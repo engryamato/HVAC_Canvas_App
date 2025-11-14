@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-11-15",
+  "categories": {
+    "air-handlers": {
+      "name": "Air Handling Units",
+      "count": 30,
+      "file": "air-handlers.json"
+    },
+    "fans": {
+      "name": "Fans",
+      "count": 25,
+      "file": "fans.json"
+    },
+    "diffusers": {
+      "name": "Diffusers",
+      "count": 50,
+      "file": "diffusers.json"
+    }
+  }
+}
+
