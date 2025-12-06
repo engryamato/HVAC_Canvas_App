@@ -18,16 +18,26 @@
     "isolatedModules": true,
     "incremental": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@core/*": ["./src/core/*"],
+      "@features/*": ["./src/features/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@types/*": ["./src/types/*"]
     },
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "allowJs": true
+    "allowJs": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "next-env.d.ts",
@@ -37,6 +47,7 @@
   ],
   "exclude": [
     "node_modules",
-    "src-tauri"
+    "src-tauri",
+    "e2e"
   ]
 }
