@@ -55,24 +55,36 @@ export const useHistoryStore = create<HistoryStore>()(
 
     undo: () => {
       const state = get();
-      if (state.past.length === 0) return undefined;
+      if (state.past.length === 0) {
+        return undefined;
+      }
 
       const command = state.past[state.past.length - 1];
+      if (!command) {
+        return undefined;
+      }
+
       set((s) => {
         s.past.pop();
-        s.future.unshift(command);
+        s.future.unshift(command as (typeof s.future)[number]);
       });
       return command;
     },
 
     redo: () => {
       const state = get();
-      if (state.future.length === 0) return undefined;
+      if (state.future.length === 0) {
+        return undefined;
+      }
 
       const command = state.future[0];
+      if (!command) {
+        return undefined;
+      }
+
       set((s) => {
         s.future.shift();
-        s.past.push(command);
+        s.past.push(command as (typeof s.past)[number]);
       });
       return command;
     },
@@ -101,4 +113,3 @@ export const useHistoryActions = () =>
     canUndo: state.canUndo,
     canRedo: state.canRedo,
   }));
-

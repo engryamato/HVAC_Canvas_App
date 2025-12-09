@@ -23,7 +23,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install hvac-design-app/.husky || true",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui"
   },
@@ -49,6 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "1.6.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.0.4",
     "eslint-plugin-react-hooks": "^4.6.0",

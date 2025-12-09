@@ -10,8 +10,10 @@ export type FittingType = z.infer<typeof FittingTypeSchema>;
 
 /**
  * Fitting properties
+ * Added name field for consistency with other entity types
  */
 export const FittingPropsSchema = z.object({
+  name: z.string().min(1).max(100).optional().describe('Optional fitting name/label'),
   fittingType: FittingTypeSchema,
   angle: z.number().min(0).max(180).optional().describe('Angle in degrees (for elbows)'),
   inletDuctId: z.string().uuid().optional(),
@@ -72,3 +74,12 @@ export const DEFAULT_FITTING_CALCULATED: FittingCalculated = {
   pressureLoss: 0,
 };
 
+/**
+ * Create default fitting props for a given type with optional name
+ */
+export function createDefaultFittingProps(type: FittingType, name?: string): FittingProps {
+  return {
+    ...DEFAULT_FITTING_PROPS[type],
+    name: name ?? `New ${type.replace('_', ' ')}`,
+  };
+}

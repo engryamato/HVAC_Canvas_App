@@ -109,7 +109,8 @@ export function isValidProjectFile(json: string): boolean {
       typeof parsed === 'object' &&
       parsed !== null &&
       typeof parsed.schemaVersion === 'string' &&
-      typeof parsed.metadata === 'object' &&
+      typeof parsed.projectId === 'string' &&
+      typeof parsed.projectName === 'string' &&
       typeof parsed.entities === 'object'
     );
   } catch {
@@ -128,4 +129,3 @@ export function getSchemaVersion(json: string): string | null {
     return null;
   }
 }
-

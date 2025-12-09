@@ -33,7 +33,8 @@ describe('generateCommandId', () => {
     const id = generateCommandId();
     const after = Date.now();
 
-    const timestamp = parseInt(id.split('-')[0], 10);
+    const timestampStr = id.split('-')[0] ?? '0';
+    const timestamp = parseInt(timestampStr, 10);
     expect(timestamp).toBeGreaterThanOrEqual(before);
     expect(timestamp).toBeLessThanOrEqual(after);
   });
@@ -42,8 +43,8 @@ describe('generateCommandId', () => {
     const id = generateCommandId();
     const parts = id.split('-');
     expect(parts).toHaveLength(2);
-    expect(parts[0]).toMatch(/^\d+$/); // timestamp
-    expect(parts[1]).toMatch(/^[a-z0-9]+$/); // random string
+    expect(parts[0] ?? '').toMatch(/^\d+$/); // timestamp
+    expect(parts[1] ?? '').toMatch(/^[a-z0-9]+$/); // random string
   });
 });
 
@@ -101,4 +102,3 @@ describe('CommandResult interface', () => {
     expect(result.error).toBe('Something went wrong');
   });
 });
-

@@ -9,11 +9,6 @@ import {
   getDocumentsDir,
 } from '../filesystem';
 
-// Mock window object
-const mockWindow = {
-  __TAURI__: {},
-};
-
 describe('filesystem utilities', () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -78,4 +73,3 @@ describe('filesystem utilities', () => {
     });
   });
 });
-

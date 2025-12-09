@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useViewportStore, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '../viewportStore';
+import { useViewportStore } from '../viewportStore';
+import { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '@/core/constants/viewport';
 
 describe('ViewportStore', () => {
   beforeEach(() => {
@@ -129,4 +130,3 @@ describe('ViewportStore', () => {
     });
   });
 });
-

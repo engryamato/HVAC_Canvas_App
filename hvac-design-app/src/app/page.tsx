@@ -1,10 +1,17 @@
+import Link from 'next/link';
+import styles from './page.module.css';
+
 export default function Home() {
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className={styles.container}>
       <h1>SizeWise HVAC Canvas</h1>
       <p>Professional HVAC design and estimation desktop application</p>
-      <p>Navigate to /dashboard to get started</p>
-    </div>
-  )
-}
 
+      <nav className={styles.nav}>
+        <Link href="/dashboard" className={styles.link}>
+          Go to Dashboard
+        </Link>
+      </nav>
+    </div>
+  );
+}

@@ -5,6 +5,7 @@ import {
   FittingTypeSchema,
   DEFAULT_FITTING_PROPS,
   DEFAULT_FITTING_CALCULATED,
+  createDefaultFittingProps,
 } from '../fitting.schema';
 
 describe('FittingTypeSchema', () => {
@@ -33,12 +34,8 @@ describe('FittingPropsSchema', () => {
   });
 
   it('should enforce angle range (0-180 degrees)', () => {
-    expect(() =>
-      FittingPropsSchema.parse({ fittingType: 'elbow_90', angle: -10 })
-    ).toThrow();
-    expect(() =>
-      FittingPropsSchema.parse({ fittingType: 'elbow_90', angle: 181 })
-    ).toThrow();
+    expect(() => FittingPropsSchema.parse({ fittingType: 'elbow_90', angle: -10 })).toThrow();
+    expect(() => FittingPropsSchema.parse({ fittingType: 'elbow_90', angle: 181 })).toThrow();
   });
 
   it('should allow optional duct connections', () => {
@@ -57,6 +54,23 @@ describe('FittingPropsSchema', () => {
         inletDuctId: 'not-a-uuid',
       })
     ).toThrow();
+  });
+
+  it('should allow optional name field', () => {
+    const props = {
+      ...DEFAULT_FITTING_PROPS.elbow_90,
+      name: 'Main Exhaust Elbow',
+    };
+    const result = FittingPropsSchema.parse(props);
+    expect(result.name).toBe('Main Exhaust Elbow');
+  });
+
+  it('should enforce name max length', () => {
+    const props = {
+      ...DEFAULT_FITTING_PROPS.tee,
+      name: 'a'.repeat(101),
+    };
+    expect(() => FittingPropsSchema.parse(props)).toThrow();
   });
 });
 
@@ -92,3 +106,19 @@ describe('FittingSchema', () => {
   });
 });
 
+describe('createDefaultFittingProps', () => {
+  it('should create props for all fitting types with default name', () => {
+    const types = ['elbow_90', 'elbow_45', 'tee', 'reducer', 'cap'] as const;
+    types.forEach((type) => {
+      const props = createDefaultFittingProps(type);
+      expect(props.fittingType).toBe(type);
+      expect(props.name).toBeTruthy();
+      expect(FittingPropsSchema.parse(props)).toBeTruthy();
+    });
+  });
+
+  it('should allow custom name override', () => {
+    const props = createDefaultFittingProps('elbow_90', 'Custom Elbow');
+    expect(props.name).toBe('Custom Elbow');
+  });
+});
