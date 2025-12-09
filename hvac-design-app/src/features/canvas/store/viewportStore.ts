@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-
-const MIN_ZOOM = 0.1; // 10%
-const MAX_ZOOM = 4.0; // 400%
-const ZOOM_STEP = 0.1;
+import {
+  MIN_ZOOM,
+  MAX_ZOOM,
+  ZOOM_STEP,
+  DEFAULT_ZOOM,
+  DEFAULT_GRID_SIZE,
+} from '@/core/constants/viewport';
 
 interface ViewportState {
   panX: number;
@@ -32,9 +35,9 @@ type ViewportStore = ViewportState & ViewportActions;
 const initialState: ViewportState = {
   panX: 0,
   panY: 0,
-  zoom: 1,
+  zoom: DEFAULT_ZOOM,
   gridVisible: true,
-  gridSize: 24, // 1/4 inch at 96 DPI
+  gridSize: DEFAULT_GRID_SIZE,
   snapToGrid: true,
 };
 
@@ -94,14 +97,14 @@ export const useViewportStore = create<ViewportStore>()(
         // For now, just center on bounds
         state.panX = -bounds.x - bounds.width / 2;
         state.panY = -bounds.y - bounds.height / 2;
-        state.zoom = 1;
+        state.zoom = DEFAULT_ZOOM;
       }),
 
     resetView: () =>
       set((state) => {
         state.panX = 0;
         state.panY = 0;
-        state.zoom = 1;
+        state.zoom = DEFAULT_ZOOM;
       }),
 
     toggleGrid: () =>
@@ -143,6 +146,5 @@ export const useViewportActions = () =>
     toggleSnap: state.toggleSnap,
   }));
 
-// Export constants for use in other modules
-export { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP };
-
+// Note: Viewport constants (MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, etc.) are now
+// centralized in @/core/constants/viewport and re-exported from ./index.ts

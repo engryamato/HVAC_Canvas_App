@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  useSelectionStore,
-  useSelectedIds,
-  useIsSelected,
-  useSelectionCount,
-  useHoveredId,
-} from '../selectionStore';
+import { useSelectionStore } from '../selectionStore';
 
 describe('SelectionStore', () => {
   beforeEach(() => {
@@ -111,4 +105,3 @@ describe('SelectionStore', () => {
     });
   });
 });
-

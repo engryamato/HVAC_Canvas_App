@@ -3,24 +3,56 @@ import { BaseEntitySchema } from './base.schema';
 
 /**
  * Equipment types for HVAC components
+ * Per Notion Architecture Specs - includes air_handler for AHU units
  */
-export const EquipmentTypeSchema = z.enum(['hood', 'fan', 'diffuser', 'damper']);
+export const EquipmentTypeSchema = z.enum(['hood', 'fan', 'diffuser', 'damper', 'air_handler']);
 
 export type EquipmentType = z.infer<typeof EquipmentTypeSchema>;
 
 /**
- * Equipment properties
+ * Capacity unit for airflow
+ */
+export const CapacityUnitSchema = z.enum(['CFM', 'm3/h']);
+export type CapacityUnit = z.infer<typeof CapacityUnitSchema>;
+
+/**
+ * Static pressure unit
+ */
+export const StaticPressureUnitSchema = z.enum(['in_wg', 'Pa']);
+export type StaticPressureUnit = z.infer<typeof StaticPressureUnitSchema>;
+
+/**
+ * Mount height unit
+ */
+export const MountHeightUnitSchema = z.enum(['in', 'mm']);
+export type MountHeightUnit = z.infer<typeof MountHeightUnitSchema>;
+
+/**
+ * Base equipment properties shared by all equipment types
+ * Per Notion Data Models & Schema - Structure
  */
 export const EquipmentPropsSchema = z.object({
   name: z.string().min(1).max(100),
   equipmentType: EquipmentTypeSchema,
   manufacturer: z.string().max(100).optional(),
-  modelNumber: z.string().max(100).optional(),
-  capacity: z.number().min(1).max(100000).describe('Capacity in CFM'),
-  staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
+  model: z.string().max(100).optional(),
+  // Capacity with explicit unit
+  capacity: z.number().min(1).max(100000).describe('Airflow capacity'),
+  capacityUnit: CapacityUnitSchema.default('CFM'),
+  // Static pressure with explicit unit
+  staticPressure: z.number().min(0).max(20).describe('Static pressure'),
+  staticPressureUnit: StaticPressureUnitSchema.default('in_wg'),
+  // Physical dimensions
   width: z.number().positive().describe('Width in inches'),
   depth: z.number().positive().describe('Depth in inches'),
   height: z.number().positive().describe('Height in inches'),
+  // Mount height with explicit unit
+  mountHeight: z.number().min(0).optional().describe('Height from finished floor'),
+  mountHeightUnit: MountHeightUnitSchema.default('in'),
+  // Connection reference
+  connectedDuctId: z.string().uuid().optional().describe('Reference to connected Duct.id'),
+  // Location tag for identification
+  locationTag: z.string().max(50).optional().describe('Location tag e.g. "ROOF-1", "MECH-101"'),
 });
 
 export type EquipmentProps = z.infer<typeof EquipmentPropsSchema>;
@@ -42,34 +74,57 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
   hood: {
     equipmentType: 'hood',
     capacity: 1000,
+    capacityUnit: 'CFM',
     staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
     width: 48,
     depth: 36,
     height: 24,
+    mountHeightUnit: 'in',
   },
   fan: {
     equipmentType: 'fan',
     capacity: 2000,
+    capacityUnit: 'CFM',
     staticPressure: 1.0,
+    staticPressureUnit: 'in_wg',
     width: 24,
     depth: 24,
     height: 24,
+    mountHeightUnit: 'in',
   },
   diffuser: {
     equipmentType: 'diffuser',
     capacity: 200,
+    capacityUnit: 'CFM',
     staticPressure: 0.1,
+    staticPressureUnit: 'in_wg',
     width: 24,
     depth: 24,
     height: 8,
+    mountHeightUnit: 'in',
   },
   damper: {
     equipmentType: 'damper',
     capacity: 500,
+    capacityUnit: 'CFM',
     staticPressure: 0.05,
+    staticPressureUnit: 'in_wg',
     width: 12,
     depth: 12,
     height: 6,
+    mountHeightUnit: 'in',
+  },
+  air_handler: {
+    equipmentType: 'air_handler',
+    capacity: 5000,
+    capacityUnit: 'CFM',
+    staticPressure: 2.0,
+    staticPressureUnit: 'in_wg',
+    width: 60,
+    depth: 48,
+    height: 72,
+    mountHeightUnit: 'in',
   },
 };
 
@@ -77,9 +132,10 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
  * Create default equipment props for a given type
  */
 export function createDefaultEquipmentProps(type: EquipmentType): EquipmentProps {
+  const typeLabel =
+    type === 'air_handler' ? 'Air Handler' : type.charAt(0).toUpperCase() + type.slice(1);
   return {
-    name: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+    name: `New ${typeLabel}`,
     ...DEFAULT_EQUIPMENT_PROPS[type],
   };
 }
-

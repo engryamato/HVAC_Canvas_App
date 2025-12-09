@@ -39,7 +39,9 @@ export function clamp(value: number, min: number, max: number): number {
  * Snap value to nearest grid increment
  */
 export function snapToGrid(value: number, gridSize: number): number {
-  if (gridSize <= 0) return value;
+  if (gridSize <= 0) {
+    return value;
+  }
   return Math.round(value / gridSize) * gridSize;
 }
 
@@ -92,7 +94,9 @@ export function lerpPoint(p1: Point, p2: Point, t: number): Point {
  */
 export function normalizeAngle(angle: number): number {
   const normalized = angle % 360;
-  return normalized < 0 ? normalized + 360 : normalized;
+  const result = normalized < 0 ? normalized + 360 : normalized;
+  // Handle -0 case - return positive 0
+  return result === 0 ? 0 : result;
 }
 
 /**
@@ -148,4 +152,3 @@ export function scalePoint(point: Point, scale: number): Point {
 export function approximately(a: number, b: number, epsilon = 0.0001): boolean {
   return Math.abs(a - b) < epsilon;
 }
-

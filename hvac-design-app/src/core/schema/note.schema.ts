@@ -9,12 +9,12 @@ export const NotePropsSchema = z.object({
     .string()
     .min(1, 'Note content is required')
     .max(10000, 'Note content cannot exceed 10,000 characters'),
-  fontSize: z.number().min(8).max(72).default(14).optional(),
+  fontSize: z.number().min(8).max(72).optional().default(14),
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color (e.g., #000000)')
-    .default('#000000')
-    .optional(),
+    .optional()
+    .default('#000000'),
 });
 
 export type NoteProps = z.infer<typeof NotePropsSchema>;
@@ -37,4 +37,3 @@ export const DEFAULT_NOTE_PROPS: NoteProps = {
   fontSize: 14,
   color: '#000000',
 };
-
