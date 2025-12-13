@@ -6,8 +6,10 @@ import { CanvasPageWrapper } from '@/features/canvas/CanvasPageWrapper';
  * Returns empty array - all project routes are dynamically generated at runtime.
  * This is required for Next.js static export with dynamic routes.
  */
-export function generateStaticParams(): { projectId: string }[] {
-  return [];
+export async function generateStaticParams() {
+  // Example: fetch available projectIds from your data source
+  const projectIds: string[] = []; // Replace with real data logic
+  return projectIds.map((id) => ({ projectId: id }));
 }
 
 /**
