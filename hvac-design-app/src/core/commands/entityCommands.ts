@@ -3,12 +3,33 @@ import type { Command, ReversibleCommand } from './types';
 import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
+import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+
+interface CommandOptions {
+  selectionBefore?: string[];
+  selectionAfter?: string[];
+}
+
+function captureSelection(options?: CommandOptions): { before: string[]; after: string[] } {
+  const selectionStore = useSelectionStore.getState();
+  const before = options?.selectionBefore ?? [...selectionStore.selectedIds];
+  const after = options?.selectionAfter ?? before;
+
+  return { before, after };
+}
+
+function applySelection(selection?: string[]): void {
+  if (!selection) return;
+  useSelectionStore.getState().selectMultiple([...selection]);
+}
 
 /**
  * Create a new entity on the canvas
  * Pushes a reversible command to history for undo support
  */
-export function createEntity(entity: Entity): void {
+export function createEntity(entity: Entity, options?: CommandOptions): void {
+  const selection = captureSelection(options);
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.CREATE_ENTITY,
@@ -20,6 +41,8 @@ export function createEntity(entity: Entity): void {
       payload: { entityId: entity.id },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   // Execute command
@@ -33,7 +56,14 @@ export function createEntity(entity: Entity): void {
  * Update an existing entity
  * Stores the previous state for undo support
  */
-export function updateEntity(id: string, updates: Partial<Entity>, previousState: Entity): void {
+export function updateEntity(
+  id: string,
+  updates: Partial<Entity>,
+  previousState: Entity,
+  options?: CommandOptions
+): void {
+  const selection = captureSelection(options);
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.UPDATE_ENTITY,
@@ -45,6 +75,8 @@ export function updateEntity(id: string, updates: Partial<Entity>, previousState
       payload: { id, updates: previousState },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   useEntityStore.getState().updateEntity(id, updates);
@@ -55,7 +87,9 @@ export function updateEntity(id: string, updates: Partial<Entity>, previousState
  * Delete an entity from the canvas
  * Stores the entity for undo support
  */
-export function deleteEntity(entity: Entity): void {
+export function deleteEntity(entity: Entity, options?: CommandOptions): void {
+  const selection = captureSelection(options);
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.DELETE_ENTITY,
@@ -67,6 +101,8 @@ export function deleteEntity(entity: Entity): void {
       payload: { entity },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   useEntityStore.getState().removeEntity(entity.id);
@@ -77,7 +113,9 @@ export function deleteEntity(entity: Entity): void {
  * Delete multiple entities at once
  * Creates a single undoable command for all deletions
  */
-export function deleteEntities(entities: Entity[]): void {
+export function deleteEntities(entities: Entity[], options?: CommandOptions): void {
+  const selection = captureSelection(options);
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.DELETE_ENTITIES,
@@ -89,6 +127,8 @@ export function deleteEntities(entities: Entity[]): void {
       payload: { entities },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   useEntityStore.getState().removeEntities(entities.map((e) => e.id));
@@ -104,6 +144,7 @@ export function undo(): boolean {
   if (!command) return false;
 
   executeCommand(command.inverse);
+  applySelection(command.selectionBefore);
   return true;
 }
 
@@ -116,6 +157,7 @@ export function redo(): boolean {
   if (!command) return false;
 
   executeCommand(command);
+  applySelection(command.selectionAfter ?? command.selectionBefore);
   return true;
 }
 
