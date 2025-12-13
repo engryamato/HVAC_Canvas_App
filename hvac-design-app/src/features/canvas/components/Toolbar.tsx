@@ -1,7 +1,13 @@
 'use client';
 
 import React from 'react';
-import { useToolStore, useToolActions, type CanvasTool } from '@/core/store/canvas.store';
+import {
+  useToolStore,
+  useToolActions,
+  type CanvasTool,
+} from '@/core/store/canvas.store';
+import { redo, undo } from '@/core/commands/entityCommands';
+import { useCanRedo, useCanUndo } from '@/core/commands/historyStore';
 
 interface ToolButtonProps {
   tool: CanvasTool;
@@ -73,6 +79,20 @@ const EquipmentIcon = () => (
   </svg>
 );
 
+const UndoIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polyline points="9 14 4 9 9 4" />
+    <path d="M20 20a9 9 0 0 0-9-9H4" />
+  </svg>
+);
+
+const RedoIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polyline points="15 10 20 15 15 20" />
+    <path d="M4 4a9 9 0 0 1 9 9h7" />
+  </svg>
+);
+
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
@@ -91,6 +111,8 @@ interface ToolbarProps {
 export function Toolbar({ className = '' }: ToolbarProps) {
   const currentTool = useToolStore((state) => state.currentTool);
   const { setTool } = useToolActions();
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
 
   // Handle keyboard shortcuts
   React.useEffect(() => {
@@ -113,6 +135,18 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         case 'e':
           setTool('equipment');
           break;
+        case 'z':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            undo();
+          }
+          break;
+        case 'y':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            redo();
+          }
+          break;
       }
     };
 
@@ -130,6 +164,33 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       role="toolbar"
       aria-label="Canvas tools"
     >
+      <div className="flex gap-2 mb-2" aria-label="Undo and redo controls">
+        <button
+          type="button"
+          onClick={() => undo()}
+          disabled={!canUndo}
+          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-150 ${
+            canUndo ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-gray-50 text-gray-400'
+          }`}
+          title="Undo (Ctrl+Z)"
+          aria-label="Undo"
+        >
+          <UndoIcon />
+        </button>
+        <button
+          type="button"
+          onClick={() => redo()}
+          disabled={!canRedo}
+          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-150 ${
+            canRedo ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-gray-50 text-gray-400'
+          }`}
+          title="Redo (Ctrl+Y)"
+          aria-label="Redo"
+        >
+          <RedoIcon />
+        </button>
+      </div>
+
       {TOOLS.map(({ tool, icon, label, shortcut }) => (
         <ToolButton
           key={tool}
