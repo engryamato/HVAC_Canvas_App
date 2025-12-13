@@ -23,9 +23,11 @@ export {
 // Entity Commands
 export {
   createEntity,
+  createEntities,
   updateEntity,
   deleteEntity,
   deleteEntities,
+  moveEntities,
   undo,
   redo,
 } from './entityCommands';

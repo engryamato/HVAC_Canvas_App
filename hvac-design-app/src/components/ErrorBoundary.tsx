@@ -36,19 +36,32 @@ export class ErrorBoundary extends React.Component<
       }
 
       return (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div
+          style={{
+            padding: '2rem',
+            textAlign: 'center',
+            background: '#fff3cd',
+            color: '#7c4700',
+            borderRadius: '12px',
+            margin: '1rem',
+          }}
+        >
           <h1>Something went wrong</h1>
-          <p>{this.state.error?.message}</p>
-          <button
-            onClick={() => this.setState({ hasError: false, error: null })}
-            style={{
-              marginTop: '1rem',
-              padding: '0.5rem 1rem',
-              cursor: 'pointer',
-            }}
-          >
-            Try again
-          </button>
+          <p>{this.state.error?.message ?? 'An unexpected error occurred.'}</p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
+            <button
+              onClick={() => this.setState({ hasError: false, error: null })}
+              style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}
+            >
+              Try again
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              style={{ padding: '0.5rem 1rem', cursor: 'pointer', background: '#1976d2', color: '#fff' }}
+            >
+              Reload
+            </button>
+          </div>
         </div>
       )
     }
