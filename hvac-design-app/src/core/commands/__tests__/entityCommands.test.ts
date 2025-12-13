@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createEntity, updateEntity, deleteEntity, undo, redo } from '../entityCommands';
 import { useEntityStore, selectEntity, selectEntityCount } from '@/core/store/entityStore';
 import { useHistoryStore } from '../historyStore';
+import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import type { Room } from '@/core/schema';
 
 const createMockRoom = (id: string, name: string): Room => ({
@@ -26,6 +27,7 @@ describe('Entity Commands', () => {
   beforeEach(() => {
     useEntityStore.getState().clearAllEntities();
     useHistoryStore.getState().clear();
+    useSelectionStore.getState().clearSelection();
   });
 
   describe('createEntity', () => {
