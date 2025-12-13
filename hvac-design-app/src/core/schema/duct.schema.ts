@@ -25,7 +25,12 @@ export const DuctPropsSchema = z
     name: z.string().min(1).max(100),
     shape: DuctShapeSchema,
     // Round duct dimension (required if shape === 'round')
-    diameter: z.number().min(4).max(60).optional().describe('Diameter in inches (round ducts only)'),
+    diameter: z
+      .number()
+      .min(4)
+      .max(60)
+      .optional()
+      .describe('Diameter in inches (round ducts only)'),
     // Rectangular duct dimensions (required if shape === 'rectangular')
     width: z
       .number()
@@ -76,12 +81,22 @@ export const DuctCalculatedSchema = z.object({
 export type DuctCalculated = z.infer<typeof DuctCalculatedSchema>;
 
 /**
+ * Optional warnings for duct validation (e.g., velocity out of range)
+ */
+export const DuctWarningsSchema = z
+  .object({
+    velocity: z.string().optional(),
+  })
+  .optional();
+
+/**
  * Complete Duct entity schema
  */
 export const DuctSchema = BaseEntitySchema.extend({
   type: z.literal('duct'),
   props: DuctPropsSchema,
   calculated: DuctCalculatedSchema,
+  warnings: DuctWarningsSchema,
 });
 
 export type Duct = z.infer<typeof DuctSchema>;
@@ -112,4 +127,3 @@ export const DEFAULT_RECTANGULAR_DUCT_PROPS = {
   airflow: 500,
   staticPressure: 0.1,
 };
-

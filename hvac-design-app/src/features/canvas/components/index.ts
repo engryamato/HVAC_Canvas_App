@@ -6,3 +6,7 @@ export { SelectionMarquee, default as SelectionMarqueeDefault } from './Selectio
 export { StatusBar, default as StatusBarDefault } from './StatusBar';
 export { Toolbar, default as ToolbarDefault } from './Toolbar';
 export { ZoomControls, default as ZoomControlsDefault } from './ZoomControls';
+export {
+  default as InspectorPanel,
+  InspectorPanel as InspectorPanelComponent,
+} from './Inspector/InspectorPanel';

@@ -1,0 +1,16 @@
+{
+  "roughnessFeet": {
+    "galvanized": 0.0005,
+    "stainless": 0.0002,
+    "aluminum": 0.0002,
+    "flex": 0.003
+  },
+  "fittingEquivalentLengthsFeet": {
+    "elbow_90": 15,
+    "elbow_45": 8,
+    "tee_through": 20,
+    "tee_branch": 30,
+    "reducer": 10,
+    "cap": 5
+  }
+}

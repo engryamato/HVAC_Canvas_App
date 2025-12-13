@@ -2,7 +2,6 @@
 
 export {
   createRoom,
-  calculateRoomValues,
   getNextRoomNumber,
   resetRoomCounter,
   default as createRoomDefault,
@@ -10,7 +9,6 @@ export {
 
 export {
   createDuct,
-  calculateDuctValues,
   getNextDuctNumber,
   resetDuctCounter,
   default as createDuctDefault,
@@ -24,3 +22,6 @@ export {
   EQUIPMENT_TYPE_LABELS,
   default as createEquipmentDefault,
 } from './equipmentDefaults';
+
+// Re-export calculation functions from calculators
+export { calculateRoomValues } from '../calculators/ventilation';

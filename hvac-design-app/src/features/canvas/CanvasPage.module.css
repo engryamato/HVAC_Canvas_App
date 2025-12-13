@@ -29,3 +29,11 @@
 .backButton:hover {
   background-color: #616161;
 }
+
+.inspector {
+  width: 320px;
+  min-width: 320px;
+  border-left: 1px solid #ddd;
+  background-color: #ffffff;
+  overflow-y: auto;
+}

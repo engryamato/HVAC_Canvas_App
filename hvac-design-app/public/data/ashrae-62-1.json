@@ -1,0 +1,58 @@
+[
+  {
+    "occupancyType": "office",
+    "rp": 5,
+    "ra": 0.06,
+    "defaultOccupantDensity": 5,
+    "defaultACH": 4
+  },
+  {
+    "occupancyType": "retail",
+    "rp": 7.5,
+    "ra": 0.06,
+    "defaultOccupantDensity": 15,
+    "defaultACH": 6
+  },
+  {
+    "occupancyType": "restaurant",
+    "rp": 7.5,
+    "ra": 0.18,
+    "defaultOccupantDensity": 70,
+    "defaultACH": 20
+  },
+  {
+    "occupancyType": "kitchen_commercial",
+    "rp": 0,
+    "ra": 0.7,
+    "defaultOccupantDensity": 10,
+    "defaultACH": 25
+  },
+  {
+    "occupancyType": "warehouse",
+    "rp": 10,
+    "ra": 0.06,
+    "defaultOccupantDensity": 2,
+    "defaultACH": 3
+  },
+  {
+    "occupancyType": "classroom",
+    "rp": 10,
+    "ra": 0.12,
+    "defaultOccupantDensity": 35,
+    "defaultACH": 6
+  },
+  {
+    "occupancyType": "conference",
+    "rp": 5,
+    "ra": 0.06,
+    "defaultOccupantDensity": 50,
+    "defaultACH": 6
+  },
+  {
+    "occupancyType": "lobby",
+    "rp": 5,
+    "ra": 0.06,
+    "defaultOccupantDensity": 30,
+    "defaultACH": 6
+  }
+]

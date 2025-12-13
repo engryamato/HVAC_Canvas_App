@@ -6,6 +6,8 @@ import { CanvasContainer } from './components/CanvasContainer';
 import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
+import InspectorPanel from './components/Inspector/InspectorPanel';
+import { useCalculations } from './hooks';
 import styles from './CanvasPage.module.css';
 
 /**
@@ -27,6 +29,8 @@ interface CanvasPageProps {
 export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElement {
   // Track mouse position for status bar
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  // Keep calculated values in sync with entity props
+  useCalculations('commercial');
 
   const handleMouseMove = useCallback((canvasX: number, canvasY: number) => {
     setMousePosition({ x: canvasX, y: canvasY });
@@ -66,8 +70,8 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
           </div>
         </div>
 
-        {/* Right Inspector Panel - Placeholder for Phase 4 */}
-        {/* <InspectorPanel className="flex-shrink-0 w-80" /> */}
+        {/* Right Inspector Panel */}
+        <InspectorPanel className={styles.inspector} />
       </div>
 
       {/* Bottom Status Bar */}

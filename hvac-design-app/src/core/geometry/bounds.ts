@@ -65,7 +65,9 @@ export function boundsContainsBounds(outer: Bounds, inner: Bounds): boolean {
  * Returns null if array is empty
  */
 export function mergeBounds(boundsArray: Bounds[]): Bounds | null {
-  if (boundsArray.length === 0) return null;
+  if (boundsArray.length === 0) {
+    return null;
+  }
 
   let minX = Infinity;
   let minY = Infinity;
@@ -169,4 +171,3 @@ export function scaleBounds(bounds: Bounds, scale: number): Bounds {
     height: newHeight,
   };
 }
-
