@@ -15,7 +15,7 @@
     "start": "next start",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "test": "vitest",
+    "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",

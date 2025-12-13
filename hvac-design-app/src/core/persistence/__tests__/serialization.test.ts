@@ -6,7 +6,7 @@ import {
   isValidProjectFile,
   getSchemaVersion,
 } from '../serialization';
-import { createEmptyProjectFile, CURRENT_SCHEMA_VERSION } from '@/core/schema';
+import { createEmptyProjectFile, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
 
 describe('serialization', () => {
   describe('serializeProject', () => {
@@ -35,7 +35,7 @@ describe('serialization', () => {
     });
 
     it('should return error for invalid project', () => {
-      const invalidProject = { invalid: true } as any;
+      const invalidProject = { invalid: true } as unknown as ProjectFile;
       const result = serializeProject(invalidProject);
 
       expect(result.success).toBe(false);
@@ -137,4 +137,3 @@ describe('serialization', () => {
     });
   });
 });
-

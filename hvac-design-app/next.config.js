@@ -1,13 +1,14 @@
+const isStaticExport = process.env.NEXT_STATIC_EXPORT === 'true';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // For Tauri: use static export in production, but not in development
-  // This allows dynamic routes during development while still supporting Tauri build
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+  // Static export is opt-in to avoid blocking dynamic routes during normal builds/CI
+  output: isStaticExport ? 'export' : undefined,
   images: {
-    unoptimized: true, // Required for static export
+    // Only disable image optimization when performing a static export
+    unoptimized: isStaticExport,
   },
   reactStrictMode: true,
-  swcMinify: true,
   trailingSlash: false,
   poweredByHeader: false,
   typescript: {
