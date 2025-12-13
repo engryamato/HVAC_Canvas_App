@@ -52,7 +52,6 @@
     "@vitest/coverage-v8": "1.6.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "^15.0.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "jsdom": "23.0.1",
     "lint-staged": "^15.2.0",
