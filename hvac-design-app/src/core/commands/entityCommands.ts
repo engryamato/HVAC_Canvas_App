@@ -3,29 +3,93 @@ import type { Command, ReversibleCommand } from './types';
 import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
+import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+
+type TransformSnapshot = Entity['transform'];
+
+type SelectionSnapshot = string[];
+
+interface TransformChange {
+  id: string;
+  from: TransformSnapshot;
+  to: TransformSnapshot;
+}
+
+interface TransformCommandPayload {
+  transforms: { id: string; transform: TransformSnapshot }[];
+  selection?: string[];
+}
+
+function getSelectionSnapshot(): SelectionSnapshot {
+  return [...useSelectionStore.getState().selectedIds];
+}
+
+function applySelection(selection?: string[]) {
+  if (!selection) return;
+
+  const entityStore = useEntityStore.getState();
+  const selectionStore = useSelectionStore.getState();
+  const validIds = selection.filter((id) => Boolean(entityStore.byId[id]));
+
+  if (validIds.length > 0) {
+    selectionStore.selectMultiple(validIds);
+  } else {
+    selectionStore.clearSelection();
+  }
+}
 
 /**
  * Create a new entity on the canvas
  * Pushes a reversible command to history for undo support
  */
 export function createEntity(entity: Entity): void {
+  const selectionBefore = getSelectionSnapshot();
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.CREATE_ENTITY,
-    payload: { entity },
+    payload: { entity, selection: [entity.id] },
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
       type: CommandType.DELETE_ENTITY,
-      payload: { entityId: entity.id },
+      payload: { entityId: entity.id, selection: selectionBefore },
       timestamp: Date.now(),
     },
   };
 
   // Execute command
   useEntityStore.getState().addEntity(entity);
+  useSelectionStore.getState().select(entity.id);
 
   // Push to history
+  useHistoryStore.getState().push(command);
+}
+
+/**
+ * Create multiple entities at once with a single history entry
+ */
+export function createEntities(entities: Entity[]): void {
+  if (entities.length === 0) return;
+
+  const selectionBefore = getSelectionSnapshot();
+  const selectionAfter = entities.map((entity) => entity.id);
+
+  const command: ReversibleCommand = {
+    id: generateCommandId(),
+    type: CommandType.CREATE_ENTITIES,
+    payload: { entities, selection: selectionAfter },
+    timestamp: Date.now(),
+    inverse: {
+      id: generateCommandId(),
+      type: CommandType.DELETE_ENTITIES,
+      payload: { entityIds: entities.map((entity) => entity.id), selection: selectionBefore },
+      timestamp: Date.now(),
+    },
+  };
+
+  useEntityStore.getState().addEntities(entities);
+  useSelectionStore.getState().selectMultiple(selectionAfter);
   useHistoryStore.getState().push(command);
 }
 
@@ -34,15 +98,17 @@ export function createEntity(entity: Entity): void {
  * Stores the previous state for undo support
  */
 export function updateEntity(id: string, updates: Partial<Entity>, previousState: Entity): void {
+  const selectionSnapshot = getSelectionSnapshot();
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.UPDATE_ENTITY,
-    payload: { id, updates },
+    payload: { id, updates, selection: selectionSnapshot },
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
       type: CommandType.UPDATE_ENTITY,
-      payload: { id, updates: previousState },
+      payload: { id, updates: previousState, selection: selectionSnapshot },
       timestamp: Date.now(),
     },
   };
@@ -56,20 +122,24 @@ export function updateEntity(id: string, updates: Partial<Entity>, previousState
  * Stores the entity for undo support
  */
 export function deleteEntity(entity: Entity): void {
+  const selectionBefore = getSelectionSnapshot();
+  const nextSelection = selectionBefore.filter((id) => id !== entity.id);
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.DELETE_ENTITY,
-    payload: { entityId: entity.id },
+    payload: { entityId: entity.id, selection: nextSelection },
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
       type: CommandType.CREATE_ENTITY,
-      payload: { entity },
+      payload: { entity, selection: selectionBefore },
       timestamp: Date.now(),
     },
   };
 
   useEntityStore.getState().removeEntity(entity.id);
+  applySelection(nextSelection);
   useHistoryStore.getState().push(command);
 }
 
@@ -78,20 +148,66 @@ export function deleteEntity(entity: Entity): void {
  * Creates a single undoable command for all deletions
  */
 export function deleteEntities(entities: Entity[]): void {
+  if (entities.length === 0) return;
+
+  const selectionBefore = getSelectionSnapshot();
+  const remainingSelection = selectionBefore.filter((id) => !entities.some((entity) => entity.id === id));
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.DELETE_ENTITIES,
-    payload: { entityIds: entities.map((e) => e.id) },
+    payload: { entityIds: entities.map((e) => e.id), selection: remainingSelection },
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
       type: CommandType.CREATE_ENTITIES,
-      payload: { entities },
+      payload: { entities, selection: selectionBefore },
       timestamp: Date.now(),
     },
   };
 
   useEntityStore.getState().removeEntities(entities.map((e) => e.id));
+  applySelection(remainingSelection);
+  useHistoryStore.getState().push(command);
+}
+
+/**
+ * Record a set of transform changes as a single move command
+ * The entities are assumed to already be at their `to` position.
+ */
+export function moveEntities(changes: TransformChange[]): void {
+  if (changes.length === 0) return;
+
+  const selectionSnapshot = getSelectionSnapshot();
+
+  const payload: TransformCommandPayload = {
+    transforms: changes.map((change) => ({ id: change.id, transform: change.to })),
+    selection: selectionSnapshot,
+  };
+
+  const inversePayload: TransformCommandPayload = {
+    transforms: changes.map((change) => ({ id: change.id, transform: change.from })),
+    selection: selectionSnapshot,
+  };
+
+  const command: ReversibleCommand = {
+    id: generateCommandId(),
+    type: CommandType.MOVE_ENTITY,
+    payload,
+    timestamp: Date.now(),
+    inverse: {
+      id: generateCommandId(),
+      type: CommandType.MOVE_ENTITY,
+      payload: inversePayload,
+      timestamp: Date.now(),
+    },
+  };
+
+  const entityStore = useEntityStore.getState();
+  payload.transforms.forEach(({ id, transform }) => {
+    entityStore.updateEntity(id, { transform });
+  });
+
   useHistoryStore.getState().push(command);
 }
 
@@ -129,29 +245,48 @@ function executeCommand(command: Command): void {
   switch (command.type) {
     case CommandType.CREATE_ENTITY:
       entityStore.addEntity((command.payload as { entity: Entity }).entity);
+      applySelection((command.payload as { selection?: string[] }).selection);
       break;
 
     case CommandType.DELETE_ENTITY:
       entityStore.removeEntity((command.payload as { entityId: string }).entityId);
+      applySelection((command.payload as { selection?: string[] }).selection);
       break;
 
     case CommandType.UPDATE_ENTITY: {
-      const { id, updates } = command.payload as { id: string; updates: Partial<Entity> };
+      const { id, updates, selection } = command.payload as {
+        id: string;
+        updates: Partial<Entity>;
+        selection?: string[];
+      };
       entityStore.updateEntity(id, updates);
+      applySelection(selection);
       break;
     }
 
     case CommandType.CREATE_ENTITIES: {
-      const { entities } = command.payload as { entities: Entity[] };
+      const { entities, selection } = command.payload as { entities: Entity[]; selection?: string[] };
       entityStore.addEntities(entities);
+      applySelection(selection);
       break;
     }
 
     case CommandType.DELETE_ENTITIES: {
-      const { entityIds } = command.payload as { entityIds: string[] };
+      const { entityIds, selection } = command.payload as { entityIds: string[]; selection?: string[] };
       entityStore.removeEntities(entityIds);
+      applySelection(selection);
+      break;
+    }
+
+    case CommandType.MOVE_ENTITY: {
+      const { transforms, selection } = command.payload as TransformCommandPayload;
+
+      transforms.forEach(({ id, transform }) => {
+        entityStore.updateEntity(id, { transform });
+      });
+
+      applySelection(selection);
       break;
     }
   }
 }
-

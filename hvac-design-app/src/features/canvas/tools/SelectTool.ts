@@ -8,6 +8,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
+import { createEntities, deleteEntities, moveEntities } from '@/core/commands';
 
 interface SelectToolState {
   mode: 'idle' | 'dragging' | 'marquee';
@@ -15,6 +16,7 @@ interface SelectToolState {
   currentPoint: { x: number; y: number } | null;
   draggedEntityId: string | null;
   dragOffset: { x: number; y: number } | null;
+  initialTransforms: Record<string, Entity['transform']> | null;
 }
 
 /**
@@ -29,6 +31,7 @@ export class SelectTool extends BaseTool {
     currentPoint: null,
     draggedEntityId: null,
     dragOffset: null,
+    initialTransforms: null,
   };
 
   getCursor(): string {
@@ -66,6 +69,16 @@ export class SelectTool extends BaseTool {
         select(entity.id);
       }
 
+      const { byId } = useEntityStore.getState();
+      const activeSelection = useSelectionStore.getState().selectedIds;
+      const initialTransforms: Record<string, Entity['transform']> = {};
+      activeSelection.forEach((id) => {
+        const found = byId[id];
+        if (found) {
+          initialTransforms[id] = { ...found.transform } as Entity['transform'];
+        }
+      });
+
       this.state = {
         mode: 'dragging',
         startPoint: { x: event.x, y: event.y },
@@ -75,6 +88,7 @@ export class SelectTool extends BaseTool {
           x: event.x - entity.transform.x,
           y: event.y - entity.transform.y,
         },
+        initialTransforms,
       };
     } else {
       if (!event.shiftKey) {
@@ -87,6 +101,7 @@ export class SelectTool extends BaseTool {
         currentPoint: { x: event.x, y: event.y },
         draggedEntityId: null,
         dragOffset: null,
+        initialTransforms: null,
       };
     }
   }
@@ -126,12 +141,31 @@ export class SelectTool extends BaseTool {
       const bounds = boundsFromPoints(this.state.startPoint, this.state.currentPoint);
       this.selectEntitiesInBounds(bounds, event.shiftKey);
     }
+
+    if (this.state.mode === 'dragging' && this.state.initialTransforms) {
+      const { byId } = useEntityStore.getState();
+      const changes = Object.entries(this.state.initialTransforms)
+        .map(([id, startTransform]) => {
+          const entity = byId[id];
+          if (!entity) return null;
+
+          const endTransform = entity.transform;
+          if (this.hasTransformChanged(startTransform, endTransform)) {
+            return { id, from: startTransform, to: { ...endTransform } };
+          }
+          return null;
+        })
+        .filter((change): change is { id: string; from: Entity['transform']; to: Entity['transform'] } => Boolean(change));
+
+      moveEntities(changes);
+    }
+
     this.reset();
   }
 
   onKeyDown(event: ToolKeyEvent): void {
-    const { selectedIds, clearSelection, selectMultiple } = useSelectionStore.getState();
-    const { byId, removeEntity, addEntity, updateEntity } = useEntityStore.getState();
+    const { selectedIds, clearSelection } = useSelectionStore.getState();
+    const { byId, updateEntity } = useEntityStore.getState();
 
     // Escape: clear selection
     if (event.key === 'Escape') {
@@ -141,17 +175,18 @@ export class SelectTool extends BaseTool {
     }
 
     // Delete/Backspace: remove selected entities
-    if (event.key === 'Delete' || event.key === 'Backspace') {
-      for (const id of selectedIds) {
-        removeEntity(id);
-      }
-      clearSelection();
+    if ((event.key === 'Delete' || event.key === 'Backspace') && selectedIds.length > 0) {
+      const entities = selectedIds
+        .map((id) => byId[id])
+        .filter((entity): entity is Entity => Boolean(entity));
+
+      deleteEntities(entities);
       return;
     }
 
     // Ctrl+D: duplicate selected entities
     if (event.ctrlKey && event.key === 'd') {
-      const newIds: string[] = [];
+      const duplicates: Entity[] = [];
       for (const id of selectedIds) {
         const entity = byId[id];
         if (entity) {
@@ -160,13 +195,12 @@ export class SelectTool extends BaseTool {
           duplicate.id = crypto.randomUUID();
           duplicate.transform.x += 24; // Offset by 2 feet
           duplicate.transform.y += 24;
-          addEntity(duplicate);
-          newIds.push(duplicate.id);
+          duplicates.push(duplicate);
         }
       }
       // Select the duplicated entities
-      if (newIds.length > 0) {
-        selectMultiple(newIds);
+      if (duplicates.length > 0) {
+        createEntities(duplicates);
       }
       return;
     }
@@ -192,9 +226,11 @@ export class SelectTool extends BaseTool {
     }
 
     if (deltaX !== 0 || deltaY !== 0) {
-      for (const id of selectedIds) {
+      const initialTransforms: Record<string, Entity['transform']> = {};
+      selectedIds.forEach((id) => {
         const entity = byId[id];
         if (entity) {
+          initialTransforms[id] = { ...entity.transform };
           updateEntity(id, {
             transform: {
               ...entity.transform,
@@ -203,7 +239,22 @@ export class SelectTool extends BaseTool {
             },
           });
         }
-      }
+      });
+
+      const changes = Object.entries(initialTransforms)
+        .map(([id, fromTransform]) => {
+          const entity = byId[id];
+          if (!entity) return null;
+
+          const endTransform = entity.transform;
+          if (this.hasTransformChanged(fromTransform, endTransform)) {
+            return { id, from: fromTransform, to: { ...endTransform } };
+          }
+          return null;
+        })
+        .filter((change): change is { id: string; from: Entity['transform']; to: Entity['transform'] } => Boolean(change));
+
+      moveEntities(changes);
     }
   }
 
@@ -232,6 +283,7 @@ export class SelectTool extends BaseTool {
       currentPoint: null,
       draggedEntityId: null,
       dragOffset: null,
+      initialTransforms: null,
     };
   }
 
@@ -306,6 +358,10 @@ export class SelectTool extends BaseTool {
     } else {
       selectMultiple(selectedIds);
     }
+  }
+
+  private hasTransformChanged(a: Entity['transform'], b: Entity['transform']): boolean {
+    return a.x !== b.x || a.y !== b.y || a.rotation !== b.rotation || a.scaleX !== b.scaleX || a.scaleY !== b.scaleY;
   }
 }
 
