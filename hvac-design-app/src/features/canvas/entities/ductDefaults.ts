@@ -1,5 +1,11 @@
 import type { Duct } from '@/core/schema';
 import { DEFAULT_ROUND_DUCT_PROPS } from '@/core/schema/duct.schema';
+import {
+  calculateDuctArea,
+  calculateVelocity,
+  calculateEquivalentDiameter,
+} from '../calculators/ductSizing';
+import { calculateFrictionLoss } from '../calculators/pressureDrop';
 
 /**
  * Counter for auto-incrementing duct names
@@ -18,45 +24,6 @@ export function resetDuctCounter(): void {
  */
 export function getNextDuctNumber(): number {
   return ductCounter++;
-}
-
-/**
- * Calculate duct values from dimensions and airflow
- */
-export function calculateDuctValues(
-  shape: 'round' | 'rectangular',
-  airflow: number,
-  diameter?: number,
-  width?: number,
-  height?: number
-): { area: number; velocity: number; frictionLoss: number } {
-  let area: number;
-
-  if (shape === 'round' && diameter !== undefined) {
-    // Area = π * r² (in sq inches)
-    area = Math.PI * Math.pow(diameter / 2, 2);
-  } else if (shape === 'rectangular' && width !== undefined && height !== undefined) {
-    // Area = width * height (in sq inches)
-    area = width * height;
-  } else {
-    area = 0;
-  }
-
-  // Convert area from sq inches to sq ft
-  const areaFt = area / 144;
-
-  // Velocity = CFM / Area (FPM)
-  const velocity = areaFt > 0 ? airflow / areaFt : 0;
-
-  // Simplified friction loss calculation (in.w.g./100ft)
-  // Real formula would use Darcy-Weisbach or ASHRAE tables
-  const frictionLoss = velocity > 0 ? 0.0001 * Math.pow(velocity / 100, 2) : 0;
-
-  return {
-    area: Math.round(area * 100) / 100,
-    velocity: Math.round(velocity * 100) / 100,
-    frictionLoss: Math.round(frictionLoss * 10000) / 10000,
-  };
 }
 
 /**
@@ -104,13 +71,7 @@ export function createDuct(
           height: overrides?.height ?? 12,
         };
 
-  const calculated = calculateDuctValues(
-    shape,
-    props.airflow,
-    'diameter' in props ? props.diameter : undefined,
-    'width' in props ? props.width : undefined,
-    'height' in props ? props.height : undefined
-  );
+  const calculated = calculateDuctValues(shape, props as Duct['props']);
 
   return {
     id: crypto.randomUUID(),
@@ -127,6 +88,44 @@ export function createDuct(
     modifiedAt: now,
     props: props as Duct['props'],
     calculated,
+  };
+}
+
+function calculateDuctValues(shape: 'round' | 'rectangular', props: Duct['props']) {
+  const area = calculateDuctArea(shape, {
+    diameter: 'diameter' in props ? props.diameter : undefined,
+    width: 'width' in props ? props.width : undefined,
+    height: 'height' in props ? props.height : undefined,
+  });
+
+  const velocity = calculateVelocity(props.airflow, area);
+
+  const diameterForLoss =
+    shape === 'round' && 'diameter' in props && props.diameter
+      ? props.diameter
+      : calculateEquivalentDiameter(
+          'width' in props ? (props.width ?? 0) : 0,
+          'height' in props ? (props.height ?? 0) : 0
+        );
+
+  const roughnessMap: Record<Duct['props']['material'], number> = {
+    galvanized: 0.0005,
+    stainless: 0.0002,
+    aluminum: 0.0002,
+    flex: 0.003,
+  };
+
+  const frictionLoss = calculateFrictionLoss(
+    velocity,
+    diameterForLoss || 1,
+    props.length,
+    roughnessMap[props.material]
+  );
+
+  return {
+    area,
+    velocity,
+    frictionLoss,
   };
 }
 

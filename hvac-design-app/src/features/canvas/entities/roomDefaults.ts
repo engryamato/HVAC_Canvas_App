@@ -1,5 +1,6 @@
 import type { Room } from '@/core/schema';
 import { DEFAULT_ROOM_PROPS } from '@/core/schema/room.schema';
+import { calculateRoomValues } from '../calculators/ventilation';
 
 /**
  * Counter for auto-incrementing room names
@@ -18,37 +19,6 @@ export function resetRoomCounter(): void {
  */
 export function getNextRoomNumber(): number {
   return roomCounter++;
-}
-
-/**
- * Calculate room values from dimensions and ACH
- */
-export function calculateRoomValues(
-  widthInches: number,
-  lengthInches: number,
-  heightInches: number,
-  airChangesPerHour: number
-): { area: number; volume: number; requiredCFM: number } {
-  // Convert to feet
-  const widthFt = widthInches / 12;
-  const lengthFt = lengthInches / 12;
-  const heightFt = heightInches / 12;
-
-  // Calculate area in sq ft
-  const area = widthFt * lengthFt;
-
-  // Calculate volume in cu ft
-  const volume = area * heightFt;
-
-  // Calculate required CFM
-  // CFM = (Volume * ACH) / 60
-  const requiredCFM = (volume * airChangesPerHour) / 60;
-
-  return {
-    area: Math.round(area * 100) / 100,
-    volume: Math.round(volume * 100) / 100,
-    requiredCFM: Math.round(requiredCFM * 100) / 100,
-  };
 }
 
 /**
@@ -78,12 +48,16 @@ export function createRoom(
     airChangesPerHour: overrides?.airChangesPerHour ?? DEFAULT_ROOM_PROPS.airChangesPerHour,
   };
 
-  const calculated = calculateRoomValues(
-    props.width,
-    props.length,
-    props.height,
-    props.airChangesPerHour
-  );
+  const calculated = calculateRoomValues({
+    id: 'temp',
+    type: 'room',
+    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    zIndex: 0,
+    createdAt: now,
+    modifiedAt: now,
+    props,
+    calculated: { area: 0, volume: 0, requiredCFM: 0 },
+  } as Room);
 
   return {
     id: crypto.randomUUID(),

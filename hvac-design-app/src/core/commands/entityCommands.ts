@@ -101,7 +101,9 @@ export function deleteEntities(entities: Entity[]): void {
  */
 export function undo(): boolean {
   const command = useHistoryStore.getState().undo();
-  if (!command) return false;
+  if (!command) {
+    return false;
+  }
 
   executeCommand(command.inverse);
   return true;
@@ -113,7 +115,9 @@ export function undo(): boolean {
  */
 export function redo(): boolean {
   const command = useHistoryStore.getState().redo();
-  if (!command) return false;
+  if (!command) {
+    return false;
+  }
 
   executeCommand(command);
   return true;
@@ -154,4 +158,3 @@ function executeCommand(command: Command): void {
     }
   }
 }
-

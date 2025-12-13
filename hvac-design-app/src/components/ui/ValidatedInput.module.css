@@ -1,0 +1,40 @@
+.input {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background-color: #fff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+.inputError {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.15);
+}
+
+.inputWarning {
+  border-color: #eab308;
+  box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.15);
+}
+
+.message {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.errorMessage {
+  color: #b91c1c;
+}
+
+.warningMessage {
+  color: #a16207;
+}

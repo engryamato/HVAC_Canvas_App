@@ -1,0 +1,6 @@
+{
+  "residential": { "minFpm": 600, "maxFpm": 900 },
+  "commercial": { "minFpm": 1000, "maxFpm": 1500 },
+  "industrial": { "minFpm": 1500, "maxFpm": 2500 },
+  "kitchen_exhaust": { "minFpm": 1500, "maxFpm": 4000 }
+}
