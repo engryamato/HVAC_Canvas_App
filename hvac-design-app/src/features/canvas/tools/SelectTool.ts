@@ -130,18 +130,80 @@ export class SelectTool extends BaseTool {
   }
 
   onKeyDown(event: ToolKeyEvent): void {
+    const { selectedIds, clearSelection, selectMultiple } = useSelectionStore.getState();
+    const { byId, removeEntity, addEntity, updateEntity } = useEntityStore.getState();
+
+    // Escape: clear selection
     if (event.key === 'Escape') {
       this.reset();
-      useSelectionStore.getState().clearSelection();
+      clearSelection();
+      return;
     }
 
+    // Delete/Backspace: remove selected entities
     if (event.key === 'Delete' || event.key === 'Backspace') {
-      const { selectedIds, clearSelection } = useSelectionStore.getState();
-      const { removeEntity } = useEntityStore.getState();
       for (const id of selectedIds) {
         removeEntity(id);
       }
       clearSelection();
+      return;
+    }
+
+    // Ctrl+D: duplicate selected entities
+    if (event.ctrlKey && event.key === 'd') {
+      const newIds: string[] = [];
+      for (const id of selectedIds) {
+        const entity = byId[id];
+        if (entity) {
+          // Create a deep copy with new ID and offset position
+          const duplicate = JSON.parse(JSON.stringify(entity));
+          duplicate.id = crypto.randomUUID();
+          duplicate.transform.x += 24; // Offset by 2 feet
+          duplicate.transform.y += 24;
+          addEntity(duplicate);
+          newIds.push(duplicate.id);
+        }
+      }
+      // Select the duplicated entities
+      if (newIds.length > 0) {
+        selectMultiple(newIds);
+      }
+      return;
+    }
+
+    // Arrow keys: move selected entities
+    const moveAmount = event.shiftKey ? 12 : 1; // Shift = 1 foot, otherwise 1 inch
+    let deltaX = 0;
+    let deltaY = 0;
+
+    switch (event.key) {
+      case 'ArrowUp':
+        deltaY = -moveAmount;
+        break;
+      case 'ArrowDown':
+        deltaY = moveAmount;
+        break;
+      case 'ArrowLeft':
+        deltaX = -moveAmount;
+        break;
+      case 'ArrowRight':
+        deltaX = moveAmount;
+        break;
+    }
+
+    if (deltaX !== 0 || deltaY !== 0) {
+      for (const id of selectedIds) {
+        const entity = byId[id];
+        if (entity) {
+          updateEntity(id, {
+            transform: {
+              ...entity.transform,
+              x: entity.transform.x + deltaX,
+              y: entity.transform.y + deltaY,
+            },
+          });
+        }
+      }
     }
   }
 
