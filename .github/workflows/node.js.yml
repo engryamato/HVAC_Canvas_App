@@ -25,6 +25,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
         cache-dependency-path: hvac-design-app/pnpm-lock.yaml
+    - name: Cache Next.js build
+      uses: actions/cache@v4
+      with:
+        path: hvac-design-app/.next/cache
+        key: nextjs-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('hvac-design-app/pnpm-lock.yaml') }}
+        restore-keys: |
+          nextjs-${{ runner.os }}-${{ matrix.node-version }}-
     - name: Install dependencies
       run: pnpm install
       working-directory: hvac-design-app
