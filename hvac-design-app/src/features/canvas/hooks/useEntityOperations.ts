@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { createEntity, deleteEntity, updateEntity } from '@/core/commands/entityCommands';
+import { createEntity, deleteEntities, updateEntity } from '@/core/commands/entityCommands';
 import type { Entity } from '@/core/schema';
 
 /**
@@ -24,11 +24,12 @@ export function useEntityOperations() {
     const { byId } = useEntityStore.getState();
     const selectionBefore = [...selectedIds];
 
-    for (const id of selectedIds) {
-      const entity = byId[id];
-      if (entity) {
-        deleteEntity(entity, { selectionBefore, selectionAfter: [] });
-      }
+    const entitiesToDelete = selectedIds
+      .map((id) => byId[id])
+      .filter((entity): entity is Entity => Boolean(entity));
+
+    if (entitiesToDelete.length > 0) {
+      deleteEntities(entitiesToDelete, { selectionBefore, selectionAfter: [] });
     }
 
     clearSelection();
