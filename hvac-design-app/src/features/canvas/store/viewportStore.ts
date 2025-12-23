@@ -116,6 +116,14 @@ export const useViewportStore = create<ViewportStore>()(
 
         const padding = 50; // Padding around content
 
+        // Guard against division by zero or negative bounds
+        if (bounds.width <= 0 || bounds.height <= 0) {
+          // Invalid bounds, just center without zoom
+          state.panX = canvasWidth / 2 - bounds.x;
+          state.panY = canvasHeight / 2 - bounds.y;
+          return;
+        }
+
         // Calculate zoom to fit content with padding
         const zoomX = (canvasWidth - padding * 2) / bounds.width;
         const zoomY = (canvasHeight - padding * 2) / bounds.height;

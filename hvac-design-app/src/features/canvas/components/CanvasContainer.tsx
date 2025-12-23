@@ -113,8 +113,8 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       return;
     }
 
-    // Get device pixel ratio for sharp rendering
-    const dpr = window.devicePixelRatio || 1;
+    // Get device pixel ratio for sharp rendering (SSR-safe)
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 
     // Set canvas size to container size
     const rect = container.getBoundingClientRect();
@@ -257,7 +257,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       return;
     }
 
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
     const width = canvas.width / dpr;
     const height = canvas.height / dpr;
 
