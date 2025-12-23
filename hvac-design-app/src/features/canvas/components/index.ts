@@ -10,3 +10,4 @@ export {
   default as InspectorPanel,
   InspectorPanel as InspectorPanelComponent,
 } from './Inspector/InspectorPanel';
+export { ExportMenu, default as ExportMenuDefault } from './ExportMenu';
