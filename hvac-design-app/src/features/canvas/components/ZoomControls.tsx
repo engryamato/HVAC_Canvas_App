@@ -44,7 +44,7 @@ export function ZoomControls({ className = '' }: ZoomControlsProps): React.React
   const zoom = useZoom();
   const { zoomIn, zoomOut, resetView, fitToContent } = useViewportActions();
   const entities = useEntityStore((state) =>
-    state.allIds.map((id) => state.byId[id]).filter((e) => e !== undefined)
+    state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined)
   );
 
   const handleZoomIn = useCallback(() => {

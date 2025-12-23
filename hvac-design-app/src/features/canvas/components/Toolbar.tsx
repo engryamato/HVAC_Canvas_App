@@ -101,21 +101,21 @@ function EquipmentTypeSelector() {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[(currentIndex + 1) % EQUIPMENT_TYPES.length]);
+          const nextIndex = (currentIndex + 1) % EQUIPMENT_TYPES.length;
+          setEquipmentType(EQUIPMENT_TYPES[nextIndex]!);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setEquipmentType(
-            EQUIPMENT_TYPES[(currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length]
-          );
+          const prevIndex = (currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length;
+          setEquipmentType(EQUIPMENT_TYPES[prevIndex]!);
           break;
         case 'Home':
           e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[0]);
+          setEquipmentType(EQUIPMENT_TYPES[0]!);
           break;
         case 'End':
           e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[EQUIPMENT_TYPES.length - 1]);
+          setEquipmentType(EQUIPMENT_TYPES[EQUIPMENT_TYPES.length - 1]!);
           break;
       }
     },
