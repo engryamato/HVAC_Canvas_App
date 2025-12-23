@@ -4,6 +4,27 @@ import React, { useCallback } from 'react';
 import { useZoom, useViewportActions } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { MIN_ZOOM, MAX_ZOOM } from '@/core/constants/viewport';
+import type { Entity } from '@/core/schema';
+
+/**
+ * Default entity dimensions for bounding box calculation
+ * These approximate sizes are used when actual entity dimensions aren't available
+ */
+const ENTITY_DIMENSIONS = {
+  room: { width: 200, height: 200 },
+  duct: { width: 100, height: 50 },
+  equipment: { width: 50, height: 50 },
+  fitting: { width: 30, height: 30 },
+  note: { width: 100, height: 50 },
+  group: { width: 50, height: 50 },
+} as const;
+
+/**
+ * Get approximate dimensions for an entity based on its type
+ */
+function getEntityDimensions(entity: Entity): { width: number; height: number } {
+  return ENTITY_DIMENSIONS[entity.type] || { width: 50, height: 50 };
+}
 
 /**
  * ZoomControls - Zoom control UI component
@@ -43,29 +64,33 @@ export function ZoomControls({ className = '' }: ZoomControlsProps): React.React
       return;
     }
 
-    // Calculate bounding box of all entities
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
+    // Calculate bounding box of all entities using reduce
+    const { minX, minY, maxX, maxY } = entities.reduce(
+      (bounds, entity) => {
+        const { x, y } = entity.transform;
+        const { width, height } = getEntityDimensions(entity);
 
-    entities.forEach((entity) => {
-      const { x, y } = entity.transform;
-      // Approximate entity size (this could be improved with actual entity dimensions)
-      const width = entity.type === 'room' ? 200 : entity.type === 'duct' ? 100 : 50;
-      const height = entity.type === 'room' ? 200 : entity.type === 'duct' ? 50 : 50;
+        return {
+          minX: Math.min(bounds.minX, x),
+          minY: Math.min(bounds.minY, y),
+          maxX: Math.max(bounds.maxX, x + width),
+          maxY: Math.max(bounds.maxY, y + height),
+        };
+      },
+      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+    );
 
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x + width);
-      maxY = Math.max(maxY, y + height);
-    });
+    // Guard against invalid bounds (all entities at same point or zero-size)
+    const boundsWidth = maxX - minX;
+    const boundsHeight = maxY - minY;
 
+    // Use minimum bounds if calculated bounds are too small
+    const MIN_BOUNDS = 100;
     const bounds = {
       x: minX,
       y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
+      width: Math.max(boundsWidth, MIN_BOUNDS),
+      height: Math.max(boundsHeight, MIN_BOUNDS),
     };
 
     // Try to get actual canvas dimensions (SSR-safe)
