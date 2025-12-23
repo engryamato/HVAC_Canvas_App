@@ -7,7 +7,8 @@ import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
 import InspectorPanel from './components/Inspector/InspectorPanel';
-import { useCalculations } from './hooks';
+import { ExportMenu } from './components/ExportMenu';
+import { useCalculations, useAutoSave } from './hooks';
 import styles from './CanvasPage.module.css';
 
 /**
@@ -31,6 +32,8 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   // Keep calculated values in sync with entity props
   useCalculations('commercial');
+  // Enable auto-save
+  const { isDirty } = useAutoSave({ enabled: true });
 
   const handleMouseMove = useCallback((canvasX: number, canvasY: number) => {
     setMousePosition({ x: canvasX, y: canvasY });
@@ -44,10 +47,16 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     <div className={`flex flex-col h-screen bg-gray-100 ${className}`}>
       {/* Header with navigation */}
       <div className={styles.header}>
-        <h2 className={styles.title}>Canvas Editor</h2>
-        <Link href="/dashboard" className={styles.backButton}>
-          Back to Dashboard
-        </Link>
+        <div className={styles.headerLeft}>
+          <h2 className={styles.title}>Canvas Editor</h2>
+          {isDirty && <span className={styles.dirtyIndicator}>Unsaved changes</span>}
+        </div>
+        <div className={styles.headerActions}>
+          <ExportMenu />
+          <Link href="/dashboard" className={styles.backButton}>
+            Back to Dashboard
+          </Link>
+        </div>
       </div>
 
       {/* Main content area */}
