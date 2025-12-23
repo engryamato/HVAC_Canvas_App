@@ -1,6 +1,38 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ProjectDetails } from '@/core/schema/project-file.schema';
+import type { ProjectDetails, ProjectFile } from '@/core/schema/project-file.schema';
+
+/**
+ * Storage key prefix for project data
+ */
+const getProjectStorageKey = (projectId: string) => `hvac-project-${projectId}`;
+
+/**
+ * Load project data from localStorage
+ */
+function loadProjectData(projectId: string): ProjectFile | null {
+  try {
+    const key = getProjectStorageKey(projectId);
+    const data = localStorage.getItem(key);
+    if (!data) return null;
+    return JSON.parse(data) as ProjectFile;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Save project data to localStorage
+ */
+function saveProjectData(projectId: string, project: ProjectFile): boolean {
+  try {
+    const key = getProjectStorageKey(projectId);
+    localStorage.setItem(key, JSON.stringify(project));
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Project list item with additional metadata
@@ -107,6 +139,19 @@ export const useProjectListStore = create<ProjectListStore>()(
           lastOpenedAt: undefined,
           isArchived: false,
         };
+
+        // Also duplicate the saved project data from localStorage
+        const originalData = loadProjectData(projectId);
+        if (originalData) {
+          const duplicatedData: ProjectFile = {
+            ...originalData,
+            projectId: newId,
+            projectName: newName,
+            createdAt: now,
+            modifiedAt: now,
+          };
+          saveProjectData(newId, duplicatedData);
+        }
 
         set((state) => ({
           projects: [newProject, ...state.projects],
