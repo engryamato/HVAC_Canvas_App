@@ -98,14 +98,25 @@ function EquipmentTypeSelector() {
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent, currentIndex: number) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        const nextIndex = (currentIndex + 1) % EQUIPMENT_TYPES.length;
-        setEquipmentType(EQUIPMENT_TYPES[nextIndex]);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const prevIndex = (currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length;
-        setEquipmentType(EQUIPMENT_TYPES[prevIndex]);
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setEquipmentType(EQUIPMENT_TYPES[(currentIndex + 1) % EQUIPMENT_TYPES.length]);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setEquipmentType(
+            EQUIPMENT_TYPES[(currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length]
+          );
+          break;
+        case 'Home':
+          e.preventDefault();
+          setEquipmentType(EQUIPMENT_TYPES[0]);
+          break;
+        case 'End':
+          e.preventDefault();
+          setEquipmentType(EQUIPMENT_TYPES[EQUIPMENT_TYPES.length - 1]);
+          break;
       }
     },
     [setEquipmentType]
