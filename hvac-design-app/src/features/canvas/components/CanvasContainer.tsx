@@ -6,6 +6,7 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../store/selectionStore';
 import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
 import type { Entity, Room, Duct, Equipment } from '@/core/schema';
+import { useViewport } from '../hooks/useViewport';
 
 // Tools
 import {
@@ -60,6 +61,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const entities = useEntityStore((state) =>
     state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined)
   );
+
+  // Enable viewport pan/zoom interactions (space-drag, middle-mouse, wheel zoom)
+  useViewport({ canvasRef });
 
   // Tool instances (created once, persisted in ref)
   const toolsRef = useRef<Record<CanvasTool, ITool> | null>(null);

@@ -1,7 +1,14 @@
 'use client';
 
 import React from 'react';
-import { useToolStore, useToolActions, type CanvasTool } from '@/core/store/canvas.store';
+import {
+  useToolStore,
+  useToolActions,
+  useSelectedEquipmentType,
+  type CanvasTool,
+} from '@/core/store/canvas.store';
+import type { EquipmentType } from '@/core/schema/equipment.schema';
+import { EQUIPMENT_TYPE_LABELS } from '../entities/equipmentDefaults';
 
 interface ToolButtonProps {
   tool: CanvasTool;
@@ -80,6 +87,40 @@ const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut:
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
 ];
 
+const EQUIPMENT_TYPES: EquipmentType[] = ['hood', 'fan', 'diffuser', 'damper', 'air_handler'];
+
+/**
+ * Equipment type selector component
+ */
+function EquipmentTypeSelector() {
+  const selectedType = useSelectedEquipmentType();
+  const { setEquipmentType } = useToolActions();
+
+  return (
+    <div className="flex flex-col gap-1 p-2 border-t border-gray-200">
+      <div className="text-xs text-gray-500 font-medium mb-1">Equipment Type</div>
+      {EQUIPMENT_TYPES.map((type) => (
+        <button
+          key={type}
+          type="button"
+          onClick={() => setEquipmentType(type)}
+          className={`
+            px-2 py-1.5 text-xs rounded transition-colors text-left
+            ${
+              selectedType === type
+                ? 'bg-blue-100 text-blue-700 font-medium'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+            }
+          `}
+          title={EQUIPMENT_TYPE_LABELS[type]}
+        >
+          {EQUIPMENT_TYPE_LABELS[type]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 interface ToolbarProps {
   className?: string;
 }
@@ -141,6 +182,9 @@ export function Toolbar({ className = '' }: ToolbarProps) {
           onClick={() => setTool(tool)}
         />
       ))}
+
+      {/* Show equipment type selector when equipment tool is active */}
+      {currentTool === 'equipment' && <EquipmentTypeSelector />}
     </div>
   );
 }
