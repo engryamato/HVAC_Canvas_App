@@ -6,9 +6,11 @@ import { CanvasContainer } from './components/CanvasContainer';
 import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
+import InspectorPanel from './components/Inspector/InspectorPanel';
 import { ExportMenu } from './components/ExportMenu';
 import { useCalculations, useAutoSave } from './hooks';
 import { useUndoRedo } from './hooks/useUndoRedo';
+import styles from './CanvasPage.module.css';
 
 /**
  * CanvasPage - Main canvas page with all components
