@@ -93,11 +93,22 @@ export const useViewportStore = create<ViewportStore>()(
 
     fitToContent: (bounds) =>
       set((state) => {
-        // This will be implemented with canvas dimensions
-        // For now, just center on bounds
-        state.panX = -bounds.x - bounds.width / 2;
-        state.panY = -bounds.y - bounds.height / 2;
-        state.zoom = DEFAULT_ZOOM;
+        // Get canvas dimensions from window (will be passed properly later)
+        const canvasWidth = window.innerWidth * 0.7; // Approximate canvas width
+        const canvasHeight = window.innerHeight * 0.8; // Approximate canvas height
+        const padding = 50; // Padding around content
+
+        // Calculate zoom to fit content with padding
+        const zoomX = (canvasWidth - padding * 2) / bounds.width;
+        const zoomY = (canvasHeight - padding * 2) / bounds.height;
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.min(zoomX, zoomY)));
+
+        // Center the content
+        const centerX = bounds.x + bounds.width / 2;
+        const centerY = bounds.y + bounds.height / 2;
+        state.panX = canvasWidth / 2 - centerX * newZoom;
+        state.panY = canvasHeight / 2 - centerY * newZoom;
+        state.zoom = newZoom;
       }),
 
     resetView: () =>

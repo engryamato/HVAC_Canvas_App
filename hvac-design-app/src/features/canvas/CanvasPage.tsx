@@ -8,6 +8,7 @@ import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
 import InspectorPanel from './components/Inspector/InspectorPanel';
 import { useCalculations } from './hooks';
+import { useUndoRedo } from './hooks/useUndoRedo';
 import styles from './CanvasPage.module.css';
 
 /**
@@ -31,6 +32,8 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   // Keep calculated values in sync with entity props
   useCalculations('commercial');
+  // Register undo/redo keyboard shortcuts
+  useUndoRedo();
 
   const handleMouseMove = useCallback((canvasX: number, canvasY: number) => {
     setMousePosition({ x: canvasX, y: canvasY });

@@ -7,22 +7,22 @@ import {
 import { createEquipment, EQUIPMENT_TYPE_DEFAULTS } from '../entities/equipmentDefaults';
 import { createEntity } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
+import { useToolStore } from '@/core/store/canvas.store';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
 
 interface EquipmentToolState {
-  selectedType: EquipmentType;
   currentPoint: { x: number; y: number } | null;
 }
 
 /**
  * Equipment tool for placing equipment on the canvas.
  * Click to place at cursor position with grid snapping.
+ * Equipment type is stored in the canvas tool store.
  */
 export class EquipmentTool extends BaseTool {
   readonly name = 'equipment';
 
   private state: EquipmentToolState = {
-    selectedType: 'fan',
     currentPoint: null,
   };
 
@@ -31,17 +31,10 @@ export class EquipmentTool extends BaseTool {
   }
 
   /**
-   * Get the currently selected equipment type
+   * Get the currently selected equipment type from store
    */
   getSelectedType(): EquipmentType {
-    return this.state.selectedType;
-  }
-
-  /**
-   * Set the equipment type to place
-   */
-  setSelectedType(type: EquipmentType): void {
-    this.state.selectedType = type;
+    return useToolStore.getState().selectedEquipmentType;
   }
 
   onActivate(): void {
@@ -82,8 +75,9 @@ export class EquipmentTool extends BaseTool {
     }
 
     const { ctx, zoom } = context;
-    const { currentPoint, selectedType } = this.state;
-    const defaults = EQUIPMENT_TYPE_DEFAULTS[selectedType];
+    const currentPoint = this.state.currentPoint;
+    const selectedType = this.getSelectedType();
+    const defaults = EQUIPMENT_TYPE_DEFAULTS[selectedType]!; // Non-null assertion: defaults always exist for all equipment types
 
     ctx.save();
 
@@ -125,10 +119,11 @@ export class EquipmentTool extends BaseTool {
   }
 
   private createEquipmentEntity(x: number, y: number): void {
-    const defaults = EQUIPMENT_TYPE_DEFAULTS[this.state.selectedType];
+    const selectedType = this.getSelectedType();
+    const defaults = EQUIPMENT_TYPE_DEFAULTS[selectedType]!; // Non-null assertion: defaults always exist for all equipment types
 
     // Center the equipment on the click point
-    const equipment = createEquipment(this.state.selectedType, {
+    const equipment = createEquipment(selectedType, {
       x: x - defaults.width / 2,
       y: y - defaults.depth / 2,
     });
