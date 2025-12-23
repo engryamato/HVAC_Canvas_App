@@ -68,7 +68,17 @@ export function ZoomControls({ className = '' }: ZoomControlsProps): React.React
       height: maxY - minY,
     };
 
-    fitToContent(bounds);
+    // Try to get actual canvas dimensions (SSR-safe)
+    let canvasDimensions: { width: number; height: number } | undefined;
+    if (typeof document !== 'undefined') {
+      const canvasElement = document.querySelector('canvas');
+      if (canvasElement) {
+        const rect = canvasElement.getBoundingClientRect();
+        canvasDimensions = { width: rect.width, height: rect.height };
+      }
+    }
+
+    fitToContent(bounds, canvasDimensions);
   }, [entities, fitToContent]);
 
   const zoomPercentage = Math.round(zoom * 100);

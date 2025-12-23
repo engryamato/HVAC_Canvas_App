@@ -23,7 +23,10 @@ interface ViewportActions {
   zoomTo: (level: number, centerX?: number, centerY?: number) => void;
   zoomIn: (centerX?: number, centerY?: number) => void;
   zoomOut: (centerX?: number, centerY?: number) => void;
-  fitToContent: (bounds: { x: number; y: number; width: number; height: number }) => void;
+  fitToContent: (
+    bounds: { x: number; y: number; width: number; height: number },
+    canvasDimensions?: { width: number; height: number }
+  ) => void;
   resetView: () => void;
   toggleGrid: () => void;
   setGridSize: (size: number) => void;
@@ -91,11 +94,26 @@ export const useViewportStore = create<ViewportStore>()(
         state.zoom = newZoom;
       }),
 
-    fitToContent: (bounds) =>
+    fitToContent: (bounds, canvasDimensions) =>
       set((state) => {
-        // Get canvas dimensions from window (will be passed properly later)
-        const canvasWidth = window.innerWidth * 0.7; // Approximate canvas width
-        const canvasHeight = window.innerHeight * 0.8; // Approximate canvas height
+        // Get canvas dimensions from parameter or fallback to viewport (SSR-safe)
+        let canvasWidth: number;
+        let canvasHeight: number;
+
+        if (canvasDimensions) {
+          canvasWidth = canvasDimensions.width;
+          canvasHeight = canvasDimensions.height;
+        } else if (typeof window !== 'undefined') {
+          // Fallback: approximate from viewport (only in browser)
+          canvasWidth = window.innerWidth * 0.7;
+          canvasHeight = window.innerHeight * 0.8;
+        } else {
+          // SSR fallback: just center without zoom adjustment
+          state.panX = -bounds.x - bounds.width / 2;
+          state.panY = -bounds.y - bounds.height / 2;
+          return;
+        }
+
         const padding = 50; // Padding around content
 
         // Calculate zoom to fit content with padding
