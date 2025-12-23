@@ -35,7 +35,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   // Build project file from current state
   const getProjectFile = useCallback((): ProjectFile | null => {
-    if (!projectDetails) return null;
+    if (!projectDetails) {return null;}
 
     return {
       ...createEmptyProjectFile(projectDetails.projectId, projectDetails.projectName),
@@ -69,7 +69,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handleExportJson = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     const result = exportProjectAsJson(project);
     if (result.success && result.data && result.filename) {
@@ -80,7 +80,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handleExportRoomsCsv = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     downloadRoomsCsv(entities, project.projectName);
     setIsOpen(false);
@@ -88,7 +88,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handleExportDuctsCsv = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     downloadDuctsCsv(entities, project.projectName);
     setIsOpen(false);
@@ -96,7 +96,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handleExportEquipmentCsv = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     downloadEquipmentCsv(entities, project.projectName);
     setIsOpen(false);
@@ -104,7 +104,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handleExportBomCsv = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     downloadBomCsv(entities, project.projectName);
     setIsOpen(false);
@@ -112,7 +112,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handlePrintPdf = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     printProjectAsPdf(project);
     setIsOpen(false);
@@ -120,7 +120,7 @@ export function ExportMenu({ className = '' }: ExportMenuProps) {
 
   const handleDownloadHtml = useCallback(() => {
     const project = getProjectFile();
-    if (!project) return;
+    if (!project) {return;}
 
     downloadPdfHtml(project);
     setIsOpen(false);

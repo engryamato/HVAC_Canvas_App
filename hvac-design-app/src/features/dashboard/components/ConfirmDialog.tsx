@@ -24,7 +24,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <div className={styles.overlay} onClick={onCancel}>

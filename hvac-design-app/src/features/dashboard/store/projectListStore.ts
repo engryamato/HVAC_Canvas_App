@@ -16,7 +16,7 @@ function loadProjectData(projectId: string): ProjectFile | null {
   try {
     const key = getProjectStorageKey(projectId);
     const data = localStorage.getItem(key);
-    if (!data) return null;
+    if (!data) {return null;}
     return JSON.parse(data) as ProjectFile;
   } catch {
     return null;
@@ -127,7 +127,7 @@ export const useProjectListStore = create<ProjectListStore>()(
       duplicateProject: (projectId, newName) => {
         const state = get();
         const original = state.projects.find((p) => p.projectId === projectId);
-        if (!original) return null;
+        if (!original) {return null;}
 
         const now = new Date().toISOString();
         const newId = crypto.randomUUID();

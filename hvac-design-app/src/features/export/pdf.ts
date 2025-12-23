@@ -1,5 +1,5 @@
 import type { ProjectFile, Room, Duct, Equipment } from '@/core/schema';
-import { generateBillOfMaterials, type BomItem } from './csv';
+import { generateBillOfMaterials } from './csv';
 
 /**
  * PDF export options
@@ -73,15 +73,15 @@ function generateRoomScheduleHtml(entities: ProjectFile['entities']): string {
     .map(
       (room) => `
     <tr>
-      <td>${escapeHtml(room.name)}</td>
+      <td>${escapeHtml(room.props.name)}</td>
       <td>${room.props.width}"</td>
+      <td>${room.props.length}"</td>
       <td>${room.props.height}"</td>
-      <td>${room.props.ceilingHeight}"</td>
-      <td>${escapeHtml(room.props.roomType)}</td>
-      <td>${room.props.occupancy ?? '-'}</td>
+      <td>${escapeHtml(room.props.occupancyType)}</td>
+      <td>${room.props.airChangesPerHour} ACH</td>
       <td>${room.calculated?.area?.toFixed(1) ?? '-'} sq ft</td>
       <td>${room.calculated?.volume?.toFixed(1) ?? '-'} cu ft</td>
-      <td>${room.calculated?.requiredCfm?.toFixed(0) ?? '-'} CFM</td>
+      <td>${room.calculated?.requiredCFM?.toFixed(0) ?? '-'} CFM</td>
     </tr>
   `
     )
@@ -95,10 +95,10 @@ function generateRoomScheduleHtml(entities: ProjectFile['entities']): string {
           <tr>
             <th>Name</th>
             <th>Width</th>
+            <th>Length</th>
             <th>Height</th>
-            <th>Ceiling</th>
-            <th>Type</th>
-            <th>Occupancy</th>
+            <th>Occupancy Type</th>
+            <th>ACH</th>
             <th>Area</th>
             <th>Volume</th>
             <th>Required CFM</th>
@@ -132,7 +132,7 @@ function generateDuctScheduleHtml(entities: ProjectFile['entities']): string {
     .map(
       (duct) => `
     <tr>
-      <td>${escapeHtml(duct.name)}</td>
+      <td>${escapeHtml(duct.props.name)}</td>
       <td>${duct.props.shape}</td>
       <td>${
         duct.props.shape === 'round'
@@ -141,9 +141,9 @@ function generateDuctScheduleHtml(entities: ProjectFile['entities']): string {
       }</td>
       <td>${duct.props.length} ft</td>
       <td>${escapeHtml(duct.props.material)}</td>
-      <td>${duct.props.cfm} CFM</td>
+      <td>${duct.props.airflow} CFM</td>
       <td>${duct.calculated?.velocity?.toFixed(0) ?? '-'} FPM</td>
-      <td>${duct.calculated?.pressureDrop?.toFixed(3) ?? '-'} in.wg</td>
+      <td>${duct.calculated?.frictionLoss?.toFixed(3) ?? '-'} in.wg/100ft</td>
     </tr>
   `
     )
@@ -193,12 +193,12 @@ function generateEquipmentScheduleHtml(entities: ProjectFile['entities']): strin
     .map(
       (eq) => `
     <tr>
-      <td>${escapeHtml(eq.name)}</td>
+      <td>${escapeHtml(eq.props.name)}</td>
       <td>${escapeHtml(eq.props.equipmentType.replace(/_/g, ' '))}</td>
       <td>${escapeHtml(eq.props.manufacturer ?? '-')}</td>
       <td>${escapeHtml(eq.props.model ?? '-')}</td>
       <td>${eq.props.capacity ? `${eq.props.capacity} ${eq.props.capacityUnit ?? ''}` : '-'}</td>
-      <td>${eq.props.width}" x ${eq.props.height}"</td>
+      <td>${eq.props.width}" x ${eq.props.depth}" x ${eq.props.height}"</td>
     </tr>
   `
     )
@@ -294,9 +294,9 @@ function generateCalculationSummaryHtml(entities: ProjectFile['entities']): stri
     if (entity?.type === 'room') {
       const room = entity as Room;
       roomCount++;
-      if (room.calculated?.area) totalRoomArea += room.calculated.area;
-      if (room.calculated?.volume) totalRoomVolume += room.calculated.volume;
-      if (room.calculated?.requiredCfm) totalRequiredCfm += room.calculated.requiredCfm;
+      if (room.calculated?.area) {totalRoomArea += room.calculated.area;}
+      if (room.calculated?.volume) {totalRoomVolume += room.calculated.volume;}
+      if (room.calculated?.requiredCFM) {totalRequiredCfm += room.calculated.requiredCFM;}
     } else if (entity?.type === 'duct') {
       const duct = entity as Duct;
       ductCount++;

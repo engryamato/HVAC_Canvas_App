@@ -39,7 +39,7 @@ export function loadProjectFromStorage(projectId: string): ProjectFile | null {
   try {
     const key = getProjectStorageKey(projectId);
     const data = localStorage.getItem(key);
-    if (!data) return null;
+    if (!data) {return null;}
     return JSON.parse(data) as ProjectFile;
   } catch (error) {
     console.error('Failed to load project:', error);
@@ -126,7 +126,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
   }));
 
   const save = useCallback((): boolean => {
-    if (!projectId || !projectDetails) return false;
+    if (!projectId || !projectDetails) {return false;}
 
     const project: ProjectFile = {
       ...createEmptyProjectFile(projectId, projectDetails.projectName),
@@ -157,7 +157,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
 
   // Detect changes and mark as dirty
   useEffect(() => {
-    if (!enabled || !projectId) return;
+    if (!enabled || !projectId) {return;}
 
     const currentState = JSON.stringify({ entities, viewport, settings });
     if (previousStateRef.current !== null && previousStateRef.current !== currentState) {
@@ -168,7 +168,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
 
   // Debounced save on changes
   useEffect(() => {
-    if (!enabled || !isDirty) return;
+    if (!enabled || !isDirty) {return;}
 
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
@@ -187,7 +187,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
 
   // Periodic auto-save
   useEffect(() => {
-    if (!enabled || !projectId) return;
+    if (!enabled || !projectId) {return;}
 
     const intervalId = setInterval(() => {
       if (isDirty) {
@@ -200,7 +200,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
 
   // Save on page unload
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {return;}
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {

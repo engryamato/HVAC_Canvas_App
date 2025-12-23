@@ -95,7 +95,7 @@ export default function Dashboard() {
   );
 
   const handleConfirmAction = useCallback(() => {
-    if (!confirmState.projectId) return;
+    if (!confirmState.projectId) {return;}
 
     if (confirmState.type === 'delete') {
       // Remove from project list store

@@ -1,4 +1,4 @@
-import type { ProjectFile, Entity, Room, Duct, Equipment, Fitting } from '@/core/schema';
+import type { ProjectFile, Room, Duct, Equipment, Fitting } from '@/core/schema';
 import { downloadFile } from './json';
 
 /**
@@ -35,7 +35,7 @@ function escapeCsvValue(
   value: string | number | boolean | undefined | null,
   separator: string = ','
 ): string {
-  if (value === undefined || value === null) return '';
+  if (value === undefined || value === null) {return '';}
   const str = String(value);
   // Quote if value contains separator, quotes, or newlines
   if (str.includes(separator) || str.includes('"') || str.includes('\n') || str.includes('\r')) {
@@ -47,7 +47,7 @@ function escapeCsvValue(
 /**
  * Convert array of objects to CSV
  */
-function arrayToCsv<T extends Record<string, unknown>>(
+function arrayToCsv<T extends object>(
   data: T[],
   columns: Array<{ key: keyof T; header: string }>,
   options: CsvExportOptions = {}
@@ -86,30 +86,17 @@ export function exportRoomsAsCsv(
     }
   }
 
-  const columns = [
-    { key: 'id' as keyof Room, header: 'ID' },
-    { key: 'name' as keyof Room, header: 'Name' },
-    { key: 'props' as keyof Room, header: 'Width (in)' },
-    { key: 'props' as keyof Room, header: 'Height (in)' },
-    { key: 'props' as keyof Room, header: 'Ceiling Height (in)' },
-    { key: 'props' as keyof Room, header: 'Room Type' },
-    { key: 'props' as keyof Room, header: 'Occupancy' },
-    { key: 'calculated' as keyof Room, header: 'Area (sq ft)' },
-    { key: 'calculated' as keyof Room, header: 'Volume (cu ft)' },
-    { key: 'calculated' as keyof Room, header: 'Required CFM' },
-  ];
-
   const data = rooms.map((room) => ({
     id: room.id,
-    name: room.name,
+    name: room.props.name,
     width: room.props.width,
+    length: room.props.length,
     height: room.props.height,
-    ceilingHeight: room.props.ceilingHeight,
-    roomType: room.props.roomType,
-    occupancy: room.props.occupancy ?? '',
+    occupancyType: room.props.occupancyType,
+    airChangesPerHour: room.props.airChangesPerHour,
     area: room.calculated?.area ?? '',
     volume: room.calculated?.volume ?? '',
-    requiredCfm: room.calculated?.requiredCfm ?? '',
+    requiredCFM: room.calculated?.requiredCFM ?? '',
   }));
 
   return arrayToCsv(
@@ -118,13 +105,13 @@ export function exportRoomsAsCsv(
       { key: 'id', header: 'ID' },
       { key: 'name', header: 'Name' },
       { key: 'width', header: 'Width (in)' },
+      { key: 'length', header: 'Length (in)' },
       { key: 'height', header: 'Height (in)' },
-      { key: 'ceilingHeight', header: 'Ceiling Height (in)' },
-      { key: 'roomType', header: 'Room Type' },
-      { key: 'occupancy', header: 'Occupancy' },
+      { key: 'occupancyType', header: 'Occupancy Type' },
+      { key: 'airChangesPerHour', header: 'ACH' },
       { key: 'area', header: 'Area (sq ft)' },
       { key: 'volume', header: 'Volume (cu ft)' },
-      { key: 'requiredCfm', header: 'Required CFM' },
+      { key: 'requiredCFM', header: 'Required CFM' },
     ],
     options
   );
@@ -148,16 +135,16 @@ export function exportDuctsAsCsv(
 
   const data = ducts.map((duct) => ({
     id: duct.id,
-    name: duct.name,
+    name: duct.props.name,
     shape: duct.props.shape,
     diameter: duct.props.shape === 'round' ? duct.props.diameter : '',
     width: duct.props.shape === 'rectangular' ? duct.props.width : '',
     height: duct.props.shape === 'rectangular' ? duct.props.height : '',
     length: duct.props.length,
     material: duct.props.material,
-    cfm: duct.props.cfm,
+    airflow: duct.props.airflow,
     velocity: duct.calculated?.velocity ?? '',
-    pressureDrop: duct.calculated?.pressureDrop ?? '',
+    frictionLoss: duct.calculated?.frictionLoss ?? '',
   }));
 
   return arrayToCsv(
@@ -171,9 +158,9 @@ export function exportDuctsAsCsv(
       { key: 'height', header: 'Height (in)' },
       { key: 'length', header: 'Length (ft)' },
       { key: 'material', header: 'Material' },
-      { key: 'cfm', header: 'CFM' },
+      { key: 'airflow', header: 'Airflow (CFM)' },
       { key: 'velocity', header: 'Velocity (FPM)' },
-      { key: 'pressureDrop', header: 'Pressure Drop (in.wg)' },
+      { key: 'frictionLoss', header: 'Friction Loss (in.wg/100ft)' },
     ],
     options
   );
@@ -197,7 +184,7 @@ export function exportEquipmentAsCsv(
 
   const data = equipment.map((eq) => ({
     id: eq.id,
-    name: eq.name,
+    name: eq.props.name,
     equipmentType: eq.props.equipmentType,
     manufacturer: eq.props.manufacturer ?? '',
     model: eq.props.model ?? '',

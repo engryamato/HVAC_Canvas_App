@@ -91,6 +91,7 @@ function ToastItem({
       }, toast.duration);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [toast.id, toast.duration, onRemove]);
 
   const getIcon = () => {
@@ -132,7 +133,7 @@ function ToastContainer({
   toasts: Toast[];
   onRemove: (id: string) => void;
 }) {
-  if (toasts.length === 0) return null;
+  if (toasts.length === 0) {return null;}
 
   return (
     <div className={styles.container} aria-live="polite" aria-atomic="true">
