@@ -8,8 +8,9 @@ import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
 import InspectorPanel from './components/Inspector/InspectorPanel';
 import { ExportMenu } from './components/ExportMenu';
-import { useCalculations, useAutoSave } from './hooks';
+import { useCalculations, useAutoSave, useKeyboardShortcuts } from './hooks';
 import { useUndoRedo } from './hooks/useUndoRedo';
+import { useToolActions } from '@/core/store/canvas.store';
 import styles from './CanvasPage.module.css';
 
 /**
@@ -35,6 +36,11 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   useCalculations('commercial');
   // Register undo/redo keyboard shortcuts
   useUndoRedo();
+  // Enable keyboard shortcuts for tools
+  const { setTool } = useToolActions();
+  useKeyboardShortcuts({
+    onToolChange: setTool,
+  });
   // Enable auto-save
   const { isDirty } = useAutoSave({ enabled: true });
 
