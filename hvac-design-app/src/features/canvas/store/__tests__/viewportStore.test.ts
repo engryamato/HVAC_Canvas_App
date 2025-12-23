@@ -91,11 +91,12 @@ describe('ViewportStore', () => {
   describe('fitToContent', () => {
     it('should center on bounds and reset zoom', () => {
       const bounds = { x: 100, y: 100, width: 200, height: 200 };
-      useViewportStore.getState().fitToContent(bounds);
+      const canvasDimensions = { width: 400, height: 400 };
+      useViewportStore.getState().fitToContent(bounds, canvasDimensions);
       const state = useViewportStore.getState();
-      expect(state.panX).toBe(-200); // -x - width/2
-      expect(state.panY).toBe(-200); // -y - height/2
-      expect(state.zoom).toBe(1);
+      expect(state.panX).toBe(-100); // canvasWidth/2 - centerX * zoom
+      expect(state.panY).toBe(-100); // canvasHeight/2 - centerY * zoom
+      expect(state.zoom).toBe(1.5); // zoom to fit with padding
     });
   });
 
