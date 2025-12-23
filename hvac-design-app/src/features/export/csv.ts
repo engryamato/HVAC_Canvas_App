@@ -28,11 +28,17 @@ export interface BomItem {
 
 /**
  * Escape a value for CSV format
+ * @param value - The value to escape
+ * @param separator - The field separator (to check if quoting is needed)
  */
-function escapeCsvValue(value: string | number | boolean | undefined | null): string {
+function escapeCsvValue(
+  value: string | number | boolean | undefined | null,
+  separator: string = ','
+): string {
   if (value === undefined || value === null) return '';
   const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+  // Quote if value contains separator, quotes, or newlines
+  if (str.includes(separator) || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
@@ -51,11 +57,13 @@ function arrayToCsv<T extends Record<string, unknown>>(
   const rows: string[] = [];
 
   if (includeHeader) {
-    rows.push(columns.map((col) => escapeCsvValue(col.header)).join(separator));
+    rows.push(columns.map((col) => escapeCsvValue(col.header, separator)).join(separator));
   }
 
   for (const item of data) {
-    const values = columns.map((col) => escapeCsvValue(item[col.key] as string | number | boolean));
+    const values = columns.map((col) =>
+      escapeCsvValue(item[col.key] as string | number | boolean, separator)
+    );
     rows.push(values.join(separator));
   }
 
