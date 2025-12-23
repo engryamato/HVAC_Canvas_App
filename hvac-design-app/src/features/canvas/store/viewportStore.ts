@@ -124,9 +124,12 @@ export const useViewportStore = create<ViewportStore>()(
           return;
         }
 
+        // Guard against canvas being too small for padding
+        const effectivePadding = Math.min(padding, canvasWidth / 4, canvasHeight / 4);
+
         // Calculate zoom to fit content with padding
-        const zoomX = (canvasWidth - padding * 2) / bounds.width;
-        const zoomY = (canvasHeight - padding * 2) / bounds.height;
+        const zoomX = Math.max(0.1, (canvasWidth - effectivePadding * 2) / bounds.width);
+        const zoomY = Math.max(0.1, (canvasHeight - effectivePadding * 2) / bounds.height);
         const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.min(zoomX, zoomY)));
 
         // Center the content
