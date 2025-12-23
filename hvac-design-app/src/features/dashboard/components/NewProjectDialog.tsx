@@ -58,7 +58,7 @@ export function NewProjectDialog({ isOpen, onClose, onCreateProject }: NewProjec
     onClose();
   }, [onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <div className={styles.overlay} onClick={handleClose}>

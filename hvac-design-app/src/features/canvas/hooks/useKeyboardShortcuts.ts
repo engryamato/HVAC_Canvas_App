@@ -2,7 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { useViewportStore } from '../store/viewportStore';
 import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { useHistoryStore } from '@/core/commands/historyStore';
+import { useHistoryStore, useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 
 /**
  * Tool types for keyboard shortcuts
@@ -41,12 +41,14 @@ interface UseKeyboardShortcutsOptions {
  * - 0: Reset zoom
  */
 export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) {
-  const { enabled = true, onToolChange, currentTool } = options;
+  const { enabled = true, onToolChange } = options;
 
-  const { toggleGrid, zoomIn, zoomOut, resetZoom } = useViewportStore();
-  const { selectedIds, clearSelection, setSelectedIds } = useSelectionStore();
+  const { toggleGrid, zoomIn, zoomOut, resetView } = useViewportStore();
+  const { selectedIds, clearSelection, selectMultiple, selectAll } = useSelectionStore();
   const { byId, allIds, removeEntities, addEntity } = useEntityStore();
-  const { undo, redo, canUndo, canRedo } = useHistoryStore();
+  const { undo, redo } = useHistoryStore();
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -115,7 +117,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
           case '0':
             if (!event.shiftKey) {
               event.preventDefault();
-              resetZoom();
+              resetView();
             }
             break;
         }
@@ -128,16 +130,16 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
             event.preventDefault();
             if (event.shiftKey) {
               // Ctrl/Cmd + Shift + Z = Redo
-              if (canRedo) redo();
+              if (canRedo) {redo();}
             } else {
               // Ctrl/Cmd + Z = Undo
-              if (canUndo) undo();
+              if (canUndo) {undo();}
             }
             break;
           case 'y':
             // Ctrl/Cmd + Y = Redo
             event.preventDefault();
-            if (canRedo) redo();
+            if (canRedo) {redo();}
             break;
           case 'd':
             // Ctrl/Cmd + D = Duplicate
@@ -146,31 +148,38 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
               const newIds: string[] = [];
               selectedIds.forEach((id) => {
                 const entity = byId[id];
-                if (entity) {
+                if (entity && 'name' in entity.props) {
                   const newId = crypto.randomUUID();
+                  const now = new Date().toISOString();
+                  // Create a copy with new id, offset position, and updated name
                   const newEntity = {
                     ...entity,
                     id: newId,
-                    name: `${entity.name} (copy)`,
+                    createdAt: now,
+                    modifiedAt: now,
+                    props: {
+                      ...entity.props,
+                      name: `${entity.props.name} (copy)`,
+                    },
                     transform: {
                       ...entity.transform,
                       x: entity.transform.x + 20,
                       y: entity.transform.y + 20,
                     },
-                  };
+                  } as typeof entity;
                   addEntity(newEntity);
                   newIds.push(newId);
                 }
               });
               if (newIds.length > 0) {
-                setSelectedIds(newIds);
+                selectMultiple(newIds);
               }
             }
             break;
           case 'a':
             // Ctrl/Cmd + A = Select all
             event.preventDefault();
-            setSelectedIds(allIds);
+            selectAll(allIds);
             break;
         }
       }
@@ -183,20 +192,21 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
       removeEntities,
       zoomIn,
       zoomOut,
-      resetZoom,
+      resetView,
       canUndo,
       canRedo,
       undo,
       redo,
       byId,
       addEntity,
-      setSelectedIds,
+      selectMultiple,
+      selectAll,
       allIds,
     ]
   );
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {return;}
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
