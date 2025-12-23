@@ -11,6 +11,7 @@ import {
 import { NewProjectDialog } from '@/features/dashboard/components/NewProjectDialog';
 import { ConfirmDialog } from '@/features/dashboard/components/ConfirmDialog';
 import { ProjectCard } from '@/features/dashboard/components/ProjectCard';
+import { deleteProjectFromStorage } from '@/features/canvas/hooks/useAutoSave';
 import styles from './page.module.css';
 
 type TabType = 'active' | 'archived';
@@ -97,7 +98,10 @@ export default function Dashboard() {
     if (!confirmState.projectId) return;
 
     if (confirmState.type === 'delete') {
+      // Remove from project list store
       removeProject(confirmState.projectId);
+      // Also delete the saved project data from localStorage
+      deleteProjectFromStorage(confirmState.projectId);
     } else if (confirmState.type === 'archive') {
       archiveProject(confirmState.projectId);
     }
