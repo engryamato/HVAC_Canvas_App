@@ -120,6 +120,10 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
     panY: state.panY,
     zoom: state.zoom,
   }));
+  const settings = useViewportStore((state) => ({
+    gridSize: state.gridSize,
+    gridVisible: state.gridVisible,
+  }));
 
   const save = useCallback((): boolean => {
     if (!projectId || !projectDetails) return false;
@@ -134,28 +138,33 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): UseAutoSaveReturn
       modifiedAt: new Date().toISOString(),
       entities,
       viewportState: viewport,
+      settings: {
+        unitSystem: 'imperial',
+        gridSize: settings.gridSize,
+        gridVisible: settings.gridVisible,
+      },
     };
 
     const success = saveProjectToStorage(projectId, project);
     if (success) {
       lastSavedRef.current = new Date();
       setDirty(false);
-      previousStateRef.current = JSON.stringify({ entities, viewport });
+      previousStateRef.current = JSON.stringify({ entities, viewport, settings });
     }
     onSave?.(success);
     return success;
-  }, [projectId, projectDetails, entities, viewport, setDirty, onSave]);
+  }, [projectId, projectDetails, entities, viewport, settings, setDirty, onSave]);
 
   // Detect changes and mark as dirty
   useEffect(() => {
     if (!enabled || !projectId) return;
 
-    const currentState = JSON.stringify({ entities, viewport });
+    const currentState = JSON.stringify({ entities, viewport, settings });
     if (previousStateRef.current !== null && previousStateRef.current !== currentState) {
       setDirty(true);
     }
     previousStateRef.current = currentState;
-  }, [enabled, projectId, entities, viewport, setDirty]);
+  }, [enabled, projectId, entities, viewport, settings, setDirty]);
 
   // Debounced save on changes
   useEffect(() => {

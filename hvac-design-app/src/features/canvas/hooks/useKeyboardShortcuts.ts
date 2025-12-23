@@ -97,6 +97,12 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
               clearSelection();
             }
             break;
+        }
+      }
+
+      // Zoom shortcuts (allow Shift for + key, which is Shift+= on most keyboards)
+      if (!isModKey && !event.altKey) {
+        switch (event.key) {
           case '=':
           case '+':
             event.preventDefault();
@@ -107,8 +113,10 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
             zoomOut();
             break;
           case '0':
-            event.preventDefault();
-            resetZoom();
+            if (!event.shiftKey) {
+              event.preventDefault();
+              resetZoom();
+            }
             break;
         }
       }
