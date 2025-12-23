@@ -7,6 +7,8 @@ import {
   useSelectedEquipmentType,
   type CanvasTool,
 } from '@/core/store/canvas.store';
+import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
+import { undo, redo } from '@/core/commands/entityCommands';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
 import { EQUIPMENT_TYPE_LABELS } from '../entities/equipmentDefaults';
 
@@ -90,6 +92,42 @@ const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut:
 const EQUIPMENT_TYPES: EquipmentType[] = ['hood', 'fan', 'diffuser', 'damper', 'air_handler'];
 
 /**
+ * Undo/Redo button component
+ */
+function UndoRedoButton({
+  onClick,
+  disabled,
+  icon,
+  label,
+  shortcut,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  icon: React.ReactNode;
+  label: string;
+  shortcut: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`
+        w-8 h-8 flex items-center justify-center rounded transition-colors
+        ${disabled
+          ? 'text-gray-400 cursor-not-allowed'
+          : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+        }
+      `}
+      title={`${label} (${shortcut})`}
+      aria-label={`${label} (${shortcut})`}
+    >
+      {icon}
+    </button>
+  );
+}
+
+/**
  * Equipment type selector component with keyboard navigation
  */
 function EquipmentTypeSelector() {
@@ -101,21 +139,21 @@ function EquipmentTypeSelector() {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[(currentIndex + 1) % EQUIPMENT_TYPES.length]);
+          const nextIndex = (currentIndex + 1) % EQUIPMENT_TYPES.length;
+          setEquipmentType(EQUIPMENT_TYPES[nextIndex]!);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setEquipmentType(
-            EQUIPMENT_TYPES[(currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length]
-          );
+          const prevIndex = (currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length;
+          setEquipmentType(EQUIPMENT_TYPES[prevIndex]!);
           break;
         case 'Home':
           e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[0]);
+          setEquipmentType(EQUIPMENT_TYPES[0]!);
           break;
         case 'End':
           e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[EQUIPMENT_TYPES.length - 1]);
+          setEquipmentType(EQUIPMENT_TYPES[EQUIPMENT_TYPES.length - 1]!);
           break;
       }
     },
@@ -222,6 +260,34 @@ export function Toolbar({ className = '' }: ToolbarProps) {
           onClick={() => setTool(tool)}
         />
       ))}
+
+      {/* Undo/Redo buttons */}
+      <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
+        <UndoRedoButton
+          onClick={undo}
+          disabled={!useCanUndo()}
+          icon={
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 7v6h6" />
+              <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+            </svg>
+          }
+          label="Undo"
+          shortcut="Ctrl+Z"
+        />
+        <UndoRedoButton
+          onClick={redo}
+          disabled={!useCanRedo()}
+          icon={
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 7v6h-6" />
+              <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
+            </svg>
+          }
+          label="Redo"
+          shortcut="Ctrl+Y"
+        />
+      </div>
 
       {/* Show equipment type selector when equipment tool is active */}
       {currentTool === 'equipment' && <EquipmentTypeSelector />}
