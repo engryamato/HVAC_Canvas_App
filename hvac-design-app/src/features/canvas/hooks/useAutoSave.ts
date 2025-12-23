@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useCallback } from 'react';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
