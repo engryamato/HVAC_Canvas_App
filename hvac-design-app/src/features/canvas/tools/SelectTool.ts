@@ -6,6 +6,7 @@ import {
 } from './BaseTool';
 import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { deleteEntity, moveEntities } from '@/core/commands/entityCommands';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
 
@@ -15,6 +16,7 @@ interface SelectToolState {
   currentPoint: { x: number; y: number } | null;
   draggedEntityId: string | null;
   dragOffset: { x: number; y: number } | null;
+  initialPositions: Record<string, { x: number; y: number }>;
 }
 
 /**
@@ -29,6 +31,7 @@ export class SelectTool extends BaseTool {
     currentPoint: null,
     draggedEntityId: null,
     dragOffset: null,
+    initialPositions: {},
   };
 
   getCursor(): string {
@@ -75,6 +78,7 @@ export class SelectTool extends BaseTool {
           x: event.x - entity.transform.x,
           y: event.y - entity.transform.y,
         },
+        initialPositions: this.captureInitialPositions(selectedIds),
       };
     } else {
       if (!event.shiftKey) {
@@ -87,6 +91,7 @@ export class SelectTool extends BaseTool {
         currentPoint: { x: event.x, y: event.y },
         draggedEntityId: null,
         dragOffset: null,
+        initialPositions: {},
       };
     }
   }
@@ -126,12 +131,16 @@ export class SelectTool extends BaseTool {
       const bounds = boundsFromPoints(this.state.startPoint, this.state.currentPoint);
       this.selectEntitiesInBounds(bounds, event.shiftKey);
     }
+
+    if (this.state.mode === 'dragging') {
+      this.commitMoveHistory();
+    }
     this.reset();
   }
 
   onKeyDown(event: ToolKeyEvent): void {
     const { selectedIds, clearSelection, selectMultiple } = useSelectionStore.getState();
-    const { byId, removeEntity, addEntity, updateEntity } = useEntityStore.getState();
+    const { byId, addEntity } = useEntityStore.getState();
 
     // Escape: clear selection
     if (event.key === 'Escape') {
@@ -143,7 +152,10 @@ export class SelectTool extends BaseTool {
     // Delete/Backspace: remove selected entities
     if (event.key === 'Delete' || event.key === 'Backspace') {
       for (const id of selectedIds) {
-        removeEntity(id);
+        const entity = byId[id];
+        if (entity) {
+          deleteEntity(entity);
+        }
       }
       clearSelection();
       return;
@@ -192,18 +204,27 @@ export class SelectTool extends BaseTool {
     }
 
     if (deltaX !== 0 || deltaY !== 0) {
-      for (const id of selectedIds) {
-        const entity = byId[id];
-        if (entity) {
-          updateEntity(id, {
-            transform: {
-              ...entity.transform,
-              x: entity.transform.x + deltaX,
-              y: entity.transform.y + deltaY,
-            },
-          });
-        }
-      }
+      const moves = selectedIds
+        .map((id) => {
+          const entity = byId[id];
+          if (!entity) return null;
+          return {
+            id,
+            from: { x: entity.transform.x, y: entity.transform.y },
+            to: { x: entity.transform.x + deltaX, y: entity.transform.y + deltaY },
+          };
+        })
+        .filter((move): move is NonNullable<typeof move> => move !== null);
+
+      moves.forEach((move) => {
+        const entity = byId[move.id];
+        if (!entity) return;
+        useEntityStore.getState().updateEntity(move.id, {
+          transform: { ...entity.transform, x: move.to.x, y: move.to.y },
+        });
+      });
+
+      moveEntities(moves, false);
     }
   }
 
@@ -232,6 +253,7 @@ export class SelectTool extends BaseTool {
       currentPoint: null,
       draggedEntityId: null,
       dragOffset: null,
+      initialPositions: {},
     };
   }
 
@@ -305,6 +327,47 @@ export class SelectTool extends BaseTool {
       selectMultiple([...new Set([...current, ...selectedIds])]);
     } else {
       selectMultiple(selectedIds);
+    }
+  }
+
+  private captureInitialPositions(ids: string[]): Record<string, { x: number; y: number }> {
+    const { byId } = useEntityStore.getState();
+    const positions: Record<string, { x: number; y: number }> = {};
+
+    ids.forEach((id) => {
+      const entity = byId[id];
+      if (entity) {
+        positions[id] = { x: entity.transform.x, y: entity.transform.y };
+      }
+    });
+
+    return positions;
+  }
+
+  private commitMoveHistory(): void {
+    const { byId } = useEntityStore.getState();
+    const moves = Object.entries(this.state.initialPositions)
+      .map(([id, initial]) => {
+        const entity = byId[id];
+        if (!entity) return null;
+
+        const currentX = entity.transform.x;
+        const currentY = entity.transform.y;
+
+        if (currentX === initial.x && currentY === initial.y) {
+          return null;
+        }
+
+        return {
+          id,
+          from: { ...initial },
+          to: { x: currentX, y: currentY },
+        };
+      })
+      .filter((move): move is NonNullable<typeof move> => move !== null);
+
+    if (moves.length > 0) {
+      moveEntities(moves, false);
     }
   }
 }
