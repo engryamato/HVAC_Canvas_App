@@ -80,6 +80,72 @@ gh workflow run tauri-release.yml -f version=1.0.0
 
 **See also:** [Release Process Documentation](../../docs/RELEASE_PROCESS.md)
 
+### [`codeql.yml`](./codeql.yml) - Security Code Scanning
+
+**Purpose:** Automated security vulnerability detection in source code
+
+**Triggers:**
+- Push to: `main`, `develop`, `claude/**`
+- Pull requests to: `main`, `develop`
+- Schedule: Weekly on Mondays at 6:00 AM UTC
+
+**Jobs:**
+1. **analyze** - Static analysis for JavaScript/TypeScript
+
+**Features:**
+- Security-extended query suite
+- Automated vulnerability detection
+- SARIF results in GitHub Security tab
+- Quality checks included
+
+**Languages:**
+- JavaScript
+- TypeScript
+
+**Outputs:**
+- Security alerts in GitHub Security tab
+- SARIF files for detailed analysis
+
+### [`dependency-review.yml`](./dependency-review.yml) - Dependency Security
+
+**Purpose:** Review dependencies in pull requests for security vulnerabilities
+
+**Triggers:**
+- Pull requests to: `main`, `develop`
+
+**Jobs:**
+1. **dependency-review** - Check for vulnerable dependencies
+2. **npm-audit** - Node.js security scan
+3. **cargo-audit** - Rust security scan
+
+**Features:**
+- Fail on moderate+ severity vulnerabilities
+- License compliance checking
+- Automated PR comments
+- npm and Cargo audits
+
+**Security Checks:**
+- Vulnerability severity
+- License compatibility
+- Supply chain risks
+
+### Dependabot Configuration
+
+**File:** `.github/dependabot.yml`
+
+**Purpose:** Automated dependency updates
+
+**Update Schedule:**
+- **npm**: Weekly on Mondays at 9:00 AM
+- **GitHub Actions**: Weekly on Mondays at 9:00 AM
+- **Cargo**: Weekly on Mondays at 9:00 AM
+
+**Features:**
+- Grouped updates by type
+- Conventional commit messages
+- Auto-assignment to maintainers
+- Smart update strategies (patch for prod, minor+patch for dev)
+
 ## Usage
 
 ### Viewing Workflow Runs

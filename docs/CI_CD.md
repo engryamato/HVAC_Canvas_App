@@ -71,6 +71,64 @@ This project uses GitHub Actions for Continuous Integration and Continuous Deplo
 - All platform installers uploaded to GitHub release
 - Retained permanently as release assets
 
+### 4. CodeQL Security Scan (`.github/workflows/codeql.yml`)
+
+**Triggers:**
+- Push to branches: `main`, `develop`, `claude/**`
+- Pull requests to: `main`, `develop`
+- Schedule: Weekly on Mondays at 6:00 AM UTC
+
+**Jobs:**
+1. **Analyze Code** - Static security analysis for JavaScript/TypeScript
+
+**Features:**
+- Security-extended query suite
+- Quality checks included
+- SARIF results uploaded to GitHub Security tab
+- Automated vulnerability detection
+
+**Languages Scanned:**
+- JavaScript
+- TypeScript
+
+### 5. Dependency Review (`.github/workflows/dependency-review.yml`)
+
+**Triggers:**
+- Pull request events to: `main`, `develop`
+
+**Jobs:**
+1. **Dependency Review** - Check for vulnerable or incompatible dependencies
+2. **npm Audit** - Node.js dependency security scan
+3. **Cargo Audit** - Rust dependency security scan
+
+**Features:**
+- Fail on moderate+ severity vulnerabilities
+- License compliance checking
+- Automated PR comments with findings
+- Supply chain security validation
+
+**Allowed Licenses:** MIT, Apache-2.0, BSD-2/3-Clause, ISC, CC0-1.0, Unlicense
+
+**Denied Licenses:** GPL-2.0/3.0, AGPL-3.0, LGPL-2.1/3.0
+
+### 6. Dependabot (`.github/dependabot.yml`)
+
+**Automated Dependency Updates:**
+- **npm packages**: Weekly on Mondays at 9:00 AM
+- **GitHub Actions**: Weekly on Mondays at 9:00 AM
+- **Cargo/Rust**: Weekly on Mondays at 9:00 AM
+
+**Configuration:**
+- Grouped updates (dev vs. prod dependencies)
+- Auto-assign to maintainers
+- Conventional commit messages
+- Ignore major updates for critical packages (React, Next.js)
+
+**Update Strategy:**
+- Development dependencies: Minor + Patch
+- Production dependencies: Patch only (safer)
+- Manual review for major versions
+
 ## Pipeline Jobs
 
 ### Lint & Type Check
