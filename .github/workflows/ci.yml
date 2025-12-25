@@ -74,7 +74,7 @@ jobs:
           working-directory: ./hvac-design-app
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-report
           path: ./hvac-design-app/coverage/
@@ -126,7 +126,7 @@ jobs:
           NEXT_PUBLIC_DEBUG_MODE: false
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.build-type }}
           path: ./hvac-design-app/.next/
@@ -184,7 +184,7 @@ jobs:
 
       - name: Upload Tauri artifacts (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tauri-linux
           path: |
@@ -194,7 +194,7 @@ jobs:
 
       - name: Upload Tauri artifacts (Windows)
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tauri-windows
           path: |
@@ -204,7 +204,7 @@ jobs:
 
       - name: Upload Tauri artifacts (macOS)
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tauri-macos
           path: |
