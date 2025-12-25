@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { createEntity, deleteEntity, moveEntities } from '@/core/commands/entityCommands';
+import { createEntity, deleteEntities, updateEntity } from '@/core/commands/entityCommands';
 import type { Entity } from '@/core/schema';
 
 /**
@@ -22,12 +22,14 @@ export function useEntityOperations() {
    */
   const deleteSelected = useCallback(() => {
     const { byId } = useEntityStore.getState();
+    const selectionBefore = [...selectedIds];
 
-    for (const id of selectedIds) {
-      const entity = byId[id];
-      if (entity) {
-        deleteEntity(entity);
-      }
+    const entitiesToDelete = selectedIds
+      .map((id) => byId[id])
+      .filter((entity): entity is Entity => Boolean(entity));
+
+    if (entitiesToDelete.length > 0) {
+      deleteEntities(entitiesToDelete, { selectionBefore, selectionAfter: [] });
     }
 
     clearSelection();
@@ -39,28 +41,28 @@ export function useEntityOperations() {
   const duplicateSelected = useCallback(() => {
     const { byId } = useEntityStore.getState();
     const offset = snapToGrid ? gridSize : 24; // Default offset if snap is off
+    const selectionBefore = [...selectedIds];
+    const clones: Entity[] = selectedIds
+      .map((id) => byId[id])
+      .filter((entity): entity is Entity => Boolean(entity))
+      .map((entity) => ({
+        ...entity,
+        id: crypto.randomUUID(),
+        transform: {
+          ...entity.transform,
+          x: entity.transform.x + offset,
+          y: entity.transform.y + offset,
+        },
+        createdAt: new Date().toISOString(),
+        modifiedAt: new Date().toISOString(),
+      }));
+
     const newIds: string[] = [];
 
-    for (const id of selectedIds) {
-      const entity = byId[id];
-      if (entity) {
-        // Clone the entity with new ID and offset position
-        const clone: Entity = {
-          ...entity,
-          id: crypto.randomUUID(),
-          transform: {
-            ...entity.transform,
-            x: entity.transform.x + offset,
-            y: entity.transform.y + offset,
-          },
-          createdAt: new Date().toISOString(),
-          modifiedAt: new Date().toISOString(),
-        };
-
-        createEntity(clone);
-        newIds.push(clone.id);
-      }
-    }
+    clones.forEach((clone) => {
+      createEntity(clone, { selectionBefore, selectionAfter: clones.map((c) => c.id) });
+      newIds.push(clone.id);
+    });
 
     // Select the new clones
     if (newIds.length > 0) {
@@ -69,17 +71,13 @@ export function useEntityOperations() {
   }, [selectedIds, selectMultiple, gridSize, snapToGrid]);
 
   /**
-   * Move selected entities by delta
-   * Uses store's updateEntity for performance during keyboard nudging
+   * Move selected entities by delta with undo support
    */
   const moveSelected = useCallback(
     (deltaX: number, deltaY: number) => {
       const { byId } = useEntityStore.getState();
-
-      const moves = selectedIds
-        .map((id) => {
-          const entity = byId[id];
-          if (!entity) return null;
+      const selectionBefore = [...selectedIds];
+      const selectionAfter = [...selectedIds];
 
           let newX = entity.transform.x + deltaX;
           let newY = entity.transform.y + deltaY;
@@ -90,28 +88,21 @@ export function useEntityOperations() {
             newY = Math.round(newY / gridSize) * gridSize;
           }
 
-          return {
+          const previousState = JSON.parse(JSON.stringify(entity)) as Entity;
+          updateEntity(
             id,
-            from: { x: entity.transform.x, y: entity.transform.y },
-            to: { x: newX, y: newY },
-          };
-        })
-        .filter((move): move is NonNullable<typeof move> => move !== null);
-
-      moves.forEach((move) => {
-        const entity = byId[move.id];
-        if (!entity) return;
-
-        useEntityStore.getState().updateEntity(move.id, {
-          transform: {
-            ...entity.transform,
-            x: move.to.x,
-            y: move.to.y,
-          },
-        });
-      });
-
-      moveEntities(moves, false);
+            {
+              transform: {
+                ...entity.transform,
+                x: newX,
+                y: newY,
+              },
+            },
+            previousState,
+            { selectionBefore, selectionAfter }
+          );
+        }
+      }
     },
     [selectedIds, gridSize, snapToGrid]
   );

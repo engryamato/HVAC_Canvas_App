@@ -43,6 +43,10 @@ export interface Command {
 export interface ReversibleCommand extends Command {
   /** The command that reverses this action */
   inverse: Command;
+  /** Selection state before the command executed */
+  selectionBefore?: string[];
+  /** Selection state after the command executed */
+  selectionAfter?: string[];
 }
 
 /**

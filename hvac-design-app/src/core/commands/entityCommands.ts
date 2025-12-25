@@ -5,51 +5,30 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 
-type TransformSnapshot = Entity['transform'];
-
-type SelectionSnapshot = string[];
-
-interface TransformChange {
-  id: string;
-  from: TransformSnapshot;
-  to: TransformSnapshot;
+interface CommandOptions {
+  selectionBefore?: string[];
+  selectionAfter?: string[];
 }
 
-interface TransformCommandPayload {
-  transforms: { id: string; transform: TransformSnapshot }[];
-  selection?: string[];
-}
-
-function getSelectionSnapshot(): SelectionSnapshot {
-  return [...useSelectionStore.getState().selectedIds];
-}
-
-function applySelection(selection?: string[]) {
-  if (!selection) return;
-
-  const entityStore = useEntityStore.getState();
+function captureSelection(options?: CommandOptions): { before: string[]; after: string[] } {
   const selectionStore = useSelectionStore.getState();
-  const validIds = selection.filter((id) => Boolean(entityStore.byId[id]));
+  const before = options?.selectionBefore ?? [...selectionStore.selectedIds];
+  const after = options?.selectionAfter ?? before;
 
-  if (validIds.length > 0) {
-    selectionStore.selectMultiple(validIds);
-  } else {
-    selectionStore.clearSelection();
-  }
+  return { before, after };
 }
 
-export interface EntityMoveDelta {
-  id: string;
-  from: { x: number; y: number };
-  to: { x: number; y: number };
+function applySelection(selection?: string[]): void {
+  if (!selection) return;
+  useSelectionStore.getState().selectMultiple([...selection]);
 }
 
 /**
  * Create a new entity on the canvas
  * Pushes a reversible command to history for undo support
  */
-export function createEntity(entity: Entity): void {
-  const selectionBefore = getSelectionSnapshot();
+export function createEntity(entity: Entity, options?: CommandOptions): void {
+  const selection = captureSelection(options);
 
   const command: ReversibleCommand = {
     id: generateCommandId(),
@@ -62,6 +41,8 @@ export function createEntity(entity: Entity): void {
       payload: { entityId: entity.id, selection: selectionBefore },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   // Execute command
@@ -103,8 +84,13 @@ export function createEntities(entities: Entity[]): void {
  * Update an existing entity
  * Stores the previous state for undo support
  */
-export function updateEntity(id: string, updates: Partial<Entity>, previousState: Entity): void {
-  const selectionSnapshot = getSelectionSnapshot();
+export function updateEntity(
+  id: string,
+  updates: Partial<Entity>,
+  previousState: Entity,
+  options?: CommandOptions
+): void {
+  const selection = captureSelection(options);
 
   const command: ReversibleCommand = {
     id: generateCommandId(),
@@ -117,6 +103,8 @@ export function updateEntity(id: string, updates: Partial<Entity>, previousState
       payload: { id, updates: previousState, selection: selectionSnapshot },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   executeAndRecord(command);
@@ -126,9 +114,8 @@ export function updateEntity(id: string, updates: Partial<Entity>, previousState
  * Delete an entity from the canvas
  * Stores the entity for undo support
  */
-export function deleteEntity(entity: Entity): void {
-  const selectionBefore = getSelectionSnapshot();
-  const nextSelection = selectionBefore.filter((id) => id !== entity.id);
+export function deleteEntity(entity: Entity, options?: CommandOptions): void {
+  const selection = captureSelection(options);
 
   const command: ReversibleCommand = {
     id: generateCommandId(),
@@ -141,6 +128,8 @@ export function deleteEntity(entity: Entity): void {
       payload: { entity, selection: selectionBefore },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   useEntityStore.getState().removeEntity(entity.id);
@@ -152,11 +141,8 @@ export function deleteEntity(entity: Entity): void {
  * Delete multiple entities at once
  * Creates a single undoable command for all deletions
  */
-export function deleteEntities(entities: Entity[]): void {
-  if (entities.length === 0) return;
-
-  const selectionBefore = getSelectionSnapshot();
-  const remainingSelection = selectionBefore.filter((id) => !entities.some((entity) => entity.id === id));
+export function deleteEntities(entities: Entity[], options?: CommandOptions): void {
+  const selection = captureSelection(options);
 
   const command: ReversibleCommand = {
     id: generateCommandId(),
@@ -169,6 +155,8 @@ export function deleteEntities(entities: Entity[]): void {
       payload: { entities, selection: selectionBefore },
       timestamp: Date.now(),
     },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
   };
 
   useEntityStore.getState().removeEntities(entities.map((e) => e.id));
@@ -225,6 +213,7 @@ export function undo(): boolean {
   if (!command) return false;
 
   executeCommand(command.inverse);
+  applySelection(command.selectionBefore);
   return true;
 }
 
@@ -237,6 +226,7 @@ export function redo(): boolean {
   if (!command) return false;
 
   executeCommand(command);
+  applySelection(command.selectionAfter ?? command.selectionBefore);
   return true;
 }
 

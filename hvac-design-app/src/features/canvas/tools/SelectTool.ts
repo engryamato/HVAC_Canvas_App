@@ -9,7 +9,11 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { deleteEntity, moveEntities } from '@/core/commands/entityCommands';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
-import { createEntities, deleteEntities, moveEntities } from '@/core/commands';
+import {
+  createEntity,
+  deleteEntity,
+  updateEntity as updateEntityCommand,
+} from '@/core/commands/entityCommands';
 
 interface SelectToolState {
   mode: 'idle' | 'dragging' | 'marquee';
@@ -17,7 +21,9 @@ interface SelectToolState {
   currentPoint: { x: number; y: number } | null;
   draggedEntityId: string | null;
   dragOffset: { x: number; y: number } | null;
-  initialTransforms: Record<string, Entity['transform']> | null;
+  initialEntities: Record<string, Entity> | null;
+  initialSelection: string[];
+  hasMoved: boolean;
 }
 
 /**
@@ -32,7 +38,9 @@ export class SelectTool extends BaseTool {
     currentPoint: null,
     draggedEntityId: null,
     dragOffset: null,
-    initialTransforms: null,
+    initialEntities: null,
+    initialSelection: [],
+    hasMoved: false,
   };
 
   getCursor(): string {
@@ -62,7 +70,8 @@ export class SelectTool extends BaseTool {
     const entity = this.findEntityAtPoint(event.x, event.y);
 
     if (entity) {
-      const { selectedIds, select, toggleSelection } = useSelectionStore.getState();
+      const selectionStore = useSelectionStore.getState();
+      const { selectedIds, select, toggleSelection } = selectionStore;
 
       if (event.shiftKey) {
         toggleSelection(entity.id);
@@ -70,13 +79,13 @@ export class SelectTool extends BaseTool {
         select(entity.id);
       }
 
+      const finalSelection = [...useSelectionStore.getState().selectedIds];
       const { byId } = useEntityStore.getState();
-      const activeSelection = useSelectionStore.getState().selectedIds;
-      const initialTransforms: Record<string, Entity['transform']> = {};
-      activeSelection.forEach((id) => {
-        const found = byId[id];
-        if (found) {
-          initialTransforms[id] = { ...found.transform } as Entity['transform'];
+      const initialEntities: Record<string, Entity> = {};
+      finalSelection.forEach((id) => {
+        const target = byId[id];
+        if (target) {
+          initialEntities[id] = JSON.parse(JSON.stringify(target)) as Entity;
         }
       });
 
@@ -89,7 +98,9 @@ export class SelectTool extends BaseTool {
           x: event.x - entity.transform.x,
           y: event.y - entity.transform.y,
         },
-        initialTransforms,
+        initialEntities,
+        initialSelection: finalSelection,
+        hasMoved: false,
       };
     } else {
       if (!event.shiftKey) {
@@ -102,7 +113,9 @@ export class SelectTool extends BaseTool {
         currentPoint: { x: event.x, y: event.y },
         draggedEntityId: null,
         dragOffset: null,
-        initialTransforms: null,
+        initialEntities: null,
+        initialSelection: [],
+        hasMoved: false,
       };
     }
   }
@@ -132,12 +145,35 @@ export class SelectTool extends BaseTool {
               y: entity.transform.y + deltaY,
             },
           });
+          this.state.hasMoved = this.state.hasMoved || deltaX !== 0 || deltaY !== 0;
         }
       }
     }
   }
 
   onMouseUp(event: ToolMouseEvent): void {
+    if (this.state.mode === 'dragging' && this.state.initialEntities && this.state.hasMoved) {
+      const { byId } = useEntityStore.getState();
+      const selectionAfter = [...useSelectionStore.getState().selectedIds];
+
+      Object.entries(this.state.initialEntities).forEach(([id, initialEntity]) => {
+        const current = byId[id];
+        if (!current) return;
+
+        if (
+          current.transform.x !== initialEntity.transform.x ||
+          current.transform.y !== initialEntity.transform.y
+        ) {
+          updateEntityCommand(
+            id,
+            { transform: { ...current.transform } },
+            initialEntity,
+            { selectionBefore: this.state.initialSelection, selectionAfter }
+          );
+        }
+      });
+    }
+
     if (this.state.mode === 'marquee' && this.state.startPoint && this.state.currentPoint) {
       const bounds = boundsFromPoints(this.state.startPoint, this.state.currentPoint);
       this.selectEntitiesInBounds(bounds, event.shiftKey);
@@ -165,8 +201,8 @@ export class SelectTool extends BaseTool {
   }
 
   onKeyDown(event: ToolKeyEvent): void {
-    const { selectedIds, clearSelection } = useSelectionStore.getState();
-    const { byId, updateEntity } = useEntityStore.getState();
+    const { selectedIds, clearSelection, selectMultiple } = useSelectionStore.getState();
+    const { byId } = useEntityStore.getState();
 
     // Escape: clear selection
     if (event.key === 'Escape') {
@@ -176,29 +212,36 @@ export class SelectTool extends BaseTool {
     }
 
     // Delete/Backspace: remove selected entities
-    if ((event.key === 'Delete' || event.key === 'Backspace') && selectedIds.length > 0) {
-      const entities = selectedIds
-        .map((id) => byId[id])
-        .filter((entity): entity is Entity => Boolean(entity));
-
-      deleteEntities(entities);
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      const selectionBefore = [...selectedIds];
+      for (const id of selectedIds) {
+        const entity = byId[id];
+        if (entity) {
+          deleteEntity(entity, { selectionBefore, selectionAfter: [] });
+        }
+      }
+      clearSelection();
       return;
     }
 
     // Ctrl+D: duplicate selected entities
     if (event.ctrlKey && event.key === 'd') {
-      const duplicates: Entity[] = [];
-      for (const id of selectedIds) {
-        const entity = byId[id];
-        if (entity) {
-          // Create a deep copy with new ID and offset position
-          const duplicate = JSON.parse(JSON.stringify(entity));
+      const selectionBefore = [...selectedIds];
+      const duplicates: Entity[] = selectedIds
+        .map((id) => byId[id])
+        .filter((entity): entity is Entity => Boolean(entity))
+        .map((entity) => {
+          const duplicate = JSON.parse(JSON.stringify(entity)) as Entity;
           duplicate.id = crypto.randomUUID();
           duplicate.transform.x += 24; // Offset by 2 feet
           duplicate.transform.y += 24;
-          duplicates.push(duplicate);
-        }
-      }
+          return duplicate;
+        });
+
+      const newIds = duplicates.map((duplicate) => duplicate.id);
+      duplicates.forEach((duplicate) =>
+        createEntity(duplicate, { selectionBefore, selectionAfter: newIds })
+      );
       // Select the duplicated entities
       if (duplicates.length > 0) {
         createEntities(duplicates);
@@ -227,18 +270,24 @@ export class SelectTool extends BaseTool {
     }
 
     if (deltaX !== 0 || deltaY !== 0) {
-      const initialTransforms: Record<string, Entity['transform']> = {};
-      selectedIds.forEach((id) => {
+      const selectionBefore = [...selectedIds];
+      const selectionAfter = [...selectedIds];
+      for (const id of selectedIds) {
         const entity = byId[id];
         if (entity) {
-          initialTransforms[id] = { ...entity.transform };
-          updateEntity(id, {
-            transform: {
-              ...entity.transform,
-              x: entity.transform.x + deltaX,
-              y: entity.transform.y + deltaY,
+          const previousState = JSON.parse(JSON.stringify(entity)) as Entity;
+          updateEntityCommand(
+            id,
+            {
+              transform: {
+                ...entity.transform,
+                x: entity.transform.x + deltaX,
+                y: entity.transform.y + deltaY,
+              },
             },
-          });
+            previousState,
+            { selectionBefore, selectionAfter }
+          );
         }
       });
 
@@ -284,7 +333,9 @@ export class SelectTool extends BaseTool {
       currentPoint: null,
       draggedEntityId: null,
       dragOffset: null,
-      initialTransforms: null,
+      initialEntities: null,
+      initialSelection: [],
+      hasMoved: false,
     };
   }
 
