@@ -1,0 +1,81 @@
+import type { Fitting, FittingType } from '@/core/schema';
+import {
+  DEFAULT_FITTING_PROPS,
+  DEFAULT_FITTING_CALCULATED,
+} from '@/core/schema/fitting.schema';
+
+/**
+ * Counter for auto-incrementing fitting names
+ */
+let fittingCounter = 1;
+
+/**
+ * Reset the fitting counter (useful for testing)
+ */
+export function resetFittingCounter(): void {
+  fittingCounter = 1;
+}
+
+/**
+ * Get the next fitting number and increment counter
+ */
+export function getNextFittingNumber(): number {
+  return fittingCounter++;
+}
+
+/**
+ * Create a new fitting entity with default values
+ */
+export function createFitting(
+  fittingType: FittingType,
+  overrides?: Partial<{
+    name: string;
+    x: number;
+    y: number;
+    angle: number;
+    inletDuctId: string;
+    outletDuctId: string;
+  }>
+): Fitting {
+  const fittingNumber = getNextFittingNumber();
+  const now = new Date().toISOString();
+  const typeDefaults = DEFAULT_FITTING_PROPS[fittingType];
+
+  const props = {
+    name: overrides?.name ?? `Fitting ${fittingNumber}`,
+    fittingType,
+    angle: overrides?.angle ?? typeDefaults.angle,
+    inletDuctId: overrides?.inletDuctId,
+    outletDuctId: overrides?.outletDuctId,
+  };
+
+  return {
+    id: crypto.randomUUID(),
+    type: 'fitting',
+    transform: {
+      x: overrides?.x ?? 0,
+      y: overrides?.y ?? 0,
+      rotation: 0,
+      scaleX: 1,
+      scaleY: 1,
+    },
+    zIndex: 10, // Fittings should render above ducts
+    createdAt: now,
+    modifiedAt: now,
+    props,
+    calculated: { ...DEFAULT_FITTING_CALCULATED },
+  };
+}
+
+/**
+ * Labels for fitting types (UI display)
+ */
+export const FITTING_TYPE_LABELS: Record<FittingType, string> = {
+  elbow_90: '90° Elbow',
+  elbow_45: '45° Elbow',
+  tee: 'Tee',
+  reducer: 'Reducer',
+  cap: 'Cap',
+};
+
+export default createFitting;
