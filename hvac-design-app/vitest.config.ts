@@ -12,13 +12,19 @@ export default defineConfig({
     exclude: ['node_modules/', 'e2e/', 'src-tauri/'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
+      reportsDirectory: './coverage',
       exclude: [
         'node_modules/',
         'src/__tests__/',
         '**/*.config.{js,ts}',
         '**/types/**',
         'e2e/',
+        '**/*.d.ts',
+        '**/index.ts', // Barrel exports
+        '**/__tests__/**',
+        '**/*.test.{ts,tsx}',
+        '**/*.spec.{ts,tsx}',
       ],
       thresholds: {
         statements: 70,
@@ -26,6 +32,7 @@ export default defineConfig({
         functions: 70,
         lines: 70,
       },
+      all: true, // Include all files in coverage, not just tested ones
     },
   },
   resolve: {

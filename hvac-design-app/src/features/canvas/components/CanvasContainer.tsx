@@ -15,6 +15,8 @@ import {
   RoomTool,
   DuctTool,
   EquipmentTool,
+  FittingTool,
+  NoteTool,
   type ITool,
   type ToolMouseEvent,
   type ToolRenderContext,
@@ -40,8 +42,8 @@ function createToolInstances(): Record<CanvasTool, ITool> {
     room: new RoomTool(),
     duct: new DuctTool(),
     equipment: new EquipmentTool(),
-    fitting: new SelectTool(), // Placeholder - not implemented yet
-    note: new SelectTool(), // Placeholder - not implemented yet
+    fitting: new FittingTool(),
+    note: new NoteTool(),
   };
 }
 

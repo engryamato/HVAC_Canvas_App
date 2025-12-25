@@ -1,0 +1,59 @@
+.section {
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  text-align: left;
+  transition: background 150ms;
+}
+
+.header:hover {
+  background: #F9FAFB;
+}
+
+.header:focus {
+  outline: 2px solid #6366F1;
+  outline-offset: -2px;
+}
+
+.icon {
+  font-size: 10px;
+  color: #6B7280;
+  transition: transform 150ms;
+  display: inline-block;
+}
+
+.icon.expanded {
+  transform: rotate(90deg);
+}
+
+.title {
+  flex: 1;
+}
+
+.content {
+  padding: 0 16px 16px 16px;
+  animation: slideDown 150ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
