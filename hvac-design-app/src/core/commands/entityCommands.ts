@@ -206,3 +206,4 @@ function executeAndRecord(command: ReversibleCommand, applyImmediately = true): 
   }
   useHistoryStore.getState().push(command);
 }
+

@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { createEntity, deleteEntity } from '@/core/commands/entityCommands';
+import { createEntity, deleteEntity, moveEntities } from '@/core/commands/entityCommands';
 import type { Entity } from '@/core/schema';
 
 /**
@@ -74,11 +74,13 @@ export function useEntityOperations() {
    */
   const moveSelected = useCallback(
     (deltaX: number, deltaY: number) => {
-      const { byId, updateEntity } = useEntityStore.getState();
+      const { byId } = useEntityStore.getState();
 
-      for (const id of selectedIds) {
-        const entity = byId[id];
-        if (entity) {
+      const moves = selectedIds
+        .map((id) => {
+          const entity = byId[id];
+          if (!entity) return null;
+
           let newX = entity.transform.x + deltaX;
           let newY = entity.transform.y + deltaY;
 
@@ -88,15 +90,28 @@ export function useEntityOperations() {
             newY = Math.round(newY / gridSize) * gridSize;
           }
 
-          updateEntity(id, {
-            transform: {
-              ...entity.transform,
-              x: newX,
-              y: newY,
-            },
-          });
-        }
-      }
+          return {
+            id,
+            from: { x: entity.transform.x, y: entity.transform.y },
+            to: { x: newX, y: newY },
+          };
+        })
+        .filter((move): move is NonNullable<typeof move> => move !== null);
+
+      moves.forEach((move) => {
+        const entity = byId[move.id];
+        if (!entity) return;
+
+        useEntityStore.getState().updateEntity(move.id, {
+          transform: {
+            ...entity.transform,
+            x: move.to.x,
+            y: move.to.y,
+          },
+        });
+      });
+
+      moveEntities(moves, false);
     },
     [selectedIds, gridSize, snapToGrid]
   );
