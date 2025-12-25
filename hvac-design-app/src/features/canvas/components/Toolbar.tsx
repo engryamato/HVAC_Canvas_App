@@ -4,7 +4,6 @@ import React from 'react';
 import {
   useToolStore,
   useToolActions,
-<<<<<<< HEAD
   useSelectedEquipmentType,
   type CanvasTool,
 } from '@/core/store/canvas.store';
@@ -12,12 +11,6 @@ import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
 import { EQUIPMENT_TYPE_LABELS } from '../entities/equipmentDefaults';
-=======
-  type CanvasTool,
-} from '@/core/store/canvas.store';
-import { redo, undo } from '@/core/commands/entityCommands';
-import { useCanRedo, useCanUndo } from '@/core/commands/historyStore';
->>>>>>> pr/4
 
 interface ToolButtonProps {
   tool: CanvasTool;
@@ -89,20 +82,6 @@ const EquipmentIcon = () => (
   </svg>
 );
 
-const UndoIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <polyline points="9 14 4 9 9 4" />
-    <path d="M20 20a9 9 0 0 0-9-9H4" />
-  </svg>
-);
-
-const RedoIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <polyline points="15 10 20 15 15 20" />
-    <path d="M4 4a9 9 0 0 1 9 9h7" />
-  </svg>
-);
-
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
@@ -160,13 +139,11 @@ function EquipmentTypeSelector() {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          const nextIndex = (currentIndex + 1) % EQUIPMENT_TYPES.length;
-          setEquipmentType(EQUIPMENT_TYPES[nextIndex]!);
+          setEquipmentType(EQUIPMENT_TYPES[(currentIndex + 1) % EQUIPMENT_TYPES.length]!);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          const prevIndex = (currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length;
-          setEquipmentType(EQUIPMENT_TYPES[prevIndex]!);
+          setEquipmentType(EQUIPMENT_TYPES[(currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length]!);
           break;
         case 'Home':
           e.preventDefault();
@@ -284,33 +261,6 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       role="toolbar"
       aria-label="Canvas tools"
     >
-      <div className="flex gap-2 mb-2" aria-label="Undo and redo controls">
-        <button
-          type="button"
-          onClick={() => undo()}
-          disabled={!canUndo}
-          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-150 ${
-            canUndo ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-gray-50 text-gray-400'
-          }`}
-          title="Undo (Ctrl+Z)"
-          aria-label="Undo"
-        >
-          <UndoIcon />
-        </button>
-        <button
-          type="button"
-          onClick={() => redo()}
-          disabled={!canRedo}
-          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-150 ${
-            canRedo ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-gray-50 text-gray-400'
-          }`}
-          title="Redo (Ctrl+Y)"
-          aria-label="Redo"
-        >
-          <RedoIcon />
-        </button>
-      </div>
-
       {TOOLS.map(({ tool, icon, label, shortcut }) => (
         <ToolButton
           key={tool}
@@ -327,7 +277,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
         <UndoRedoButton
           onClick={undo}
-          disabled={!useCanUndo()}
+          disabled={!canUndo}
           icon={
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 7v6h6" />
@@ -339,7 +289,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         />
         <UndoRedoButton
           onClick={redo}
-          disabled={!useCanRedo()}
+          disabled={!canRedo}
           icon={
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 7v6h-6" />
