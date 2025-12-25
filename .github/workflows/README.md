@@ -44,6 +44,42 @@ This directory contains GitHub Actions workflows for CI/CD automation.
 - Bundle size analysis in job summary
 - Code metrics in job summary
 
+### [`tauri-release.yml`](./tauri-release.yml) - Automated Releases
+
+**Purpose:** Build and publish Tauri desktop app releases
+
+**Triggers:**
+- Push to version tags: `v*.*.*` (e.g., `v1.0.0`, `v2.1.3-beta`)
+- Manual workflow dispatch with version input
+
+**Jobs:**
+1. **create-release** - Create GitHub release with changelog
+2. **build-and-upload** - Build installers for all platforms:
+   - Linux: `.deb`, `.AppImage`
+   - Windows: `.exe` (NSIS), `.msi`
+   - macOS Intel: `.dmg` (x64)
+   - macOS Apple Silicon: `.dmg` (aarch64)
+3. **update-release-notes** - Add installation instructions
+4. **notify-success** - Post success summary
+5. **notify-failure** - Post failure details (if failed)
+
+**Outputs:**
+- GitHub Release with installers
+- Release notes from CHANGELOG.md
+- Installation instructions
+
+**Usage:**
+```bash
+# Create and push version tag
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+
+# Or trigger manually via GitHub UI or CLI
+gh workflow run tauri-release.yml -f version=1.0.0
+```
+
+**See also:** [Release Process Documentation](../../docs/RELEASE_PROCESS.md)
+
 ## Usage
 
 ### Viewing Workflow Runs

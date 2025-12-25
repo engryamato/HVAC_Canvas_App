@@ -1,0 +1,301 @@
+name: Tauri Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger on version tags like v1.0.0, v1.2.3-beta
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  # Job 1: Create GitHub Release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag or input
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Extract changelog for version
+        id: changelog
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+
+          if [ -f "CHANGELOG.md" ]; then
+            # Extract changelog section for this version
+            CHANGELOG=$(sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | sed '$d')
+
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="Release version ${VERSION}"
+            fi
+          else
+            CHANGELOG="Release version ${VERSION}"
+          fi
+
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: HVAC Canvas App v${{ steps.get_version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+
+  # Job 2: Build and Upload Artifacts
+  build-and-upload:
+    name: Build ${{ matrix.platform }}
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-latest
+            rust_target: x86_64-unknown-linux-gnu
+            artifact_name: 'HVAC-Canvas-App_${{ needs.create-release.outputs.version }}_amd64.deb'
+            artifact_path: 'hvac-design-app/src-tauri/target/release/bundle/deb/*.deb'
+
+          - platform: linux-appimage
+            os: ubuntu-latest
+            rust_target: x86_64-unknown-linux-gnu
+            artifact_name: 'HVAC-Canvas-App_${{ needs.create-release.outputs.version }}_amd64.AppImage'
+            artifact_path: 'hvac-design-app/src-tauri/target/release/bundle/appimage/*.AppImage'
+
+          - platform: windows
+            os: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            artifact_name: 'HVAC-Canvas-App_${{ needs.create-release.outputs.version }}_x64-setup.exe'
+            artifact_path: 'hvac-design-app/src-tauri/target/release/bundle/nsis/*.exe'
+
+          - platform: windows-msi
+            os: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            artifact_name: 'HVAC-Canvas-App_${{ needs.create-release.outputs.version }}_x64_en-US.msi'
+            artifact_path: 'hvac-design-app/src-tauri/target/release/bundle/msi/*.msi'
+
+          - platform: macos
+            os: macos-latest
+            rust_target: x86_64-apple-darwin
+            artifact_name: 'HVAC-Canvas-App_${{ needs.create-release.outputs.version }}_x64.dmg'
+            artifact_path: 'hvac-design-app/src-tauri/target/release/bundle/dmg/*.dmg'
+
+          - platform: macos-arm
+            os: macos-latest
+            rust_target: aarch64-apple-darwin
+            artifact_name: 'HVAC-Canvas-App_${{ needs.create-release.outputs.version }}_aarch64.dmg'
+            artifact_path: 'hvac-design-app/src-tauri/target/release/bundle/dmg/*.dmg'
+
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.0-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Validate environment
+        run: npm run validate-env
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_DEBUG_MODE: false
+
+      - name: Build Tauri app
+        run: npm run tauri:build -- --target ${{ matrix.rust_target }}
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_DEBUG_MODE: false
+
+      - name: Find and rename artifact
+        id: find_artifact
+        shell: bash
+        run: |
+          ARTIFACT=$(find src-tauri/target/release/bundle -name "*.deb" -o -name "*.AppImage" -o -name "*.exe" -o -name "*.msi" -o -name "*.dmg" | head -1)
+
+          if [ -z "$ARTIFACT" ]; then
+            echo "No artifact found!"
+            exit 1
+          fi
+
+          echo "Found artifact: $ARTIFACT"
+          echo "artifact_path=$ARTIFACT" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.find_artifact.outputs.artifact_path }}
+          asset_name: ${{ matrix.artifact_name }}
+          asset_content_type: application/octet-stream
+
+  # Job 3: Update Release Notes
+  update-release-notes:
+    name: Update Release Notes
+    needs: [create-release, build-and-upload]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate release notes
+        run: |
+          VERSION="${{ needs.create-release.outputs.version }}"
+
+          cat > release_notes.md <<EOF
+          ## HVAC Canvas App v${VERSION}
+
+          ### Installation
+
+          **Windows:**
+          - Download and run \`HVAC-Canvas-App_${VERSION}_x64-setup.exe\` (recommended)
+          - Or install via MSI: \`HVAC-Canvas-App_${VERSION}_x64_en-US.msi\`
+
+          **macOS:**
+          - Download \`HVAC-Canvas-App_${VERSION}_x64.dmg\` (Intel)
+          - Or \`HVAC-Canvas-App_${VERSION}_aarch64.dmg\` (Apple Silicon)
+          - Drag to Applications folder
+
+          **Linux:**
+          - Debian/Ubuntu: \`sudo dpkg -i HVAC-Canvas-App_${VERSION}_amd64.deb\`
+          - AppImage: \`chmod +x HVAC-Canvas-App_${VERSION}_amd64.AppImage && ./HVAC-Canvas-App_${VERSION}_amd64.AppImage\`
+
+          ### What's New
+
+          EOF
+
+          if [ -f "CHANGELOG.md" ]; then
+            sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | sed '$d' >> release_notes.md
+          else
+            echo "See commit history for changes in this release." >> release_notes.md
+          fi
+
+          cat release_notes.md
+
+      - name: Update release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const notes = fs.readFileSync('release_notes.md', 'utf8');
+
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const release = releases.data.find(r => r.tag_name === 'v${{ needs.create-release.outputs.version }}');
+
+            if (release) {
+              await github.rest.repos.updateRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                body: notes,
+              });
+            }
+
+  # Job 4: Notify on Success
+  notify-success:
+    name: Notify Success
+    needs: [create-release, build-and-upload, update-release-notes]
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Create success summary
+        run: |
+          VERSION="${{ needs.create-release.outputs.version }}"
+
+          echo "## 🎉 Release v${VERSION} Published Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts Built:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Windows (exe, msi)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ macOS (Intel & Apple Silicon)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Linux (deb, AppImage)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release URL:" >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ github.repository }}/releases/tag/v${VERSION}" >> $GITHUB_STEP_SUMMARY
+
+  # Job 5: Notify on Failure
+  notify-failure:
+    name: Notify Failure
+    needs: [create-release, build-and-upload]
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Create failure summary
+        run: |
+          VERSION="${{ needs.create-release.outputs.version }}"
+
+          echo "## ❌ Release v${VERSION} Failed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Troubleshooting:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify Rust target is installed" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check platform-specific dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "3. Review build logs for compilation errors" >> $GITHUB_STEP_SUMMARY
+          echo "4. Ensure version tag matches semver format (v1.2.3)" >> $GITHUB_STEP_SUMMARY
