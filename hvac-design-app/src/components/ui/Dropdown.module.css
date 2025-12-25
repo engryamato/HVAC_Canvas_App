@@ -1,0 +1,98 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 150ms;
+  min-width: 120px;
+}
+
+.trigger:hover {
+  border-color: #9CA3AF;
+  background: #F9FAFB;
+}
+
+.trigger:focus {
+  outline: 2px solid #6366F1;
+  outline-offset: 2px;
+}
+
+.triggerIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.triggerLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.arrow {
+  margin-left: auto;
+  font-size: 10px;
+  color: #6B7280;
+  transition: transform 150ms;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  background: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background 100ms;
+}
+
+.menuItem:hover {
+  background: #F3F4F6;
+}
+
+.menuItem.selected {
+  background: #EEF2FF;
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+.itemIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

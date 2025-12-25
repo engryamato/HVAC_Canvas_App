@@ -9,6 +9,7 @@
  */
 import { create } from 'zustand';
 import type { EquipmentType } from '../schema/equipment.schema';
+import type { FittingType } from '../schema/fitting.schema';
 
 /**
  * Available canvas tool types
@@ -20,6 +21,8 @@ interface ToolState {
   currentTool: CanvasTool;
   /** Selected equipment type when equipment tool is active */
   selectedEquipmentType: EquipmentType;
+  /** Selected fitting type when fitting tool is active */
+  selectedFittingType: FittingType;
 }
 
 interface ToolActions {
@@ -29,6 +32,8 @@ interface ToolActions {
   resetTool: () => void;
   /** Set the selected equipment type */
   setEquipmentType: (type: EquipmentType) => void;
+  /** Set the selected fitting type */
+  setFittingType: (type: FittingType) => void;
 }
 
 type ToolStore = ToolState & ToolActions;
@@ -36,6 +41,7 @@ type ToolStore = ToolState & ToolActions;
 const initialState: ToolState = {
   currentTool: 'select',
   selectedEquipmentType: 'fan',
+  selectedFittingType: 'elbow_90',
 };
 
 export const useToolStore = create<ToolStore>((set) => ({
@@ -46,6 +52,8 @@ export const useToolStore = create<ToolStore>((set) => ({
   resetTool: () => set({ currentTool: 'select' }),
 
   setEquipmentType: (type) => set({ selectedEquipmentType: type }),
+
+  setFittingType: (type) => set({ selectedFittingType: type }),
 }));
 
 // Hook selectors (for React components with reactivity)
@@ -56,12 +64,15 @@ export const useIsToolActive = (tool: CanvasTool) =>
 
 export const useSelectedEquipmentType = () => useToolStore((state) => state.selectedEquipmentType);
 
+export const useSelectedFittingType = () => useToolStore((state) => state.selectedFittingType);
+
 // Actions hook (per naming convention)
 export const useToolActions = () =>
   useToolStore((state) => ({
     setTool: state.setTool,
     resetTool: state.resetTool,
     setEquipmentType: state.setEquipmentType,
+    setFittingType: state.setFittingType,
   }));
 
 /**

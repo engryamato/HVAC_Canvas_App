@@ -4,6 +4,12 @@ import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
 
+export interface EntityMoveDelta {
+  id: string;
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+}
+
 /**
  * Create a new entity on the canvas
  * Pushes a reversible command to history for undo support
@@ -22,11 +28,7 @@ export function createEntity(entity: Entity): void {
     },
   };
 
-  // Execute command
-  useEntityStore.getState().addEntity(entity);
-
-  // Push to history
-  useHistoryStore.getState().push(command);
+  executeAndRecord(command);
 }
 
 /**
@@ -47,8 +49,7 @@ export function updateEntity(id: string, updates: Partial<Entity>, previousState
     },
   };
 
-  useEntityStore.getState().updateEntity(id, updates);
-  useHistoryStore.getState().push(command);
+  executeAndRecord(command);
 }
 
 /**
@@ -69,8 +70,7 @@ export function deleteEntity(entity: Entity): void {
     },
   };
 
-  useEntityStore.getState().removeEntity(entity.id);
-  useHistoryStore.getState().push(command);
+  executeAndRecord(command);
 }
 
 /**
@@ -91,8 +91,36 @@ export function deleteEntities(entities: Entity[]): void {
     },
   };
 
-  useEntityStore.getState().removeEntities(entities.map((e) => e.id));
-  useHistoryStore.getState().push(command);
+  executeAndRecord(command);
+}
+
+/**
+ * Move one or more entities from previous to new coordinates.
+ * If applyImmediately is true (default), the move is applied before recording history.
+ */
+export function moveEntities(moves: EntityMoveDelta[], applyImmediately = true): void {
+  if (moves.length === 0) return;
+
+  const command: ReversibleCommand = {
+    id: generateCommandId(),
+    type: moves.length === 1 ? CommandType.MOVE_ENTITY : CommandType.MOVE_ENTITIES,
+    payload: { moves },
+    timestamp: Date.now(),
+    inverse: {
+      id: generateCommandId(),
+      type: moves.length === 1 ? CommandType.MOVE_ENTITY : CommandType.MOVE_ENTITIES,
+      payload: {
+        moves: moves.map((move) => ({
+          id: move.id,
+          from: move.to,
+          to: move.from,
+        })),
+      },
+      timestamp: Date.now(),
+    },
+  };
+
+  executeAndRecord(command, applyImmediately);
 }
 
 /**
@@ -101,9 +129,7 @@ export function deleteEntities(entities: Entity[]): void {
  */
 export function undo(): boolean {
   const command = useHistoryStore.getState().undo();
-  if (!command) {
-    return false;
-  }
+  if (!command) return false;
 
   executeCommand(command.inverse);
   return true;
@@ -115,9 +141,7 @@ export function undo(): boolean {
  */
 export function redo(): boolean {
   const command = useHistoryStore.getState().redo();
-  if (!command) {
-    return false;
-  }
+  if (!command) return false;
 
   executeCommand(command);
   return true;
@@ -156,5 +180,29 @@ function executeCommand(command: Command): void {
       entityStore.removeEntities(entityIds);
       break;
     }
+
+    case CommandType.MOVE_ENTITY:
+    case CommandType.MOVE_ENTITIES: {
+      const { moves } = command.payload as { moves: EntityMoveDelta[] };
+      moves.forEach((move) => {
+        const entity = entityStore.byId[move.id];
+        if (!entity) return;
+        entityStore.updateEntity(move.id, {
+          transform: {
+            ...entity.transform,
+            x: move.to.x,
+            y: move.to.y,
+          },
+        });
+      });
+      break;
+    }
   }
+}
+
+function executeAndRecord(command: ReversibleCommand, applyImmediately = true): void {
+  if (applyImmediately) {
+    executeCommand(command);
+  }
+  useHistoryStore.getState().push(command);
 }

@@ -23,5 +23,20 @@ export {
   default as createEquipmentDefault,
 } from './equipmentDefaults';
 
+export {
+  createFitting,
+  getNextFittingNumber,
+  resetFittingCounter,
+  FITTING_TYPE_LABELS,
+  default as createFittingDefault,
+} from './fittingDefaults';
+
+export {
+  createNote,
+  getNextNoteNumber,
+  resetNoteCounter,
+  default as createNoteDefault,
+} from './noteDefaults';
+
 // Re-export calculation functions from calculators
 export { calculateRoomValues } from '../calculators/ventilation';
