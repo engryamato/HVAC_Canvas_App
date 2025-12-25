@@ -5,15 +5,12 @@ import {
   useToolStore,
   useToolActions,
   useSelectedEquipmentType,
-  useSelectedFittingType,
   type CanvasTool,
 } from '@/core/store/canvas.store';
 import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
-import type { FittingType } from '@/core/schema/fitting.schema';
 import { EQUIPMENT_TYPE_LABELS } from '../entities/equipmentDefaults';
-import { FITTING_TYPE_LABELS } from '../entities/fittingDefaults';
 
 interface ToolButtonProps {
   tool: CanvasTool;
@@ -85,33 +82,14 @@ const EquipmentIcon = () => (
   </svg>
 );
 
-const FittingIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="10" y="10" width="8" height="8" rx="1" transform="rotate(45 12 12)" />
-  </svg>
-);
-
-const NoteIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <polyline points="14,2 14,8 20,8" />
-    <line x1="8" y1="13" x2="16" y2="13" />
-    <line x1="8" y1="17" x2="16" y2="17" />
-  </svg>
-);
-
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
   { tool: 'duct', icon: <DuctIcon />, label: 'Duct', shortcut: 'D' },
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
-  { tool: 'fitting', icon: <FittingIcon />, label: 'Fitting', shortcut: 'F' },
-  { tool: 'note', icon: <NoteIcon />, label: 'Note', shortcut: 'N' },
 ];
 
 const EQUIPMENT_TYPES: EquipmentType[] = ['hood', 'fan', 'diffuser', 'damper', 'air_handler'];
-
-const FITTING_TYPES: FittingType[] = ['elbow_90', 'elbow_45', 'tee', 'reducer', 'cap'];
 
 /**
  * Undo/Redo button component
@@ -161,13 +139,11 @@ function EquipmentTypeSelector() {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          const nextIndex = (currentIndex + 1) % EQUIPMENT_TYPES.length;
-          setEquipmentType(EQUIPMENT_TYPES[nextIndex]!);
+          setEquipmentType(EQUIPMENT_TYPES[(currentIndex + 1) % EQUIPMENT_TYPES.length]!);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          const prevIndex = (currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length;
-          setEquipmentType(EQUIPMENT_TYPES[prevIndex]!);
+          setEquipmentType(EQUIPMENT_TYPES[(currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length]!);
           break;
         case 'Home':
           e.preventDefault();
@@ -221,78 +197,6 @@ function EquipmentTypeSelector() {
   );
 }
 
-/**
- * Fitting type selector component with keyboard navigation
- */
-function FittingTypeSelector() {
-  const selectedType = useSelectedFittingType();
-  const { setFittingType } = useToolActions();
-
-  const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent, currentIndex: number) => {
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          const nextIndex = (currentIndex + 1) % FITTING_TYPES.length;
-          setFittingType(FITTING_TYPES[nextIndex]!);
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          const prevIndex = (currentIndex - 1 + FITTING_TYPES.length) % FITTING_TYPES.length;
-          setFittingType(FITTING_TYPES[prevIndex]!);
-          break;
-        case 'Home':
-          e.preventDefault();
-          setFittingType(FITTING_TYPES[0]!);
-          break;
-        case 'End':
-          e.preventDefault();
-          setFittingType(FITTING_TYPES[FITTING_TYPES.length - 1]!);
-          break;
-      }
-    },
-    [setFittingType]
-  );
-
-  return (
-    <div
-      className="flex flex-col gap-1 p-2 border-t border-gray-200"
-      role="radiogroup"
-      aria-label="Fitting type selection"
-    >
-      <div id="fitting-type-label" className="text-xs text-gray-500 font-medium mb-1">
-        Fitting Type
-      </div>
-      {FITTING_TYPES.map((type, index) => {
-        const isSelected = selectedType === type;
-        return (
-          <button
-            key={type}
-            type="button"
-            role="radio"
-            aria-checked={isSelected}
-            aria-labelledby="fitting-type-label"
-            onClick={() => setFittingType(type)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-            tabIndex={isSelected ? 0 : -1}
-            className={`
-              px-2 py-1.5 text-xs rounded transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${
-                isSelected
-                  ? 'bg-orange-100 text-orange-700 font-medium'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }
-            `}
-            title={FITTING_TYPE_LABELS[type]}
-          >
-            {FITTING_TYPE_LABELS[type]}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 interface ToolbarProps {
   className?: string;
 }
@@ -304,8 +208,6 @@ interface ToolbarProps {
 export function Toolbar({ className = '' }: ToolbarProps) {
   const currentTool = useToolStore((state) => state.currentTool);
   const { setTool } = useToolActions();
-
-  // Undo/Redo state (must be called at top level, not in JSX)
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
 
@@ -330,11 +232,17 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         case 'e':
           setTool('equipment');
           break;
-        case 'f':
-          setTool('fitting');
+        case 'z':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            undo();
+          }
           break;
-        case 'n':
-          setTool('note');
+        case 'y':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            redo();
+          }
           break;
       }
     };
@@ -365,11 +273,8 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         />
       ))}
 
-      {/* Divider */}
-      <div className="border-t border-gray-300 my-1" />
-
       {/* Undo/Redo buttons */}
-      <div className="flex flex-row gap-1 justify-center">
+      <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
         <UndoRedoButton
           onClick={undo}
           disabled={!canUndo}
@@ -398,9 +303,6 @@ export function Toolbar({ className = '' }: ToolbarProps) {
 
       {/* Show equipment type selector when equipment tool is active */}
       {currentTool === 'equipment' && <EquipmentTypeSelector />}
-
-      {/* Show fitting type selector when fitting tool is active */}
-      {currentTool === 'fitting' && <FittingTypeSelector />}
     </div>
   );
 }
