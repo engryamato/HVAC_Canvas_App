@@ -305,6 +305,10 @@ export function Toolbar({ className = '' }: ToolbarProps) {
   const currentTool = useToolStore((state) => state.currentTool);
   const { setTool } = useToolActions();
 
+  // Undo/Redo state (must be called at top level, not in JSX)
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
+
   // Handle keyboard shortcuts
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -361,11 +365,14 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         />
       ))}
 
+      {/* Divider */}
+      <div className="border-t border-gray-300 my-1" />
+
       {/* Undo/Redo buttons */}
-      <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
+      <div className="flex flex-row gap-1 justify-center">
         <UndoRedoButton
           onClick={undo}
-          disabled={!useCanUndo()}
+          disabled={!canUndo}
           icon={
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 7v6h6" />
@@ -377,7 +384,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         />
         <UndoRedoButton
           onClick={redo}
-          disabled={!useCanRedo()}
+          disabled={!canRedo}
           icon={
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 7v6h-6" />
