@@ -1,0 +1,221 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Job 1: PR Validation
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for console.log statements
+        run: |
+          echo "Checking for console.log statements in source files..."
+          if git diff origin/${{ github.base_ref }}..HEAD -- '*.ts' '*.tsx' | grep -E '^\+.*console\.(log|debug|info)'; then
+            echo "::warning::Found console.log statements in changed files. Consider removing debug statements."
+          else
+            echo "✅ No console.log statements found"
+          fi
+
+      - name: Check for TODO comments
+        run: |
+          echo "Checking for new TODO comments..."
+          if git diff origin/${{ github.base_ref }}..HEAD | grep -E '^\+.*\/\/\s*TODO'; then
+            echo "::warning::Found new TODO comments. Consider creating issues for tracking."
+          else
+            echo "✅ No new TODO comments found"
+          fi
+
+  # Job 2: Dependency Audit
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Check for outdated dependencies
+        run: |
+          echo "Checking for outdated dependencies..."
+          npm outdated || echo "Some dependencies are outdated"
+
+  # Job 3: Bundle Size Analysis
+  bundle-size:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for production
+        run: npm run build:prod
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_DEBUG_MODE: false
+
+      - name: Analyze bundle size
+        run: |
+          echo "## 📦 Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -d ".next/static" ]; then
+            echo "### Static Assets" >> $GITHUB_STEP_SUMMARY
+            find .next/static -name '*.js' -type f -exec du -h {} \; | sort -rh | head -20 >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check bundle size limit
+        run: |
+          MAX_SIZE_KB=500
+          TOTAL_SIZE=$(find .next/static -name '*.js' -type f -exec du -k {} + | awk '{sum+=$1} END {print sum}')
+
+          echo "Total bundle size: ${TOTAL_SIZE}KB"
+
+          if [ "$TOTAL_SIZE" -gt "$MAX_SIZE_KB" ]; then
+            echo "::warning::Bundle size (${TOTAL_SIZE}KB) exceeds recommended limit (${MAX_SIZE_KB}KB)"
+          else
+            echo "✅ Bundle size within limits"
+          fi
+
+  # Job 4: Code Quality Metrics
+  code-quality:
+    name: Code Quality Metrics
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Count lines of code
+        run: |
+          echo "## 📊 Code Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Lines of Code" >> $GITHUB_STEP_SUMMARY
+
+          SRC_LINES=$(find src -name '*.ts' -o -name '*.tsx' | xargs wc -l | tail -1 | awk '{print $1}')
+          TEST_LINES=$(find src -name '*.test.ts' -o -name '*.test.tsx' | xargs wc -l | tail -1 | awk '{print $1}')
+
+          echo "- Source code: ${SRC_LINES} lines" >> $GITHUB_STEP_SUMMARY
+          echo "- Test code: ${TEST_LINES} lines" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$TEST_LINES" -gt 0 ]; then
+            RATIO=$(echo "scale=2; $TEST_LINES / $SRC_LINES" | bc)
+            echo "- Test/Source ratio: ${RATIO}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check for large files
+        run: |
+          echo "### Large Files (>500 lines)" >> $GITHUB_STEP_SUMMARY
+          find src -name '*.ts' -o -name '*.tsx' | xargs wc -l | awk '$1 > 500 {print}' | sort -rn >> $GITHUB_STEP_SUMMARY || echo "No files exceed 500 lines" >> $GITHUB_STEP_SUMMARY
+
+  # Job 5: Accessibility Check
+  accessibility:
+    name: Accessibility Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for aria-label usage
+        run: |
+          echo "Checking for accessibility attributes..."
+          BUTTON_COUNT=$(grep -r "<button" src --include="*.tsx" | wc -l)
+          ARIA_COUNT=$(grep -r "aria-label" src --include="*.tsx" | wc -l)
+
+          echo "Buttons found: $BUTTON_COUNT"
+          echo "aria-label attributes: $ARIA_COUNT"
+
+          if [ "$BUTTON_COUNT" -gt "$ARIA_COUNT" ]; then
+            echo "::warning::Some buttons may be missing accessibility labels"
+          fi
+
+      - name: Check for alt text on images
+        run: |
+          IMG_COUNT=$(grep -r "<img" src --include="*.tsx" | wc -l)
+          ALT_COUNT=$(grep -r 'alt=' src --include="*.tsx" | wc -l)
+
+          echo "Images found: $IMG_COUNT"
+          echo "alt attributes: $ALT_COUNT"
+
+          if [ "$IMG_COUNT" -gt "$ALT_COUNT" ]; then
+            echo "::warning::Some images may be missing alt text"
+          fi
