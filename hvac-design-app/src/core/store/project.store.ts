@@ -21,21 +21,21 @@ interface ProjectActions {
 
 type ProjectStore = ProjectState & ProjectActions;
 
-const initialState: ProjectState = {
+export const PROJECT_INITIAL_STATE: ProjectState = {
   currentProjectId: null,
   projectDetails: null,
   isDirty: false,
 };
 
 export const useProjectStore = create<ProjectStore>((set) => ({
-  ...initialState,
+  ...PROJECT_INITIAL_STATE,
 
   setProject: (id, details) =>
     set({ currentProjectId: id, projectDetails: details, isDirty: false }),
 
   setDirty: (dirty) => set({ isDirty: dirty }),
 
-  clearProject: () => set(initialState),
+  clearProject: () => set(PROJECT_INITIAL_STATE),
 }));
 
 // Hook selectors (for React components with reactivity)

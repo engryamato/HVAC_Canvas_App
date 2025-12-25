@@ -31,3 +31,6 @@ export {
   useEntityCount,
   useEntityActions,
 } from './entityStore';
+
+// Preferences Store
+export { usePreferencesStore, usePreferences, usePreferencesActions } from './preferencesStore';

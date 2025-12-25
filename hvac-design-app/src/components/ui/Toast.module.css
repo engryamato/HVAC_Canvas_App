@@ -1,101 +1,49 @@
 .container {
   position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
+  top: 1rem;
+  right: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  z-index: 9999;
-  max-width: 400px;
+  gap: 0.5rem;
+  z-index: 2000;
 }
 
 .toast {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease-out;
-  min-width: 280px;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.success {
-  background-color: #e8f5e9;
-  border-left: 4px solid #4caf50;
-  color: #2e7d32;
-}
-
-.error {
-  background-color: #ffebee;
-  border-left: 4px solid #f44336;
-  color: #c62828;
-}
-
-.warning {
-  background-color: #fff3e0;
-  border-left: 4px solid #ff9800;
-  color: #e65100;
-}
-
-.info {
-  background-color: #e3f2fd;
-  border-left: 4px solid #2196f3;
-  color: #1565c0;
-}
-
-.icon {
-  flex-shrink: 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.message {
-  flex: 1;
-  font-size: 0.875rem;
-  line-height: 1.4;
-}
-
-.closeButton {
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  line-height: 1;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 240px;
   cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-  padding: 0;
-  margin-left: 0.5rem;
 }
 
-.closeButton:hover {
-  opacity: 1;
+.toast.success {
+  background: #ecfdf3;
+  border: 1px solid #22c55e;
 }
 
-.success .closeButton {
-  color: #2e7d32;
+.toast.error {
+  background: #fef2f2;
+  border: 1px solid #ef4444;
 }
 
-.error .closeButton {
-  color: #c62828;
+.toast.warning {
+  background: #fff7ed;
+  border: 1px solid #f59e0b;
 }
 
-.warning .closeButton {
-  color: #e65100;
+.toast.info {
+  background: #eff6ff;
+  border: 1px solid #3b82f6;
 }
 
-.info .closeButton {
-  color: #1565c0;
+.close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
 }
