@@ -46,6 +46,31 @@ This project uses GitHub Actions for Continuous Integration and Continuous Deplo
 4. **Code Quality Metrics** - LOC, test ratio, large files
 5. **Accessibility Check** - Basic a11y validation
 
+### 3. Tauri Release (`.github/workflows/tauri-release.yml`)
+
+**Triggers:**
+- Push to version tags: `v*.*.*` (e.g., v1.0.0, v1.2.3-beta)
+- Manual workflow dispatch with version input
+
+**Jobs:**
+1. **Create Release** - Generate GitHub release with changelog
+2. **Build and Upload** - Build Tauri apps for all platforms:
+   - Linux: `.deb`, `.AppImage`
+   - Windows: `.exe` (NSIS), `.msi`
+   - macOS: `.dmg` (Intel x64 & Apple Silicon arm64)
+3. **Update Release Notes** - Add installation instructions and changelog
+4. **Notify Success/Failure** - Post summary to GitHub Actions
+
+**Release Process:**
+1. Update `CHANGELOG.md` with version changes
+2. Update `package.json` version
+3. Create and push git tag: `git tag v1.0.0 && git push origin v1.0.0`
+4. Workflow automatically builds and publishes release
+
+**Artifacts:**
+- All platform installers uploaded to GitHub release
+- Retained permanently as release assets
+
 ## Pipeline Jobs
 
 ### Lint & Type Check
