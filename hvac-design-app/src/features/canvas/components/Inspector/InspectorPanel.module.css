@@ -1,6 +1,7 @@
 .panel {
   width: 320px;
   min-width: 320px;
+  height: 100%;
   border-left: 1px solid #e5e7eb;
   background: #ffffff;
   display: flex;
