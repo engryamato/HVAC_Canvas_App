@@ -140,62 +140,32 @@ export class ErrorBoundary extends React.Component<
       const showDetails = this.props.showDetails ?? process.env.NODE_ENV === 'development';
 
       return (
-        <div style={styles.container}>
-          <div style={styles.icon}>⚠️</div>
-          <h1 style={styles.title}>Something went wrong</h1>
-          <p style={styles.message}>
-            {error?.message || 'An unexpected error occurred. Please try again.'}
-          </p>
-
-          <div style={styles.buttonGroup}>
+        <div
+          style={{
+            padding: '2rem',
+            textAlign: 'center',
+            background: '#fff3cd',
+            color: '#7c4700',
+            borderRadius: '12px',
+            margin: '1rem',
+          }}
+        >
+          <h1>Something went wrong</h1>
+          <p>{this.state.error?.message ?? 'An unexpected error occurred.'}</p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
             <button
-              onClick={this.handleReset}
-              style={styles.primaryButton}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#1565c0';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = '#1976d2';
-              }}
+              onClick={() => this.setState({ hasError: false, error: null })}
+              style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}
             >
-              Try Again
+              Try again
             </button>
             <button
-              onClick={this.handleReload}
-              style={styles.secondaryButton}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#e0e0e0';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = '#f5f5f5';
-              }}
+              onClick={() => window.location.reload()}
+              style={{ padding: '0.5rem 1rem', cursor: 'pointer', background: '#1976d2', color: '#fff' }}
             >
-              Reload Page
+              Reload
             </button>
           </div>
-
-          {showDetails && error && (
-            <div style={styles.details}>
-              <details>
-                <summary style={styles.detailsSummary}>Show Error Details</summary>
-                <div style={styles.errorStack}>
-                  <strong>Error:</strong> {error.message}
-                  {'\n\n'}
-                  <strong>Stack:</strong>
-                  {'\n'}
-                  {error.stack}
-                  {errorInfo?.componentStack && (
-                    <>
-                      {'\n\n'}
-                      <strong>Component Stack:</strong>
-                      {'\n'}
-                      {errorInfo.componentStack}
-                    </>
-                  )}
-                </div>
-              </details>
-            </div>
-          )}
         </div>
       );
     }

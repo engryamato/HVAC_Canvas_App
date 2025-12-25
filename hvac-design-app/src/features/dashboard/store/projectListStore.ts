@@ -1,209 +1,122 @@
-'use client';
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ProjectDetails, ProjectFile } from '@/core/schema/project-file.schema';
+import { nanoid } from 'nanoid';
 
-/**
- * Storage key prefix for project data
- */
-const getProjectStorageKey = (projectId: string) => `hvac-project-${projectId}`;
-
-/**
- * Load project data from localStorage
- */
-function loadProjectData(projectId: string): ProjectFile | null {
-  try {
-    const key = getProjectStorageKey(projectId);
-    const data = localStorage.getItem(key);
-    if (!data) {return null;}
-    return JSON.parse(data) as ProjectFile;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Save project data to localStorage
- */
-function saveProjectData(projectId: string, project: ProjectFile): boolean {
-  try {
-    const key = getProjectStorageKey(projectId);
-    localStorage.setItem(key, JSON.stringify(project));
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Project list item with additional metadata
- */
-export interface ProjectListItem extends ProjectDetails {
-  /** File path for persistence (web uses localStorage key) */
-  storagePath: string;
-  /** Last opened timestamp */
-  lastOpenedAt?: string;
-  /** Whether the project is archived */
-  isArchived?: boolean;
+export interface ProjectMeta {
+  id: string;
+  name: string;
+  path: string;
+  lastModified: string;
+  entityCount: number;
+  archived?: boolean;
 }
 
 interface ProjectListState {
-  /** List of all projects */
-  projects: ProjectListItem[];
-  /** Loading state */
-  isLoading: boolean;
-  /** Error message */
-  error: string | null;
+  projects: ProjectMeta[];
+  loading: boolean;
+  error?: string;
 }
 
 interface ProjectListActions {
-  /** Add a new project to the list */
-  addProject: (project: ProjectListItem) => void;
-  /** Update project metadata */
-  updateProject: (projectId: string, updates: Partial<ProjectListItem>) => void;
-  /** Remove a project from the list */
-  removeProject: (projectId: string) => void;
-  /** Archive a project (soft delete) */
-  archiveProject: (projectId: string) => void;
-  /** Restore an archived project */
-  restoreProject: (projectId: string) => void;
-  /** Duplicate a project */
-  duplicateProject: (projectId: string, newName: string) => ProjectListItem | null;
-  /** Update last opened timestamp */
-  markAsOpened: (projectId: string) => void;
-  /** Set loading state */
-  setLoading: (loading: boolean) => void;
-  /** Set error */
-  setError: (error: string | null) => void;
-  /** Clear all projects */
-  clearProjects: () => void;
+  refresh: () => void;
+  createProject: (name: string) => ProjectMeta;
+  openProject: (path: string) => ProjectMeta | undefined;
+  archiveProject: (path: string) => void;
+  deleteProject: (path: string) => void;
+  duplicateProject: (path: string, newName?: string) => ProjectMeta | undefined;
+  renameProject: (path: string, newName: string) => void;
+  updateEntityCount: (path: string, count: number) => void;
 }
 
 type ProjectListStore = ProjectListState & ProjectListActions;
 
-const initialState: ProjectListState = {
-  projects: [],
-  isLoading: false,
-  error: null,
-};
+const INDEX_KEY = 'sws.projectIndex';
+
+function normalizeName(name: string) {
+  return name.trim().replace(/\s+/g, ' ');
+}
+
+function createPath(name: string) {
+  return `/projects/${name.replace(/[^a-z0-9\-]+/gi, '_')}.sws`;
+}
+
+function makeProject(name: string): ProjectMeta {
+  const normalized = normalizeName(name);
+  return {
+    id: nanoid(),
+    name: normalized,
+    path: createPath(normalized),
+    lastModified: new Date().toISOString(),
+    entityCount: 0,
+  };
+}
 
 export const useProjectListStore = create<ProjectListStore>()(
   persist(
     (set, get) => ({
-      ...initialState,
+      projects: [],
+      loading: false,
 
-      addProject: (project) =>
-        set((state) => ({
-          projects: [project, ...state.projects.filter((p) => p.projectId !== project.projectId)],
-        })),
-
-      updateProject: (projectId, updates) =>
-        set((state) => ({
-          projects: state.projects.map((p) =>
-            p.projectId === projectId ? { ...p, ...updates, modifiedAt: new Date().toISOString() } : p
-          ),
-        })),
-
-      removeProject: (projectId) =>
-        set((state) => ({
-          projects: state.projects.filter((p) => p.projectId !== projectId),
-        })),
-
-      archiveProject: (projectId) =>
-        set((state) => ({
-          projects: state.projects.map((p) =>
-            p.projectId === projectId ? { ...p, isArchived: true } : p
-          ),
-        })),
-
-      restoreProject: (projectId) =>
-        set((state) => ({
-          projects: state.projects.map((p) =>
-            p.projectId === projectId ? { ...p, isArchived: false } : p
-          ),
-        })),
-
-      duplicateProject: (projectId, newName) => {
+      refresh: () => {
         const state = get();
-        const original = state.projects.find((p) => p.projectId === projectId);
-        if (!original) {return null;}
-
-        const now = new Date().toISOString();
-        const newId = crypto.randomUUID();
-        const newProject: ProjectListItem = {
-          ...original,
-          projectId: newId,
-          projectName: newName,
-          createdAt: now,
-          modifiedAt: now,
-          storagePath: `project-${newId}`,
-          lastOpenedAt: undefined,
-          isArchived: false,
-        };
-
-        // Also duplicate the saved project data from localStorage
-        const originalData = loadProjectData(projectId);
-        if (originalData) {
-          const duplicatedData: ProjectFile = {
-            ...originalData,
-            projectId: newId,
-            projectName: newName,
-            createdAt: now,
-            modifiedAt: now,
-          };
-          saveProjectData(newId, duplicatedData);
+        if (!state.loading) {
+          set({ projects: [...state.projects] });
         }
-
-        set((state) => ({
-          projects: [newProject, ...state.projects],
-        }));
-
-        return newProject;
       },
 
-      markAsOpened: (projectId) =>
+      createProject: (name) => {
+        const project = makeProject(name);
+        set((state) => ({ projects: [project, ...state.projects] }));
+        return project;
+      },
+
+      openProject: (path) => get().projects.find((p) => p.path === path),
+
+      archiveProject: (path) =>
         set((state) => ({
           projects: state.projects.map((p) =>
-            p.projectId === projectId ? { ...p, lastOpenedAt: new Date().toISOString() } : p
+            p.path === path ? { ...p, archived: true, lastModified: new Date().toISOString() } : p
           ),
         })),
 
-      setLoading: (loading) => set({ isLoading: loading }),
+      deleteProject: (path) =>
+        set((state) => ({ projects: state.projects.filter((p) => p.path !== path) })),
 
-      setError: (error) => set({ error }),
+      duplicateProject: (path, newName) => {
+        const source = get().projects.find((p) => p.path === path);
+        if (!source) return undefined;
+        const duplicate = makeProject(newName ?? `${source.name} Copy`);
+        set((state) => ({ projects: [duplicate, ...state.projects] }));
+        return duplicate;
+      },
 
-      clearProjects: () => set({ projects: [] }),
+      renameProject: (path, newName) =>
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.path === path
+              ? { ...p, name: normalizeName(newName), path: createPath(newName), lastModified: new Date().toISOString() }
+              : p
+          ),
+        })),
+
+      updateEntityCount: (path, count) =>
+        set((state) => ({
+          projects: state.projects.map((p) => (p.path === path ? { ...p, entityCount: count } : p)),
+        })),
     }),
-    {
-      name: 'hvac-project-list',
-      version: 1,
-    }
+    { name: INDEX_KEY }
   )
 );
 
-// Hook selectors
 export const useProjects = () => useProjectListStore((state) => state.projects);
-export const useActiveProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => !p.isArchived));
-export const useArchivedProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => p.isArchived));
-export const useProjectById = (projectId: string) =>
-  useProjectListStore((state) => state.projects.find((p) => p.projectId === projectId));
-export const useIsLoading = () => useProjectListStore((state) => state.isLoading);
-export const useProjectListError = () => useProjectListStore((state) => state.error);
-
-// Actions hook
 export const useProjectListActions = () =>
   useProjectListStore((state) => ({
-    addProject: state.addProject,
-    updateProject: state.updateProject,
-    removeProject: state.removeProject,
+    refresh: state.refresh,
+    createProject: state.createProject,
+    openProject: state.openProject,
     archiveProject: state.archiveProject,
-    restoreProject: state.restoreProject,
+    deleteProject: state.deleteProject,
     duplicateProject: state.duplicateProject,
-    markAsOpened: state.markAsOpened,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    clearProjects: state.clearProjects,
+    renameProject: state.renameProject,
+    updateEntityCount: state.updateEntityCount,
   }));

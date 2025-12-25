@@ -5,6 +5,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .headerLeft {
@@ -50,10 +51,42 @@
   background-color: #616161;
 }
 
-.inspector {
-  width: 320px;
-  min-width: 320px;
-  border-left: 1px solid #ddd;
-  background-color: #ffffff;
-  overflow-y: auto;
+.saveStatus {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+}
+
+.saveTime {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.historyControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.historyButton {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.historyButton:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.historyButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
