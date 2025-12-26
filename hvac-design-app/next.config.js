@@ -23,6 +23,18 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  // Handle Tauri-specific modules that aren't available in web builds
+  webpack: (config, { isServer }) => {
+    // Externalize Tauri modules that may not exist in web context
+    // These are dynamically imported and guarded by isTauri() checks
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@tauri-apps/api/fs': false,
+      '@tauri-apps/api/path': false,
+      '@tauri-apps/plugin-fs': false,
+    };
+    return config;
+  },
 };
 
 module.exports = nextConfig;
