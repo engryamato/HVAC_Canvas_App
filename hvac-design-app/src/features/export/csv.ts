@@ -45,10 +45,57 @@ interface EntitiesLike {
 export interface BomItem {
   itemNumber: number;
   name: string;
+  type: string;
   description: string;
   quantity: number;
   unit: string;
   specifications: string;
+}
+
+/**
+ * Generate bill of materials from entities
+ * Returns BomItem array suitable for display in BOMTable
+ */
+export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
+  const entityList = entities.allIds
+    .map((id) => entities.byId[id])
+    .filter((e): e is Record<string, unknown> => e !== undefined);
+
+  const items: BomItem[] = [];
+  let itemNumber = 1;
+
+  entityList.forEach((entity) => {
+    const entityType = String(entity.type ?? 'unknown');
+    const props = (entity.props ?? {}) as Record<string, unknown>;
+
+    // Map entity type to display name
+    let displayType = 'Other';
+    if (entityType === 'duct') {
+      displayType = 'Duct';
+    } else if (entityType === 'equipment') {
+      displayType = 'Equipment';
+    } else if (entityType === 'fitting') {
+      displayType = 'Fitting';
+    } else if (entityType === 'room') {
+      return; // Skip rooms in BOM
+    }
+
+    const size = props.width && props.height
+      ? `${props.width}" x ${props.height}"`
+      : props.size as string | undefined;
+
+    items.push({
+      itemNumber: itemNumber++,
+      name: String(props.name ?? entityType),
+      type: displayType,
+      description: String(props.description ?? `${displayType} item`),
+      quantity: 1,
+      unit: 'ea',
+      specifications: size ?? '',
+    });
+  });
+
+  return items;
 }
 
 export function downloadBomCsv(entities: EntitiesLike, projectName: string): void {

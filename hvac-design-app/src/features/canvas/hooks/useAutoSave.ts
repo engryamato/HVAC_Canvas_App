@@ -25,7 +25,9 @@ export function useAutoSave(project: ProjectFile | null, path: string | null) {
   };
 
   const performSave = useCallback(async () => {
-    if (!project || !path) return;
+    if (!project || !path) {
+      return;
+    }
     setStatus('saving');
     setError(null);
 

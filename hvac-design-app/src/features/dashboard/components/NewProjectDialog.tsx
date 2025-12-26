@@ -48,7 +48,9 @@ export function NewProjectDialog({ isOpen, onClose, onCreateProject }: NewProjec
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className={styles.backdrop} role="dialog" aria-modal="true">

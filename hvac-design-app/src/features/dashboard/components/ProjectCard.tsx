@@ -53,8 +53,12 @@ export function ProjectCard({
               value={draftName}
               onChange={(e) => setDraftName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') handleRename();
-                if (e.key === 'Escape') setEditing(false);
+                if (e.key === 'Enter') {
+                  handleRename();
+                }
+                if (e.key === 'Escape') {
+                  setEditing(false);
+                }
               }}
               autoFocus
             />

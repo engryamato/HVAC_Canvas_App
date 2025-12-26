@@ -157,7 +157,9 @@ export class SelectTool extends BaseTool {
 
       Object.entries(this.state.initialEntities).forEach(([id, initialEntity]) => {
         const current = byId[id];
-        if (!current) return;
+        if (!current) {
+          return;
+        }
 
         if (
           current.transform.x !== initialEntity.transform.x ||
@@ -376,10 +378,6 @@ export class SelectTool extends BaseTool {
     } else {
       selectMultiple(selectedIds);
     }
-  }
-
-  private hasTransformChanged(a: Entity['transform'], b: Entity['transform']): boolean {
-    return a.x !== b.x || a.y !== b.y || a.rotation !== b.rotation || a.scaleX !== b.scaleX || a.scaleY !== b.scaleY;
   }
 }
 

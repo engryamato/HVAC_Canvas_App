@@ -79,7 +79,9 @@ export const useProjectListStore = create<ProjectListStore>()(
 
       duplicateProject: (projectId, newName) => {
         const source = get().projects.find((p) => p.projectId === projectId);
-        if (!source) return;
+        if (!source) {
+          return;
+        }
         const now = new Date().toISOString();
         const newProjectId = crypto.randomUUID();
         const newProject: ProjectListItem = {
