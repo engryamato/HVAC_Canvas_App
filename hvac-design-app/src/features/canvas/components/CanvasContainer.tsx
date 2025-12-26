@@ -55,6 +55,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
+  const resizeFrameRef = useRef<number>();
+  const lastSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const isResizingRef = useRef(false);
 
   // Store state
   const { panX, panY, zoom, gridVisible, gridSize } = useViewportStore();
@@ -109,29 +112,75 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   /**
    * Handle canvas resize
+   * Uses requestAnimationFrame and a flag to prevent ResizeObserver loops
    */
   const handleResize = useCallback(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) {
+    // Prevent recursive calls
+    if (isResizingRef.current) {
       return;
     }
 
-    // Get device pixel ratio for sharp rendering (SSR-safe)
-    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
-
-    // Set canvas size to container size
-    const rect = container.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
-
-    // Scale context for device pixel ratio
-    const ctx = getContext();
-    if (ctx) {
-      ctx.scale(dpr, dpr);
+    // Cancel any pending resize
+    if (resizeFrameRef.current) {
+      cancelAnimationFrame(resizeFrameRef.current);
     }
+
+    // Defer resize to next frame to prevent ResizeObserver loop
+    resizeFrameRef.current = requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      const container = containerRef.current;
+      if (!canvas || !container) {
+        return;
+      }
+
+      // Set flag to prevent recursive calls
+      isResizingRef.current = true;
+
+      try {
+        // Get device pixel ratio for sharp rendering (SSR-safe)
+        const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+
+        // Get container size
+        const rect = container.getBoundingClientRect();
+        const newWidth = Math.max(1, rect.width);
+        const newHeight = Math.max(1, rect.height);
+
+        // Check if size actually changed to prevent unnecessary updates
+        if (
+          lastSizeRef.current &&
+          Math.abs(lastSizeRef.current.width - newWidth) < 0.5 &&
+          Math.abs(lastSizeRef.current.height - newHeight) < 0.5
+        ) {
+          isResizingRef.current = false;
+          return;
+        }
+
+        // Update last size BEFORE making changes to prevent loop
+        lastSizeRef.current = { width: newWidth, height: newHeight };
+
+        // Set canvas size to container size
+        canvas.width = newWidth * dpr;
+        canvas.height = newHeight * dpr;
+        canvas.style.width = `${newWidth}px`;
+        canvas.style.height = `${newHeight}px`;
+
+        // Scale context for device pixel ratio
+        const ctx = getContext();
+        if (ctx) {
+          // Reset transform before scaling to avoid accumulation
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.scale(dpr, dpr);
+        }
+
+        // Clear flag after a short delay to allow any pending observers to settle
+        requestAnimationFrame(() => {
+          isResizingRef.current = false;
+        });
+      } catch (error) {
+        isResizingRef.current = false;
+        console.error('Error in handleResize:', error);
+      }
+    });
   }, [getContext]);
 
   /**
@@ -299,17 +348,67 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     animationFrameRef.current = requestAnimationFrame(render);
   }, [getContext, panX, panY, zoom, gridVisible, renderGrid, renderEntities, activeTool]);
 
-  // Set up resize observer
+  // Set up resize detection using window resize + manual check instead of ResizeObserver
+  // This avoids ResizeObserver loops that can cause infinite scrolling
   useEffect(() => {
+    let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+    let checkInterval: ReturnType<typeof setInterval> | null = null;
+
+    // Debounced resize handler
+    const debouncedResize = () => {
+      if (isResizingRef.current) {
+        return;
+      }
+
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+
+      resizeTimeout = setTimeout(() => {
+        if (!isResizingRef.current) {
+          handleResize();
+        }
+      }, 100); // 100ms debounce
+    };
+
+    // Initial resize
     handleResize();
 
-    const resizeObserver = new ResizeObserver(handleResize);
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
+    // Use window resize event instead of ResizeObserver to avoid loops
+    window.addEventListener('resize', debouncedResize);
+
+    // Also check periodically for size changes (fallback for programmatic resizes)
+    checkInterval = setInterval(() => {
+      const container = containerRef.current;
+      if (!container || isResizingRef.current) {
+        return;
+      }
+
+      const rect = container.getBoundingClientRect();
+      const currentWidth = Math.max(1, rect.width);
+      const currentHeight = Math.max(1, rect.height);
+
+      if (
+        !lastSizeRef.current ||
+        Math.abs(lastSizeRef.current.width - currentWidth) >= 1 ||
+        Math.abs(lastSizeRef.current.height - currentHeight) >= 1
+      ) {
+        debouncedResize();
+      }
+    }, 500); // Check every 500ms
 
     return () => {
-      resizeObserver.disconnect();
+      window.removeEventListener('resize', debouncedResize);
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
+      // Cancel any pending resize frame
+      if (resizeFrameRef.current) {
+        cancelAnimationFrame(resizeFrameRef.current);
+      }
     };
   }, [handleResize]);
 
