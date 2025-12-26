@@ -7,17 +7,12 @@ import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
 import InspectorPanel from './components/Inspector/InspectorPanel';
-import { ExportMenu } from './components/ExportMenu';
-import { useCalculations, useAutoSave, useKeyboardShortcuts } from './hooks';
-import { useUndoRedo } from './hooks/useUndoRedo';
-import { useToolActions } from '@/core/store/canvas.store';
+import { ExportMenu } from '@/features/export/ExportMenu';
+import { useAutoSave, useKeyboardShortcuts } from './hooks';
 import styles from './CanvasPage.module.css';
-import { useAutoSave } from './hooks/useAutoSave';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { createEmptyProjectFile } from '@/core/schema';
 import { useCurrentProjectId, useProjectDetails } from '@/core/store/project.store';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
-import { ExportMenu } from '@/features/export/ExportMenu';
 import { redo, undo, useCanRedo, useCanUndo } from '@/core/commands';
 
 /**
@@ -46,7 +41,9 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const canRedo = useCanRedo();
 
   const projectFile = useMemo(() => {
-    if (!projectId) return null;
+    if (!projectId) {
+      return null;
+    }
     return createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
   }, [projectDetails?.projectName, projectId]);
 

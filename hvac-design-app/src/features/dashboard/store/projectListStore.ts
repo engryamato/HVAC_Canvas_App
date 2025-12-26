@@ -1,55 +1,35 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { nanoid } from 'nanoid';
 
-export interface ProjectMeta {
-  id: string;
-  name: string;
-  path: string;
-  lastModified: string;
-  entityCount: number;
-  archived?: boolean;
+export interface ProjectListItem {
+  projectId: string;
+  projectName: string;
+  projectNumber?: string;
+  clientName?: string;
+  createdAt: string;
+  modifiedAt: string;
+  storagePath: string;
+  isArchived: boolean;
 }
 
 interface ProjectListState {
-  projects: ProjectMeta[];
+  projects: ProjectListItem[];
   loading: boolean;
   error?: string;
 }
 
 interface ProjectListActions {
-  refresh: () => void;
-  createProject: (name: string) => ProjectMeta;
-  openProject: (path: string) => ProjectMeta | undefined;
-  archiveProject: (path: string) => void;
-  deleteProject: (path: string) => void;
-  duplicateProject: (path: string, newName?: string) => ProjectMeta | undefined;
-  renameProject: (path: string, newName: string) => void;
-  updateEntityCount: (path: string, count: number) => void;
+  addProject: (project: ProjectListItem) => void;
+  updateProject: (projectId: string, updates: Partial<ProjectListItem>) => void;
+  removeProject: (projectId: string) => void;
+  archiveProject: (projectId: string) => void;
+  restoreProject: (projectId: string) => void;
+  duplicateProject: (projectId: string, newName: string) => void;
 }
 
 type ProjectListStore = ProjectListState & ProjectListActions;
 
 const INDEX_KEY = 'sws.projectIndex';
-
-function normalizeName(name: string) {
-  return name.trim().replace(/\s+/g, ' ');
-}
-
-function createPath(name: string) {
-  return `/projects/${name.replace(/[^a-z0-9\-]+/gi, '_')}.sws`;
-}
-
-function makeProject(name: string): ProjectMeta {
-  const normalized = normalizeName(name);
-  return {
-    id: nanoid(),
-    name: normalized,
-    path: createPath(normalized),
-    lastModified: new Date().toISOString(),
-    entityCount: 0,
-  };
-}
 
 export const useProjectListStore = create<ProjectListStore>()(
   persist(
@@ -57,66 +37,80 @@ export const useProjectListStore = create<ProjectListStore>()(
       projects: [],
       loading: false,
 
-      refresh: () => {
-        const state = get();
-        if (!state.loading) {
-          set({ projects: [...state.projects] });
-        }
-      },
-
-      createProject: (name) => {
-        const project = makeProject(name);
+      addProject: (project) => {
         set((state) => ({ projects: [project, ...state.projects] }));
-        return project;
       },
 
-      openProject: (path) => get().projects.find((p) => p.path === path),
-
-      archiveProject: (path) =>
+      updateProject: (projectId, updates) => {
         set((state) => ({
           projects: state.projects.map((p) =>
-            p.path === path ? { ...p, archived: true, lastModified: new Date().toISOString() } : p
-          ),
-        })),
-
-      deleteProject: (path) =>
-        set((state) => ({ projects: state.projects.filter((p) => p.path !== path) })),
-
-      duplicateProject: (path, newName) => {
-        const source = get().projects.find((p) => p.path === path);
-        if (!source) return undefined;
-        const duplicate = makeProject(newName ?? `${source.name} Copy`);
-        set((state) => ({ projects: [duplicate, ...state.projects] }));
-        return duplicate;
-      },
-
-      renameProject: (path, newName) =>
-        set((state) => ({
-          projects: state.projects.map((p) =>
-            p.path === path
-              ? { ...p, name: normalizeName(newName), path: createPath(newName), lastModified: new Date().toISOString() }
+            p.projectId === projectId
+              ? { ...p, ...updates, modifiedAt: new Date().toISOString() }
               : p
           ),
-        })),
+        }));
+      },
 
-      updateEntityCount: (path, count) =>
+      removeProject: (projectId) => {
         set((state) => ({
-          projects: state.projects.map((p) => (p.path === path ? { ...p, entityCount: count } : p)),
-        })),
+          projects: state.projects.filter((p) => p.projectId !== projectId),
+        }));
+      },
+
+      archiveProject: (projectId) => {
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.projectId === projectId
+              ? { ...p, isArchived: true, modifiedAt: new Date().toISOString() }
+              : p
+          ),
+        }));
+      },
+
+      restoreProject: (projectId) => {
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.projectId === projectId
+              ? { ...p, isArchived: false, modifiedAt: new Date().toISOString() }
+              : p
+          ),
+        }));
+      },
+
+      duplicateProject: (projectId, newName) => {
+        const source = get().projects.find((p) => p.projectId === projectId);
+        if (!source) {
+          return;
+        }
+        const now = new Date().toISOString();
+        const newProjectId = crypto.randomUUID();
+        const newProject: ProjectListItem = {
+          ...source,
+          projectId: newProjectId,
+          projectName: newName,
+          createdAt: now,
+          modifiedAt: now,
+          storagePath: `project-${newProjectId}`,
+          isArchived: false,
+        };
+        set((state) => ({ projects: [newProject, ...state.projects] }));
+      },
     }),
     { name: INDEX_KEY }
   )
 );
 
 export const useProjects = () => useProjectListStore((state) => state.projects);
+export const useActiveProjects = () =>
+  useProjectListStore((state) => state.projects.filter((p) => !p.isArchived));
+export const useArchivedProjects = () =>
+  useProjectListStore((state) => state.projects.filter((p) => p.isArchived));
 export const useProjectListActions = () =>
   useProjectListStore((state) => ({
-    refresh: state.refresh,
-    createProject: state.createProject,
-    openProject: state.openProject,
+    addProject: state.addProject,
+    updateProject: state.updateProject,
+    removeProject: state.removeProject,
     archiveProject: state.archiveProject,
-    deleteProject: state.deleteProject,
+    restoreProject: state.restoreProject,
     duplicateProject: state.duplicateProject,
-    renameProject: state.renameProject,
-    updateEntityCount: state.updateEntityCount,
   }));

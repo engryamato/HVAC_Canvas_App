@@ -6,7 +6,6 @@ import {
 } from './BaseTool';
 import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { deleteEntity, moveEntities } from '@/core/commands/entityCommands';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
 import {
@@ -158,7 +157,9 @@ export class SelectTool extends BaseTool {
 
       Object.entries(this.state.initialEntities).forEach(([id, initialEntity]) => {
         const current = byId[id];
-        if (!current) return;
+        if (!current) {
+          return;
+        }
 
         if (
           current.transform.x !== initialEntity.transform.x ||
@@ -177,24 +178,6 @@ export class SelectTool extends BaseTool {
     if (this.state.mode === 'marquee' && this.state.startPoint && this.state.currentPoint) {
       const bounds = boundsFromPoints(this.state.startPoint, this.state.currentPoint);
       this.selectEntitiesInBounds(bounds, event.shiftKey);
-    }
-
-    if (this.state.mode === 'dragging' && this.state.initialTransforms) {
-      const { byId } = useEntityStore.getState();
-      const changes = Object.entries(this.state.initialTransforms)
-        .map(([id, startTransform]) => {
-          const entity = byId[id];
-          if (!entity) return null;
-
-          const endTransform = entity.transform;
-          if (this.hasTransformChanged(startTransform, endTransform)) {
-            return { id, from: startTransform, to: { ...endTransform } };
-          }
-          return null;
-        })
-        .filter((change): change is { id: string; from: Entity['transform']; to: Entity['transform'] } => Boolean(change));
-
-      moveEntities(changes);
     }
 
     this.reset();
@@ -243,8 +226,8 @@ export class SelectTool extends BaseTool {
         createEntity(duplicate, { selectionBefore, selectionAfter: newIds })
       );
       // Select the duplicated entities
-      if (duplicates.length > 0) {
-        createEntities(duplicates);
+      if (newIds.length > 0) {
+        selectMultiple(newIds);
       }
       return;
     }
@@ -289,22 +272,7 @@ export class SelectTool extends BaseTool {
             { selectionBefore, selectionAfter }
           );
         }
-      });
-
-      const changes = Object.entries(initialTransforms)
-        .map(([id, fromTransform]) => {
-          const entity = byId[id];
-          if (!entity) return null;
-
-          const endTransform = entity.transform;
-          if (this.hasTransformChanged(fromTransform, endTransform)) {
-            return { id, from: fromTransform, to: { ...endTransform } };
-          }
-          return null;
-        })
-        .filter((change): change is { id: string; from: Entity['transform']; to: Entity['transform'] } => Boolean(change));
-
-      moveEntities(changes);
+      }
     }
   }
 
@@ -410,10 +378,6 @@ export class SelectTool extends BaseTool {
     } else {
       selectMultiple(selectedIds);
     }
-  }
-
-  private hasTransformChanged(a: Entity['transform'], b: Entity['transform']): boolean {
-    return a.x !== b.x || a.y !== b.y || a.rotation !== b.rotation || a.scaleX !== b.scaleX || a.scaleY !== b.scaleY;
   }
 }
 
