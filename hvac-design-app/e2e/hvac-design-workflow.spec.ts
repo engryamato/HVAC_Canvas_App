@@ -7,8 +7,8 @@ import { test, expect, type Page } from '@playwright/test';
 
 test.describe('HVAC Design Workflow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    // Wait for app to load
+    // Navigate to dashboard
+    await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
   });
 
