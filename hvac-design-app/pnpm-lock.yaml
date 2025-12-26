@@ -20,9 +20,6 @@ importers:
       '@tauri-apps/api':
         specifier: 2.9.1
         version: 2.9.1
-      '@tauri-apps/plugin-store':
-        specifier: ^2.4.1
-        version: 2.4.1
       immer:
         specifier: ^11.0.1
         version: 11.1.0
@@ -974,9 +971,6 @@ packages:
     resolution: {integrity: sha512-knSt/9AvCTeyfC6wkyeouF9hBW/0Mzuw+5vBKEvzaGPQsfFJo1ZCp5FkdiZpGBBfnm09BhugasGRTGofzatfqQ==}
     engines: {node: '>= 10'}
     hasBin: true
-
-  '@tauri-apps/plugin-store@2.4.1':
-    resolution: {integrity: sha512-ckGSEzZ5Ii4Hf2D5x25Oqnm2Zf9MfDWAzR+volY0z/OOBz6aucPKEY0F649JvQ0Vupku6UJo7ugpGRDOFOunkA==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -3808,10 +3802,6 @@ snapshots:
       '@tauri-apps/cli-win32-arm64-msvc': 1.5.9
       '@tauri-apps/cli-win32-ia32-msvc': 1.5.9
       '@tauri-apps/cli-win32-x64-msvc': 1.5.9
-
-  '@tauri-apps/plugin-store@2.4.1':
-    dependencies:
-      '@tauri-apps/api': 2.9.1
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
