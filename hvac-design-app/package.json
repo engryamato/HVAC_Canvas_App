@@ -51,7 +51,7 @@
     "@types/node": "22.0.0",
     "@types/react": "18.2.46",
     "@types/react-dom": "18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/coverage-v8": "1.6.1",
