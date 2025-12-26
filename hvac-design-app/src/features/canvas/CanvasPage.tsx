@@ -41,7 +41,9 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const canRedo = useCanRedo();
 
   const projectFile = useMemo(() => {
-    if (!projectId) return null;
+    if (!projectId) {
+      return null;
+    }
     return createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
   }, [projectDetails?.projectName, projectId]);
 

@@ -26,11 +26,12 @@ function schemaFor(entity?: Entity | null) {
   }
 }
 
-function pathMatchesField(path: (string | number)[], field: string) {
+function pathMatchesField(path: PropertyKey[], field: string) {
   if (!path.length) {
     return false;
   }
-  return path.includes(field) || path.join('.').endsWith(field);
+  const stringPath = path.map(String);
+  return stringPath.includes(field) || stringPath.join('.').endsWith(field);
 }
 
 /**
@@ -73,7 +74,7 @@ export function useFieldValidation(entity: SupportedEntity | null) {
           return rest;
         });
       } else {
-        const fieldError = result.error.errors.find((err) => pathMatchesField(err.path, field));
+        const fieldError = result.error.issues.find((err) => pathMatchesField(err.path, field));
         if (fieldError) {
           setErrors((prev) => ({ ...prev, [field]: fieldError.message }));
         }

@@ -34,7 +34,9 @@ function getSelectionSnapshot(): string[] {
 }
 
 function applySelection(selection?: string[]): void {
-  if (!selection) return;
+  if (!selection) {
+    return;
+  }
   useSelectionStore.getState().selectMultiple([...selection]);
 }
 
@@ -77,7 +79,9 @@ export function createEntity(entity: Entity, options?: CommandOptions): void {
  * Create multiple entities at once with a single history entry
  */
 export function createEntities(entities: Entity[]): void {
-  if (entities.length === 0) return;
+  if (entities.length === 0) {
+    return;
+  }
 
   const selectionBefore = getSelectionSnapshot();
   const selectionAfter = entities.map((entity) => entity.id);
@@ -192,7 +196,9 @@ export function deleteEntities(entities: Entity[], options?: CommandOptions): vo
  * The entities are assumed to already be at their `to` position.
  */
 export function moveEntities(changes: TransformChange[]): void {
-  if (changes.length === 0) return;
+  if (changes.length === 0) {
+    return;
+  }
 
   const selectionSnapshot = getSelectionSnapshot();
 
@@ -233,7 +239,9 @@ export function moveEntities(changes: TransformChange[]): void {
  */
 export function undo(): boolean {
   const command = useHistoryStore.getState().undo();
-  if (!command) return false;
+  if (!command) {
+    return false;
+  }
 
   executeCommand(command.inverse);
   applySelection(command.selectionBefore);
@@ -246,7 +254,9 @@ export function undo(): boolean {
  */
 export function redo(): boolean {
   const command = useHistoryStore.getState().redo();
-  if (!command) return false;
+  if (!command) {
+    return false;
+  }
 
   executeCommand(command);
   applySelection(command.selectionAfter ?? command.selectionBefore);

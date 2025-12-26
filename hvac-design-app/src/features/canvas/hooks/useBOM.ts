@@ -2,8 +2,7 @@
 
 import { useMemo } from 'react';
 import { useEntityStore } from '@/core/store/entityStore';
-import { generateBillOfMaterials } from '@/features/export/csv';
-import type { BomItem } from '@/features/export/csv';
+import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
 
 /**
  * Grouped BOM items by category
@@ -16,10 +15,10 @@ export interface GroupedBomItems {
 
 /**
  * Hook to get Bill of Materials from current entities
- * 
+ *
  * Automatically updates when entities change.
  * Groups items by category (Ducts, Equipment, Fittings).
- * 
+ *
  * @returns Grouped BOM items
  */
 export function useBOM(): GroupedBomItems {
@@ -36,9 +35,9 @@ export function useBOM(): GroupedBomItems {
   // Group items by type
   const grouped = useMemo(() => {
     return {
-      ducts: bomItems.filter(item => item.type === 'Duct'),
-      equipment: bomItems.filter(item => item.type === 'Equipment'),
-      fittings: bomItems.filter(item => item.type === 'Fitting'),
+      ducts: bomItems.filter((item) => item.type === 'Duct'),
+      equipment: bomItems.filter((item) => item.type === 'Equipment'),
+      fittings: bomItems.filter((item) => item.type === 'Fitting'),
     };
   }, [bomItems]);
 
