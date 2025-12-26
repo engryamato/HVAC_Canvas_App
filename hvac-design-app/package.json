@@ -35,12 +35,12 @@
   "dependencies": {
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
-    "@mui/material": "7.3.6",
-    "@tauri-apps/api": "1.5.3",
+    "@mui/material": "5.15.0",
+    "@tauri-apps/api": "2.9.1",
     "immer": "^11.0.1",
     "nanoid": "^5.1.6",
     "next": "^15.0.0",
-    "react": "18.3.1",
+    "react": "18.2.0",
     "react-dom": "18.2.0",
     "zod": "3.22.4",
     "zustand": "4.4.7"
@@ -59,7 +59,7 @@
     "eslint-config-next": "^15.0.0",
     "husky": "^9.1.7",
     "jsdom": "23.0.1",
-    "lint-staged": "^16.2.7",
+    "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
     "typescript": "5.3.3",
     "vitest": "^1.6.1"
