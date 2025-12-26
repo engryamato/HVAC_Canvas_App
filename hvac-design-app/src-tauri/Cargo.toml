@@ -16,14 +16,6 @@ tauri-build = { version = "1", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [ "window-close", "window-maximize", "window-hide", "window-unminimize", "window-minimize", "window-unmaximize", "window-start-dragging", "window-show", "dialog-all", "fs-all", "path-all"] }
-tauri-plugin-store = "2.0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-reqwest = { version = "0.12", features = ["json", "blocking"] }
-tokio = { version = "1", features = ["full"] }
-tiny_http = "0.12"
-url = "2.5"
-urlencoding = "2.1"
-open = "5.0"
-base64 = "0.22"
 

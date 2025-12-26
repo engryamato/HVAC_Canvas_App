@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import {
   useActiveProjects,
@@ -8,7 +7,6 @@ import {
   useProjectListActions,
   type ProjectListItem,
 } from '@/features/dashboard/store/projectListStore';
-import { useAuthStore } from '@/core/store/auth.store';
 import { NewProjectDialog } from '@/features/dashboard/components/NewProjectDialog';
 import { ConfirmDialog } from '@/features/dashboard/components/ConfirmDialog';
 import { ProjectCard } from '@/features/dashboard/components/ProjectCard';
@@ -23,8 +21,6 @@ interface ConfirmState {
 }
 
 export default function Dashboard() {
-  const router = useRouter();
-  const { user, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState<TabType>('active');
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
   const [confirmState, setConfirmState] = useState<ConfirmState>({
@@ -48,12 +44,6 @@ export default function Dashboard() {
     (projectData: { projectName: string; projectNumber?: string; clientName?: string }) => {
       const now = new Date().toISOString();
       const projectId = crypto.randomUUID();
-      const currentUserId = user?.id;
-
-      if (!currentUserId) {
-        console.error('No user logged in');
-        return;
-      }
 
       const newProject: ProjectListItem = {
         projectId,
@@ -64,13 +54,12 @@ export default function Dashboard() {
         modifiedAt: now,
         storagePath: `project-${projectId}`,
         isArchived: false,
-        userId: currentUserId, // Associate with current user
       };
 
       addProject(newProject);
       setIsNewProjectOpen(false);
     },
-    [addProject, user]
+    [addProject]
   );
 
   const handleDeleteConfirm = useCallback(
@@ -136,15 +125,6 @@ export default function Dashboard() {
     [updateProject]
   );
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await logout();
-      router.push('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  }, [logout, router]);
-
   const currentProjects = activeTab === 'active' ? activeProjects : archivedProjects;
 
   return (
@@ -160,18 +140,6 @@ export default function Dashboard() {
           <button className={styles.newProjectButton} onClick={() => setIsNewProjectOpen(true)}>
             + New Project
           </button>
-          <div className={styles.userSection}>
-            {user?.picture && (
-              <img src={user.picture} alt={user.name} className={styles.userAvatar} />
-            )}
-            <div className={styles.userDetails}>
-              <span className={styles.userName}>{user?.name}</span>
-              <span className={styles.userEmail}>{user?.email}</span>
-            </div>
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              Logout
-            </button>
-          </div>
         </div>
       </div>
 
