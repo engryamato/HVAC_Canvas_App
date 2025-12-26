@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState, useCallback } from 'react';
 import {
   useActiveProjects,
@@ -141,9 +140,6 @@ export default function Dashboard() {
           <button className={styles.newProjectButton} onClick={() => setIsNewProjectOpen(true)}>
             + New Project
           </button>
-          <Link href="/" className={styles.backButton}>
-            Back to Home
-          </Link>
         </div>
       </div>
 
