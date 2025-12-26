@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useAuthStore } from '@/core/store/auth.store';
 
 export interface ProjectListItem {
   projectId: string;
@@ -10,6 +11,7 @@ export interface ProjectListItem {
   modifiedAt: string;
   storagePath: string;
   isArchived: boolean;
+  userId: string; // Associate project with user
 }
 
 interface ProjectListState {
@@ -100,11 +102,26 @@ export const useProjectListStore = create<ProjectListStore>()(
   )
 );
 
-export const useProjects = () => useProjectListStore((state) => state.projects);
-export const useActiveProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => !p.isArchived));
-export const useArchivedProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => p.isArchived));
+export const useProjects = () => {
+  const currentUserId = useAuthStore.getState().user?.id;
+  return useProjectListStore((state) =>
+    state.projects.filter((p) => p.userId === currentUserId)
+  );
+};
+
+export const useActiveProjects = () => {
+  const currentUserId = useAuthStore.getState().user?.id;
+  return useProjectListStore((state) =>
+    state.projects.filter((p) => !p.isArchived && p.userId === currentUserId)
+  );
+};
+
+export const useArchivedProjects = () => {
+  const currentUserId = useAuthStore.getState().user?.id;
+  return useProjectListStore((state) =>
+    state.projects.filter((p) => p.isArchived && p.userId === currentUserId)
+  );
+};
 export const useProjectListActions = () =>
   useProjectListStore((state) => ({
     addProject: state.addProject,

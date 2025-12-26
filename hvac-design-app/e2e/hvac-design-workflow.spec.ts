@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { mockGoogleAuth } from './helpers/auth.helper';
 
 /**
  * E2E tests for HVAC Design workflows
@@ -7,8 +8,9 @@ import { test, expect, type Page } from '@playwright/test';
 
 test.describe('HVAC Design Workflow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    // Wait for app to load
+    // Authenticate user before each test
+    await mockGoogleAuth(page);
+    // Wait for dashboard to load
     await page.waitForLoadState('networkidle');
   });
 
