@@ -136,8 +136,7 @@ export class ErrorBoundary extends React.Component<
         return this.props.fallback;
       }
 
-      const { error, errorInfo } = this.state;
-      const showDetails = this.props.showDetails ?? process.env.NODE_ENV === 'development';
+      const { error } = this.state;
 
       return (
         <div
@@ -151,7 +150,7 @@ export class ErrorBoundary extends React.Component<
           }}
         >
           <h1>Something went wrong</h1>
-          <p>{this.state.error?.message ?? 'An unexpected error occurred.'}</p>
+          <p>{error?.message ?? 'An unexpected error occurred.'}</p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}

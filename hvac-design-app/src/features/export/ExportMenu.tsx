@@ -22,13 +22,17 @@ export function ExportMenu() {
   const projectDetails = useProjectDetails();
 
   const project = useMemo(() => {
-    if (!projectId) return null;
+    if (!projectId) {
+      return null;
+    }
     const base = createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
     return { ...base, entities: { byId: {}, allIds: [] } };
   }, [projectDetails?.projectName, projectId]);
 
   const handleExportJson = () => {
-    if (!project) return;
+    if (!project) {
+      return;
+    }
     const json = exportProjectJSON(project);
     download(json, `${project.projectName}.json`, 'application/json');
   };
@@ -40,7 +44,9 @@ export function ExportMenu() {
   };
 
   const handleExportPdf = async () => {
-    if (!project) return;
+    if (!project) {
+      return;
+    }
     const pdfResult = await exportProjectPDF(project, { pageSize: 'letter' });
     if (pdfResult.success && pdfResult.data) {
       download(pdfResult.data, `${project.projectName}.pdf`, 'application/pdf');
