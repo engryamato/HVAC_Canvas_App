@@ -3,14 +3,22 @@
 import { useState } from 'react';
 import styles from './NewProjectDialog.module.css';
 
-interface NewProjectDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onCreate: (name: string) => void;
+interface ProjectData {
+  projectName: string;
+  projectNumber?: string;
+  clientName?: string;
 }
 
-export function NewProjectDialog({ open, onClose, onCreate }: NewProjectDialogProps) {
-  const [name, setName] = useState('');
+export interface NewProjectDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreateProject: (data: ProjectData) => void;
+}
+
+export function NewProjectDialog({ isOpen, onClose, onCreateProject }: NewProjectDialogProps) {
+  const [projectName, setProjectName] = useState('');
+  const [projectNumber, setProjectNumber] = useState('');
+  const [clientName, setClientName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const validate = (value: string) => {
@@ -25,31 +33,53 @@ export function NewProjectDialog({ open, onClose, onCreate }: NewProjectDialogPr
   };
 
   const handleSubmit = () => {
-    const validationError = validate(name);
+    const validationError = validate(projectName);
     setError(validationError);
     if (!validationError) {
-      onCreate(name.trim());
-      setName('');
+      onCreateProject({
+        projectName: projectName.trim(),
+        projectNumber: projectNumber.trim() || undefined,
+        clientName: clientName.trim() || undefined,
+      });
+      setProjectName('');
+      setProjectNumber('');
+      setClientName('');
       onClose();
     }
   };
 
-  if (!open) return null;
+  if (!isOpen) return null;
 
   return (
     <div className={styles.backdrop} role="dialog" aria-modal="true">
       <div className={styles.dialog}>
         <h3>Create New Project</h3>
         <label className={styles.label}>
-          Project Name
+          Project Name *
           <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={() => setError(validate(name))}
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            onBlur={() => setError(validate(projectName))}
             placeholder="My HVAC Layout"
           />
         </label>
         {error && <div className={styles.error}>{error}</div>}
+        <label className={styles.label}>
+          Project Number
+          <input
+            value={projectNumber}
+            onChange={(e) => setProjectNumber(e.target.value)}
+            placeholder="Optional"
+          />
+        </label>
+        <label className={styles.label}>
+          Client Name
+          <input
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            placeholder="Optional"
+          />
+        </label>
         <div className={styles.actions}>
           <button onClick={onClose} className={styles.secondary}>
             Cancel

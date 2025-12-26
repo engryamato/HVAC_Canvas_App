@@ -79,6 +79,9 @@ export function useEntityOperations() {
       const selectionBefore = [...selectedIds];
       const selectionAfter = [...selectedIds];
 
+      selectedIds.forEach((id) => {
+        const entity = byId[id];
+        if (entity) {
           let newX = entity.transform.x + deltaX;
           let newY = entity.transform.y + deltaY;
 
@@ -102,7 +105,7 @@ export function useEntityOperations() {
             { selectionBefore, selectionAfter }
           );
         }
-      }
+      });
     },
     [selectedIds, gridSize, snapToGrid]
   );
