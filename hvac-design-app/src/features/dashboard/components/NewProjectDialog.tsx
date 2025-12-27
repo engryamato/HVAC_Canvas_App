@@ -53,40 +53,49 @@ export function NewProjectDialog({ isOpen, onClose, onCreateProject }: NewProjec
   }
 
   return (
-    <div className={styles.backdrop} role="dialog" aria-modal="true">
+    <div className={styles.backdrop} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
       <div className={styles.dialog}>
-        <h3>Create New Project</h3>
-        <label className={styles.label}>
+        <h3 id="dialog-title">Create New Project</h3>
+        <label className={styles.label} htmlFor="projectName">
           Project Name *
-          <input
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            onBlur={() => setError(validate(projectName))}
-            placeholder="My HVAC Layout"
-          />
         </label>
-        {error && <div className={styles.error}>{error}</div>}
-        <label className={styles.label}>
+        <input
+          id="projectName"
+          name="projectName"
+          value={projectName}
+          onChange={(e) => setProjectName(e.target.value)}
+          onBlur={() => setError(validate(projectName))}
+          placeholder="My HVAC Layout"
+          aria-required="true"
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={error ? 'projectName-error' : undefined}
+        />
+        {error && <div id="projectName-error" className={styles.error} role="alert">{error}</div>}
+        <label className={styles.label} htmlFor="projectNumber">
           Project Number
-          <input
-            value={projectNumber}
-            onChange={(e) => setProjectNumber(e.target.value)}
-            placeholder="Optional"
-          />
         </label>
-        <label className={styles.label}>
+        <input
+          id="projectNumber"
+          name="projectNumber"
+          value={projectNumber}
+          onChange={(e) => setProjectNumber(e.target.value)}
+          placeholder="Optional"
+        />
+        <label className={styles.label} htmlFor="clientName">
           Client Name
-          <input
-            value={clientName}
-            onChange={(e) => setClientName(e.target.value)}
-            placeholder="Optional"
-          />
         </label>
+        <input
+          id="clientName"
+          name="clientName"
+          value={clientName}
+          onChange={(e) => setClientName(e.target.value)}
+          placeholder="Optional"
+        />
         <div className={styles.actions}>
-          <button onClick={onClose} className={styles.secondary}>
+          <button type="button" onClick={onClose} className={styles.secondary}>
             Cancel
           </button>
-          <button onClick={handleSubmit} className={styles.primary}>
+          <button type="button" onClick={handleSubmit} className={styles.primary}>
             Create
           </button>
         </div>
