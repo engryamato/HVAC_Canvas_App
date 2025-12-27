@@ -10,6 +10,10 @@ export default defineConfig({
     setupFiles: './src/__tests__/setup.ts',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules/', 'e2e/', 'src-tauri/'],
+    deps: {
+      // Inline Tauri modules so mocks work with dynamic imports
+      inline: [/@tauri-apps/],
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
@@ -44,6 +48,11 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@utils': path.resolve(__dirname, './src/utils'),
       '@types': path.resolve(__dirname, './src/types'),
+      // Alias Tauri v1 API paths to the v2 mocks module for test compatibility
+      '@tauri-apps/api/fs': path.resolve(__dirname, 'node_modules/@tauri-apps/api/mocks.js'),
+      '@tauri-apps/api/path': path.resolve(__dirname, 'node_modules/@tauri-apps/api/path.js'),
+      '@tauri-apps/api/dialog': path.resolve(__dirname, 'node_modules/@tauri-apps/api/mocks.js'),
+      '@tauri-apps/api/tauri': path.resolve(__dirname, 'node_modules/@tauri-apps/api/core.js'),
     },
   },
 });

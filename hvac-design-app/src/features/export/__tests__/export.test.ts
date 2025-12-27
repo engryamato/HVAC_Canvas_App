@@ -1,15 +1,17 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { exportProjectToCsv } from '../csv';
-import { exportProjectToJson, downloadFile } from '../json';
+import { exportProjectToJson } from '../json';
+import { downloadFile } from '../download';
 import type { ProjectFile } from '@/core/schema';
 
 // Mock the download function
-vi.mock('../json', async () => {
-  const actual = await vi.importActual('../json');
-  return {
-    ...actual,
-    downloadFile: vi.fn(),
-  };
+vi.mock('../download', () => ({
+  downloadFile: vi.fn(),
+}));
+
+// Clear mocks between tests to ensure clean state
+beforeEach(() => {
+  vi.clearAllMocks();
 });
 
 const createMockProject = (): ProjectFile => ({

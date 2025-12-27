@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Toolbar } from '../Toolbar';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityStore } from '@/core/store/entityStore';
@@ -68,7 +68,9 @@ describe('Toolbar - Undo/Redo Integration', () => {
       render(<Toolbar />);
 
       const room = createMockRoom('room-1', 'Test Room');
-      createEntity(room);
+      act(() => {
+        createEntity(room);
+      });
 
       const undoButton = screen.getByLabelText(/undo/i);
       expect(undoButton).not.toBeDisabled();
@@ -79,7 +81,9 @@ describe('Toolbar - Undo/Redo Integration', () => {
 
       // Create entity
       const room = createMockRoom('room-1', 'Test Room');
-      createEntity(room);
+      act(() => {
+        createEntity(room);
+      });
 
       // Click undo
       const undoButton = screen.getByLabelText(/undo/i);
@@ -95,7 +99,9 @@ describe('Toolbar - Undo/Redo Integration', () => {
 
       // Create entity
       const room = createMockRoom('room-1', 'Test Room');
-      createEntity(room);
+      act(() => {
+        createEntity(room);
+      });
 
       expect(useEntityStore.getState().allIds.length).toBe(1);
 
@@ -111,7 +117,9 @@ describe('Toolbar - Undo/Redo Integration', () => {
 
       // Create entity
       const room = createMockRoom('room-1', 'Test Room');
-      createEntity(room);
+      act(() => {
+        createEntity(room);
+      });
 
       // Undo
       const undoButton = screen.getByLabelText(/undo/i);
@@ -134,9 +142,11 @@ describe('Toolbar - Undo/Redo Integration', () => {
       const room2 = createMockRoom('room-2', 'Room 2');
       const room3 = createMockRoom('room-3', 'Room 3');
 
-      createEntity(room1);
-      createEntity(room2);
-      createEntity(room3);
+      act(() => {
+        createEntity(room1);
+        createEntity(room2);
+        createEntity(room3);
+      });
 
       expect(useEntityStore.getState().allIds.length).toBe(3);
 

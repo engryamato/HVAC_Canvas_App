@@ -1,20 +1,26 @@
 import type { BOMLineItem } from './bom';
 import { generateBOM } from './bom';
+import type { ProjectFile } from '@/core/schema';
+import { downloadFile } from './download';
+
+interface ExportCsvOptions {
+  separator?: string;
+  includeHeader?: boolean;
+  download?: boolean;
+}
+
+function escapeCsvValue(value: string, separator: string): string {
+  if (value.includes(separator) || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
 
 function escapeCsv(value: string): string {
   if (value.includes(',') || value.includes('"') || value.includes('\n')) {
     return `"${value.replace(/"/g, '""')}"`;
   }
   return value;
-}
-
-function downloadFile(content: string, filename: string, mimeType: string): void {
-  const blob = new Blob([content], { type: mimeType });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(link.href);
 }
 
 export function exportBOMtoCSV(bom: BOMLineItem[]): string {
@@ -111,5 +117,89 @@ export function downloadBomCsv(entities: EntitiesLike, projectName: string): voi
 
   const bom = generateBOM(entityList);
   const csv = exportBOMtoCSV(bom);
-  downloadFile(csv, `${projectName}-bom.csv`, 'text/csv;charset=utf-8');
+  downloadFileLocal(csv, `${projectName}-bom.csv`, 'text/csv;charset=utf-8');
+}
+
+/**
+ * Export project to CSV format
+ * Creates a BOM-style CSV with all entities
+ */
+export function exportProjectToCsv(project: ProjectFile, options: ExportCsvOptions = {}): string {
+  const separator = options.separator ?? ',';
+  const includeHeader = options.includeHeader !== false;
+
+  const headers = ['Item #', 'Type', 'Name', 'Description', 'Quantity', 'Unit', 'Specifications'];
+
+  const rows: string[][] = [];
+  let itemNumber = 1;
+
+  // Process all entities
+  project.entities.allIds.forEach((id) => {
+    const entity = project.entities.byId[id];
+    if (!entity) return;
+
+    const entityType = entity.type;
+    const props = entity.props as Record<string, unknown>;
+
+    // Build specifications string
+    let specs = '';
+    if (entityType === 'room') {
+      specs = `${props.width}" x ${props.length}" x ${props.height}"`;
+    } else if (entityType === 'duct') {
+      specs = `${props.length}ft, ${props.width}" x ${props.height}"`;
+    } else if (entityType === 'equipment') {
+      const manufacturer = props.manufacturer ? `${props.manufacturer}` : '';
+      const model = props.modelNumber ? ` ${props.modelNumber}` : '';
+      specs = `${manufacturer}${model}`.trim();
+    }
+
+    // Build description
+    let description = '';
+    if (entityType === 'room') {
+      description = `${props.occupancyType} - ${(entity.calculated as Record<string, unknown>)?.area ?? 0} sq ft`;
+    } else if (entityType === 'duct') {
+      description = `${props.material ?? 'Standard'} duct`;
+    } else if (entityType === 'equipment') {
+      description = `${props.equipmentType ?? 'Equipment'}`;
+    } else if (entityType === 'fitting') {
+      description = `${props.fittingType ?? 'Fitting'}`;
+    } else if (entityType === 'note') {
+      description = String(props.content ?? '').substring(0, 50);
+    }
+
+    rows.push([
+      String(itemNumber++),
+      entityType,
+      String(props.name ?? entityType),
+      description,
+      '1',
+      'ea',
+      specs,
+    ]);
+  });
+
+  // Build CSV string
+  const allRows = includeHeader ? [headers, ...rows] : rows;
+
+  const csvContent = allRows
+    .map((row) => row.map((cell) => escapeCsvValue(String(cell), separator)).join(separator))
+    .join('\n');
+
+  // Handle download option
+  if (options.download) {
+    const sanitizedName = project.projectName.replace(/[/\\?%*:|"<>\s]/g, '_');
+    downloadFile(csvContent, `${sanitizedName}_BOM.csv`, 'text/csv');
+  }
+
+  return csvContent;
+}
+
+// Local version of downloadFile to avoid circular import issues
+function downloadFileLocal(content: string, filename: string, mimeType: string): void {
+  const blob = new Blob([content], { type: mimeType });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
 }

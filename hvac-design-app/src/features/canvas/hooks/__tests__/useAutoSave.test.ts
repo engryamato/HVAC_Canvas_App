@@ -139,6 +139,13 @@ describe('useAutoSave - Hook Behavior', () => {
   beforeEach(() => {
     localStorage.clear();
     useEntityStore.getState().clearAllEntities();
+    useViewportStore.setState({
+      panX: 0,
+      panY: 0,
+      zoom: 1,
+      gridVisible: true,
+      gridSize: 12,
+    });
     useProjectStore.setState({
       currentProjectId: 'test-project',
       projectDetails: {
@@ -208,7 +215,7 @@ describe('useAutoSave - Hook Behavior', () => {
 
   describe('Dirty State Tracking', () => {
     it('should mark as dirty when entities change', async () => {
-      const { result } = renderHook(() => useAutoSave({ enabled: true }));
+      const { result, rerender } = renderHook(() => useAutoSave({ enabled: true }));
 
       expect(result.current.isDirty).toBe(false);
 
@@ -218,13 +225,14 @@ describe('useAutoSave - Hook Behavior', () => {
         useEntityStore.getState().addEntity(room);
       });
 
-      await waitFor(() => {
-        expect(result.current.isDirty).toBe(true);
-      });
+      // Force rerender to pick up state changes
+      rerender();
+
+      expect(result.current.isDirty).toBe(true);
     });
 
     it('should mark as dirty when viewport changes', async () => {
-      const { result } = renderHook(() => useAutoSave({ enabled: true }));
+      const { result, rerender } = renderHook(() => useAutoSave({ enabled: true }));
 
       expect(result.current.isDirty).toBe(false);
 
@@ -233,14 +241,15 @@ describe('useAutoSave - Hook Behavior', () => {
         useViewportStore.setState({ panX: 100, panY: 100 });
       });
 
-      await waitFor(() => {
-        expect(result.current.isDirty).toBe(true);
-      });
+      // Force rerender to pick up state changes
+      rerender();
+
+      expect(result.current.isDirty).toBe(true);
     });
   });
 
   describe('Debounced Save', () => {
-    it('should save after debounce delay when dirty', async () => {
+    it('should save after debounce delay when dirty', () => {
       const onSave = vi.fn();
       renderHook(() => useAutoSave({ enabled: true, debounceDelay: 1000, onSave }));
 
@@ -259,16 +268,14 @@ describe('useAutoSave - Hook Behavior', () => {
         vi.advanceTimersByTime(1000);
       });
 
-      await waitFor(() => {
-        expect(onSave).toHaveBeenCalled();
-      });
+      expect(onSave).toHaveBeenCalled();
     });
 
-    it('should reset debounce on multiple changes', async () => {
+    it('should reset debounce on multiple changes', () => {
       const onSave = vi.fn();
-      renderHook(() => useAutoSave({ enabled: true, debounceDelay: 1000, onSave }));
+      const { rerender } = renderHook(() => useAutoSave({ enabled: true, debounceDelay: 1000, onSave }));
 
-      // First change
+      // First change - set dirty
       act(() => {
         useProjectStore.setState({ isDirty: true });
       });
@@ -278,18 +285,19 @@ describe('useAutoSave - Hook Behavior', () => {
         vi.advanceTimersByTime(500);
       });
 
-      // Second change (should reset timer)
+      // Second change (should reset timer) - trigger via viewport change
       act(() => {
         useViewportStore.setState({ panX: 100 });
-        useProjectStore.setState({ isDirty: true });
       });
+      // Rerender to pick up change counter update
+      rerender();
 
       // Fast-forward another 500ms (total 1000ms from first, but only 500ms from second)
       act(() => {
         vi.advanceTimersByTime(500);
       });
 
-      // Should not have saved yet
+      // Should not have saved yet (only 500ms since last change)
       expect(onSave).not.toHaveBeenCalled();
 
       // Fast-forward remaining 500ms
@@ -297,14 +305,12 @@ describe('useAutoSave - Hook Behavior', () => {
         vi.advanceTimersByTime(500);
       });
 
-      await waitFor(() => {
-        expect(onSave).toHaveBeenCalled();
-      });
+      expect(onSave).toHaveBeenCalled();
     });
   });
 
   describe('Interval Auto-Save', () => {
-    it('should auto-save at specified interval when dirty', async () => {
+    it('should auto-save at specified interval when dirty', () => {
       const onSave = vi.fn();
       renderHook(() => useAutoSave({ enabled: true, interval: 5000, onSave }));
 
@@ -318,12 +324,10 @@ describe('useAutoSave - Hook Behavior', () => {
         vi.advanceTimersByTime(5000);
       });
 
-      await waitFor(() => {
-        expect(onSave).toHaveBeenCalled();
-      });
+      expect(onSave).toHaveBeenCalled();
     });
 
-    it('should not auto-save when not dirty', async () => {
+    it('should not auto-save when not dirty', () => {
       const onSave = vi.fn();
       renderHook(() => useAutoSave({ enabled: true, interval: 5000, onSave }));
 

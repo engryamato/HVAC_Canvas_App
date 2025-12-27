@@ -8,9 +8,10 @@ interface SelectionState {
 
 interface SelectionActions {
   select: (id: string) => void;
+  selectSingle: (id: string) => void; // Alias for select
   addToSelection: (id: string) => void;
   removeFromSelection: (id: string) => void;
-  toggleSelection: (id: string) => void;
+  toggleSelection: (id: string, forceAdd?: boolean) => void;
   selectMultiple: (ids: string[]) => void;
   clearSelection: () => void;
   selectAll: (allIds: string[]) => void;
@@ -33,6 +34,11 @@ export const useSelectionStore = create<SelectionStore>()(
         state.selectedIds = [id];
       }),
 
+    selectSingle: (id) =>
+      set((state) => {
+        state.selectedIds = [id];
+      }),
+
     addToSelection: (id) =>
       set((state) => {
         if (!state.selectedIds.includes(id)) {
@@ -45,12 +51,23 @@ export const useSelectionStore = create<SelectionStore>()(
         state.selectedIds = state.selectedIds.filter((s) => s !== id);
       }),
 
-    toggleSelection: (id) =>
+    toggleSelection: (id, forceAdd) =>
       set((state) => {
-        if (state.selectedIds.includes(id)) {
+        if (forceAdd === true) {
+          // Force add - always add to selection
+          if (!state.selectedIds.includes(id)) {
+            state.selectedIds.push(id);
+          }
+        } else if (forceAdd === false) {
+          // Force remove - always remove from selection
           state.selectedIds = state.selectedIds.filter((s) => s !== id);
         } else {
-          state.selectedIds.push(id);
+          // Default toggle behavior
+          if (state.selectedIds.includes(id)) {
+            state.selectedIds = state.selectedIds.filter((s) => s !== id);
+          } else {
+            state.selectedIds.push(id);
+          }
         }
       }),
 
@@ -92,6 +109,7 @@ export const useHasSelection = () => useSelectionStore((state) => state.selected
 export const useSelectionActions = () =>
   useSelectionStore((state) => ({
     select: state.select,
+    selectSingle: state.selectSingle,
     addToSelection: state.addToSelection,
     removeFromSelection: state.removeFromSelection,
     toggleSelection: state.toggleSelection,

@@ -3,7 +3,7 @@ import { useEntityStore } from '../../entityStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { useProjectStore } from '../../project.store';
-import { useToolStore } from '@/features/canvas/store/canvas.store';
+import { useToolStore } from '@/core/store/canvas.store';
 import { createEntity, deleteEntity, updateEntity, undo, redo } from '@/core/commands/entityCommands';
 import type { Room, Duct } from '@/core/schema';
 
