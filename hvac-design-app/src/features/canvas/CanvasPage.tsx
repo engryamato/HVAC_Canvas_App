@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { CanvasContainer } from './components/CanvasContainer';
 import { Toolbar } from './components/Toolbar';
@@ -10,8 +10,6 @@ import InspectorPanel from './components/Inspector/InspectorPanel';
 import { ExportMenu } from '@/features/export/ExportMenu';
 import { useAutoSave, useKeyboardShortcuts } from './hooks';
 import styles from './CanvasPage.module.css';
-import { createEmptyProjectFile } from '@/core/schema';
-import { useCurrentProjectId, useProjectDetails } from '@/core/store/project.store';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { redo, undo, useCanRedo, useCanUndo } from '@/core/commands';
 
@@ -34,22 +32,21 @@ interface CanvasPageProps {
 export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElement {
   // Track mouse position for status bar
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
-  const projectId = useCurrentProjectId();
-  const projectDetails = useProjectDetails();
-  const projectFolder = usePreferencesStore((state) => state.projectFolder);
+
+  // Note: Project data is now managed internally by stores via CanvasPageWrapper and useAutoSave
+
+  // Ensure preferences are loaded
+  usePreferencesStore((state) => state.projectFolder); // Keep subscription active if needed
+
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
 
-  const projectFile = useMemo(() => {
-    if (!projectId) {
-      return null;
-    }
-    return createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
-  }, [projectDetails?.projectName, projectId]);
+  // useAutoSave now manages state internally via store
+  const { save, isDirty } = useAutoSave();
+  const triggerSave = save;
 
-  const projectPath = projectId ? `${projectFolder}/${projectId}.sws` : null;
-
-  const { status: saveStatus, lastSavedAt, triggerSave } = useAutoSave(projectFile, projectPath);
+  // Placeholder for status - useAutoSave currently doesn't expose these
+  const saveStatus = isDirty ? 'unsaved' : 'saved';
 
   const handleMouseMove = useCallback((canvasX: number, canvasY: number) => {
     setMousePosition({ x: canvasX, y: canvasY });
@@ -95,8 +92,8 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
         </div>
         <ExportMenu />
         <div className={styles.saveStatus}>
-          <span>{saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : 'Idle'}</span>
-          {lastSavedAt && <span className={styles.saveTime}>{lastSavedAt.toLocaleTimeString()}</span>}
+          <span>{saveStatus === 'unsaved' ? 'Unsaved' : 'Saved'}</span>
+          {/* {lastSavedAt && <span className={styles.saveTime}>{lastSavedAt.toLocaleTimeString()}</span>} */}
         </div>
       </div>
 
