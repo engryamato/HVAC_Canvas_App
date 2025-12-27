@@ -64,7 +64,8 @@ export function createEntity(entity: Entity, options?: CommandOptions): void {
       timestamp: Date.now(),
     },
     selectionBefore: selection.before,
-    selectionAfter: selection.after,
+    // After redo, the created entity should be selected
+    selectionAfter: options?.selectionAfter ?? [entity.id],
   };
 
   // Execute command
