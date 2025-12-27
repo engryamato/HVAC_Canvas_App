@@ -45,10 +45,13 @@ describe('Tool Workflow Integration Tests', () => {
     selectTool.onDeactivate();
   });
 
+  // Helper to get fresh store state
+  const getEntityStore = () => useEntityStore.getState();
+  const getSelectionStore = () => useSelectionStore.getState();
+  const getHistoryStore = () => useHistoryStore.getState();
+
   describe('Complete HVAC Design Workflow', () => {
     it('should create a complete HVAC design with rooms, ducts, equipment, and fittings', () => {
-      const entityStore = useEntityStore.getState();
-
       // Step 1: Create two rooms
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
@@ -60,8 +63,8 @@ describe('Tool Workflow Integration Tests', () => {
       roomTool.onMouseUp({ x: 400, y: 200, button: 0 });
       roomTool.onDeactivate();
 
-      expect(entityStore.allIds.length).toBe(2);
-      const rooms = entityStore.allIds.map(id => entityStore.byId[id]).filter(e => e.type === 'room') as Room[];
+      expect(getEntityStore().allIds.length).toBe(2);
+      const rooms = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'room') as Room[];
       expect(rooms.length).toBe(2);
 
       // Step 2: Add equipment to first room
@@ -69,8 +72,8 @@ describe('Tool Workflow Integration Tests', () => {
       equipmentTool.onMouseDown({ x: 150, y: 150, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
 
-      expect(entityStore.allIds.length).toBe(3);
-      const equipment = entityStore.allIds.map(id => entityStore.byId[id]).filter(e => e.type === 'equipment') as Equipment[];
+      expect(getEntityStore().allIds.length).toBe(3);
+      const equipment = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'equipment') as Equipment[];
       expect(equipment.length).toBe(1);
 
       // Step 3: Create duct connecting the rooms
@@ -80,8 +83,8 @@ describe('Tool Workflow Integration Tests', () => {
       ductTool.onMouseUp({ x: 300, y: 150, button: 0 });
       ductTool.onDeactivate();
 
-      expect(entityStore.allIds.length).toBe(4);
-      const ducts = entityStore.allIds.map(id => entityStore.byId[id]).filter(e => e.type === 'duct') as Duct[];
+      expect(getEntityStore().allIds.length).toBe(4);
+      const ducts = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'duct') as Duct[];
       expect(ducts.length).toBe(1);
 
       // Step 4: Add fittings at duct ends
@@ -90,8 +93,8 @@ describe('Tool Workflow Integration Tests', () => {
       fittingTool.onMouseDown({ x: 300, y: 150, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       fittingTool.onDeactivate();
 
-      expect(entityStore.allIds.length).toBe(6);
-      const fittings = entityStore.allIds.map(id => entityStore.byId[id]).filter(e => e.type === 'fitting') as Fitting[];
+      expect(getEntityStore().allIds.length).toBe(6);
+      const fittings = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'fitting') as Fitting[];
       expect(fittings.length).toBe(2);
 
       // Step 5: Add annotation note
@@ -99,12 +102,12 @@ describe('Tool Workflow Integration Tests', () => {
       noteTool.onMouseDown({ x: 250, y: 250, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       noteTool.onDeactivate();
 
-      expect(entityStore.allIds.length).toBe(7);
-      const notes = entityStore.allIds.map(id => entityStore.byId[id]).filter(e => e.type === 'note') as Note[];
+      expect(getEntityStore().allIds.length).toBe(7);
+      const notes = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'note') as Note[];
       expect(notes.length).toBe(1);
 
       // Verify final design
-      expect(entityStore.allIds.length).toBe(7);
+      expect(getEntityStore().allIds.length).toBe(7);
       expect(rooms.length).toBe(2);
       expect(ducts.length).toBe(1);
       expect(equipment.length).toBe(1);
@@ -113,8 +116,6 @@ describe('Tool Workflow Integration Tests', () => {
     });
 
     it('should maintain proper z-index ordering for all entity types', () => {
-      const entityStore = useEntityStore.getState();
-
       // Create one of each type
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
@@ -138,7 +139,7 @@ describe('Tool Workflow Integration Tests', () => {
       noteTool.onMouseDown({ x: 180, y: 180, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       noteTool.onDeactivate();
 
-      const entities = entityStore.allIds.map(id => entityStore.byId[id]);
+      const entities = getEntityStore().allIds.map(id => getEntityStore().byId[id]);
       const room = entities.find(e => e.type === 'room') as Room;
       const duct = entities.find(e => e.type === 'duct') as Duct;
       const equipment = entities.find(e => e.type === 'equipment') as Equipment;
@@ -162,9 +163,6 @@ describe('Tool Workflow Integration Tests', () => {
 
   describe('Selection and Modification Workflow', () => {
     it('should select, move, and modify entities across multiple tools', () => {
-      const entityStore = useEntityStore.getState();
-      const selectionStore = useSelectionStore.getState();
-
       // Create multiple rooms
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
@@ -173,31 +171,31 @@ describe('Tool Workflow Integration Tests', () => {
       roomTool.onMouseUp({ x: 400, y: 200, button: 0 });
       roomTool.onDeactivate();
 
-      const room1Id = entityStore.allIds[0];
-      const room2Id = entityStore.allIds[1];
+      const room1Id = getEntityStore().allIds[0];
+      const room2Id = getEntityStore().allIds[1];
 
       // Switch to select tool and select first room
       selectTool.onActivate();
-      selectionStore.selectSingle(room1Id);
-      expect(selectionStore.selectedIds).toContain(room1Id);
-      expect(selectionStore.selectedIds.length).toBe(1);
+      getSelectionStore().selectSingle(room1Id);
+      expect(getSelectionStore().selectedIds).toContain(room1Id);
+      expect(getSelectionStore().selectedIds.length).toBe(1);
 
       // Multi-select second room with Shift
-      selectionStore.toggleSelection(room2Id, true);
-      expect(selectionStore.selectedIds).toContain(room1Id);
-      expect(selectionStore.selectedIds).toContain(room2Id);
-      expect(selectionStore.selectedIds.length).toBe(2);
+      getSelectionStore().toggleSelection(room2Id, true);
+      expect(getSelectionStore().selectedIds).toContain(room1Id);
+      expect(getSelectionStore().selectedIds).toContain(room2Id);
+      expect(getSelectionStore().selectedIds.length).toBe(2);
 
       // Move selected rooms
-      const room1Before = entityStore.byId[room1Id];
-      const room2Before = entityStore.byId[room2Id];
+      const room1Before = getEntityStore().byId[room1Id];
+      const room2Before = getEntityStore().byId[room2Id];
 
       selectTool.onMouseDown({ x: 150, y: 150, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       selectTool.onMouseMove({ x: 200, y: 200 });
       selectTool.onMouseUp({ x: 200, y: 200, button: 0 });
 
-      const room1After = entityStore.byId[room1Id];
-      const room2After = entityStore.byId[room2Id];
+      const room1After = getEntityStore().byId[room1Id];
+      const room2After = getEntityStore().byId[room2Id];
 
       // Both rooms should have moved
       expect(room1After.transform.x).not.toBe(room1Before.transform.x);
@@ -207,9 +205,6 @@ describe('Tool Workflow Integration Tests', () => {
     });
 
     it('should handle selection persistence across tool switches', () => {
-      const entityStore = useEntityStore.getState();
-      const selectionStore = useSelectionStore.getState();
-
       // Create entities with different tools
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
@@ -221,13 +216,13 @@ describe('Tool Workflow Integration Tests', () => {
       ductTool.onMouseUp({ x: 250, y: 150, button: 0 });
       ductTool.onDeactivate();
 
-      const roomId = entityStore.allIds[0];
-      const ductId = entityStore.allIds[1];
+      const roomId = getEntityStore().allIds[0];
+      const ductId = getEntityStore().allIds[1];
 
       // Select room
       selectTool.onActivate();
-      selectionStore.selectSingle(roomId);
-      expect(selectionStore.selectedIds).toContain(roomId);
+      getSelectionStore().selectSingle(roomId);
+      expect(getSelectionStore().selectedIds).toContain(roomId);
       selectTool.onDeactivate();
 
       // Switch to equipment tool (selection should clear or persist based on design)
@@ -238,61 +233,56 @@ describe('Tool Workflow Integration Tests', () => {
       // Switch back to select tool
       selectTool.onActivate();
       // Can re-select
-      selectionStore.selectSingle(ductId);
-      expect(selectionStore.selectedIds).toContain(ductId);
+      getSelectionStore().selectSingle(ductId);
+      expect(getSelectionStore().selectedIds).toContain(ductId);
       selectTool.onDeactivate();
     });
   });
 
   describe('Undo/Redo Integration', () => {
     it('should support undo/redo across multiple tool operations', () => {
-      const entityStore = useEntityStore.getState();
-
       // Operation 1: Create room
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       roomTool.onMouseUp({ x: 200, y: 200, button: 0 });
       roomTool.onDeactivate();
-      expect(entityStore.allIds.length).toBe(1);
+      expect(getEntityStore().allIds.length).toBe(1);
 
       // Operation 2: Create duct
       ductTool.onActivate();
       ductTool.onMouseDown({ x: 150, y: 150, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       ductTool.onMouseUp({ x: 250, y: 150, button: 0 });
       ductTool.onDeactivate();
-      expect(entityStore.allIds.length).toBe(2);
+      expect(getEntityStore().allIds.length).toBe(2);
 
       // Operation 3: Create equipment
       equipmentTool.onActivate();
       equipmentTool.onMouseDown({ x: 200, y: 200, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
-      expect(entityStore.allIds.length).toBe(3);
+      expect(getEntityStore().allIds.length).toBe(3);
 
       // Undo last operation (equipment)
       undo();
-      expect(entityStore.allIds.length).toBe(2);
-      expect(entityStore.allIds.every(id => entityStore.byId[id].type !== 'equipment')).toBe(true);
+      expect(getEntityStore().allIds.length).toBe(2);
+      expect(getEntityStore().allIds.every(id => getEntityStore().byId[id].type !== 'equipment')).toBe(true);
 
       // Undo second operation (duct)
       undo();
-      expect(entityStore.allIds.length).toBe(1);
-      expect(entityStore.byId[entityStore.allIds[0]].type).toBe('room');
+      expect(getEntityStore().allIds.length).toBe(1);
+      expect(getEntityStore().byId[getEntityStore().allIds[0]].type).toBe('room');
 
       // Redo duct creation
       redo();
-      expect(entityStore.allIds.length).toBe(2);
-      expect(entityStore.allIds.some(id => entityStore.byId[id].type === 'duct')).toBe(true);
+      expect(getEntityStore().allIds.length).toBe(2);
+      expect(getEntityStore().allIds.some(id => getEntityStore().byId[id].type === 'duct')).toBe(true);
 
       // Redo equipment creation
       redo();
-      expect(entityStore.allIds.length).toBe(3);
-      expect(entityStore.allIds.some(id => entityStore.byId[id].type === 'equipment')).toBe(true);
+      expect(getEntityStore().allIds.length).toBe(3);
+      expect(getEntityStore().allIds.some(id => getEntityStore().byId[id].type === 'equipment')).toBe(true);
     });
 
     it('should maintain history stack across complex workflows', () => {
-      const entityStore = useEntityStore.getState();
-      const historyStore = useHistoryStore.getState();
-
       // Create several entities
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
@@ -309,41 +299,39 @@ describe('Tool Workflow Integration Tests', () => {
       fittingTool.onDeactivate();
 
       // Should have 3 commands in history
-      expect(historyStore.past.length).toBe(3);
-      expect(historyStore.future.length).toBe(0);
+      expect(getHistoryStore().past.length).toBe(3);
+      expect(getHistoryStore().future.length).toBe(0);
 
       // Undo all
       undo();
       undo();
       undo();
-      expect(entityStore.allIds.length).toBe(0);
-      expect(historyStore.past.length).toBe(0);
-      expect(historyStore.future.length).toBe(3);
+      expect(getEntityStore().allIds.length).toBe(0);
+      expect(getHistoryStore().past.length).toBe(0);
+      expect(getHistoryStore().future.length).toBe(3);
 
       // Redo all
       redo();
       redo();
       redo();
-      expect(entityStore.allIds.length).toBe(3);
-      expect(historyStore.past.length).toBe(3);
-      expect(historyStore.future.length).toBe(0);
+      expect(getEntityStore().allIds.length).toBe(3);
+      expect(getHistoryStore().past.length).toBe(3);
+      expect(getHistoryStore().future.length).toBe(0);
     });
   });
 
   describe('Grid Snapping Integration', () => {
     it('should snap entities to grid across all tools', () => {
-      const entityStore = useEntityStore.getState();
-
       // Create room with grid snapping
       roomTool.onActivate();
       roomTool.onMouseDown({ x: 105, y: 107, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       roomTool.onMouseUp({ x: 205, y: 207, button: 0 });
       roomTool.onDeactivate();
 
-      const room = entityStore.byId[entityStore.allIds[0]] as Room;
-      // Should snap to nearest 12px grid (assuming 12px grid size)
-      expect(room.transform.x % 12).toBe(0);
-      expect(room.transform.y % 12).toBe(0);
+      const room = getEntityStore().byId[getEntityStore().allIds[0]] as Room;
+      // Should snap to nearest grid (default 24px grid size based on viewport constants)
+      expect(room.transform.x % 24).toBe(0);
+      expect(room.transform.y % 24).toBe(0);
 
       // Create duct with grid snapping
       ductTool.onActivate();
@@ -351,18 +339,18 @@ describe('Tool Workflow Integration Tests', () => {
       ductTool.onMouseUp({ x: 253, y: 149, button: 0 });
       ductTool.onDeactivate();
 
-      const duct = entityStore.byId[entityStore.allIds[1]] as Duct;
-      expect(duct.transform.x % 12).toBe(0);
-      expect(duct.transform.y % 12).toBe(0);
+      const duct = getEntityStore().byId[getEntityStore().allIds[1]] as Duct;
+      expect(duct.transform.x % 24).toBe(0);
+      expect(duct.transform.y % 24).toBe(0);
 
       // Create equipment with grid snapping
       equipmentTool.onActivate();
       equipmentTool.onMouseDown({ x: 198, y: 202, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
 
-      const equipment = entityStore.byId[entityStore.allIds[2]] as Equipment;
-      expect(equipment.transform.x % 12).toBe(0);
-      expect(equipment.transform.y % 12).toBe(0);
+      const equipment = getEntityStore().byId[getEntityStore().allIds[2]] as Equipment;
+      expect(equipment.transform.x % 24).toBe(0);
+      expect(equipment.transform.y % 24).toBe(0);
     });
   });
 
@@ -385,7 +373,6 @@ describe('Tool Workflow Integration Tests', () => {
     });
 
     it('should handle creating entities at same location', () => {
-      const entityStore = useEntityStore.getState();
       const location = { x: 200, y: 200 };
 
       // Create multiple entities at same spot
@@ -407,12 +394,10 @@ describe('Tool Workflow Integration Tests', () => {
       noteTool.onDeactivate();
 
       // All should be created successfully
-      expect(entityStore.allIds.length).toBe(4);
+      expect(getEntityStore().allIds.length).toBe(4);
     });
 
     it('should handle empty canvas operations', () => {
-      const entityStore = useEntityStore.getState();
-
       expect(() => {
         // Try to select on empty canvas
         selectTool.onActivate();
@@ -427,13 +412,12 @@ describe('Tool Workflow Integration Tests', () => {
         redo();
       }).not.toThrow();
 
-      expect(entityStore.allIds.length).toBe(0);
+      expect(getEntityStore().allIds.length).toBe(0);
     });
   });
 
   describe('Performance and Scalability', () => {
     it('should handle creating many entities without performance degradation', () => {
-      const entityStore = useEntityStore.getState();
       const startTime = performance.now();
 
       roomTool.onActivate();
@@ -448,14 +432,12 @@ describe('Tool Workflow Integration Tests', () => {
       const endTime = performance.now();
       const duration = endTime - startTime;
 
-      expect(entityStore.allIds.length).toBe(50);
+      expect(getEntityStore().allIds.length).toBe(50);
       // Should complete in reasonable time (<1 second for 50 rooms)
       expect(duration).toBeLessThan(1000);
     });
 
     it('should handle deep undo/redo stack', () => {
-      const entityStore = useEntityStore.getState();
-
       // Create 20 entities
       roomTool.onActivate();
       for (let i = 0; i < 20; i++) {
@@ -464,19 +446,19 @@ describe('Tool Workflow Integration Tests', () => {
       }
       roomTool.onDeactivate();
 
-      expect(entityStore.allIds.length).toBe(20);
+      expect(getEntityStore().allIds.length).toBe(20);
 
       // Undo all
       for (let i = 0; i < 20; i++) {
         undo();
       }
-      expect(entityStore.allIds.length).toBe(0);
+      expect(getEntityStore().allIds.length).toBe(0);
 
       // Redo all
       for (let i = 0; i < 20; i++) {
         redo();
       }
-      expect(entityStore.allIds.length).toBe(20);
+      expect(getEntityStore().allIds.length).toBe(20);
     });
   });
 });

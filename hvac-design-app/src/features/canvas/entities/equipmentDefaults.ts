@@ -115,7 +115,7 @@ export function createEquipment(
       scaleX: 1,
       scaleY: 1,
     },
-    zIndex: 2,
+    zIndex: 5, // Equipment renders at same level as ducts
     createdAt: now,
     modifiedAt: now,
     props: {

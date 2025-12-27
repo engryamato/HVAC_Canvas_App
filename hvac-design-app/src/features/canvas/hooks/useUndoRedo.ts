@@ -27,8 +27,16 @@ function isMacOS(): boolean {
  */
 export function useUndoRedo() {
   useEffect(() => {
-    // SSR guard: only run in browser
-    if (typeof window === 'undefined') {
+    // SSR guard: only run in browser - use try-catch for environments where window is deleted
+    let win: typeof globalThis.window | undefined;
+    try {
+      win = typeof window !== 'undefined' ? window : undefined;
+    } catch {
+      // window is not defined (SSR or deleted)
+      return;
+    }
+
+    if (!win) {
       return;
     }
 
@@ -38,11 +46,12 @@ export function useUndoRedo() {
         return;
       }
 
-      const isMac = isMacOS();
-      const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+      // Check for Ctrl or Cmd (both work on all platforms for better compatibility)
+      const ctrlOrCmd = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
 
       // Undo: Ctrl+Z or Cmd+Z
-      if (ctrlOrCmd && e.key === 'z' && !e.shiftKey) {
+      if (ctrlOrCmd && key === 'z' && !e.shiftKey) {
         e.preventDefault();
         undo();
         return;
@@ -50,8 +59,8 @@ export function useUndoRedo() {
 
       // Redo: Ctrl+Y or Ctrl+Shift+Z or Cmd+Shift+Z
       if (
-        (ctrlOrCmd && e.key === 'y') || // Ctrl+Y (Windows/Linux)
-        (ctrlOrCmd && e.shiftKey && e.key === 'z') // Ctrl+Shift+Z or Cmd+Shift+Z
+        (ctrlOrCmd && key === 'y') || // Ctrl+Y (Windows/Linux)
+        (ctrlOrCmd && e.shiftKey && key === 'z') // Ctrl+Shift+Z or Cmd+Shift+Z
       ) {
         e.preventDefault();
         redo();
@@ -59,10 +68,10 @@ export function useUndoRedo() {
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    win.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      win.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 }

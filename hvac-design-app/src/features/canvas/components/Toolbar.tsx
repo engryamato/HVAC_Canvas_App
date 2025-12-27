@@ -5,11 +5,13 @@ import {
   useToolStore,
   useToolActions,
   useSelectedEquipmentType,
+  useSelectedFittingType,
   type CanvasTool,
 } from '@/core/store/canvas.store';
 import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
+import type { FittingType } from '@/core/schema/fitting.schema';
 import { EQUIPMENT_TYPE_LABELS } from '../entities/equipmentDefaults';
 
 interface ToolButtonProps {
@@ -82,14 +84,43 @@ const EquipmentIcon = () => (
   </svg>
 );
 
+const FittingIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 12h8M20 12h-4M12 4v8M12 20v-4" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const NoteIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
+    <line x1="9" y1="9" x2="10" y2="9" />
+    <line x1="9" y1="13" x2="15" y2="13" />
+    <line x1="9" y1="17" x2="15" y2="17" />
+  </svg>
+);
+
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
   { tool: 'duct', icon: <DuctIcon />, label: 'Duct', shortcut: 'D' },
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
+  { tool: 'fitting', icon: <FittingIcon />, label: 'Fitting', shortcut: 'F' },
+  { tool: 'note', icon: <NoteIcon />, label: 'Note', shortcut: 'N' },
 ];
 
 const EQUIPMENT_TYPES: EquipmentType[] = ['hood', 'fan', 'diffuser', 'damper', 'air_handler'];
+
+const FITTING_TYPES: FittingType[] = ['elbow_90', 'elbow_45', 'tee', 'reducer', 'cap'];
+
+const FITTING_TYPE_LABELS: Record<FittingType, string> = {
+  elbow_90: '90° Elbow',
+  elbow_45: '45° Elbow',
+  tee: 'Tee',
+  reducer: 'Reducer',
+  cap: 'Cap',
+};
 
 /**
  * Undo/Redo button component
@@ -197,6 +228,76 @@ function EquipmentTypeSelector() {
   );
 }
 
+/**
+ * Fitting type selector component with keyboard navigation
+ */
+function FittingTypeSelector() {
+  const selectedType = useSelectedFittingType();
+  const { setFittingType } = useToolActions();
+
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent, currentIndex: number) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setFittingType(FITTING_TYPES[(currentIndex + 1) % FITTING_TYPES.length]!);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setFittingType(FITTING_TYPES[(currentIndex - 1 + FITTING_TYPES.length) % FITTING_TYPES.length]!);
+          break;
+        case 'Home':
+          e.preventDefault();
+          setFittingType(FITTING_TYPES[0]!);
+          break;
+        case 'End':
+          e.preventDefault();
+          setFittingType(FITTING_TYPES[FITTING_TYPES.length - 1]!);
+          break;
+      }
+    },
+    [setFittingType]
+  );
+
+  return (
+    <div
+      className="flex flex-col gap-1 p-2 border-t border-gray-200"
+      role="radiogroup"
+      aria-label="Fitting type selection"
+    >
+      <div id="fitting-type-label" className="text-xs text-gray-500 font-medium mb-1">
+        Fitting Type
+      </div>
+      {FITTING_TYPES.map((type, index) => {
+        const isSelected = selectedType === type;
+        return (
+          <button
+            key={type}
+            type="button"
+            role="radio"
+            aria-checked={isSelected}
+            aria-labelledby="fitting-type-label"
+            onClick={() => setFittingType(type)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            tabIndex={isSelected ? 0 : -1}
+            className={`
+              px-2 py-1.5 text-xs rounded transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500
+              ${
+                isSelected
+                  ? 'bg-blue-100 text-blue-700 font-medium'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }
+            `}
+            title={FITTING_TYPE_LABELS[type]}
+          >
+            {FITTING_TYPE_LABELS[type]}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 interface ToolbarProps {
   className?: string;
 }
@@ -231,6 +332,12 @@ export function Toolbar({ className = '' }: ToolbarProps) {
           break;
         case 'e':
           setTool('equipment');
+          break;
+        case 'f':
+          setTool('fitting');
+          break;
+        case 'n':
+          setTool('note');
           break;
         case 'z':
           if (e.ctrlKey || e.metaKey) {
@@ -303,6 +410,9 @@ export function Toolbar({ className = '' }: ToolbarProps) {
 
       {/* Show equipment type selector when equipment tool is active */}
       {currentTool === 'equipment' && <EquipmentTypeSelector />}
+
+      {/* Show fitting type selector when fitting tool is active */}
+      {currentTool === 'fitting' && <FittingTypeSelector />}
     </div>
   );
 }

@@ -107,24 +107,42 @@ export function createEntities(entities: Entity[]): void {
 /**
  * Update an existing entity
  * Stores the previous state for undo support
+ * Can be called with just the updated entity (will fetch previous state from store)
  */
 export function updateEntity(
-  id: string,
-  updates: Partial<Entity>,
-  previousState: Entity,
+  entityOrId: Entity | string,
+  updates?: Partial<Entity>,
+  previousState?: Entity,
   options?: CommandOptions
 ): void {
+  // Support both calling styles:
+  // updateEntity(entity) - pass complete updated entity
+  // updateEntity(id, updates, previousState) - legacy style
+  let id: string;
+  let actualUpdates: Partial<Entity>;
+  let actualPreviousState: Entity;
+
+  if (typeof entityOrId === 'string') {
+    id = entityOrId;
+    actualUpdates = updates!;
+    actualPreviousState = previousState!;
+  } else {
+    id = entityOrId.id;
+    actualPreviousState = useEntityStore.getState().byId[id];
+    actualUpdates = entityOrId;
+  }
+
   const selection = captureSelection(options);
 
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.UPDATE_ENTITY,
-    payload: { id, updates, selection: selection.before },
+    payload: { id, updates: actualUpdates, selection: selection.before },
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
       type: CommandType.UPDATE_ENTITY,
-      payload: { id, updates: previousState, selection: selection.before },
+      payload: { id, updates: actualPreviousState, selection: selection.before },
       timestamp: Date.now(),
     },
     selectionBefore: selection.before,
@@ -137,15 +155,33 @@ export function updateEntity(
 /**
  * Delete an entity from the canvas
  * Stores the entity for undo support
+ * Can be called with either entity ID (string) or Entity object
  */
-export function deleteEntity(entity: Entity, options?: CommandOptions): void {
+export function deleteEntity(entityOrId: Entity | string, options?: CommandOptions): void {
+  // Support both calling styles:
+  // deleteEntity('entity-id') - pass string ID
+  // deleteEntity(entity) - pass Entity object
+  let entity: Entity;
+  let entityId: string;
+
+  if (typeof entityOrId === 'string') {
+    entityId = entityOrId;
+    entity = useEntityStore.getState().byId[entityId];
+    if (!entity) {
+      return; // Entity doesn't exist
+    }
+  } else {
+    entity = entityOrId;
+    entityId = entity.id;
+  }
+
   const selection = captureSelection(options);
-  const nextSelection = selection.after.filter((id) => id !== entity.id);
+  const nextSelection = selection.after.filter((id) => id !== entityId);
 
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.DELETE_ENTITY,
-    payload: { entityId: entity.id, selection: nextSelection },
+    payload: { entityId, selection: nextSelection },
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
@@ -157,7 +193,7 @@ export function deleteEntity(entity: Entity, options?: CommandOptions): void {
     selectionAfter: nextSelection,
   };
 
-  useEntityStore.getState().removeEntity(entity.id);
+  useEntityStore.getState().removeEntity(entityId);
   applySelection(nextSelection);
   useHistoryStore.getState().push(command);
 }

@@ -48,6 +48,8 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@tauri-apps/cli": "1.5.9",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
     "@types/node": "22.0.0",
     "@types/react": "18.2.46",
     "@types/react-dom": "18.2.18",

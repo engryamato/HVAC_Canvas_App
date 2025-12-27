@@ -120,12 +120,12 @@ export class EquipmentTool extends BaseTool {
 
   private createEquipmentEntity(x: number, y: number): void {
     const selectedType = this.getSelectedType();
-    const defaults = EQUIPMENT_TYPE_DEFAULTS[selectedType]!; // Non-null assertion: defaults always exist for all equipment types
 
-    // Center the equipment on the click point
+    // Place equipment at the snapped position (corner, not centered)
+    // This ensures the transform position is grid-aligned
     const equipment = createEquipment(selectedType, {
-      x: x - defaults.width / 2,
-      y: y - defaults.depth / 2,
+      x,
+      y,
     });
 
     createEntity(equipment);

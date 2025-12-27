@@ -14,7 +14,7 @@ import { useViewportStore } from '../store/viewportStore';
 const MIN_ROOM_SIZE = 12;
 
 interface RoomToolState {
-  mode: 'idle' | 'placing';
+  mode: 'idle' | 'placing' | 'dragging';
   startPoint: { x: number; y: number } | null;
   currentPoint: { x: number; y: number } | null;
 }
@@ -52,28 +52,41 @@ export class RoomTool extends BaseTool {
     const snappedPoint = this.snapToGrid(event.x, event.y);
 
     if (this.state.mode === 'idle') {
-      // First click: set start corner
+      // First click: set start corner and enter dragging mode
       this.state = {
-        mode: 'placing',
+        mode: 'dragging',
         startPoint: snappedPoint,
         currentPoint: snappedPoint,
       };
     } else if (this.state.mode === 'placing' && this.state.startPoint) {
-      // Second click: confirm room
+      // Second click: confirm room (two-click mode)
       this.createRoomEntity(this.state.startPoint, snappedPoint);
       this.reset();
     }
   }
 
   onMouseMove(event: ToolMouseEvent): void {
-    if (this.state.mode === 'placing') {
+    if (this.state.mode === 'dragging' || this.state.mode === 'placing') {
       const snappedPoint = this.snapToGrid(event.x, event.y);
       this.state.currentPoint = snappedPoint;
     }
   }
 
-  onMouseUp(_event: ToolMouseEvent): void {
-    // Room uses two clicks, not click-drag
+  onMouseUp(event: ToolMouseEvent): void {
+    if (this.state.mode === 'dragging' && this.state.startPoint) {
+      const snappedPoint = this.snapToGrid(event.x, event.y);
+      const dx = Math.abs(snappedPoint.x - this.state.startPoint.x);
+      const dy = Math.abs(snappedPoint.y - this.state.startPoint.y);
+
+      // If dragged beyond minimum size, create room immediately
+      if (dx >= MIN_ROOM_SIZE && dy >= MIN_ROOM_SIZE) {
+        this.createRoomEntity(this.state.startPoint, snappedPoint);
+        this.reset();
+      } else {
+        // If not dragged enough, switch to placing mode for two-click behavior
+        this.state.mode = 'placing';
+      }
+    }
   }
 
   onKeyDown(event: ToolKeyEvent): void {
@@ -83,7 +96,7 @@ export class RoomTool extends BaseTool {
   }
 
   render(context: ToolRenderContext): void {
-    if (this.state.mode !== 'placing' || !this.state.startPoint || !this.state.currentPoint) {
+    if ((this.state.mode !== 'placing' && this.state.mode !== 'dragging') || !this.state.startPoint || !this.state.currentPoint) {
       return;
     }
 

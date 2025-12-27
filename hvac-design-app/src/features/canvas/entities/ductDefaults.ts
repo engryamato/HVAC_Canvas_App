@@ -83,7 +83,7 @@ export function createDuct(
       scaleX: 1,
       scaleY: 1,
     },
-    zIndex: 1,
+    zIndex: 5, // Ducts render above rooms
     createdAt: now,
     modifiedAt: now,
     props: props as Duct['props'],
