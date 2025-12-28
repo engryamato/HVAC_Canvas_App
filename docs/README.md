@@ -6,12 +6,15 @@ Welcome to the technical documentation for the SizeWise HVAC Canvas App. This do
 
 - **[System Architecture](./ARCHITECTURE.md)**: Start here to understand how the app works at a high level.
 - **[Element Index](./elements/INDEX.md)**: A complete list of all components, stores, hooks, and utilities.
+- **[Contributor Guide](../CONTRIBUTING.md)**: Setup, testing, and contribution standards.
+- **[How to Add Entities](./guides/HOW_TO_ADD_ENTITY.md)**: Step-by-step guide for extending the system.
 - **[User Journeys](./UserJourney.md)**: Understand the application from a user's perspective.
 
 ## 📁 Documentation Structure
 
-- **[`/elements`](./elements/)**: Detailed documentation for every code element, organized by category.
-- **[`/archive`](./archive/)**: Historical implementation plans and project setup documents.
+- **[`/elements`](./elements/)**: Detailed documentation for every code element.
+- **[`/guides`](./guides/)**: "How-to" cookbooks for common development tasks.
+- **[`/archive`](./archive/)**: Historical implementation plans.
 - **[`/PR_Documentation`](./PR_Documentation/)**: Documentation related to specific pull requests and features.
 
 ## 🛠 Tech Stack
