@@ -30,15 +30,14 @@ src/components/ui/LoadingIndicator.tsx
 
 ## Variants
 
-### 1. Basic Spinner
+### 1. Basic Loader (Pulsating Dots)
 
 ```
-     ◜
-    ◝ ◞
-     ◟
-
-Size: sm (16px), md (24px), lg (32px)
+     ●   ●   ●
+   (Pulse animation)
 ```
+
+Size: sm (8px), md (12px), lg (16px) dots
 
 ### 2. With Message
 

@@ -2,17 +2,40 @@
 
 Complete documentation for all HVAC Canvas App elements.
 
-## 01. Components (Existing)
-See `/docs/elements/01-components/` for UI component documentation.
+## 01. Components
+UI components for the canvas editor and general application.
 
-## 02. Stores (Existing)
-See `/docs/elements/02-stores/` for Zustand store documentation.
+- [CanvasPage.md](./01-components/canvas/CanvasPage.md) - Main editor layout
+- [LeftSidebar.md](./01-components/canvas/LeftSidebar.md) - Project context and site conditions
+- [RightSidebar.md](./01-components/canvas/RightSidebar.md) - Engineering BOQ and calculations
+- [BottomToolbar.md](./01-components/canvas/BottomToolbar.md) - Global actions and settings
+- [FABTool.md](./01-components/canvas/FABTool.md) - Floating quick-create menu
+- [CanvasContainer.md](./01-components/canvas/CanvasContainer.md) - Main rendering workspace
+- [InspectorPanel.md](./01-components/inspector/InspectorPanel.md) - Detail property editor
 
-## 03. Schemas (Existing)
-See `/docs/elements/03-schemas/` for Zod schema documentation.
+## 02. Stores
+Zustand stores for application-wide state management.
 
-## 04. Tools (Existing)
-See `/docs/elements/04-tools/` for canvas tool documentation.
+- [entityStore.md](./02-stores/entityStore.md) - Central repository for design entities
+- [canvasStore.md](./02-stores/canvasStore.md) - UI state (active tool, cursor)
+- [projectStore.md](./02-stores/projectStore.md) - Active project metadata
+- [viewportStore.md](./02-stores/viewportStore.md) - Pan, zoom, and grid settings
+
+## 03. Schemas
+Zod schemas for data validation and type safety.
+
+- [RoomSchema.md](./03-schemas/RoomSchema.md)
+- [DuctSchema.md](./03-schemas/DuctSchema.md)
+- [EquipmentSchema.md](./03-schemas/EquipmentSchema.md)
+- [ProjectFileSchema.md](./03-schemas/ProjectFileSchema.md)
+
+## 04. Tools
+Canvas interaction logic and input handling.
+
+- [SelectTool.md](./04-tools/SelectTool.md) - Selection and movement
+- [RoomTool.md](./04-tools/RoomTool.md) - Room drawing logic
+- [DuctTool.md](./04-tools/DuctTool.md) - Segmented duct drawing
+- [EquipmentTool.md](./04-tools/EquipmentTool.md) - Component placement
 
 ## 05. Renderers (3 files)
 Canvas rendering functions for entities with selection states and zoom support.

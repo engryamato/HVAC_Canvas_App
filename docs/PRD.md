@@ -97,144 +97,87 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
 
 ---
 
-### 2.2 Canvas (HVAC Design Workspace)
+### 2.2 Canvas Interface
 
-### FR-CANV-001: Viewport
+### FR-UI-001: Layout Structure
+- **Left Sidebar**: Sizable Drawer Layer containing Project Details, Scope, and Site Conditions.
+- **Right Sidebar**: Sizable Drawer Layer containing Bill of Quantities and Calculations.
+- **Bottom Toolbar**: Dynamic Sizing Bar containing file operations, process, settings, and notifications.
+- **FAB Tool**: Floating Action Button triggered by 'D' key for quick entity creation.
 
-- Infinite 2D canvas with pan and zoom
-- Pan: Middle-mouse drag OR Space + left-drag
-- Zoom: Mouse wheel (centered on cursor position)
-- Zoom range: 10% to 400%
-- Fit-to-content shortcut (Ctrl+0)
-- Reset view shortcut (Home key)
+### FR-UI-002: Left Sidebar (Project Context)
+**Project Details (Accordion):**
+- Name
+- Location
+- Client
 
-### FR-CANV-002: Grid System
+**Project Scope (Accordion):**
+- **Scope** (Multi-select): HVAC, For future updates
+- **Material** (Multi-select with Dropdowns):
+  - Galvanized Steel (G-60, G-90)
+  - Stainless Steel (304S.S., 316S.S., 409S.S., 430S.S., 444S.S.)
+  - Aluminum
+  - PVS
+- **Project Type** (Dropdown): Residential, Commercial, Industrial
 
-- Configurable grid overlay (ON by default)
-- Grid sizes: 1/4”, 1/2”, 1” (configurable in Settings)
-- Snap-to-grid enabled by default
-- Grid visibility toggle (G key)
-- Grid color: subtle gray (#E5E5E5)
+**Site Conditions (Accordion):**
+- Elevation (Text/Number)
+- Outdoor Temperature (Text/Number)
+- Indoor Temperature (Text/Number)
+- Wind Speed (Text/Number)
+- Humidity (Text/Number)
+- Local Codes (Text/Number)
 
-### FR-CANV-003: Selection Tool (V)
+### FR-UI-003: Right Sidebar (Engineering)
+**Bill of Quantities (Accordion):**
+- Table with columns: Quantity, Name (Separated by Size, Description, Weight), Description, Weight.
+- Categories: Ducts, Fittings, Equipment, Accessories.
 
-- Single-click to select entity
-- Shift+click to add/remove from selection
-- Click-drag for rectangular marquee selection
-- Escape to clear selection
-- Selection indicator: blue outline with resize handles
+**Calculation (Accordion):**
+- Color coding for issues: Inappropriate (Red?), Warning (Yellow), Normal (Green/None).
+- **Equipment Hierarchy**: Organized by Air System -> Duct Section.
+- **Air Volume** (Unit Dropdown):
+  - English: CFM (Default), CFS, CFH
+  - Metric: m³/s (Default), m³/h, m³/m, L/s
+- **Air Velocity** (Unit Dropdown):
+  - English: FPM (Default), FPS
+  - Metric: m/s (Default), cm/s
+- **Air Pressure** (Static & Dynamic):
+  - English: in. W.C., psi
+  - Metric: Pa, kPa
+- **Temperature**:
+  - English: °F, °R
+  - Metric: °C, °K
 
-### FR-CANV-004: Room Tool (R)
+### FR-UI-004: Bottom Toolbar
+**Buttons (Icon + Tooltip):**
+- **File Upload**: Upload external files.
+- **Export**: Opens Export Modal.
+- **Process**: Triggers calculation engine.
+- **Save**: Persist current state.
+- **Save and Exit**: Save and return to dashboard.
+- **Exit**: Return to dashboard (Confirmation modal if unsaved).
+- **Settings**:
+  - **Scale**: 1/4” = 1’-0” (English Default) / 1:50 (Metric Default).
+  - **Unit of Measure**: English/Metric.
+  - **System Toggles**: Show/Hide Warnings for Ducts, Equipment, Room.
+- **Notification**: Opens notification drawer (close button top-left).
 
-- Two-click placement: first click sets corner, move mouse, second click confirms
-- Preview rectangle shown while placing
-- Snap to grid during placement
-- Minimum room size: 12” x 12”
-- Cancel with Escape key
+### FR-UI-005: FAB Tool (Quick Create)
+- Trigger: Press button ‘D’.
+- **Umbrella Menu**:
+  - **Rooms**: Select room templates.
+  - **Ducts**: Select duct types.
+  - **Equipments**: Select equipment types.
 
-### FR-CANV-005: Duct Tool (D)
-
-- Click-drag to draw duct segment
-- Start point snaps to equipment outlets or room edges
-- End point snaps to equipment inlets or room edges
-- Duct shape selectable in Inspector (round/rectangular)
-- Automatic fitting insertion at direction changes
-
-### FR-CANV-006: Equipment Tool (E)
-
-- Click to place equipment at cursor position
-- Equipment type selectable from submenu/palette
-- Snap to grid and room edges
-- Equipment types (Phase 1): Hood, Fan, Diffuser, Damper
-
-### FR-CANV-007: Entity Manipulation
-
-- Move: Click-drag selected entity
-- Resize: Drag corner/edge handles (rooms only)
-- Delete: Delete or Backspace key
-- Duplicate: Ctrl+D
-- Group: Ctrl+G (group selected)
-- Ungroup: Ctrl+Shift+G
-
-### FR-CANV-008: Undo/Redo System
-
-- Command pattern: all mutations are reversible commands
-- Undo: Ctrl+Z (up to 100 commands)
-- Redo: Ctrl+Y or Ctrl+Shift+Z
-- History persisted in project file
-
----
-
-### 2.3 Inspector Panel (Right Sidebar)
-
-### FR-INSP-001: Context-Sensitive Display
-
-- Show properties panel when single entity selected
-- Show multi-selection summary when multiple entities selected
-- Show canvas properties when nothing selected
-- Panel width: 320px (fixed)
-
-### FR-INSP-002: Room Properties
-
-**Identity Group:**
-- Name (text input, 1-100 chars)
-- Notes (textarea, optional)
-
-**Geometry Group:**
-- Width (number, inches, 1-10,000)
-- Length (number, inches, 1-10,000)
-- Height (number, inches, 1-500)
-
-**Occupancy Group:**
-- Occupancy Type (dropdown: office, retail, restaurant, kitchen, warehouse, etc.)
-- Air Changes Per Hour (number, derived from occupancy type, editable)
-
-**Calculated Values (read-only, gray background):**
-- Area (sq ft)
-- Volume (cu ft)
-- Required CFM
-
-### FR-INSP-003: Duct Properties
-
-**Identity Group:**
-- Name (text input)
-
-**Geometry Group:**
-- Shape (dropdown: round, rectangular)
-- Diameter (if round, inches, 4-60)
-- Width (if rectangular, inches, 4-96)
-- Height (if rectangular, inches, 4-96)
-- Length (feet, 0.1-1000)
-
-**Airflow Group:**
-- Material (dropdown: galvanized, stainless, aluminum, flex)
-- Airflow (CFM, 1-100,000)
-- Static Pressure (in.w.g., 0-20)
-
-**Calculated Values (read-only):**
-- Cross-sectional Area (sq in)
-- Velocity (FPM)
-- Friction Loss (in.w.g./100ft)
-
-### FR-INSP-004: Equipment Properties
-
-**Identity Group:**
-- Name (text input)
-- Equipment Type (dropdown: hood, fan, diffuser, damper)
-- Manufacturer (text, optional)
-- Model Number (text, optional)
-
-**Performance Group (varies by type):**
-- Capacity (CFM)
-- Static Pressure (in.w.g.)
-- Dimensions (W x D x H)
-
-### FR-INSP-005: Validation Feedback
-
-- Invalid fields: red border + error message below field
-- Warnings: yellow border + warning message
-- Real-time validation as user types (300ms debounce)
-- Clear error indicators when value corrected
+### FR-UI-006: Feedback & Notifications
+- **Loaders**: Three pulsating dots for async operations.
+- **Toast Notifications**:
+  - Status: "File uploaded", "Progress saved".
+  - **Interactive Warnings** (Click to highlight entity):
+    - **Ducts**: Sizing Issue (Too small/large).
+    - **Equipment**: Capacity Issue (Inadequate/Excessive).
+    - **Rooms**: Size Issue (Too small/large).
 
 ---
 

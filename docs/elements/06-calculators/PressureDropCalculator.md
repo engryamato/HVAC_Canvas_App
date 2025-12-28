@@ -41,7 +41,7 @@ calculateVelocityPressure(1000);
 
 ### calculateFrictionLoss
 
-Calculate friction loss for duct length using ASHRAE approximation.
+Calculate friction loss for straight duct runs (ΔP).
 
 ```typescript
 export function calculateFrictionLoss(
@@ -53,10 +53,12 @@ export function calculateFrictionLoss(
 ```
 
 **Formula:**
-```typescript
-frictionPer100 = 0.109136 × (velocity/1000)^1.9 × (12/diameter)^1.22 × roughnessAdjustment
-totalFriction = (frictionPer100 / 100) × length
-```
+We use ASHRAE/SMACNA standard methods.
+- **Straight Ducts**: Lookup per 100 ft of duct at given Q and size, or use Darcy-Weisbach approximation:
+  ```typescript
+  ΔP = (f × L × V²) / (2 × g × D)
+  ```
+  *Note: In US practice, this is often typically look-up from friction loss charts.*
 
 **Example:**
 ```typescript
@@ -67,11 +69,31 @@ calculateFrictionLoss(1000, 12, 50, 0.0005);
 
 ### calculateFittingLoss
 
-Calculate pressure loss through fittings using equivalent length.
+Calculate pressure loss through fittings (elbows, tees, etc.).
 
 ```typescript
-export function calculateFittingLoss(frictionPer100: number, equivalentLengthFeet: number): number
+export function calculateFittingLoss(
+  velocityFpm: number,
+  lossCoefficient: number
+): number
 ```
+
+**Formula:**
+```typescript
+ΔP_fitting = C × Pv
+where:
+  C = loss coefficient (from tables like SMACNA)
+  Pv = velocity pressure = (V / 4005)²
+```
+or expressed as:
+```typescript
+ΔP_fitting = K × (V² / 2g)
+```
+
+**Common Coefficients (K/C):**
+- 90° Elbow (Round): ~0.30
+- 90° Elbow (Rectangular w/ vanes): ~0.15
+- 45° Elbow: ~0.18
 
 ### calculateEquivalentDiameter
 

@@ -21,10 +21,10 @@ src/features/canvas/CanvasPage.tsx
 ## Dependencies
 
 - `@/features/canvas/components/CanvasContainer` - Main canvas
-- `@/features/canvas/components/Toolbar` - Tool selection
-- `@/features/canvas/components/Inspector/InspectorPanel` - Property editor
-- `@/features/canvas/components/StatusBar` - Status display
-- `@/features/canvas/components/ZoomControls` - Zoom buttons
+- `@/features/canvas/components/LeftSidebar` - Project context (Details, Scope, Site)
+- `@/features/canvas/components/RightSidebar` - Engineering (BOM, Calculations)
+- `@/features/canvas/components/BottomToolbar` - Actions & Settings
+- `@/features/canvas/components/FABTool` - Quick create menu
 - `@/features/canvas/hooks/useKeyboardShortcuts` - Keyboard handling
 - `@/features/canvas/hooks/useAutoSave` - Auto-save logic
 - `@/core/store/project.store` - Project state
@@ -39,27 +39,24 @@ src/features/canvas/CanvasPage.tsx
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  HEADER BAR                                                    [Save]   │
-│  Project Name: HVAC Layout - Building A          [Export ▼] [Settings]  │
-├──────────┬────────────────────────────────────────────┬─────────────────┤
-│          │                                            │                 │
-│ TOOLBAR  │                                            │   INSPECTOR     │
-│          │                                            │   PANEL         │
-│  [V]     │                                            │                 │
-│  [R]     │              CANVAS                        │ ┌─────────────┐ │
-│  [D]     │             CONTAINER                      │ │ Dimensions  │ │
-│  [E]     │                                            │ │ Width: 120  │ │
-│  [F]     │                                            │ │ Length: 180 │ │
-│  [N]     │                                            │ └─────────────┘ │
-│          │                                            │ ┌─────────────┐ │
-│  ─────   │                                            │ │ Ventilation │ │
-│  [Undo]  │                                            │ └─────────────┘ │
-│  [Redo]  │                                            │                 │
-│          │                                            │                 │
-├──────────┴────────────────────────────────────────────┴─────────────────┤
-│  STATUS BAR                                            ZOOM CONTROLS    │
-│  X: 120  Y: 85  |  Zoom: 100%  |  Grid: On  |  1 selected    [-][100%][+]│
+│ LEFT SIDEBAR       │                                     │ RIGHT SIDEBAR│
+│ [Project Details]  │                                     │ [Bill of Qty]│
+│ Name: Building A   │                                     │  - Ducts     │
+│ Client: ACME Corp  │                                     │  - Fittings  │
+│                    │                                     │              │
+│ [Scope]            │              CANVAS                 │ [Calculation]│
+│ ☑ HVAC             │             CONTAINER               │  - Air Sys   │
+│ ☑ Metric           │                                     │  - Velocity  │
+│                    │                                     │              │
+│ [Site Conditions]  │          (Infinite Pan/Zoom)        │              │
+│ Temp: 72°F         │                                     │              │
+│ Wind: 5mph         │                                     │              │
+│                    │                                     │              │
+├────────────────────┴─────────────────────────────────────┴──────────────┤
+│ BOTTOM TOOLBAR                                                          │
+│ [Upload] [Export] [Process] [Save] ... [Settings] [Notification]        │
 └─────────────────────────────────────────────────────────────────────────┘
+   (Floating Action Button 'D' appears on canvas for tools)
 ```
 
 ## Component Implementation
@@ -111,24 +108,20 @@ export function CanvasPage({ projectId }: CanvasPageProps) {
 
   return (
     <div className="canvas-page">
-      <CanvasHeader />
-
       <div className="canvas-main">
-        <Toolbar />
+        <LeftSidebar />
 
         <div className="canvas-center">
           <CanvasErrorBoundary>
             <CanvasContainer />
+            <FABTool />
           </CanvasErrorBoundary>
         </div>
 
-        <InspectorPanel />
+        <RightSidebar />
       </div>
 
-      <div className="canvas-footer">
-        <StatusBar />
-        <ZoomControls />
-      </div>
+      <BottomToolbar />
     </div>
   );
 }

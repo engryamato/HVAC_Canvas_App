@@ -34,6 +34,18 @@ src/components/ui/Toast.tsx
 | `warning` | Yellow/Orange | ⚠ | Caution, potential issue |
 | `info` | Blue | ℹ | General information |
 
+## Interactive Warnings
+Certain warnings allow user interaction to locate issues on the canvas:
+
+*   **Duct Sizing Issue**: Highlights the specific duct section (too small/large).
+*   **Equipment Capacity Issue**: Highlights the equipment tag (inadequate/excessive).
+*   **Room Size Issue**: Highlights the room tag.
+
+Clicking the notification will:
+1.  Pan/Zoom to the entity.
+2.  Select the entity.
+3.  Open the relevant sidebar for correction.
+
 ## Visual Layout
 
 ```
