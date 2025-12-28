@@ -86,8 +86,8 @@ test.describe('Dashboard Visual Tests', () => {
       await page.getByRole('button', { name: /new project/i }).click();
       await page.waitForTimeout(300);
 
-      // Try to submit empty form
-      await page.getByRole('button', { name: /create/i }).click();
+      // Try to submit empty form (use exact match to avoid ambiguity)
+      await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
       await page.waitForTimeout(200);
 
       // Screenshot with validation errors
@@ -126,30 +126,22 @@ test.describe('Dashboard Visual Tests', () => {
       if (await projectNumber.isVisible()) {
         await projectNumber.fill('TP-001');
       }
-      await page.getByRole('button', { name: /create/i }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
       await page.waitForTimeout(500);
     });
 
     test('should display project card correctly', async ({ page }) => {
-      const projectCard = page.locator('[data-testid="project-card"]').first().or(
-        page.getByText('Test Project Alpha').locator('..')
-      );
-
-      if (await projectCard.isVisible()) {
-        await expect(projectCard).toHaveScreenshot('project-card.png');
-      }
+      const projectCard = page.getByTestId('project-card').first();
+      await expect(projectCard).toBeVisible();
+      await expect(projectCard).toHaveScreenshot('project-card.png');
     });
 
     test('should display project card hover state', async ({ page }) => {
-      const projectCard = page.locator('[data-testid="project-card"]').first().or(
-        page.getByText('Test Project Alpha').locator('..')
-      );
-
-      if (await projectCard.isVisible()) {
-        await projectCard.hover();
-        await page.waitForTimeout(200);
-        await expect(projectCard).toHaveScreenshot('project-card-hover.png');
-      }
+      const projectCard = page.getByTestId('project-card').first();
+      await expect(projectCard).toBeVisible();
+      await projectCard.hover();
+      await page.waitForTimeout(200);
+      await expect(projectCard).toHaveScreenshot('project-card-hover.png');
     });
 
     test('should display project context menu', async ({ page }) => {
@@ -171,7 +163,7 @@ test.describe('Dashboard Visual Tests', () => {
         await page.getByRole('button', { name: /new project/i }).click();
         await page.waitForTimeout(300);
         await page.getByLabel(/project name/i).fill(`Test Project ${i}`);
-        await page.getByRole('button', { name: /create/i }).click();
+        await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
         await page.waitForTimeout(500);
       }
 
@@ -189,7 +181,7 @@ test.describe('Dashboard Visual Tests', () => {
         await page.getByRole('button', { name: /new project/i }).click();
         await page.waitForTimeout(300);
         await page.getByLabel(/project name/i).fill(`Project ${i}`);
-        await page.getByRole('button', { name: /create/i }).click();
+        await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
         await page.waitForTimeout(500);
       }
     });
@@ -256,7 +248,7 @@ test.describe('Dashboard Visual Tests', () => {
       await page.getByRole('button', { name: /new project/i }).click();
       await page.waitForTimeout(300);
       await page.getByLabel(/project name/i).fill('Project to Delete');
-      await page.getByRole('button', { name: /create/i }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
       await page.waitForTimeout(500);
     });
 

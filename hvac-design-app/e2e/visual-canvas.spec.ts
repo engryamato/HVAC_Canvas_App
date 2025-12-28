@@ -7,7 +7,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Canvas Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Create a project and navigate to canvas
+    // Create a project and navigate to canvas by clicking the card
+    // Per PRD FR-DASH-003 and US-PM-002: clicking project card navigates to canvas
     await page.goto('/dashboard');
     await page.evaluate(() => {
       localStorage.removeItem('sws.projectIndex');
@@ -19,14 +20,12 @@ test.describe('Canvas Visual Tests', () => {
     await page.getByRole('button', { name: /new project/i }).click();
     await page.waitForTimeout(300);
     await page.getByLabel(/project name/i).fill('Visual Test Canvas');
-    await page.getByRole('button', { name: /create/i }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
     await page.waitForTimeout(500);
 
-    // Navigate to canvas (click on project or auto-navigate)
-    const projectCard = page.getByText('Visual Test Canvas');
-    if (await projectCard.isVisible()) {
-      await projectCard.click();
-    }
+    // Click project card to navigate to canvas (per PRD specification)
+    const projectCard = page.locator('[data-testid="project-card"]').first();
+    await projectCard.click();
     await page.waitForURL(/canvas/);
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
