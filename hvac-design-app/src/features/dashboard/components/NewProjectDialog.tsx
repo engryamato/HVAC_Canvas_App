@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { validateProjectName } from '@/utils';
 import styles from './NewProjectDialog.module.css';
 
 interface ProjectData {
@@ -20,31 +21,35 @@ export function NewProjectDialog({ isOpen, onClose, onCreateProject }: NewProjec
   const [projectNumber, setProjectNumber] = useState('');
   const [clientName, setClientName] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validate = (value: string) => {
-    const trimmed = value.trim();
-    if (trimmed.length < 1 || trimmed.length > 100) {
-      return 'Project name must be between 1 and 100 characters.';
-    }
-    if (/[/\\?%*:|"<>]/.test(trimmed)) {
-      return 'Project name contains invalid filename characters.';
-    }
-    return null;
-  };
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
 
-  const handleSubmit = () => {
-    const validationError = validate(projectName);
-    setError(validationError);
-    if (!validationError) {
-      onCreateProject({
+    const validation = validateProjectName(projectName);
+    setError(validation.error);
+
+    if (!validation.isValid) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await onCreateProject({
         projectName: projectName.trim(),
         projectNumber: projectNumber.trim() || undefined,
         clientName: clientName.trim() || undefined,
       });
+
+      // Reset form state
       setProjectName('');
       setProjectNumber('');
       setClientName('');
+      setError(null);
       onClose();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -56,49 +61,70 @@ export function NewProjectDialog({ isOpen, onClose, onCreateProject }: NewProjec
     <div className={styles.backdrop} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
       <div className={styles.dialog}>
         <h3 id="dialog-title">Create New Project</h3>
-        <label className={styles.label} htmlFor="projectName">
-          Project Name *
-        </label>
-        <input
-          id="projectName"
-          name="projectName"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-          onBlur={() => setError(validate(projectName))}
-          placeholder="My HVAC Layout"
-          aria-required="true"
-          aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={error ? 'projectName-error' : undefined}
-        />
-        {error && <div id="projectName-error" className={styles.error} role="alert">{error}</div>}
-        <label className={styles.label} htmlFor="projectNumber">
-          Project Number
-        </label>
-        <input
-          id="projectNumber"
-          name="projectNumber"
-          value={projectNumber}
-          onChange={(e) => setProjectNumber(e.target.value)}
-          placeholder="Optional"
-        />
-        <label className={styles.label} htmlFor="clientName">
-          Client Name
-        </label>
-        <input
-          id="clientName"
-          name="clientName"
-          value={clientName}
-          onChange={(e) => setClientName(e.target.value)}
-          placeholder="Optional"
-        />
-        <div className={styles.actions}>
-          <button type="button" onClick={onClose} className={styles.secondary}>
-            Cancel
-          </button>
-          <button type="button" onClick={handleSubmit} className={styles.primary}>
-            Create
-          </button>
-        </div>
+        <form onSubmit={handleSubmit}>
+          <label className={styles.label} htmlFor="projectName">
+            Project Name *
+          </label>
+          <input
+            id="projectName"
+            name="projectName"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            onBlur={() => setError(validateProjectName(projectName).error)}
+            placeholder="My HVAC Layout"
+            aria-required="true"
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={error ? 'projectName-error' : undefined}
+            autoFocus
+            maxLength={100}
+            disabled={isSubmitting}
+            className={error ? styles.errorInput : ''}
+          />
+          {error && (
+            <div id="projectName-error" className={styles.error} role="alert">
+              ⚠️ {error}
+            </div>
+          )}
+          <label className={styles.label} htmlFor="projectNumber">
+            Project Number
+          </label>
+          <input
+            id="projectNumber"
+            name="projectNumber"
+            value={projectNumber}
+            onChange={(e) => setProjectNumber(e.target.value)}
+            placeholder="Optional"
+            disabled={isSubmitting}
+          />
+          <label className={styles.label} htmlFor="clientName">
+            Client Name
+          </label>
+          <input
+            id="clientName"
+            name="clientName"
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            placeholder="Optional"
+            disabled={isSubmitting}
+          />
+          <div className={styles.actions}>
+            <button
+              type="button"
+              onClick={onClose}
+              className={styles.secondary}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={styles.primary}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating...' : 'Create'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
