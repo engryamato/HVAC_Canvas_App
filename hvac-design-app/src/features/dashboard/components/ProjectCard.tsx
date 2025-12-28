@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import styles from './ProjectCard.module.css';
 import type { ProjectListItem } from '../store/projectListStore';
@@ -22,6 +23,7 @@ export function ProjectCard({
   onDuplicate,
   onRename,
 }: ProjectCardProps) {
+  const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(project.projectName);
@@ -39,11 +41,31 @@ export function ProjectCard({
     }
   };
 
+  // Navigate to canvas when clicking the card (per PRD FR-DASH-003 and US-PM-002)
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'INPUT' ||
+      target.tagName === 'A' ||
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('a')
+    ) {
+      return;
+    }
+    router.push(`/canvas/${project.projectId}`);
+  };
+
   return (
     <div
       className={styles.card}
       onMouseLeave={() => setShowMenu(false)}
+      onClick={handleCardClick}
       role="article"
+      data-testid="project-card"
+      style={{ cursor: 'pointer' }}
     >
       <div className={styles.header}>
         {editing ? (
