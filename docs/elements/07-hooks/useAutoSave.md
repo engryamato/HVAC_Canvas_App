@@ -233,7 +233,7 @@ describe('useAutoSave', () => {
 
 ## Related Elements
 
-- [Project Store](../02-stores/ProjectStore.md)
-- [Entity Store](../02-stores/EntityStore.md)
-- [Viewport Store](../02-stores/ViewportStore.md)
+- [projectStore](../02-stores/projectStore.md)
+- [entityStore](../02-stores/entityStore.md)
+- [viewportStore](../02-stores/viewportStore.md)
 - [ProjectIO](../10-persistence/ProjectIO.md)
