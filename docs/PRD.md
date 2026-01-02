@@ -11,14 +11,14 @@
 
 ## Table of Contents
 
-1. [Executive Summary](about:blank#1-executive-summary)
-2. [Functional Requirements](about:blank#2-functional-requirements)
-3. [Technical Requirements](about:blank#3-technical-requirements)
-4. [User Stories](about:blank#4-user-stories)
-5. [Acceptance Criteria](about:blank#5-acceptance-criteria)
-6. [Non-Functional Requirements](about:blank#6-non-functional-requirements)
-7. [Dependencies](about:blank#7-dependencies)
-8. [Out of Scope](about:blank#8-out-of-scope)
+1. [Executive Summary](#1-executive-summary)
+2. [Functional Requirements](#2-functional-requirements)
+3. [Technical Requirements](#3-technical-requirements)
+4. [User Stories](#4-user-stories)
+5. [Acceptance Criteria](#5-acceptance-criteria)
+6. [Non-Functional Requirements](#6-non-functional-requirements)
+7. [Dependencies](#7-dependencies)
+8. [Out of Scope](#8-out-of-scope)
 
 ---
 

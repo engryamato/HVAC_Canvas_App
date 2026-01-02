@@ -39,8 +39,8 @@ Tools are responsible for interpreting user mouse/keyboard input and converting 
 
 ### 3. The Command Pattern (Undo/Redo)
 To support robust undo/redo (up to 100 steps), every state mutation is wrapped in a [Command](elements/09-commands/CommandTypes.md).
-- **[EntityCommands](09-commands/EntityCommands.md)** handle creation, deletion, and movement.
-- The **[HistoryStore](09-commands/HistoryStore.md)** maintains the past/future stack.
+- **[EntityCommands](elements/09-commands/EntityCommands.md)** handle creation, deletion, and movement.
+- The **[HistoryStore](elements/09-commands/HistoryStore.md)** maintains the past/future stack.
 
 ### 4. Rendering Pipeline (Read Operations)
 The canvas renders at 60fps (or on state change) by iterating through the entities in the `entityStore`.
