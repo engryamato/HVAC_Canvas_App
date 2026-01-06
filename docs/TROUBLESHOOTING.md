@@ -445,6 +445,45 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 4. **Click on canvas** - Ensure canvas has focus (not a panel or dialog)
 5. **Check for stuck keys** - Press and release `Shift`, `Ctrl`, `Alt`
 
+**Tool state diagnosis:**
+
+| Symptom | Likely Cause | Solution |
+|---------|--------------|----------|
+| Tool shows active but doesn't work | Canvas doesn't have focus | Click on canvas area |
+| Tool briefly activates then resets | Modifier key stuck | Press and release Shift, Ctrl, Alt |
+| No visual feedback on click | Event handler not firing | Refresh the page |
+| Tool works erratically | Conflicting browser extension | Try incognito mode |
+| Tool changes unexpectedly | Accidental shortcut press | Check if pressing near other keys |
+
+---
+
+#### Tool gets stuck in a mode
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Tool appears stuck, won't switch modes or cancel operation |
+| **Possible Causes** | Unfinished multi-point operation, state corruption, modal state |
+| **Solutions** | Force reset tool state |
+
+**Troubleshooting steps:**
+
+1. **Press `Escape` multiple times** - May need 2-3 presses to fully cancel
+2. **Press `V` to switch to Select** - Forces tool change
+3. **Click outside canvas then back** - Resets focus state
+4. **Check for hidden dialogs** - A dialog might be capturing input
+5. **Refresh if persistent** - `F5` to reload (save work first!)
+
+**Multi-point tool behavior:**
+
+Some tools require multiple clicks to complete:
+
+| Tool | Expected Clicks | How to Cancel |
+|------|-----------------|---------------|
+| Room (rectangle) | 2 clicks (corners) | `Escape` |
+| Room (L-shape) | 6 clicks (corners) | `Escape` |
+| Duct line | 2 clicks (start/end) | `Escape` |
+| Polygon | Multiple + double-click to finish | `Escape` |
+
 ---
 
 #### Entity creation fails silently
@@ -457,11 +496,60 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 
 **Troubleshooting steps:**
 
-1. **Check minimum size** - Rooms must be at least 1ft x 1ft
+1. **Check minimum size** - Rooms must be at least 1ft x 1ft (12 inches)
 2. **Look at cursor position** - Entity created at click location
 3. **Check zoom level** - Small entities may not be visible at low zoom
 4. **Press `0`** - Reset view to find "lost" entities
 5. **Use `Ctrl+A`** - Select all to see if entity exists
+6. **Check console for errors** - `F12` > Console tab for error messages
+
+**Common entity creation failures:**
+
+| Scenario | Why It Fails | Solution |
+|----------|-------------|----------|
+| Very small drag | Below minimum dimension | Drag a larger area |
+| Click-release in same spot | No area defined | Click-drag or click twice |
+| Drawing outside canvas bounds | Entity clipped | Zoom out, recenter view |
+| Overlapping existing entity | Depends on entity type | Check collision settings |
+| Incorrect tool for entity type | Wrong creation mode | Select correct tool from toolbar |
+
+**Minimum dimensions for entities:**
+
+| Entity Type | Minimum Width | Minimum Height |
+|-------------|---------------|----------------|
+| Room | 12 inches | 12 inches |
+| Duct | 4 inches | N/A |
+| Equipment | Varies | Varies |
+| Generic shape | 1 inch | 1 inch |
+
+---
+
+#### Tool produces incorrect results
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Entity is created but with wrong dimensions, position, or properties |
+| **Possible Causes** | Snap-to-grid interference, wrong unit interpretation, input field focus |
+| **Solutions** | Verify settings and input method |
+
+**Troubleshooting steps:**
+
+1. **Check snap-to-grid setting:**
+   - Press `G` to toggle grid snapping
+   - Snap can round dimensions to nearest grid unit
+   - Temporarily disable for precise placement
+
+2. **Verify coordinate display:**
+   - Look at status bar for actual coordinates
+   - Compare with expected values
+
+3. **Check for input field interference:**
+   - If Inspector Panel field is focused, typing may edit that instead
+   - Click on canvas before using keyboard
+
+4. **Verify unit display:**
+   - Ensure you're reading inches vs feet correctly
+   - 12" = 1' (displayed differently based on context)
 
 ---
 
@@ -483,6 +571,16 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 4. **Try marquee selection** - Drag a rectangle over the entity
 5. **Check for locks** - Entity may be locked (unlock in Inspector Panel)
 
+**Selection troubleshooting table:**
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| Click passes through entity | Entity on hidden layer | Show all layers |
+| Only edge/outline selectable | Fill not clickable | Click on entity border |
+| Selection highlight doesn't show | Visual glitch | Refresh page |
+| Wrong entity selected | Overlapping entities | Use Shift+click to cycle, or move entities apart |
+| Entity selected but can't edit | Entity locked | Unlock in Inspector Panel |
+
 ---
 
 #### Selection box doesn't appear or works incorrectly
@@ -499,6 +597,69 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 2. **Click canvas first** - Ensure focus before dragging
 3. **Check for interfering panels** - Resize or close side panels
 4. **Disable snap-to-grid temporarily** - Press `G` to toggle
+5. **Check browser developer tools** - Ensure no element is capturing mouse events
+
+**Selection modes:**
+
+| Mode | How to Activate | Behavior |
+|------|----------------|----------|
+| Single select | Click on entity | Selects one, deselects others |
+| Add to selection | Shift+click | Adds entity to current selection |
+| Toggle selection | Ctrl+click | Toggles entity in selection |
+| Marquee select | Drag on empty space | Selects all entities in rectangle |
+| Select all | `Ctrl+A` | Selects all entities |
+| Deselect all | `Escape` or click empty | Clears selection |
+
+---
+
+#### Multi-select with Shift/Ctrl doesn't work
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Holding Shift or Ctrl while clicking doesn't add to selection |
+| **Possible Causes** | Modifier key not registered, browser shortcut intercept, sticky keys |
+| **Solutions** | Verify modifier key state |
+
+**Troubleshooting steps:**
+
+1. **Verify key is being pressed:**
+   - Check keyboard connection
+   - Try other modifier key (Ctrl if Shift doesn't work)
+
+2. **Check for sticky keys:**
+   - Windows: Settings > Accessibility > Keyboard > Sticky Keys (should be off)
+   - macOS: System Preferences > Accessibility > Keyboard > Sticky Keys
+
+3. **Test modifier keys:**
+   - Open browser DevTools (`F12`)
+   - Go to Console, type: `document.addEventListener('keydown', e => console.log(e.key, e.shiftKey, e.ctrlKey))`
+   - Press modifier keys to verify they're registered
+
+4. **Check browser shortcuts:**
+   - Some browser extensions intercept modifier+click
+   - Try incognito mode to test
+
+5. **Try alternative methods:**
+   - Use marquee selection instead
+   - Select first entity, then Shift+click additional entities
+
+---
+
+#### Selection persists or won't clear
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Can't deselect entities, selection "sticks" |
+| **Possible Causes** | State corruption, event handler issue |
+| **Solutions** | Force clear selection |
+
+**Troubleshooting steps:**
+
+1. **Press `Escape`** - Standard deselect command
+2. **Click on empty canvas space** - Should deselect all
+3. **Switch tools** - Press `V`, then another tool, then back to `V`
+4. **Use menu option** - Edit > Select None (if available)
+5. **Refresh page** - Last resort to clear state
 
 ---
 
@@ -520,6 +681,17 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 4. **Press `0`** - Reset view to origin
 5. **Check browser zoom** - `Ctrl+0` to reset browser zoom (different from canvas zoom)
 
+**Navigation methods reference:**
+
+| Action | Primary Method | Alternative 1 | Alternative 2 |
+|--------|---------------|---------------|---------------|
+| Pan | Middle-click + drag | Arrow keys | Space + drag (if supported) |
+| Zoom in | Scroll wheel up | `+` or `=` key | Zoom control buttons |
+| Zoom out | Scroll wheel down | `-` key | Zoom control buttons |
+| Reset view | `0` key | View > Reset | Double-click on zoom indicator |
+| Fit all | `Ctrl+0` | View > Fit All | - |
+| Zoom to selection | `Ctrl+1` | View > Zoom to Selection | - |
+
 ---
 
 #### View jumps unexpectedly or resets
@@ -536,6 +708,74 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 2. **Check mouse** - Middle button click may have triggered pan
 3. **Check keyboard** - May have accidentally pressed `0` (reset) or arrow keys
 4. **Disable browser gestures** - Some browsers have navigation gestures
+
+**Common causes of unexpected view changes:**
+
+| Trigger | Behavior | Prevention |
+|---------|----------|------------|
+| Selecting entity | View may center on selection | Disable "auto-center on selection" if available |
+| Double-clicking | May trigger zoom or center | Single-click only when intending |
+| Touchpad pinch | Zoom gesture | Disable touchpad zoom gestures |
+| Horizontal scroll | May pan view | Check mouse with horizontal scroll |
+| New entity created | View may jump to entity | Entity created at click location |
+
+---
+
+#### Zoom limits or stuck at zoom level
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Can't zoom in or out further, zoom appears stuck |
+| **Possible Causes** | Reached zoom limits, zoom state corruption |
+| **Solutions** | Reset zoom or use different method |
+
+**Troubleshooting steps:**
+
+1. **Check current zoom level** - Look at zoom indicator in status bar
+2. **Verify you're not at limit:**
+   - Maximum zoom: typically 400-800%
+   - Minimum zoom: typically 10-25%
+3. **Try reset zoom** - Press `0` or View > Reset
+4. **Try keyboard zoom** - `+` and `-` keys
+5. **Clear zoom state** - Refresh page if zoom is stuck
+
+**Zoom limits:**
+
+| Zoom Level | Status | Notes |
+|------------|--------|-------|
+| < 25% | Minimum | Can't zoom out further |
+| 25-100% | Normal overview | Good for seeing full project |
+| 100% | Actual size | 1:1 pixel ratio |
+| 100-400% | Detailed view | For precise work |
+| > 400% | Maximum | May impact performance |
+
+---
+
+#### Mouse scroll conflicts with zoom
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Scroll wheel zooms when you want to scroll page, or vice versa |
+| **Possible Causes** | Canvas capturing scroll events, browser scroll behavior |
+| **Solutions** | Use correct scroll target |
+
+**Troubleshooting steps:**
+
+1. **Check mouse position:**
+   - Over canvas: scroll = zoom
+   - Over panels/page: scroll = scroll content
+
+2. **Use modifier keys** (if supported):
+   - `Ctrl+scroll` may force zoom
+   - Plain scroll may force scroll
+
+3. **Check browser settings:**
+   - Some browsers have "smooth scrolling" that affects behavior
+   - Disable smooth scrolling to test
+
+4. **For trackpad users:**
+   - Two-finger scroll may behave differently
+   - Check trackpad gesture settings
 
 ---
 
@@ -557,6 +797,35 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 4. **Press `Escape` first** - Clear any active state
 5. **Check browser shortcuts** - Some keys conflict with browser (e.g., `F1` for help)
 
+**Shortcut focus requirements:**
+
+| Shortcut Type | Required Focus | Notes |
+|---------------|----------------|-------|
+| Tool selection (V, R, D, etc.) | Canvas | Must be focused on canvas |
+| Edit commands (Ctrl+C/V/X) | Canvas | May also work with selection in panels |
+| Navigation (arrows, 0) | Canvas | Canvas must have focus |
+| Dialog shortcuts | Dialog | Only when dialog is open |
+| Global shortcuts | Any | Work regardless of focus |
+
+---
+
+#### Shortcuts trigger wrong action
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Pressing a shortcut key does something unexpected |
+| **Possible Causes** | Browser shortcut conflict, extension intercept, wrong context |
+| **Solutions** | Identify and resolve conflict |
+
+**Troubleshooting steps:**
+
+1. **Check what action occurred** - Note the actual result
+2. **Verify the shortcut** - Check Help > Keyboard Shortcuts for correct key
+3. **Test in incognito** - Disable extensions
+4. **Check for browser override:**
+   - Browser may intercept before app receives key
+   - Some shortcuts cannot be overridden
+
 **Common conflicts:**
 
 | Key | Browser Action | App Action | Solution |
@@ -564,7 +833,90 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 | `F1` | Browser help | - | Use app's Help menu |
 | `F5` | Refresh | - | Save first! |
 | `F11` | Fullscreen | - | Use View menu |
+| `F12` | DevTools | - | Expected behavior |
 | `Ctrl+W` | Close tab | - | Be careful! |
+| `Ctrl+T` | New tab | - | Use app menu |
+| `Ctrl+N` | New browser window | New project | May conflict |
+| `Ctrl+S` | Save page | Save project | Usually works correctly |
+| `Ctrl+P` | Print | - | Use app export |
+
+---
+
+#### Modifier key combinations don't register
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Shortcuts with Ctrl, Shift, Alt don't work |
+| **Possible Causes** | Key combination intercepted, timing issue, OS-level shortcut |
+| **Solutions** | Test and identify conflict |
+
+**Troubleshooting steps:**
+
+1. **Test basic shortcuts first:**
+   - Single letter keys (V, R, D) should work
+   - If they work, problem is with modifier handling
+
+2. **Check for OS shortcuts:**
+   - Windows: Some Ctrl+Alt combinations are system shortcuts
+   - macOS: Some Cmd combinations are system shortcuts
+   - Linux: Desktop environment may intercept
+
+3. **Check keyboard layout:**
+   - Non-US layouts may have different key positions
+   - Special characters may differ
+
+4. **Test modifier key registration:**
+   ```javascript
+   // In browser console (F12)
+   document.addEventListener('keydown', e => {
+     console.log(`Key: ${e.key}, Ctrl: ${e.ctrlKey}, Shift: ${e.shiftKey}, Alt: ${e.altKey}`);
+   });
+   ```
+
+5. **Try alternative shortcuts:**
+   - Use menu equivalents instead
+   - Check if app supports customizable shortcuts
+
+**Platform-specific shortcuts:**
+
+| Action | Windows | macOS | Notes |
+|--------|---------|-------|-------|
+| Save | `Ctrl+S` | `Cmd+S` | Standard across platforms |
+| Undo | `Ctrl+Z` | `Cmd+Z` | Standard |
+| Redo | `Ctrl+Y` or `Ctrl+Shift+Z` | `Cmd+Shift+Z` | May vary |
+| Copy | `Ctrl+C` | `Cmd+C` | Standard |
+| Paste | `Ctrl+V` | `Cmd+V` | Standard |
+| Select All | `Ctrl+A` | `Cmd+A` | Standard |
+
+---
+
+#### Keyboard stops responding entirely
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | No keyboard shortcuts or typing works in the app |
+| **Possible Causes** | Focus trap, JavaScript error, input field stuck |
+| **Solutions** | Break focus and reset |
+
+**Troubleshooting steps:**
+
+1. **Click outside the browser** - Then click back in
+2. **Press Tab repeatedly** - Move focus through UI elements
+3. **Press Escape multiple times** - Clear any active state
+4. **Check for hidden modal** - Look for overlay or dialog
+5. **Check console for errors** - `F12` > Console (if accessible)
+6. **Use mouse to navigate** - Menus should still work
+7. **Refresh as last resort** - `F5` (use mouse to click refresh button if keyboard completely unresponsive)
+
+**Focus trap identification:**
+
+| Symptom | Likely Cause | Solution |
+|---------|-------------|----------|
+| Cursor visible but can't type | Wrong element focused | Click on target element |
+| No cursor anywhere | Focus lost from window | Click inside window |
+| Keys type in wrong place | Text field has focus | Press Escape, click canvas |
+| Only Tab works | Modal dialog open | Close dialog or Tab to close button |
+| Nothing works | JavaScript error | Check console, refresh page |
 
 ---
 
