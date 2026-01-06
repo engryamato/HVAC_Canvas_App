@@ -34,3 +34,35 @@ SizeWise HVAC Canvas is a **modern, local-first desktop application** that empow
 
 SizeWise HVAC Canvas bridges the gap between complex CAD software and simple diagramming tools, delivering a purpose-built solution for HVAC layout and estimation. The application runs entirely on your local machine, ensuring your project files and client data never leave your control—critical for contractors handling sensitive commercial projects.
 
+## ✨ Features
+
+### 🎨 Visual Canvas Design
+Draw rooms, ductwork, and equipment on an **infinite canvas** with intuitive drag-and-drop tools. See your HVAC layout come to life in real-time with 60fps rendering performance.
+
+### 📐 Automatic HVAC Calculations
+Let the app do the math. As you design, the **calculation engine** automatically computes:
+- **CFM (Cubic Feet per Minute)** — Airflow requirements based on room dimensions
+- **ACH (Air Changes per Hour)** — Ventilation rates for code compliance
+- **Duct sizing** — Proper dimensions for your specified airflow
+
+### 📦 Bill of Materials Generation
+Generate accurate **Bills of Materials** directly from your design. Export equipment lists, ductwork quantities, and material specifications for bidding and procurement.
+
+### 🔒 Local-First Architecture
+Your data **never leaves your machine**. All project files are stored locally in a validated `.sws` format—no cloud accounts, no subscriptions, no internet required.
+
+### 💻 Native Cross-Platform Desktop
+Built with **Tauri** for true native performance on:
+- ✅ Windows 10/11
+- ✅ macOS (Intel & Apple Silicon)
+- ✅ Linux (Ubuntu, Fedora, Arch)
+
+### ↩️ Robust Undo/Redo
+Made a mistake? No problem. The **command-based history system** supports up to 100 undo steps, so you can experiment freely without fear of losing work.
+
+### 🗂️ Project File Management
+Save your entire project as a single `.sws` file with **automatic validation**. The app creates backups automatically, ensuring your work is always protected.
+
+### 📚 Equipment Library
+Access a built-in library of **HVAC equipment types** including exhaust hoods, fans, and ductwork components—complete with default specifications you can customize.
+
