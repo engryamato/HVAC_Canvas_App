@@ -19,7 +19,9 @@ This guide provides solutions for common issues you may encounter while using th
 - [Calculation Issues](#calculation-issues)
   - [CFM Calculation Problems](#cfm-calculation-problems)
   - [Area/Volume Errors](#areavolume-errors)
+  - [Ventilation Requirements](#ventilation-requirements)
   - [Duct Sizing Discrepancies](#duct-sizing-discrepancies)
+  - [Calculation Verification Checklist](#calculation-verification-checklist)
 - [File Issues](#file-issues)
   - [Save/Load Errors](#saveload-errors)
   - [Corrupted Files](#corrupted-files)
@@ -922,48 +924,203 @@ Some tools require multiple clicks to complete:
 
 ## Calculation Issues
 
+This section addresses troubleshooting for HVAC calculations including CFM (airflow), area/volume, ventilation requirements, and duct sizing. Understanding why calculations may differ from expectations helps ensure your designs are accurate.
+
 ### CFM Calculation Problems
 
 #### CFM value seems too high or too low
 
 | Aspect | Details |
 |--------|---------|
-| **Problem** | Calculated CFM doesn't match expectations |
-| **Possible Causes** | Wrong occupancy type, incorrect dimensions, calculation method mismatch |
-| **Solutions** | Verify inputs |
+| **Problem** | Calculated CFM doesn't match expectations or manual calculations |
+| **Possible Causes** | Wrong occupancy type, incorrect dimensions, calculation method mismatch, ceiling height not set |
+| **Solutions** | Systematic verification of all inputs |
 
 **Troubleshooting steps:**
 
-1. **Check occupancy type** - Select room > Inspector Panel > Occupancy Type
-2. **Verify dimensions** - Ensure width, length, and height are correct
-3. **Check ceiling height** - Default is 10 ft; adjust if different
-4. **Compare calculation methods:**
-   - ASHRAE 62.1: Based on people + area
-   - ACH method: Based on volume and air changes
-5. **Manual verification:**
+1. **Verify the occupancy type:**
+   - Select room > Inspector Panel > Occupancy Type
+   - Different types have drastically different CFM requirements
+   - Common mistake: Using "Restaurant" (high CFM) when "Office" is appropriate
+
+2. **Check all room dimensions:**
+   - Width and length (affect area)
+   - Ceiling height (affects volume and ACH calculations)
+   - Default ceiling height is 10 ft—change if different
+
+3. **Understand which calculation method is being used:**
+
+   | Method | Formula | When Used |
+   |--------|---------|-----------|
+   | **ASHRAE 62.1** | `CFM = (Rp × People) + (Ra × Area)` | Commercial buildings (default) |
+   | **ACH Method** | `CFM = (Volume × ACH) / 60` | Labs, hospitals, special requirements |
+
+4. **Manual verification examples:**
+
+   **ASHRAE 62.1 Example (Office):**
    ```
-   ASHRAE: CFM = (Rp × People) + (Ra × Area)
-   ACH: CFM = (Volume × ACH) / 60
+   Room: 1,000 sq ft, estimated 5 people
+   Rp = 5 CFM/person, Ra = 0.06 CFM/sq ft
+   CFM = (5 × 5) + (0.06 × 1000) = 25 + 60 = 85 CFM
    ```
+
+   **ACH Example:**
+   ```
+   Room volume: 2,000 cu ft (20' × 10' × 10')
+   Required ACH: 6
+   CFM = (2,000 × 6) / 60 = 200 CFM
+   ```
+
+5. **Check for occupancy density overrides:**
+   - The app uses default people per 1000 sq ft for each occupancy type
+   - If you've manually set occupancy count, it overrides the default
+
+**Common CFM discrepancies explained:**
+
+| Your Calculation | App Calculation | Why Different | Resolution |
+|------------------|-----------------|---------------|------------|
+| Higher | Lower | You may be using ACH, app uses ASHRAE | Check calculation method setting |
+| Lower | Higher | High occupancy type selected | Verify occupancy type matches use |
+| Different | Different | Different ceiling heights assumed | Set actual ceiling height |
+| Manual CFM/person | Area-based | ASHRAE includes both area AND people | Use complete ASHRAE formula |
+| Round numbers | Decimal | App doesn't round intermediate values | Normal precision difference |
 
 **See also:** [FAQ - Why is my calculated CFM different from what I expected?](./FAQ.md#why-is-my-calculated-cfm-different-from-what-i-expected)
 
 ---
 
-#### CFM shows as zero
+#### CFM shows as zero or NaN
 
 | Aspect | Details |
 |--------|---------|
-| **Problem** | Room shows 0 CFM |
-| **Possible Causes** | Invalid dimensions, missing properties, calculation error |
-| **Solutions** | Set valid dimensions |
+| **Problem** | Room displays 0 CFM, NaN, or no CFM value at all |
+| **Possible Causes** | Invalid dimensions, missing required properties, calculation error |
+| **Solutions** | Reset room properties |
 
 **Troubleshooting steps:**
 
-1. **Check all dimensions are > 0** - Width, length, and ceiling height
-2. **Check for NaN values** - Clear and re-enter dimensions
-3. **Check occupancy type** - Ensure a type is selected
-4. **Try recreating the room** - Delete and draw new
+1. **Check that all dimensions are positive numbers:**
+   - Width must be > 0
+   - Length must be > 0
+   - Ceiling height must be > 0
+   - Any zero or negative value results in 0 CFM
+
+2. **Check for NaN (Not a Number) values:**
+   - Clear dimension fields completely
+   - Re-enter numeric values only
+   - Avoid pasting from other applications (may include hidden characters)
+
+3. **Verify occupancy type is selected:**
+   - Open Inspector Panel
+   - Ensure an occupancy type is chosen (not blank or "None")
+   - If blank, select appropriate type from dropdown
+
+4. **Check for extremely small dimensions:**
+   - Very small rooms (< 1 sq ft) may show 0 CFM due to rounding
+   - Ensure dimensions reflect real-world sizes
+
+5. **Try recreating the room:**
+   - If persistent, delete the problematic room
+   - Create a new room with the same dimensions
+   - Re-apply properties
+
+**Diagnosis table:**
+
+| CFM Display | Likely Cause | Quick Fix |
+|-------------|--------------|-----------|
+| Shows "0" | Dimension is zero or negative | Check width/length/height |
+| Shows "NaN" | Invalid input (text, special chars) | Clear and re-enter numbers |
+| Shows nothing | Occupancy type not set | Select occupancy type |
+| Shows "-" or blank | Room entity corrupted | Delete and recreate room |
+| Very small (< 1) | Room too small | Verify dimensions are in correct units |
+
+---
+
+#### CFM differs significantly from ASHRAE 62.1 tables
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | App's CFM doesn't match values from ASHRAE 62.1 reference tables |
+| **Possible Causes** | Different occupancy densities, outdated reference, zone efficiency factors |
+| **Solutions** | Align assumptions with ASHRAE methodology |
+
+**Troubleshooting steps:**
+
+1. **Verify you're comparing the same standard version:**
+   - App uses ASHRAE 62.1-2019/2022 values
+   - Older references may have different Rp/Ra values
+
+2. **Check default occupancy densities:**
+
+   | Occupancy Type | App Default (people/1000 sq ft) | ASHRAE Table 6.2.2.1 |
+   |----------------|--------------------------------|----------------------|
+   | Office | 5 | 5 |
+   | Retail | 15 | 15 |
+   | Restaurant | 70 | 70 (dining) |
+   | Classroom | 35 | 25-35 |
+   | Conference Room | 50 | 50 |
+
+   - Differences may occur if your reference uses different densities
+
+3. **Account for zone air distribution effectiveness (Ez):**
+   - ASHRAE 62.1 includes Ez factor (typically 0.8-1.0)
+   - App may or may not apply this factor
+   - `Voz = Vbz / Ez` (zone outdoor airflow = breathing zone / effectiveness)
+
+4. **Check if zone or system-level calculation:**
+   - Room-level: Breathing zone outdoor airflow (Vbz)
+   - System-level: Includes ventilation efficiency (Ev)
+   - App calculates at room level by default
+
+5. **Verify units:**
+   - App displays CFM (cubic feet per minute)
+   - Some references show L/s (liters per second)
+   - Conversion: 1 CFM = 0.4719 L/s
+
+---
+
+#### Occupancy type doesn't match my space
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Predefined occupancy types don't fit your specific space |
+| **Possible Causes** | Mixed-use space, uncommon occupancy, local code requirements |
+| **Solutions** | Use closest type and adjust, or override CFM manually |
+
+**Troubleshooting steps:**
+
+1. **Find the closest matching occupancy:**
+   - Match by activity level (sedentary vs. active)
+   - Match by occupancy density
+   - When in doubt, choose the more conservative (higher CFM) option
+
+2. **Mixed-use spaces:**
+   - Option A: Split into multiple rooms, each with appropriate type
+   - Option B: Use dominant occupancy for entire space
+   - Option C: Use highest CFM requirement type (most conservative)
+
+3. **Override calculated CFM:**
+   - Select room > Inspector Panel
+   - Look for "CFM Override" or "Manual CFM" option
+   - Enter your calculated value based on local codes
+
+4. **Document your reasoning:**
+   - Add a Note entity near the room
+   - Document why you deviated from defaults
+   - Reference specific code or standard
+
+**Occupancy type selection guide:**
+
+| Space Type | Recommended Selection | Reasoning |
+|------------|----------------------|-----------|
+| Break room | Restaurant (dining area) | Food service ventilation |
+| Server room | Laboratory | Heat load, ACH-based |
+| Gym/Fitness | Retail (high activity) | High metabolic rates |
+| Library | Office | Sedentary, quiet |
+| Lobby/Reception | Retail | Transient occupancy |
+| Copy/Print room | Office | Low density |
+| Storage (occupied) | Warehouse | Minimal ventilation |
+| Medical waiting | Healthcare | Infection control |
 
 ---
 
@@ -973,22 +1130,304 @@ Some tools require multiple clicks to complete:
 
 | Aspect | Details |
 |--------|---------|
-| **Problem** | Displayed area/volume doesn't match expected values |
-| **Possible Causes** | Unit confusion, dimension entry errors, rounding |
-| **Solutions** | Verify units and inputs |
+| **Problem** | Displayed area or volume doesn't match expected values |
+| **Possible Causes** | Unit confusion, dimension entry errors, rounding display |
+| **Solutions** | Verify units and calculation method |
 
 **Troubleshooting steps:**
 
-1. **Check unit system** - App uses feet and inches
-2. **Verify dimension entry:**
-   - Width and length in inches (internally) or as displayed
-   - Example: 20 ft wide room = 240 inches
-3. **Check ceiling height** - Used for volume calculation
-4. **Manual verification:**
+1. **Understand the unit system:**
+   - App stores dimensions internally in inches
+   - Displays in feet and inches (e.g., 10' 6")
+   - Area displayed in square feet
+   - Volume displayed in cubic feet
+
+2. **Verify dimension entry format:**
+   - "10" in a feet field = 10 feet
+   - "10" in an inches field = 10 inches
+   - "10'6" or "10' 6" = 10 feet 6 inches
+   - Check field labels to know which unit is expected
+
+3. **Manual area verification:**
    ```
-   Area (sq ft) = (Width in inches × Length in inches) / 144
-   Volume (cu ft) = Area × Ceiling Height (ft)
+   Area (sq ft) = Width (ft) × Length (ft)
+
+   Example:
+   Width: 15' 6" = 15.5 ft
+   Length: 20' 0" = 20.0 ft
+   Area = 15.5 × 20 = 310 sq ft
    ```
+
+4. **Manual volume verification:**
+   ```
+   Volume (cu ft) = Area (sq ft) × Ceiling Height (ft)
+
+   Example:
+   Area: 310 sq ft
+   Ceiling Height: 9' 0" = 9.0 ft
+   Volume = 310 × 9 = 2,790 cu ft
+   ```
+
+5. **Check for rounding display:**
+   - App may display rounded values (e.g., 310 sq ft)
+   - Internal calculations use full precision
+   - Small differences (< 1%) are normal rounding
+
+**Common area/volume errors:**
+
+| Symptom | Likely Cause | Solution |
+|---------|--------------|----------|
+| Area is 144x expected | Entered feet as inches | Re-enter in correct unit |
+| Area is 1/144 expected | Entered inches as feet | Re-enter in correct unit |
+| Volume way off | Ceiling height wrong/default | Set actual ceiling height |
+| Area matches, volume doesn't | Ceiling height not set | Verify ceiling height |
+| Slightly off (< 1%) | Display rounding | Normal—calculations use full precision |
+| Very different | Wrong room selected | Verify correct room is selected |
+
+---
+
+#### Dimensions don't match drawn room
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Room dimensions in Inspector don't match what was drawn on canvas |
+| **Possible Causes** | Snap-to-grid rounding, resize after creation, minimum size enforcement |
+| **Solutions** | Edit dimensions directly or redraw |
+
+**Troubleshooting steps:**
+
+1. **Check snap-to-grid setting:**
+   - Press `G` to toggle grid visibility
+   - Grid snapping rounds to nearest grid unit (default: 12")
+   - Disable for precise placement: View > Snap to Grid (uncheck)
+
+2. **Verify drawn vs. displayed dimensions:**
+   - Select room with Select tool (`V`)
+   - Look at Inspector Panel dimensions
+   - These are the actual values used in calculations
+
+3. **Edit dimensions directly:**
+   - Select room
+   - In Inspector Panel, click on dimension field
+   - Enter exact value needed
+   - Press Enter to apply
+
+4. **Check minimum room sizes:**
+   - Minimum room dimensions are enforced
+   - Rooms smaller than 1' × 1' may be adjusted automatically
+
+5. **Redraw with precision:**
+   - Delete problematic room
+   - Temporarily disable snap-to-grid
+   - Draw room at desired size
+   - Re-enable snap-to-grid
+
+---
+
+#### L-shaped or complex room calculations
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Complex room shapes show incorrect area or inconsistent calculations |
+| **Possible Causes** | Complex shape calculation method, overlapping sections, missing sections |
+| **Solutions** | Verify shape points or split into rectangles |
+
+**Troubleshooting steps:**
+
+1. **Understand complex room calculation:**
+   - L-shaped rooms use polygon area calculation
+   - Area = sum of all triangles formed by vertices
+   - Self-intersecting shapes may produce incorrect results
+
+2. **Verify all corner points:**
+   - Select room
+   - Check that all corners are properly defined
+   - Look for missing or extra points
+
+3. **Alternative: Split into rectangles:**
+   - For complex shapes, draw multiple rectangular rooms
+   - Each rectangle gets its own CFM calculation
+   - Total CFM = sum of all room CFMs
+   - This method is often more accurate and easier to verify
+
+4. **Manual verification for L-shapes:**
+   ```
+   L-shape area = Rectangle 1 + Rectangle 2
+
+   Example L-shape:
+   ┌────────┐
+   │   A    │  A: 20' × 15' = 300 sq ft
+   │        ├───────┐
+   │        │   B   │  B: 10' × 10' = 100 sq ft
+   └────────┴───────┘
+   Total Area = 300 + 100 = 400 sq ft
+   ```
+
+5. **Check for overlapping regions:**
+   - If using multiple rooms, ensure they don't overlap
+   - Overlapping areas would be counted twice
+
+**Best practices for complex spaces:**
+
+| Shape Type | Recommended Approach | Notes |
+|------------|---------------------|-------|
+| Simple L-shape | Single L-shape room | Works well |
+| Complex L-shape | Split into rectangles | Easier to verify |
+| U-shape | Split into 3 rectangles | Simplest calculation |
+| Irregular | Multiple rooms | Most accurate |
+| Curved walls | Approximate with rectangles | Curves not supported |
+
+---
+
+### Ventilation Requirements
+
+#### ACH calculation doesn't match expectations
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Air changes per hour calculation gives unexpected results |
+| **Possible Causes** | Volume calculation issue, ACH rate incorrect, CFM/ACH confusion |
+| **Solutions** | Verify volume and ACH inputs |
+
+**Troubleshooting steps:**
+
+1. **Verify the ACH formula is applied correctly:**
+   ```
+   CFM = (Volume × ACH) / 60
+
+   Where:
+   - Volume is in cubic feet
+   - ACH is air changes per hour
+   - 60 converts hours to minutes
+   ```
+
+2. **Check volume calculation:**
+   - Volume = Area × Ceiling Height
+   - Verify ceiling height is set (not using default)
+   - Higher ceilings = more volume = more CFM for same ACH
+
+3. **Common ACH requirements reference:**
+
+   | Space Type | Typical ACH | Source/Reason |
+   |------------|-------------|---------------|
+   | Residential | 0.35 | ASHRAE 62.2 |
+   | Office | 4-6 | General comfort |
+   | Classroom | 6-8 | Occupant density |
+   | Healthcare exam | 6 | ASHRAE 170 |
+   | Hospital patient room | 6 | Infection control |
+   | Operating room | 20 | Strict sterility |
+   | Laboratory | 6-12 | Fume control |
+   | Kitchen (commercial) | 15-30 | Heat/odor removal |
+
+4. **Verify you're not mixing methods:**
+   - ACH method: Volume-based
+   - ASHRAE 62.1: Area + occupancy-based
+   - These give different results—use appropriate method for space type
+
+5. **Example ACH calculation:**
+   ```
+   Room: 25' × 20' × 10' ceiling
+   Volume = 25 × 20 × 10 = 5,000 cu ft
+   Required ACH = 8 (classroom)
+
+   CFM = (5,000 × 8) / 60 = 667 CFM
+   ```
+
+---
+
+#### ASHRAE vs ACH methods give different results
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | ASHRAE 62.1 and ACH methods produce significantly different CFM values |
+| **Possible Causes** | Methods designed for different purposes, space characteristics vary |
+| **Solutions** | Use appropriate method for space type, take higher value |
+
+**Understanding the differences:**
+
+| Factor | ASHRAE 62.1 Method | ACH Method |
+|--------|-------------------|------------|
+| **Based on** | People + floor area | Room volume |
+| **Formula** | `(Rp × People) + (Ra × Area)` | `(Volume × ACH) / 60` |
+| **Best for** | Commercial/office | Healthcare, labs, kitchens |
+| **Ceiling height impact** | Indirect (affects comfort) | Direct (higher = more CFM) |
+| **Occupancy impact** | Direct (more people = more CFM) | Indirect (density not considered) |
+| **Typical use** | Routine ventilation | Contamination control |
+
+**Comparison example:**
+
+```
+Space: 20' × 15' office, 10' ceiling, 3 occupants
+
+ASHRAE 62.1 Method:
+- Area = 300 sq ft
+- Rp = 5 CFM/person, Ra = 0.06 CFM/sq ft
+- CFM = (5 × 3) + (0.06 × 300) = 15 + 18 = 33 CFM
+
+ACH Method (6 ACH):
+- Volume = 300 × 10 = 3,000 cu ft
+- CFM = (3,000 × 6) / 60 = 300 CFM
+```
+
+**Why they differ:**
+- ASHRAE focuses on fresh air for breathing
+- ACH focuses on complete air replacement
+- Higher ceilings increase ACH-based CFM but not ASHRAE-based
+
+**Which to use:**
+
+| Situation | Recommended Method |
+|-----------|-------------------|
+| Standard office | ASHRAE 62.1 |
+| Retail, restaurants | ASHRAE 62.1 |
+| Labs with fume hoods | ACH (per code) |
+| Healthcare (patient areas) | ACH (per ASHRAE 170) |
+| Kitchens | ACH (for heat/odor) |
+| Data centers | ACH (for heat removal) |
+| When codes specify ACH | ACH |
+| When uncertain | Use HIGHER of both |
+
+---
+
+#### Ventilation doesn't meet local code requirements
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Calculated ventilation doesn't satisfy local building code |
+| **Possible Causes** | Local amendments, different standards, specific requirements |
+| **Solutions** | Override with code-required values |
+
+**Troubleshooting steps:**
+
+1. **Identify the applicable code:**
+   - International Mechanical Code (IMC)
+   - Local amendments to IMC
+   - State-specific codes (California Title 24, etc.)
+   - Project-specific requirements
+
+2. **Compare code requirements to ASHRAE:**
+   - Many codes reference ASHRAE 62.1 directly
+   - Some have stricter requirements
+   - Local amendments may modify values
+
+3. **Override calculated values when needed:**
+   - Select room > Inspector Panel
+   - Use "CFM Override" to set code-required value
+   - Document the code reference
+
+4. **Common code variations:**
+
+   | Jurisdiction | Common Differences |
+   |--------------|-------------------|
+   | California | Often stricter than ASHRAE |
+   | Healthcare (FGI) | Specific ACH requirements |
+   | Education | State-specific classroom rates |
+   | High-rise | Additional pressurization needs |
+
+5. **Document compliance:**
+   - Add notes indicating code reference
+   - Save calculation backup documentation
+   - Note any overrides and reasons
 
 ---
 
@@ -999,24 +1438,322 @@ Some tools require multiple clicks to complete:
 | Aspect | Details |
 |--------|---------|
 | **Problem** | App suggests different duct size than hand calculations |
-| **Possible Causes** | Different velocity assumptions, rounding differences, standard sizes |
-| **Solutions** | Check assumptions |
+| **Possible Causes** | Different velocity assumptions, rounding to standard sizes, calculation method |
+| **Solutions** | Align velocity assumptions and check rounding |
 
 **Troubleshooting steps:**
 
-1. **Check velocity assumption:**
-   - Main ducts: 1000-1800 FPM
-   - Branch ducts: 600-1000 FPM
-   - App may use different defaults
-2. **Check for standard size rounding** - App rounds to standard duct sizes
-3. **Verify CFM input** - Duct size based on required airflow
-4. **Compare formulas:**
+1. **Verify velocity assumptions:**
+
+   | Duct Location | App Default (FPM) | Industry Range (FPM) |
+   |---------------|-------------------|---------------------|
+   | Main trunk | 1,200 | 1,000-1,800 |
+   | Branch duct | 800 | 600-1,000 |
+   | Supply runout | 600 | 500-750 |
+   | Return | 500 | 400-600 |
+
+   - Different velocity = different duct size for same CFM
+
+2. **Understand the sizing formula:**
    ```
    Area (sq in) = (CFM × 144) / Velocity (FPM)
-   Round duct diameter = √(Area × 4 / π)
+
+   For round duct:
+   Diameter = √((4 × Area) / π)
+
+   Example: 400 CFM at 1000 FPM
+   Area = (400 × 144) / 1000 = 57.6 sq in
+   Diameter = √((4 × 57.6) / 3.14159) = 8.56"
+   ```
+
+3. **Check standard size rounding:**
+
+   | Calculated Size | App Rounds To | Reason |
+   |-----------------|---------------|--------|
+   | 8.56" | 8" or 10" | Standard sizes available |
+   | 6.2" × 12.1" | 6" × 12" | Manufacturability |
+   | 9.5" | 10" | Commercial availability |
+
+   - App typically rounds UP for safety
+   - May round DOWN if very close to standard size
+
+4. **Verify CFM input:**
+   - Duct size based on airflow (CFM) it must carry
+   - Check that CFM shown is what you expect
+   - Multiple rooms may combine at trunk
+
+5. **For rectangular ducts:**
+   ```
+   Equivalent round diameter:
+   De = 1.30 × ((W × H)^0.625) / ((W + H)^0.25)
+
+   Example: 12" × 8" rectangular
+   De = 1.30 × ((12 × 8)^0.625) / ((12 + 8)^0.25)
+   De = 1.30 × (96^0.625) / (20^0.25)
+   De = 1.30 × 19.6 / 2.11 = 12.1" equivalent
    ```
 
 **See also:** [FAQ - How does the app calculate duct sizes?](./FAQ.md#how-does-the-app-calculate-duct-sizes)
+
+---
+
+#### Duct size too large or too small for space
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Calculated duct size won't fit in available space, or seems oversized |
+| **Possible Causes** | Low velocity selection, incorrect CFM, space constraints not considered |
+| **Solutions** | Adjust velocity or use rectangular duct |
+
+**Troubleshooting steps:**
+
+1. **Increase velocity for smaller ducts:**
+   - Higher velocity = smaller duct = more noise
+   - Balance size constraints with noise requirements
+
+   | Location | Max Velocity (FPM) | Noise Impact |
+   |----------|-------------------|--------------|
+   | Above ceiling (office) | 1,500 | Acceptable |
+   | Exposed residential | 900 | Low noise |
+   | Mechanical room | 2,500 | No impact |
+   | Near diffuser | 750 | Critical |
+
+2. **Switch to rectangular duct:**
+   - Same CFM in flatter profile
+   - Example: 10" round → 14" × 6" rectangular (lower height)
+   - Calculate equivalent: use equivalent diameter formula
+
+3. **Consider multiple smaller ducts:**
+   - Split airflow into parallel runs
+   - Two 6" ducts ≈ one 8.5" duct
+   - May fit better in constrained spaces
+
+4. **Verify CFM requirement:**
+   - Oversized duct may indicate excessive CFM calculation
+   - Review room CFM requirements
+   - Check occupancy type and settings
+
+5. **Rectangular duct fitting guide:**
+
+   | Round Diameter | Equivalent Rectangular (Aspect Ratio ≤ 3:1) |
+   |----------------|----------------------------------------------|
+   | 6" | 7" × 4" or 5" × 5" |
+   | 8" | 10" × 5" or 8" × 7" |
+   | 10" | 14" × 6" or 10" × 8" |
+   | 12" | 16" × 8" or 12" × 10" |
+   | 14" | 20" × 8" or 14" × 12" |
+
+---
+
+#### Equivalent duct size conversion errors
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Converting between round and rectangular duct gives wrong results |
+| **Possible Causes** | Using wrong formula, aspect ratio issues, friction factor differences |
+| **Solutions** | Use correct equivalent diameter formula |
+
+**Troubleshooting steps:**
+
+1. **Use the correct equivalent diameter formula:**
+   ```
+   Equal Friction Method (most common):
+   De = 1.30 × ((W × H)^0.625) / ((W + H)^0.25)
+
+   Where W = width, H = height (both in inches)
+   ```
+
+2. **Do NOT use simple area equivalence:**
+   ```
+   INCORRECT: Area_round = Area_rect
+   π × r² = W × H
+
+   This ignores friction differences and will undersize rectangular ducts
+   ```
+
+3. **Check aspect ratio:**
+   - Aspect ratio = larger dimension / smaller dimension
+   - Keep below 4:1 for efficiency
+   - Very flat ducts have more friction
+
+   | Aspect Ratio | Efficiency | Recommendation |
+   |--------------|------------|----------------|
+   | 1:1 | Best | Ideal |
+   | 2:1 | Good | Acceptable |
+   | 3:1 | Fair | Use when needed |
+   | 4:1+ | Poor | Avoid if possible |
+
+4. **Verification table:**
+
+   | Round (diameter) | Rectangular Equivalent (common) | CFM @ 1000 FPM |
+   |------------------|--------------------------------|----------------|
+   | 6" | 8" × 4" or 6" × 5" | 196 |
+   | 8" | 12" × 5" or 8" × 7" | 349 |
+   | 10" | 14" × 6" or 10" × 9" | 545 |
+   | 12" | 18" × 7" or 12" × 11" | 785 |
+   | 14" | 22" × 8" or 14" × 13" | 1,069 |
+   | 16" | 26" × 9" or 16" × 14" | 1,396 |
+
+5. **Use the app's conversion tool:**
+   - If available, use built-in converter
+   - Enter round size, get rectangular options
+   - Accounts for proper equivalent diameter
+
+---
+
+#### Duct velocity calculations incorrect
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Calculated or displayed velocity doesn't match expected values |
+| **Possible Causes** | Unit confusion, area calculation error, CFM incorrect |
+| **Solutions** | Verify velocity formula and inputs |
+
+**Troubleshooting steps:**
+
+1. **Verify the velocity formula:**
+   ```
+   Velocity (FPM) = CFM / Area (sq ft)
+
+   Or with common units:
+   Velocity (FPM) = (CFM × 144) / Area (sq in)
+   ```
+
+2. **Calculate duct area correctly:**
+   ```
+   Round duct:
+   Area (sq in) = π × r² = π × (d/2)²
+   Area (sq in) = 0.7854 × d²
+
+   Example: 10" round
+   Area = 0.7854 × 100 = 78.54 sq in = 0.545 sq ft
+
+   Rectangular duct:
+   Area (sq in) = W × H
+
+   Example: 12" × 8"
+   Area = 96 sq in = 0.667 sq ft
+   ```
+
+3. **Check unit consistency:**
+   - CFM = cubic feet per minute (volume/time)
+   - FPM = feet per minute (distance/time)
+   - Area must be in square feet for FPM result
+
+4. **Example velocity check:**
+   ```
+   Duct: 10" round, 400 CFM
+   Area = 0.545 sq ft
+   Velocity = 400 / 0.545 = 734 FPM
+   ```
+
+5. **Velocity guidelines for reference:**
+
+   | Application | Velocity (FPM) | Noise Level |
+   |-------------|----------------|-------------|
+   | Residential main | 700-900 | Low |
+   | Commercial main | 1,000-1,500 | Moderate |
+   | High-velocity | 1,500-2,500 | Higher |
+   | Near grilles | 300-600 | Quiet |
+   | Return ducts | 400-800 | Quiet |
+
+---
+
+#### Total CFM doesn't add up across duct system
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Sum of branch CFM doesn't equal main trunk CFM, or calculations don't balance |
+| **Possible Causes** | Missing branches, leakage factor, diversity factor applied |
+| **Solutions** | Verify all connections and factors |
+
+**Troubleshooting steps:**
+
+1. **Basic continuity check:**
+   ```
+   Main trunk CFM = Sum of all branch CFMs
+
+   Example:
+   Main trunk: 1,000 CFM
+   Branch 1: 300 CFM
+   Branch 2: 350 CFM
+   Branch 3: 350 CFM
+   Total: 1,000 CFM ✓
+   ```
+
+2. **Check for missing connections:**
+   - Ensure all branches are connected to main
+   - Disconnected ducts won't be counted in totals
+   - Visually verify connection points
+
+3. **Consider leakage factor:**
+   - Real systems have duct leakage (3-10%)
+   - Some designs add leakage factor to CFM
+   - Main may show higher CFM than sum of branches
+
+4. **Check for diversity factor:**
+   - Not all spaces need maximum airflow simultaneously
+   - Diversity may reduce main duct sizing
+   - Check if diversity is applied in settings
+
+5. **Verify calculation mode:**
+   - "Supply" counts airflow leaving the space
+   - "Return" counts airflow entering
+   - Mixing modes can cause confusion
+
+**Troubleshooting table:**
+
+| Symptom | Possible Cause | Check |
+|---------|---------------|-------|
+| Main < branches | Missing main CFM assignment | Set main duct CFM |
+| Main > branches | Leakage factor applied | Check design settings |
+| Branches don't sum | Disconnected branch | Verify connections |
+| Numbers vary unexpectedly | Diversity factor | Check system settings |
+| Return ≠ Supply | Different calculation modes | Should balance in closed system |
+
+---
+
+### Calculation Verification Checklist
+
+Use this checklist to systematically verify calculations:
+
+**Room CFM Verification:**
+
+| Check | How to Verify | Expected Result |
+|-------|---------------|-----------------|
+| Dimensions entered correctly | Inspector Panel | Match floor plan |
+| Ceiling height set | Inspector Panel | Actual height (not default) |
+| Occupancy type appropriate | Inspector Panel dropdown | Matches space use |
+| Calculation method correct | Settings/Properties | ASHRAE or ACH as needed |
+| CFM reasonable for space | Compare to similar spaces | Within expected range |
+
+**Area/Volume Verification:**
+
+| Check | How to Verify | Expected Result |
+|-------|---------------|-----------------|
+| Area matches floor plan | Manual: W × L | Within 1% |
+| Volume calculated correctly | Manual: Area × Height | Within 1% |
+| Complex shapes correct | Sum of rectangles | Matches total |
+| Units displayed correctly | Check unit indicators | ft, sq ft, cu ft |
+
+**Duct Sizing Verification:**
+
+| Check | How to Verify | Expected Result |
+|-------|---------------|-----------------|
+| CFM input correct | Check connected rooms | Sum of room CFMs |
+| Velocity appropriate | Check application | Within range for use |
+| Size is standard | Compare to standard sizes | Available commercially |
+| Equivalent diameter correct | Use De formula | Friction equivalent |
+| Fits available space | Compare to constraints | Fits with clearance |
+
+---
+
+### Related Resources
+
+- **[FAQ - HVAC Calculations](./FAQ.md#hvac-calculations--standards)** - Frequently asked questions about calculations
+- **[GLOSSARY.md](./GLOSSARY.md)** - Definitions of HVAC terms (CFM, ACH, FPM, etc.)
+- **[FAQ - How does the app calculate duct sizes?](./FAQ.md#how-does-the-app-calculate-duct-sizes)** - Detailed duct sizing explanation
+- **[FAQ - What is ASHRAE 62.1?](./FAQ.md#what-is-ashrae-621-and-how-does-the-app-use-it)** - ASHRAE standard explanation
 
 ---
 
