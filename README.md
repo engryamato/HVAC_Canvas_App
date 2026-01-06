@@ -189,3 +189,41 @@ npm run tauri:build
 | **[Changelog](CHANGELOG.md)** | Version history and release notes |
 | **[Security Policy](SECURITY.md)** | Vulnerability reporting and security practices |
 
+## 🤝 Contributing
+
+We welcome contributions from the community! Whether it's fixing bugs, adding features, improving documentation, or sharing ideas—every contribution helps make SizeWise HVAC Canvas better for everyone.
+
+**Ready to contribute?**
+
+1. 📖 Read our **[Contributing Guide](CONTRIBUTING.md)** for setup instructions and workflow
+2. 🐛 Found a bug? [Open an issue](https://github.com/engryamato/HVAC_Canvas_App/issues/new)
+3. 💡 Have an idea? Start a [discussion](https://github.com/engryamato/HVAC_Canvas_App/discussions)
+4. 🔧 Submit a pull request following our [branch naming](CONTRIBUTING.md#branch-naming) and [commit conventions](CONTRIBUTING.md#commit-messages)
+
+All contributions are subject to our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2024-2025 engryamato
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/engryamato">engryamato</a> and contributors
+</p>
