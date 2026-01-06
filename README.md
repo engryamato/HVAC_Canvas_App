@@ -160,3 +160,32 @@ npm run tauri:build
 | **[Prettier](https://prettier.io/)** | 3.1 | Code formatting |
 | **[Husky](https://typicode.github.io/husky/)** | 9.1 | Git hooks for pre-commit checks |
 
+## 📖 Documentation
+
+### Getting Started
+
+| Document | Description |
+|----------|-------------|
+| **[Quick Start Guide](docs/QUICK_START.md)** | Get up and running in 15 minutes |
+| **[Architecture Overview](docs/ARCHITECTURE.md)** | Understand the system design and data flow |
+| **[User Journeys](docs/UserJourney.md)** | See the app from a user's perspective |
+
+### For Contributors
+
+| Document | Description |
+|----------|-------------|
+| **[Contributing Guide](CONTRIBUTING.md)** | How to contribute code, report bugs, and suggest features |
+| **[Testing Guide](docs/TESTING.md)** | Comprehensive testing strategies and examples |
+| **[CI/CD Pipeline](docs/CI_CD.md)** | Automated testing, builds, and deployments |
+| **[Release Process](docs/RELEASE_PROCESS.md)** | How releases are versioned and published |
+
+### Reference
+
+| Document | Description |
+|----------|-------------|
+| **[Full Documentation Hub](docs/README.md)** | Central index of all documentation |
+| **[Product Requirements (PRD)](docs/PRD.md)** | Detailed product vision and requirements |
+| **[HVAC Glossary](docs/GLOSSARY.md)** | HVAC and technical terminology reference |
+| **[Changelog](CHANGELOG.md)** | Version history and release notes |
+| **[Security Policy](SECURITY.md)** | Vulnerability reporting and security practices |
+
