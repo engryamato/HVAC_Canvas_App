@@ -111,3 +111,52 @@ npm run tauri:build
 
 > 📖 **Need more details?** See the full [Quick Start Guide](docs/QUICK_START.md) for step-by-step instructions, debugging tips, and your first 15 minutes with the app.
 
+## 🛠️ Tech Stack
+
+### Core Framework
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **[Next.js](https://nextjs.org/)** | 15.0 | React framework with SSR, routing, and optimizations |
+| **[React](https://react.dev/)** | 18.2 | UI component library |
+| **[Tauri](https://tauri.app/)** | 1.x | Native desktop wrapper (Rust-based, lightweight) |
+| **[Rust](https://www.rust-lang.org/)** | 2021 Edition | Backend runtime for native file system access |
+| **[TypeScript](https://www.typescriptlang.org/)** | 5.3 | Type-safe JavaScript |
+
+### State Management
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **[Zustand](https://zustand-demo.pmnd.rs/)** | 4.4 | Lightweight, performant state management |
+| **[Immer](https://immerjs.github.io/immer/)** | 11.0 | Immutable state updates with mutable syntax |
+
+### UI & Styling
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **[Material UI](https://mui.com/)** | 5.15 | React component library |
+| **[Emotion](https://emotion.sh/)** | 11.11 | CSS-in-JS styling solution |
+
+### Data Validation & Utilities
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **[Zod](https://zod.dev/)** | 4.2 | Schema validation for project files |
+| **[nanoid](https://github.com/ai/nanoid)** | 5.1 | Unique ID generation |
+
+### Testing
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **[Vitest](https://vitest.dev/)** | 1.6 | Unit and integration testing |
+| **[Testing Library](https://testing-library.com/)** | 16.3 | React component testing utilities |
+| **[Playwright](https://playwright.dev/)** | 1.40 | End-to-end browser testing |
+
+### Development Tools
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **[ESLint](https://eslint.org/)** | 8.56 | Code linting |
+| **[Prettier](https://prettier.io/)** | 3.1 | Code formatting |
+| **[Husky](https://typicode.github.io/husky/)** | 9.1 | Git hooks for pre-commit checks |
+
