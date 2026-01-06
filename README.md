@@ -66,3 +66,48 @@ Save your entire project as a single `.sws` file with **automatic validation**. 
 ### 📚 Equipment Library
 Access a built-in library of **HVAC equipment types** including exhaust hoods, fans, and ductwork components—complete with default specifications you can customize.
 
+## 🚀 Quick Start
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+| Requirement | Version | Installation |
+|-------------|---------|--------------|
+| **Node.js** | 18.0.0+ | [nodejs.org](https://nodejs.org/) |
+| **Rust** | 1.70.0+ | [rustup.rs](https://rustup.rs/) |
+| **npm** | 9.0.0+ | Included with Node.js |
+| **Git** | Latest | [git-scm.com](https://git-scm.com/) |
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/engryamato/HVAC_Canvas_App.git
+cd HVAC_Canvas_App/hvac-design-app
+
+# Install dependencies
+npm install
+```
+
+### Development
+
+```bash
+# Start the web development server
+npm run dev
+# Open http://localhost:3000 in your browser
+
+# Or run the full desktop app in dev mode
+npm run tauri:dev
+```
+
+### Build for Production
+
+```bash
+# Build the desktop application
+npm run tauri:build
+# Output: src-tauri/target/release/
+```
+
+> 📖 **Need more details?** See the full [Quick Start Guide](docs/QUICK_START.md) for step-by-step instructions, debugging tips, and your first 15 minutes with the app.
+
