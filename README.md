@@ -200,7 +200,7 @@ We welcome contributions from the community! Whether it's fixing bugs, adding fe
 3. 💡 Have an idea? Start a [discussion](https://github.com/engryamato/HVAC_Canvas_App/discussions)
 4. 🔧 Submit a pull request following our [branch naming](CONTRIBUTING.md#branch-naming) and [commit conventions](CONTRIBUTING.md#commit-messages)
 
-All contributions are subject to our [Code of Conduct](CODE_OF_CONDUCT.md).
+We encourage respectful and constructive collaboration from all contributors.
 
 ## 📄 License
 
