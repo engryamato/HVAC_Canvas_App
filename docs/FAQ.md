@@ -10,6 +10,7 @@ This document answers common questions about using the SizeWise HVAC Canvas App.
 - [Canvas Navigation](#canvas-navigation)
 - [Tools Usage](#tools-usage)
 - [HVAC Calculations & Standards](#hvac-calculations--standards)
+- [File Operations](#file-operations)
 - [Project Management](#project-management)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
 
@@ -547,6 +548,369 @@ For multi-use spaces (e.g., office with break area):
 - [GLOSSARY.md](./GLOSSARY.md) - Full definitions of HVAC terms
 - Inspector Panel - Hover over fields for tooltips
 - Room/Duct properties - See calculated values and formulas
+
+---
+
+## File Operations
+
+This section covers questions about saving, loading, and managing project files in the SizeWise HVAC Canvas App.
+
+---
+
+### What is the .sws file format?
+
+The `.sws` (SizeWise) file format is the native project format for the HVAC Canvas App. It's a JSON-based format that stores your complete project data.
+
+**File structure:**
+```json
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Project Name",
+    "client": "Client Name",
+    "projectNumber": "PRJ-001",
+    "location": "Building Address",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "modifiedAt": "2024-01-15T14:45:00Z"
+  },
+  "viewport": {
+    "offsetX": 0,
+    "offsetY": 0,
+    "zoom": 1.0
+  },
+  "entities": [
+    // Array of all rooms, ducts, equipment, notes, etc.
+  ],
+  "settings": {
+    // Project-specific settings
+  }
+}
+```
+
+**Key characteristics:**
+- Human-readable JSON format (can be opened in any text editor)
+- Stores all entities with their properties and positions
+- Preserves viewport state (pan/zoom position)
+- Includes project metadata and settings
+- Version number enables future format migrations
+
+---
+
+### Can I manually edit an .sws file?
+
+Yes, since `.sws` files are JSON format, you can edit them in any text editor. However, exercise caution:
+
+**Safe to edit:**
+- Project metadata (name, client, location)
+- Notes and text content
+- Simple property values
+
+**Risky to edit:**
+- Entity coordinates and dimensions
+- ID references between entities
+- Schema version number
+
+**Best practices:**
+1. Always create a backup before manual edits
+2. Use a JSON validator to check syntax
+3. Test the file after editing by opening in the app
+
+**Warning:** Invalid JSON will prevent the file from loading. The app attempts to recover corrupted files from backups automatically.
+
+---
+
+### How does auto-save work?
+
+The app automatically saves your project to prevent data loss:
+
+**Auto-save behavior:**
+- Triggers every **2 minutes** when changes are detected
+- Creates a backup file before overwriting the main file
+- Shows a brief save indicator in the status bar
+- Does not interrupt your work
+
+**Auto-save locations:**
+
+| Platform | Auto-save Location |
+|----------|-------------------|
+| **Desktop app** | Same folder as original file |
+| **Web app** | Browser local storage |
+
+**Disabling auto-save:** Auto-save cannot be disabled, but you can save to a different location using **File > Save As** to manage versions manually.
+
+---
+
+### Where are backup files stored?
+
+Backup files (`.sws.bak`) are created automatically to protect against data loss.
+
+**Backup file naming:**
+- Main file: `MyProject.sws`
+- Backup file: `MyProject.sws.bak`
+
+**When backups are created:**
+- Before every manual save (`Ctrl+S`)
+- Before every auto-save
+- Before any file migration/upgrade
+
+**Backup retention:**
+- Only the most recent backup is kept
+- Older backups are overwritten
+- Backups are stored in the same directory as the main file
+
+**Accessing backups:**
+1. Navigate to your project folder
+2. Look for files ending in `.sws.bak`
+3. Rename to `.sws` to open as a project
+
+---
+
+### How do I recover a project from backup?
+
+If your project file becomes corrupted or you need to restore a previous version:
+
+**Automatic recovery:**
+When opening a corrupted file, the app automatically:
+1. Detects the corruption
+2. Attempts to load the `.sws.bak` file
+3. Notifies you if recovery was successful
+4. Prompts you to save with a new name
+
+**Manual recovery:**
+1. Navigate to your project folder
+2. Find the backup file (`ProjectName.sws.bak`)
+3. Copy it to a new location
+4. Rename the copy to `ProjectName-recovered.sws`
+5. Open the renamed file in the app
+6. Verify your work and save normally
+
+**If both files are corrupted:**
+- Check for any manual backups you may have created
+- Look in cloud sync history (Dropbox, OneDrive, etc.)
+- Check system backup/restore points
+
+---
+
+### What export formats are available?
+
+The app supports multiple export formats for different use cases:
+
+| Format | Extension | Best For | Contains |
+|--------|-----------|----------|----------|
+| **PNG** | `.png` | Sharing images, presentations | Canvas snapshot |
+| **JPEG** | `.jpg` | Web use, smaller file size | Canvas snapshot (compressed) |
+| **PDF** | `.pdf` | Printing, client deliverables | Vector graphics, multiple pages |
+| **CSV** | `.csv` | Bill of materials, spreadsheets | Entity data in columns |
+| **JSON** | `.json` | Data interchange, backup | Raw project data |
+
+**Export options by format:**
+
+**Image exports (PNG/JPEG):**
+- Resolution: 1x, 2x, 4x
+- Background: Transparent or white
+- Selection only or entire canvas
+
+**PDF export:**
+- Page size: Letter, Legal, A4, Custom
+- Orientation: Portrait or Landscape
+- Scale: Fit to page or actual size
+- Include metadata: Yes/No
+
+**CSV export:**
+- Includes all entities with properties
+- Compatible with Excel, Google Sheets
+- Useful for generating quotes
+
+---
+
+### How do I export just the Bill of Materials?
+
+To export the BOM (Bill of Materials) for estimating:
+
+1. Click **File > Export > Bill of Materials** (or **BOM** menu)
+2. Choose export format:
+   - **CSV**: For spreadsheets
+   - **PDF**: For printing/sharing
+3. Select what to include:
+   - ☑ Duct materials
+   - ☑ Fittings
+   - ☑ Equipment
+   - ☑ Registers/Diffusers
+4. Click **Export**
+
+**BOM data includes:**
+- Item descriptions and quantities
+- Sizes and specifications
+- Material types
+- Unit and total lengths (for ducts)
+- Optional: pricing columns for manual entry
+
+---
+
+### Can I import projects from other software?
+
+The app supports several import methods:
+
+**Direct imports:**
+- `.sws` files from other SizeWise installations
+- `.json` files in compatible format
+
+**Background image imports:**
+| Format | Use Case |
+|--------|----------|
+| **PNG/JPEG** | Scan of existing floor plan |
+| **PDF** | Architectural drawings |
+| **DXF** | CAD file floor plans (limited support) |
+
+**Importing a floor plan image:**
+1. Select **File > Import Image**
+2. Choose your image file
+3. The image appears as a background layer
+4. Use the **Scale Tool** to calibrate real-world dimensions:
+   - Click two points on a known dimension
+   - Enter the actual distance
+   - The image scales automatically
+5. Trace over the floor plan using the Room tool
+
+**Note:** Imported images are for tracing reference only; they don't convert to editable entities.
+
+---
+
+### How do I share a project file with someone?
+
+**Sharing the native project file:**
+1. Save your project (`Ctrl+S`)
+2. Locate the `.sws` file on your computer
+3. Share via:
+   - Email attachment (small projects)
+   - Cloud storage link (Dropbox, Google Drive, OneDrive)
+   - USB drive or network share
+4. Recipient opens the file with their SizeWise app
+
+**Important considerations:**
+- Recipient needs the SizeWise app installed
+- Ensure compatible app versions for seamless transfer
+- Shared files don't sync automatically (each person has their own copy)
+
+**For non-SizeWise users:**
+Export as PDF for viewing, or CSV for data access.
+
+---
+
+### What happens if I open an older project file?
+
+The app handles file version compatibility automatically:
+
+**Forward compatibility:**
+- Older `.sws` files are automatically upgraded to the current format
+- A backup of the original file is created before migration
+- All entities and settings are preserved
+- You may see a notification about the upgrade
+
+**Backward compatibility:**
+- Newer files may not open in older app versions
+- Critical features may be lost if downgrading
+- Always update to the latest app version when collaborating
+
+**Version information:**
+The file version is stored in the JSON:
+```json
+{
+  "version": "1.0",
+  ...
+}
+```
+
+If you encounter version issues, check that all team members are using the same app version.
+
+---
+
+### How much disk space do project files use?
+
+Project file sizes depend on complexity:
+
+| Project Size | Typical Entities | File Size |
+|--------------|------------------|-----------|
+| **Small** | < 50 | 50-200 KB |
+| **Medium** | 50-200 | 200 KB - 1 MB |
+| **Large** | 200-500 | 1-5 MB |
+| **Very Large** | 500+ | 5-20 MB |
+
+**What affects file size:**
+- Number of entities (rooms, ducts, equipment)
+- Complexity of properties
+- Embedded notes and annotations
+- Undo history is NOT stored (only current state)
+
+**Reducing file size:**
+- Delete unused entities
+- Remove unnecessary annotations
+- Export and re-import to clear metadata
+
+---
+
+### Where does the web app store my projects?
+
+The web version stores projects in **browser local storage**:
+
+**Storage details:**
+- Location: Browser's local storage (per domain)
+- Limit: ~5-10 MB total (varies by browser)
+- Persistence: Data persists until cleared
+
+**Limitations of local storage:**
+- Not synced across devices
+- Cleared if browser data is deleted
+- Storage quota may be limited
+
+**Best practice for web users:**
+1. Always use **File > Save As** to download `.sws` files
+2. Store downloaded files in a backed-up location
+3. Don't rely solely on browser storage for important projects
+
+**To access web storage:**
+Your recent projects appear on the Dashboard automatically.
+
+---
+
+### Why can't I save to a specific location?
+
+If you're having trouble saving to a particular folder:
+
+**Possible causes:**
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| **Permission denied** | Folder requires admin rights | Save to Documents or Desktop |
+| **Path too long** | Windows path limit exceeded | Use shorter folder names |
+| **Network drive** | Connection issue | Save locally, then copy |
+| **Read-only folder** | Folder is write-protected | Choose a different location |
+| **Disk full** | No free space | Free up disk space |
+
+**Web app limitations:**
+The web version uses browser file dialogs, which may have additional restrictions. The desktop app provides full file system access.
+
+---
+
+### How do I create manual backups of my project?
+
+While auto-backup is always enabled, you can create manual backups:
+
+**Method 1: Save As**
+1. Open your project
+2. Use **File > Save As**
+3. Save with a different name (e.g., `MyProject-backup-2024-01-15.sws`)
+
+**Method 2: File copy**
+1. Close the project (or ensure it's saved)
+2. Navigate to the project folder
+3. Copy both `.sws` and `.sws.bak` files
+4. Paste to a backup location
+
+**Recommended backup strategy:**
+- Create dated backups at project milestones
+- Store backups in a separate location (cloud or external drive)
+- Keep at least 3 versions for important projects
 
 ---
 
