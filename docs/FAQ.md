@@ -9,6 +9,7 @@ This document answers common questions about using the SizeWise HVAC Canvas App.
 - [Getting Started](#getting-started)
 - [Canvas Navigation](#canvas-navigation)
 - [Tools Usage](#tools-usage)
+- [HVAC Calculations & Standards](#hvac-calculations--standards)
 - [Project Management](#project-management)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
 
@@ -270,6 +271,282 @@ Changes take effect immediately.
    - Residential
 
 Each occupancy type has different ASHRAE 62.1 ventilation requirements.
+
+---
+
+## HVAC Calculations & Standards
+
+This section covers the technical aspects of HVAC calculations used by the SizeWise app. For detailed term definitions, see the [GLOSSARY.md](./GLOSSARY.md).
+
+---
+
+### What is CFM and how is it calculated?
+
+**CFM (Cubic Feet per Minute)** is the volumetric flow rate of air—the primary unit for sizing ductwork and ventilation systems.
+
+**The app calculates CFM for rooms using two methods:**
+
+| Method | Formula | Best For |
+|--------|---------|----------|
+| **ACH Method** | `CFM = (Volume × ACH) / 60` | Industrial, healthcare, labs |
+| **ASHRAE 62.1** | `CFM = (Rp × People) + (Ra × Area)` | Commercial buildings |
+
+**Example (ACH Method):**
+- Room volume: 2,400 cu ft (20' × 12' × 10')
+- Required ACH: 6
+- CFM = (2,400 × 6) / 60 = **240 CFM**
+
+**Example (ASHRAE 62.1 Method):**
+- Office: 1,000 sq ft, 5 people
+- Rp = 5 CFM/person, Ra = 0.06 CFM/sq ft
+- CFM = (5 × 5) + (0.06 × 1000) = 25 + 60 = **85 CFM**
+
+The app automatically selects the appropriate method based on the occupancy type you choose.
+
+---
+
+### What is ACH and when should I use it?
+
+**ACH (Air Changes per Hour)** represents how many times the entire air volume in a space is replaced per hour.
+
+**Use ACH when:**
+- Designing spaces with specific air quality requirements (labs, hospitals)
+- Local codes mandate minimum air changes
+- Dealing with contamination control
+- Industrial or manufacturing environments
+
+**Typical ACH Requirements:**
+
+| Space Type | Minimum ACH | Notes |
+|------------|-------------|-------|
+| **Residential** | 0.35 | Per ASHRAE 62.2 |
+| **Office** | 4-6 | General ventilation |
+| **Conference Room** | 6-8 | Higher occupancy variance |
+| **Classroom** | 6-8 | Code varies by jurisdiction |
+| **Laboratory** | 8-12 | Depends on hazard class |
+| **Hospital OR** | 15-20 | Strict infection control |
+| **Clean Room** | 20-600 | Depends on ISO class |
+
+**Note:** ACH is volume-based, so taller ceilings require more CFM to achieve the same ACH.
+
+---
+
+### What is ASHRAE 62.1 and how does the app use it?
+
+**ASHRAE Standard 62.1** is the industry standard for "Ventilation for Acceptable Indoor Air Quality" published by the American Society of Heating, Refrigerating and Air-Conditioning Engineers.
+
+**Key concepts used by the app:**
+
+1. **Breathing Zone Outdoor Airflow (Vbz):**
+   - `Vbz = (Rp × Pz) + (Ra × Az)`
+   - Where Pz = zone population, Az = zone floor area
+
+2. **Rp (People Outdoor Air Rate):** CFM required per person
+3. **Ra (Area Outdoor Air Rate):** CFM required per square foot
+
+**ASHRAE 62.1 Default Values (used by the app):**
+
+| Occupancy Type | Rp (CFM/person) | Ra (CFM/sq ft) | Default Density (people/1000 sq ft) |
+|----------------|-----------------|----------------|-------------------------------------|
+| **Office** | 5 | 0.06 | 5 |
+| **Retail** | 7.5 | 0.12 | 15 |
+| **Restaurant** | 7.5 | 0.18 | 70 |
+| **Classroom** | 10 | 0.12 | 35 |
+| **Conference Room** | 5 | 0.06 | 50 |
+| **Healthcare (Exam)** | 5 | 0.06 | 20 |
+| **Laboratory** | 10 | 0.18 | 25 |
+| **Warehouse** | 10 | 0.06 | N/A |
+
+**To change occupancy type:** Select the room → Inspector Panel → Occupancy Type dropdown.
+
+---
+
+### Why is my calculated CFM different from what I expected?
+
+Common reasons for unexpected CFM values:
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| **CFM too high** | Wrong occupancy type selected | Check room's occupancy type in Inspector |
+| **CFM too low** | Ceiling height not set | Set correct ceiling height (affects volume) |
+| **CFM = 0** | Invalid dimensions | Ensure width, length, height are all > 0 |
+| **CFM mismatch vs. manual calc** | App uses ASHRAE 62.1 by default | Check if manual calc used ACH method |
+| **Different from old project** | Occupancy defaults updated | Verify current Rp/Ra values in settings |
+
+**Verification steps:**
+1. Select the room and check the Inspector Panel
+2. Verify dimensions (width × length × ceiling height)
+3. Confirm occupancy type matches intended use
+4. Check if ceiling height is using the default or custom value
+
+---
+
+### How do I choose between round and rectangular ducts?
+
+Both duct shapes can deliver the same CFM—the choice depends on installation constraints and efficiency:
+
+| Factor | Round Duct | Rectangular Duct |
+|--------|------------|------------------|
+| **Airflow efficiency** | Better (less friction) | More friction loss |
+| **Space efficiency** | Needs more clearance | Fits in tight spaces |
+| **Cost** | Generally cheaper | More expensive to fabricate |
+| **Noise** | Quieter | Can be noisier |
+| **Fittings** | Simpler connections | More complex transitions |
+| **Best for** | Main runs, high velocity | Low ceilings, tight plenums |
+
+**Equivalent diameter:** The app calculates the equivalent round diameter for rectangular ducts to ensure proper sizing:
+
+```
+De = 1.30 × ((W × H)^0.625) / ((W + H)^0.25)
+```
+
+Where W = width, H = height (in inches)
+
+---
+
+### How does the app calculate duct sizes?
+
+The app sizes ducts based on **airflow (CFM)** and **velocity (FPM - feet per minute)**:
+
+**Basic Formula:**
+```
+Area (sq ft) = CFM / Velocity (FPM)
+```
+
+**Recommended Duct Velocities:**
+
+| Duct Location | Velocity (FPM) | Noise Level |
+|---------------|----------------|-------------|
+| **Main trunk** | 1000-1800 | Moderate |
+| **Branch ducts** | 600-1000 | Low |
+| **Supply outlets** | 500-750 | Quiet |
+| **Return inlets** | 400-600 | Very quiet |
+| **Residential** | 600-900 | Low |
+| **Commercial** | 1000-1500 | Acceptable |
+
+**Example:**
+- Required: 400 CFM at 1000 FPM
+- Area = 400 / 1000 = 0.4 sq ft = 57.6 sq in
+- Round duct diameter ≈ 8.5" (use 8" or 10" standard size)
+
+**Tip:** Lower velocity = quieter operation but larger (more expensive) ductwork.
+
+---
+
+### What is pressure drop and why does it matter?
+
+**Pressure drop** (or pressure loss) is the resistance to airflow in the duct system, measured in inches of water column (in. w.c. or in. w.g.).
+
+**Why it matters:**
+- The blower/fan must overcome total pressure drop
+- Excessive pressure drop = undersized system, poor airflow, high energy use
+- Too little pressure drop might indicate oversized ducts (wasted cost)
+
+**What causes pressure drop:**
+
+| Component | Typical Loss | Notes |
+|-----------|--------------|-------|
+| **Straight duct** | 0.08-0.10 in/100 ft | Friction loss |
+| **90° elbow** | 0.05-0.15 in | Varies by radius |
+| **Tee/branch** | 0.10-0.25 in | Splitting airflow |
+| **Reducer** | 0.02-0.05 in | Velocity change |
+| **Diffuser/grille** | 0.05-0.15 in | Terminal friction |
+| **Filter** | 0.10-0.50 in | Clean vs. dirty |
+
+**Target total pressure drop:**
+- Residential: 0.08-0.10 in. w.c. per 100 ft equivalent length
+- Commercial: 0.10-0.15 in. w.c. per 100 ft equivalent length
+
+---
+
+### What are the different occupancy types and when should I use each?
+
+The app provides preset occupancy types based on ASHRAE 62.1 categories:
+
+| Occupancy Type | Use For | Key Characteristics |
+|----------------|---------|---------------------|
+| **Office** | Workspaces, cubicles, private offices | Low density, moderate ventilation |
+| **Retail** | Stores, malls, showrooms | Higher density, customer traffic |
+| **Restaurant** | Dining areas (not kitchens) | Very high density, peak loads |
+| **Classroom** | Schools, training rooms | Moderate-high density, code-driven |
+| **Conference Room** | Meeting rooms, boardrooms | Variable occupancy, high peak CFM |
+| **Healthcare** | Exam rooms, waiting areas | Infection control considerations |
+| **Laboratory** | Research labs, prep areas | High ACH, fume hood exhaust |
+| **Warehouse** | Storage, distribution centers | Low occupancy, large volumes |
+| **Residential** | Homes, apartments | Per ASHRAE 62.2 (different standard) |
+
+**Custom occupancy:** If your space doesn't match a preset, select the closest type and manually adjust CFM in the Inspector Panel.
+
+---
+
+### How do I handle spaces with variable occupancy?
+
+For spaces like conference rooms or auditoriums where occupancy varies significantly:
+
+1. **Design for peak:** Size for maximum expected occupancy
+2. **Consider DCV:** Document potential for Demand-Controlled Ventilation (CO2 sensors)
+3. **Use correct density:** Conference rooms use 50 people/1000 sq ft by default
+4. **Note in design:** Add annotations about variable occupancy assumptions
+
+**Best practice:** Size the ductwork for peak load, then specify variable-speed equipment or dampers in your BOM notes.
+
+---
+
+### How do I calculate ventilation for a room with mixed uses?
+
+For multi-use spaces (e.g., office with break area):
+
+**Option 1: Dominant use**
+- Assign the primary occupancy type
+- Suitable for 80%+ single-use spaces
+
+**Option 2: Split the room**
+- Draw separate rooms for each zone
+- Apply appropriate occupancy to each
+- Total CFM = sum of all zones
+
+**Option 3: Worst-case design**
+- Use the occupancy type with highest CFM requirement
+- Most conservative approach
+
+**Example:** Open office with coffee bar
+- Option 1: Use "Office" type (dominant use)
+- Option 2: Draw two rooms—office area + break area (as "Restaurant")
+- Option 3: Use "Restaurant" type for whole space (over-designed but safe)
+
+---
+
+### What units does the app use for HVAC calculations?
+
+| Measurement | Imperial Unit | Metric Unit* |
+|-------------|---------------|--------------|
+| **Airflow** | CFM (cu ft/min) | L/s or m³/h |
+| **Velocity** | FPM (ft/min) | m/s |
+| **Pressure** | in. w.c. | Pa |
+| **Dimensions** | feet / inches | meters / mm |
+| **Area** | sq ft | sq m |
+| **Volume** | cu ft | cu m |
+
+*Metric support: The app currently uses imperial units. Metric conversion is calculated internally for international code compliance but displayed values are imperial.
+
+**Conversion factors:**
+- 1 CFM = 0.4719 L/s = 1.699 m³/h
+- 1 FPM = 0.00508 m/s
+- 1 in. w.c. = 249 Pa
+
+---
+
+### Where can I learn more about HVAC standards?
+
+**Official resources:**
+- [ASHRAE 62.1](https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards) - Ventilation standard
+- [SMACNA](https://www.smacna.org/) - Duct construction standards
+- [ACCA Manual D](https://www.acca.org/standards/manual-d) - Residential duct design
+
+**In-app resources:**
+- [GLOSSARY.md](./GLOSSARY.md) - Full definitions of HVAC terms
+- Inspector Panel - Hover over fields for tooltips
+- Room/Duct properties - See calculated values and formulas
 
 ---
 
