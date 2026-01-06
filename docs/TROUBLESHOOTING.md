@@ -90,6 +90,51 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 
 4. **Reduce zoom complexity** - Very high zoom levels (400%+) require more rendering
 
+5. **Profile rendering performance** (advanced):
+   - Open Developer Tools (`F12`)
+   - Go to Performance tab
+   - Click Record and perform the slow action
+   - Look for long paint or scripting times
+   - Common culprits: excessive re-renders, large DOM updates
+
+**Performance optimization tips:**
+
+| Optimization | Impact | How to Apply |
+|-------------|--------|--------------|
+| Reduce entity count | High | Split project by floor/area |
+| Disable grid at high zoom | Medium | Toggle grid off when not needed |
+| Close inspector panels | Low | Minimize panels when not editing |
+| Use production build | High | Desktop app vs dev server |
+| Lower browser zoom | Medium | Use canvas zoom instead of browser zoom |
+
+---
+
+#### Rendering feels choppy or stutters
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Canvas updates in bursts, not smooth continuous motion |
+| **Possible Causes** | V-sync issues, background processes, thermal throttling |
+| **Solutions** | Optimize system and browser settings |
+
+**Troubleshooting steps:**
+
+1. **Check CPU/GPU temperature** - Thermal throttling causes stutters
+   - Use Task Manager (Windows) or Activity Monitor (Mac)
+   - Ensure adequate cooling, especially on laptops
+
+2. **Close background apps** - Video streaming, downloads, updates
+
+3. **Check browser performance mode:**
+   - Chrome: Type `chrome://flags/#enable-gpu-rasterization` - ensure enabled
+   - Firefox: `about:config` > `gfx.webrender.all` - ensure `true`
+
+4. **Disable resource-intensive extensions** - Ad blockers, security extensions
+
+5. **Check display refresh rate:**
+   - Higher refresh rate monitors (144Hz) provide smoother experience
+   - Match canvas animation to display refresh rate
+
 ---
 
 #### Application freezes or becomes unresponsive
@@ -110,6 +155,44 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
    - Find the browser tab/process
    - End the specific tab (not entire browser to preserve other work)
 5. **After recovery:** Your work may be preserved in auto-save; reopen the project
+
+**Identifying the cause:**
+
+| Freeze Type | Likely Cause | Diagnostic |
+|-------------|--------------|------------|
+| During save | Large file, slow disk | Check file size, disk activity |
+| During zoom/pan | Too many entities | Check entity count |
+| During calculation | Complex geometry | Simplify room shapes |
+| Random freezes | Memory leak | Monitor memory over time |
+| After long use | Memory accumulation | Restart browser periodically |
+
+---
+
+#### UI feels sluggish or buttons respond slowly
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Button clicks, menu opens, and panel interactions feel delayed |
+| **Possible Causes** | JavaScript performance issues, excessive DOM manipulation |
+| **Solutions** | Reduce UI complexity and browser load |
+
+**Troubleshooting steps:**
+
+1. **Close unnecessary panels** - Each open panel adds rendering overhead
+2. **Minimize property inspector** - Only open when editing
+3. **Clear browser data:**
+   - `Ctrl+Shift+Delete` > Clear cached images and files
+   - This forces reload of optimized resources
+
+4. **Check for extension conflicts:**
+   - Open incognito mode (`Ctrl+Shift+N`)
+   - Test if UI is faster
+   - If yes, disable extensions one by one to find culprit
+
+5. **Verify JavaScript console for errors:**
+   - `F12` > Console tab
+   - Look for red error messages
+   - Errors can cause performance degradation
 
 ---
 
@@ -141,6 +224,72 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 
 ---
 
+#### Browser-specific issues and workarounds
+
+**Chrome-specific issues:**
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Canvas flickers | GPU compositing bug | Enable/disable hardware acceleration |
+| Text appears blurry | Sub-pixel rendering | Zoom to 100%, use canvas zoom instead |
+| File dialog won't open | Extension blocking | Try incognito mode |
+
+**Firefox-specific issues:**
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Slow canvas rendering | WebGL not enabled | Check `about:config` for `webgl.disabled` |
+| Scroll wheel zoom inconsistent | Smooth scrolling | Disable `general.smoothScroll` |
+| Memory grows over time | Memory management | Restart Firefox periodically |
+
+**Safari-specific issues:**
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Keyboard shortcuts conflict | macOS shortcuts | Use app menu alternatives |
+| Touch gestures don't work | Gesture recognition | Use keyboard alternatives |
+| Colors look different | Color profile | Check Display settings |
+
+**Edge-specific issues:**
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Similar to Chrome | Chromium-based | Apply Chrome solutions |
+| Extensions from Chrome store | Compatibility | Enable Chrome extension support |
+
+---
+
+#### Canvas2D or WebGL errors
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Error messages about Canvas2D or WebGL rendering |
+| **Possible Causes** | Graphics driver issues, browser restrictions, GPU blocklist |
+| **Solutions** | Update drivers and check browser settings |
+
+**Troubleshooting steps:**
+
+1. **Update graphics drivers:**
+   - Windows: Device Manager > Display adapters > Update driver
+   - macOS: System Preferences > Software Update
+   - Linux: Use package manager for mesa/nvidia drivers
+
+2. **Check WebGL support:**
+   - Visit `https://get.webgl.org/` to test
+   - If WebGL not working, canvas will fall back to 2D
+
+3. **Reset browser GPU settings:**
+   - Chrome: `chrome://gpu` - Check for issues
+   - Chrome: `chrome://flags/#ignore-gpu-blocklist` - Try enabling
+   - Firefox: `about:support` - Check Graphics section
+
+4. **Disable GPU blocklist** (if safe):
+   - Only if you trust your GPU is functioning correctly
+   - Chrome: `--ignore-gpu-blocklist` flag
+   - Note: May cause instability with problematic drivers
+
+---
+
 ### Memory Issues
 
 #### "Out of memory" errors or browser tab crashes
@@ -163,6 +312,116 @@ Issues related to slow rendering, laggy interactions, or unresponsive UI.
 - Keep projects under 500 entities when possible
 - Save frequently to avoid losing work
 - Use the desktop app for very large projects (better memory management)
+
+---
+
+#### Monitoring and managing memory usage
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Need to track memory usage to prevent crashes |
+| **Possible Causes** | Proactive monitoring requirement |
+| **Solutions** | Use browser tools to monitor memory |
+
+**How to monitor memory:**
+
+1. **Browser Task Manager:**
+   - Chrome/Edge: `Shift+Esc` to open browser task manager
+   - Shows memory per tab
+   - Warning signs: >500MB for single tab
+
+2. **Developer Tools Memory Panel:**
+   - `F12` > Memory tab
+   - Take heap snapshot to see memory allocation
+   - Compare snapshots to find memory leaks
+
+3. **Performance Monitor:**
+   - `F12` > Performance Monitor (Chrome)
+   - Real-time view of JS heap, DOM nodes, listeners
+
+**Memory thresholds:**
+
+| Memory Usage | Status | Action |
+|-------------|--------|--------|
+| < 200 MB | Normal | No action needed |
+| 200-400 MB | Elevated | Consider saving and refreshing |
+| 400-700 MB | High | Save work, close other tabs |
+| > 700 MB | Critical | Save immediately, restart browser |
+
+---
+
+#### Memory leak troubleshooting
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Memory continuously increases over time without releasing |
+| **Possible Causes** | Event listeners not cleaned up, detached DOM nodes, circular references |
+| **Solutions** | Identify and report leak patterns |
+
+**Identifying memory leaks:**
+
+1. **Symptom recognition:**
+   - Memory grows even when idle
+   - Memory doesn't decrease after deleting entities
+   - Browser becomes slower over time
+
+2. **Diagnostic steps:**
+   - Open Memory panel (`F12` > Memory)
+   - Take heap snapshot
+   - Perform action (create/delete entities)
+   - Take another snapshot
+   - Compare snapshots for objects that should be freed
+
+3. **Temporary workarounds:**
+   - Save and refresh periodically (every 30-60 minutes for large projects)
+   - Use the desktop app for extended sessions
+   - Close and reopen browser daily
+
+4. **Reporting memory leaks:**
+   - Note the specific actions that cause memory growth
+   - Include heap snapshot comparison if possible
+   - Report to GitHub issues with reproduction steps
+
+---
+
+#### Reducing memory usage in large projects
+
+| Aspect | Details |
+|--------|---------|
+| **Problem** | Project is too large and causing memory issues |
+| **Possible Causes** | Many entities, complex shapes, undo history |
+| **Solutions** | Optimize project structure |
+
+**Memory reduction strategies:**
+
+1. **Split by floor/area:**
+   - Create separate files for each floor
+   - Link projects via naming convention
+   - Example: `Building-Floor1.sws`, `Building-Floor2.sws`
+
+2. **Simplify complex rooms:**
+   - Use rectangles instead of L-shapes when possible
+   - Break complex shapes into simpler components
+   - Remove unnecessary detail
+
+3. **Clear undo history:**
+   - Large undo stacks consume memory
+   - Save, close, and reopen to clear history
+   - Consider this after major editing sessions
+
+4. **Remove unused elements:**
+   - Delete helper lines and construction geometry
+   - Remove duplicate overlapping entities
+   - Clean up abandoned drafts
+
+**Memory usage by feature:**
+
+| Feature | Memory Impact | Optimization |
+|---------|--------------|--------------|
+| Entities | ~1-5 KB each | Keep under 500 |
+| Undo history | ~10-50 KB per action | Clear periodically |
+| Selection state | ~1-2 KB per entity | Deselect when done |
+| Viewport state | ~5 KB | Minimal impact |
 
 ---
 
