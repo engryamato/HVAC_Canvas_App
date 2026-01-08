@@ -1,9 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 
 export default function CanvasPage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'd' || e.key === 'D' || e.code === 'KeyD')) {
+                e.preventDefault();
+                router.push('/dashboard');
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [router]);
+
     return (
         <div className="h-screen w-screen flex flex-col bg-slate-50 overflow-hidden">
             {/* Tutorial Overlay */}

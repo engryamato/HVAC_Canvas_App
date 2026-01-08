@@ -24,13 +24,6 @@ async function clearProjectStorage(page: Page) {
     await page.evaluate(() => {
         localStorage.clear();
         sessionStorage.clear();
-        indexedDB.databases().then((databases) => {
-            databases.forEach((db) => {
-                if (db.name) {
-                    indexedDB.deleteDatabase(db.name);
-                }
-            });
-        });
     });
     // Reload to apply cleared storage
     await page.reload();
