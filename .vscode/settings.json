@@ -1,3 +1,6 @@
 {
-    "claudeCode.useTerminal": true
+    "claudeCode.useTerminal": true,
+    "chat.mcp.assisted.nuget.enabled": true,
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay"
 }
