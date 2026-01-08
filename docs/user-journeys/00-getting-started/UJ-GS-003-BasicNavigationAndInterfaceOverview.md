@@ -161,8 +161,11 @@ This document provides a comprehensive overview of the HVAC Canvas App interface
 - Responsive layout adapts to window resizing
 
 **Related Elements:**
-- Components: `AppLayout`, `Header`, `Toolbar`, `LeftSidebar`, `RightSidebar`, `Canvas`, `StatusBar`
-- Stores: `LayoutStore` (sidebar states, panel visibility)
+- Components: `AppShell` (composite layout using shadcn/ui primitives)
+  - `ui/card.tsx` - Header and StatusBar base
+  - `ui/sheet.tsx` - Collapsible sidebars
+  - `ui/separator.tsx` - Visual dividers
+- Stores: `useLayoutStore` (sidebar states, panel visibility)
 - Services: `LayoutService`
 
 ### Step 2: Navigating Between Dashboard and Canvas
@@ -246,8 +249,8 @@ File Menu Dropdown:
 - Browser back button behaves as expected
 
 **Related Elements:**
-- Components: `Header`, `Breadcrumb`, `FileMenu`
-- Stores: `AppStateStore` (routing, navigation history)
+- Components: `Header` (built with `Card` variant), `Breadcrumb`, `FileMenu` (using `DropdownMenu` primitive)
+- Stores: `useAppStateStore` (routing, navigation history)
 - Services: `RouterService`, `NavigationService`
 - Routes: `/dashboard`, `/canvas/:projectId`
 
@@ -367,8 +370,8 @@ Left Sidebar - Collapsed:
 - Visual feedback on hover and selection
 
 **Related Elements:**
-- Components: `LeftSidebar`, `EquipmentLibrary`, `CategoryTree`, `SearchBox`
-- Stores: `EquipmentStore`, `LayoutStore`
+- Components: `LeftSidebar` (using `Sheet` primitive), `EquipmentLibrary`, `CategoryTree` (using `Accordion`), `SearchBox` (using `Input`)
+- Stores: `useEquipmentStore`, `useLayoutStore`
 - Services: `EquipmentLibraryService`, `SearchService`
 
 ### Step 4: Understanding the Right Sidebar - Properties and Panels
@@ -502,8 +505,8 @@ Right Sidebar - BOM Panel:
 - Collapse maximizes canvas when panels not needed
 
 **Related Elements:**
-- Components: `RightSidebar`, `PropertiesPanel`, `CalculationsPanel`, `BOMPanel`, `NotesPanel`
-- Stores: `EntityStore`, `BOMStore`, `NotesStore`, `LayoutStore`
+- Components: `RightSidebar` (using `Sheet` and `Tabs` primitives), `PropertiesPanel`, `CalculationsPanel`, `BOMPanel`, `NotesPanel`
+- Stores: `useEntityStore`, `useBOMStore`, `useNotesStore`, `useLayoutStore`
 - Services: `PropertyService`, `CalculationService`, `BOMService`
 
 ### Step 5: Using the Toolbar and Accessing Tools
@@ -607,8 +610,8 @@ Tool Active State:
 - Quick actions provide one-click access to common operations
 
 **Related Elements:**
-- Components: `Toolbar`, `ToolButton`, `ZoomControl`, `GridToggle`
-- Stores: `ToolStore` (active tool), `ViewportStore` (zoom, grid)
+- Components: `Toolbar` (using `Card` with `Button` variants), `ToolButton`, `ZoomControl`, `GridToggle`
+- Stores: `useToolStore` (active tool), `useViewportStore` (zoom, grid)
 - Services: `ToolService`, `ZoomService`
 
 ## 5. Edge Cases and Handling
@@ -954,28 +957,37 @@ Toast Notification: "Cannot execute action - project is read-only"
 ## 8. Related Elements
 
 ### Components
-- `AppLayout`: Main application layout wrapper
-  - Location: `src/components/layout/AppLayout.tsx`
+
+**Layout Components (shadcn/ui architecture):**
+
+- `AppShell`: Main application layout wrapper
+  - Location: `src/components/layout/AppShell.tsx`
+  - Built with: `ui/sheet.tsx`, `ui/card.tsx`, `ui/separator.tsx`
   - Props: `children`, `showSidebars`, `layoutMode`
 
 - `Header`: Top application header with navigation
   - Location: `src/components/layout/Header.tsx`
+  - Built with: `ui/card.tsx` (glassmorphism variant), `ui/button.tsx`
   - Props: `projectName`, `breadcrumb`, `onNavigate`
 
 - `Toolbar`: Tool selection and quick actions bar
   - Location: `src/components/layout/Toolbar.tsx`
+  - Built with: `ui/card.tsx`, `ui/button.tsx` (multiple variants)
   - Props: `activeTool`, `onToolSelect`, `canUndo`, `canRedo`
 
 - `LeftSidebar`: Equipment library and layers
   - Location: `src/components/layout/LeftSidebar.tsx`
+  - Built with: `ui/sheet.tsx`, `ui/accordion.tsx`, `ui/input.tsx`
   - Props: `activeTab`, `collapsed`, `onToggle`
 
 - `RightSidebar`: Properties, calculations, BOM, notes
   - Location: `src/components/layout/RightSidebar.tsx`
+  - Built with: `ui/sheet.tsx`, `ui/tabs.tsx`
   - Props: `activeTab`, `collapsed`, `selectedEntity`
 
 - `StatusBar`: Bottom status information bar
   - Location: `src/components/layout/StatusBar.tsx`
+  - Built with: `ui/card.tsx` (minimal variant)
   - Props: `cursorPos`, `zoom`, `entityCount`, `connectionStatus`
 
 - `Breadcrumb`: Navigation breadcrumb component
@@ -984,28 +996,39 @@ Toast Notification: "Cannot execute action - project is read-only"
 
 - `KeyboardShortcutDialog`: Shortcut reference dialog
   - Location: `src/components/help/KeyboardShortcutDialog.tsx`
+  - Built with: `ui/dialog.tsx`
   - Props: `onClose`, `filterByContext`
 
+**UI Primitives (shadcn/ui):**
+- `ui/card.tsx` - Used for Header, Toolbar, StatusBar
+- `ui/sheet.tsx` - Used for collapsible sidebars
+- `ui/button.tsx` - Used throughout toolbar and actions
+- `ui/tabs.tsx` - Used for right sidebar panels
+- `ui/accordion.tsx` - Used for equipment categories
+- `ui/input.tsx` - Used for search and form inputs
+- `ui/separator.tsx` - Used for visual dividers
+- `ui/dialog.tsx` - Used for modals
+
 ### Zustand Stores
-- `LayoutStore`: UI layout state management
-  - Location: `src/stores/LayoutStore.ts`
+- `useLayoutStore`: UI layout state management
+  - Location: `src/stores/useLayoutStore.ts`
   - State: `leftSidebarCollapsed`, `rightSidebarCollapsed`, `activeLeftTab`, `activeRightTab`
   - Actions: `toggleLeftSidebar()`, `toggleRightSidebar()`, `setActiveTab()`
 
-- `ToolStore`: Active tool and toolbar state
-  - Location: `src/stores/ToolStore.ts`
+- `useToolStore`: Active tool and toolbar state
+  - Location: `src/stores/useToolStore.ts`
   - State: `activeTool`, `toolOptions`
   - Actions: `setActiveTool()`, `updateToolOptions()`
 
-- `ViewportStore`: Canvas viewport state
-  - Location: `src/stores/ViewportStore.ts`
+- `useViewportStore`: Canvas viewport state
+  - Location: `src/stores/useViewportStore.ts`
   - State: `zoom`, `panOffset`, `gridVisible`, `gridSize`
   - Actions: `setZoom()`, `toggleGrid()`, `fitToScreen()`
 
-- `AppStateStore`: Global application state
-  - Location: `src/stores/AppStateStore.ts`
-  - State: `currentRoute`, `navigationHistory`, `isFullscreen`
-  - Actions: `navigate()`, `goBack()`, `toggleFullscreen()`
+- `useAppStateStore`: Global application state
+  - Location: `src/stores/useAppStateStore.ts`
+  - State: `currentRoute`, `navigationHistory`, `isFullscreen`, `hasLaunched`
+  - Actions: `navigate()`, `goBack()`, `toggleFullscreen()`, `setHasLaunched()`
 
 ### Hooks
 - `useLayout`: Layout state and control
@@ -1222,6 +1245,50 @@ Esc: Clear focus / Close modal
 ```
 
 ## 10. Testing
+
+> [!IMPORTANT]
+> **Human-Centric E2E Testing Policy**
+> 
+> All E2E tests for this User Journey MUST follow the strict "Human-Centric" navigation policy established in `docs/TESTING.md`.
+> 
+> **Key Rules**:
+> - ✅ **ALLOWED**: Initial entry via `page.goto('/')` or `page.goto('/dashboard')`
+> - ❌ **PROHIBITED**: Mid-flow `page.goto()` calls to navigate between application states
+> - ✅ **REQUIRED**: All navigation MUST use UI interactions (clicks, form submissions, keyboard shortcuts)
+> - ✅ **REQUIRED**: Visual verification using browser subagent for UI quality assurance
+> 
+> Reference: [E2E Navigation Rules](../../TESTING.md#e2e-navigation-rules)
+
+### Visual Verification with Browser Subagent
+
+Before running automated E2E tests, perform visual verification using the browser subagent to ensure the UI meets premium quality standards:
+
+**Verification Flow**:
+1. **Dashboard Load**: Verify layout, header, project grid visual quality
+2. **Project Open**: Click project card, verify smooth transition to Canvas
+3. **Layout Inspection**: Verify all regions (Header, Toolbar, Sidebars, Canvas, Status Bar) render correctly
+4. **Sidebar Toggle**: Test collapse/expand animations for smoothness
+5. **Tab Switching**: Verify right sidebar tab transitions
+6. **Tool Selection**: Verify active tool highlighting
+7. **Breadcrumb Navigation**: Return to Dashboard via breadcrumb
+8. **State Persistence**: Reopen project, verify sidebar states persisted
+
+**Recording**: All browser subagent sessions must be recorded and stored as proof of visual verification.
+
+**Example Browser Subagent Task**:
+```
+Navigate to http://localhost:3000/dashboard.
+1. Verify the Header shows "SizeWise HVAC Canvas" branding.
+2. Click on the "Office HVAC" project card.
+3. Verify the Canvas page loads with all layout regions visible.
+4. Click the left sidebar toggle button to collapse it.
+5. Press Ctrl+B to expand it again.
+6. Click the "BOM" tab in the right sidebar.
+7. Click the "Duct" tool in the toolbar.
+8. Click the "Dashboard" breadcrumb link.
+9. Verify you are back on the Dashboard.
+STRICT: Do NOT use page.goto() after step 1. All navigation via UI only.
+```
 
 ### Unit Tests
 
