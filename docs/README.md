@@ -5,8 +5,6 @@ Welcome to the technical documentation for the SizeWise HVAC Canvas App. This do
 ## 🚀 Quick Start
 
 - **[Quick Start Guide](./QUICK_START.md)**: Get up and running in 15 minutes
-- **[FAQ](./FAQ.md)**: Frequently asked questions about using the app
-- **[Troubleshooting Guide](./TROUBLESHOOTING.md)**: Solutions for common issues
 - **[System Architecture](./ARCHITECTURE.md)**: Start here to understand how the app works at a high level
 - **[Testing Guide](./TESTING.md)**: Comprehensive testing strategies and examples
 - **[Glossary](./GLOSSARY.md)**: HVAC and technical terms reference
