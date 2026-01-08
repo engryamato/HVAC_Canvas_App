@@ -1,0 +1,8 @@
+{
+  "sourceType": "ideation",
+  "ideationType": "documentation_gaps",
+  "ideaId": "doc-001",
+  "rationale": "README.md is the primary entry point for all developers, contributors, and users discovering the project. An empty README creates a poor first impression and forces visitors to dig through the docs/ folder to understand what the project does. HVAC estimators evaluating this tool would immediately bounce without context.",
+  "category": "documentation",
+  "priority": "high"
+}
