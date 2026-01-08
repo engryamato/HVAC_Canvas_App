@@ -336,9 +336,9 @@ describe('Export Workflow User Journey', () => {
 
     it('should preserve entity order in allIds', () => {
       const entities = ['room-1', 'duct-1', 'equip-1', 'fit-1'].map((id, i) => {
-        if (id.startsWith('room')) return createMockRoom(id, 'Room');
-        if (id.startsWith('duct')) return createMockDuct(id, 'Duct');
-        if (id.startsWith('equip')) return createMockEquipment(id, 'Equip', 'fan');
+        if (id.startsWith('room')) {return createMockRoom(id, 'Room');}
+        if (id.startsWith('duct')) {return createMockDuct(id, 'Duct');}
+        if (id.startsWith('equip')) {return createMockEquipment(id, 'Equip', 'fan');}
         return createMockFitting(id, 'elbow_90');
       });
 

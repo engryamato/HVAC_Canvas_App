@@ -136,7 +136,7 @@ export function exportProjectToCsv(project: ProjectFile, options: ExportCsvOptio
   // Process all entities
   project.entities.allIds.forEach((id) => {
     const entity = project.entities.byId[id];
-    if (!entity) return;
+    if (!entity) {return;}
 
     const entityType = entity.type;
     const props = entity.props as Record<string, unknown>;

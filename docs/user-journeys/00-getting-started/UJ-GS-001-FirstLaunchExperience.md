@@ -103,20 +103,81 @@ This document describes the complete user experience when launching the HVAC Can
 ┌─────────────────────────────────────────────┐
 │                                             │
 │                                             │
-│          ┌─────────────────┐                │
-│          │                 │                │
-│          │   [HVAC LOGO]   │                │
-│          │   Canvas App    │                │
-│          │                 │                │
-│          └─────────────────┘                │
+│         [Application Logo]                  │
+│        (Gradient Background)                │
+│             animate-in                      │
 │                                             │
-│         Loading application...              │
-│         ████████████░░░░░░░░  60%           │
+│         HVAC Canvas App                     │
+│    Initializing canvas engine...            │
+│       (Pulsing Animation)                   │
 │                                             │
-│         Loading equipment library...        │
+│  [━━━━━━━━━━━━━━━━━━━━━━○─────] 70%         │
 │                                             │
 │                                             │
 └─────────────────────────────────────────────┘
+```
+
+**User Feedback:**
+- Splash screen provides visual feedback that application is loading
+- Progress bar shows loading completion percentage
+- Loading messages indicate what's being initialized
+- Premium branding establishes credibility
+
+**Related Elements:**
+- Components: `SplashScreen`, `Progress`, `Card`
+- Services: `AppInitializer`
+- Stores: `AppStateStore`
+
+### Step 2: Welcome Screen Display
+
+**User Actions:**
+1. User reads welcome message and application overview
+2. User reviews feature highlights (3-4 key features)
+3. User decides whether to take Quick Start tutorial or skip
+4. User clicks "Start Tutorial" or "Skip to App" button
+
+**System Response:**
+1. System displays Welcome Screen with animated entrance
+2. System shows application title: "Welcome to HVAC Canvas App"
+3. System displays tagline: "Design professional HVAC systems with ease"
+4. System presents feature highlights with icons:
+   - "Drag-and-drop canvas design"
+   - "Automatic duct routing"
+   - "Real-time calculations"
+   - "Export to industry formats"
+5. System shows two prominent action buttons:
+   - Primary: "Start Quick Tutorial" (blue, recommended)
+   - Secondary: "Skip and Explore" (ghost variant)
+6. System displays checkbox: "Don't show this again"
+7. System waits for user interaction
+8. System tracks user's choice for analytics (tutorial vs. skip)
+
+**Visual State:**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ [Glassmorphism Card]                                    │
+│                                                         │
+│              Welcome to HVAC Canvas                     │
+│    Design professional HVAC systems with ease...        │
+│                                                         │
+│  ┌───────────────┐  ┌───────────────┐  ┌──────────┐     │
+│  │   [Icon]      │  │   [Icon]      │  │  [Icon]  │ ... │
+│  │  Drag-and-    │  │  Auto         │  │  Calc    │     │
+│  │  drop         │  │  Routing      │  │          │     │
+│  └───────────────┘  └───────────────┘  └──────────┘     │
+│      (Hover^)           (Hover^)                        │
+│                                                         │
+│        ┌───────────────────────────────────┐            │
+│        │      Start Quick Tutorial         │ (Primary)  │
+│        └───────────────────────────────────┘            │
+│        ┌───────────────────────────────────┐            │
+│        │      Skip and Explore             │ (Ghost)    │
+│        └───────────────────────────────────┘            │
+│                                                         │
+│  □ Don't show this again                                │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
 **User Feedback:**
@@ -261,43 +322,39 @@ This document describes the complete user experience when launching the HVAC Can
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Tutorial: Step 2 of 5                            [Skip]    │
-├─────────────────────────────────────────────────────────────┤
+│  (Filtered Backdrop / Overlay)                              │
 │                                                             │
-│  ┌──────────────────────────────────────────────┐          │
-│  │  Step 2: Connect Equipment with Ducts        │          │
-│  │  ────────────────────────────────────────    │          │
-│  │                                              │          │
-│  │  Click the Duct Tool in the toolbar,        │          │
-│  │  then click the AHU to start drawing a      │          │
-│  │  duct connection.                            │          │
-│  │                                              │          │
-│  │  [Animation: Cursor clicking Duct Tool]     │          │
-│  │                                              │          │
-│  │            [Next: Step 3] →                  │          │
-│  └──────────────────────────────────────────────┘          │
-│         ↓                                                   │
-│  ═══════════════════════════════════════════════           │
-│  ║ [Line] [Duct] [Select] [Delete] │ Help ║ ← HIGHLIGHTED │
-│  ═══════════════════════════════════════════════           │
-│                                                             │
-│  ┌─────────────────────────────────────────┐               │
-│  │  ┌─────────┐                             │               │
-│  │  │  [AHU]  │ ← Your placed AHU           │               │
-│  │  └─────────┘                             │               │
-│  │                                          │               │
-│  │  (Canvas area with placed equipment)     │               │
-│  │                                          │               │
-│  └─────────────────────────────────────────┘               │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │ [Dialog Primitive]                                  │   │
+│   │                                                     │   │
+│   │  Equipment Placement                          [Skip]│   │
+│   │  (Step 1 of 5)                                      │   │
+│   │                                                     │   │
+│   │  Drag the Air Handler Unit onto the canvas to       │   │
+│   │  begin your design.                                 │   │
+│   │                                                     │   │
+│   │                [Next >]                             │   │
+│   └─────────────────────────────────────────────────────┘   │
+│            ↓                                                │
+│   (Spotlight on Sidebar)                                    │
+│  ┌───────────────┐                                          │
+│  │ EQUIPMENT     │                                          │
+│  │ [AHU] [VAV]   │                                          │
+│  │ [Fan] [Duct]  │                                          │
+│  └───────────────┘                                          │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **User Feedback:**
-- Progress indicator shows position in tutorial (Step X of 5)
+- Progress badge shows clear position in tutorial
 - Highlighted UI areas focus attention on relevant elements
-- Clear instructions with visual animations demonstrate actions
-- Validation feedback confirms correct actions
+- Accessible dialog ensures focus management
+- Clear "Next" and "Skip" actions for control
+
+**Related Elements:**
+- Components: `TutorialOverlay`, `Dialog`, `Canvas`, `Sidebar`
+- Stores: `TutorialStore`
 - Skip option always available for impatient users
 - Completion badge rewards finishing the tutorial
 

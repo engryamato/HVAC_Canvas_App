@@ -39,7 +39,7 @@ export function loadProjectFromStorage(projectId: string): StoredProject | null 
   try {
     const key = `${STORAGE_KEY_PREFIX}${projectId}`;
     const data = localStorage.getItem(key);
-    if (!data) return null;
+    if (!data) {return null;}
     return JSON.parse(data) as StoredProject;
   } catch {
     return null;
@@ -108,7 +108,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
 
   // Build project data for storage
   const buildProjectData = useCallback((): StoredProject | null => {
-    if (!currentProjectId || !projectDetails) return null;
+    if (!currentProjectId || !projectDetails) {return null;}
 
     const entityStore = useEntityStore.getState();
     const viewportStore = useViewportStore.getState();
@@ -139,10 +139,10 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
 
   // Save function
   const save = useCallback((): boolean => {
-    if (!currentProjectId) return false;
+    if (!currentProjectId) {return false;}
 
     const projectData = buildProjectData();
-    if (!projectData) return false;
+    if (!projectData) {return false;}
 
     const success = saveProjectToStorage(currentProjectId, projectData);
 
@@ -205,7 +205,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
 
   // Debounced auto-save - reset timer when changeCounter changes
   useEffect(() => {
-    if (!enabled || !storeIsDirty) return;
+    if (!enabled || !storeIsDirty) {return;}
 
     // Clear existing timer on each change (reset debounce)
     if (debounceTimer.current) {
@@ -227,7 +227,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
 
   // Interval-based auto-save
   useEffect(() => {
-    if (!enabled || !interval) return;
+    if (!enabled || !interval) {return;}
 
     intervalTimer.current = setInterval(() => {
       if (storeIsDirty) {

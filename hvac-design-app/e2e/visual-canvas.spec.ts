@@ -464,7 +464,7 @@ test.describe('Canvas Visual Tests', () => {
     test('should display canvas with multiple entity types', async ({ page }) => {
       const canvas = page.locator('canvas').first();
       const box = await canvas.boundingBox();
-      if (!box) return;
+      if (!box) {return;}
 
       // Create a room
       await page.keyboard.press('r');
@@ -497,7 +497,7 @@ test.describe('Canvas Visual Tests', () => {
     test('should display full page with complete design', async ({ page }) => {
       const canvas = page.locator('canvas').first();
       const box = await canvas.boundingBox();
-      if (!box) return;
+      if (!box) {return;}
 
       // Create multiple entities
       await page.keyboard.press('r');

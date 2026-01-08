@@ -384,7 +384,7 @@ test.describe('Critical User Journey - Complete HVAC Design Workflow', () => {
         await expect(canvas).toBeVisible({ timeout: 10000 });
 
         const box = await canvas.boundingBox();
-        if (!box) throw new Error('Canvas not found');
+        if (!box) {throw new Error('Canvas not found');}
 
         // Rapidly create multiple rooms
         await page.keyboard.press('r');
