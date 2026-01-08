@@ -62,18 +62,20 @@ export const Toolbar: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => setZoom(Math.max(25, zoom - 25))}
+                    data-testid="zoom-out"
                 >
                     <ZoomOut className="w-4 h-4" />
                 </Button>
-                <span className="text-sm font-medium w-12 text-center">{zoom}%</span>
+                <span className="text-sm font-medium w-12 text-center" data-testid="zoom-level">{zoom}%</span>
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setZoom(Math.min(400, zoom + 25))}
+                    data-testid="zoom-in"
                 >
                     <ZoomIn className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={fitToScreen}>
+                <Button variant="ghost" size="sm" onClick={fitToScreen} data-testid="zoom-fit">
                     <Maximize2 className="w-4 h-4" />
                 </Button>
             </div>
@@ -83,10 +85,10 @@ export const Toolbar: React.FC = () => {
 
             {/* Undo/Redo */}
             <div className="flex gap-1">
-                <Button variant="ghost" size="sm" disabled>
+                <Button variant="ghost" size="sm" disabled data-testid="undo">
                     <Undo className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" disabled>
+                <Button variant="ghost" size="sm" disabled data-testid="redo">
                     <Redo className="w-4 h-4" />
                 </Button>
             </div>

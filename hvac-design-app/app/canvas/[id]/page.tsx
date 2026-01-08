@@ -13,8 +13,14 @@ export default function CanvasPage() {
     const params = useParams();
     const router = useRouter();
     const projectId = params.id as string;
-    const { getProject } = useProjectStore();
-    const project = getProject(projectId);
+    const [isMounted, setIsMounted] = React.useState(false);
+    const project = useProjectStore((state) => state.projects.find((p) => p.id === projectId));
+    const projectsCount = useProjectStore((state) => state.projects.length);
+
+    useEffect(() => {
+        setIsMounted(true);
+        console.log(`CanvasPage mounted. ProjectID: ${projectId}, Found: ${!!project}, TotalProjects: ${projectsCount}`);
+    }, [projectId, project, projectsCount]);
 
     // Keyboard shortcut: Ctrl+Shift+D to go back to Dashboard
     useEffect(() => {
@@ -29,8 +35,11 @@ export default function CanvasPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [router]);
 
+    if (!isMounted) return <div className="h-screen w-screen bg-slate-50" />;
+
     // Redirect if project not found
     if (!project) {
+        console.log('Project not found, rendering error state');
         return (
             <div className="h-screen w-screen flex items-center justify-center">
                 <div className="text-center">
