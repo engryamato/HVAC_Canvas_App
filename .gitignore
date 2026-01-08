@@ -13,6 +13,15 @@ node_modules/
 dist/
 build/
 
-# IDE
+# IDE and Metadata
 .vscode/
 .idea/
+.continue/
+.claude/
+.worktrees/
+.auto-claude/
+.auto-claude-status
+.claude_settings.json
+
+# Windows junk
+nul
