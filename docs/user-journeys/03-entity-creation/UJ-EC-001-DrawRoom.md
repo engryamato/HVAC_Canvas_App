@@ -25,15 +25,19 @@ This user journey covers the complete workflow for creating a room entity on the
 
 ### Step 1: Activate Room Tool
 
-**User Action**: Press `R` key OR click "Room" button in toolbar
+**User Action**: Press `R` key OR click "Room" button in toolbar OR click "Room" in **FAB (Floating Action Button)** tool menu
 
 **Expected Result**:
 - Room tool becomes active
+- FAB menu closes (if was open)
 - Toolbar shows Room button as selected (highlighted state)
 - Cursor changes to crosshair (+) when over canvas
 - Previous tool deactivates gracefully
 - Status bar shows: "Room Tool: Click and drag to create room"
 - Inspector panel shows empty state with hint: "Draw a room to see properties"
+- **Room size** is changeable by:
+  * Dragging while drawing (interactive preview)
+  * Specifying exact dimensions in Inspector after creation (numeric inputs)
 
 **Validation Method**: E2E test
 ```typescript

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This user journey covers editing existing project metadata (name, project number, client name, location) from the canvas editor, including accessing the edit dialog, form validation, saving changes, and updating the UI across all components.
+This user journey covers editing existing project metadata from the canvas editor's **Left Sidebar (Sizable Drawer)**, which displays project information in a 3-section accordion format: Project Details, Project Scope, and Site Conditions. Users can modify all fields, save changes, and see updates reflected across the application.
 
 ## PRD References
 
@@ -23,51 +23,74 @@ This user journey covers editing existing project metadata (name, project number
 
 ## User Journey Steps
 
-### Step 1: Open Edit Project Dialog
+### Step 1: Open Edit Project  Metadata (Left Sidebar)
 
-**User Action**: Click "Edit" icon button in left sidebar project details section OR use keyboard shortcut `Ctrl/Cmd+I`
+**User Action**: User is in Canvas Editor with Left Sidebar visible. Click "Edit" icon button in the **Project Details** accordion header OR use keyboard shortcut `Ctrl/Cmd+I`
 
 **Expected Result**:
-- Edit Project Dialog modal opens
-- Dialog overlays canvas with backdrop
-- Dialog title: "Edit Project Details"
-- Form pre-populated with current values:
-  - Project Name: "Office Building HVAC" (focused, selected)
-  - Project Number: "2025-001"
-  - Client Name: "Acme Corporation"
-  - Location: "123 Main St, Chicago, IL"
-- "Save" button enabled (even without changes)
-- "Cancel" button enabled
-- Dialog is centered on screen
-- Focus on Project Name field
+- **Left Sidebar** (sizable drawer) displays project metadata in editable mode
+- Sidebar shows **3 accordion sections**:
+  
+  **1. Project Details** (expanded, now editable):
+  - Project Name: "Office Building HVAC" (text input, focused, selected)
+  - Location: "123 Main St, Chicago, IL" (text input)
+  - Client: "Acme Corporation" (text input)
+  
+  **2. Project Scope** (can expand/collapse):
+  - Scope: ☑ HVAC, ☐ For future updates (disabled)
+  - Material (Multiple Select with nested dropdowns):
+    * ☑ Galvanized Steel → [G-60, **G-90** ← selected]
+    * ☑ Stainless Steel → [304 S.S., 316 S.S., ...]
+    * ☐ Aluminum
+    * ☐ PVC
+  - Project Type: [Residential, **Commercial** ←, Industrial]
+  
+  **3. Site Conditions** (can expand/collapse):
+  - Elevation: "650" (numeric input, unit: ft)
+  - Outdoor Temperature: "95" (numeric input, unit: °F)
+  - Indoor Temperature: "72" (numeric input, unit: °F)
+  - Wind Speed: "15" (numeric input, unit: mph)
+  - Humidity: "45" (numeric input, unit: %)
+  - Local Codes: "IMC 2021, ASHRAE 62.1" (text input)
+
+- "Save" button visible at bottom of sidebar
+- "Cancel" button visible  (reverts changes)
+- Focus on Project Name field (selected text)
 
 **Validation Method**: E2E test
 ```typescript
 await page.click('[aria-label="Edit project details"]');
 
-await expect(page.locator('dialog')).toBeVisible();
-await expect(page.locator('dialog h2')).toHaveText('Edit Project Details');
+await expect(page.locator('.left-sidebar')).toBeVisible();
 await expect(page.locator('input[name="name"]')).toHaveValue('Office Building HVAC');
 await expect(page.locator('input[name="name"]')).toBeFocused();
+
+// Verify accordions
+await expect(page.locator('text=Project Details')).toBeVisible();
+await expect(page.locator('text=Project Scope')).toBeVisible();
+await expect(page.locator('text=Site Conditions')).toBeVisible();
 ```
 
 ---
 
-### Step 2: Edit Project Name
+### Step 2: Edit Project Name and Basic Details
 
-**User Action**: Change project name from "Office Building HVAC" to "Downtown Office Tower HVAC"
+**User Action**: In the **Project Details** section:
+- Change project name from "Office Building HVAC" to "Downtown Office Tower HVAC"
+- Change location to "456 Commerce St, Suite 200, Chicago, IL 60607"
+- Change client to "Acme Corp - Facilities Division"
 
 **Expected Result**:
-- Text updates in input field as typed
-- Character counter shows "28/100"
+- Text updates in input fields as typed
+- Character counter shows "28/100" for project name
 - No validation errors (valid length)
-- "Save" button remains enabled
-- Form marked as dirty (has changes)
+- "Save" button highlights/becomes enabled (if disabled initially)
+- Sidebar marked as modified (unsaved changes indicator)
 
 **Validation Method**: Unit test
 ```typescript
-it('allows editing project name', () => {
-  const { getByLabelText } = render(<EditProjectDialog project={mockProject} />);
+it('allows editing project name and details', () => {
+  const { getByLabelText } = render(<LeftSidebar project={mockProject} />);
 
   const nameInput = getByLabelText('Project Name');
   fireEvent.change(nameInput, { target: { value: 'Downtown Office Tower HVAC' } });
@@ -79,27 +102,47 @@ it('allows editing project name', () => {
 
 ---
 
-### Step 3: Edit Optional Fields
+### Step 3: Edit Project Scope and Site Conditions
 
-**User Action**: Update optional fields:
-- Project Number: "2025-001" → "2025-007-REV-A"
-- Client Name: "Acme Corporation" → "Acme Corp - Facilities Division"
-- Location: "123 Main St, Chicago, IL" → "456 Commerce St, Suite 200, Chicago, IL 60607"
+**User Action**: Expand **Project Scope** accordion and update:
+- Add "Aluminum" to materials (check the box)
+- Change Galvanized Steel grade from "G-90" to "G-60"
+- Change Project Type from "Commercial" to "Industrial"
+
+Expand **Site Conditions** accordion and update:
+- Elevation: "650" → "1200"
+- Outdoor Temperature: "95" → "102"
+- Wind Speed: "15" → "25"
 
 **Expected Result**:
-- All fields update as typed
-- No validation errors (optional fields have no strict format)
-- Character counters update (if applicable)
-- "Save" button remains enabled
-- Unsaved changes indicator appears (asterisk in dialog title)
+- All accordion sections expand/collapse smoothly
+- Material sub-dropdowns appear when checkbox is checked
+- All fields update as typed/selected
+- Numeric fields validate input (reject non-numeric characters)
+- Unit hints remain visible
+- Unsaved changes indicator persists
+- "Save" button remains highlighted/enabled
 
 **Validation Method**: E2E test
 ```typescript
-await page.fill('[name="projectNumber"]', '2025-007-REV-A');
-await page.fill('[name="clientName"]', 'Acme Corp - Facilities Division');
-await page.fill('[name="location"]', '456 Commerce St, Suite 200, Chicago, IL 60607');
+if (await page.locator('button:has-text("Project Scope")').getAttribute('aria-expanded') === 'false') {
+  await page.click('button:has-text("Project Scope")');
+}
 
-await expect(page.locator('[name="projectNumber"]')).toHaveValue('2025-007-REV-A');
+await page.check('input[value="Aluminum"]');
+await page.selectOption('select[name="galvanizedSteelGrade"]', 'G-60');
+await page.selectOption('select[name="projectType"]', 'Industrial');
+
+if (await page.locator('button:has-text("Site Conditions")').getAttribute('aria-expanded') === 'false') {
+  await page.click('button:has-text("Site Conditions")');
+}
+
+await page.fill('[name="elevation"]', '1200');
+await page.fill('[name="outdoorTemp"]', '102');
+await page.fill('[name="windSpeed"]', '25');
+
+await expect(page.locator('[name="elevation"]')).toHaveValue('1200');
+await expect(page.locator('select[name="projectType"]')).toHaveValue('Industrial');
 ```
 
 ---

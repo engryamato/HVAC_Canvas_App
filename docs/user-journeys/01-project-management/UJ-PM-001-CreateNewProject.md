@@ -29,11 +29,35 @@ This user journey covers the complete workflow for creating a new HVAC design pr
 **Expected Result**:
 - NewProjectDialog modal opens
 - Dialog title reads "Create New Project"
-- Form shows 4 input fields:
-  - Project Name (required, focused)
-  - Project Number (optional)
-  - Client Name (optional)
-  - Location (optional)
+- Form displays **3 collapsible accordion sections**:
+  
+  **1. Project Details** (expanded by default)
+  - Project Name (required, focused, text input)
+  - Location (optional, text input)
+  - Client (optional, text input)
+  
+  **2. Project Scope** (collapsed by default)
+  - Scope (Multiple Select, checkboxes):
+    * ☐ HVAC (checked by default)
+    * ☐ For future updates (disabled/grayed out)
+  - Material (Multiple Select with nested dropdowns):
+    * ☐ Galvanized Steel → Dropdown: [G-60, G-90]
+    * ☐ Stainless Steel → Dropdown: [304 S.S., 316 S.S., 409 S.S., 430 S.S., 444 S.S.]
+    * ☐ Aluminum
+    * ☐ PVC
+  - Project Type (Dropdown, single select):
+    * Options: [Residential, Commercial, Industrial]
+    * Default: Residential
+  
+  **3. Site Conditions** (collapsed by default)
+  - Elevation (Numeric/Text field, with unit hint: "ft" or "m")
+  - Outdoor Temperature (Numeric/Text field, hint: "°F" or "°C")
+  - Indoor Temperature (Numeric/Text field, hint: "°F" or "°C")
+  - Wind Speed (Numeric/Text field, hint: "mph" or "km/h")
+  - Humidity (Numeric/Text field, hint: "%")
+  - Local Codes (Text field)
+  - *Note*: All Site Conditions auto-populate if location data is available
+  
 - "Create" button is disabled (no name entered yet)
 - "Cancel" button is enabled
 
@@ -42,6 +66,15 @@ This user journey covers the complete workflow for creating a new HVAC design pr
 await page.click('button:has-text("New Project")');
 await expect(page.locator('dialog')).toBeVisible();
 await expect(page.locator('input[name="projectName"]')).toBeFocused();
+
+// Verify accordions present
+await expect(page.locator('text=Project Details')).toBeVisible();
+await expect(page.locator('text=Project Scope')).toBeVisible();
+await expect(page.locator('text=Site Conditions')).toBeVisible();
+
+// Verify defaults
+await expect(page.locator('input[type="checkbox"][value="HVAC"]')).toBeChecked();
+await expect(page.locator('select[name="projectType"]')).toHaveValue('Residential');
 ```
 
 ---
@@ -71,23 +104,49 @@ it('enables create button when project name is valid', () => {
 
 ---
 
-### Step 3: Enter Optional Metadata
+### Step 3: Enter Optional Metadata (Scope and Site Conditions)
 
-**User Action**: Fill in optional fields:
-- Project Number: "2025-001"
-- Client Name: "Acme Corporation"
-- Location: "123 Main St, Chicago, IL"
+**User Action**: Expand "Project Scope" accordion and configure:
+- Scope: Keep "HVAC" checked
+- Material: 
+  * Check "Galvanized Steel" → Select "G-90" from dropdown
+  * Check "Stainless Steel" → Select "304 S.S." from dropdown
+- Project Type: Select "Commercial"
+
+Then expand "Site Conditions" accordion and enter:
+- Elevation: "650"
+- Outdoor Temperature: "95"
+- Indoor Temperature: "72"
+- Wind Speed: "15"
+- Humidity: "45"
+- Local Codes: "IMC 2021, ASHRAE 62.1"
 
 **Expected Result**:
-- All values appear in respective fields
-- No validation errors
+- All selected values appear in their respective fields/checkboxes
+- Material sub-dropdowns only visible when parent checkbox is checked
+- No validation errors (all fields are optional)
+- Numeric fields accept both integer and decimal values
+- Unit hints remain visible beside each numeric field
 - "Create" button remains enabled
 
 **Validation Method**: E2E test
 ```typescript
-await page.fill('[name="projectNumber"]', '2025-001');
-await page.fill('[name="clientName"]', 'Acme Corporation');
-await page.fill('[name="location"]', '123 Main St, Chicago, IL');
+// Expand and fill Scope
+await page.click('button:has-text("Project Scope")');
+await page.check('input[value="Galvanized Steel"]');
+await page.selectOption('select[name="galvanizedSteelGrade"]', 'G-90');
+await page.check('input[value="Stainless Steel"]');
+await page.selectOption('select[name="stainlessSteelGrade"]', '304 S.S.');
+await page.selectOption('select[name="projectType"]', 'Commercial');
+
+// Expand and fill Site Conditions
+await page.click('button:has-text("Site Conditions")');
+await page.fill('[name="elevation"]', '650');
+await page.fill('[name="outdoorTemp"]', '95');
+await page.fill('[name="indoorTemp"]', '72');
+await page.fill('[name="windSpeed"]', '15');
+await page.fill('[name="humidity"]', '45');
+await page.fill('[name="localCodes"]', 'IMC 2021, ASHRAE 62.1');
 ```
 
 ---
@@ -101,7 +160,13 @@ await page.fill('[name="location"]', '123 Main St, Chicago, IL');
 - Button becomes disabled during creation
 - New project is created with:
   - Generated UUID (e.g., `550e8400-e29b-41d4-a716-446655440000`)
-  - Entered metadata
+  - **Entered metadata**:
+    * **Project Details**: name, location, client
+    * **Project Scope**: 
+      - scope: ["HVAC"]
+      - materials: [{ type: "Galvanized Steel", grade: "G-90" }, { type: "Stainless Steel", grade: "304 S.S." }]
+      - projectType: "Commercial"
+    * **Site Conditions**: elevation, outdoorTemp, indoorTemp, windSpeed, humidity, localCodes
   - createdAt: current timestamp
   - modifiedAt: current timestamp
   - entityCount: 0
@@ -113,7 +178,7 @@ await page.fill('[name="location"]', '123 Main St, Chicago, IL');
 
 **Validation Method**: Integration test
 ```typescript
-it('creates project and navigates to canvas', async () => {
+it('creates project with complete metadata and navigates to canvas', async () => {
   const router = { push: vi.fn() };
   const { addProject } = useProjectListStore.getState();
 
@@ -122,6 +187,11 @@ it('creates project and navigates to canvas', async () => {
   fireEvent.change(getByLabelText('Project Name'), {
     target: { value: 'Office Building HVAC' }
   });
+  
+  // Fill Scope
+  fireEvent.click(getByText('Project Scope'));
+  fireEvent.click(getByLabelText('Galvanized Steel'));
+  fireEvent.change(getByLabelText('Galvanized Steel Grade'), { target: { value: 'G-90' } });
 
   fireEvent.click(getByText('Create'));
 
@@ -129,6 +199,9 @@ it('creates project and navigates to canvas', async () => {
     const projects = useProjectListStore.getState().projects;
     expect(projects).toHaveLength(1);
     expect(projects[0].name).toBe('Office Building HVAC');
+    expect(projects[0].scope.materials).toContainEqual({ type: 'Galvanized Steel', grade: 'G-90' });
+    expect(projects[0].scope.projectType).toBe('Commercial');
+    expect(projects[0].siteConditions.elevation).toBe('650');
     expect(projects[0].id).toMatch(/^[0-9a-f]{8}-/); // UUID format
   });
 
@@ -144,11 +217,26 @@ it('creates project and navigates to canvas', async () => {
 
 **Expected Result**:
 - Canvas editor page loads at `/canvas/{projectId}`
-- Left sidebar shows project details:
+- Left sidebar shows **3-section accordion** with project details:
+  
+  **Project Details** (expanded):
   - Name: "Office Building HVAC"
-  - Number: "2025-001"
-  - Client: "Acme Corporation"
   - Location: "123 Main St, Chicago, IL"
+  - Client: "Acme Corporation"
+  
+  **Project Scope** (collapsed):
+  - Scope: HVAC ✓
+  - Materials: Galvanized Steel (G-90), Stainless Steel (304 S.S.)
+  - Project Type: Commercial
+  
+  **Site Conditions** (collapsed):
+  - Elevation: 650 ft
+  - Outdoor Temperature: 95°F
+  - Indoor Temperature: 72°F
+  - Wind Speed: 15 mph
+  - Humidity: 45%
+  - Local Codes: IMC 2021, ASHRAE 62.1
+
 - Canvas is empty (no entities)
 - Status bar shows "Entities: 0"
 - Select tool is active by default
@@ -156,8 +244,18 @@ it('creates project and navigates to canvas', async () => {
 **Validation Method**: E2E test
 ```typescript
 await expect(page).toHaveURL(/\/canvas\//);
-await expect(page.locator('h1')).toHaveText('Office Building HVAC');
+await expect(page.locator('h2:has-text("Office Building HVAC")')).toBeVisible();
 await expect(page.locator('.status-bar')).toContainText('Entities: 0');
+
+// Expand and verify Scope
+await page.click('button:has-text("Project Scope")');
+await expect(page.locator('text=Commercial')).toBeVisible();
+await expect(page.locator('text=Galvanized Steel (G-90)')).toBeVisible();
+
+// Expand and verify Site Conditions
+await page.click('button:has-text("Site Conditions")');
+await expect(page.locator('text=Elevation: 650 ft')).toBeVisible();
+await expect(page.locator('text=95°F')).toBeVisible();
 ```
 
 ---

@@ -81,29 +81,41 @@ it('loads source project data for duplication', async () => {
   - **New UUID**: `crypto.randomUUID()`
   - **New name**: "Office Building HVAC - Copy"
   - **New timestamps**: createdAt and modifiedAt set to now
-  - **Copied metadata**: projectNumber, clientName, location preserved
-  - **Entity copy**: All entities deep-cloned (same IDs or new IDs)
+  - **Copied metadata**: All project details, scope, and site conditions preserved
+  - **Entity copy**: All entities deep-cloned
   - **Settings copy**: All canvas settings preserved
 
 ```typescript
 const duplicateProject: Project = {
   id: crypto.randomUUID(),
   name: `${sourceProject.name} - Copy`,
-  projectNumber: sourceProject.projectNumber,
-  clientName: sourceProject.clientName,
   location: sourceProject.location,
+  client: sourceProject.client,
+  scope: {
+    types: [...sourceProject.scope.types],
+    materials: sourceProject.scope.materials.map(m => ({...m})),
+    projectType: sourceProject.scope.projectType
+  },
+  siteConditions: {
+    elevation: sourceProject.siteConditions?.elevation,
+    outdoorTemp: sourceProject.siteConditions?.outdoorTemp,
+    indoorTemp: sourceProject.siteConditions?.indoorTemp,
+    windSpeed: sourceProject.siteConditions?.windSpeed,
+    humidity: sourceProject.siteConditions?.humidity,
+    localCodes: sourceProject.siteConditions?.localCodes
+  },
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   entityCount: sourceProject.entityCount,
-  thumbnailUrl: null,  // Will regenerate
-  isArchived: false    // Never archive duplicates
+  thumbnailUrl: null,
+  isArchived: false
 };
 
 const duplicateFile: ProjectFile = {
   schemaVersion: sourceData.schemaVersion,
   projectId: duplicateProject.id,
   projectMetadata: duplicateProject,
-  entities: sourceData.entities,  // Deep clone
+  entities: sourceData.entities,
   viewportState: sourceData.viewportState,
   settings: sourceData.settings
 };
@@ -111,12 +123,14 @@ const duplicateFile: ProjectFile = {
 
 **Validation Method**: Unit test
 ```typescript
-it('creates duplicate with unique ID and modified name', () => {
+it('creates duplicate with unique ID and preserves all metadata', () => {
   const source = mockProject;
   const duplicate = createDuplicate(source);
 
   expect(duplicate.id).not.toBe(source.id);
   expect(duplicate.name).toBe(`${source.name} - Copy`);
+  expect(duplicate.scope.materials).toEqual(source.scope.materials);
+  expect(duplicate.siteConditions.elevation).toBe(source.siteConditions.elevation);
   expect(duplicate.createdAt).not.toBe(source.createdAt);
 });
 ```

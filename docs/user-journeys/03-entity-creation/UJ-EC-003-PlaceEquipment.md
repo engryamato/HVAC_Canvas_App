@@ -25,7 +25,7 @@ This user journey covers placing HVAC equipment entities (furnaces, air handlers
 
 ### Step 1: Activate Equipment Tool
 
-**User Action**: Press `E` key OR click "Equipment" button in toolbar
+**User Action**: Press `E` key OR click "Equipment" button in toolbar OR select from **FAB (Floating Action Button)** tool menu
 
 **Expected Result**:
 - Equipment tool becomes active
