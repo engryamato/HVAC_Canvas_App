@@ -1,0 +1,13 @@
+{
+  "task_description": "Improve user journey documentation by expanding docs/UserJourney.md to cover the complete user experience including dashboard, project management, and export workflows",
+  "scoped_services": ["main"],
+  "files_to_modify": ["docs/UserJourney.md"],
+  "files_to_reference": [
+    "docs/elements/01-components/dashboard/ProjectCard.md",
+    "docs/elements/01-components/export/ExportMenu.md"
+  ],
+  "patterns": {
+    "documentation": "Markdown files with section headers and code references"
+  },
+  "created_at": "2026-01-06T09:01:00Z"
+}

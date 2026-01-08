@@ -1,0 +1,90 @@
+{
+  "complexity": "simple",
+  "workflow_type": "simple",
+  "confidence": 0.90,
+  "reasoning": "This is a documentation-only task focused on improving the existing UserJourney.md file. The scope is limited to 1-2 markdown files with no code changes, no external integrations, and no infrastructure impact. The existing documentation is comprehensive but could benefit from structural or content improvements.",
+
+  "analysis": {
+    "scope": {
+      "estimated_files": 2,
+      "estimated_services": 1,
+      "is_cross_cutting": false,
+      "notes": "Primary file is docs/UserJourney.md (32 lines). May also update docs/README.md if navigation improvements are needed."
+    },
+    "integrations": {
+      "external_services": [],
+      "new_dependencies": [],
+      "research_needed": false,
+      "notes": "No external integrations. Pure documentation improvement task."
+    },
+    "infrastructure": {
+      "docker_changes": false,
+      "database_changes": false,
+      "config_changes": false,
+      "notes": "No infrastructure impact - documentation files only."
+    },
+    "knowledge": {
+      "patterns_exist": true,
+      "research_required": false,
+      "unfamiliar_tech": [],
+      "notes": "Existing documentation patterns are well-established in docs/ directory. The UserJourney.md already follows a clear walkthrough format with code references."
+    },
+    "risk": {
+      "level": "low",
+      "concerns": [],
+      "notes": "Documentation-only changes carry minimal risk. No functional code is modified."
+    }
+  },
+
+  "recommended_phases": [
+    "discovery",
+    "quick_spec",
+    "validation"
+  ],
+
+  "flags": {
+    "needs_research": false,
+    "needs_self_critique": false,
+    "needs_infrastructure_setup": false
+  },
+
+  "validation_recommendations": {
+    "risk_level": "trivial",
+    "skip_validation": true,
+    "minimal_mode": true,
+    "test_types_required": [],
+    "security_scan_required": false,
+    "staging_deployment_required": false,
+    "reasoning": "Documentation-only changes to markdown files with no functional code modifications. No testing required as changes do not affect application behavior."
+  },
+
+  "existing_documentation_analysis": {
+    "primary_file": "docs/UserJourney.md",
+    "current_length": "32 lines",
+    "current_format": "Numbered walkthrough with code file references",
+    "covers_scenarios": [
+      "Canvas navigation and viewport controls",
+      "Room creation and sizing",
+      "Duct drawing and inspection",
+      "Equipment placement",
+      "Entity selection and manipulation",
+      "Property editing and validation",
+      "Undo/redo operations",
+      "Final cleanup"
+    ],
+    "related_files": [
+      "docs/README.md - Links to UserJourney.md",
+      "hvac-design-app/e2e/critical-user-journey.spec.ts - E2E test implementing user journey"
+    ],
+    "potential_improvements": [
+      "Add table of contents for navigation",
+      "Include visual diagrams or screenshots",
+      "Add more user scenarios (multi-room layouts, advanced workflows)",
+      "Improve formatting with headers and sections",
+      "Add troubleshooting section",
+      "Cross-reference with E2E test scenarios"
+    ]
+  },
+
+  "created_at": "2025-01-06T00:00:00.000Z"
+}
