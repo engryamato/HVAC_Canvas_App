@@ -53,10 +53,7 @@ function validateDebugMode() {
 
   if (debugMode === undefined) {
     warn('NEXT_PUBLIC_DEBUG_MODE is not set, defaulting to false');
-    return true;
-  }
-
-  if (debugMode === 'true' && isProductionBuild()) {
+  } else if (debugMode === 'true' && isProductionBuild()) {
     error('NEXT_PUBLIC_DEBUG_MODE is set to true in production build!');
     error('This will expose debug information to end users.');
     error('');
@@ -65,9 +62,10 @@ function validateDebugMode() {
     error('2. Ensure NEXT_PUBLIC_DEBUG_MODE=false');
     error('3. Remove any .env.local overrides for production builds');
     return false;
+  } else {
+    success(`DEBUG_MODE is correctly set to: ${debugMode}`);
   }
 
-  success(`DEBUG_MODE is correctly set to: ${debugMode}`);
   return true;
 }
 
@@ -79,14 +77,12 @@ function validateNodeEnv() {
 
   if (!nodeEnv) {
     warn('NODE_ENV is not set');
-    return true;
-  }
-
-  if (nodeEnv !== 'production' && nodeEnv !== 'development' && nodeEnv !== 'test') {
+  } else if (nodeEnv !== 'production' && nodeEnv !== 'development' && nodeEnv !== 'test') {
     warn(`NODE_ENV is set to non-standard value: ${nodeEnv}`);
+  } else {
+    success(`NODE_ENV is set to: ${nodeEnv}`);
   }
 
-  success(`NODE_ENV is set to: ${nodeEnv}`);
   return true;
 }
 
