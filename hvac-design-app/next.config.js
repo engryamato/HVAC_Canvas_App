@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 
 const isStaticExport = process.env.NEXT_STATIC_EXPORT === 'true';
 
