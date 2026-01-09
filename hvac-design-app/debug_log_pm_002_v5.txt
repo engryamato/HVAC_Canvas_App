@@ -1,0 +1,43 @@
+npm warn exec The following package was not found and will be installed: playwright@1.57.0
+Error: Cannot find module '@playwright/test'
+Require stack:
+- /app/playwright.config.ts
+- /root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/transform/transform.js
+- /root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/common/configLoader.js
+- /root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/program.js
+- /root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/cli.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at Module.resolveFilename [as _resolveFilename] (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/transform/transform.js:240:36)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (node:internal/modules/helpers:152:16)
+    at Object.<anonymous> (/app/playwright.config.ts:1:1)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Module.newCompile2 (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/third_party/pirates.js:46:29)
+    at Object.<anonymous> (node:internal/modules/cjs/loader:1893:10)
+    at Object.newLoader2 [as .ts] (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/third_party/pirates.js:52:22)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (node:internal/modules/helpers:152:16)
+    at requireOrImport (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/transform/transform.js:218:18)
+    at loadUserConfig (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/common/configLoader.js:107:89)
+    at loadConfig (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/common/configLoader.js:119:28)
+    at loadConfigFromFile (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/common/configLoader.js:331:10)
+    at runTests (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/program.js:197:18)
+    at r.<anonymous> (/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/program.js:70:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/app/playwright.config.ts',
+    '/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/transform/transform.js',
+    '/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/common/configLoader.js',
+    '/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/lib/program.js',
+    '/root/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/cli.js'
+  ]
+}

@@ -47,6 +47,25 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   // Set project ID in store when route loads
   useEffect(() => {
     try {
+      // Handle tutorial projects specially - they don't exist in storage
+      // but we need to allow the tutorial flow to proceed
+      if (projectId.startsWith('tutorial-')) {
+        // Create a temporary tutorial project with minimal data
+        const tutorialProject = {
+          id: projectId,
+          name: 'Tutorial Project',
+          projectNumber: '',
+          clientName: '',
+          location: '',
+          scope: { details: [], materials: [], projectType: 'Residential' },
+          siteConditions: { elevation: '', outdoorTemp: '', indoorTemp: '', windSpeed: '', humidity: '', localCodes: '' },
+          createdAt: new Date().toISOString(),
+          modifiedAt: new Date().toISOString(),
+        };
+        loadProject(tutorialProject);
+        return;
+      }
+
       const persistedProject = getProject(projectId);
 
       if (!persistedProject) {
@@ -62,7 +81,10 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
       // Check version compatibility
       const projVersion = (persistedProject as any).version || '1.0.0';
+      console.log(`[CanvasPageWrapper] Project: ${persistedProject.name}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
+
       if (compareVersions(projVersion, APP_VERSION) > 0) {
+        console.log('[CanvasPageWrapper] Version mismatch detected');
         setProjectVersion(projVersion);
         setVersionWarning(true);
         return; // Wait for user decision

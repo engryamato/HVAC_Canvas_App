@@ -13,6 +13,7 @@ import { useAutoSave, useKeyboardShortcuts } from './hooks';
 import styles from './CanvasPage.module.css';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { redo, undo, useCanRedo, useCanUndo } from '@/core/commands';
+import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 
 /**
  * CanvasPage - Main canvas page with all components
@@ -127,6 +128,9 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
       {/* Bottom Status Bar */}
       <StatusBar mousePosition={mousePosition} />
+
+      {/* Tutorial Overlay - renders when tutorial is active */}
+      <TutorialOverlay />
     </div>
   );
 }

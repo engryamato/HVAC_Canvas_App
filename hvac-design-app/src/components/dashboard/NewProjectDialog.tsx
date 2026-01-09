@@ -51,6 +51,17 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
 
     const isValid = projectName.trim().length > 0 && projectName.length <= 100;
 
+    // Helper for non-secure contexts (Docker) where crypto.randomUUID might be missing
+    const generateId = () => {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+
     const handleCreate = async () => {
         if (!isValid) return;
 
@@ -67,8 +78,10 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
             if (matAluminum) materials.push({ type: 'Aluminum' });
             if (matPvc) materials.push({ type: 'PVC' });
 
+            const newId = generateId();
+
             const newProject = {
-                id: crypto.randomUUID(),
+                id: newId,
                 name: projectName.trim(),
                 projectNumber: projectNumber.trim() || null,
                 clientName: clientName.trim() || null,

@@ -25,6 +25,7 @@ export interface Project {
     entityCount: number;
     thumbnailUrl?: string | null;
     isArchived: boolean;
+    version?: string; // App version when created/modified
 }
 
 interface ProjectStoreState {

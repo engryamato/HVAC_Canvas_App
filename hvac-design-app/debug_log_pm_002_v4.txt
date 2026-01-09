@@ -1,0 +1,697 @@
+
+Running 27 tests using 1 worker
+
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓   1 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:126:9 › UJ-PM-002: Open Existing Project › Strict Flow: Open Project from Dashboard (1.4s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓   2 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:225:9 › UJ-PM-002: Open Existing Project › Step 4: Opening Project from File System (770ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓   3 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:258:9 › UJ-PM-002: Open Existing Project › Step 5: Auto-Opening Last Project (576ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓   4 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:322:9 › UJ-PM-002: Open Existing Project › Edge Case: Project Corrupted or Invalid Data (1.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   5 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (6.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   6 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (retry #1) (6.6s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   7 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (retry #2) (6.3s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   8 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (6.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   9 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #1) (6.6s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  10 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #2) (6.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  11 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:437:9 › UJ-PM-002: Open Existing Project › Keyboard Shortcuts: Dashboard Navigation (1.4s)
+  ✓  12 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:487:9 › UJ-PM-002: Open Existing Project › Verify Recent Projects Section (240ms)
+  ✓  13 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:516:9 › UJ-PM-002: Open Existing Project › Empty State: No Projects (203ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  14 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:126:9 › UJ-PM-002: Open Existing Project › Strict Flow: Open Project from Dashboard (2.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  15 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:225:9 › UJ-PM-002: Open Existing Project › Step 4: Opening Project from File System (967ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  16 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:258:9 › UJ-PM-002: Open Existing Project › Step 5: Auto-Opening Last Project (794ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  17 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:322:9 › UJ-PM-002: Open Existing Project › Edge Case: Project Corrupted or Invalid Data (1.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  18 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (6.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  19 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (retry #1) (7.7s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  20 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (retry #2) (7.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  21 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (7.0s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  22 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #1) (7.3s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  23 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #2) (6.8s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  24 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:437:9 › UJ-PM-002: Open Existing Project › Keyboard Shortcuts: Dashboard Navigation (2.1s)
+  ✓  25 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:487:9 › UJ-PM-002: Open Existing Project › Verify Recent Projects Section (502ms)
+  ✓  26 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:516:9 › UJ-PM-002: Open Existing Project › Empty State: No Projects (317ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  27 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:126:9 › UJ-PM-002: Open Existing Project › Strict Flow: Open Project from Dashboard (2.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  28 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:225:9 › UJ-PM-002: Open Existing Project › Step 4: Opening Project from File System (1.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  29 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:258:9 › UJ-PM-002: Open Existing Project › Step 5: Auto-Opening Last Project (1.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  30 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:322:9 › UJ-PM-002: Open Existing Project › Edge Case: Project Corrupted or Invalid Data (2.0s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  31 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (7.0s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  32 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (retry #1) (7.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  33 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (retry #2) (7.0s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  34 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (6.9s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  35 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #1) (7.3s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  36 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #2) (6.9s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  37 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:437:9 › UJ-PM-002: Open Existing Project › Keyboard Shortcuts: Dashboard Navigation (2.2s)
+  ✓  38 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:487:9 › UJ-PM-002: Open Existing Project › Verify Recent Projects Section (1.0s)
+  ✓  39 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:516:9 › UJ-PM-002: Open Existing Project › Empty State: No Projects (846ms)
+
+
+  1) [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version › Edge Case: Version Mismatch Handling 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium-retry2/error-context.md
+
+  2) [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure › Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry2/error-context.md
+
+  3) [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version › Edge Case: Version Mismatch Handling 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-firefox-retry2/error-context.md
+
+  4) [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure › Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry2/error-context.md
+
+  5) [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version › Edge Case: Version Mismatch Handling 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/newer.*version/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/newer.*version/i)[22m
+
+
+      390 |
+      391 |             // Verify version warning appears
+    > 392 |             await expect(page.getByText(/newer.*version/i)).toBeVisible();
+          |                                                             ^
+      393 |
+      394 |             // Verify options presented
+      395 |             // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:392:61
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:378:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-970fd-tch---Newer-Project-Version-webkit-retry2/error-context.md
+
+  6) [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure › Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:403:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry2/error-context.md
+
+  6 failed
+    [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version 
+    [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure 
+    [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version 
+    [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure 
+    [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:369:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version 
+    [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:400:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure 
+  21 passed (2.7m)

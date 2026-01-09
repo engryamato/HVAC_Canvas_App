@@ -1,0 +1,146 @@
+
+Running 6 tests using 1 worker
+
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: BROWSER LOG: Test Log from Page Evaluate
+BROWSER LOG: [NewProjectDialog] handleCreate called
+BROWSER LOG: [NewProjectDialog] isValid: true, isLoading: false
+BROWSER LOG: [NewProjectDialog] Starting creation...
+BROWSER LOG: [NewProjectDialog] Generated ID: 0cbcdeba-f0af-4892-8e95-aa6ce1968c0f
+BROWSER LOG: [NewProjectDialog] Calling addProject...
+BROWSER LOG: [NewProjectDialog] addProject success. Navigating...
+BROWSER LOG: [NewProjectDialog] Navigation initiated
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  1 [chromium] › e2e/01-project-management/uj-pm-001-create-project.spec.ts:33:9 › UJ-PM-001: Create New Project › Strict Flow: Create Project with Full Metadata (3.0s)
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+  ✓  2 [chromium] › e2e/01-project-management/uj-pm-001-create-project.spec.ts:188:9 › UJ-PM-001: Create New Project › Edge Case: Project Name Too Long (279ms)
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: BROWSER LOG: Test Log from Page Evaluate
+BROWSER LOG: [NewProjectDialog] handleCreate called
+BROWSER LOG: [NewProjectDialog] isValid: true, isLoading: false
+BROWSER LOG: [NewProjectDialog] Starting creation...
+BROWSER LOG: [NewProjectDialog] Generated ID: 04e6d946-089f-457d-845e-0e76ef671794
+BROWSER LOG: [NewProjectDialog] Calling addProject...
+BROWSER LOG: [NewProjectDialog] addProject success. Navigating...
+BROWSER LOG: [NewProjectDialog] Navigation initiated
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  3 [firefox] › e2e/01-project-management/uj-pm-001-create-project.spec.ts:33:9 › UJ-PM-001: Create New Project › Strict Flow: Create Project with Full Metadata (4.2s)
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+  ✓  4 [firefox] › e2e/01-project-management/uj-pm-001-create-project.spec.ts:188:9 › UJ-PM-001: Create New Project › Edge Case: Project Name Too Long (611ms)
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: BROWSER LOG: Test Log from Page Evaluate
+BROWSER LOG: [NewProjectDialog] handleCreate called
+BROWSER LOG: [NewProjectDialog] isValid: true, isLoading: false
+BROWSER LOG: [NewProjectDialog] Starting creation...
+BROWSER LOG: [NewProjectDialog] Generated ID: 2777586e-28c0-442c-9f1e-d04501d943a4
+BROWSER LOG: [NewProjectDialog] Calling addProject...
+BROWSER LOG: [NewProjectDialog] addProject success. Navigating...
+BROWSER LOG: [NewProjectDialog] Navigation initiated
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  5 [webkit] › e2e/01-project-management/uj-pm-001-create-project.spec.ts:33:9 › UJ-PM-001: Create New Project › Strict Flow: Create Project with Full Metadata (6.3s)
+BROWSER LOG: [NewProjectDialog] Rendered. Open: false
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+BROWSER LOG: [NewProjectDialog] Rendered. Open: true
+  ✓  6 [webkit] › e2e/01-project-management/uj-pm-001-create-project.spec.ts:188:9 › UJ-PM-001: Create New Project › Edge Case: Project Name Too Long (991ms)
+
+  6 passed (18.0s)

@@ -1,0 +1,409 @@
+
+Running 27 tests using 1 worker
+
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"0848a949-38ef-4a81-8ef8-ca099fe64acf","name":"Office HVAC","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T18:14:05.221Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"a96347e9-2fa2-4976-97d1-8ee7a6fe81c4","name":"Warehouse A","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T20:14:05.221Z","entityCount":8,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"d0a8012e-5536-4da6-8a70-850f872d65f0","name":"Retail Store","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-15T00:00:00.000Z","entityCount":15,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Office HVAC, Version: 1.0.0, App Version: 1.0.0
+  ✓   1 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:127:9 › UJ-PM-002: Open Existing Project › Strict Flow: Open Project from Dashboard (1.4s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: File System Project, Version: 1.0.0, App Version: 1.0.0
+  ✓   2 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:226:9 › UJ-PM-002: Open Existing Project › Step 4: Opening Project from File System (773ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Auto Open Project, Version: 1.0.0, App Version: 1.0.0
+  ✓   3 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:259:9 › UJ-PM-002: Open Existing Project › Step 5: Auto-Opening Last Project (574ms)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"dae5b087-cc05-45fc-8a0a-6819a51c7469","clientName":"Invalid Data","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓   4 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:323:9 › UJ-PM-002: Open Existing Project › Edge Case: Project Corrupted or Invalid Data (1.2s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"96d342e5-bff3-446f-aafa-5a17d52724ac","name":"Future Version Project","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"99.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Future Version Project, Version: 99.0.0, App Version: 1.0.0
+BROWSER LOG: [CanvasPageWrapper] Version mismatch detected
+  ✓   5 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:370:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (1.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   6 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (6.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   7 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #1) (6.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘   8 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #2) (6.2s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"ccf3a4e6-71b3-4324-a4d7-c087b02309ce","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"c941e532-3414-45f2-b3b8-d1d33ad027fb","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"64622896-e737-4311-a927-06e4c30ac91a","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Project 1, Version: 1.0.0, App Version: 1.0.0
+  ✓   9 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:437:9 › UJ-PM-002: Open Existing Project › Keyboard Shortcuts: Dashboard Navigation (1.4s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"893e72bb-adcb-48c5-8446-f5ac1a4f136d","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"adbc7249-c655-46a7-8542-ced076d5f6a5","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"4047b509-6335-4d4b-ad4b-2c857a97cff8","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-07T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"157fa59e-0ab0-43ee-b0fd-0b886d1cae62","name":"Project 4","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-06T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"6521ce85-c3fa-4be5-9ba6-13fe6ea26e7b","name":"Project 5","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-05T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"1b5f773c-8521-4952-9f79-1cccd500ce34","name":"Project 6","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-04T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"270356e2-43cf-456d-a1ee-4283aabccf2c","name":"Project 7","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-03T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"247ffd33-ae5b-43d0-8a53-a7b9a0db78a3","name":"Project 8","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-02T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"75774536-5900-460f-a584-b7c8eddbd69f","name":"Project 9","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-01T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"4f69f33f-0c5f-4529-96b4-ff7a147627d0","name":"Project 10","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-31T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"5b6421ee-2e16-441d-84c2-81702fc3a84a","name":"Project 11","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-30T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"33d62be8-6186-4d32-97da-827269a43f68","name":"Project 12","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-29T20:14:32.195Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+  ✓  10 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:487:9 › UJ-PM-002: Open Existing Project › Verify Recent Projects Section (256ms)
+  ✓  11 [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:516:9 › UJ-PM-002: Open Existing Project › Empty State: No Projects (205ms)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"8a826ebf-dc96-41ca-98e0-2d412ec7bb11","name":"Office HVAC","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T18:14:34.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"eb7dfc32-bfd2-4330-90b9-869933366b7b","name":"Warehouse A","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T20:14:34.001Z","entityCount":8,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"4e4aad19-4db4-4a74-a305-9137acf3a03b","name":"Retail Store","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-15T00:00:00.000Z","entityCount":15,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Office HVAC, Version: 1.0.0, App Version: 1.0.0
+  ✓  12 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:127:9 › UJ-PM-002: Open Existing Project › Strict Flow: Open Project from Dashboard (2.2s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: File System Project, Version: 1.0.0, App Version: 1.0.0
+  ✓  13 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:226:9 › UJ-PM-002: Open Existing Project › Step 4: Opening Project from File System (981ms)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Auto Open Project, Version: 1.0.0, App Version: 1.0.0
+  ✓  14 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:259:9 › UJ-PM-002: Open Existing Project › Step 5: Auto-Opening Last Project (806ms)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"e6936cb5-766c-41fb-9b91-2c0938708313","clientName":"Invalid Data","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  15 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:323:9 › UJ-PM-002: Open Existing Project › Edge Case: Project Corrupted or Invalid Data (1.5s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"6fdddfff-6471-4302-b3a5-78fd2c6ac398","name":"Future Version Project","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"99.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Future Version Project, Version: 99.0.0, App Version: 1.0.0
+BROWSER LOG: [CanvasPageWrapper] Version mismatch detected
+  ✓  16 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:370:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (1.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  17 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (6.4s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  18 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #1) (7.1s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  19 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #2) (6.8s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"f55d2ba5-973f-431a-8b0a-f0ba55a48189","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"18375d46-2c27-4857-a236-dc3fbd82cc17","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"d2180603-72f9-46ba-b89d-875c28f43662","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Project 1, Version: 1.0.0, App Version: 1.0.0
+  ✓  20 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:437:9 › UJ-PM-002: Open Existing Project › Keyboard Shortcuts: Dashboard Navigation (2.1s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"02480425-2867-4012-beff-c7cd34f41fe7","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"e34fa85a-8557-40bc-b6fa-5d57bb21652f","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"9256e2d9-e2c9-4fda-beb2-8fa5eda370f5","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-07T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"99fa1762-61a1-4aca-ad05-da8c01d9271c","name":"Project 4","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-06T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"c2bdffcc-24c4-42c2-b782-96e25e504c0f","name":"Project 5","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-05T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"dacf7f79-de4c-437e-9e39-d1eff2f710c3","name":"Project 6","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-04T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"e693aeda-c2ae-48c0-9451-f4635ace4a90","name":"Project 7","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-03T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"5f792f52-3c95-4ea9-bd08-71f18c3de2b2","name":"Project 8","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-02T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"1ab6de0f-0f65-42cb-a07b-18065fa11448","name":"Project 9","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-01T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"0ab4f194-e8ba-47c6-8e49-268812876ce8","name":"Project 10","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-31T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"f4c37cc4-e4b3-4572-878b-3690ec3eb4bd","name":"Project 11","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-30T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"dab35f7c-8581-4805-ab45-1e2815895be9","name":"Project 12","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-29T20:15:05.880Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+  ✓  21 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:487:9 › UJ-PM-002: Open Existing Project › Verify Recent Projects Section (505ms)
+  ✓  22 [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:516:9 › UJ-PM-002: Open Existing Project › Empty State: No Projects (317ms)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"ac410004-0112-4058-aefc-c1c80f729655","name":"Office HVAC","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T18:15:08.215Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"3466f743-4340-4387-8da7-bacddd5e23af","name":"Warehouse A","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T20:15:08.216Z","entityCount":8,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"483131fa-57ab-4eea-824d-4d1ab59c695d","name":"Retail Store","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-15T00:00:00.000Z","entityCount":15,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Office HVAC, Version: 1.0.0, App Version: 1.0.0
+  ✓  23 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:127:9 › UJ-PM-002: Open Existing Project › Strict Flow: Open Project from Dashboard (2.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: File System Project, Version: 1.0.0, App Version: 1.0.0
+  ✓  24 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:226:9 › UJ-PM-002: Open Existing Project › Step 4: Opening Project from File System (1.5s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Auto Open Project, Version: 1.0.0, App Version: 1.0.0
+  ✓  25 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:259:9 › UJ-PM-002: Open Existing Project › Step 5: Auto-Opening Last Project (1.3s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"c9590af1-ef44-4553-a8a3-b36f078445c7","clientName":"Invalid Data","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✓  26 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:323:9 › UJ-PM-002: Open Existing Project › Edge Case: Project Corrupted or Invalid Data (2.0s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"98fdf4cf-1655-467d-9f92-367c8aa65b5a","name":"Future Version Project","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"99.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Future Version Project, Version: 99.0.0, App Version: 1.0.0
+BROWSER LOG: [CanvasPageWrapper] Version mismatch detected
+  ✓  27 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:370:9 › UJ-PM-002: Open Existing Project › Edge Case: Version Mismatch - Newer Project Version (2.0s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  28 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (6.9s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  29 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #1) (7.3s)
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+  ✘  30 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure (retry #2) (6.9s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"d057164f-6e8c-4569-b69a-713d9c9c7e9b","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"9687d013-22a7-4b5b-a10d-fd770046f9b9","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"522e4d9a-d046-4cd3-a4b9-d058d88ab13e","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+BROWSER LOG: [CanvasPageWrapper] Project: Project 1, Version: 1.0.0, App Version: 1.0.0
+  ✓  31 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:437:9 › UJ-PM-002: Open Existing Project › Keyboard Shortcuts: Dashboard Navigation (2.2s)
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"f6d350e1-7ba9-4549-a91f-9f49bd25e0f8","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"31303f2e-9a7b-46a5-b76d-3715109ded30","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"8541b0b3-8f16-4f5d-bc2a-b7682ab073f6","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-07T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"53120856-6b68-4cbd-8198-11afe8d39778","name":"Project 4","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-06T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"25a81279-3d69-4be8-81fb-7b8f37f81afa","name":"Project 5","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-05T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"99bedc3c-4910-41f3-a0c2-9ec9c2e53b31","name":"Project 6","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-04T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"9e27bc95-1c49-46ff-89ec-3f47af59a22e","name":"Project 7","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-03T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"2a70b320-742d-4e84-a37c-443d80036917","name":"Project 8","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-02T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"428068b1-60ae-4b7a-b0f1-fe47a1b5b82c","name":"Project 9","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-01T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"c7df2c29-e88e-4db1-a8ce-3ebf8be6e4ae","name":"Project 10","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-31T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"e831bb0d-8882-4921-9b55-abb0a906726e","name":"Project 11","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-30T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"848e5cf2-fb3e-4e75-b5d1-91a11b7b178d","name":"Project 12","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-12-29T20:15:42.128Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+  ✓  32 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:487:9 › UJ-PM-002: Open Existing Project › Verify Recent Projects Section (986ms)
+  ✓  33 [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:516:9 › UJ-PM-002: Open Existing Project › Empty State: No Projects (858ms)
+
+
+  1) [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure › Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium-retry2/error-context.md
+
+  2) [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure › Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-firefox-retry2/error-context.md
+
+  3) [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure › Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project/i)[22m
+
+
+      426 |
+      427 |             // Verify error message displayed
+    > 428 |             await expect(page.getByText(/unable to load project/i)).toBeVisible();
+          |                                                                     ^
+      429 |             // Or check for specific error code
+      430 |             // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
+      431 |
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:428:69
+        at /app/e2e/01-project-management/uj-pm-002-open-project.spec.ts:404:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-webkit-retry2/error-context.md
+
+  3 failed
+    [chromium] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure 
+    [firefox] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure 
+    [webkit] › e2e/01-project-management/uj-pm-002-open-project.spec.ts:401:9 › UJ-PM-002: Open Existing Project › Error Scenario: IndexedDB Read Failure 
+  24 passed (1.6m)

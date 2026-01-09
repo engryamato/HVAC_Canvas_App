@@ -39,7 +39,11 @@ test.describe('UJ-PM-001: Create New Project', () => {
 
             // Expected Result: NewProjectDialog modal opens
             await expect(page.getByTestId('new-project-dialog')).toBeVisible();
-            await expect(page.getByText('Create New Project')).toBeVisible();
+            await expect(page.getByRole('heading', { name: 'Create New Project' })).toBeVisible();
+
+            // Wait for dialog to be fully interactive (React hydration)
+            await page.waitForLoadState('networkidle');
+            await page.waitForTimeout(300); // Small delay for animations
 
             // Verify 3 collapsible accordion sections
             await expect(page.getByText('Project Details')).toBeVisible();
@@ -47,11 +51,15 @@ test.describe('UJ-PM-001: Create New Project', () => {
             await expect(page.getByText('Site Conditions')).toBeVisible();
 
             // Verify Defaults (Project Scope checked, Residential default)
-            const scopeTrigger = page.getByRole('button', { name: 'Project Scope' });
-            await scopeTrigger.click();
+            const dialog = page.getByTestId('new-project-dialog');
+            const scopeTrigger = dialog.getByRole('button', { name: 'Project Scope' });
+            await scopeTrigger.click({ force: true });
             await expect(scopeTrigger).toHaveAttribute('aria-expanded', 'true');
 
-            await expect(page.getByLabel('HVAC')).toBeChecked();
+            // Wait for accordion content to fully expand
+            const hvacCheckbox = page.locator('#scope-hvac');
+            await expect(hvacCheckbox).toBeVisible();
+            await expect(hvacCheckbox).toHaveAttribute('data-state', 'checked');
             await expect(page.getByRole('combobox', { name: 'Project Type' })).toContainText('Residential');
 
             // "Create" button is disabled
@@ -82,21 +90,27 @@ test.describe('UJ-PM-001: Create New Project', () => {
         // --- Step 3: Enter Optional Metadata ---
         await test.step('Step 3: Enter Optional Metadata', async () => {
             // User Action: Expand "Project Scope" and configure
-            const scopeTrigger = page.getByRole('button', { name: 'Project Scope' });
-            if ((await scopeTrigger.getAttribute('aria-expanded')) !== 'true') {
-                await scopeTrigger.click();
+            // User Action: Expand "Project Scope" and configure
+            const dialog = page.getByTestId('new-project-dialog');
+            const scopeTrigger = dialog.getByRole('button', { name: 'Project Scope' });
+
+            // Unconditionally click if we need to expand, or verify check
+            // Use standard check - if aria-expanded is false, click
+            if (await scopeTrigger.getAttribute('aria-expanded') !== 'true') {
+                await scopeTrigger.click({ force: true });
             }
+            // Add explicit wait
             await expect(page.getByLabel('Galvanized Steel')).toBeVisible();
 
             // Material - Galvanized Steel
-            await page.getByLabel('Galvanized Steel').check();
+            await page.getByRole('checkbox', { name: 'Galvanized Steel' }).click();
             // Click the Grade select trigger to open dropdown
             await page.getByLabel('Galvanized Steel Grade').click();
             // Click the G-90 option
             await page.getByRole('option', { name: 'G-90' }).click();
 
             // Material - Stainless Steel
-            await page.getByLabel('Stainless Steel').check();
+            await page.getByRole('checkbox', { name: 'Stainless Steel' }).click();
             // Click the Grade select trigger to open dropdown
             await page.getByLabel('Stainless Steel Grade').click();
             // Click the 304 S.S. option
@@ -107,12 +121,13 @@ test.describe('UJ-PM-001: Create New Project', () => {
             await page.getByRole('option', { name: 'Commercial' }).click();
 
             // Site Conditions
-            const siteConditionsTrigger = page.getByRole('button', { name: 'Site Conditions' });
-            if ((await siteConditionsTrigger.getAttribute('aria-expanded')) !== 'true') {
-                await siteConditionsTrigger.click();
+            // Site Conditions
+            const siteConditionsTrigger = dialog.getByRole('button', { name: 'Site Conditions' });
+            if (await siteConditionsTrigger.getAttribute('aria-expanded') !== 'true') {
+                await siteConditionsTrigger.click({ force: true });
             }
             // Wait for accordion animation and fields to be visible
-            await expect(page.getByLabel('Elevation')).toBeVisible();
+            await expect(page.getByLabel('Elevation (ft)')).toBeVisible();
             await page.getByLabel('Elevation (ft)').fill('650');
             await page.getByLabel('Outdoor Temp (°F)').fill('95');
             await page.getByLabel('Indoor Temp (°F)').fill('72');

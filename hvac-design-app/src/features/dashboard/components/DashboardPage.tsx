@@ -7,7 +7,7 @@ import { SearchBar } from './SearchBar';
 import { RecentProjectsSection } from './RecentProjectsSection';
 import { AllProjectsSection } from './AllProjectsSection';
 import { Plus, FolderOpen } from 'lucide-react';
-import { NewProjectDialog } from './NewProjectDialog';
+import { NewProjectDialog } from '@/components/dashboard/NewProjectDialog';
 import { FileMenu } from '@/components/layout/FileMenu';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
 
@@ -120,7 +120,7 @@ export function DashboardPage() {
                         Create New Project
                     </button>
                 </div>
-                <NewProjectDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+                <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
             </div>
         );
     }
@@ -162,7 +162,7 @@ export function DashboardPage() {
                 <AllProjectsSection projects={filteredProjects} searchTerm={searchTerm} />
             </div>
 
-            <NewProjectDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+            <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </div>
     );
 }

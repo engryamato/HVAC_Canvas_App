@@ -11,3 +11,16 @@ services:
     environment:
       - NODE_ENV=production
     restart: always
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.57.0-jammy
+    container_name: hvac-playwright
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - hvac-app
+    command: npx playwright test
+    environment:
+      - CI=true

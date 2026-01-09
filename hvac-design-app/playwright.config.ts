@@ -42,8 +42,8 @@ export default defineConfig({
 
   /* Shared settings for all the projects below */
   use: {
-    /* Base URL for all tests */
-    baseURL: 'http://localhost:3000',
+    /* Base URL for all tests. On CI/Docker, use the service name. */
+    baseURL: process.env.CI ? 'http://hvac-app:3000' : 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
@@ -78,10 +78,11 @@ export default defineConfig({
   ],
 
   /* Run local dev server before starting the tests */
-  webServer: {
+  /* Only run webServer if NOT in CI/Docker (host mode) */
+  webServer: process.env.CI ? undefined : {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120 * 1000,
   },
 });
