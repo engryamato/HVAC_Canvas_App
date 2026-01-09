@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { CanvasContainer } from './components/CanvasContainer';
 import { Toolbar } from './components/Toolbar';
+import { ProjectSidebar } from './components/ProjectSidebar';
 import { StatusBar } from './components/StatusBar';
 import { ZoomControls } from './components/ZoomControls';
 import InspectorPanel from './components/Inspector/InspectorPanel';
@@ -99,6 +100,9 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
       {/* Main content area */}
       <div className="flex flex-1 overflow-hidden">
+        {/* Project Sidebar - Leftmost */}
+        <ProjectSidebar className="flex-shrink-0" />
+
         {/* Left Toolbar */}
         <Toolbar className="flex-shrink-0" />
 

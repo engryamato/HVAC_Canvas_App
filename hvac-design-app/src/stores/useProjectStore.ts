@@ -7,6 +7,19 @@ export interface Project {
     projectNumber?: string | null;
     clientName?: string | null;
     location?: string | null;
+    scope: {
+        details: string[];
+        materials: { type: string; grade?: string }[];
+        projectType: string;
+    };
+    siteConditions: {
+        elevation: string;
+        outdoorTemp: string;
+        indoorTemp: string;
+        windSpeed: string;
+        humidity: string;
+        localCodes: string;
+    };
     createdAt: string;
     modifiedAt: string;
     entityCount: number;

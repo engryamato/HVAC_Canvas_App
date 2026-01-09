@@ -147,6 +147,32 @@ export const ProjectFileSchema = z.object({
 
 export type ProjectFile = z.infer<typeof ProjectFileSchema>;
 
+
+/**
+ * Project Scope Schema
+ */
+export const ProjectScopeSchema = z.object({
+  details: z.array(z.string()),
+  materials: z.array(z.object({ type: z.string(), grade: z.string().optional() })),
+  projectType: z.string(),
+});
+
+export type ProjectScope = z.infer<typeof ProjectScopeSchema>;
+
+/**
+ * Site Conditions Schema
+ */
+export const SiteConditionsSchema = z.object({
+  elevation: z.string(),
+  outdoorTemp: z.string(),
+  indoorTemp: z.string(),
+  windSpeed: z.string(),
+  humidity: z.string(),
+  localCodes: z.string(),
+});
+
+export type SiteConditions = z.infer<typeof SiteConditionsSchema>;
+
 /**
  * Project details for simplified project metadata
  */
@@ -155,6 +181,8 @@ export const ProjectDetailsSchema = z.object({
   projectName: z.string().min(1).max(100),
   projectNumber: z.string().max(50).optional(),
   clientName: z.string().max(100).optional(),
+  scope: ProjectScopeSchema.optional(),
+  siteConditions: SiteConditionsSchema.optional(),
   createdAt: z.string().datetime(),
   modifiedAt: z.string().datetime(),
 });

@@ -58,7 +58,7 @@ export default defineConfig({
     viewport: { width: 1280, height: 720 },
 
     /* Disable animations for consistent screenshots */
-    reducedMotion: 'reduce',
+    // reducedMotion: 'reduce',
   },
 
   /* Configure projects for major browsers */

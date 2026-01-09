@@ -83,7 +83,7 @@ export const WelcomeScreen: React.FC = () => {
 
                     <div className="mt-6 flex items-center gap-2">
                         <input type="checkbox" id="dont-show" className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                        <label htmlFor="dont-show" className="text-slate-500 text-sm">Don't show this again</label>
+                        <label htmlFor="dont-show" className="text-slate-500 text-sm">Don&apos;t show this again</label>
                     </div>
                 </div>
 
