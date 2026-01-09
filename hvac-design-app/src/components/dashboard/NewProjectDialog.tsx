@@ -99,7 +99,8 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
             resetForm();
             router.push(`/canvas/${newProject.id}`);
         } catch (error) {
-            console.error('Failed to create project:', error);
+            // Error handling: Form validation should prevent most errors
+            // Future: Add toast notification for user feedback
         } finally {
             setIsLoading(false);
         }

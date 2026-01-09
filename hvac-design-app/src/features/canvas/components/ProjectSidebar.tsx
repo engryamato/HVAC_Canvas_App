@@ -19,9 +19,7 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
         return <div className={cn("w-64 bg-background border-r p-4", className)}>No Project Loaded</div>;
     }
 
-    const { projectName, projectNumber, clientName, location, scope, siteConditions } = projectDetails as any; // Cast to any because TS might strictly infer without new fields if I didn't update types perfectly in core store?? 
-    // Wait, I strictly updated ProjectDetailsSchema usage. ProjectDetails interface is inferred from schema.
-    // So type should be correct.
+    const { projectName, projectNumber, clientName, location, scope, siteConditions } = projectDetails;
 
     return (
         <div className={cn("w-64 bg-background border-r flex flex-col overflow-hidden", className)}>
@@ -55,7 +53,7 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
                                     </ul>
                                     <div className="font-medium mt-2">Materials</div>
                                     <ul className="list-disc list-inside pl-1 text-muted-foreground">
-                                        {scope.materials?.map((m: any) => (
+                                        {scope.materials?.map((m) => (
                                             <li key={m.type}>{m.type} {m.grade ? `(${m.grade})` : ''}</li>
                                         ))}
                                     </ul>
