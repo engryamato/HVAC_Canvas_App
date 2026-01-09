@@ -1,8 +1,7 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStateStore } from '@/stores/useAppStateStore';
+import { useAutoOpen } from '@/hooks/useAutoOpen';
 import { SplashScreen } from './SplashScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 
@@ -11,6 +10,9 @@ export const AppInitializer: React.FC = () => {
     const { hasLaunched, isFirstLaunch } = useAppStateStore();
     const [showSplash, setShowSplash] = useState(true);
     const [mounted, setMounted] = useState(false);
+
+    // Auto-open last project if enabled
+    useAutoOpen();
 
     useEffect(() => {
         setMounted(true);
@@ -24,7 +26,7 @@ export const AppInitializer: React.FC = () => {
         }
     };
 
-    if (!mounted) {return null;} // Avoid hydration mismatch
+    if (!mounted) { return null; } // Avoid hydration mismatch
 
     if (showSplash) {
         return <SplashScreen onComplete={handleSplashComplete} />;

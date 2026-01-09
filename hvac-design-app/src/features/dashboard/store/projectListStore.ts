@@ -6,6 +6,7 @@ export interface ProjectListItem {
   projectName: string;
   projectNumber?: string;
   clientName?: string;
+  entityCount?: number; // Number of entities in project
   createdAt: string;
   modifiedAt: string;
   storagePath: string;
@@ -14,6 +15,7 @@ export interface ProjectListItem {
 
 interface ProjectListState {
   projects: ProjectListItem[];
+  recentProjectIds: string[]; // Max 10 project IDs, ordered by access time (most recent first)
   loading: boolean;
   error?: string;
 }
@@ -25,6 +27,7 @@ interface ProjectListActions {
   archiveProject: (projectId: string) => void;
   restoreProject: (projectId: string) => void;
   duplicateProject: (projectId: string, newName: string) => void;
+  markAsOpened: (projectId: string) => void; // Track project access for Recent Projects
 }
 
 type ProjectListStore = ProjectListState & ProjectListActions;
@@ -35,6 +38,7 @@ export const useProjectListStore = create<ProjectListStore>()(
   persist(
     (set, get) => ({
       projects: [],
+      recentProjectIds: [],
       loading: false,
 
       addProject: (project) => {
@@ -95,6 +99,28 @@ export const useProjectListStore = create<ProjectListStore>()(
         };
         set((state) => ({ projects: [newProject, ...state.projects] }));
       },
+
+      markAsOpened: (projectId) => {
+        set((state) => {
+          // Update modifiedAt timestamp
+          const updatedProjects = state.projects.map((p) =>
+            p.projectId === projectId
+              ? { ...p, modifiedAt: new Date().toISOString() }
+              : p
+          );
+
+          // Update recent list: add to front, remove duplicates, limit to 5
+          const newRecent = [
+            projectId,
+            ...state.recentProjectIds.filter((id) => id !== projectId),
+          ].slice(0, 5);
+
+          return {
+            projects: updatedProjects,
+            recentProjectIds: newRecent,
+          };
+        });
+      },
     }),
     { name: INDEX_KEY }
   )
@@ -105,6 +131,15 @@ export const useActiveProjects = () =>
   useProjectListStore((state) => state.projects.filter((p) => !p.isArchived));
 export const useArchivedProjects = () =>
   useProjectListStore((state) => state.projects.filter((p) => p.isArchived));
+
+// Selector for recent projects (max 10, ordered by access time)
+export const useRecentProjects = () =>
+  useProjectListStore((state) => {
+    return state.recentProjectIds
+      .map((id) => state.projects.find((p) => p.projectId === id))
+      .filter((p): p is ProjectListItem => p !== undefined);
+  });
+
 export const useProjectListActions = () =>
   useProjectListStore((state) => ({
     addProject: state.addProject,
@@ -113,4 +148,5 @@ export const useProjectListActions = () =>
     archiveProject: state.archiveProject,
     restoreProject: state.restoreProject,
     duplicateProject: state.duplicateProject,
+    markAsOpened: state.markAsOpened,
   }));

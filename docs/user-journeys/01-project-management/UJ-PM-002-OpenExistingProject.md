@@ -22,7 +22,7 @@ This document describes the complete user experience for accessing and opening e
 
 ### Success Criteria
 - User can locate and open desired project within 3 clicks
-- Recent projects list shows last 10 accessed projects
+- Recent projects list shows last 5 accessed projects
 - Search and filters help locate specific projects quickly
 - Project preview shows sufficient metadata for identification
 - Projects open within 2 seconds (typical size)
@@ -89,9 +89,9 @@ This document describes the complete user experience for accessing and opening e
 3. System loads project list from ProjectStore
 4. System queries IndexedDB for all projects: `getAllProjects()`
 5. System sorts projects by last modified date (descending)
-6. System retrieves recent projects list: last 10 opened projects
+6. System retrieves recent projects list: last 5 opened projects
 7. System displays Dashboard with two sections:
-   - **Recent Projects** (top section, max 10 items)
+   - **Recent Projects** (top section, max 5 items, hidden when empty)
    - **All Projects** (scrollable grid below)
 8. System renders each project as card with:
    - Project name (bold, 18px)
@@ -1080,7 +1080,7 @@ Project Opened
             │
             v
 ┌───────────────────────────┐
-│ Limit list to max 10      │
+│ Limit list to max 5       │
 │ items (FIFO)              │
 └───────────┬───────────────┘
             │
@@ -1224,7 +1224,7 @@ describe('ProjectService', () => {
   test('getAllProjects returns all projects from IndexedDB')
   test('getAllProjects returns empty array when no projects exist')
   test('addToRecent adds project to beginning of recent list')
-  test('addToRecent maintains max 10 recent projects')
+  test('addToRecent maintains max 5 recent projects')
   test('addToRecent removes duplicate before adding')
   test('deleteProject soft deletes project (moves to trash)')
   test('handles IndexedDB read errors gracefully')

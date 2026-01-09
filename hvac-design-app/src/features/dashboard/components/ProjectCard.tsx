@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import styles from './ProjectCard.module.css';
 import type { ProjectListItem } from '../store/projectListStore';
+import { useProjectListActions } from '../store/projectListStore';
 
 interface ProjectCardProps {
   project: ProjectListItem;
@@ -28,10 +29,24 @@ export function ProjectCard({
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(project.projectName);
 
-  const formattedDate = useMemo(
-    () => new Date(project.modifiedAt).toLocaleString(),
-    [project.modifiedAt]
-  );
+  // Relative date formatting (UJ-PM-002: "2 hours ago", "Yesterday", "Jan 15")
+  const formattedDate = useMemo(() => {
+    const date = new Date(project.modifiedAt);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    if (diffHours < 1) {
+      return 'Just now';
+    } else if (diffHours < 24) {
+      const hours = Math.floor(diffHours);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else if (diffHours < 48) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  }, [project.modifiedAt]);
 
   const handleRename = () => {
     const trimmed = draftName.trim();
@@ -40,6 +55,8 @@ export function ProjectCard({
       setEditing(false);
     }
   };
+
+  const { markAsOpened } = useProjectListActions();
 
   // Navigate to canvas when clicking the card (per PRD FR-DASH-003 and US-PM-002)
   const handleCardClick = (e: React.MouseEvent) => {
@@ -55,6 +72,13 @@ export function ProjectCard({
     ) {
       return;
     }
+    markAsOpened(project.projectId);
+    router.push(`/canvas/${project.projectId}`);
+  };
+
+  const handleOpenClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    markAsOpened(project.projectId);
     router.push(`/canvas/${project.projectId}`);
   };
 
@@ -125,14 +149,22 @@ export function ProjectCard({
         )}
       </div>
       <div className={styles.meta}>
-        <span>Last modified: {formattedDate}</span>
+        <span>{formattedDate}</span>
+        {project.entityCount !== undefined && <span>{project.entityCount} items</span>}
         {project.projectNumber && <span>#{project.projectNumber}</span>}
         {project.clientName && <span>{project.clientName}</span>}
         {project.isArchived && <span className={styles.archived}>Archived</span>}
       </div>
-      <Link href={`/canvas/${project.projectId}`} className={styles.openButton}>
-        Open Project
-      </Link>
+      <div className={styles.actions}>
+        <button
+          onClick={handleOpenClick}
+          className={styles.openButton}
+          role="button"
+          aria-label={`Open ${project.projectName}`}
+        >
+          Open
+        </button>
+      </div>
     </div>
   );
 }
