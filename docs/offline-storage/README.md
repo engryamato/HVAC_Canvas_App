@@ -14,6 +14,62 @@ The system is designed to work seamlessly across both desktop (Tauri) and web br
 
 ---
 
+## 📋 Documentation Purpose & Usage
+
+> **⚠️ IMPORTANT**: Documents in this folder serve as **SPECIFICATION & REFERENCE** for generating test specs and implementing features, similar to the `docs/user-journeys` documentation.
+
+### Purpose
+These documents are designed to:
+1. **Serve as reference** for developers creating strict test specifications
+2. **Align with user journey documentation** in `docs/user-journeys`
+3. **Provide implementation specifications** (both current state and intended behavior)
+4. **Enable test-driven development** by documenting expected behavior before implementation
+
+### Document Format
+All documents in this folder follow a strict format to facilitate test spec generation:
+
+- **Clear acceptance criteria** with checkboxes
+- **Step-by-step flows** with expected outcomes
+- **Edge cases and error scenarios** fully documented
+- **Code references** to actual implementation (file paths and line numbers)
+- **Status indicators** (✅ Implemented, ⚠️ Partial, ❌ Not Implemented)
+- **Current vs. Intended behavior** clearly distinguished
+- **Cross-references** to related user journeys
+
+### Relationship to User Journeys
+Offline storage documentation **must align with** user journey specifications:
+
+| Offline Storage Doc | Related User Journey | Alignment |
+|---------------------|---------------------|-----------|
+| [OS-INIT-001](./01-initialization/OS-INIT-001-FirstLaunchSetup.md) | [UJ-GS-001](../user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md) | First launch experience |
+| [OS-DF-003](./05-data-flow/OS-DF-003-AutoSaveFlow.md) | [UJ-FM-002](../user-journeys/08-file-management/UJ-FM-002-AutoSave.md) | Auto-save behavior |
+| [OS-DF-001](./05-data-flow/OS-DF-001-ImportFlow.md) | UJ-FM-001 | Project import flow |
+| [OS-ERR-002](./07-error-recovery/OS-ERR-002-BackupRecovery.md) | UJ-FM-009 | Backup recovery |
+
+### For Test Spec Generation
+When creating test specifications from these documents:
+
+1. **Use acceptance criteria** as test case templates
+2. **Convert step-by-step flows** into test steps
+3. **Edge cases become edge case tests**
+4. **Error scenarios become negative test cases**
+5. **Code references** guide integration test setup
+6. **Known issues** become bug regression tests
+
+**Example**: [OS-INIT-001](./01-initialization/OS-INIT-001-FirstLaunchSetup.md) includes:
+- ✅ Complete acceptance criteria (ready for test case generation)
+- ✅ Step-by-step initialization flow (ready for test steps)
+- ✅ Known Issues section (ready for regression tests)
+- ✅ Code references for integration tests
+
+### Document Status Indicators
+Documents use clear status indicators:
+- **📋 SPECIFICATION & REFERENCE** - Document serves as spec (may include intended behavior)
+- **✅ Verified against implementation** - Document matches actual code
+- **🔄 Specification with gaps** - Some behaviors are intended, not implemented
+
+---
+
 ## Storage Layers
 
 ### 1. In-Memory State (Zustand Stores)
@@ -204,11 +260,14 @@ See [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md) for complete details.
 
 This documentation follows these principles:
 
-1. **Accuracy over comprehensiveness** - Only document what's actually implemented
-2. **Clear status indicators** - Every feature marked as implemented/partial/planned
-3. **Code-verified content** - All references verified against actual implementation
-4. **Cross-reference existing docs** - Links to element docs rather than duplicating
-5. **Discrepancy tracking** - Documents where code differs from other documentation
+1. **Test-spec ready format** - Structured to enable easy generation of strict test specifications
+2. **Alignment with user journeys** - All flows must align with corresponding user journey documentation
+3. **Accuracy over comprehensiveness** - Only document what's actually implemented (or clearly mark intended behavior)
+4. **Clear status indicators** - Every feature marked as ✅ Implemented, ⚠️ Partial, ❌ Not Implemented, or 📋 Specification
+5. **Code-verified content** - All references verified against actual implementation with file paths and line numbers
+6. **Current vs. Intended behavior** - Clearly distinguish between actual implementation and specification
+7. **Cross-reference existing docs** - Links to element docs and user journeys rather than duplicating
+8. **Discrepancy tracking** - Documents where code differs from other documentation (in "Known Issues" sections)
 
 ---
 
@@ -216,15 +275,81 @@ This documentation follows these principles:
 
 When updating offline storage documentation:
 
-1. Verify implementation status in code
-2. Update `IMPLEMENTATION_STATUS.md` if feature status changes
-3. Cross-reference related element documentation
-4. Include code file paths and line numbers where applicable
-5. Mark any discrepancies between documentation and implementation
+### Required Steps
+1. **Verify implementation status** in actual code (not assumptions)
+2. **Maintain test-spec format**:
+   - Include clear acceptance criteria with checkboxes
+   - Document step-by-step flows with expected outcomes
+   - Add edge cases and error scenarios
+   - Include code references (file paths and line numbers)
+3. **Align with user journeys**: Ensure flow matches corresponding `docs/user-journeys` documentation
+4. **Update IMPLEMENTATION_STATUS.md** if feature status changes
+5. **Cross-reference related documentation** (element docs, user journeys, other OS docs)
+6. **Mark discrepancies clearly**:
+   - Use "Current Implementation" vs "Intended Implementation" sections
+   - Add "Known Issues" section for bugs or gaps
+   - Use status indicators (📋, ✅, ⚠️, ❌)
+
+### Document Structure Template
+Every offline storage document should include:
+```markdown
+# OS-XXX-YYY: Document Title
+
+**Document Type**: 📋 SPECIFICATION & REFERENCE (or ✅ Verified)
+**Last Updated**: YYYY-MM-DD
+**Status**: Brief status description
+
+> ⚠️ IMPORTANT: Note about document purpose
+
+## Prerequisites
+[Environment requirements]
+
+## Step-by-Step Flow
+[Numbered steps with expected outcomes]
+
+## Edge Cases
+[Documented edge cases]
+
+## Error Scenarios
+[Error handling documentation]
+
+## Implementation Status
+✅ Fully Implemented
+⚠️ Partially Implemented
+❌ Not Implemented
+
+## Known Issues
+[Any bugs or gaps]
+
+## Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+
+## Related Documentation
+- [User Journey Reference]
+- [Element Documentation]
+```
+
+### Alignment Checklist
+Before committing documentation updates:
+- [ ] Flows match corresponding user journey documentation
+- [ ] Acceptance criteria are testable and clear
+- [ ] Code references are verified and current
+- [ ] Status indicators accurately reflect implementation
+- [ ] Known issues are documented with specifications for fixes
+- [ ] Document follows test-spec ready format
 
 ---
 
 ## Version History
+
+- **2026-01-10**: Documentation purpose and format update
+  - Added "Documentation Purpose & Usage" section
+  - Clarified documents serve as test spec reference (like user-journeys)
+  - Added document structure template
+  - Updated documentation principles to emphasize test-spec format
+  - Added alignment checklist and user journey mapping table
+  - Enhanced contributing guidelines with required steps and structure
 
 - **2026-01**: Initial offline storage documentation created
   - Documented actual three-layer architecture (Zustand + localStorage + .sws files)
