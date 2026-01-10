@@ -1,11 +1,14 @@
 # OS-INIT-001: First Launch Setup
 
+**Document Type**: 📋 **SPECIFICATION & REFERENCE**
 **Last Updated**: 2026-01-10
-**Status**: ✅ Verified against implementation
+**Status**: 🔄 Specification with implementation gaps identified
+
+> **⚠️ IMPORTANT**: This document serves as the **specification and reference** for implementing first launch functionality and generating test specs. Some described behaviors represent **INTENDED implementation** rather than current state. See [Implementation Status](#implementation-status) and [Known Issues](#known-issues) sections for actual vs. intended behavior.
 
 ## Overview
 
-This document describes the **first launch initialization** process for the HVAC Canvas App, covering:
+This document describes the **first launch initialization** process (both current implementation and intended behavior) for the HVAC Canvas App, covering:
 
 - Environment detection (Tauri vs Web)
 - First launch detection and state management
@@ -27,6 +30,8 @@ This document describes the **first launch initialization** process for the HVAC
 - ✅ Updated implementation status to reflect WelcomeScreen component
 - ✅ Verified acceptance criteria against E2E test coverage
 - ✅ Added cross-references to UJ-GS-001 specification
+- ✅ Applied Augment code review corrections (4 documentation fixes)
+- ⚠️ Identified critical rehydration bug (documented as known issue)
 
 ---
 
@@ -68,6 +73,7 @@ This document describes the **first launch initialization** process for the HVAC
 ```typescript
 // From AppInitializer.tsx:8-44
 export const AppInitializer: React.FC = () => {
+    const router = useRouter();
     const { hasLaunched, isFirstLaunch } = useAppStateStore();
     const [showSplash, setShowSplash] = useState(true);
     const [mounted, setMounted] = useState(false);
@@ -79,6 +85,13 @@ export const AppInitializer: React.FC = () => {
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const handleSplashComplete = () => {
+        setShowSplash(false);
+        if (!isFirstLaunch) {
+            router.replace('/dashboard');
+        }
+    };
 
     if (!mounted) { return null; }
 
@@ -92,8 +105,12 @@ export const AppInitializer: React.FC = () => {
         return <WelcomeScreen />;
     }
 
-    // Redirect to dashboard for returning users
-    return <Redirect to="/dashboard" />;
+    // Show redirecting placeholder for returning users
+    return (
+        <div className="flex items-center justify-center h-screen bg-slate-50">
+            <p className="text-slate-500 animate-pulse">Redirecting to dashboard...</p>
+        </div>
+    );
 }
 ```
 
@@ -169,7 +186,8 @@ try {
 - **First launch** (no localStorage keys): Use default initial state from store definition
 - **Returning user** (keys exist): Hydrate stores with persisted data
 - **Corrupted data** (JSON parse error): Log error, use defaults, overwrite on next save
-- **Quota exceeded** (rare during read): Use defaults, show warning if write fails later
+
+**Note**: `QuotaExceededError` only occurs on writes (`localStorage.setItem`), not reads (`localStorage.getItem`). If storage is full, reads still succeed but subsequent writes will fail.
 
 **Performance**: Synchronous hydration typically takes 1-5ms for small datasets (< 10KB)
 
@@ -197,28 +215,50 @@ interface AppState {
 1. Zustand persist middleware reads `hvac-app-storage` key from localStorage
 2. If key exists with `hasLaunched: true` → **Returning user**
 3. If key doesn't exist or `hasLaunched: false` → **First launch**
-4. `isFirstLaunch` is computed as `!hasLaunched` (not persisted separately)
-5. After first welcome screen is shown, `setHasLaunched(true)` is called
+4. `isFirstLaunch` is stored as a separate state field (not a computed getter)
+5. The `setHasLaunched(value)` action updates both: `hasLaunched: value` and `isFirstLaunch: !value`
+6. After first welcome screen is shown, `setHasLaunched(true)` is called
 
-**Persistence Strategy** (Partial State Persistence):
+**Important**: `isFirstLaunch` is a separate state field that's synchronized with `hasLaunched` via the `setHasLaunched` action. Since only `hasLaunched` is persisted (via `partialize`), the store **SHOULD use** an `onRehydrateStorage` callback to ensure `isFirstLaunch` is correctly recalculated as `!hasLaunched` after rehydration from localStorage.
+
+**⚠️ Current Implementation** (has bug - see [Known Issues](#known-issues)):
 ```typescript
-// From useAppStateStore.ts:26-29
+// From useAppStateStore.ts:26-29 (CURRENT - BUGGY)
 persist(
     (set) => ({ /* ... */ }),
     {
         name: 'hvac-app-storage',
-        partialize: (state) => ({ hasLaunched: state.hasLaunched })
+        partialize: (state) => ({ hasLaunched: state.hasLaunched }),
+        // ❌ MISSING: onRehydrateStorage callback to fix isFirstLaunch
+    }
+)
+```
+
+**✅ Intended Implementation** (specification for future fix):
+```typescript
+// INTENDED BEHAVIOR (to be implemented)
+persist(
+    (set) => ({ /* ... */ }),
+    {
+        name: 'hvac-app-storage',
+        partialize: (state) => ({ hasLaunched: state.hasLaunched }),
+        onRehydrateStorage: () => (state) => {
+            // After rehydration, ensure isFirstLaunch is consistent with hasLaunched
+            if (state) {
+                state.isFirstLaunch = !state.hasLaunched;
+            }
+        },
     }
 )
 ```
 
 **Why `partialize`?**
 - Only `hasLaunched` needs to persist between sessions
-- `isFirstLaunch` is derived and doesn't need storage
+- `isFirstLaunch` should be derived/recalculated on rehydration
 - `isLoading` is purely transient UI state
 - Reduces localStorage storage usage
 
-**Code Reference**: `hvac-design-app/src/stores/useAppStateStore.ts:1-31`
+**Code Reference**: `hvac-design-app/src/stores/useAppStateStore.ts:26-29` (current), see [Known Issues](#known-issues) for required fix
 
 ### Step 4: Default Directory Setup (Desktop Only)
 
@@ -543,6 +583,55 @@ See [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md) for complete details
 
 ---
 
+## Known Issues
+
+### 🔴 CRITICAL: isFirstLaunch Rehydration Bug (Identified by Augment Review)
+
+**Issue**: `isFirstLaunch` state becomes inconsistent after page reload for returning users.
+
+**Root Cause**:
+- `isFirstLaunch` is stored as a separate state field (not a computed getter)
+- Only `hasLaunched` is persisted to localStorage via `partialize`
+- On rehydration, `isFirstLaunch` uses its initial value (`true`) instead of being recalculated from `hasLaunched`
+
+**Current Behavior** (BUGGY):
+```typescript
+// First visit
+{ hasLaunched: false, isFirstLaunch: true } ✅ CORRECT
+
+// User completes onboarding, setHasLaunched(true) called
+{ hasLaunched: true, isFirstLaunch: false } ✅ CORRECT
+
+// User reloads page - Zustand persist rehydrates from localStorage
+// localStorage has: { "hasLaunched": true }
+// But isFirstLaunch uses initial state value
+{ hasLaunched: true, isFirstLaunch: true } ❌ BUG! Both are true!
+```
+
+**Impact**:
+- Returning users see the welcome screen again on every page reload
+- State inconsistency breaks first launch detection logic
+
+**Intended Fix** (for implementation):
+Add `onRehydrateStorage` callback to recalculate `isFirstLaunch`:
+```typescript
+{
+    name: 'hvac-app-storage',
+    partialize: (state) => ({ hasLaunched: state.hasLaunched }),
+    onRehydrateStorage: () => (state) => {
+        if (state) {
+            state.isFirstLaunch = !state.hasLaunched;
+        }
+    },
+}
+```
+
+**Status**: 📋 Documented for future implementation
+**Verification**: See [AUGMENT-REVIEW-VERIFICATION.md](./AUGMENT-REVIEW-VERIFICATION.md) for detailed analysis
+**Test Spec**: Unit tests should verify rehydration behavior (test spec TBD)
+
+---
+
 ## User Journey References
 
 - **[UJ-GS-001: First Launch Experience](../../user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md)** - Comprehensive 1600+ line specification covering:
@@ -580,9 +669,11 @@ See [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md) for complete details
   - **Verification**: Manual testing required on desktop build
 
 **Test Coverage**:
-- **E2E**: First launch flow tested across Chromium, Firefox, WebKit
-- **Unit**: useAppStateStore tested for first launch detection
-- **Integration**: Store hydration tested in store integration tests
+- **E2E**: ✅ First launch flow tested across Chromium, Firefox, WebKit
+- **Unit**: ⚠️ useAppStateStore not directly unit tested (covered by E2E and integration tests)
+- **Integration**: ✅ Store hydration tested in store integration tests
+
+**Note**: Direct unit tests for `useAppStateStore` rehydration behavior should be added to verify `isFirstLaunch` state consistency after localStorage persistence/rehydration.
 
 ---
 
