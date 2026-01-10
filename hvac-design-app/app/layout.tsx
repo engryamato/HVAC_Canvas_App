@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { DeviceWarning } from '@components/common/DeviceWarning'
 
 export const metadata: Metadata = {
   title: 'SizeWise HVAC Canvas',
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <DeviceWarning />
         {children}
       </body>
     </html>

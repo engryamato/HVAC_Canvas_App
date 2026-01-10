@@ -179,6 +179,16 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
     - **Equipment**: Capacity Issue (Inadequate/Excessive).
     - **Rooms**: Size Issue (Too small/large).
 
+### FR-UI-007: Device Compatibility
+- **Detection**: Automatically detect device type (PC, Laptop, Tablet vs. Mobile).
+- **Warning**: Display full-screen blocking error on mobile devices (phones).
+- **Behavior**: **Terminate** execution or block access. No option to proceed.
+- **Criteria**: Screen width < 640px.
+
+### FR-UI-008: Responsive Elements
+- **Requirement**: Elements (Sidebars, Toolbars) must adjust to screen availability.
+- **Documentation**: See `docs/guides/RESPONSIVE_DESIGN.md` for specific behavior.
+
 ---
 
 ### 2.4 Calculations Engine

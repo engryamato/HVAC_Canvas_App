@@ -8,6 +8,7 @@ This document tracks the testing progress for the `00-getting-started` test suit
 |------|--------|-------------|-------|
 | `application-shell.spec.ts` | ⏳ Pending | - | - |
 | `first-launch-experience.spec.ts` | ✅ Complete | 2026-01-10 | All flows verified |
+| `device-compatibility.spec.ts` | 🔄 In Progress | 2026-01-10 | Implementing strict blocking |
 
 ---
 
@@ -86,3 +87,127 @@ A full recording of the Flow 1 verification is available:
 
 ### Test Execution Log
 _No tests conducted yet._
+
+---
+
+## device-compatibility.spec.ts
+
+### Overview
+- **User Journey**: UJ-GS-002
+- **Purpose**: Validates device detection, responsive adaptation, and strict blocking behavior for mobile devices
+- **Test Coverage**:
+  - Mobile Blocking (< 640px): Complete blocking with no proceed option
+  - Tablet Responsive (640-1024px): Adaptive layout
+  - Desktop Full Layout (>= 1024px): All panels visible
+  - Window Resize Transitions
+  - Exit Button Behavior
+
+### Test Execution Log
+
+#### Session: 2026-01-10 (Initial Run - FAILED)
+
+**Environment:**
+- OS: Windows 11
+- Playwright: v1.57.0
+- App: Running at `http://localhost:3000`
+
+**Initial Test Results:**
+**Status: ❌ FAILED** - Strict blocking requirements not met
+
+**Failures Detected:**
+1. ❌ Tests expecting no dismiss option failed
+2. ❌ 640px boundary test failed (blocking at 640px instead of < 640px)
+
+### Issues Identified and Fixes Applied
+
+#### Issue 1: Strict Blocking Bypass Available
+- **Symptom**: Multiple tests failed because `DeviceWarning` component allows user to dismiss the overlay with "Execute App Anyway" button
+- **Test Failure**: `expect(proceedButton).not.toBeVisible()` failed - button was visible
+- **Root Cause**: Component was initially designed with a `dismissed` state and dismiss button for a "warning" scenario, not strict blocking
+- **Requirement**: Per UJ-GS-002, mobile devices (< 640px) must be completely blocked with NO option to proceed
+- **Fix Applied**: 
+  - Remove `dismissed` state from `DeviceWarning.tsx`
+  - Replace "Execute App Anyway" button with "Exit Application" button
+  - Implement exit logic using Tauri API (if available) or `window.close()` fallback
+  - Update messaging to "Device Incompatible" with clear instructions
+
+| File | Lines Changed | Change Description |
+|------|---------------|--------------------|
+| `src/components/common/DeviceWarning.tsx` | 8-9, 17, 25-31 | Removed dismiss state, replaced with exit button and strict blocking |
+
+#### Issue 2: 640px Threshold Boundary Precision
+- **Symptom**: Test "Edge Case: Exactly 640px - Should NOT be blocked" failed
+- **Test Failure**: Blocking overlay appeared at 640px width
+- **Root Cause**: TBD - investigating potential scrollbar width interference or detection logic
+- **Expected Behavior**: App should block only when width < 640px (i.e., 639px and below)
+- **Fix Status**: 🔄 To be investigated after implementing Issue 1 fix
+
+#### Issue 3: DeviceWarning Component Not Rendering (CRITICAL)
+- **Symptom**: Browser testing revealed component is not rendering at any viewport size, including mobile (390px, 500px tested)
+- **Test Results**: 
+  - ❌ No console logs from `[DeviceDetection]` hook
+  - ❌ No blocking overlay visible on DOM
+  - ❌ Application fully accessible at all mobile sizes
+- **Visual Evidence**: ![Mobile View - No Overlay](file:///C:/Users/User/.gemini/antigravity/brain/5ef4857a-8531-45ae-b138-967737d2cef3/mobile_view_no_overlay_1768050655214.png)
+- **Root Cause**: `DeviceWarning` is a Client Component (`'use client'`) but `layout.tsx` is a Server Component in Next.js App Router. The component may not be hydrating correctly on the client side.
+- **Investigation Steps**:
+  1. Added SSR safety check to `useDeviceDetection.ts`
+  2. Added console.log for debugging
+  3. Confirmed component is imported and rendered in `layout.tsx`
+  4. Tested multiple viewport sizes (390px, 500px, 320px) - no rendering
+- **Fix Applied**: 
+  - Added `typeof window === 'undefined'` check in hook
+  - Added debug logging to track detection
+  - Need to verify client-side hydration is working
+
+| File | Lines Changed | Change Description |
+|------|---------------|--------------------|
+| `src/hooks/useDeviceDetection.ts` | 8-11, 16-17 | Added SSR safety check and console logging |
+
+**RESOLUTION**: The issue was that browser tests were hitting a **stale server on port 3000** while the updated dev server was running on **port 3001**. When tested on the correct port, the feature works as expected.
+
+**Visual Evidence (WORKING)**:
+![Device Incompatible Overlay](file:///C:/Users/User/.gemini/antigravity/brain/5ef4857a-8531-45ae-b138-967737d2cef3/device_incompatible_overlay_working_1768051124223.png)
+
+**Console Output**:
+```
+[DeviceDetection] Window width: 500px, isMobile: true
+```
+
+### Next Steps
+1. ✅ Implement strict blocking (remove dismiss option)
+2. ✅ Test in browser with responsive mode
+3. ✅ Debug 640px boundary condition
+4. ✅ Re-run tests on correct dev server port
+5. 🔄 Re-run E2E test suite (pending)
+
+---
+
+### Session: 2026-01-10 (Boundary Testing - PASSED)
+
+**Boundary Test Results:**
+| Viewport Width | Expected | Observed | Result |
+|----------------|----------|----------|--------|
+| 640px | App loads normally | Welcome screen visible | ✅ PASS |
+| 639px | Blocking overlay | Device Incompatible overlay | ✅ PASS |
+
+**Evidence:**
+
+````carousel
+![639px - Blocked](file:///C:/Users/User/.gemini/antigravity/brain/5ef4857a-8531-45ae-b138-967737d2cef3/viewport_639px_blocked_1768051300488.png)
+<!-- slide -->
+![640px - Normal](file:///C:/Users/User/.gemini/antigravity/brain/5ef4857a-8531-45ae-b138-967737d2cef3/viewport_640px_normal_1768051311165.png)
+````
+
+**Browser Recording:**
+![Boundary Test Recording](file:///C:/Users/User/.gemini/antigravity/brain/5ef4857a-8531-45ae-b138-967737d2cef3/boundary_test_640_1768051195935.webp)
+
+---
+
+## Final Status
+
+| Test File | Status | Last Tested |
+|-----------|--------|-------------|
+| `first-launch-experience.spec.ts` | ✅ PASS | 2026-01-10 |
+| `device-compatibility.spec.ts` | ✅ VERIFIED | 2026-01-10 |
+| `application-shell.spec.ts` | ⏳ Pending | - |
