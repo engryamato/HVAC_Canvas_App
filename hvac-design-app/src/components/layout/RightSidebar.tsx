@@ -4,29 +4,72 @@ import React, { useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { ChevronRight, Settings, List, FileText } from 'lucide-react';
+import { ChevronRight, Settings, List, FileText, Calculator } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const RightSidebar: React.FC = () => {
-    const { rightSidebarCollapsed, toggleRightSidebar, activeRightTab, setActiveRightTab } =
-        useLayoutStore();
+    const {
+        rightSidebarCollapsed,
+        toggleRightSidebar,
+        activeRightTab,
+        setActiveRightTab
+    } = useLayoutStore();
 
-    // Keyboard shortcut: Ctrl+I
+    // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey && (e.key === 'i' || e.key === 'I' || e.code === 'KeyI')) {
+            // Toggle sidebar (Ctrl+Shift+B) or Legacy (Ctrl+I)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'b' || e.key === 'B')) {
                 e.preventDefault();
                 toggleRightSidebar();
+                return;
+            }
+            if (e.ctrlKey && (e.key === 'i' || e.key === 'I')) {
+                e.preventDefault();
+                toggleRightSidebar();
+                return;
+            }
+
+            // Tab shortcuts
+            if (e.ctrlKey) {
+                if (e.key === 'p' || e.key === 'P') { // Ctrl+P -> Properties
+                    e.preventDefault();
+                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    setActiveRightTab('properties');
+                } else if (e.key === 'm' || e.key === 'M') { // Ctrl+M -> BOM
+                    e.preventDefault();
+                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    setActiveRightTab('bom');
+                } else if (e.shiftKey && (e.key === 'p' || e.key === 'P')) { // Ctrl+Shift+P -> Calc
+                    e.preventDefault();
+                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    setActiveRightTab('calculations');
+                } else if (e.shiftKey && (e.key === 'n' || e.key === 'N')) { // Ctrl+Shift+N -> Notes
+                    e.preventDefault();
+                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    setActiveRightTab('notes');
+                }
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [toggleRightSidebar]);
+    }, [toggleRightSidebar, rightSidebarCollapsed, setActiveRightTab]);
+
+    const tabs = [
+        { id: 'properties', label: 'Properties', icon: Settings },
+        { id: 'calculations', label: 'Calculations', icon: Calculator },
+        { id: 'bom', label: 'BOM', icon: List },
+        { id: 'notes', label: 'Notes', icon: FileText },
+    ];
 
     if (rightSidebarCollapsed) {
         return (
             <div
-                className="w-12 bg-white border-l flex flex-col items-center pt-4"
+                className={cn(
+                    "w-12 bg-white border-l flex flex-col items-center pt-4 transition-all duration-300",
+                    "collapsed"
+                )}
                 data-testid="right-sidebar"
             >
                 <Button
@@ -34,40 +77,61 @@ export const RightSidebar: React.FC = () => {
                     size="sm"
                     onClick={toggleRightSidebar}
                     data-testid="right-sidebar-toggle"
+                    aria-label="Expand sidebar"
                 >
                     <ChevronRight className="w-4 h-4 rotate-180" />
                 </Button>
-            </div>
-        );
-    }
 
-    const tabs = [
-        { id: 'properties', label: 'Properties', icon: Settings },
-        { id: 'bom', label: 'BOM', icon: List },
-        { id: 'notes', label: 'Notes', icon: FileText },
-    ];
-
-    return (
-        <aside
-            className="w-80 bg-white border-l flex flex-col"
-            data-testid="right-sidebar"
-        >
-            {/* Header with Tabs */}
-            <div className="h-12 border-b flex items-center justify-between px-4">
-                <div className="flex gap-1">
-                    {tabs.map((tab) => {
+                {/* Vertical Tabs */}
+                <div className="mt-4 flex flex-col gap-2 w-full px-1">
+                    {tabs.map(tab => {
                         const Icon = tab.icon;
                         return (
                             <Button
                                 key={tab.id}
-                                variant={activeRightTab === tab.id ? 'default' : 'ghost'}
+                                variant={activeRightTab === tab.id ? 'secondary' : 'ghost'}
                                 size="sm"
-                                onClick={() => setActiveRightTab(tab.id)}
-                                className="gap-1"
-                                data-testid={`tab-${tab.id}`}
+                                onClick={() => {
+                                    setActiveRightTab(tab.id);
+                                    toggleRightSidebar();
+                                }}
+                                className="w-full h-10 p-0 justify-center"
+                                title={tab.label}
                             >
                                 <Icon className="w-4 h-4" />
-                                {tab.label}
+                            </Button>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <aside
+            className="w-80 bg-white border-l flex flex-col transition-all duration-300"
+            data-testid="right-sidebar"
+        >
+            {/* Header with Tabs */}
+            <div className="h-12 border-b flex items-center justify-between px-2">
+                <div className="flex gap-0.5">
+                    {tabs.map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeRightTab === tab.id;
+                        return (
+                            <Button
+                                key={tab.id}
+                                variant={isActive ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setActiveRightTab(tab.id)}
+                                className={cn("gap-1 px-2 h-8", isActive ? "" : "text-slate-500")}
+                                data-testid={`tab-${tab.id}`}
+                                aria-label={tab.label}
+                                aria-selected={isActive}
+                                role="tab"
+                            >
+                                <Icon className="w-3.5 h-3.5" />
+                                <span className="hidden xl:inline text-xs">{tab.label}</span>
                             </Button>
                         );
                     })}
@@ -77,6 +141,8 @@ export const RightSidebar: React.FC = () => {
                     size="sm"
                     onClick={toggleRightSidebar}
                     data-testid="right-sidebar-toggle"
+                    className="h-8 w-8 p-0"
+                    aria-label="Collapse sidebar"
                 >
                     <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -87,21 +153,39 @@ export const RightSidebar: React.FC = () => {
                 {activeRightTab === 'properties' && (
                     <div data-testid="properties-panel">
                         <h3 className="font-semibold mb-4">Properties</h3>
-                        <div className="text-sm text-slate-500">No selection</div>
+                        <div className="text-sm text-slate-500 border rounded p-4 bg-slate-50">
+                            No item selected
+                            <div className="mt-2 text-xs text-slate-400">
+                                Project: Office HVAC<br />
+                                Created: Jan 10, 2026
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeRightTab === 'calculations' && (
+                    <div data-testid="calculations-panel">
+                        <h3 className="font-semibold mb-4">Calculations</h3>
+                        <div className="text-sm text-slate-500">
+                            Select entities to view load calculations.
+                        </div>
                     </div>
                 )}
 
                 {activeRightTab === 'bom' && (
                     <div data-testid="bom-panel">
                         <h3 className="font-semibold mb-4">Bill of Materials</h3>
-                        <div className="text-sm text-slate-500">No items</div>
+                        <div className="text-sm text-slate-500">No items in BOM</div>
                     </div>
                 )}
 
                 {activeRightTab === 'notes' && (
                     <div data-testid="notes-panel">
                         <h3 className="font-semibold mb-4">Project Notes</h3>
-                        <div className="text-sm text-slate-500">No notes</div>
+                        <textarea
+                            className="w-full h-32 p-2 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="Add project notes here..."
+                        />
                     </div>
                 )}
             </div>

@@ -7,9 +7,10 @@ import { FileMenu } from './FileMenu';
 
 interface HeaderProps {
     projectName: string;
+    showBreadcrumb?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ projectName }) => {
+export const Header: React.FC<HeaderProps> = ({ projectName, showBreadcrumb = true }) => {
     const router = useRouter();
 
     return (
@@ -21,20 +22,22 @@ export const Header: React.FC<HeaderProps> = ({ projectName }) => {
             <div className="flex items-center gap-4">
                 <FileMenu />
 
-                <div className="flex items-center gap-2 text-sm">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push('/dashboard')}
-                        className="gap-1"
-                        data-testid="breadcrumb-dashboard"
-                    >
-                        <Home className="w-4 h-4" />
-                        Dashboard
-                    </Button>
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
-                    <span className="font-semibold text-slate-900">{projectName}</span>
-                </div>
+                {showBreadcrumb && (
+                    <div className="flex items-center gap-2 text-sm" data-testid="breadcrumb">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => router.push('/dashboard')}
+                            className="gap-1"
+                            data-testid="breadcrumb-dashboard"
+                        >
+                            <Home className="w-4 h-4" />
+                            Dashboard
+                        </Button>
+                        <ChevronRight className="w-4 h-4 text-slate-400" />
+                        <span className="font-semibold text-slate-900">{projectName}</span>
+                    </div>
+                )}
             </div>
 
             {/* Branding */}

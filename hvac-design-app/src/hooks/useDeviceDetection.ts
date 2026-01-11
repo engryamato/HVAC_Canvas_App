@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger';
 
 export function useDeviceDetection() {
     // Initialize to false for SSR, will update client-side
@@ -15,7 +16,7 @@ export function useDeviceDetection() {
             const width = window.innerWidth;
             const isMobileWidth = width < 640;
 
-            console.log(`[DeviceDetection] Window width: ${width}px, isMobile: ${isMobileWidth}`);
+            logger.debug(`[DeviceDetection] Window width: ${width}px, isMobile: ${isMobileWidth}`);
             setIsMobile(isMobileWidth);
         };
 

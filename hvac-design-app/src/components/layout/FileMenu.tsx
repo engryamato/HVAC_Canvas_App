@@ -57,7 +57,6 @@ export function FileMenu() {
                 variant="ghost"
                 size="sm"
                 className="gap-2"
-                role="button"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <FileText className="w-4 h-4" />
@@ -65,16 +64,44 @@ export function FileMenu() {
             </Button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50">
+                <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50 flex flex-col items-start">
+                    <button
+                        onClick={() => router.push('/dashboard')}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                    >
+                        Go to Dashboard <span className="text-xs opacity-50 ml-2">Ctrl+Shift+D</span>
+                    </button>
+
+                    <div className="h-px bg-slate-200 w-full my-1" />
+
+                    <button
+                        onClick={() => { /* TODO: New Project */ }}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                    >
+                        New Project... <span className="text-xs opacity-50 ml-2">Ctrl+N</span>
+                    </button>
                     <button
                         onClick={handleOpenFromFile}
                         disabled={isLoading}
-                        role="menuitem"
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex justify-between items-center"
                     >
-                        {isLoading ? 'Opening...' : 'Open from File...'}
+                        {isLoading ? 'Opening...' : 'Open from File...'} <span className="text-xs opacity-50 ml-2">Ctrl+O</span>
                     </button>
-                    {/* Future: Add Save, Export, etc. */}
+
+                    <div className="h-px bg-slate-200 w-full my-1" />
+
+                    <button
+                        onClick={() => { /* TODO: Save */ }}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                    >
+                        Save Project <span className="text-xs opacity-50 ml-2">Ctrl+S</span>
+                    </button>
+                    <button
+                        onClick={() => { /* TODO: Export */ }}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm"
+                    >
+                        Export...
+                    </button>
                 </div>
             )}
         </div>

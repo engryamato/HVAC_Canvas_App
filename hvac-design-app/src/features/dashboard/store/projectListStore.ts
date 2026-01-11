@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { logger } from '@/utils/logger';
 
 export interface ProjectListItem {
   projectId: string;
@@ -42,6 +43,7 @@ export const useProjectListStore = create<ProjectListStore>()(
       loading: false,
 
       addProject: (project) => {
+        logger.debug('[ProjectListStore] Adding project:', project);
         set((state) => ({ projects: [project, ...state.projects] }));
       },
 
@@ -122,7 +124,13 @@ export const useProjectListStore = create<ProjectListStore>()(
         });
       },
     }),
-    { name: INDEX_KEY }
+    {
+      name: INDEX_KEY,
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        console.log('[ProjectListStore] Hydration finished', state);
+      },
+    }
   )
 );
 
@@ -135,8 +143,9 @@ export const useArchivedProjects = () =>
 // Selector for recent projects (max 10, ordered by access time)
 export const useRecentProjects = () =>
   useProjectListStore((state) => {
-    return state.recentProjectIds
-      .map((id) => state.projects.find((p) => p.projectId === id))
+    // Ensure hydration has occurred or fallback
+    return (state.recentProjectIds || [])
+      .map((id) => (state.projects || []).find((p) => p.projectId === id))
       .filter((p): p is ProjectListItem => p !== undefined);
   });
 

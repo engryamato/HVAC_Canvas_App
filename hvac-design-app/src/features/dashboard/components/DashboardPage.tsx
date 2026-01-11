@@ -78,7 +78,7 @@ export function DashboardPage() {
     // Empty state
     if (allProjects.length === 0) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" data-testid="dashboard-page">
                 {/* Header */}
                 <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
                     <div className="container mx-auto px-6 py-4 flex items-center justify-between">
@@ -126,7 +126,7 @@ export function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" data-testid="dashboard-page">
             {/* Header */}
             <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
                 <div className="container mx-auto px-6 py-4 flex items-center justify-between">

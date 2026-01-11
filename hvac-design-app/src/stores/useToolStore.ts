@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Tool = 'select' | 'duct' | 'equipment' | 'text' | null;
+type Tool = 'select' | 'line' | 'duct' | 'equipment' | 'text' | null;
 
 interface ToolStoreState {
     activeTool: Tool;

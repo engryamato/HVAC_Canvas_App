@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useProjectStore } from '@/stores/useProjectStore';
+import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { useRouter } from 'next/navigation';
 
 interface NewProjectDialogProps {
@@ -47,6 +48,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
 
     const [isLoading, setIsLoading] = useState(false);
     const { addProject } = useProjectStore();
+    const addProjectToList = useProjectListStore((state) => state.addProject);
     const router = useRouter();
 
     const isValid = projectName.trim().length > 0 && projectName.length <= 100;
@@ -106,7 +108,42 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
                 isArchived: false,
             };
 
+            // Save to project-storage (Canvas)
             addProject(newProject);
+
+            // Save to sws.projectIndex (Dashboard)
+            console.error('[NewProjectDialog] Manually saving to project index');
+            const projectListItem = {
+                projectId: newProject.id,
+                projectName: newProject.name,
+                projectNumber: newProject.projectNumber || undefined,
+                clientName: newProject.clientName || undefined,
+                entityCount: newProject.entityCount,
+                createdAt: newProject.createdAt,
+                modifiedAt: newProject.modifiedAt,
+                storagePath: `project-${newProject.id}`,
+                isArchived: newProject.isArchived
+            };
+
+            // Manual persistence backup due to test env reliability issues
+            try {
+                const existing = localStorage.getItem('sws.projectIndex');
+                const state = existing
+                    ? JSON.parse(existing).state
+                    : { projects: [], recentProjectIds: [], loading: false };
+
+                state.projects = [projectListItem, ...(state.projects || [])];
+
+                localStorage.setItem('sws.projectIndex', JSON.stringify({
+                    state,
+                    version: 0
+                }));
+                console.error('[NewProjectDialog] Manual save success');
+            } catch (e) {
+                console.error('[NewProjectDialog] Manual save failed', e);
+            }
+
+            addProjectToList(projectListItem);
 
             onOpenChange(false);
             resetForm();
@@ -216,6 +253,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
                                             placeholder="123 Main St, Chicago, IL"
                                             value={location}
                                             onChange={(e) => setLocation(e.target.value)}
+                                            data-testid="project-location-input"
                                         />
                                     </div>
                                 </div>
@@ -357,7 +395,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
                     <Button
                         onClick={handleCreate}
                         disabled={!isValid || isLoading}
-                        data-testid="create-project-btn"
+                        data-testid="create-button"
                     >
                         {isLoading ? 'Creating...' : 'Create Project'}
                     </Button>

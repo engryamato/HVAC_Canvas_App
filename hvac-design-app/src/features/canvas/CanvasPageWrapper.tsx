@@ -7,6 +7,7 @@ import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore
 import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/utils/logger';
 
 interface CanvasPageWrapperProps {
   projectId: string;
@@ -81,10 +82,10 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
       // Check version compatibility
       const projVersion = (persistedProject as any).version || '1.0.0';
-      console.log(`[CanvasPageWrapper] Project: ${persistedProject.name}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
+      logger.debug(`[CanvasPageWrapper] Project: ${persistedProject.name}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
 
       if (compareVersions(projVersion, APP_VERSION) > 0) {
-        console.log('[CanvasPageWrapper] Version mismatch detected');
+        logger.debug('[CanvasPageWrapper] Version mismatch detected');
         setProjectVersion(projVersion);
         setVersionWarning(true);
         return; // Wait for user decision
