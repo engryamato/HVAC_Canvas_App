@@ -42,13 +42,22 @@
     "no-console": [
       "warn",
       {
-        "allow": ["warn", "error"]
+        "allow": [
+          "warn",
+          "error"
+        ]
       }
     ],
     "prefer-const": "warn",
     "no-var": "error",
-    "eqeqeq": ["error", "always"],
-    "curly": ["error", "all"]
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "curly": [
+      "error",
+      "all"
+    ]
   },
   "settings": {
     "react": {
@@ -61,7 +70,8 @@
     "out/",
     "src-tauri/target/",
     "*.config.js",
-    "*.config.mjs"
+    "*.config.mjs",
+    "next-env.d.ts",
+    "scripts/*.js"
   ]
 }
-

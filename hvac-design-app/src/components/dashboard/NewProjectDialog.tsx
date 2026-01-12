@@ -59,26 +59,26 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
             return crypto.randomUUID();
         }
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     };
 
     const handleCreate = async () => {
-        if (!isValid) return;
+        if (!isValid) { return; }
 
         setIsLoading(true);
 
         try {
             // Construct Scope object
             const scopeDetails: string[] = [];
-            if (scopeHvac) scopeDetails.push('HVAC');
+            if (scopeHvac) { scopeDetails.push('HVAC'); }
 
             const materials = [];
-            if (matGalvanized) materials.push({ type: 'Galvanized Steel', grade: gradeGalvanized });
-            if (matStainless) materials.push({ type: 'Stainless Steel', grade: gradeStainless });
-            if (matAluminum) materials.push({ type: 'Aluminum' });
-            if (matPvc) materials.push({ type: 'PVC' });
+            if (matGalvanized) { materials.push({ type: 'Galvanized Steel', grade: gradeGalvanized }); }
+            if (matStainless) { materials.push({ type: 'Stainless Steel', grade: gradeStainless }); }
+            if (matAluminum) { materials.push({ type: 'Aluminum' }); }
+            if (matPvc) { materials.push({ type: 'PVC' }); }
 
             const newId = generateId();
 

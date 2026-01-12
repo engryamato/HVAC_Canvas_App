@@ -13,8 +13,10 @@ export const DeviceWarning = () => {
     const handleExit = async () => {
         // Try Tauri API first (for desktop app)
         try {
-            // @ts-ignore - Tauri API may not be available in browser
+            // @ts-expect-error - Tauri API may not be available in browser
             if (typeof window.__TAURI__ !== 'undefined') {
+                // Dynamic import for Tauri - may fail in web context
+                // @ts-expect-error - Tauri module may not exist in web-only builds
                 const { exit } = await import('@tauri-apps/api/process');
                 await exit(0);
                 return;

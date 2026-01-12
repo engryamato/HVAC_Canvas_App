@@ -14,8 +14,8 @@ export function useAutoOpen() {
 
     useEffect(() => {
         // Only run once
-        if (hasRun) return;
-        if (!autoOpenEnabled) return;
+        if (hasRun) {return;}
+        if (!autoOpenEnabled) {return;}
 
         // Small delay to let AppInitializer finish
         const timer = setTimeout(() => {

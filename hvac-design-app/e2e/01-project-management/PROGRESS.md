@@ -6,6 +6,7 @@ This document tracks the testing progress for the `01-project-management` test s
 
 | File | Status | Last Tested | Notes |
 |------|--------|-------------|-------|
+| `uj-pm-000-lifecycle-overview.spec.ts` | ✅ Complete | 2026-01-10 | Core persistence and lifecycle verified |
 | `uj-pm-001-create-project.spec.ts` | ✅ Passed | 2026-01-10 | Full metadata flow verified |
 | `uj-pm-002-open-project.spec.ts` | ✅ Passed (18/27) | 2026-01-10 | Core features complete, Edge cases need test setup update |
 

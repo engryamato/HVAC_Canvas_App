@@ -78,7 +78,7 @@ test.describe('HVAC Design Workflow', () => {
       let hasProject = false;
       try {
         const existing = localStorage.getItem(key);
-        if (existing && JSON.parse(existing).state.projects.length > 0) hasProject = true;
+        if (existing && JSON.parse(existing).state.projects.length > 0) {hasProject = true;}
       } catch { }
 
       if (!hasProject) {
@@ -118,7 +118,7 @@ test.describe('HVAC Design Workflow', () => {
     // Wait for project to be persisted to localStorage before navigating
     await page.waitForFunction(() => {
       const data = localStorage.getItem('sws.projectIndex');
-      if (!data) return false;
+      if (!data) {return false;}
       try {
         const parsed = JSON.parse(data);
         return parsed.state && parsed.state.projects && parsed.state.projects.length > 0;

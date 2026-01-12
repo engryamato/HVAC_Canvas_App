@@ -181,6 +181,7 @@ export const ProjectDetailsSchema = z.object({
   projectName: z.string().min(1).max(100),
   projectNumber: z.string().max(50).optional(),
   clientName: z.string().max(100).optional(),
+  location: z.string().max(200).optional(),
   scope: ProjectScopeSchema.optional(),
   siteConditions: SiteConditionsSchema.optional(),
   createdAt: z.string().datetime(),

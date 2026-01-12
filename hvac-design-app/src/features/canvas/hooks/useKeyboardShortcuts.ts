@@ -101,7 +101,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
           if (selectedIds.length > 0) {
             const entities = selectedIds
               .map((id) => useEntityStore.getState().byId[id])
-              .filter(Boolean);
+              .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
             if (entities.length > 0) {
               deleteEntities(entities);
             }

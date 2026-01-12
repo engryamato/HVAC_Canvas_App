@@ -34,19 +34,19 @@ export const RightSidebar: React.FC = () => {
             if (e.ctrlKey) {
                 if (e.key === 'p' || e.key === 'P') { // Ctrl+P -> Properties
                     e.preventDefault();
-                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    if (rightSidebarCollapsed) {toggleRightSidebar();}
                     setActiveRightTab('properties');
                 } else if (e.key === 'm' || e.key === 'M') { // Ctrl+M -> BOM
                     e.preventDefault();
-                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    if (rightSidebarCollapsed) {toggleRightSidebar();}
                     setActiveRightTab('bom');
                 } else if (e.shiftKey && (e.key === 'p' || e.key === 'P')) { // Ctrl+Shift+P -> Calc
                     e.preventDefault();
-                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    if (rightSidebarCollapsed) {toggleRightSidebar();}
                     setActiveRightTab('calculations');
                 } else if (e.shiftKey && (e.key === 'n' || e.key === 'N')) { // Ctrl+Shift+N -> Notes
                     e.preventDefault();
-                    if (rightSidebarCollapsed) toggleRightSidebar();
+                    if (rightSidebarCollapsed) {toggleRightSidebar();}
                     setActiveRightTab('notes');
                 }
             }

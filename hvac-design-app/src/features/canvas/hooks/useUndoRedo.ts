@@ -6,7 +6,7 @@ import { undo, redo } from '@/core/commands/entityCommands';
 /**
  * Detect if user is on macOS (SSR-safe)
  */
-function isMacOS(): boolean {
+function _isMacOS(): boolean {
   if (typeof navigator === 'undefined') {
     return false;
   }
@@ -71,7 +71,7 @@ export function useUndoRedo() {
     win.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      win.removeEventListener('keydown', handleKeyDown);
+      win!.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 }

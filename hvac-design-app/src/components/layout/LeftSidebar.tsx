@@ -236,7 +236,7 @@ const EquipmentCategory: React.FC<{
     // If searching, always expand if matches found
     const isExpanded = searchQuery ? filteredItems.length > 0 : expanded;
 
-    if (searchQuery && filteredItems.length === 0) return null;
+    if (searchQuery && filteredItems.length === 0) {return null;}
 
     return (
         <div className="mb-1" data-testid={`category-${id}`}>

@@ -6,14 +6,14 @@ This document tracks the testing progress for the `00-getting-started` test suit
 
 | File | Status | Last Tested | Notes |
 |------|--------|-------------|-------|
-| `application-shell.spec.ts` | ⏳ Pending | - | - |
-| `basic-navigation.spec.ts` | ✅ Complete | 2026-01-10 | E2E tests for interface navigation |
-| `first-launch-experience.spec.ts` | ✅ Complete | 2026-01-10 | All flows verified |
-| `device-compatibility.spec.ts` | ✅ Complete | 2026-01-10 | Strict blocking implemented and verified |
+| `uj-gs-004-application-shell.spec.ts` | ⏳ Pending | - | - |
+| `uj-gs-003-navigation.spec.ts` | ✅ Complete | 2026-01-10 | E2E tests for interface navigation |
+| `uj-gs-001-onboarding.spec.ts` | ✅ Complete | 2026-01-10 | All flows verified |
+| `uj-gs-002-device-compatibility.spec.ts` | ✅ Complete | 2026-01-10 | Strict blocking implemented and verified |
 
 ---
 
-## basic-navigation.spec.ts
+## uj-gs-003-navigation.spec.ts
 
 ### Overview
 - **User Journey**: UJ-GS-003-BasicNavigationAndInterfaceOverview
@@ -51,7 +51,7 @@ This document tracks the testing progress for the `00-getting-started` test suit
 
 ---
 
-## first-launch-experience.spec.ts
+## uj-gs-001-onboarding.spec.ts
 
 ### Overview
 - **User Journey**: UJ-GS-001
@@ -118,10 +118,10 @@ A full recording of the Flow 1 verification is available:
 
 ---
 
-## application-shell.spec.ts
+## uj-gs-004-application-shell.spec.ts
 
 ### Overview
-- **User Journey**: UJ-GS-003
+- **User Journey**: UJ-GS-004
 - **Purpose**: Validates core application shell layout and regions
 
 ### Test Execution Log
@@ -129,7 +129,7 @@ _No tests conducted yet._
 
 ---
 
-## device-compatibility.spec.ts
+## uj-gs-002-device-compatibility.spec.ts
 
 ### Overview
 - **User Journey**: UJ-GS-002
@@ -247,7 +247,7 @@ _No tests conducted yet._
 
 | Test File | Status | Last Tested |
 |-----------|--------|-------------|
-| `basic-navigation.spec.ts` | ✅ SPECIFICATION | 2026-01-10 |
-| `first-launch-experience.spec.ts` | ✅ PASS | 2026-01-10 |
-| `device-compatibility.spec.ts` | ✅ VERIFIED | 2026-01-10 |
-| `application-shell.spec.ts` | ⏳ Pending | - |
+| `uj-gs-003-navigation.spec.ts` | ✅ SPECIFICATION | 2026-01-10 |
+| `uj-gs-001-onboarding.spec.ts` | ✅ PASS | 2026-01-10 |
+| `uj-gs-002-device-compatibility.spec.ts` | ✅ VERIFIED | 2026-01-10 |
+| `uj-gs-004-application-shell.spec.ts` | ⏳ Pending | - |

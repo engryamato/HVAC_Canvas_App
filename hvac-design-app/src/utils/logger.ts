@@ -18,15 +18,15 @@ function shouldLog(level: LogLevel): boolean {
 
 export const logger = {
     debug: (...args: any[]) => {
-        if (shouldLog('debug')) console.debug(...args);
+        if (shouldLog('debug')) {console.debug(...args);}
     },
     info: (...args: any[]) => {
-        if (shouldLog('info')) console.info(...args);
+        if (shouldLog('info')) {console.info(...args);}
     },
     warn: (...args: any[]) => {
-        if (shouldLog('warn')) console.warn(...args);
+        if (shouldLog('warn')) {console.warn(...args);}
     },
     error: (...args: any[]) => {
-        if (shouldLog('error')) console.error(...args);
+        if (shouldLog('error')) {console.error(...args);}
     },
 };
