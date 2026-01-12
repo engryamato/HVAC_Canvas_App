@@ -26,6 +26,17 @@ export const useAppStateStore = create<AppState>()(
         {
             name: 'hvac-app-storage',
             partialize: (state) => ({ hasLaunched: state.hasLaunched }),
+            // Custom merge to ensure isFirstLaunch is derived from hasLaunched after rehydration
+            merge: (persistedState: any, currentState) => {
+                const persisted = persistedState as Partial<AppState>;
+                const hasLaunched = persisted?.hasLaunched ?? currentState.hasLaunched;
+                return {
+                    ...currentState,
+                    hasLaunched,
+                    isFirstLaunch: !hasLaunched, // Derived from persistence
+                    isLoading: false, // Hydration complete
+                };
+            },
         }
     )
 );

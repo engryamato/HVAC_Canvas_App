@@ -20,7 +20,11 @@ This document describes the **first launch initialization** process (both curren
 
 **Scope**: Application startup and initialization, not project-specific setup.
 
-**Recent Updates** (2026-01-10):
+**Recent Updates** (2026-01-12):
+- ✅ **FIXED** critical `isFirstLaunch` rehydration bug with custom `merge` function
+- ✅ Added 18 unit tests for `useAppStateStore` (including rehydration verification)
+
+**Previous Updates** (2026-01-10):
 - ✅ Fixed storage key discrepancy (`hvac-app-storage` vs `project-storage`)
 - ✅ Updated preferences defaults to match actual implementation
 - ✅ Added AppInitializer component flow documentation
@@ -31,7 +35,7 @@ This document describes the **first launch initialization** process (both curren
 - ✅ Verified acceptance criteria against E2E test coverage
 - ✅ Added cross-references to UJ-GS-001 specification
 - ✅ Applied Augment code review corrections (4 documentation fixes)
-- ⚠️ Identified critical rehydration bug (documented as known issue)
+
 
 ---
 
@@ -585,50 +589,40 @@ See [IMPLEMENTATION_STATUS.md](../IMPLEMENTATION_STATUS.md) for complete details
 
 ## Known Issues
 
-### 🔴 CRITICAL: isFirstLaunch Rehydration Bug (Identified by Augment Review)
+### ✅ FIXED: isFirstLaunch Rehydration Bug (Originally identified by Augment Review)
 
-**Issue**: `isFirstLaunch` state becomes inconsistent after page reload for returning users.
+**Issue**: `isFirstLaunch` state became inconsistent after page reload for returning users.
 
 **Root Cause**:
-- `isFirstLaunch` is stored as a separate state field (not a computed getter)
-- Only `hasLaunched` is persisted to localStorage via `partialize`
-- On rehydration, `isFirstLaunch` uses its initial value (`true`) instead of being recalculated from `hasLaunched`
+- `isFirstLaunch` was stored as a separate state field (not a computed getter)
+- Only `hasLaunched` was persisted to localStorage via `partialize`
+- On rehydration, `isFirstLaunch` used its initial value (`true`) instead of being recalculated from `hasLaunched`
 
-**Current Behavior** (BUGGY):
-```typescript
-// First visit
-{ hasLaunched: false, isFirstLaunch: true } ✅ CORRECT
+**Fix Applied** (2026-01-12):
+Added custom `merge` function to Zustand persist middleware that derives `isFirstLaunch` from `hasLaunched` during rehydration:
 
-// User completes onboarding, setHasLaunched(true) called
-{ hasLaunched: true, isFirstLaunch: false } ✅ CORRECT
-
-// User reloads page - Zustand persist rehydrates from localStorage
-// localStorage has: { "hasLaunched": true }
-// But isFirstLaunch uses initial state value
-{ hasLaunched: true, isFirstLaunch: true } ❌ BUG! Both are true!
-```
-
-**Impact**:
-- Returning users see the welcome screen again on every page reload
-- State inconsistency breaks first launch detection logic
-
-**Intended Fix** (for implementation):
-Add `onRehydrateStorage` callback to recalculate `isFirstLaunch`:
 ```typescript
 {
     name: 'hvac-app-storage',
     partialize: (state) => ({ hasLaunched: state.hasLaunched }),
-    onRehydrateStorage: () => (state) => {
-        if (state) {
-            state.isFirstLaunch = !state.hasLaunched;
-        }
+    merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<AppState> | undefined;
+        const hasLaunched = persisted?.hasLaunched ?? currentState.hasLaunched;
+        return {
+            ...currentState,
+            ...persisted,
+            isFirstLaunch: !hasLaunched, // Derive from hasLaunched
+        };
     },
 }
 ```
 
-**Status**: 📋 Documented for future implementation
-**Verification**: See [AUGMENT-REVIEW-VERIFICATION.md](./AUGMENT-REVIEW-VERIFICATION.md) for detailed analysis
-**Test Spec**: Unit tests should verify rehydration behavior (test spec TBD)
+**Verification**:
+- ✅ 18 unit tests added to `src/stores/__tests__/useAppStateStore.test.ts`
+- ✅ E2E onboarding tests pass (2/2)
+- ✅ Full test suite passes with no regressions
+
+**Status**: ✅ Fixed and verified
 
 ---
 

@@ -1,0 +1,16 @@
+**/node_modules
+**/.git
+**/.vscode
+**/.idea
+**/*.log
+**/.next
+**/dist
+**/build
+**/coverage
+**/playwright-report
+**/test-results
+**/target
+**/.augment
+**/.auto-claude
+**/.claude
+**/.continue

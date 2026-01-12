@@ -1,11 +1,11 @@
-version: '3'
+version: '3.8'
 
 services:
   hvac-app:
     container_name: hvac-canvas-app
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: hvac-design-app/Dockerfile
     ports:
       - "3000:3000"
     environment:

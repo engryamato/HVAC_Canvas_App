@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -7,9 +7,16 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+# For monorepos, we often need the workspace root files
+COPY pnpm-lock.yaml* pnpm-workspace.yaml* package.json ./
+COPY hvac-design-app/package.json ./hvac-design-app/
+COPY hvac-design-app/pnpm-lock.yaml* ./hvac-design-app/
+
+RUN mkdir -p node_modules hvac-design-app/node_modules
+
 RUN \
-  if [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f hvac-design-app/pnpm-lock.yaml ]; then cd hvac-design-app && corepack enable pnpm && pnpm i --frozen-lockfile; \
   elif [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
   else echo "Lockfile not found." && exit 1; \
@@ -20,7 +27,10 @@ RUN \
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/hvac-design-app/node_modules ./hvac-design-app/node_modules
 COPY . .
+
+WORKDIR /app/hvac-design-app
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -28,7 +38,8 @@ COPY . .
 # ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN \
-  if [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm run build; \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+  elif [ -f ../pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
   elif [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   else echo "Lockfile not found." && exit 1; \
@@ -45,16 +56,16 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Standalone mode in a monorepo structure traces from the root
+# The standalone folder is created inside the app directory
+COPY --from=builder --chown=nextjs:nodejs /app/hvac-design-app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/hvac-design-app/.next/static ./hvac-design-app/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/hvac-design-app/public ./hvac-design-app/public
 
 USER nextjs
 
@@ -64,4 +75,5 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+# Standalone mode in a monorepo structure has server.js in the app folder
+CMD ["node", "hvac-design-app/server.js"]
