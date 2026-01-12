@@ -3,17 +3,20 @@ import { useRouter } from 'next/navigation';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
+import { useTutorialStore } from '@/stores/useTutorialStore';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
 import { SplashScreen } from './SplashScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 
+
 export const AppInitializer: React.FC = () => {
     const router = useRouter();
     const { hasLaunched, isFirstLaunch, isLoading } = useAppStateStore();
+    const { isActive: isTutorialActive } = useTutorialStore();
     const [showSplash, setShowSplash] = useState(true);
     const [mounted, setMounted] = useState(false);
 
-    console.log('[AppInfo Render]', { showSplash, isFirstLaunch, isLoading });
+    console.log('[AppInfo Render]', { showSplash, isFirstLaunch, isLoading, isTutorialActive });
 
     // Force preferences hydration on startup
     usePreferencesStore();
@@ -28,13 +31,19 @@ export const AppInitializer: React.FC = () => {
     // Handle dynamic redirection when state changes (e.g. after rehydration)
     useEffect(() => {
         // Debug logging for troubleshooting
-        console.log('[AppInfo] State:', { showSplash, isFirstLaunch, isLoading });
+        console.log('[AppInfo] State:', { showSplash, isFirstLaunch, isLoading, isTutorialActive });
+
+        // Don't redirect if tutorial is active - user is navigating to canvas
+        if (isTutorialActive) {
+            console.log('[AppInfo] Tutorial active, skipping dashboard redirect');
+            return;
+        }
 
         if (!showSplash && !isFirstLaunch && !isLoading) {
             console.log('[AppInfo] Redirecting to dashboard...');
             router.replace('/dashboard');
         }
-    }, [showSplash, isFirstLaunch, isLoading, router]);
+    }, [showSplash, isFirstLaunch, isLoading, isTutorialActive, router]);
 
     // Force persistence of defaults on first load (Fix for lazy hydration "Paper App" issue)
     useEffect(() => {

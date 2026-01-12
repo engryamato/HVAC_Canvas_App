@@ -461,7 +461,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const cursor = activeTool.getCursor();
 
   return (
-    <div ref={containerRef} className={`relative w-full h-full overflow-hidden ${className || ''}`}>
+    <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
