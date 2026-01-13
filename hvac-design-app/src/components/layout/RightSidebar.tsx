@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { ChevronRight, Settings, List, FileText, Calculator } from 'lucide-react';
@@ -18,13 +17,8 @@ export const RightSidebar: React.FC = () => {
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Toggle sidebar (Ctrl+Shift+B) or Legacy (Ctrl+I)
+            // Toggle sidebar (Ctrl+Shift+B)
             if (e.ctrlKey && e.shiftKey && (e.key === 'b' || e.key === 'B')) {
-                e.preventDefault();
-                toggleRightSidebar();
-                return;
-            }
-            if (e.ctrlKey && (e.key === 'i' || e.key === 'I')) {
                 e.preventDefault();
                 toggleRightSidebar();
                 return;
@@ -32,22 +26,14 @@ export const RightSidebar: React.FC = () => {
 
             // Tab shortcuts
             if (e.ctrlKey) {
-                if (e.key === 'p' || e.key === 'P') { // Ctrl+P -> Properties
+                if (!e.shiftKey && (e.key === 'p' || e.key === 'P')) { // Ctrl+P -> Properties
                     e.preventDefault();
-                    if (rightSidebarCollapsed) {toggleRightSidebar();}
+                    if (rightSidebarCollapsed) { toggleRightSidebar(); }
                     setActiveRightTab('properties');
-                } else if (e.key === 'm' || e.key === 'M') { // Ctrl+M -> BOM
+                } else if (!e.shiftKey && (e.key === 'm' || e.key === 'M')) { // Ctrl+M -> BOM
                     e.preventDefault();
-                    if (rightSidebarCollapsed) {toggleRightSidebar();}
+                    if (rightSidebarCollapsed) { toggleRightSidebar(); }
                     setActiveRightTab('bom');
-                } else if (e.shiftKey && (e.key === 'p' || e.key === 'P')) { // Ctrl+Shift+P -> Calc
-                    e.preventDefault();
-                    if (rightSidebarCollapsed) {toggleRightSidebar();}
-                    setActiveRightTab('calculations');
-                } else if (e.shiftKey && (e.key === 'n' || e.key === 'N')) { // Ctrl+Shift+N -> Notes
-                    e.preventDefault();
-                    if (rightSidebarCollapsed) {toggleRightSidebar();}
-                    setActiveRightTab('notes');
                 }
             }
         };
@@ -66,10 +52,7 @@ export const RightSidebar: React.FC = () => {
     if (rightSidebarCollapsed) {
         return (
             <div
-                className={cn(
-                    "w-12 bg-white border-l flex flex-col items-center pt-4 transition-all duration-300",
-                    "collapsed"
-                )}
+                className="w-12 bg-white border-l flex flex-col items-center pt-4 transition-all duration-300 collapsed"
                 data-testid="right-sidebar"
             >
                 <Button
@@ -86,17 +69,21 @@ export const RightSidebar: React.FC = () => {
                 <div className="mt-4 flex flex-col gap-2 w-full px-1">
                     {tabs.map(tab => {
                         const Icon = tab.icon;
+                        const isActive = activeRightTab === tab.id;
                         return (
                             <Button
                                 key={tab.id}
-                                variant={activeRightTab === tab.id ? 'secondary' : 'ghost'}
+                                variant={isActive ? 'secondary' : 'ghost'}
                                 size="sm"
                                 onClick={() => {
                                     setActiveRightTab(tab.id);
                                     toggleRightSidebar();
                                 }}
-                                className="w-full h-10 p-0 justify-center"
+                                className={cn("w-full h-10 p-0 justify-center") + (isActive ? " active" : "")}
                                 title={tab.label}
+                                data-testid={`tab-${tab.id}`}
+                                role="tab"
+                                aria-selected={isActive}
                             >
                                 <Icon className="w-4 h-4" />
                             </Button>
@@ -124,7 +111,7 @@ export const RightSidebar: React.FC = () => {
                                 variant={isActive ? 'default' : 'ghost'}
                                 size="sm"
                                 onClick={() => setActiveRightTab(tab.id)}
-                                className={cn("gap-1 px-2 h-8", isActive ? "" : "text-slate-500")}
+                                className={cn("gap-1 px-2 h-8", !isActive && "text-slate-500") + (isActive ? " active" : "")}
                                 data-testid={`tab-${tab.id}`}
                                 aria-label={tab.label}
                                 aria-selected={isActive}

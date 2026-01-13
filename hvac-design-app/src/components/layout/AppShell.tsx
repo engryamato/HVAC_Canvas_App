@@ -6,7 +6,6 @@ import { Toolbar } from './Toolbar';
 import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { StatusBar } from './StatusBar';
-import { KeyboardShortcutsDialog } from '@/components/help/KeyboardShortcutsDialog';
 
 interface AppShellProps {
     children: ReactNode;
@@ -16,8 +15,10 @@ interface AppShellProps {
 export const AppShell: React.FC<AppShellProps> = ({ children, projectName }) => {
     return (
         <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-50 text-slate-900">
-            {/* Top Bar */}
+            {/* Header with Menu Bar */}
             <Header projectName={projectName} />
+
+            {/* Toolbar */}
             <Toolbar />
 
             {/* Main Content Area */}
@@ -32,11 +33,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children, projectName }) => 
                 <RightSidebar />
             </div>
 
-            {/* Bottom Bar */}
+            {/* Status Bar */}
             <StatusBar />
-
-            {/* Global Dialogs */}
-            <KeyboardShortcutsDialog />
         </div>
     );
 };

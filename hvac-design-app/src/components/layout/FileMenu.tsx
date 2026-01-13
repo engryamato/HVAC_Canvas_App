@@ -68,6 +68,7 @@ export function FileMenu() {
                     <button
                         onClick={() => router.push('/dashboard')}
                         className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                        data-testid="menu-dashboard"
                     >
                         Go to Dashboard <span className="text-xs opacity-50 ml-2">Ctrl+Shift+D</span>
                     </button>

@@ -18,10 +18,10 @@ export const LeftSidebar: React.FC = () => {
     // Local state for search and categories
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-        'ahu': true,
-        'vav': true,
-        'fan': false,
-        'duct': false,
+        'air-handling-units': true,
+        'vav-boxes': false,
+        'fans': false,
+        'ducts': false,
     });
 
     const toggleCategory = (catId: string) => {
@@ -34,7 +34,7 @@ export const LeftSidebar: React.FC = () => {
     // Keyboard shortcut: Ctrl+B
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey && (e.key === 'b' || e.key === 'B' || e.code === 'KeyB')) {
+            if (e.ctrlKey && !e.shiftKey && (e.key === 'b' || e.key === 'B' || e.code === 'KeyB')) {
                 e.preventDefault();
                 toggleLeftSidebar();
             }
@@ -53,10 +53,7 @@ export const LeftSidebar: React.FC = () => {
     if (leftSidebarCollapsed) {
         return (
             <div
-                className={cn(
-                    "w-12 bg-white border-r flex flex-col items-center pt-4 transition-all duration-300",
-                    "collapsed"
-                )}
+                className="w-12 bg-white border-r flex flex-col items-center pt-4 transition-all duration-300 collapsed"
                 data-testid="left-sidebar"
             >
                 <Button
@@ -73,17 +70,21 @@ export const LeftSidebar: React.FC = () => {
                 <div className="mt-4 flex flex-col gap-2 w-full px-1">
                     {tabs.map(tab => {
                         const Icon = tab.icon;
+                        const isActive = activeLeftTab === tab.id;
                         return (
                             <Button
                                 key={tab.id}
-                                variant={activeLeftTab === tab.id ? 'secondary' : 'ghost'}
+                                variant={isActive ? 'secondary' : 'ghost'}
                                 size="sm"
                                 onClick={() => {
                                     setActiveLeftTab(tab.id);
                                     toggleLeftSidebar(); // Expand on tab click
                                 }}
-                                className="w-full h-10 p-0 justify-center"
+                                className={cn("w-full h-10 p-0 justify-center") + (isActive ? " active" : "")}
                                 title={tab.label}
+                                data-testid={`tab-${tab.id}`}
+                                role="tab"
+                                aria-selected={isActive}
                             >
                                 <Icon className="w-4 h-4" />
                             </Button>
@@ -127,7 +128,7 @@ export const LeftSidebar: React.FC = () => {
                                 isActive
                                     ? "text-blue-600 border-blue-600 bg-blue-50/50"
                                     : "text-slate-600 border-transparent hover:bg-slate-50"
-                            )}
+                            ) + (isActive ? " active" : "")}
                             data-testid={`tab-${tab.id}`}
                             role="tab"
                             aria-selected={isActive}
@@ -160,21 +161,22 @@ export const LeftSidebar: React.FC = () => {
                         {/* Category Tree */}
                         <div className="flex-1 overflow-y-auto p-2" data-testid="equipment-category-tree">
                             <EquipmentCategory
-                                id="ahu"
+                                id="air-handling-units"
                                 label="Air Handling Units"
-                                expanded={expandedCategories['ahu']}
-                                onToggle={() => toggleCategory('ahu')}
+                                expanded={expandedCategories['air-handling-units']}
+                                onToggle={() => toggleCategory('air-handling-units')}
                                 searchQuery={searchQuery}
                                 items={[
                                     { name: 'AHU - York MCA', desc: '5000 CFM' },
                                     { name: 'AHU - Trane', desc: '3000 CFM' },
+                                    { name: 'AHU - Carrier', desc: '7500 CFM' },
                                 ]}
                             />
                             <EquipmentCategory
-                                id="vav"
+                                id="vav-boxes"
                                 label="VAV Boxes"
-                                expanded={expandedCategories['vav']}
-                                onToggle={() => toggleCategory('vav')}
+                                expanded={expandedCategories['vav-boxes']}
+                                onToggle={() => toggleCategory('vav-boxes')}
                                 searchQuery={searchQuery}
                                 items={[
                                     { name: 'VAV - Single Duct', desc: 'Cooling Only' },
@@ -182,14 +184,26 @@ export const LeftSidebar: React.FC = () => {
                                 ]}
                             />
                             <EquipmentCategory
-                                id="fan"
+                                id="fans"
                                 label="Fans"
-                                expanded={expandedCategories['fan']}
-                                onToggle={() => toggleCategory('fan')}
+                                expanded={expandedCategories['fans']}
+                                onToggle={() => toggleCategory('fans')}
                                 searchQuery={searchQuery}
                                 items={[
                                     { name: 'Exhaust Fan', desc: 'Roof Mounted' },
                                     { name: 'Supply Fan', desc: 'Inline' },
+                                ]}
+                            />
+                            <EquipmentCategory
+                                id="ducts"
+                                label="Ductwork"
+                                expanded={expandedCategories['ducts']}
+                                onToggle={() => toggleCategory('ducts')}
+                                searchQuery={searchQuery}
+                                items={[
+                                    { name: 'Round Duct', desc: 'Galvanized' },
+                                    { name: 'Rectangular Duct', desc: 'Galvanized' },
+                                    { name: 'Flex Duct', desc: 'Insulated' },
                                 ]}
                             />
                         </div>
@@ -197,16 +211,22 @@ export const LeftSidebar: React.FC = () => {
                 )}
 
                 {activeLeftTab === 'layers' && (
-                    <div className="p-4 text-center text-slate-500" data-testid="layers-panel">
-                        <Layers className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                        <p>Layers functionality coming soon</p>
+                    <div className="flex-1 p-4" data-testid="layers-panel">
+                        <div className="text-center text-slate-500">
+                            <Layers className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                            <p className="text-sm">Layer management</p>
+                            <p className="text-xs text-slate-400 mt-1">Coming soon</p>
+                        </div>
                     </div>
                 )}
 
                 {activeLeftTab === 'recent' && (
-                    <div className="p-4 text-center text-slate-500" data-testid="recent-panel">
-                        <Clock className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                        <p>No recent items</p>
+                    <div className="flex-1 p-4" data-testid="recent-panel">
+                        <div className="text-center text-slate-500">
+                            <Clock className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                            <p className="text-sm">No recent items</p>
+                            <p className="text-xs text-slate-400 mt-1">Recently used equipment will appear here</p>
+                        </div>
                     </div>
                 )}
             </div>
@@ -236,7 +256,7 @@ const EquipmentCategory: React.FC<{
     // If searching, always expand if matches found
     const isExpanded = searchQuery ? filteredItems.length > 0 : expanded;
 
-    if (searchQuery && filteredItems.length === 0) {return null;}
+    if (searchQuery && filteredItems.length === 0) { return null; }
 
     return (
         <div className="mb-1" data-testid={`category-${id}`}>

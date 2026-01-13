@@ -8,6 +8,7 @@ import { useViewportStore } from '@/stores/useViewportStore';
 import {
     MousePointer2,
     Square,
+    Minus,
     Move,
     Box,
     Circle,
@@ -19,6 +20,7 @@ import {
     Redo,
     Grid,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const Toolbar: React.FC = () => {
     const { currentTool: activeTool, setTool: setActiveTool } = useToolStore();
@@ -42,6 +44,7 @@ export const Toolbar: React.FC = () => {
             // Tool shortcuts (matching E2E expectations)
             switch (e.key.toLowerCase()) {
                 case 'v': setActiveTool('select'); break;
+                case 'l': setActiveTool('line'); break;
                 case 'r': setActiveTool('room'); break;
                 case 'd': setActiveTool('duct'); break;
                 case 'e': setActiveTool('equipment'); break;
@@ -57,6 +60,7 @@ export const Toolbar: React.FC = () => {
 
     const tools = [
         { id: 'select', label: 'Select', icon: MousePointer2, shortcut: 'V' },
+        { id: 'line', label: 'Line', icon: Minus, shortcut: 'L' },
         { id: 'room', label: 'Room', icon: Square, shortcut: 'R' },
         { id: 'duct', label: 'Duct', icon: Move, shortcut: 'D' },
         { id: 'equipment', label: 'Equipment', icon: Box, shortcut: 'E' },
@@ -66,7 +70,7 @@ export const Toolbar: React.FC = () => {
 
     return (
         <Card
-            className="h-12 bg-white border-b flex items-center px-4 gap-4 rounded-none"
+            className="h-[45px] bg-white border-b flex items-center px-4 gap-4 rounded-none shrink-0"
             data-testid="toolbar"
         >
             {/* Tool Selection */}
@@ -80,14 +84,14 @@ export const Toolbar: React.FC = () => {
                             variant={isActive ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => setActiveTool(tool.id)}
-                            className={`gap-1 ${isActive ? 'active' : ''}`}
+                            className={cn("gap-1 h-8") + (isActive ? " active" : "")}
                             data-testid={`tool-${tool.id}`}
                             aria-label={tool.label}
                             aria-pressed={isActive}
                             title={`${tool.label} (${tool.shortcut})`}
                         >
                             <Icon className="w-4 h-4" />
-                            <span className="hidden sm:inline">{tool.label}</span>
+                            <span className="hidden md:inline text-xs">{tool.label}</span>
                         </Button>
                     );
                 })}
@@ -97,7 +101,7 @@ export const Toolbar: React.FC = () => {
             <div className="h-6 w-px bg-slate-200" />
 
             {/* View Controls */}
-            <div className="flex items-center gap-2" role="group" aria-label="View controls">
+            <div className="flex items-center gap-1" role="group" aria-label="View controls" data-testid="zoom-control">
                 <Button
                     variant="ghost"
                     size="sm"
@@ -105,11 +109,12 @@ export const Toolbar: React.FC = () => {
                     data-testid="zoom-out"
                     aria-label="Zoom out"
                     title="Zoom Out (Ctrl+-)"
+                    className="h-8 w-8 p-0"
                 >
                     <ZoomOut className="w-4 h-4" />
                 </Button>
 
-                <span className="text-sm font-medium w-12 text-center select-none" data-testid="zoom-level">
+                <span className="text-xs font-medium w-12 text-center select-none" data-testid="zoom-level">
                     {zoom}%
                 </span>
 
@@ -120,6 +125,7 @@ export const Toolbar: React.FC = () => {
                     data-testid="zoom-in"
                     aria-label="Zoom in"
                     title="Zoom In (Ctrl++)"
+                    className="h-8 w-8 p-0"
                 >
                     <ZoomIn className="w-4 h-4" />
                 </Button>
@@ -131,6 +137,7 @@ export const Toolbar: React.FC = () => {
                     data-testid="zoom-fit"
                     aria-label="Fit to screen"
                     title="Fit to Screen"
+                    className="h-8 w-8 p-0"
                 >
                     <Maximize2 className="w-4 h-4" />
                 </Button>
@@ -143,7 +150,7 @@ export const Toolbar: React.FC = () => {
                     aria-label="Toggle grid"
                     aria-pressed={gridVisible}
                     title="Toggle Grid (Ctrl+G)"
-                    className={gridVisible ? 'bg-slate-100' : ''}
+                    className={cn("h-8 w-8 p-0", gridVisible && "bg-slate-100")}
                 >
                     <Grid className="w-4 h-4" />
                 </Button>
@@ -161,6 +168,7 @@ export const Toolbar: React.FC = () => {
                     data-testid="undo-button"
                     aria-label="Undo"
                     title="Undo (Ctrl+Z)"
+                    className="h-8 w-8 p-0"
                 >
                     <Undo className="w-4 h-4" />
                 </Button>
@@ -171,6 +179,7 @@ export const Toolbar: React.FC = () => {
                     data-testid="redo-button"
                     aria-label="Redo"
                     title="Redo (Ctrl+Shift+Z)"
+                    className="h-8 w-8 p-0"
                 >
                     <Redo className="w-4 h-4" />
                 </Button>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CanvasPage } from './CanvasPage';
 import { useProjectStore as useSessionStore } from '@/core/store/project.store';
 import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore';
-import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
+import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
@@ -25,8 +25,8 @@ function compareVersions(v1: string, v2: string): number {
   for (let i = 0; i < 3; i++) {
     const p1 = parts1[i] || 0;
     const p2 = parts2[i] || 0;
-    if (p1 > p2) {return 1;}
-    if (p1 < p2) {return -1;}
+    if (p1 > p2) { return 1; }
+    if (p1 < p2) { return -1; }
   }
   return 0;
 }
@@ -136,12 +136,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
     localStorage.setItem('lastActiveProjectId', projectId);
   }
 
-  // Show error dialog
+  // Show error page (404)
   if (projectError) {
     return (
-      <ErrorDialog
+      <ErrorPage
+        title="Project Not Found"
         message={projectError}
-        onClose={() => router.push('/dashboard')}
       />
     );
   }
