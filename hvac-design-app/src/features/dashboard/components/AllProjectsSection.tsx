@@ -1,8 +1,7 @@
 'use client';
 
-import ProjectCard from './ProjectCard';
+import { ProjectGrid } from './ProjectGrid';
 import type { ProjectListItem } from '../store/projectListStore';
-import { useProjectListActions } from '../store/projectListStore';
 
 interface AllProjectsSectionProps {
     projects: ProjectListItem[];
@@ -14,7 +13,6 @@ interface AllProjectsSectionProps {
  * Implements UJ-PM-002 Step 1 & 2: Project list and search results
  */
 export function AllProjectsSection({ projects, searchTerm }: AllProjectsSectionProps) {
-    const actions = useProjectListActions();
 
     return (
         <section data-testid="all-projects">
@@ -22,25 +20,7 @@ export function AllProjectsSection({ projects, searchTerm }: AllProjectsSectionP
                 All Projects
             </h2>
             {projects.length > 0 ? (
-                <div
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                        gap: '16px',
-                    }}
-                >
-                    {projects.map((project) => (
-                        <ProjectCard
-                            key={project.projectId}
-                            project={project}
-                            onDelete={actions.removeProject}
-                            onArchive={actions.archiveProject}
-                            onRestore={actions.restoreProject}
-                            onDuplicate={actions.duplicateProject}
-                            onRename={(id, name) => actions.updateProject(id, { projectName: name })}
-                        />
-                    ))}
-                </div>
+                <ProjectGrid projects={projects} />
             ) : (
                 <p style={{ color: '#666', fontStyle: 'italic' }}>
                     {searchTerm
