@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers exporting a comprehensive project report containing project details, entity list, calculations, and BOM (Bill of Materials) in PDF format for documentation and client delivery.
+### Purpose
+This document describes how users export comprehensive project reports that include metadata, entity summaries, calculations, and BOM details for client delivery.
+
+### Scope
+**In Scope:**
+- Opening the export dialog from the canvas
+- Configuring report options and sections
+- Generating the PDF report
+- Saving or downloading the generated file
+
+**Out of Scope:**
+- CSV or Excel exports (see 09-export journeys)
+- Automated scheduled reporting
+- Emailing reports directly from the app
+
+### User Personas
+- **Primary**: HVAC designers delivering reports to clients
+- **Secondary**: Project managers reviewing project documentation
+- **Tertiary**: Sales or estimating teams packaging deliverables
+
+### Success Criteria
+- Export dialog opens from the File menu or shortcut
+- Report options apply correctly with clear previews
+- PDF generation completes with progress feedback
+- Exported file is saved or downloaded successfully
+- Report content matches selected sections and branding
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,9 +69,31 @@ This user journey covers exporting a comprehensive project report containing pro
 
 ## Prerequisites
 
-- User is in Canvas Editor page
-- Project has entities (at least 1 room or duct)
-- PDF generation library available
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Canvas access | User is in the Canvas Editor |
+| Report intent | User knows which report sections to include |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Export dialog available | File menu exposes export report action |
+| PDF generator ready | PDF library loaded and initialized |
+| Calculation data ready | BOM and calculation data accessible |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project entities | At least one entity exists for meaningful output |
+| Project metadata | Name, client, and identifiers available |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `ExportDialog` | Collects export options | `src/components/canvas/ExportDialog.tsx` |
+| `ReportGenerator` | Builds PDF output | `src/lib/ReportGenerator.ts` |
+| `entityStore` | Supplies entity data | `src/stores/entityStore.ts` |
 
 ## User Journey Steps
 

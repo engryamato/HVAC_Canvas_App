@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers archiving completed or inactive HVAC projects to declutter the active project list while preserving project files. Includes archive action, project list filtering, restoration capability, and archived project management.
+### Purpose
+This document describes how users archive completed or inactive projects to keep the active list focused while preserving project data for later restoration.
+
+### Scope
+**In Scope:**
+- Archiving from the dashboard
+- Viewing archived projects
+- Restoring archived projects
+- Persisting archive status in metadata
+
+**Out of Scope:**
+- Permanent deletion (see UJ-PM-004)
+- Project duplication (see UJ-PM-006)
+- Advanced archive automation policies
+
+### User Personas
+- **Primary**: HVAC designers managing large project portfolios
+- **Secondary**: Project managers organizing active vs archived work
+- **Tertiary**: Administrators auditing project lifecycles
+
+### Success Criteria
+- Archive action hides projects from the active list
+- Archived projects remain accessible in the Archived tab
+- Restore action returns projects to active state
+- Archive status persists across sessions
+- Archive/restore actions provide clear confirmation feedback
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,9 +69,31 @@ This user journey covers archiving completed or inactive HVAC projects to declut
 
 ## Prerequisites
 
-- User is on Dashboard page (`/dashboard`)
-- At least one project exists in active project list
-- Project is not currently open in canvas editor
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Dashboard access | User can view projects on the dashboard |
+| Portfolio context | User understands which projects should be archived |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project list loaded | Active projects rendered with actions |
+| Archive dialog | Confirmation dialog available (if enabled) |
+| Tab navigation | Active/Archived tabs available |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Active project | At least one project in active list |
+| Archive metadata | `isArchived` and `archivedAt` fields supported |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `projectListStore` | Archive state management | `src/stores/projectListStore.ts` |
+| `ArchiveDialog` | Archive confirmation UI | `src/components/dashboard/ArchiveDialog.tsx` |
+| `DashboardPage` | Tab switching and filters | `src/pages/DashboardPage.tsx` |
 
 ## User Journey Steps
 

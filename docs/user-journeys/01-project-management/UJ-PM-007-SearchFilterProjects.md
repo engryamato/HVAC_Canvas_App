@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers searching and filtering the project list on the dashboard using text search, filters, and sorting options to quickly find specific projects among many.
+### Purpose
+This document describes how users search, sort, and filter the dashboard project list to quickly locate projects by name, client, or metadata.
+
+### Scope
+**In Scope:**
+- Typing search queries and seeing real-time results
+- Sorting projects by name or date
+- Filtering between active and archived lists
+- Clearing search and reset behavior
+
+**Out of Scope:**
+- Advanced analytics or reporting on projects
+- Full-text search across project contents
+- Cross-user search in shared cloud workspaces
+
+### User Personas
+- **Primary**: HVAC designers managing multiple active projects
+- **Secondary**: Project managers reviewing project portfolios
+- **Tertiary**: Administrators auditing large project lists
+
+### Success Criteria
+- Search filters results in real time with clear counts
+- Sorting and filtering operate together without conflicts
+- Clear search restores the full list immediately
+- Large lists remain responsive during filtering
+- Empty state messaging is descriptive and actionable
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,8 +69,30 @@ This user journey covers searching and filtering the project list on the dashboa
 
 ## Prerequisites
 
-- User is on Dashboard page
-- Multiple projects exist (ideally 5+)
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Dashboard access | User can view the project list on the dashboard |
+| Basic search knowledge | User understands simple text search |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project list loaded | Projects rendered before filtering |
+| Search UI available | Search input and sort dropdown visible |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project volume | Multiple projects exist to filter (5+ recommended) |
+| Metadata fields | Names, clients, and dates available for sorting |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `SearchBar` | Text input and clear actions | `src/components/dashboard/SearchBar.tsx` |
+| `SortDropdown` | Sorting selector | `src/components/dashboard/SortDropdown.tsx` |
+| `projectListStore` | Filtered project data | `src/stores/projectListStore.ts` |
 
 ## User Journey Steps
 

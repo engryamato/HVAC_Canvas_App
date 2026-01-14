@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers permanently deleting an HVAC project from the dashboard, including project selection, confirmation dialog with safety measures, file system deletion, store cleanup, and user feedback. Includes safeguards against accidental deletion.
+### Purpose
+This document describes how users permanently delete HVAC projects from the dashboard, including confirmation safeguards, file cleanup, and user feedback.
+
+### Scope
+**In Scope:**
+- Triggering delete from the dashboard
+- Confirmation dialog with safety checks
+- Deleting project records and files
+- UI updates and undo messaging
+
+**Out of Scope:**
+- Archiving projects (see UJ-PM-005)
+- Duplicating or exporting projects (see UJ-PM-006, UJ-PM-008)
+- Restoring deleted files from backups
+
+### User Personas
+- **Primary**: HVAC designers removing test or obsolete projects
+- **Secondary**: Project managers cleaning up portfolios
+- **Tertiary**: Administrators enforcing data retention policies
+
+### Success Criteria
+- Delete action requires explicit confirmation
+- Project is removed from the dashboard list
+- Storage cleanup completes or reports clear errors
+- Undo option appears within the defined window
+- No references remain in recent lists or searches
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,10 +69,32 @@ This user journey covers permanently deleting an HVAC project from the dashboard
 
 ## Prerequisites
 
-- User is on Dashboard page (`/dashboard`)
-- At least one project exists in project list
-- Project is not currently open in canvas editor
-- User has write permissions to project directory
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Dashboard access | User can view the dashboard project list |
+| Delete intent | User understands deletion is permanent |
+| Permissions | User has permission to delete projects |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project list loaded | Projects rendered in the dashboard |
+| Confirmation dialog | Delete dialog component available |
+| File operations ready | Storage backend ready for delete actions |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Target project | At least one deletable project exists |
+| Project not open | Target project not actively opened in canvas |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `DeleteConfirmDialog` | Confirmation UI and validation | `src/components/dashboard/DeleteConfirmDialog.tsx` |
+| `projectListStore` | Project removal state | `src/stores/projectListStore.ts` |
+| `ProjectIO` | File deletion logic | `src/services/ProjectIO.ts` |
 
 ## User Journey Steps
 
