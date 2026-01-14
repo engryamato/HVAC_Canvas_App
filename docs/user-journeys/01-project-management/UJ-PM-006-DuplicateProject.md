@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers creating an exact copy of an existing project from the dashboard, useful for creating project variations, templates, or backups. Similar to Save As but initiated from the dashboard instead of within the canvas editor.
+### Purpose
+This document describes how users duplicate an existing project from the dashboard to create variations, templates, or backups without opening the project in the canvas editor.
+
+### Scope
+**In Scope:**
+- Initiating duplication from the dashboard
+- Copying project metadata, entities, and settings
+- Naming and ID generation for the duplicate
+- Saving the duplicate and updating the project list
+
+**Out of Scope:**
+- Save As from the canvas editor (see UJ-FM-003)
+- Selective entity copy between projects
+- Template library management
+
+### User Personas
+- **Primary**: HVAC designers iterating on project variants
+- **Secondary**: Project managers creating templates from finished work
+- **Tertiary**: QA reviewers creating backup copies for testing
+
+### Success Criteria
+- Duplicate action completes without modifying the source project
+- New project receives a unique ID and name
+- Duplicate appears in the dashboard list with correct metadata
+- Copy operation handles large projects with clear progress feedback
+- Errors are surfaced with recovery guidance
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,10 +69,31 @@ This user journey covers creating an exact copy of an existing project from the 
 
 ## Prerequisites
 
-- User is on Dashboard page (`/dashboard`)
-- At least one project exists
-- Project to duplicate is not corrupted
-- File system has sufficient space
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Dashboard access | User can view projects on the dashboard |
+| Project knowledge | User understands which project to duplicate |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project list loaded | Projects rendered with action menus |
+| Duplication service | Duplicate handler available |
+| Storage ready | Backend can write a new project copy |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Source project | Project is readable and not corrupted |
+| Sufficient storage | Space available for the new copy |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `ProjectService` | Duplicate project logic | `src/services/ProjectService.ts` |
+| `projectListStore` | Adds new project to list | `src/stores/projectListStore.ts` |
+| `ProjectIO` | Reads and writes project files | `src/services/ProjectIO.ts` |
 
 ## User Journey Steps
 

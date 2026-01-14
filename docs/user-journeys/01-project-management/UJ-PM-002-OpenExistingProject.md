@@ -29,6 +29,34 @@ This document describes the complete user experience for accessing and opening e
 - Error messages clearly explain issues and provide recovery options
 - User can open projects from multiple sources seamlessly
 
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
+
 ## 2. PRD References
 
 ### Related PRD Sections
@@ -52,26 +80,32 @@ This document describes the complete user experience for accessing and opening e
 ## 3. Prerequisites
 
 ### User Prerequisites
-- User has previously created or saved at least one project
-- User understands basic project organization and naming conventions
-- User knows project location (local storage, file system, or cloud)
+| Requirement | Description |
+| --- | --- |
+| Existing project | User has created or saved at least one project |
+| Project awareness | User knows where the project is stored (local, file, or cloud) |
+| Navigation basics | User can locate dashboard lists and project cards |
 
 ### System Prerequisites
-- Application fully initialized and loaded
-- IndexedDB accessible for local project storage
-- File system access permissions granted (for file-based projects)
-- Network connectivity (if accessing cloud-based projects)
+| Requirement | Description |
+| --- | --- |
+| Application initialized | Dashboard loads successfully after launch |
+| Storage backend ready | IndexedDB or file system available based on platform |
+| Network access | Required for cloud-based project sources |
 
 ### Data Prerequisites
-- At least one project exists in storage
-- Project metadata indexed for search and filtering
-- Thumbnails generated for existing projects (if available)
-- Recent projects list populated from user's history
+| Requirement | Description |
+| --- | --- |
+| Project index | Project metadata indexed for search and filters |
+| Recent list | Recent projects list available (if any) |
+| Thumbnails | Previews generated where available |
 
 ### Technical Prerequisites
-- Browser supports File System Access API (for file-based projects)
-- Sufficient memory to load project data (minimum 100MB available)
-- No corrupted project data in storage
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `ProjectStore` | Retrieves saved projects | `src/stores/projectStore.ts` |
+| `ProjectIO` | Loads project files | `src/services/ProjectIO.ts` |
+| `SearchService` | Filters and sorts projects | `src/services/SearchService.ts` |
 
 ## 4. User Journey Steps
 

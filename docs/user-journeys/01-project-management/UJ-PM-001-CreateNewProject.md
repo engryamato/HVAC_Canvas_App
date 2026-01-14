@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers the complete workflow for creating a new HVAC design project from the dashboard, including metadata input, validation, project initialization, and navigation to the canvas editor.
+### Purpose
+This document describes how users create a new HVAC design project from the dashboard, including metadata entry, validation, project initialization, and navigation into the canvas editor.
+
+### Scope
+**In Scope:**
+- Opening the New Project dialog from the dashboard
+- Entering metadata, scope, and site conditions
+- Validation, submission, and project initialization
+- Navigation to the canvas editor after creation
+
+**Out of Scope:**
+- Duplicating an existing project (see UJ-PM-006)
+- Editing metadata after creation (see UJ-PM-003)
+- Opening or importing existing projects (see UJ-PM-002)
+
+### User Personas
+- **Primary**: HVAC designers starting a new project from scratch
+- **Secondary**: Project managers creating standardized project entries
+- **Tertiary**: Trainees creating practice projects
+
+### Success Criteria
+- New Project dialog opens within one click from the dashboard
+- Required fields validate with clear errors and guidance
+- Project is created and listed in the dashboard
+- User navigates to the canvas editor without data loss
+- Project metadata persists to the active storage backend
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,9 +69,32 @@ This user journey covers the complete workflow for creating a new HVAC design pr
 
 ## Prerequisites
 
-- Application is launched and running
-- User is on the Dashboard page (`/dashboard`)
-- No modal dialogs are currently open
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Access to dashboard | User can reach the Dashboard page (`/dashboard`) |
+| Basic project naming | User understands the project's naming conventions |
+| HVAC context | User knows basic HVAC terminology used in metadata |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Application initialized | Core modules and stores finished loading |
+| Dashboard ready | Project list rendered and actions enabled |
+| No blocking dialogs | No modal dialog obscures the dashboard |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project metadata schema | Required fields and validation rules loaded |
+| Equipment library | Default equipment library available for later use |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `projectListStore` | Stores project summaries | `src/stores/projectListStore.ts` |
+| `NewProjectDialog` | Collects project metadata | `src/components/dashboard/NewProjectDialog.tsx` |
+| `ProjectService` | Creates and persists project files | `src/services/ProjectService.ts` |
 
 ## User Journey Steps
 

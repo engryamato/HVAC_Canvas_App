@@ -2,7 +2,60 @@
 
 ## Overview
 
-This user journey covers editing existing project metadata from the canvas editor's **Left Sidebar (Sizable Drawer)**, which displays project information in a 3-section accordion format: Project Details, Project Scope, and Site Conditions. Users can modify all fields, save changes, and see updates reflected across the application.
+### Purpose
+This document describes how users edit existing project metadata from the canvas editor's left sidebar, including Project Details, Project Scope, and Site Conditions, and how updates propagate across the app.
+
+### Scope
+**In Scope:**
+- Opening the edit mode from the canvas editor
+- Editing project details, scope, and site conditions
+- Validation and save actions
+- Updating metadata across dashboard, title, and stores
+
+**Out of Scope:**
+- Creating new projects (see UJ-PM-001)
+- Duplicating or archiving projects (see UJ-PM-005, UJ-PM-006)
+- Exporting project reports (see UJ-PM-008)
+
+### User Personas
+- **Primary**: HVAC designers updating project details during design
+- **Secondary**: Project managers correcting client or site information
+- **Tertiary**: QA reviewers verifying project metadata accuracy
+
+### Success Criteria
+- User can open metadata editor from the canvas sidebar
+- All editable fields accept changes with validation feedback
+- Save updates the active project and project list stores
+- Metadata changes persist to the storage backend
+- UI updates across dashboard, title, and recents without reload
+
+## Platform Context
+
+This journey applies to both Tauri Desktop and Web Browser deployments. Key differences are handled through platform detection and storage backends.
+
+### Platform Detection
+- Runtime check: `typeof window !== 'undefined' && '__TAURI__' in window`
+- UI adapts for native dialogs and file operations in Tauri
+- Web mode uses browser storage and download flows
+
+### Feature Parity Summary
+| Feature | Tauri Desktop | Web Browser | Notes |
+| --- | --- | --- | --- |
+| Project storage | File system (.sws) | IndexedDB/localStorage | Web storage quotas apply |
+| File dialogs | Native OS dialogs | Browser download/upload | Different UX patterns |
+| Offline work | Full offline | Limited (cache/PWA) | Tauri supports true offline |
+| Auto-backup | `.sws.bak` file | Export recommended | Tauri maintains backups |
+
+### Platform-Specific Components
+| Component | Tauri Desktop | Web Browser |
+| --- | --- | --- |
+| Storage service | `@tauri-apps/api/fs` | IndexedDB/localStorage |
+| File picker | Tauri dialog APIs | `<input type="file">` |
+| Export handler | Native save | Browser download |
+
+### Related Platform Docs
+- [UJ-GS-006-EnvironmentDetection.md](../00-getting-started/UJ-GS-006-EnvironmentDetection.md)
+- [UJ-GS-002-DeviceCompatibility.md](../00-getting-started/UJ-GS-002-DeviceCompatibility.md)
 
 ## PRD References
 
@@ -16,10 +69,32 @@ This user journey covers editing existing project metadata from the canvas edito
 
 ## Prerequisites
 
-- User is in Canvas Editor page (`/canvas/{projectId}`)
-- Project is loaded with existing metadata
-- Left sidebar is visible
-- User has write permissions to project file
+### User Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Canvas access | User is in the Canvas Editor (`/canvas/{projectId}`) |
+| Metadata familiarity | User understands project details and scope fields |
+| Write permissions | User can edit and save the project |
+
+### System Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Project loaded | Active project and metadata in memory |
+| Sidebar available | Left sidebar rendered and interactive |
+| Validation rules | Metadata validation rules initialized |
+
+### Data Prerequisites
+| Requirement | Description |
+| --- | --- |
+| Existing metadata | Project has name and base metadata values |
+| Scope options | Available scope and materials lists loaded |
+
+### Technical Prerequisites
+| Component | Purpose | Location |
+| --- | --- | --- |
+| `EditProjectDialog` | Edit metadata UI | `src/components/canvas/EditProjectDialog.tsx` |
+| `projectStore` | Active project state | `src/stores/projectStore.ts` |
+| `projectListStore` | Dashboard project list sync | `src/stores/projectListStore.ts` |
 
 ## User Journey Steps
 
