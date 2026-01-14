@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
+import { isTauri } from '@/utils/platform';
 
 export const DeviceWarning = () => {
     const { isMobile } = useDeviceDetection();
@@ -12,17 +13,16 @@ export const DeviceWarning = () => {
 
     const handleExit = async () => {
         // Try Tauri API first (for desktop app)
-        try {
-            // @ts-expect-error - Tauri API may not be available in browser
-            if (typeof window.__TAURI__ !== 'undefined') {
+        if (isTauri) {
+            try {
                 // Dynamic import for Tauri - may fail in web context
                 // @ts-expect-error - Tauri module may not exist in web-only builds
                 const { exit } = await import('@tauri-apps/api/process');
                 await exit(0);
                 return;
+            } catch (error) {
+                console.warn('Tauri exit not available:', error);
             }
-        } catch (error) {
-            console.warn('Tauri exit not available:', error);
         }
 
         // Fallback: try window.close() (may be blocked by browser)

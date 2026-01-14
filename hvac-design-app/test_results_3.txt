@@ -1,0 +1,1721 @@
+
+Running 54 tests using 8 workers
+
+[1A[2K[1/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:21:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should create a new project with all metadata fields
+[1A[2K[2/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:84:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should validate project name is required
+[1A[2K[3/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:51:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should persist new project to localStorage
+[1A[2K[4/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:116:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should show correct project count after creation
+[1A[2K[5/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:162:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should rename project and update localStorage
+[1A[2K[6/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:226:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should archive project and move to archived tab
+[1A[2K[7/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:100:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should validate project name length and characters
+[1A[2K[8/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:193:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should duplicate project with new ID and storage path
+[1A[2K[9/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:254:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should restore archived project
+[1A[2K[10/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:293:10 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should delete project with confirmation
+[1A[2K[11/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:319:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should cancel delete confirmation
+[1A[2K[12/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:358:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should navigate to canvas editor from project card
+[1A[2K  1) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:116:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should show correct project count after creation 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/0 active project/i)
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText(/0 active project/i)[22m
+
+
+      116 |     test('should show correct project count after creation', async ({ page }) => {
+      117 |       // Initially should show 0 active projects
+    > 118 |       await expect(page.getByText(/0 active project/i)).toBeVisible({ timeout: 3000 });
+          |                                                         ^
+      119 |
+      120 |       // Create a project (use header button)
+      121 |       const newProjectBtn = page.getByTestId('new-project-btn');
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:118:57
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-a5aa5-roject-count-after-creation-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-a5aa5-roject-count-after-creation-chromium\error-context.md
+
+
+[1A[2K  2) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:193:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should duplicate project with new ID and storage path 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Test Project')
+    Expected: visible
+    Error: strict mode violation: getByText('Test Project') resolved to 2 elements:
+        1) <h3 class="ProjectCard_title__NLY7g">Test Project - Copy</h3> aka getByRole('heading', { name: 'Test Project - Copy' })
+        2) <h3 class="ProjectCard_title__NLY7g">Test Project</h3> aka getByRole('heading', { name: 'Test Project', exact: true })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('Test Project')[22m
+
+
+      207 |
+      208 |       // Verify both projects visible
+    > 209 |       await expect(page.getByText('Test Project')).toBeVisible({ timeout: 5000 });
+          |                                                    ^
+      210 |       await expect(page.getByText('Test Project (Copy)')).toBeVisible({ timeout: 5000 });
+      211 |
+      212 |       // Verify localStorage has 2 projects with different IDs
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:209:52
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-93203-ith-new-ID-and-storage-path-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-93203-ith-new-ID-and-storage-path-chromium\error-context.md
+
+
+[1A[2K  3) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:100:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should validate project name length and characters 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/invalid/i)
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText(/invalid/i)[22m
+
+
+      111 |
+      112 |       // Should show error about invalid characters
+    > 113 |       await expect(page.getByText(/invalid/i)).toBeVisible({ timeout: 3000 });
+          |                                                ^
+      114 |     });
+      115 |
+      116 |     test('should show correct project count after creation', async ({ page }) => {
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:113:48
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-42b58--name-length-and-characters-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-42b58--name-length-and-characters-chromium\error-context.md
+
+
+[1A[2K[13/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:446:7 ΓÇ║ Preferences Persistence ΓÇ║ should use default preferences when none stored
+[1A[2K[14/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:372:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should show back to dashboard link in canvas
+[1A[2K[15/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:383:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should navigate back to dashboard from canvas
+[1A[2K[16/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:414:7 ΓÇ║ Preferences Persistence ΓÇ║ should persist preferences to localStorage
+[1A[2K  4) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:254:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should restore archived project 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('dialog')
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByRole('dialog')[22m
+
+
+      258 |
+      259 |       await page.getByTestId('menu-archive-btn').click();
+    > 260 |       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 3000 });
+          |                                              ^
+      261 |
+      262 |       // Confirm archive in dialog
+      263 |       await page.getByRole('button', { name: /archive/i }).click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:260:46
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-1787f-ld-restore-archived-project-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-1787f-ld-restore-archived-project-chromium\error-context.md
+
+
+[1A[2K[17/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:498:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should maintain project order after reload (most recent first)
+[1A[2K[18/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:531:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should preserve archived status after reload
+[1A[2K[19/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:467:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should restore projects after page reload
+[1A[2K  5) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:293:10 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should delete project with confirmation 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/permanently delete/i)
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText(/permanently delete/i)[22m
+
+
+      299 |
+      300 |       // Wait for delete confirmation dialog
+    > 301 |       await expect(page.getByText(/permanently delete/i)).toBeVisible({ timeout: 3000 });
+          |                                                           ^
+      302 |
+      303 |       // Confirm deletion
+      304 |       await page.getByRole('button', { name: /delete/i }).click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:301:59
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-a79f8-e-project-with-confirmation-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-a79f8-e-project-with-confirmation-chromium\error-context.md
+
+
+[1A[2K[20/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:577:7 ΓÇ║ Empty State Handling ΓÇ║ should show empty state when no projects exist
+[1A[2K  6) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:319:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should cancel delete confirmation 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/permanently delete/i)
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByText(/permanently delete/i)[22m
+
+
+      325 |
+      326 |       // Wait for delete confirmation dialog
+    > 327 |       await expect(page.getByText(/permanently delete/i)).toBeVisible({ timeout: 3000 });
+          |                                                           ^
+      328 |
+      329 |       // Cancel
+      330 |       await page.getByRole('button', { name: /cancel/i }).click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:327:59
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-2117f--cancel-delete-confirmation-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-2117f--cancel-delete-confirmation-chromium\error-context.md
+
+
+[1A[2K[21/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:582:8 ΓÇ║ Empty State Handling ΓÇ║ should show empty state for archived tab when no archived projects
+[1A[2K[22/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:599:7 ΓÇ║ Empty State Handling ΓÇ║ should provide create button in empty state
+[1A[2K[23/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:611:7 ΓÇ║ localStorage Structure Validation ΓÇ║ should use correct localStorage keys
+[1A[2K[24/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:628:7 ΓÇ║ localStorage Structure Validation ΓÇ║ should have valid ProjectListItem structure
+[1A[2K[25/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-001-create-project.spec.ts:31:9 ΓÇ║ UJ-PM-001: Create New Project ΓÇ║ Strict Flow: Create Project with Full Metadata
+[1A[2K  7) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:628:7 ΓÇ║ localStorage Structure Validation ΓÇ║ should have valid ProjectListItem structure 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoMatch[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected pattern: [32m/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i[39m
+    Received string:  [31m"f57450a1-af9f-4869-9095-40239946c3d3"[39m
+
+      666 |
+      667 |     // UUID format for projectId
+    > 668 |     expect(project.projectId).toMatch(
+          |                               ^
+      669 |       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      670 |     );
+      671 |
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:668:31
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-d23fe-d-ProjectListItem-structure-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-d23fe-d-ProjectListItem-structure-chromium\error-context.md
+
+
+[1A[2K[26/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-001-create-project.spec.ts:183:9 ΓÇ║ UJ-PM-001: Create New Project ΓÇ║ Edge Case: Project Name Too Long
+[1A[2K[27/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:127:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Strict Flow: Open Project from Dashboard
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:127:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Strict Flow: Open Project from Dashboard
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"b7be37e5-fc95-4a6f-b16c-3ea5df3c371c","name":"Office HVAC","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-14T14:27:29.695Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"17fa782d-7153-46a4-a264-f7145828f311","name":"Warehouse A","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-13T16:27:29.696Z","entityCount":8,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"3723c385-d637-4d60-969e-72cc14915313","name":"Retail Store","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-15T00:00:00.000Z","entityCount":15,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(3), recentProjectIds: Array(3), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Office HVAC, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Office HVAC, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2K  8) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-001-create-project.spec.ts:31:9 ΓÇ║ UJ-PM-001: Create New Project ΓÇ║ Strict Flow: Create Project with Full Metadata ΓÇ║ Step 1: Open New Project Dialog 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeDisabled[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('create-project-btn')
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeDisabled" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('create-project-btn')[22m
+
+
+      64 |
+      65 |             // "Create" button is disabled
+    > 66 |             await expect(page.getByTestId('create-project-btn')).toBeDisabled();
+         |                                                                  ^
+      67 |
+      68 |             // Re-open Project Details for Step 2 if closed
+      69 |             const detailsTrigger = page.getByRole('button', { name: 'Project Details' });
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-001-create-project.spec.ts:66:66
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-001-create-project.spec.ts:34:9
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-13184--Project-with-Full-Metadata-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-13184--Project-with-Full-Metadata-chromium\error-context.md
+
+
+[1A[2K[28/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:230:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 4: Opening Project from File System
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:230:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 4: Opening Project from File System
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:127:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Strict Flow: Open Project from Dashboard
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:230:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 4: Opening Project from File System
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K  9) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:127:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Strict Flow: Open Project from Dashboard ΓÇ║ Step 3: Opening Project from Dashboard 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'Office HVAC' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'Office HVAC' })[22m
+
+
+      219 |
+      220 |             // Verify Canvas page loaded
+    > 221 |             await expect(page.getByRole('heading', { name: 'Office HVAC' })).toBeVisible({ timeout: 5000 });
+          |                                                                              ^
+      222 |
+      223 |             // Verify project metadata in sidebar
+      224 |             // (Project Details should be visible by default)
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:221:78
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:200:9
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-84947-Open-Project-from-Dashboard-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-84947-Open-Project-from-Dashboard-chromium\error-context.md
+
+
+[1A[2K[29/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project
+[1A[2K  10) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:230:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 4: Opening Project from File System ΓÇ║ Step 4: Opening Project from File System 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('menu')
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByRole('menu')[22m
+
+
+      243 |
+      244 |             // Wait for menu dropdown to be visible
+    > 245 |             await expect(page.getByRole('menu')).toBeVisible({ timeout: 3000 });
+          |                                                  ^
+      246 |
+      247 |             // User clicks "Open from File..."
+      248 |             await page.getByRole('menuitem', { name: /open.*file/i }).click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:245:50
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:231:9
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-dd3fc-ng-Project-from-File-System-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-dd3fc-ng-Project-from-File-System-chromium\error-context.md
+
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[30/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(1), recentProjectIds: Array(1), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Auto Open Project, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Auto Open Project, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"094cb586-6f83-4668-9537-9157b0123718","clientName":"Invalid Data","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(1), recentProjectIds: Array(1), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(1), recentProjectIds: Array(1), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K  11) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project ΓÇ║ Step 5: Auto-Opening Last Project 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'Auto Open Project' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'Auto Open Project' })[22m
+
+
+      326 |
+      327 |             // Verify correct project opened
+    > 328 |             await expect(page.getByRole('heading', { name: 'Auto Open Project' })).toBeVisible({ timeout: 5000 });
+          |                                                                                    ^
+      329 |         });
+      330 |     });
+      331 |
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:328:84
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:314:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-707f9-5-Auto-Opening-Last-Project-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-707f9-5-Auto-Opening-Last-Project-chromium\error-context.md
+
+
+[1A[2K  12) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:358:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should navigate to canvas editor from project card 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('link', { name: /open project/i })[22m
+
+
+      358 |     test('should navigate to canvas editor from project card', async ({ page }) => {
+      359 |       // Click open project
+    > 360 |       await page.getByRole('link', { name: /open project/i }).click();
+          |                                                               ^
+      361 |
+      362 |       // Wait for navigation to canvas
+      363 |       await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:360:63
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-edf85-as-editor-from-project-card-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-edf85-as-editor-from-project-card-chromium\error-context.md
+
+
+[1A[2K[31/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+[1A[2K  13) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data ΓÇ║ Edge Case: Corrupted Data Handling 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/cannot be opened/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/cannot be opened/i)[22m
+
+
+      352 |
+      353 |             // Verify error dialog appears
+    > 354 |             await expect(page.getByText(/cannot be opened/i)).toBeVisible({ timeout: 5000 });
+          |                                                               ^
+      355 |             // await expect(page.getByText(/corrupted/i)).toBeVisible({ timeout: 5000 });
+      356 |
+      357 |             // Verify recovery options are presented
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:354:63
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:345:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-93d71-t-Corrupted-or-Invalid-Data-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-93d71-t-Corrupted-or-Invalid-Data-chromium\error-context.md
+
+
+[1A[2K[32/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+[1A[2K  14) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:372:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should show back to dashboard link in canvas 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('link', { name: /open project/i })[22m
+
+
+      371 |
+      372 |     test('should show back to dashboard link in canvas', async ({ page }) => {
+    > 373 |       await page.getByRole('link', { name: /open project/i }).click();
+          |                                                               ^
+      374 |       await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
+      375 |
+      376 |       // Wait for page to fully load
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:373:63
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-bce41-to-dashboard-link-in-canvas-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-bce41-to-dashboard-link-in-canvas-chromium\error-context.md
+
+
+[1A[2K  15) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:383:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should navigate back to dashboard from canvas 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('link', { name: /open project/i })[22m
+
+
+      382 |
+      383 |     test('should navigate back to dashboard from canvas', async ({ page }) => {
+    > 384 |       await page.getByRole('link', { name: /open project/i }).click();
+          |                                                               ^
+      385 |       await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
+      386 |
+      387 |       // Wait for page to fully load
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:384:63
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-14288-ck-to-dashboard-from-canvas-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-14288-ck-to-dashboard-from-canvas-chromium\error-context.md
+
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[33/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"73be4172-3e87-4198-bac2-d6fcb90af25f","name":"Future Version Project","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"99.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[34/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+[1A[2K[35/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+[1A[2KBROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(1), recentProjectIds: Array(1), loading: false, addProject: , updateProject: }
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: [ProjectListStore] Hydration finished undefined
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Future Version Project, Version: 99.0.0, App Version: 1.0.0
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Version mismatch detected
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Future Version Project, Version: 99.0.0, App Version: 1.0.0
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Version mismatch detected
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K  16) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:498:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should maintain project order after reload (most recent first) 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('new-project-btn')[22m
+
+
+      509 |     await page.waitForTimeout(300);
+      510 |
+    > 511 |     await newProjectBtn.click();
+          |                         ^
+      512 |     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
+      513 |     await page.getByLabel(/project name/i).fill('Second Created');
+      514 |     await page.getByRole('button', { name: /create/i }).click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:511:25
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-b5775-r-reload-most-recent-first--chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-b5775-r-reload-most-recent-first--chromium\error-context.md
+
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2K  17) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure ΓÇ║ Error Scenario: IndexedDB Failure 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/unable to load project|project not found/i)
+    Expected: visible
+    Error: strict mode violation: getByText(/unable to load project|project not found/i) resolved to 2 elements:
+        1) <h1 class="text-2xl font-bold text-slate-900 mb-2">Project Not Found</h1> aka getByRole('heading', { name: 'Project Not Found' })
+        2) <p class="text-slate-600 mb-8">Project not found. The project may have been deleΓÇª</p> aka getByText('Project not found. The')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/unable to load project|project not found/i)[22m
+
+
+      415 |
+      416 |             // Verify error message displayed (accept either "Unable to load" or "Project not found" as both indicate storage/load failure)
+    > 417 |             await expect(page.getByText(/unable to load project|project not found/i)).toBeVisible({ timeout: 5000 });
+          |                                                                                       ^
+      418 |         });
+      419 |     });
+      420 |
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:417:87
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:398:9
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-a5686-ario-IndexedDB-Read-Failure-chromium\error-context.md
+
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+BROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"6185de2f-de29-4b0c-bba8-d284afd4bef0","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"a0834bb2-5824-4bd4-9f1e-6efc668f4a16","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"1c8ab922-0eab-46a6-8c1c-3501c488ce28","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2025-01-09T00:00:00.000Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: [SeedProjects] Writing to project-storage: {"state":{"projects":[{"id":"b498ee3d-6794-4ddc-9737-96ee61683d03","name":"Project 1","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-14T16:27:49.358Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"12b2c1c9-4743-439a-8463-2ca8ec2c1220","name":"Project 2","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-13T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"deed95b0-2001-4a2e-9b29-49681ac88690","name":"Project 3","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-12T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"1e4802d3-6af1-4432-a07a-0cbf433d1c36","name":"Project 4","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-11T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"fb80a24e-bec9-4c7b-b07d-d7c4dc7441ee","name":"Project 5","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-10T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"846a077a-3087-435b-816f-2d6517b9cf92","name":"Project 6","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-09T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"289d5acb-1117-47e0-a060-5eadf52ee484","name":"Project 7","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-08T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"2dbb1e16-5f29-4d06-acf2-7c8f9027ada6","name":"Project 8","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-07T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"6acbf963-66d2-4271-b126-566c6cb324d6","name":"Project 9","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-06T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"4748e37c-8e6c-49b0-93f9-e3498cec5ca2","name":"Project 10","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-05T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"5ecb48bb-0975-4e88-865d-79945a36a0e6","name":"Project 11","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-04T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]},{"id":"606c1962-dad2-4ebd-99be-d4ca611cf0ad","name":"Project 12","projectNumber":"","clientName":"Acme Corporation","location":"123 Main St, Chicago, IL","scope":{"details":[],"materials":[],"projectType":"Commercial"},"siteConditions":{"elevation":"0","outdoorTemp":"70","indoorTemp":"70","windSpeed":"0","humidity":"50","localCodes":""},"createdAt":"2025-01-01T00:00:00.000Z","modifiedAt":"2026-01-03T16:27:49.360Z","entityCount":12,"version":"1.0.0","thumbnailUrl":null,"isArchived":false,"entities":[]}]},"version":0}
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K  18) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:531:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should preserve archived status after reload 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('project-card-menu-btn')[22m
+
+
+      542 |     await page.waitForTimeout(300);
+      543 |
+    > 544 |     await page.getByTestId('project-card-menu-btn').click();
+          |                                                     ^
+      545 |     await expect(page.getByTestId('project-card-menu')).toBeVisible({ timeout: 3000 });
+      546 |
+      547 |     await page.getByTestId('menu-archive-btn').click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:544:53
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-cb6fb-rchived-status-after-reload-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-cb6fb-rchived-status-after-reload-chromium\error-context.md
+
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:502:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Empty State: No Projects
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[36/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:168:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Enter key saves the new name
+[1A[2K[37/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:101:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Rename option opens inline edit mode
+[1A[2K[38/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:118:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Saving changes updates project name in list
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(3), recentProjectIds: Array(3), loading: false, addProject: , updateProject: }
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(12), recentProjectIds: Array(5), loading: false, addProject: , updateProject: }
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[39/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:146:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Escape key cancels rename
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(12), recentProjectIds: Array(5), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2KBROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:473:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Verify Recent Projects Section
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[40/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:99:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version
+BROWSER LOG: ./src/components/common/DeviceWarning.tsx
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\common'
+
+[1A[2KBROWSER LOG: ./src/utils/platform.ts
+Module not found: Can't resolve '@tauri-apps/api/process' in 'C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils'
+
+[1A[2K  19) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:168:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Enter key saves the new name 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('project-card-menu')
+    Expected: visible
+    Error: strict mode violation: getByTestId('project-card-menu') resolved to 2 elements:
+        1) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('recent-projects').getByTestId('project-card-menu')
+        2) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('all-projects').getByTestId('project-card-menu')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card-menu')[22m
+
+
+      173 |         // Open rename mode
+      174 |         await page.getByTestId('project-card-menu-btn').first().click();
+    > 175 |         await expect(page.getByTestId('project-card-menu')).toBeVisible();
+          |                                                             ^
+      176 |         await page.getByTestId('menu-edit-btn').click();
+      177 |
+      178 |         // Change the name and press Enter
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-003-edit-project.spec.ts:175:61
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-5849c-nter-key-saves-the-new-name-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-5849c-nter-key-saves-the-new-name-chromium\error-context.md
+
+
+[1A[2K  20) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:582:8 ΓÇ║ Empty State Handling ΓÇ║ should show empty state for archived tab when no archived projects 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: /archived/i })[22m
+
+
+      590 |
+      591 |     // Switch to archived tab
+    > 592 |     await page.getByRole('button', { name: /archived/i }).click();
+          |                                                           ^
+      593 |     await page.waitForTimeout(200);
+      594 |
+      595 |     // Should show empty state for archived
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:592:59
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-706f4-b-when-no-archived-projects-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-706f4-b-when-no-archived-projects-chromium\error-context.md
+
+
+[1A[2K  21) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:101:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Rename option opens inline edit mode 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('project-card-menu')
+    Expected: visible
+    Error: strict mode violation: getByTestId('project-card-menu') resolved to 2 elements:
+        1) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('recent-projects').getByTestId('project-card-menu')
+        2) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('all-projects').getByTestId('project-card-menu')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card-menu')[22m
+
+
+      106 |         // Open the action menu
+      107 |         await page.getByTestId('project-card-menu-btn').first().click();
+    > 108 |         await expect(page.getByTestId('project-card-menu')).toBeVisible();
+          |                                                             ^
+      109 |
+      110 |         // Click Rename (which is the edit option)
+      111 |         await page.getByTestId('menu-edit-btn').click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-003-edit-project.spec.ts:108:61
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-2f642-tion-opens-inline-edit-mode-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-2f642-tion-opens-inline-edit-mode-chromium\error-context.md
+
+
+[1A[2K[chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:423:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Keyboard Shortcuts: Dashboard Navigation
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER LOG: [ProjectListStore] Hydration finished {projects: Array(3), recentProjectIds: Array(3), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2KBROWSER LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER LOG: [CanvasPageWrapper] Project: Project 1, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2K[41/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:140:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Restore action moves project back to Active tab
+[1A[2K  22) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version ΓÇ║ Edge Case: Version Mismatch Handling 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: /update app/i })
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for getByRole('button', { name: /update app/i })[22m
+
+
+      391 |             // Verify options presented
+      392 |             await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible({ timeout: 3000 });
+    > 393 |             await expect(page.getByRole('button', { name: /update app/i })).toBeVisible({ timeout: 3000 });
+          |                                                                             ^
+      394 |         });
+      395 |     });
+      396 |
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:393:77
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts:372:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-970fd-tch---Newer-Project-Version-chromium\error-context.md
+
+
+[1A[2K[42/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:120:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state
+[1A[2K[43/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:120:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Archive action moves project to Archived tab
+[1A[2K[44/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:97:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Tab navigation shows correct project counts
+[1A[2K  23) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:118:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Saving changes updates project name in list 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'Project Before Rename' })
+    Expected: visible
+    Error: strict mode violation: getByRole('heading', { name: 'Project Before Rename' }) resolved to 2 elements:
+        1) <h3 class="ProjectCard_title__NLY7g">Project Before Rename</h3> aka getByTestId('recent-projects').getByRole('heading', { name: 'Project Before Rename' })
+        2) <h3 class="ProjectCard_title__NLY7g">Project Before Rename</h3> aka getByTestId('all-projects').getByRole('heading', { name: 'Project Before Rename' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'Project Before Rename' })[22m
+
+
+      122 |
+      123 |         // Verify original name shows
+    > 124 |         await expect(page.getByRole('heading', { name: 'Project Before Rename' })).toBeVisible();
+          |                                                                                    ^
+      125 |
+      126 |         // Open rename mode
+      127 |         await page.getByTestId('project-card-menu-btn').first().click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-003-edit-project.spec.ts:124:84
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-37c36-pdates-project-name-in-list-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-37c36-pdates-project-name-in-list-chromium\error-context.md
+
+
+[1A[2K  24) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:146:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Escape key cancels rename 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('project-card-menu')
+    Expected: visible
+    Error: strict mode violation: getByTestId('project-card-menu') resolved to 2 elements:
+        1) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('recent-projects').getByTestId('project-card-menu')
+        2) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('all-projects').getByTestId('project-card-menu')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card-menu')[22m
+
+
+      151 |         // Open rename mode
+      152 |         await page.getByTestId('project-card-menu-btn').first().click();
+    > 153 |         await expect(page.getByTestId('project-card-menu')).toBeVisible();
+          |                                                             ^
+      154 |         await page.getByTestId('menu-edit-btn').click();
+      155 |
+      156 |         // Change the name in the input
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-003-edit-project.spec.ts:153:61
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-0d6bc-a-Escape-key-cancels-rename-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-0d6bc-a-Escape-key-cancels-rename-chromium\error-context.md
+
+
+[1A[2K[45/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:96:9 ΓÇ║ UJ-PM-006: Duplicate Project ΓÇ║ Duplicate creates a new project
+[1A[2K[46/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:111:9 ΓÇ║ UJ-PM-006: Duplicate Project ΓÇ║ Original project remains unchanged after duplicate
+[1A[2K[47/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:102:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Search filters projects by name
+[1A[2K  25) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:99:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('project-card-menu')
+    Expected: visible
+    Error: strict mode violation: getByTestId('project-card-menu') resolved to 4 elements:
+        1) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('project-card-menu').first()
+        2) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('project-card-menu').nth(1)
+        3) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('project-card-menu').nth(2)
+        4) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('project-card-menu').nth(3)
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card-menu')[22m
+
+
+      105 |         // Delete the first project
+      106 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+    > 107 |         await expect(page.getByTestId('project-card-menu')).toBeVisible();
+          |                                                             ^
+      108 |         await page.getByTestId('menu-delete-btn').click();
+      109 |
+      110 |         // Confirm delete
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:107:61
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-chromium\error-context.md
+
+
+[1A[2K[48/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:152:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Sort select is visible
+[1A[2K[49/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:127:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Clear search shows all projects
+[1A[2K  26) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:120:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('project-card-menu')
+    Expected: visible
+    Error: strict mode violation: getByTestId('project-card-menu') resolved to 2 elements:
+        1) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('recent-projects').getByTestId('project-card-menu')
+        2) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('all-projects').getByTestId('project-card-menu')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card-menu')[22m
+
+
+      126 |         // Delete the project
+      127 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+    > 128 |         await expect(page.getByTestId('project-card-menu')).toBeVisible();
+          |                                                             ^
+      129 |         await page.getByTestId('menu-delete-btn').click();
+      130 |
+      131 |         // Confirm delete
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:128:61
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-chromium\error-context.md
+
+
+[1A[2K  27) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:111:9 ΓÇ║ UJ-PM-006: Duplicate Project ΓÇ║ Original project remains unchanged after duplicate 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('project-card-menu')
+    Expected: visible
+    Error: strict mode violation: getByTestId('project-card-menu') resolved to 2 elements:
+        1) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('recent-projects').getByTestId('project-card-menu')
+        2) <div class="ProjectCard_menu__SAMeY" data-testid="project-card-menu">ΓÇª</div> aka getByTestId('all-projects').getByTestId('project-card-menu')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card-menu')[22m
+
+
+      114 |         // Duplicate the project
+      115 |         await page.getByTestId('project-card-menu-btn').first().click();
+    > 116 |         await expect(page.getByTestId('project-card-menu')).toBeVisible();
+          |                                                             ^
+      117 |         await page.getByTestId('menu-duplicate-btn').click();
+      118 |
+      119 |         // Wait for update
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:116:61
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-eb986-s-unchanged-after-duplicate-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-eb986-s-unchanged-after-duplicate-chromium\error-context.md
+
+
+[1A[2K[50/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:83:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu
+[1A[2K[51/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:97:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options
+[1A[2K[52/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:114:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog
+[1A[2K[53/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:130:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections
+[1A[2K[54/54] [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:165:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Sort by Name orders alphabetically
+[1A[2K  28) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:96:9 ΓÇ║ UJ-PM-006: Duplicate Project ΓÇ║ Duplicate creates a new project 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m1[39m
+    Received: [31m2[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 2 elements[22m
+    [2m      - unexpected value "2"[22m
+
+
+       98 |
+       99 |         // Verify 1 project initially
+    > 100 |         await expect(page.getByTestId('project-card')).toHaveCount(1);
+          |                                                        ^
+      101 |
+      102 |         // Duplicate the project
+      103 |         await page.getByTestId('project-card-menu-btn').first().click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:100:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-9343c-icate-creates-a-new-project-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-9343c-icate-creates-a-new-project-chromium\error-context.md
+
+
+[1A[2K  29) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:120:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Archive action moves project to Archived tab 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m2[39m
+    Received: [31m4[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 4 elements[22m
+    [2m      - unexpected value "4"[22m
+
+
+      126 |
+      127 |         // Verify 2 active projects
+    > 128 |         await expect(page.getByTestId('project-card')).toHaveCount(2);
+          |                                                        ^
+      129 |
+      130 |         // Archive the first project
+      131 |         await page.getByTestId('project-card-menu-btn').first().click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-005-archive-project.spec.ts:128:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-7da61-ves-project-to-Archived-tab-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-7da61-ves-project-to-Archived-tab-chromium\error-context.md
+
+
+[1A[2K  30) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:97:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Tab navigation shows correct project counts 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m2[39m
+    Received: [31m4[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 4 elements[22m
+    [2m      - unexpected value "4"[22m
+
+
+      108 |
+      109 |         // Verify Active tab shows 2 projects
+    > 110 |         await expect(page.getByTestId('project-card')).toHaveCount(2);
+          |                                                        ^
+      111 |
+      112 |         // Switch to Archived tab
+      113 |         await page.getByRole('button', { name: /Archived/i }).click();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-005-archive-project.spec.ts:110:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-50fba-hows-correct-project-counts-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-50fba-hows-correct-project-counts-chromium\error-context.md
+
+
+[1A[2K  31) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:102:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Search filters projects by name 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m3[39m
+    Received: [31m6[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 6 elements[22m
+    [2m      - unexpected value "6"[22m
+
+
+      108 |
+      109 |         // All 3 projects should be visible initially
+    > 110 |         await expect(page.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
+          |                                                        ^
+      111 |
+      112 |         // Type search term
+      113 |         const searchInput = page.getByPlaceholder('Search projects...');
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-007-search-filter.spec.ts:110:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-60c10-ch-filters-projects-by-name-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-60c10-ch-filters-projects-by-name-chromium\error-context.md
+
+
+[1A[2K  32) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:127:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Clear search shows all projects 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m1[39m
+    Received: [31m4[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 4 elements[22m
+    [2m      - unexpected value "4"[22m
+
+
+      138 |         // Wait for debounce and filtering
+      139 |         await page.waitForTimeout(500);
+    > 140 |         await expect(page.getByTestId('project-card')).toHaveCount(1, { timeout: 5000 });
+          |                                                        ^
+      141 |
+      142 |         // Clear search by clearing input
+      143 |         await searchInput.clear();
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-007-search-filter.spec.ts:140:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-dc4d7-r-search-shows-all-projects-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-dc4d7-r-search-shows-all-projects-chromium\error-context.md
+
+
+[1A[2K  32 failed
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:100:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should validate project name length and characters 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:116:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Create Project ΓÇ║ should show correct project count after creation 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:193:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should duplicate project with new ID and storage path 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:254:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should restore archived project 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:293:10 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should delete project with confirmation 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:319:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Project Card Actions ΓÇ║ should cancel delete confirmation 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:358:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should navigate to canvas editor from project card 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:372:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should show back to dashboard link in canvas 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:383:9 ΓÇ║ Project Management - Dashboard ΓÇ║ Navigation to Canvas ΓÇ║ should navigate back to dashboard from canvas 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:498:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should maintain project order after reload (most recent first) 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:531:8 ΓÇ║ Data Persistence Across Sessions ΓÇ║ should preserve archived status after reload 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:582:8 ΓÇ║ Empty State Handling ΓÇ║ should show empty state for archived tab when no archived projects 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-000-lifecycle-overview.spec.ts:628:7 ΓÇ║ localStorage Structure Validation ΓÇ║ should have valid ProjectListItem structure 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-001-create-project.spec.ts:31:9 ΓÇ║ UJ-PM-001: Create New Project ΓÇ║ Strict Flow: Create Project with Full Metadata 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:127:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Strict Flow: Open Project from Dashboard 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:230:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 4: Opening Project from File System 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:265:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Step 5: Auto-Opening Last Project 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:332:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Project Corrupted or Invalid Data 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:363:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Edge Case: Version Mismatch - Newer Project Version 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-002-open-project.spec.ts:397:9 ΓÇ║ UJ-PM-002: Open Existing Project ΓÇ║ Error Scenario: IndexedDB Read Failure 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:101:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Rename option opens inline edit mode 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:118:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Saving changes updates project name in list 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:146:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Escape key cancels rename 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-003-edit-project.spec.ts:168:9 ΓÇ║ UJ-PM-003: Edit Project Metadata ΓÇ║ Enter key saves the new name 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:99:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:120:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:97:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Tab navigation shows correct project counts 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-005-archive-project.spec.ts:120:9 ΓÇ║ UJ-PM-005: Archive/Restore Project ΓÇ║ Archive action moves project to Archived tab 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:96:9 ΓÇ║ UJ-PM-006: Duplicate Project ΓÇ║ Duplicate creates a new project 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-006-duplicate-project.spec.ts:111:9 ΓÇ║ UJ-PM-006: Duplicate Project ΓÇ║ Original project remains unchanged after duplicate 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:102:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Search filters projects by name 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-007-search-filter.spec.ts:127:9 ΓÇ║ UJ-PM-007: Search & Filter Projects ΓÇ║ Clear search shows all projects 
+  4 skipped
+  18 passed (55.8s)

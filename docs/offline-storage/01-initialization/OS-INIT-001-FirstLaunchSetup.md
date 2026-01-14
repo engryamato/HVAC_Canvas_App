@@ -131,7 +131,7 @@ export const AppInitializer: React.FC = () => {
 
 **Code Reference**: `hvac-design-app/src/components/onboarding/AppInitializer.tsx:1-44`
 
-**Related Documentation**: See [UJ-GS-001](../../user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md) for complete first launch UX specification
+**Related Documentation**: See [UJ-GS-001](../../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md) for complete first launch UX specification
 
 ### Step 2: Environment Detection
 
@@ -628,7 +628,7 @@ Added custom `merge` function to Zustand persist middleware that derives `isFirs
 
 ## User Journey References
 
-- **[UJ-GS-001: First Launch Experience](../../user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md)** - Comprehensive 1600+ line specification covering:
+- **[UJ-GS-001: First Launch Experience](../../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md)** - Comprehensive 1600+ line specification covering:
   - Splash screen animation and loading
   - Welcome screen with feature highlights
   - Interactive tutorial (5-step walkthrough)

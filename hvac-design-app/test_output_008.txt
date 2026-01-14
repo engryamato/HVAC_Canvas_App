@@ -1,0 +1,219 @@
+
+Running 12 tests using 8 workers
+
+  Γ£ÿ   5 [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections (166ms)
+  Γ£ÿ   2 [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options (277ms)
+  Γ£ÿ   1 [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog (307ms)
+  Γ£ÿ   7 [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu (230ms)
+  Γ£ÿ  10 [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options (858ms)
+  Γ£ÿ   9 [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu (944ms)
+  Γ£ÿ  12 [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections (878ms)
+  Γ£ÿ  11 [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog (906ms)
+  Γ£ÿ   4 [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections (2.2s)
+  Γ£ÿ   6 [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog (2.1s)
+  Γ£ÿ   3 [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options (1.8s)
+  Γ£ÿ   8 [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu (1.2s)
+
+
+  1) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-b4af7-dialog-opens-from-File-menu-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  2) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e71a8-og-has-all-required-options-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  3) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-2b509-Cancel-button-closes-dialog-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  4) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-cbcf7-n-updates-included-sections-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  5) [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 290 > eval:2:7
+    evaluate@debugger eval code:292:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 290 > eval:2:7
+        at evaluate@debugger eval code:292:16
+        at @debugger eval code:1:44
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-b4af7-dialog-opens-from-File-menu-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  6) [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 290 > eval:2:7
+    evaluate@debugger eval code:292:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 290 > eval:2:7
+        at evaluate@debugger eval code:292:16
+        at @debugger eval code:1:44
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e71a8-og-has-all-required-options-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  7) [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 290 > eval:2:7
+    evaluate@debugger eval code:292:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 290 > eval:2:7
+        at evaluate@debugger eval code:292:16
+        at @debugger eval code:1:44
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-2b509-Cancel-button-closes-dialog-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  8) [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 290 > eval:2:7
+    evaluate@debugger eval code:292:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 290 > eval:2:7
+        at evaluate@debugger eval code:292:16
+        at @debugger eval code:1:44
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-cbcf7-n-updates-included-sections-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  9) [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      74 | test.describe('UJ-PM-008: Export Project Report', () => {
+      75 |     test.beforeEach(async ({ page }) => {
+    > 76 |         await page.evaluate(() => {
+         |                    ^
+      77 |             localStorage.clear();
+      78 |             sessionStorage.clear();
+      79 |         });
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-b4af7-dialog-opens-from-File-menu-webkit\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  10) [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      74 | test.describe('UJ-PM-008: Export Project Report', () => {
+      75 |     test.beforeEach(async ({ page }) => {
+    > 76 |         await page.evaluate(() => {
+         |                    ^
+      77 |             localStorage.clear();
+      78 |             sessionStorage.clear();
+      79 |         });
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e71a8-og-has-all-required-options-webkit\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  11) [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      74 | test.describe('UJ-PM-008: Export Project Report', () => {
+      75 |     test.beforeEach(async ({ page }) => {
+    > 76 |         await page.evaluate(() => {
+         |                    ^
+      77 |             localStorage.clear();
+      78 |             sessionStorage.clear();
+      79 |         });
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-2b509-Cancel-button-closes-dialog-webkit\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  12) [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      74 | test.describe('UJ-PM-008: Export Project Report', () => {
+      75 |     test.beforeEach(async ({ page }) => {
+    > 76 |         await page.evaluate(() => {
+         |                    ^
+      77 |             localStorage.clear();
+      78 |             sessionStorage.clear();
+      79 |         });
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-008-export-report.spec.ts:76:20
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-cbcf7-n-updates-included-sections-webkit\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  12 failed
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections 
+    [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu 
+    [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options 
+    [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog 
+    [firefox] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections 
+    [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:82:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export Report dialog opens from File menu 
+    [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:96:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Export dialog has all required options 
+    [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:113:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Cancel button closes dialog 
+    [webkit] ΓÇ║ e2e\01-project-management\uj-pm-008-export-report.spec.ts:129:9 ΓÇ║ UJ-PM-008: Export Project Report ΓÇ║ Report type selection updates included sections 
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

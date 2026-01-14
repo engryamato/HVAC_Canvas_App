@@ -338,6 +338,7 @@ interface FeatureHighlightCardProps {
 ---
 
 ## Related Documentation
-- User Journey: `docs/user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md`
+- User Journey (Tauri Offline): `docs/user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md`
+- User Journey (Hybrid): `docs/user-journeys/00-getting-started/hybrid/UJ-GS-001-FirstLaunchExperience.md`
 - Testing Guide: `docs/TESTING.md`
 - UI Primitives: `docs/elements/01-components/ui/`

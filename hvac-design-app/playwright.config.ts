@@ -41,9 +41,9 @@ export default defineConfig({
   snapshotPathTemplate: '{snapshotDir}/{testFilePath}/{arg}{ext}',
 
   /* Shared settings for all the projects below */
-  use: {
-    /* Base URL for all tests. On CI/Docker, use the service name. */
-    baseURL: process.env.CI ? 'http://hvac-app:3000' : 'http://localhost:3000',
+   use: {
+     /* Base URL for all tests. On CI/Docker, use the service name. */
+     baseURL: process.env.CI ? 'http://hvac-app:3000' : 'http://localhost:3001',
 
     /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
@@ -79,11 +79,15 @@ export default defineConfig({
 
   /* Run local dev server before starting the tests */
   /* Only run webServer if NOT in CI/Docker (host mode) */
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 120 * 1000,
-  },
+   /* Run local dev server before starting tests - temporarily disabled to fix connection issues */
+   /*
+   webServer: process.env.CI ? undefined : {
+     command: 'npm run dev',
+     url: 'http://localhost:3000',
+     reuseExistingServer: !process.env.CI,
+     timeout: 120 * 1000,
+     port: 3000,
+   },
+   */
 });
 

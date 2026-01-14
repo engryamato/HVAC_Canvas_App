@@ -154,7 +154,8 @@ These elements require a minimum viewport width to remain usable and accessible.
 
 5. **Application Blocking**:
    - No children (application content) visible behind overlay
-   - All interaction blocked except Exit button
+   - All interaction blocked except Exit and help actions
+   - Secondary actions offer desktop transition help (email link/QR + requirements)
    - No way to dismiss or proceed
 
 **Visual State:**
@@ -181,6 +182,10 @@ These elements require a minimum viewport width to remain usable and accessible.
 │                    ║  ┌─────────────────┐  ║                │
 │                    ║  │ Exit Application│  ║                │
 │                    ║  └─────────────────┘  ║                │
+│                    ║  ┌─────────────────┐  ║                │
+│                    ║  │ Email me a link │  ║                │
+│                    ║  └─────────────────┘  ║                │
+│                    ║   View Requirements   ║                │
 │                    ║                       ║                │
 │                    ╚═══════════════════════╝                │
 │                                                             │
@@ -199,7 +204,7 @@ Mobile Phone Viewport (390 x 844 pixels)
 | Visual | Warning icon (⚠️) prominently displayed |
 | Visual | Clear messaging explaining the issue |
 | Visual | Professional styling matching app design |
-| Interactive | Single "Exit Application" button |
+| Interactive | Exit button + email link/requirements actions |
 | Accessibility | `role="alertdialog"` for screen readers |
 
 **Related Elements:**
@@ -252,7 +257,8 @@ Mobile Phone Viewport (390 x 844 pixels)
 2. Most browsers block `window.close()` for security reasons
 3. If blocked, system shows fallback message:
    - "Please close this browser tab manually"
-   - Or redirect to a blank page
+   - "View device requirements" link for more guidance
+   - Optional redirect to a neutral info page
 4. User must manually close tab/window
 
 **Visual State:**
@@ -272,6 +278,7 @@ After Clicking Exit (Web Context - Blocked):
 │                    ║                       ║                │
 │                    ║   Please close this   ║                │
 │                    ║   tab manually.       ║                │
+│                    ║   View requirements   ║                │
 │                    ║                       ║                │
 │                    ╚═══════════════════════╝                │
 │                                                             │
@@ -631,7 +638,7 @@ User rotates iPad to portrait orientation, causing viewport width to drop below 
 **Handling:**
 1. Detection logic treats portrait narrow tablet same as mobile
 2. Blocking overlay appears with same messaging
-3. Additional context provided: "Try rotating to landscape"
+3. Additional context provided with rotate icon/animation: "Try rotating to landscape"
 4. When user rotates to landscape:
    - Width increases above threshold
    - Overlay disappears

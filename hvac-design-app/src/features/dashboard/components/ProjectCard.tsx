@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import styles from './ProjectCard.module.css';
 import type { ProjectListItem } from '../store/projectListStore';
 import { useProjectListActions } from '../store/projectListStore';
@@ -12,7 +11,7 @@ interface ProjectCardProps {
   onDelete: (projectId: string) => void;
   onArchive: (projectId: string) => void;
   onRestore: (projectId: string) => void;
-  onDuplicate: (projectId: string) => void;
+  onDuplicate: (projectId: string, newName: string) => void;
   onRename: (projectId: string, newName: string) => void;
 }
 
@@ -28,6 +27,23 @@ export function ProjectCard({
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(project.projectName);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!showMenu) {
+      return;
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showMenu]);
 
   // Relative date formatting (UJ-PM-002: "2 hours ago", "Yesterday", "Jan 15")
   const formattedDate = useMemo(() => {
@@ -85,7 +101,6 @@ export function ProjectCard({
   return (
     <div
       className={styles.card}
-      onMouseLeave={() => setShowMenu(false)}
       onClick={handleCardClick}
       role="article"
       data-testid="project-card"
@@ -115,38 +130,53 @@ export function ProjectCard({
         ) : (
           <h3 className={styles.title}>{project.projectName}</h3>
         )}
-        <button
-          className={styles.menuButton}
-          onClick={() => setShowMenu((s) => !s)}
-          aria-label="Project actions"
-        >
-          ⋮
-        </button>
-        {showMenu && (
-          <div className={styles.menu}>
-            <button onClick={() => { setEditing(true); setShowMenu(false); }}>
+        <div ref={menuRef} style={{ position: 'relative' }}>
+          <button
+            className={styles.menuButton}
+            onPointerDown={(e) => {
+              e.stopPropagation(); 
+              e.preventDefault(); 
+              setShowMenu((s) => !s); 
+            }}
+            aria-label="Project actions"
+            data-testid="project-card-menu-btn"
+          >
+            ⋮
+          </button>
+          <div 
+            className={styles.menu} 
+            data-testid="project-card-menu"
+            style={{ display: showMenu ? 'flex' : 'none' }}
+          >
+            <button data-testid="menu-edit-btn" onClick={() => { setEditing(true); setShowMenu(false); }}>
               Rename
             </button>
-            <button onClick={() => { onDuplicate(project.projectId); setShowMenu(false); }}>
+            <button data-testid="menu-duplicate-btn" onClick={() => {
+              const copyName = `${project.projectName} - Copy`;
+              onDuplicate(project.projectId, copyName);
+              setShowMenu(false);
+            }}>
               Duplicate
             </button>
             {project.isArchived ? (
-              <button onClick={() => { onRestore(project.projectId); setShowMenu(false); }}>
+              <button data-testid="menu-restore-btn" onClick={() => { onRestore(project.projectId); setShowMenu(false); }}>
                 Restore
               </button>
             ) : (
-              <button onClick={() => { onArchive(project.projectId); setShowMenu(false); }}>
+              <button data-testid="menu-archive-btn" onClick={() => { onArchive(project.projectId); setShowMenu(false); }}>
                 Archive
               </button>
             )}
             <button
+              data-testid="menu-delete-btn"
               onClick={() => { onDelete(project.projectId); setShowMenu(false); }}
               className={styles.danger}
             >
               Delete
             </button>
           </div>
-        )}
+
+        </div>
       </div>
       <div className={styles.meta}>
         <span>{formattedDate}</span>

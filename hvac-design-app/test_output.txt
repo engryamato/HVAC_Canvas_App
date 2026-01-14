@@ -1,0 +1,209 @@
+
+Running 6 tests using 6 workers
+
+  Γ£ÿ  1 [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state (8.4s)
+  Γ£ÿ  4 [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list (8.5s)
+  Γ£ÿ  5 [webkit] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state (9.9s)
+  Γ£ÿ  3 [webkit] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list (10.2s)
+  Γ£ÿ  6 [firefox] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state (10.6s)
+  Γ£ÿ  2 [firefox] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list (10.5s)
+
+
+  1) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m2[39m
+    Received: [31m4[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 4 elements[22m
+    [2m      - unexpected value "4"[22m
+
+
+      100 |
+      101 |         // Verify both projects are visible
+    > 102 |         await expect(page.getByTestId('project-card')).toHaveCount(2);
+          |                                                        ^
+      103 |
+      104 |         // Delete the first project
+      105 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:102:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-chromium\error-context.md
+
+  2) [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m1[39m
+    Received: [31m2[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 2 elements[22m
+    [2m      - unexpected value "2"[22m
+
+
+      121 |
+      122 |         // Verify project is visible
+    > 123 |         await expect(page.getByTestId('project-card')).toHaveCount(1);
+          |                                                        ^
+      124 |
+      125 |         // Delete the project
+      126 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:123:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-chromium\error-context.md
+
+  3) [firefox] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m2[39m
+    Received: [31m4[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 4 elements[22m
+    [2m      - unexpected value "4"[22m
+
+
+      100 |
+      101 |         // Verify both projects are visible
+    > 102 |         await expect(page.getByTestId('project-card')).toHaveCount(2);
+          |                                                        ^
+      103 |
+      104 |         // Delete the first project
+      105 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:102:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-firefox\error-context.md
+
+  4) [firefox] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m1[39m
+    Received: [31m2[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 2 elements[22m
+    [2m      - unexpected value "2"[22m
+
+
+      121 |
+      122 |         // Verify project is visible
+    > 123 |         await expect(page.getByTestId('project-card')).toHaveCount(1);
+          |                                                        ^
+      124 |
+      125 |         // Delete the project
+      126 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:123:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-firefox\error-context.md
+
+  5) [webkit] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m2[39m
+    Received: [31m4[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 4 elements[22m
+    [2m      - unexpected value "4"[22m
+
+
+      100 |
+      101 |         // Verify both projects are visible
+    > 102 |         await expect(page.getByTestId('project-card')).toHaveCount(2);
+          |                                                        ^
+      103 |
+      104 |         // Delete the first project
+      105 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:102:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-webkit\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-287f9-e-removes-project-from-list-webkit\error-context.md
+
+  6) [webkit] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('project-card')
+    Expected: [32m1[39m
+    Received: [31m2[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('project-card')[22m
+    [2m    9 ├ù locator resolved to 2 elements[22m
+    [2m      - unexpected value "2"[22m
+
+
+      121 |
+      122 |         // Verify project is visible
+    > 123 |         await expect(page.getByTestId('project-card')).toHaveCount(1);
+          |                                                        ^
+      124 |
+      125 |         // Delete the project
+      126 |         await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-004-delete-project.spec.ts:123:56
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-webkit\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\01-project-management-uj-p-e7f25-t-project-shows-empty-state-webkit\error-context.md
+
+  6 failed
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+    [chromium] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+    [firefox] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+    [firefox] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+    [webkit] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:98:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Delete removes project from list 
+    [webkit] ΓÇ║ e2e\01-project-management\uj-pm-004-delete-project.spec.ts:119:9 ΓÇ║ UJ-PM-004: Delete Project ΓÇ║ Deleting last project shows empty state 
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
@@ -13,7 +13,9 @@ export const AppInitializer: React.FC = () => {
     const router = useRouter();
     const { hasLaunched, isFirstLaunch, isLoading } = useAppStateStore();
     const { isActive: isTutorialActive } = useTutorialStore();
-    const [showSplash, setShowSplash] = useState(true);
+    const searchParams = useSearchParams();
+    const skipSplash = searchParams.get('skipSplash') === 'true';
+    const [showSplash, setShowSplash] = useState(!skipSplash);
     const [mounted, setMounted] = useState(false);
 
     console.log('[AppInfo Render]', { showSplash, isFirstLaunch, isLoading, isTutorialActive });
@@ -48,7 +50,7 @@ export const AppInitializer: React.FC = () => {
     // Force persistence of defaults on first load (Fix for lazy hydration "Paper App" issue)
     useEffect(() => {
         // Safe check for browser environment
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') {return;}
 
         // Ensure preferences file exists
         if (!localStorage.getItem('sws.preferences')) {
@@ -67,7 +69,7 @@ export const AppInitializer: React.FC = () => {
 
     // Fix for potential hydration mismatches (robustness)
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') {return;}
         const stored = localStorage.getItem('hvac-app-storage');
         if (stored) {
             try {

@@ -276,7 +276,7 @@ useAutoOpen();
 
 **Required Fix**:
 - Change line 368 from "(if exists in user journey docs)" to actual path
-- Add: "See [UJ-GS-001](../../user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md)"
+- Add: "See [UJ-GS-001](../../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md)"
 - Add note: "UJ-GS-001 provides complete UI/UX specification for first launch experience"
 
 **Impact**: MEDIUM - Improves discoverability
@@ -557,7 +557,7 @@ After OS-INIT-001 is updated, consider updating:
 - `/hvac-design-app/src/core/persistence/filesystem.ts`
 - `/hvac-design-app/src/core/store/preferencesStore.ts`
 - `/hvac-design-app/src/features/dashboard/store/projectListStore.ts`
-- `/docs/user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md`
+- `/docs/user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md`
 - `/docs/offline-storage/README.md`
 
 ### Files Not Yet Analyzed (Future Work)

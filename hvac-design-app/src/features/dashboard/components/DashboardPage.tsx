@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useProjectListStore, useRecentProjects } from '../store/projectListStore';
-import { useFilteredProjects } from '../hooks/useFilteredProjects';
+import { useFilteredProjects, SortOption } from '../hooks/useFilteredProjects';
 import { SearchBar } from './SearchBar';
 import { RecentProjectsSection } from './RecentProjectsSection';
 import { AllProjectsSection } from './AllProjectsSection';
-import { Plus, FolderOpen } from 'lucide-react';
+import { Plus, Archive } from 'lucide-react';
 import { NewProjectDialog } from '@/components/dashboard/NewProjectDialog';
 import { FileMenu } from '@/components/layout/FileMenu';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
@@ -22,12 +22,18 @@ import { useAutoOpen } from '@/hooks/useAutoOpen';
  * - Auto-open last project (if enabled)
  */
 export function DashboardPage() {
-    const allProjects = useProjectListStore(state => state.projects.filter(p => !p.isArchived));
+    const allProjectsRaw = useProjectListStore(state => state.projects);
+    const activeProjects = allProjectsRaw.filter(p => !p.isArchived);
+    const archivedProjects = allProjectsRaw.filter(p => p.isArchived);
     const recentProjects = useRecentProjects();
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const filteredProjects = useFilteredProjects(allProjects, searchTerm);
-    const searchInputRef = useRef<HTMLInputElement>(null);
+    const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
+    const [sortBy, setSortBy] = useState<SortOption>('modified');
+    
+    const displayedProjects = activeTab === 'active' ? activeProjects : archivedProjects;
+    const filteredProjects = useFilteredProjects(displayedProjects, searchTerm, sortBy);
+    const _searchInputRef = useRef<HTMLInputElement>(null);
     const [focusedIndex, setFocusedIndex] = useState(0);
 
     // Auto-open last project if enabled
@@ -75,8 +81,8 @@ export function DashboardPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [searchTerm, focusedIndex, filteredProjects]);
 
-    // Empty state
-    if (allProjects.length === 0) {
+    // Empty state (only show when NO projects exist at all)
+    if (allProjectsRaw.length === 0) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" data-testid="dashboard-page">
                 {/* Header */}
@@ -150,16 +156,71 @@ export function DashboardPage() {
 
             {/* Main Content */}
             <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
-                {/* Search Bar */}
-                <div style={{ marginBottom: '32px' }}>
-                    <SearchBar value={searchTerm} onChange={setSearchTerm} />
+                {/* Tab Navigation */}
+                <div className="flex items-center gap-4 mb-6" data-testid="project-tabs">
+                    <button
+                        onClick={() => setActiveTab('active')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                            activeTab === 'active'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'text-slate-600 hover:bg-slate-100'
+                        }`}
+                        data-testid="tab-active"
+                    >
+                        Active
+                        <span className={`px-2 py-0.5 rounded-full text-xs ${
+                            activeTab === 'active' ? 'bg-blue-200' : 'bg-slate-200'
+                        }`}>
+                            {activeProjects.length}
+                        </span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('archived')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                            activeTab === 'archived'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'text-slate-600 hover:bg-slate-100'
+                        }`}
+                        data-testid="tab-archived"
+                    >
+                        <Archive className="w-4 h-4" />
+                        Archived
+                        <span className={`px-2 py-0.5 rounded-full text-xs ${
+                            activeTab === 'archived' ? 'bg-blue-200' : 'bg-slate-200'
+                        }`}>
+                            {archivedProjects.length}
+                        </span>
+                    </button>
                 </div>
 
-                {/* Recent Projects Section */}
-                <RecentProjectsSection projects={recentProjects} />
+                {/* Search Bar and Sort */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+                    <SearchBar value={searchTerm} onChange={setSearchTerm} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <label htmlFor="sort-select" className="text-sm text-slate-500 whitespace-nowrap">Sort by:</label>
+                        <select
+                            id="sort-select"
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as SortOption)}
+                            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            data-testid="sort-select"
+                        >
+                            <option value="modified">Last Modified</option>
+                            <option value="name">Name (A-Z)</option>
+                            <option value="created">Date Created</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Recent Projects Section - only show on Active tab */}
+                {activeTab === 'active' && <RecentProjectsSection projects={recentProjects} />}
 
                 {/* All Projects Section */}
-                <AllProjectsSection projects={filteredProjects} searchTerm={searchTerm} />
+                <AllProjectsSection 
+                    projects={filteredProjects} 
+                    searchTerm={searchTerm}
+                    emptyMessage={activeTab === 'archived' ? 'No archived projects' : undefined}
+                />
             </div>
 
             <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />

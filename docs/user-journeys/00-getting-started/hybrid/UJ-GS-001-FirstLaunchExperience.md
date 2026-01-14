@@ -191,78 +191,6 @@ This document describes the complete user experience when launching the HVAC Can
 - Services: `AppInitializer`, `StorageService`
 - Stores: `AppStateStore`, `SettingsStore`
 
-### Step 2: Welcome Screen Display
-
-**User Actions:**
-1. User reads welcome message and application overview
-2. User reviews feature highlights (3-4 key features)
-3. User decides whether to take Quick Start tutorial or skip
-4. User clicks "Start Tutorial" or "Skip to App" button
-
-**System Response:**
-1. System displays Welcome Screen with animated entrance
-2. System shows application title: "Welcome to HVAC Canvas App"
-3. System displays tagline: "Design professional HVAC systems with ease"
-4. System presents feature highlights with icons:
-   - "Drag-and-drop canvas design"
-   - "Automatic duct routing"
-   - "Real-time calculations"
-   - "Export to industry formats"
-5. System shows two prominent action buttons:
-   - Primary: "Start Quick Tutorial" (blue, recommended)
-   - Secondary: "Skip and Explore" (gray outline)
-6. System displays checkbox: "Don't show this again"
-7. System waits for user interaction
-8. System tracks user's choice for analytics (tutorial vs. skip)
-
-**Visual State:**
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│              Welcome to HVAC Canvas App                 │
-│         Design professional HVAC systems with ease      │
-│                                                         │
-│  ┌───────────────┐  ┌───────────────┐                  │
-│  │   [DRAG]      │  │   [AUTO]      │                  │
-│  │  Drag-and-    │  │  Automatic    │                  │
-│  │  drop canvas  │  │  duct routing │                  │
-│  │  design       │  │               │                  │
-│  └───────────────┘  └───────────────┘                  │
-│                                                         │
-│  ┌───────────────┐  ┌───────────────┐                  │
-│  │   [CALC]      │  │   [EXPORT]    │                  │
-│  │  Real-time    │  │  Export to    │                  │
-│  │  calculations │  │  industry     │                  │
-│  │               │  │  formats      │                  │
-│  └───────────────┘  └───────────────┘                  │
-│                                                         │
-│        ┌───────────────────────────────────┐           │
-│        │   [►] Start Quick Tutorial (3min) │ (Primary) │
-│        └───────────────────────────────────┘           │
-│                                                         │
-│        ┌───────────────────────────────────┐           │
-│        │      Skip and Explore             │ (Secondary)│
-│        └───────────────────────────────────┘           │
-│                                                         │
-│  □ Don't show this welcome screen again                │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-**User Feedback:**
-- Feature highlights give quick overview of capabilities
-- Clear action buttons guide next steps
-- Estimated time (3min) sets expectations for tutorial
-- Skip option respects user's choice and time
-- "Don't show again" checkbox provides control
-
-**Related Elements:**
-- Components: `WelcomeScreen`, `FeatureHighlightCard`
-- Stores: `AppStateStore` (onboarding state)
-- Services: `OnboardingService`, `AnalyticsService`
-- Routes: `/welcome` (initial route on first launch)
-
 ### Step 3: Quick Start Tutorial Walkthrough
 
 **User Actions:**
@@ -279,7 +207,7 @@ This document describes the complete user experience when launching the HVAC Can
 
 **System Response:**
 1. System transitions to Canvas page with tutorial overlay
-2. System displays Tutorial Progress indicator: "Step 1 of 5"
+2. System displays Tutorial Progress indicator: "Step 1 of 5" plus progress dots/bar
 3. System shows semi-transparent overlay highlighting specific UI area
 4. System displays tutorial tooltip with instructions and animation
 5. System waits for user to complete the guided action
@@ -328,7 +256,7 @@ This document describes the complete user experience when launching the HVAC Can
 │   │ [Dialog Primitive]                                  │   │
 │   │                                                     │   │
 │   │  Equipment Placement                          [Skip]│   │
-│   │  (Step 1 of 5)                                      │   │
+│   │  (Step 1 of 5)  ●●○○○                               │   │
 │   │                                                     │   │
 │   │  Drag the Air Handler Unit onto the canvas to       │   │
 │   │  begin your design.                                 │   │
@@ -372,13 +300,15 @@ This document describes the complete user experience when launching the HVAC Can
    - Start with Blank Canvas (for experienced users)
 2. User browses available templates if interested (optional)
 3. User selects a template or blank canvas option
-4. User enters project name: "My First HVAC Project"
-5. User enters project description (optional)
-6. User configures initial settings:
+4. User optionally adjusts Quick Settings in the selected card:
    - Unit system (Imperial/Metric)
+   - Grid size
+5. User enters project name: "My First HVAC Project"
+6. User enters project description (optional)
+7. User configures initial settings:
    - Default equipment manufacturer preferences
    - Auto-save frequency
-7. User clicks "Create Project" button
+8. User clicks "Create Project" button
 
 **System Response:**
 1. System displays Project Creation screen after tutorial completion
@@ -395,21 +325,24 @@ This document describes the complete user experience when launching the HVAC Can
    - Description: "Start fresh with unlimited creative freedom"
    - Best for: "Experienced designers or unique projects"
 
-3. System displays project details form when option selected
-4. System provides default project name: "Untitled Project [Date]"
-5. System validates project name (required, 1-100 chars, unique)
-6. System shows optional description field (up to 500 characters)
-7. System displays initial settings panel with defaults:
+3. System displays inline Quick Settings on the selected card:
    - Unit System: Imperial (default) or Metric
+   - Grid size: 12, 24 (default), 48
+4. System displays project details form when option selected
+5. System provides default project name: "Untitled Project [Date]"
+6. System validates project name (required, 1-100 chars, unique)
+7. System shows optional description field (up to 500 characters)
+8. System displays initial settings panel with defaults:
    - Manufacturer: "All" (default) or specific brand
    - Auto-save: Every 5 minutes (default)
-8. System validates all inputs on blur
-9. System enables "Create Project" button when valid
-10. System creates new project in ProjectStore on button click
-11. System initializes empty canvas or loads template
-12. System saves project to IndexedDB
-13. System navigates to Canvas page with new project loaded
-14. System displays success toast: "Project created successfully!"
+9. System pre-fills the full form from Quick Settings selections
+10. System validates all inputs on blur
+11. System enables "Create Project" button when valid
+12. System creates new project in ProjectStore on button click
+13. System initializes empty canvas or loads template
+14. System saves project to IndexedDB
+15. System navigates to Canvas page with new project loaded
+16. System displays success toast: "Project created successfully!"
 
 **Visual State:**
 
@@ -515,7 +448,7 @@ This document describes the complete user experience when launching the HVAC Can
    - Content: "Click here anytime for help and documentation"
    - Dismiss: Auto-dismiss after 8 seconds or manual close
 
-4. System shows tooltips sequentially with 2-second delay between each
+4. System shows tooltips sequentially with a short delay (0.5s) and a "Next" control for user-driven pacing
 5. System saves `canvas.firstView = true` flag after tooltips shown
 6. System displays floating "Tips" panel in bottom-right corner:
    - Shows rotating helpful tips every 10 seconds
@@ -576,7 +509,7 @@ This document describes the complete user experience when launching the HVAC Can
 **User Feedback:**
 - Sequential tooltips prevent overwhelming user
 - Contextual placement connects instructions to UI elements
-- Auto-dismiss prevents modal interruption
+- User-driven pacing keeps tips comfortable, with auto-dismiss as fallback
 - Rotating tips provide ongoing learning
 - Persistent help menu always accessible
 - Idle hints gently nudge user toward first actions

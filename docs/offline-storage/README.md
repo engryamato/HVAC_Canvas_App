@@ -41,7 +41,7 @@ Offline storage documentation **must align with** user journey specifications:
 
 | Offline Storage Doc | Related User Journey | Alignment |
 |---------------------|---------------------|-----------|
-| [OS-INIT-001](./01-initialization/OS-INIT-001-FirstLaunchSetup.md) | [UJ-GS-001](../user-journeys/00-getting-started/UJ-GS-001-FirstLaunchExperience.md) | First launch experience |
+| [OS-INIT-001](./01-initialization/OS-INIT-001-FirstLaunchSetup.md) | [UJ-GS-001](../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md) | First launch experience |
 | [OS-DF-003](./05-data-flow/OS-DF-003-AutoSaveFlow.md) | [UJ-FM-002](../user-journeys/08-file-management/UJ-FM-002-AutoSave.md) | Auto-save behavior |
 | [OS-DF-001](./05-data-flow/OS-DF-001-ImportFlow.md) | UJ-FM-001 | Project import flow |
 | [OS-ERR-002](./07-error-recovery/OS-ERR-002-BackupRecovery.md) | UJ-FM-009 | Backup recovery |

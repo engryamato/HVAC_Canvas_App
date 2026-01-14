@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { FileSystemService } from '@/services/FileSystemService';
 import { useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
+import { ExportReportDialog } from '@/features/export/ExportReportDialog';
 
 export function FileMenu() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [exportDialogOpen, setExportDialogOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     // Close menu when clicking outside
@@ -51,60 +53,75 @@ export function FileMenu() {
         }
     };
 
+    const handleExportReport = () => {
+        setIsOpen(false);
+        setExportDialogOpen(true);
+    };
+
     return (
-        <div className="relative" ref={menuRef}>
-            <Button
-                variant="ghost"
-                size="sm"
-                className="gap-2"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <FileText className="w-4 h-4" />
-                File
-            </Button>
+        <>
+            <div className="relative" ref={menuRef}>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => setIsOpen(!isOpen)}
+                >
+                    <FileText className="w-4 h-4" />
+                    File
+                </Button>
 
-            {isOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50 flex flex-col items-start">
-                    <button
-                        onClick={() => router.push('/dashboard')}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
-                        data-testid="menu-dashboard"
-                    >
-                        Go to Dashboard <span className="text-xs opacity-50 ml-2">Ctrl+Shift+D</span>
-                    </button>
+                {isOpen && (
+                    <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50 flex flex-col items-start">
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                            data-testid="menu-dashboard"
+                        >
+                            Go to Dashboard <span className="text-xs opacity-50 ml-2">Ctrl+Shift+D</span>
+                        </button>
 
-                    <div className="h-px bg-slate-200 w-full my-1" />
+                        <div className="h-px bg-slate-200 w-full my-1" />
 
-                    <button
-                        onClick={() => { /* TODO: New Project */ }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
-                    >
-                        New Project... <span className="text-xs opacity-50 ml-2">Ctrl+N</span>
-                    </button>
-                    <button
-                        onClick={handleOpenFromFile}
-                        disabled={isLoading}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex justify-between items-center"
-                    >
-                        {isLoading ? 'Opening...' : 'Open from File...'} <span className="text-xs opacity-50 ml-2">Ctrl+O</span>
-                    </button>
+                        <button
+                            onClick={() => { /* TODO: New Project */ }}
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                        >
+                            New Project... <span className="text-xs opacity-50 ml-2">Ctrl+N</span>
+                        </button>
+                        <button
+                            onClick={handleOpenFromFile}
+                            disabled={isLoading}
+                            role="menuitem"
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm flex justify-between items-center"
+                        >
+                            {isLoading ? 'Opening...' : 'Open from File...'} <span className="text-xs opacity-50 ml-2">Ctrl+O</span>
+                        </button>
 
-                    <div className="h-px bg-slate-200 w-full my-1" />
+                        <div className="h-px bg-slate-200 w-full my-1" />
 
-                    <button
-                        onClick={() => { /* TODO: Save */ }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
-                    >
-                        Save Project <span className="text-xs opacity-50 ml-2">Ctrl+S</span>
-                    </button>
-                    <button
-                        onClick={() => { /* TODO: Export */ }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm"
-                    >
-                        Export...
-                    </button>
-                </div>
-            )}
-        </div>
+                        <button
+                            onClick={() => { /* TODO: Save */ }}
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                        >
+                            Save Project <span className="text-xs opacity-50 ml-2">Ctrl+S</span>
+                        </button>
+                        <button
+                            onClick={handleExportReport}
+                            role="menuitem"
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
+                            data-testid="menu-export-report"
+                        >
+                            Export Report... <span className="text-xs opacity-50 ml-2">Ctrl+P</span>
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            <ExportReportDialog
+                open={exportDialogOpen}
+                onOpenChange={setExportDialogOpen}
+            />
+        </>
     );
 }

@@ -129,12 +129,12 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
         const mockProjects = [
             createMockProject({
                 projectName: 'Office HVAC',
-                modifiedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+                modifiedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
                 entityCount: 12
             }),
             createMockProject({
                 projectName: 'Warehouse A',
-                modifiedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
+                modifiedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
                 entityCount: 8
             }),
             createMockProject({
@@ -149,21 +149,21 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
         // --- Step 1: Accessing Dashboard and Project List ---
         await test.step('Step 1: Accessing Dashboard and Project List', async () => {
             // User is on dashboard (already navigated by seedProjects)
-            await expect(page).toHaveURL('/dashboard');
+            await expect(page).toHaveURL('/dashboard', { timeout: 5000 });
 
             // Verify Dashboard loads with project list
-            await expect(page.getByText('Recent Projects')).toBeVisible();
-            await expect(page.getByText('All Projects')).toBeVisible();
+            await expect(page.getByText('Recent Projects')).toBeVisible({ timeout: 5000 });
+            await expect(page.getByText('All Projects')).toBeVisible({ timeout: 5000 });
 
             // Verify project cards are rendered in All Projects
             const allProjects = page.locator('[data-testid="all-projects"]');
-            await expect(allProjects.getByText('Office HVAC')).toBeVisible();
-            await expect(allProjects.getByText('Warehouse A')).toBeVisible();
-            await expect(allProjects.getByText('Retail Store')).toBeVisible();
+            await expect(allProjects.getByText('Office HVAC')).toBeVisible({ timeout: 5000 });
+            await expect(allProjects.getByText('Warehouse A')).toBeVisible({ timeout: 5000 });
+            await expect(allProjects.getByText('Retail Store')).toBeVisible({ timeout: 5000 });
 
             // Verify metadata displays (entity count)
-            await expect(allProjects.getByText('12 items')).toBeVisible(); // Office HVAC
-            await expect(allProjects.getByText('8 items')).toBeVisible(); // Warehouse A
+            await expect(allProjects.getByText('12 items')).toBeVisible({ timeout: 5000 });
+            await expect(allProjects.getByText('8 items')).toBeVisible({ timeout: 5000 });
         });
 
         // --- Step 2: Searching and Filtering Projects ---
@@ -180,7 +180,7 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
 
             // Verify filtered results in All Projects
             const allProjects = page.locator('[data-testid="all-projects"]');
-            await expect(allProjects.getByText('Warehouse A')).toBeVisible();
+            await expect(allProjects.getByText('Warehouse A')).toBeVisible({ timeout: 5000 });
             // Other projects should be filtered out or hidden
             // (This depends on implementation - they might be display:none or removed from DOM)
 
@@ -192,41 +192,42 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
             await page.waitForTimeout(500);
 
             // All projects visible again in All Projects
-            await expect(page.locator('[data-testid="all-projects"]').getByText('Office HVAC')).toBeVisible();
-            await expect(page.locator('[data-testid="all-projects"]').getByText('Retail Store')).toBeVisible();
+            await expect(page.locator('[data-testid="all-projects"]').getByText('Office HVAC')).toBeVisible({ timeout: 5000 });
+            await expect(page.locator('[data-testid="all-projects"]').getByText('Retail Store')).toBeVisible({ timeout: 5000 });
         });
 
         // --- Step 3: Opening Project from Dashboard ---
         await test.step('Step 3: Opening Project from Dashboard', async () => {
             // Locate the "Office HVAC" project card in All Projects
-            const projectCard = page.locator('[data-testid="all-projects"] [data-testid="project-card"]').filter({
+            const allProjects = page.locator('[data-testid="all-projects"]');
+            const projectCard = allProjects.locator('[data-testid="project-card"]').filter({
                 hasText: 'Office HVAC'
             });
 
+            // Wait for card to be visible
+            await expect(projectCard.first()).toBeVisible({ timeout: 5000 });
+
             // Click the "Open" button
-            const openButton = projectCard.getByRole('button', { name: /open/i });
+            const openButton = projectCard.first().getByRole('button', { name: /open/i });
+            await openButton.scrollIntoViewIfNeeded();
+            await expect(openButton).toBeVisible({ timeout: 3000 });
             await openButton.click();
 
             // Wait for navigation to canvas
             await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
-
-            // Wait for page to fully load
             await page.waitForLoadState('networkidle');
 
             // Verify Canvas page loaded
-            await expect(page.getByRole('heading', { name: 'Office HVAC' })).toBeVisible();
+            await expect(page.getByRole('heading', { name: 'Office HVAC' })).toBeVisible({ timeout: 5000 });
 
             // Verify project metadata in sidebar
             // (Project Details should be visible by default)
-            await expect(page.getByText('123 Main St, Chicago, IL')).toBeVisible();
-            await expect(page.getByText('Acme Corporation')).toBeVisible();
+            await expect(page.getByText('123 Main St, Chicago, IL')).toBeVisible({ timeout: 5000 });
+            await expect(page.getByText('Acme Corporation')).toBeVisible({ timeout: 5000 });
         });
     });
 
     test('Step 4: Opening Project from File System', async ({ page }) => {
-        // Navigate to dashboard
-        await page.goto('/dashboard');
-
         await test.step('Step 4: Opening Project from File System', async () => {
             // Create mock project data for file
             const mockFileProject = createMockProject({
@@ -240,21 +241,26 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
             // User clicks File menu
             await page.getByRole('button', { name: /file/i }).click();
 
+            // Wait for menu dropdown to be visible
+            await expect(page.getByRole('menu')).toBeVisible({ timeout: 3000 });
+
             // User clicks "Open from File..."
             await page.getByRole('menuitem', { name: /open.*file/i }).click();
 
             // The native file picker would open here, but it's mocked
-            // Our mock auto-returns the file handle
+            // Our mock auto-returns a file handle
 
             // Wait for project to load
-            await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
             await page.waitForLoadState('networkidle');
+            await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
 
             // Verify project loaded from file
-            await expect(page.getByRole('heading', { name: 'File System Project' })).toBeVisible();
-            await expect(page.getByText('From File')).toBeVisible();
+            await expect(page.getByRole('heading', { name: 'File System Project' })).toBeVisible({ timeout: 5000 });
+            await expect(page.getByText('From File')).toBeVisible({ timeout: 5000 });
         });
     });
+
+
 
     test('Step 5: Auto-Opening Last Project', async ({ page }) => {
         // Create a mock project
@@ -305,18 +311,21 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
             localStorage.setItem('lastActiveProjectId', project.projectId);
         }, mockProject);
 
-        await test.step('Step 5: Auto-Opening Last Project', async () => {
+         await test.step('Step 5: Auto-Opening Last Project', async () => {
             // Reload page to trigger auto-open
             await page.reload();
+            await page.waitForLoadState('networkidle');
+            await page.waitForTimeout(500);
 
             // Look for auto-open notification (if implemented)
             // await expect(page.getByText(/opening last project/i)).toBeVisible();
 
             // Should auto-navigate to canvas
             await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
+            await page.waitForLoadState('networkidle');
 
             // Verify correct project opened
-            await expect(page.getByRole('heading', { name: 'Auto Open Project' })).toBeVisible();
+            await expect(page.getByRole('heading', { name: 'Auto Open Project' })).toBeVisible({ timeout: 5000 });
         });
     });
 
@@ -333,37 +342,21 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
 
         await seedProjects(page, [corruptedProject]);
 
-        await test.step('Edge Case: Corrupted Data Handling', async () => {
-            // Try to open corrupted project (scope to all-projects to avoid strict mode)
-            // Since project name is missing, we can't search by name easily in user UI if it renders "Untitled" or similar.
-            // But the card might still render with ID or placeholder.
-            // Let's assume the project list renders it.
-            // However, our validation logic in CanvasPageWrapper happens ON LOAD.
-            // To reliably click it, we might need to rely on the fact it's the only one or use a different selector.
-            // Actually, if name is missing, our ProjectCard might crash or show "Untitled".
-
-            // Let's adjust: We keep the name for the LIST, but corrupt the STORE data so when it Loads, it is invalid.
-            // But seedProjects sets both.
-
-            // Simpler approach: Keep name invalid in logic but use ID to navigate directly, 
-            // bypassing the Dashboard UI click if the UI hides invalid projects.
-            // BUT strict mode wants us to mimic user.
-
-            // If we remove 'id' or 'name' from the persisted object, getProject might return it incomplete.
-
-            // Let's TRY navigating directly to it to test the Wrapper logic, as a user might via URL.
+         await test.step('Edge Case: Corrupted Data Handling', async () => {
+            // Simpler approach: Use ID to navigate directly
+            // bypassing Dashboard UI click if UI hides invalid projects.
             await page.goto(`/canvas/${corruptedProject.projectId}`);
 
             // Wait a moment for error to appear
             await page.waitForTimeout(1000);
 
             // Verify error dialog appears
-            await expect(page.getByText(/cannot be opened/i)).toBeVisible();
-            // Or: await expect(page.getByText(/corrupted/i)).toBeVisible();
+            await expect(page.getByText(/cannot be opened/i)).toBeVisible({ timeout: 5000 });
+            // await expect(page.getByText(/corrupted/i)).toBeVisible({ timeout: 5000 });
 
             // Verify recovery options are presented
-            // await expect(page.getByRole('button', { name: /try to recover/i })).toBeVisible();
-            // await expect(page.getByRole('button', { name: /delete project/i })).toBeVisible();
+            await expect(page.getByRole('button', { name: /try to recover/i })).toBeVisible({ timeout: 3000 });
+            await expect(page.getByRole('button', { name: /delete project/i })).toBeVisible({ timeout: 3000 });
         });
     });
 
@@ -376,39 +369,38 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
 
         await seedProjects(page, [newerVersionProject]);
 
-        await test.step('Edge Case: Version Mismatch Handling', async () => {
+         await test.step('Edge Case: Version Mismatch Handling', async () => {
             // Try to open newer version project (scope to all-projects to avoid strict mode)
             const allProjects = page.locator('[data-testid="all-projects"]');
             const projectCard = allProjects.locator('[data-testid="project-card"]').filter({
                 hasText: 'Future Version Project'
             });
 
-            const openButton = projectCard.getByRole('button', { name: /open/i });
+            // Wait for card to be visible
+            await expect(projectCard.first()).toBeVisible({ timeout: 5000 });
+
+            const openButton = projectCard.first().getByRole('button', { name: /open/i });
+            await openButton.scrollIntoViewIfNeeded();
+            await expect(openButton).toBeVisible({ timeout: 3000 });
             await openButton.click();
 
             // Wait for warning dialog
             await page.waitForTimeout(1000);
-
-            // Verify version warning appears
-            await expect(page.getByRole('heading', { name: /newer.*version/i })).toBeVisible();
+            await expect(page.getByRole('heading', { name: /newer.*version/i })).toBeVisible({ timeout: 5000 });
 
             // Verify options presented
-            // await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible();
-            // await expect(page.getByRole('button', { name: /update app/i })).toBeVisible();
+            await expect(page.getByRole('button', { name: /open anyway/i })).toBeVisible({ timeout: 3000 });
+            await expect(page.getByRole('button', { name: /update app/i })).toBeVisible({ timeout: 3000 });
         });
     });
 
     test('Error Scenario: IndexedDB Read Failure', async ({ page }) => {
-        await page.goto('/dashboard');
-
         await test.step('Error Scenario: IndexedDB Failure', async () => {
-            // Mock IndexedDB failure
-            // Mock Storage/Loading failure
             // Mock Storage/Loading failure using addInitScript to persist across navigation
             await page.addInitScript(() => {
                 const originalSetItem = Storage.prototype.setItem;
                 // Note: We do NOT mock getItem here, because we want hydration to succeed!
-                // But we mock setItem to throw globally to ensure we catch the write operation
+                // But we mock setItem to throw globally to ensure we catch write operation
                 Storage.prototype.setItem = function (key, value) {
                     throw new Error('Storage Write Failed');
                 };
@@ -418,19 +410,15 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
             // This ensures we bypass 'Project not found' and hit the storage error in loadProject
             await page.goto('/canvas/ca2cc8f5-9442-4ad4-abea-cb2aa03ebc24');
 
-            // Wait for error message
+            // Wait for error message to be displayed
             await page.waitForTimeout(1000);
 
-            // Verify error message displayed
             // Verify error message displayed (accept either "Unable to load" or "Project not found" as both indicate storage/load failure)
-            await expect(page.getByText(/unable to load project|project not found/i)).toBeVisible();
-            // Or check for specific error code
-            // await expect(page.getByText(/ERR_INDEXEDDB_READ_FAILED/i)).toBeVisible();
-
-            // Verify recovery options
-            // await expect(page.getByRole('button', { name: /retry/i })).toBeVisible();
+            await expect(page.getByText(/unable to load project|project not found/i)).toBeVisible({ timeout: 5000 });
         });
     });
+
+
 
     test('Keyboard Shortcuts: Dashboard Navigation', async ({ page }) => {
         // Seed multiple projects

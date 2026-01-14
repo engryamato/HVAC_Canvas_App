@@ -30,6 +30,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
 
     const handleClear = () => {
         setLocalValue('');
+        onChange('');
     };
 
     return (

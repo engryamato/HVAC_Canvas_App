@@ -121,7 +121,7 @@ This document provides a comprehensive overview of the HVAC Canvas App interface
    - Cursor coordinates (left)
    - Zoom level (center)
    - Grid status (center)
-   - Entity count (center-right)
+   - Auto-save status (center-right)
    - Connection status (right)
 
 2. System displays all regions in default configuration
@@ -149,15 +149,16 @@ This document provides a comprehensive overview of the HVAC Canvas App interface
 │        │                                          │          │
 │   [<]  │                                          │   [>]    │
 ├────────┴──────────────────────────────────────────┴──────────┤
-│ X: 1250, Y: 680 | Zoom: 100% | Grid: On | 12 items | ● Online│ ← Status
+│ X: 1250, Y: 680 | Zoom: 100% | Grid: On | Saved 2m ago | ● Online│ ← Status
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **User Feedback:**
 - Clear visual separation between regions
 - Consistent header and toolbar across all pages
+- Iconography uses a single set (e.g., Lucide) for visual consistency
 - Collapsible sidebars indicated by collapse arrows
-- Status bar provides contextual information
+- Status bar provides contextual information and last-saved state
 - Responsive layout adapts to window resizing
 
 **Related Elements:**
@@ -212,6 +213,7 @@ This document provides a comprehensive overview of the HVAC Canvas App interface
 6. System displays breadcrumb trail in header:
    - Dashboard: "Dashboard"
    - Canvas: "Dashboard > Project Name"
+   - Project name segment opens a dropdown for recent projects
 
 **Visual State:**
 
@@ -292,11 +294,11 @@ File Menu Dropdown:
    - System shows "No results" if no matches
    - System clears filter when search cleared
 
-5. When user clicks sidebar collapse button (« icon):
+5. When user clicks sidebar collapse button (« icon) placed mid-edge for easy reach:
    - System animates sidebar collapse to 40px width
    - System shows vertical tab labels
    - System saves collapsed state to settings
-   - Collapse button changes to expand (» icon)
+   - Collapse button remains mid-edge and changes to expand (» icon)
 
 6. When user clicks expand button:
    - System animates sidebar expansion to 280px width
@@ -338,7 +340,7 @@ Left Sidebar - Expanded (Equipment Tab):
 │   │[I] │ 1000 CFM          │
 │   └────┘                   │
 │                            │
-│                      [«]   │ ← Collapse
+│      [«] (mid-edge)        │ ← Collapse
 └────────────────────────────┘
 
 Left Sidebar - Collapsed:
@@ -393,7 +395,7 @@ Left Sidebar - Collapsed:
    - **Notes**
 
 2. **Properties Tab** (when no selection):
-   - Shows message: "No item selected"
+   - Shows empty-state illustration with message: "Select an item to view properties"
    - Shows project properties:
      - Project name
      - Created date
@@ -1097,7 +1099,7 @@ Toast Notification: "Cannot execute action - project is read-only"
 │  [<] │                                                  │  [>]  │
 ├──────┴──────────────────────────────────────────────────┴───────┤
 │                       STATUS BAR (30px)                         │
-│ X:1250, Y:680 │ Zoom: 100% │ Grid: On │ 12 items │ ● Online   │
+│ X:1250, Y:680 │ Zoom: 100% │ Grid: On │ Saved 2m ago │ ● Online   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1179,7 +1181,7 @@ Expanded State (Default):
 │  [VAV]     │                  │  CFM:  []  │
 │  [Fan]     │                  │            │
 │            │                  │            │
-│      [«]   │                  │   [»]      │
+│  [«] (mid-edge)│              │   [»]      │
 │  (280px)   │                  │  (320px)   │
 └────────────┴──────────────────┴────────────┘
 
