@@ -15,13 +15,17 @@ This user journey covers the data integrity validation that occurs during applic
 ## Prerequisites
 
 - Application is launching or loading a project
-- localStorage and/or .sws files exist from previous sessions
+- IndexedDB, localStorage, and/or .sws files exist from previous sessions
 
 ## Integrity Check Flow
 
-### Phase 1: localStorage Validation (Startup)
+### Phase 1: Persistence Layer Validation (Startup)
 
 **Timing**: Immediately when Zustand stores initialize
+
+**Scope**:
+1. **Preferences**: `localStorage` (theme, sidebar state)
+2. **Project Data**: `IndexedDB` (database connection, object store existence)
 
 **Expected Behavior**:
 
@@ -146,7 +150,7 @@ it('should load backup when main file corrupted', async () => {
 
 ---
 
-### 2. localStorage Quota Exceeded
+### 2. Storage Quota Exceeded (IndexedDB/LocalStorage)
 
 **Expected Handling**:
 - Catch quota error during save

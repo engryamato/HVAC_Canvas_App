@@ -441,6 +441,20 @@ describe('Project Save/Load Integration', () => {
 
 ---
 
+## Platform-Specific Testing
+
+### Web (Hybrid)
+Standard Playwright tests run in a browser environment (`http://localhost:3000`).
+- **Storage**: mocks `localStorage` / `IndexedDB`.
+- **Downloads**: Verifies Blob URLs and download attributes.
+- **Shortcuts**: Tests standard browser key events.
+
+### Native (Desktop)
+Testing functionality that relies on Tauri Rust APIs requires **Mocking**.
+See [Mocking Tauri APIs](#mocking-tauri-apis) for setup.
+- **File System**: Mock `tauri.fs` to verify `writeTextFile` calls.
+- **Dialogs**: Mock `tauri.dialog` to simulate user file selection.
+
 ## End-to-End Testing (Playwright)
 
 E2E tests verify critical user journeys across the entire application.

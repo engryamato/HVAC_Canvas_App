@@ -8,6 +8,7 @@
  * - Happy Path: Splash -> Welcome -> Tutorial -> Project Creation -> Canvas
  * - Skip Path: Splash -> Welcome -> Skip -> Project Creation -> Canvas
  *
+ * @spec docs/user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md
  * @author Onboarding Team
  * @created 2026-01-08
  */
@@ -22,13 +23,7 @@ async function simulateFirstLaunch(page: Page) {
     await page.evaluate(() => {
         localStorage.clear();
         sessionStorage.clear();
-        indexedDB.databases().then(databases => {
-            databases.forEach(db => {
-                if (db.name) {
-                    indexedDB.deleteDatabase(db.name);
-                }
-            });
-        });
+
     });
 }
 
@@ -59,59 +54,60 @@ test.describe('UJ-GS-001: First Launch Experience', () => {
         await expect(splash).not.toBeVisible({ timeout: 5000 });
 
         // 3. Welcome Screen
-        const welcome = page.getByTestId('welcome-screen');
-        // Note: We use a more generic selector or the data-testid I added in refactor
-        // The WelcomeScreen refactor didn't explicitly add 'data-testid="welcome-screen"' 
-        // to the root div, but the content has unique text.
-        // Let's rely on text or the Start button which has a testid.
-        await expect(page.getByText('Welcome to HVAC Canvas')).toBeVisible();
+        const welcome = page.getByText('Welcome to HVAC Canvas');
+        await expect(welcome).toBeVisible({ timeout: 10000 });
 
         // click 'Start Quick Tutorial'
         await page.getByTestId('start-tutorial-btn').click();
 
         // 4. Tutorial Flow (Dialog Overlay)
         const tutorial = page.getByTestId('tutorial-overlay');
-        await expect(tutorial).toBeVisible();
+        await expect(tutorial).toBeVisible({ timeout: 10000 });
         await expect(page.getByText('Equipment Placement')).toBeVisible(); // Step 1 Title
 
         // Step 1 -> Next
-        await page.getByRole('button', { name: 'Next' }).click();
+        await tutorial.getByRole('button', { name: 'Next' }).click();
         await expect(page.getByText('Duct Connection')).toBeVisible(); // Step 2
 
         // Step 2 -> Next
-        await page.getByRole('button', { name: 'Next' }).click();
+        await tutorial.getByRole('button', { name: 'Next' }).click();
         await expect(page.getByText('Properties Panel')).toBeVisible(); // Step 3
 
         // Step 3 -> Next
-        await page.getByRole('button', { name: 'Next' }).click();
+        await tutorial.getByRole('button', { name: 'Next' }).click();
         await expect(page.getByText('Canvas Navigation')).toBeVisible(); // Step 4
 
         // Step 4 -> Next
-        await page.getByRole('button', { name: 'Next' }).click();
+        await tutorial.getByRole('button', { name: 'Next' }).click();
         await expect(page.getByText('Help Access')).toBeVisible(); // Step 5
 
         // Step 5 -> Finish
-        await page.getByRole('button', { name: 'Finish' }).click();
+        await tutorial.getByRole('button', { name: 'Finish' }).click();
 
         // 5. Dashboard (Final Destination)
         // Should navigate directly to /dashboard
         await expect(page).toHaveURL(/\/dashboard/);
+        await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
     });
 
-    test('Flow 2: Fast Track (Skip Tutorial)', async ({ page }) => {
-        // 1. Launch Application
-        await page.goto('/');
+        test('Flow 2: Fast Track (Skip Tutorial)', async ({ page }) => {
+            // 1. Launch Application
+            await page.goto('/');
 
-        // 2. Wait for Splash
-        await expect(page.getByTestId('splash-screen')).toBeVisible();
-        await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });
+            // 2. Wait for Splash
+            await expect(page.getByTestId('app-logo')).toBeVisible();
+            await expect(page.getByTestId('splash-screen')).toBeVisible();
+            await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });
 
-        // 3. Welcome Screen -> Skip
-        await expect(page.getByText('Welcome to HVAC Canvas')).toBeVisible();
-        await page.getByTestId('skip-tutorial-btn').click();
+            // 3. Welcome Screen -> Skip
+            await expect(page.getByText('Welcome to HVAC Canvas')).toBeVisible();
+            await page.getByTestId('skip-tutorial-btn').click();
 
         // 4. Dashboard (Immediate)
         await expect(page).toHaveURL(/\/dashboard/);
-    });
+
+        // Verify dashboard loads
+        await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
+        });
 
 });

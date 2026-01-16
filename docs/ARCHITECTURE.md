@@ -55,7 +55,7 @@ HVAC engineering calculations are decoupled from the UI but react to entity chan
 ### 6. Persistence & Serialization
 The project is saved as a single `.sws` file (JSON-based).
 - **[Serialization](elements/10-persistence/Serialization.md)**: Uses **Zod schemas** to validate data during both save and load, ensuring file integrity.
-- **[ProjectIO](elements/10-persistence/ProjectIO.md)**: Handles the actual file system operations via Tauri, including automated backup creation.
+- **[ProjectIO](elements/10-persistence/ProjectIO.md)**: Abstraction layer that routes I/O to **IndexedDB/Cloud** (Web) or **Native FS** (Tauri). See [Platform Adapters](architecture/01-platform-adapters.md).
 
 ## Entity Lifecycle
 1. **Creation**: A [Tool](elements/04-tools/) uses an [Entity Factory](elements/08-entities/) to create a new object with [defaults](elements/08-entities/RoomDefaults.md).

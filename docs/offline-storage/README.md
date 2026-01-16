@@ -7,7 +7,7 @@ The HVAC Canvas App uses a **multi-layer offline-first storage architecture** de
 - **Desktop permanence**: Full project files stored as `.sws` JSON files via Tauri APIs
 - **Web browser caching**: Temporary localStorage persistence for web environments
 - **In-memory performance**: Zustand stores for fast UI updates
-- **Automatic sync**: Background auto-save with 2-second debounce
+- **Automatic sync**: Background auto-save every 300 seconds (configurable)
 - **Data integrity**: Zod schema validation and backup creation
 
 The system is designed to work seamlessly across both desktop (Tauri) and web browser environments with appropriate fallbacks.
@@ -42,7 +42,7 @@ Offline storage documentation **must align with** user journey specifications:
 | Offline Storage Doc | Related User Journey | Alignment |
 |---------------------|---------------------|-----------|
 | [OS-INIT-001](./01-initialization/OS-INIT-001-FirstLaunchSetup.md) | [UJ-GS-001](../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md) | First launch experience |
-| [OS-DF-003](./05-data-flow/OS-DF-003-AutoSaveFlow.md) | [UJ-FM-002](../user-journeys/08-file-management/UJ-FM-002-AutoSave.md) | Auto-save behavior |
+| [OS-DF-003](./05-data-flow/OS-DF-003-AutoSaveFlow.md) | [UJ-FM-002](../user-journeys/08-file-management/tauri-offline/UJ-FM-002-AutoSave.md) | Auto-save behavior |
 | [OS-DF-001](./05-data-flow/OS-DF-001-ImportFlow.md) | UJ-FM-001 | Project import flow |
 | [OS-ERR-002](./07-error-recovery/OS-ERR-002-BackupRecovery.md) | UJ-FM-009 | Backup recovery |
 
@@ -90,14 +90,13 @@ The **source of truth** during runtime:
 Automatic persistence via Zustand `persist` middleware:
 
 - **Storage keys**:
-  - `hvac-project-{projectId}` - Individual project auto-save data
+  - `hvac-project-{projectId}` - Project data (localStorage)
   - `sws.preferences` - User preferences
-  - `sws.projectIndex` - Project list index
-  - `project-storage` - Current project state
+  - `sws.projectIndex` - Project index metadata
 
-**Size limit**: ~5MB per origin (browser-dependent)
+**Size limit**: ~5MB per origin (localStorage)
 
-**Purpose**: Temporary caching to survive page refreshes and provide quick restore
+**Purpose**: `localStorage` for project data and settings; cloud backup is separate and not used for auto-save.
 
 ### 3. File System (.sws Files)
 
@@ -161,7 +160,7 @@ graph TB
 
 ### Auto-Save Flow (Desktop)
 ```
-Store change → 2s debounce → Serialize entities → Save to .sws → Create .bak backup
+Store change → 300s interval → Serialize entities → Save to .sws → Create .bak backup
 ```
 
 ### Auto-Save Flow (Web)
@@ -181,7 +180,7 @@ User Cmd/Ctrl+S → Save dialog → Serialize → Write .sws → Create .bak →
 ### Core Documentation
 - [Implementation Status](./IMPLEMENTATION_STATUS.md) - What's implemented vs planned
 - [Storage Layers Overview](./02-storage-layers/OS-SL-001-ArchitectureOverview.md) - Three-layer architecture
-- [localStorage Cache](./02-storage-layers/OS-SL-003-LocalStorageCache.md) - Browser persistence
+- [IndexedDB Storage](./02-storage-layers/OS-SL-003-IndexedDBStorage.md) - Deprecated reference (localStorage-only policy)
 
 ### Initialization
 - [First Launch Setup](./01-initialization/OS-INIT-001-FirstLaunchSetup.md)
@@ -208,7 +207,7 @@ User Cmd/Ctrl+S → Save dialog → Serialize → Write .sws → Create .bak →
 - [Known Limitations](./07-error-recovery/OS-ERR-003-KnownLimitations.md)
 
 ### Future Enhancements
-- [IndexedDB Plan](./04-future-enhancements/OS-FE-001-IndexedDBPlan.md) - Planned but not implemented
+- [IndexedDB Storage](./02-storage-layers/OS-SL-003-IndexedDBStorage.md) - Deprecated reference
 
 ---
 
@@ -220,9 +219,9 @@ User Cmd/Ctrl+S → Save dialog → Serialize → Write .sws → Create .bak →
 - [FileSystem Element Docs](../elements/10-persistence/FileSystem.md) - Tauri abstraction layer
 
 ### User Journey Documentation
-- [UJ-FM-002: Auto-Save Project](../../docs/user-journey/UJ-FM-002-AutoSaveProject.md)
-- [UJ-FM-009: Create Backup/Duplicate](../../docs/user-journey/UJ-FM-009-CreateBackupDuplicate.md)
-- [UJ-GS-001: First Launch Initialization](../../docs/user-journey/UJ-GS-001-FirstLaunchInitialization.md)
+- [UJ-FM-002: Auto-Save](../user-journeys/08-file-management/tauri-offline/UJ-FM-002-AutoSave.md)
+- [UJ-FM-009: Recover Autosave](../user-journeys/08-file-management/tauri-offline/UJ-FM-009-RecoverAutosavedProject.md)
+- [UJ-GS-001: First Launch Experience](../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md)
 
 ### Technical References
 - Zod Schema: `src/core/schema/project-file.schema.ts`
@@ -238,7 +237,7 @@ User Cmd/Ctrl+S → Save dialog → Serialize → Write .sws → Create .bak →
 - .sws file save/load with Zod validation
 - Automatic backup (.bak file) creation
 - localStorage persistence via Zustand middleware
-- Auto-save with 2-second debounce
+- Auto-save with 300-second interval
 - Tauri/Web environment detection and fallback
 - Schema migration framework (v1.0.0)
 
@@ -247,10 +246,10 @@ User Cmd/Ctrl+S → Save dialog → Serialize → Write .sws → Create .bak →
 - Error code system (documented vs actual differs)
 
 ### Not Implemented ❌
-- IndexedDB cache layer (localStorage used instead)
 - Backup rotation (only 1 .bak kept, not 5 versions)
 - Retry logic on file lock (no retry mechanism)
 - Idle detection (30-minute pause not implemented)
+- IndexedDB cache layer (Rejected in favor of localStorage)
 
 See [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md) for complete details.
 
@@ -354,5 +353,5 @@ Before committing documentation updates:
 - **2026-01**: Initial offline storage documentation created
   - Documented actual three-layer architecture (Zustand + localStorage + .sws files)
   - Clarified Tauri vs Web environment differences
-  - Marked IndexedDB as "planned but not implemented"
-  - Documented 2-second auto-save debounce (actual behavior)
+  - Marked IndexedDB as rejected under localStorage-only policy
+  - Documented 300-second auto-save interval (spec)

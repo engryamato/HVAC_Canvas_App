@@ -1,11 +1,17 @@
-# Complete Workflows
+# Workflow User Journeys
 
-## Overview
+This section is split by delivery mode:
 
-This category covers end-to-end workflows that connect multiple components and features in the SizeWise HVAC Canvas App.
+## [Hybrid / Web](./hybrid/)
+Browser-based lifecycle. Handles:
+- **Zero Install** (URL Access)
+- **Cloud/IDB Storage**
+- **Browser Downloads**
+- [UJ-WF-001 Small Office Design](./hybrid/UJ-WF-001-SmallOfficeDesign.md)
 
-## Child Documents
-
-- [UJ-WF-001: Small Office Design](UJ-WF-001-SmallOfficeDesign.md)
-
-</details>
+## [Tauri / Native](./tauri-offline/)
+Desktop-based lifecycle. Handles:
+- **Installable** (MSI/DMG)
+- **Local FS Storage**
+- **Native Exports**
+- [UJ-WF-001 Small Office Design](./tauri-offline/UJ-WF-001-SmallOfficeDesign.md)

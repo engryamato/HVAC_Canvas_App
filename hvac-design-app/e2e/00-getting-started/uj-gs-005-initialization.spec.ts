@@ -8,7 +8,7 @@
  * - Default preferences initialization
  * - Storage key verification
  *
- * @spec OS-INIT-001-FirstLaunchSetup.md
+ * @spec docs/offline-storage/01-initialization/OS-INIT-001-FirstLaunchSetup.md
  * @created 2026-01-12
  */
 
@@ -21,13 +21,7 @@ async function clearAllStorage(page: Page) {
     await page.evaluate(() => {
         localStorage.clear();
         sessionStorage.clear();
-        indexedDB.databases().then(databases => {
-            databases.forEach(db => {
-                if (db.name) {
-                    indexedDB.deleteDatabase(db.name);
-                }
-            });
-        });
+
     });
 }
 
@@ -235,7 +229,8 @@ test.describe('OS-INIT-001: First Launch Initialization', () => {
             if (preferences && preferences.state) {
                 expect(preferences.state.projectFolder).toBe('/projects');
                 expect(preferences.state.unitSystem).toBe('imperial');
-                expect(preferences.state.autoSaveInterval).toBe(60000);
+                // Spec: OS-INIT-001 First Launch defaults (auto-save 300s).
+                expect(preferences.state.autoSaveInterval).toBe(300000);
                 expect(preferences.state.gridSize).toBe(24);
                 expect(preferences.state.theme).toBe('light');
             }

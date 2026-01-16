@@ -61,6 +61,7 @@ export const TutorialOverlay: React.FC = () => {
                     <Button
                         onClick={handleNext}
                         size="lg"
+                        data-testid="tutorial-next-btn"
                     >
                         {currentStep === totalSteps ? 'Finish' : 'Next'}
                     </Button>

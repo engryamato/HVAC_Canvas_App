@@ -438,7 +438,7 @@ interface BOMLineItem {
 | **State Management** | Zustand | 4.x | Lightweight, performant state |
 | **Schema Validation** | Zod | 3.x | Runtime type validation |
 | **Canvas Rendering** | Pure Canvas 2D | - | No wrapper libraries; Fabric.js explicitly rejected per DEC-001 |
-| **Local Cache** | IndexedDB | - | Client-side caching; .sws file remains authoritative |
+| **Local Cache** | localStorage | - | Browser-based persistence for web; .sws file remains authoritative on Desktop |
 | **Language** | TypeScript | 5.x | Type-safe development |
 | **Package Manager** | pnpm | 8.x | Fast, disk-efficient |
 | **Testing** | Vitest | 1.x | Unit/integration testing |

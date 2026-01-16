@@ -26,11 +26,11 @@ Document the **Zustand persist middleware** implementation used across multiple 
 
 ### Related PRD Sections
 - **Section 4.2: Offline-First Architecture** - localStorage as browser cache layer
-- **FR-FILE-004**: Auto-save functionality relies on localStorage persistence
+- **FR-FILE-004**: Auto-save functionality relies on **localStorage** persistence
 
 ### Related User Journeys
-- [UJ-GS-001](../../user-journey/UJ-GS-001-FirstLaunchInitialization.md): First launch initialization
-- [UJ-FM-002](../../user-journey/UJ-FM-002-AutoSaveProject.md): Auto-save behavior
+- [UJ-GS-001](../../user-journeys/00-getting-started/tauri-offline/UJ-GS-001-FirstLaunchExperience.md): First launch experience
+- [UJ-FM-002](../../user-journeys/08-file-management/tauri-offline/UJ-FM-002-AutoSave.md): Auto-save behavior
 
 ---
 
@@ -38,7 +38,7 @@ Document the **Zustand persist middleware** implementation used across multiple 
 
 ### Zustand Persist Middleware
 
-The `persist` middleware is part of the Zustand ecosystem and provides automatic synchronization between store state and browser storage (localStorage/sessionStorage/IndexedDB).
+The `persist` middleware is part of the Zustand ecosystem and provides automatic synchronization between store state and browser storage (localStorage).
 
 ```typescript
 import { create } from 'zustand';
@@ -543,7 +543,7 @@ sequenceDiagram
 | **No migration** | Can't evolve schema over time | Manual localStorage clear | Implement migrate function |
 | **Silent failures** | No user feedback on errors | None | Add error notifications |
 | **No debouncing** | High-frequency updates lag UI | Batch state changes | Add debounce wrapper |
-| **5MB quota** | Large projects may exceed limit | None | Switch to IndexedDB (planned) |
+| **5MB quota** | Large projects may exceed limit | Export/split projects | No alternative storage planned |
 | **Synchronous I/O** | Blocks main thread | None | Consider async storage adapter |
 
 ---
@@ -555,7 +555,7 @@ sequenceDiagram
 | **Zustand persist** | Preferences, project list | Automatic, declarative | No versioning, silent failures |
 | **Manual localStorage** | Auto-save (useAutoSave) | Full control, error handling | Manual serialization |
 | **.sws files** | Desktop permanent storage | Full project data, backups | Requires Tauri, manual save |
-| **IndexedDB** | Not implemented | Large storage, indexed queries | Complex API, not implemented |
+| **IndexedDB (Rejected)** | Not implemented | Large storage, indexed queries | Not aligned with localStorage-only policy |
 
 ---
 
@@ -615,4 +615,4 @@ sequenceDiagram
 2. **Add debouncing**: Reduce write frequency for high-change stores
 3. **Add error notifications**: Alert user when persistence fails
 4. **Add partialize**: Exclude transient fields from storage
-5. **Consider IndexedDB**: For larger storage needs (see [OS-FE-001](../04-future-enhancements/OS-FE-001-IndexedDBPlan.md))
+5. **Reinforce localStorage limits**: Encourage exports for large projects

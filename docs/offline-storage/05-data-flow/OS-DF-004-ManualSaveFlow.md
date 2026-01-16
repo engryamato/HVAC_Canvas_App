@@ -3,14 +3,16 @@
 ## 1. Overview
 
 ### Purpose
-Document the **manual save workflow** triggered by user actions (Cmd/Ctrl+S, Save button, File menu), including save dialogs, .sws file writing, backup creation, and user feedback.
+Document the **manual save workflow** triggered by user actions (Cmd/Ctrl+S, Save button, File menu), including save dialogs, .sws file writing on desktop, localStorage persistence on web, backup creation, and user feedback.
 
 ### Scope
 - Keyboard shortcut handling (Cmd/Ctrl+S)
 - Save vs Save As workflows
 - File dialog integration (Tauri)
-- .sws file writing via projectIO
+- localStorage persistence for web
+- .sws file writing via projectIO (desktop)
 - Backup creation (.bak files)
+- Cloud backup triggers (manual only, no autosave)
 - Success/error feedback
 
 ### Implementation Status
@@ -497,7 +499,7 @@ stateDiagram-v2
 | Feature | Auto-Save | Manual Save |
 |---------|-----------|-------------|
 | **Trigger** | Store changes | User action |
-| **Timing** | 2s debounce | Immediate |
+| **Timing** | 300s interval | Immediate |
 | **Target** | localStorage | .sws file |
 | **Backup** | No | Yes (.bak file) |
 | **User feedback** | None (silent) | Toast notification |

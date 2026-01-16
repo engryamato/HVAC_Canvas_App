@@ -25,7 +25,7 @@ type PreferencesStore = PreferencesState & PreferencesActions;
 export const PREFERENCES_DEFAULTS: PreferencesState = {
   projectFolder: '/projects',
   unitSystem: 'imperial',
-  autoSaveInterval: 60000,
+  autoSaveInterval: 300000,
   gridSize: 24,
   theme: 'light',
 };

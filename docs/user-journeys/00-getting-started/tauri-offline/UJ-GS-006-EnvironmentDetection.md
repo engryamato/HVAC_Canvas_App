@@ -45,7 +45,7 @@ it('should detect web environment correctly', () => {
 | Environment | Primary Storage | Backup | File Operations |
 |-------------|-----------------|--------|-----------------|
 | Desktop (Tauri) | File system (.sws) | localStorage | ✅ Full support |
-| Web Browser | localStorage | None | ❌ Disabled |
+| Web Browser | IndexedDB | localStorage | ✅ Full support |
 
 **Validation Method**: E2E test
 ```typescript
@@ -65,7 +65,7 @@ test('should use localStorage in web mode', async ({ page }) => {
 - Project creation: ✅ Available (saves to localStorage)
 - Project save: ⚠️ Triggers browser download (not file save)
 - Open from file: ⚠️ Uses file upload (`<input type="file">`)
-- Auto-save: ✅ Available (localStorage only)
+- Auto-save: ✅ Available (IndexedDB)
 - Recent files: ⚠️ Limited to localStorage history
 
 **Validation Method**: E2E test

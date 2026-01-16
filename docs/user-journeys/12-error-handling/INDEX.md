@@ -1,11 +1,19 @@
-# Error Handling
+# Error Handling User Journeys
 
-## Overview
+This section is split by delivery mode:
 
-This category covers all user journeys related to how the SizeWise HVAC Canvas App communicates and manages errors during runtime.
+## [Hybrid / Web](./hybrid/)
+Browser-based recovery. Handles:
+- **Refresh Strategy** (F5 / Reload Context)
+- **Offline Mode** (`navigator.onLine`)
+- **Quota Management** (localStorage)
+- [UJ-ERR-001 Application Recovery](./hybrid/UJ-ERR-001-ApplicationRecovery.md)
+- [UJ-EH-006 Warning Notifications](./hybrid/UJ-EH-006-WarningNotifications.md)
 
-## Child Documents
-
-- [UJ-ERR-001: Application Recovery](UJ-ERR-001-ApplicationRecovery.md)
-
-</details>
+## [Tauri / Native](./tauri-offline/)
+Desktop-based recovery. Handles:
+- **App Restart** (Relaunch Executable)
+- **Panic Hooks** (Rust Backend Logging)
+- **File Corruption** (Config Reset)
+- [UJ-ERR-001 Application Recovery](./tauri-offline/UJ-ERR-001-ApplicationRecovery.md)
+- [UJ-EH-006 Warning Notifications](./tauri-offline/UJ-EH-006-WarningNotifications.md)

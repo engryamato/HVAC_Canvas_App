@@ -79,15 +79,11 @@ export default defineConfig({
 
   /* Run local dev server before starting the tests */
   /* Only run webServer if NOT in CI/Docker (host mode) */
-   /* Run local dev server before starting tests - temporarily disabled to fix connection issues */
-   /*
-   webServer: process.env.CI ? undefined : {
-     command: 'npm run dev',
-     url: 'http://localhost:3000',
-     reuseExistingServer: !process.env.CI,
-     timeout: 120 * 1000,
-     port: 3000,
-   },
-   */
+  webServer: {
+    command: 'npm run dev -- --port 3001',
+    url: 'http://localhost:3001',
+    reuseExistingServer: true,
+    timeout: 300 * 1000,
+  },
 });
 

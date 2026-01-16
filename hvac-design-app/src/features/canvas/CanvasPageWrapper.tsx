@@ -4,10 +4,16 @@ import { useEffect, useState } from 'react';
 import { CanvasPage } from './CanvasPage';
 import { useProjectStore as useSessionStore } from '@/core/store/project.store';
 import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore';
+import { useEntityStore } from '@/core/store/entityStore';
+import { useViewportStore } from './store/viewportStore';
+import { useSelectionStore } from './store/selectionStore';
+import { useHistoryStore } from '@/core/commands/historyStore';
+import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
+import { loadProjectFromStorage, type LocalStoragePayload } from './hooks/useAutoSave';
 
 interface CanvasPageWrapperProps {
   projectId: string;
@@ -45,6 +51,31 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const [projectVersion, setProjectVersion] = useState<string>('');
   const [shouldLoadProject, setShouldLoadProject] = useState(false);
 
+  const hydrateFromPayload = (payload: LocalStoragePayload) => {
+    try {
+      useEntityStore.getState().hydrate(payload.project.entities);
+      useViewportStore.setState({
+        panX: payload.viewport.panX,
+        panY: payload.viewport.panY,
+        zoom: payload.viewport.zoom,
+        gridVisible: payload.viewport.gridVisible,
+        gridSize: payload.viewport.gridSize,
+        snapToGrid: payload.viewport.snapToGrid,
+      });
+      useSelectionStore.setState({
+        selectedIds: payload.selection.selectedIds,
+        hoveredId: payload.selection.hoveredId,
+      });
+      useHistoryStore.setState({
+        past: payload.history.past,
+        future: payload.history.future,
+        maxSize: payload.history.maxSize,
+      });
+    } catch (error) {
+      logger.error('[CanvasPageWrapper] Failed to hydrate from localStorage payload', error);
+    }
+  };
+
   // Set project ID in store when route loads
   useEffect(() => {
     try {
@@ -67,22 +98,28 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
         return;
       }
 
+      const storedProject = loadProjectFromStorage(projectId);
+      const storedPayload = storedProject?.payload;
       const persistedProject = getProject(projectId);
 
-      if (!persistedProject) {
+      if (!persistedProject && !storedPayload) {
         setProjectError('Project not found. The project may have been deleted or corrupted.');
         return;
       }
 
-      // Validate required fields
-      if (!persistedProject.id || !persistedProject.name) {
+      const projectName = storedPayload?.project?.projectName ?? persistedProject?.name;
+      if (!projectName) {
         setProjectError('Project data is corrupted or invalid. Required fields are missing.');
         return;
       }
 
+      if (storedPayload) {
+        hydrateFromPayload(storedPayload);
+      }
+
       // Check version compatibility
-      const projVersion = (persistedProject as any).version || '1.0.0';
-      logger.debug(`[CanvasPageWrapper] Project: ${persistedProject.name}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
+      const projVersion = (persistedProject as any)?.version || '1.0.0';
+      logger.debug(`[CanvasPageWrapper] Project: ${projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
 
       if (compareVersions(projVersion, APP_VERSION) > 0) {
         logger.debug('[CanvasPageWrapper] Version mismatch detected');
@@ -92,7 +129,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
 
       // Load project
-      loadProject(persistedProject);
+      loadProject(persistedProject, storedPayload);
     } catch (error) {
       console.error('Failed to load project:', error);
       setProjectError('Unable to load project. The file may be corrupted or there was a storage error.');
@@ -108,9 +145,13 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   useEffect(() => {
     if (shouldLoadProject) {
       try {
+        const storedProject = loadProjectFromStorage(projectId);
         const persistedProject = getProject(projectId);
-        if (persistedProject) {
-          loadProject(persistedProject);
+        if (storedProject?.payload) {
+          hydrateFromPayload(storedProject.payload);
+        }
+        if (persistedProject || storedProject?.payload) {
+          loadProject(persistedProject, storedProject?.payload);
         }
       } catch (error) {
         setProjectError('Unable to load project.');
@@ -119,21 +160,37 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
     }
   }, [shouldLoadProject, projectId, getProject]);
 
-  function loadProject(persistedProject: any) {
+  function loadProject(persistedProject: any, storedPayload?: LocalStoragePayload) {
+    const storedProject = storedPayload?.project;
+    const resolvedProjectId = storedProject?.projectId ?? persistedProject?.id ?? projectId;
+
     setProject(projectId, {
-      projectId: persistedProject.id,
-      projectName: persistedProject.name,
-      projectNumber: persistedProject.projectNumber || undefined,
-      clientName: persistedProject.clientName || undefined,
-      location: persistedProject.location || undefined,
-      scope: persistedProject.scope,
-      siteConditions: persistedProject.siteConditions,
-      createdAt: persistedProject.createdAt,
-      modifiedAt: persistedProject.modifiedAt,
+      projectId: resolvedProjectId,
+      projectName: storedProject?.projectName ?? persistedProject?.name ?? 'Untitled Project',
+      projectNumber: storedProject?.projectNumber ?? (persistedProject?.projectNumber || undefined),
+      clientName: storedProject?.clientName ?? (persistedProject?.clientName || undefined),
+      location: persistedProject?.location || undefined,
+      scope: persistedProject?.scope,
+      siteConditions: persistedProject?.siteConditions,
+      createdAt: storedProject?.createdAt ?? persistedProject?.createdAt ?? new Date().toISOString(),
+      modifiedAt: storedProject?.modifiedAt ?? persistedProject?.modifiedAt ?? new Date().toISOString(),
     });
 
     // Track as last active project for auto-open feature
     localStorage.setItem('lastActiveProjectId', projectId);
+
+    if (storedPayload) {
+      useProjectListStore.getState().addProject({
+        projectId: resolvedProjectId,
+        projectName: storedProject?.projectName ?? persistedProject?.name ?? 'Untitled Project',
+        projectNumber: storedProject?.projectNumber ?? persistedProject?.projectNumber,
+        clientName: storedProject?.clientName ?? persistedProject?.clientName,
+        createdAt: storedProject?.createdAt ?? new Date().toISOString(),
+        modifiedAt: storedProject?.modifiedAt ?? new Date().toISOString(),
+        storagePath: `project-${resolvedProjectId}`,
+        isArchived: false,
+      });
+    }
   }
 
   // Show error page (404)

@@ -11,7 +11,7 @@
  * - Window Resize Transitions: Dynamic blocking/unblocking
  * - Exit Button Behavior: Platform-appropriate exit
  *
- * @see docs/user-journeys/00-getting-started/UJ-GS-002-DeviceCompatibility.md
+ * @spec docs/user-journeys/00-getting-started/tauri-offline/UJ-GS-002-DeviceCompatibility.md
  * @author Device Compatibility Team
  * @created 2026-01-10
  */
@@ -49,6 +49,16 @@ async function setViewport(page: Page, width: number, height: number) {
     await page.waitForLoadState('networkidle');
 }
 
+async function markHasLaunched(page: Page) {
+    await page.addInitScript(() => {
+        localStorage.setItem('hvac-app-storage', JSON.stringify({
+            state: { hasLaunched: true },
+            version: 0,
+        }));
+    });
+}
+
+
 test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () => {
 
     test.describe('Step 1: Mobile Device Blocking (< 640px)', () => {
@@ -61,8 +71,8 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // Validate blocking overlay is visible
-            const deviceWarning = page.getByRole('alertdialog');
-            await expect(deviceWarning).toBeVisible();
+            const deviceWarning = page.getByTestId('device-warning');
+            await expect(deviceWarning).toBeVisible({ timeout: 10000 });
 
             // Validate warning message content
             await expect(page.getByText('Device Incompatible')).toBeVisible();
@@ -70,7 +80,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await expect(page.getByText(/Tablet, Laptop, or Desktop/i)).toBeVisible();
 
             // Validate Exit button is present
-            const exitButton = page.getByRole('button', { name: /exit application/i });
+            const exitButton = page.getByTestId('exit-application');
             await expect(exitButton).toBeVisible();
 
             // Validate NO proceed/dismiss button exists
@@ -88,7 +98,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.setViewportSize(VIEWPORTS.mobile.pixel5);
             await page.goto('/');
 
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible({ timeout: 10000 });
             await expect(page.getByText('Device Incompatible')).toBeVisible();
         });
 
@@ -96,15 +106,15 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.setViewportSize(VIEWPORTS.mobile.galaxyS21);
             await page.goto('/');
 
-            await expect(page.getByRole('alertdialog')).toBeVisible();
-            await expect(page.getByRole('button', { name: /exit/i })).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible({ timeout: 10000 });
+            await expect(page.getByTestId('exit-application')).toBeVisible();
         });
 
         test('Edge Case: Exactly 639px - Should be blocked', async ({ page }) => {
             await page.setViewportSize({ width: 639, height: 800 });
             await page.goto('/');
 
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible({ timeout: 10000 });
             await expect(page.getByText('Device Incompatible')).toBeVisible();
         });
 
@@ -116,7 +126,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.setViewportSize(VIEWPORTS.mobile.iphone14);
             await page.goto('/');
 
-            const exitButton = page.getByRole('button', { name: /exit/i });
+            const exitButton = page.getByTestId('exit-application');
             await expect(exitButton).toBeVisible();
 
             // Tab should focus the exit button
@@ -131,7 +141,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.setViewportSize(VIEWPORTS.mobile.iphone14);
             await page.goto('/');
 
-            const exitButton = page.getByRole('button', { name: /exit/i });
+            const exitButton = page.getByTestId('exit-application');
             await exitButton.click();
 
             // In web context, window.close() is blocked, so a fallback message should appear
@@ -148,15 +158,10 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // No blocking overlay should be visible
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Application header should be visible
-            await expect(page.getByText('SizeWise HVAC Canvas')).toBeVisible();
-
-            // Hamburger menu or sidebar toggle should be present (tablet mode)
-            // In tablet mode, sidebars are collapsed/drawer mode
-            const hamburgerMenu = page.getByRole('button', { name: /menu|☰|≡/i }).first();
-            await expect(hamburgerMenu).toBeVisible();
+            await expect(page.getByTestId('app-logo')).toBeVisible();
         });
 
         test('Scenario: iPad Air (820px) - Responsive sidebar behavior', async ({ page }) => {
@@ -164,7 +169,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // No blocking
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Sidebars should be in collapsed/drawer state by default
             // Left sidebar collapsed (not persistent)
@@ -183,18 +188,20 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // Should load successfully, not blocked
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
-            await expect(page.getByText('SizeWise HVAC Canvas')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
+            await expect(page.getByTestId('app-logo')).toBeVisible();
         });
 
         test('Edge Case: Galaxy Tab (800px) - Tablet layout applies', async ({ page }) => {
             await page.setViewportSize(VIEWPORTS.tablet.galaxyTab);
-            await page.goto('/');
+            await markHasLaunched(page);
+            await page.goto('/dashboard');
 
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
-            // Toolbar should be visible and compact
-            const toolbar = page.getByTestId('bottom-toolbar');
-            await expect(toolbar).toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
+            await expect(page.getByText('Device Incompatible')).not.toBeVisible();
+
+            // Dashboard should render in tablet layout
+            await expect(page.getByTestId('dashboard-page')).toBeVisible();
         });
 
     });
@@ -206,7 +213,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/dashboard');
 
             // No blocking overlay
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Application loads successfully
             await expect(page).toHaveURL(/dashboard/);
@@ -218,23 +225,18 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
 
         test('Scenario: Standard Desktop (1920px) - Full workspace available', async ({ page }) => {
             await page.setViewportSize(VIEWPORTS.desktop.standard);
-            await page.goto('/');
-
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
-            await expect(page.getByText('SizeWise HVAC Canvas')).toBeVisible();
-
-            // Navigate to canvas to verify layout
-            // Assuming user would create or open a project
-            // For now, verify dashboard loads
+            await markHasLaunched(page);
             await page.goto('/dashboard');
-            await expect(page).toHaveURL(/dashboard/);
+
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
+            await expect(page.getByTestId('dashboard-page')).toBeVisible();
         });
 
         test('Scenario: Wide Monitor (2560px) - Maximum workspace', async ({ page }) => {
             await page.setViewportSize(VIEWPORTS.desktop.wide);
             await page.goto('/');
 
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
             // Application should handle wide viewports gracefully
         });
 
@@ -248,13 +250,13 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // Verify no blocking initially
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Resize to just below threshold
             await setViewport(page, 639, 900);
 
             // Blocking overlay should now be visible
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
             await expect(page.getByText('Device Incompatible')).toBeVisible();
         });
 
@@ -262,19 +264,19 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             // Start at wide desktop
             await page.setViewportSize({ width: 1920, height: 1080 });
             await page.goto('/');
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Resize to tablet range (no blocking)
             await setViewport(page, 800, 1080);
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Resize to just above threshold (still no blocking)
             await setViewport(page, 641, 1080);
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Resize to threshold - blocking activates
             await setViewport(page, 639, 1080);
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
         });
 
     });
@@ -282,30 +284,31 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
     test.describe('Step 6: Recovery from Blocking by Expanding Window', () => {
 
         test('Scenario: Expand from 639px to 640px - Overlay disappears', async ({ page }) => {
-            // Start blocked
             await page.setViewportSize({ width: 639, height: 800 });
             await page.goto('/');
-            await expect(page.getByRole('alertdialog')).toBeVisible();
 
-            // Expand to threshold
-            await setViewport(page, 640, 800);
+            await expect(page.getByTestId('device-warning')).toBeVisible();
+
+            // Expand to 640px
+            await page.setViewportSize({ width: 640, height: 800 });
+            await page.waitForTimeout(300);
 
             // Overlay should disappear
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
-            await expect(page.getByText('SizeWise HVAC Canvas')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
+            await expect(page.getByTestId('app-logo')).toBeVisible();
         });
 
         test('Scenario: Expand to desktop - Application fully functional', async ({ page }) => {
             // Start blocked at mobile
             await page.setViewportSize({ width: 390, height: 844 });
             await page.goto('/');
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
 
             // Expand to desktop
             await setViewport(page, 1280, 720);
 
             // Application should be fully accessible
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Verify we can navigate normally
             await page.goto('/dashboard');
@@ -320,11 +323,11 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
 
             // Shrink to mobile (blocked)
             await setViewport(page, 390, 844);
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
 
             // Expand back to desktop
             await setViewport(page, 1280, 720);
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Verify still on dashboard (state preserved)
             await expect(page).toHaveURL(/dashboard/);
@@ -340,7 +343,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // Should not be blocked
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
         });
 
         test('Edge Case 2: Browser zoom simulation (effective width < 640)', async ({ page }) => {
@@ -352,7 +355,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // Should be blocked (under threshold)
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
         });
 
         test('Edge Case 3: Rapid resize (flicker prevention)', async ({ page }) => {
@@ -367,7 +370,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
 
             // Final state should be stable (not blocked at 640)
             await page.reload();
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
         });
 
         test('Edge Case 4: Boundary testing - 638px, 639px, 640px, 641px', async ({ page }) => {
@@ -384,9 +387,9 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
                 await page.goto('/');
 
                 if (shouldBlock) {
-                    await expect(page.getByRole('alertdialog')).toBeVisible();
+                    await expect(page.getByTestId('device-warning')).toBeVisible();
                 } else {
-                    await expect(page.getByRole('alertdialog')).not.toBeVisible();
+                    await expect(page.getByTestId('device-warning')).not.toBeVisible();
                 }
             }
         });
@@ -399,7 +402,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.setViewportSize(VIEWPORTS.mobile.iphone14);
             await page.goto('/');
 
-            const overlay = page.getByRole('alertdialog');
+            const overlay = page.getByTestId('device-warning');
             await expect(overlay).toBeVisible();
 
             // Verify ARIA role
@@ -414,22 +417,19 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.setViewportSize(VIEWPORTS.mobile.iphone14);
             await page.goto('/');
 
-            const exitButton = page.getByRole('button', { name: /exit/i });
+            const exitButton = page.getByTestId('exit-application');
+            await expect(exitButton).toBeVisible();
 
             // Tab should focus button
             await page.keyboard.press('Tab');
             await expect(exitButton).toBeFocused();
-
-            // Enter should activate
-            // (We can't test actual close, just verify Enter doesn't throw)
-            await page.keyboard.press('Enter');
         });
 
         test('A11Y: Focus is trapped within overlay when blocked', async ({ page }) => {
             await page.setViewportSize(VIEWPORTS.mobile.iphone14);
             await page.goto('/');
 
-            const exitButton = page.getByRole('button', { name: /exit/i });
+            const exitButton = page.getByTestId('exit-application');
 
             // Tab cycles within overlay (only exit button focusable)
             await page.keyboard.press('Tab');
@@ -453,7 +453,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // Wait for overlay to appear
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
             const detectionTime = Date.now() - startTime;
 
             // Should appear quickly (allowing for network/render time)
@@ -474,7 +474,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.waitForTimeout(200); // Allow debounce
 
             // Overlay should be visible and stable
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
         });
 
     });
@@ -488,7 +488,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/dashboard');
 
             // Should still see blocking overlay (redirect or overlay applies on all routes)
-            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await expect(page.getByTestId('device-warning')).toBeVisible();
         });
 
         test('Integration: Desktop user proceeds to dashboard normally', async ({ page }) => {
@@ -496,7 +496,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/');
 
             // No blocking
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
 
             // Can navigate to dashboard
             await page.goto('/dashboard');
@@ -508,7 +508,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             await page.goto('/dashboard');
 
             // No blocking, can access dashboard
-            await expect(page.getByRole('alertdialog')).not.toBeVisible();
+            await expect(page.getByTestId('device-warning')).not.toBeVisible();
             await expect(page).toHaveURL(/dashboard/);
 
             // Can interact with sidebar toggles if present

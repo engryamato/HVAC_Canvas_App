@@ -16,6 +16,7 @@ Welcome to the technical documentation for the SizeWise HVAC Canvas App. This do
 ## 📁 Documentation Structure
 
 - **[`/elements`](./elements/)**: Detailed documentation for every code element.
+- **[`/architecture`](./architecture/)**: High-level platform architecture and patterns.
 - **[`/guides`](./guides/)**: "How-to" cookbooks for common development tasks.
 - **[`/archive`](./archive/)**: Historical implementation plans and archived PR documentation.
 

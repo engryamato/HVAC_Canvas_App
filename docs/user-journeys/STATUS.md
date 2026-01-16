@@ -101,7 +101,7 @@ This document tracks the progress of creating 129 user journey documents for the
 #### 05 - Property Editing (0/10)
 - UJ-PE-001: Edit Room Properties
 - UJ-PE-002: Edit Duct Properties
-- UJ-PE-003: Edit Equipment Properties
+- UJ-PE-003: Using Property Presets
 - UJ-PE-004: Edit Note Content
 - UJ-PE-005: Bulk Edit Properties
 - UJ-PE-006: Change Occupancy Type
@@ -134,19 +134,19 @@ This document tracks the progress of creating 129 user journey documents for the
 - UJ-UR-009: Undo Property Changes
 
 #### 09 - Export (0/6)
-- UJ-EX-001: Export PDF
-- UJ-EX-002: Export PNG Image
-- UJ-EX-003: Export BOM to Excel
-- UJ-EX-004: Export Calculations to PDF
-- UJ-EX-005: Print Project
-- UJ-EX-006: Share Link (Future)
+- UJ-EXP-001: Export PDF
+- UJ-EXP-002: Export PNG Image
+- UJ-EXP-003: Export BOM to Excel
+- UJ-EXP-004: Export Calculations to PDF
+- UJ-EXP-005: Print Project
+- UJ-EXP-006: Share Link (Future)
 
 #### 10 - BOM Panel (0/5)
-- UJ-BP-001: Open BOM Panel
-- UJ-BP-002: View Duct List
-- UJ-BP-003: View Equipment List
-- UJ-BP-004: View Fitting List
-- UJ-BP-005: Export BOM
+- UJ-BOM-001: Open BOM Panel
+- UJ-BOM-002: View Duct List
+- UJ-BOM-003: View Equipment List
+- UJ-BOM-004: View Fitting List
+- UJ-BOM-005: Export BOM
 
 #### 11 - Keyboard Shortcuts (0/7)
 - UJ-KS-001: View Shortcuts Panel
@@ -166,29 +166,29 @@ This document tracks the progress of creating 129 user journey documents for the
 - UJ-EH-006: Crash Recovery
 
 #### 13 - Settings & Preferences (0/5)
-- UJ-SP-001: Change Unit System
-- UJ-SP-002: Customize Grid Size
-- UJ-SP-003: Set Default Values
-- UJ-SP-004: Theme Selection
-- UJ-SP-005: Auto-Save Interval
+- UJ-SET-001: Change Unit System
+- UJ-SET-002: Customize Grid Size
+- UJ-SET-003: Set Default Values
+- UJ-SET-004: Theme Selection
+- UJ-SET-005: Auto-Save Interval
 
 #### 14 - Sidebar Interactions (0/7)
-- UJ-SI-001: Toggle Left Sidebar
-- UJ-SI-002: Toggle Right Sidebar
-- UJ-SI-003: Resize Sidebar
-- UJ-SI-004: Collapse Sidebar Sections
-- UJ-SI-005: Edit Site Conditions
-- UJ-SI-006: View Project Statistics
-- UJ-SI-007: Access Recent Files
+- UJ-SB-001: Toggle Left Sidebar
+- UJ-SB-002: Toggle Right Sidebar
+- UJ-SB-003: Resize Sidebar
+- UJ-SB-004: Collapse Sidebar Sections
+- UJ-SB-005: Edit Site Conditions
+- UJ-SB-006: View Project Statistics
+- UJ-SB-007: Access Recent Files
 
 #### 15 - Complete Workflows (0/7)
-- UJ-CW-001: Design Single-Zone System
-- UJ-CW-002: Design Multi-Zone System
-- UJ-CW-003: Residential HVAC Layout
-- UJ-CW-004: Commercial Office Layout
-- UJ-CW-005: Kitchen Exhaust System
-- UJ-CW-006: Laboratory Ventilation
-- UJ-CW-007: Data Center Cooling
+- UJ-WF-001: Design Single-Zone System
+- UJ-WF-002: Design Multi-Zone System
+- UJ-WF-003: Residential HVAC Layout
+- UJ-WF-004: Commercial Office Layout
+- UJ-WF-005: Kitchen Exhaust System
+- UJ-WF-006: Laboratory Ventilation
+- UJ-WF-007: Data Center Cooling
 
 ---
 

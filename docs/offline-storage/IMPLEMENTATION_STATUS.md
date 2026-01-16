@@ -74,28 +74,25 @@ This document tracks the **actual implementation status** of offline storage fea
 
 | Feature | Documented In | Current Alternative | Priority | Reason |
 |---------|---------------|-------------------|----------|--------|
-| IndexedDB cache | `PRD.md:431` | localStorage | Low | localStorage sufficient for current scale |
+| IndexedDB cache | `PRD.md` | - | Rejected | User preference for localStorage |
 | Backup rotation (5 versions) | `UJ-FM-009` | Single .bak file | Medium | User-requested enhancement |
 | Retry logic (3x on failure) | `UJ-FM-002` | No retry | Medium | Would improve reliability |
-| Idle detection (30min pause) | `UJ-FM-002` | No idle detection | Low | 2s debounce works well |
-| 5-minute auto-save interval | `UJ-FM-002` | 2s debounce | Low | Current implementation better |
+| Idle detection (30min pause) | `UJ-FM-002` | No idle detection | Low | 300s interval reduces churn |
+| 300-second auto-save interval | `UJ-FM-002` | 2s debounce | Low | Current implementation better |
 | Atomic writes | Not documented | Direct file write | High | Risk of corruption on crash |
 | File compression | Not documented | Uncompressed JSON | Low | File sizes acceptable |
 | Conflict resolution | Not documented | Last-write-wins | Medium | Not multi-user yet |
 
 ### IndexedDB Cache
 
-**Why Mentioned**: PRD.md:431 lists IndexedDB as a potential optimization for complex queries and large datasets.
+**Status**: ❌ Rejected (localStorage-only policy)
 
-**Current Implementation**: localStorage via Zustand persist middleware
+**Current Implementation**: localStorage for all web project data and auto-save
 
-**When Needed**:
-- Projects with 1000+ entities
-- Complex query requirements (e.g., spatial indexing)
-- Offline queue for pending operations
-- Multi-megabyte project files exceeding localStorage limits
+**Notes**:
+- Cloud storage is reserved for backups only
+- No IndexedDB migration is planned
 
-**Migration Path**: See [04-future-enhancements/OS-FE-001-IndexedDBPlan.md](./04-future-enhancements/OS-FE-001-IndexedDBPlan.md)
 
 ### Retry Logic
 
@@ -141,22 +138,24 @@ async function saveProjectWithRetry(path: string, data: ProjectFile, retries = 3
 
 | Source | Stated Interval | Actual Behavior |
 |--------|----------------|-----------------|
-| `UJ-FM-002` | 5 minutes | 2000ms debounce |
+| `UJ-FM-002` | 300 seconds | 2000ms debounce |
 | `useAutoSave.ts:50` | N/A (code) | 2000ms debounce |
-| PRD.md | 5 minutes | 2000ms debounce |
+| PRD.md | 300 seconds | 2000ms debounce |
 
-**Resolution**: Document actual 2-second debounce behavior. The 2s debounce is more responsive and works well in practice.
+**Resolution**: Align implementation to the 300-second spec or update the spec if the 2-second debounce is intended long-term.
 
 **Code Reference**: `src/features/canvas/hooks/useAutoSave.ts:50`
+
 
 ### Storage Layer
 
 | Source | Documented Layer | Actual Layer |
 |--------|------------------|--------------|
-| PRD.md:431 | IndexedDB | localStorage |
-| Architecture docs | File + IndexedDB | File + localStorage |
+| PRD.md:441 | localStorage | localStorage |
+| Architecture docs | File + localStorage | File + localStorage |
 
-**Resolution**: Update PRD to reflect localStorage as the browser cache layer, mark IndexedDB as future enhancement.
+**Resolution**: Documentation aligned to localStorage-only policy.
+
 
 ### Error Handling
 
@@ -224,7 +223,7 @@ async function saveProjectWithRetry(path: string, data: ProjectFile, retries = 3
 3. Improve test coverage for persistence layer
 
 ### Long Term (Future)
-1. Evaluate IndexedDB migration if project size grows
+1. Reinforce localStorage limits and export guidance
 2. Implement conflict resolution for multi-device sync
 3. Add file compression for large projects
 
@@ -274,4 +273,4 @@ When updating this document:
 - [ProjectIO Element Documentation](../elements/10-persistence/ProjectIO.md) - Comprehensive API reference
 - [Auto-Save Flow](./05-data-flow/OS-DF-003-AutoSaveFlow.md) - Detailed auto-save documentation
 - [Known Limitations](./07-error-recovery/OS-ERR-003-KnownLimitations.md) - Current system limitations
-- [IndexedDB Plan](./04-future-enhancements/OS-FE-001-IndexedDBPlan.md) - Future enhancement details
+- [IndexedDB Storage](./02-storage-layers/OS-SL-003-IndexedDBStorage.md) - Deprecated reference

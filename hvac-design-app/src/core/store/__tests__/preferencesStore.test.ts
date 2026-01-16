@@ -17,7 +17,7 @@ describe('PreferencesStore', () => {
       const state = usePreferencesStore.getState();
       expect(state.projectFolder).toBe('/projects');
       expect(state.unitSystem).toBe('imperial');
-      expect(state.autoSaveInterval).toBe(60000);
+      expect(state.autoSaveInterval).toBe(300000);
       expect(state.gridSize).toBe(24);
       expect(state.theme).toBe('light');
     });

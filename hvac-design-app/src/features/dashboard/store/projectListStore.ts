@@ -126,13 +126,28 @@ export const useProjectListStore = create<ProjectListStore>()(
     }),
     {
       name: INDEX_KEY,
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        // Handle SSR - return dummy storage if window is undefined
+        if (typeof window === 'undefined') {
+          return {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+          };
+        }
+        return localStorage;
+      }),
       onRehydrateStorage: () => (state) => {
         console.log('[ProjectListStore] Hydration finished', state);
       },
+      skipHydration: true, // Prevent hydration mismatch on SSR
     }
   )
 );
+
+export const rehydrateProjectList = async () => {
+  await useProjectListStore.persist.rehydrate();
+};
 
 export const useProjects = () => useProjectListStore((state) => state.projects);
 export const useActiveProjects = () =>

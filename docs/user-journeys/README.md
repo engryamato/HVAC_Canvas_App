@@ -12,7 +12,7 @@ This directory contains comprehensive user journey documentation for the SizeWis
 
 | Category | Count | Priority | Status |
 |----------|-------|----------|--------|
-| [00 - Getting Started](#00-getting-started) | 3 | Medium | 🟡 Planned |
+| [00 - Getting Started](#00-getting-started) | 5 | Medium | 🟡 Planned |
 | [01 - Project Management](#01-project-management) | 8 | **High** | 🟢 In Progress |
 | [02 - Canvas Navigation](#02-canvas-navigation) | 8 | **High** | 🟡 Planned |
 | [03 - Entity Creation](#03-entity-creation) | 16 | **High** | 🟢 In Progress |
@@ -61,6 +61,8 @@ Initial user experience and orientation.
 | UJ-GS-001 | [First Launch](./00-getting-started/UJ-GS-001-FirstLaunch.md) | Medium |
 | UJ-GS-002 | [Dashboard Navigation](./00-getting-started/UJ-GS-002-DashboardNavigation.md) | Medium |
 | UJ-GS-003 | [Help and Shortcuts](./00-getting-started/UJ-GS-003-HelpAndShortcuts.md) | Medium |
+| UJ-GS-006 | [Environment Detection](./00-getting-started/UJ-GS-006-EnvironmentDetection.md) | **Critical** |
+| UJ-GS-007 | [Integrity Check](./00-getting-started/UJ-GS-007-IntegrityCheck.md) | **Critical** |
 
 ---
 
@@ -152,7 +154,7 @@ Editing entity properties via inspector panel.
 |----|--------------|----------|
 | UJ-PE-001 | [Inspector Panel Overview](./05-property-editing/UJ-PE-001-InspectorPanelOverview.md) | High |
 | UJ-PE-002 | [Edit Room Properties](./05-property-editing/UJ-PE-002-EditRoomProperties.md) | High |
-| UJ-PE-003 | [Edit Duct Properties](./05-property-editing/UJ-PE-003-EditDuctProperties.md) | High |
+| UJ-PE-003 | [Using Property Presets](./05-property-editing/UJ-PE-003-UsingPropertyPresets.md) | High |
 | UJ-PE-004 | [Edit Equipment Properties](./05-property-editing/UJ-PE-004-EditEquipmentProperties.md) | High |
 | UJ-PE-005 | [Edit Fitting Properties](./05-property-editing/UJ-PE-005-EditFittingProperties.md) | Medium |
 | UJ-PE-006 | [Edit Note Properties](./05-property-editing/UJ-PE-006-EditNoteProperties.md) | Low |
@@ -169,16 +171,16 @@ HVAC engineering calculations (ASHRAE 62.1, duct sizing, pressure loss).
 
 | ID | User Journey | Priority |
 |----|--------------|----------|
-| UJ-CALC-001 | [Room Ventilation ASHRAE](./06-calculations/UJ-CALC-001-RoomVentilationASHRAE.md) | High |
-| UJ-CALC-002 | [ACH to CFM Conversion](./06-calculations/UJ-CALC-002-ACHToCFMConversion.md) | High |
-| UJ-CALC-003 | [Duct Velocity Calculation](./06-calculations/UJ-CALC-003-DuctVelocityCalculation.md) | High |
-| UJ-CALC-004 | [Velocity Pressure](./06-calculations/UJ-CALC-004-VelocityPressure.md) | Medium |
-| UJ-CALC-005 | [Round Duct Sizing](./06-calculations/UJ-CALC-005-RoundDuctSizing.md) | High |
-| UJ-CALC-006 | [Rectangular Duct Sizing](./06-calculations/UJ-CALC-006-RectangularDuctSizing.md) | Medium |
-| UJ-CALC-007 | [Friction Loss](./06-calculations/UJ-CALC-007-FrictionLoss.md) | Medium |
-| UJ-CALC-008 | [Fitting Pressure Loss](./06-calculations/UJ-CALC-008-FittingPressureLoss.md) | Medium |
-| UJ-CALC-009 | [Live Recalculation](./06-calculations/UJ-CALC-009-LiveRecalculation.md) | High |
-| UJ-CALC-010 | [Velocity Warnings](./06-calculations/UJ-CALC-010-VelocityWarnings.md) | Medium |
+| UJ-CA-001 | [Room Ventilation ASHRAE](./06-calculations/UJ-CA-001-RoomVentilationASHRAE.md) | High |
+| UJ-CA-002 | [ACH to CFM Conversion](./06-calculations/UJ-CA-002-ACHToCFMConversion.md) | High |
+| UJ-CA-003 | [Duct Velocity Calculation](./06-calculations/UJ-CA-003-DuctVelocityCalculation.md) | High |
+| UJ-CA-004 | [Velocity Pressure](./06-calculations/UJ-CA-004-VelocityPressure.md) | Medium |
+| UJ-CA-005 | [Round Duct Sizing](./06-calculations/UJ-CA-005-RoundDuctSizing.md) | High |
+| UJ-CA-006 | [Rectangular Duct Sizing](./06-calculations/UJ-CA-006-RectangularDuctSizing.md) | Medium |
+| UJ-CA-007 | [Friction Loss](./06-calculations/UJ-CA-007-FrictionLoss.md) | Medium |
+| UJ-CA-008 | [Fitting Pressure Loss](./06-calculations/UJ-CA-008-FittingPressureLoss.md) | Medium |
+| UJ-CA-009 | [Live Recalculation](./06-calculations/UJ-CA-009-LiveRecalculation.md) | High |
+| UJ-CA-010 | [Velocity Warnings](./06-calculations/UJ-CA-010-VelocityWarnings.md) | Medium |
 
 ---
 
@@ -240,11 +242,11 @@ Bill of Materials panel functionality.
 
 | ID | User Journey | Priority |
 |----|--------------|----------|
-| UJ-BOM-001 | [View BOM Summary](./10-bom-panel/UJ-BOM-001-ViewBOMSummary.md) | Medium |
-| UJ-BOM-002 | [Expand Categories](./10-bom-panel/UJ-BOM-002-ExpandCategories.md) | Low |
-| UJ-BOM-003 | [BOM Live Updates](./10-bom-panel/UJ-BOM-004-BOMLiveUpdates.md) | Medium |
-| UJ-BOM-004 | [BOM Export from Panel](./10-bom-panel/UJ-BOM-004-BOMExportFromPanel.md) | Medium |
-| UJ-BOM-005 | [Empty BOM State](./10-bom-panel/UJ-BOM-005-EmptyBOMState.md) | Low |
+| UJ-BOM-001 | [View BOM Summary](./10-bom-panel/INDEX.md) | Medium |
+| UJ-BOM-002 | [Filter/Sort BOM](./10-bom-panel/INDEX.md) | Low |
+| UJ-BOM-003 | [Export BOM](./10-bom-panel/INDEX.md) | Medium |
+| UJ-BOM-004 | [Edit BOM Line Items](./10-bom-panel/INDEX.md) | Medium |
+| UJ-BOM-005 | [BOM Cost Analysis](./10-bom-panel/INDEX.md) | Low |
 
 ---
 
@@ -270,12 +272,12 @@ Validation errors, save/load failures, and recovery.
 
 | ID | User Journey | Priority |
 |----|--------------|----------|
-| UJ-ERR-001 | [Validation Errors](./12-error-handling/UJ-ERR-001-ValidationErrors.md) | High |
-| UJ-ERR-002 | [File Load Errors](./12-error-handling/UJ-ERR-002-FileLoadErrors.md) | High |
-| UJ-ERR-003 | [Calculation Errors](./12-error-handling/UJ-ERR-003-CalculationErrors.md) | Medium |
-| UJ-ERR-004 | [Save Errors](./12-error-handling/UJ-ERR-004-SaveErrors.md) | High |
-| UJ-ERR-005 | [Error Boundary Recovery](./12-error-handling/UJ-ERR-005-ErrorBoundaryRecovery.md) | Medium |
-| UJ-ERR-006 | [Toast Notifications](./12-error-handling/UJ-ERR-006-ToastNotifications.md) | Medium |
+| UJ-EH-001 | [Application Recovery](./12-error-handling/INDEX.md) | High |
+| UJ-EH-002 | [File Load Errors](./12-error-handling/INDEX.md) | High |
+| UJ-EH-003 | [Calculation Errors](./12-error-handling/INDEX.md) | Medium |
+| UJ-EH-004 | [Save Errors](./12-error-handling/INDEX.md) | High |
+| UJ-EH-005 | [Error Boundary Recovery](./12-error-handling/INDEX.md) | Medium |
+| UJ-EH-006 | [Warning Notifications](./12-error-handling/INDEX.md) | Medium |
 
 ---
 

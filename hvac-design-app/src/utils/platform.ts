@@ -16,22 +16,10 @@ export const getPlatformInfo = async () => {
         };
     }
 
-    try {
-        // Dynamic import to avoid webpack/bundling errors in non-Tauri builds
-        const { platform } = await import('@tauri-apps/api/process');
-        const platformStr = await platform();
-
-        return {
-            platform: platformStr,
-            arch: 'unknown', // Could add arch() if needed
-        };
-    } catch (error) {
-        console.warn('Failed to get Tauri platform info:', error);
-        return {
-            platform: 'unknown',
-            arch: 'unknown',
-        };
-    }
+    return {
+        platform: 'tauri',
+        arch: 'unknown',
+    };
 };
 
 /**

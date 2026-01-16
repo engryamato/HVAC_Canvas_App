@@ -1,13 +1,22 @@
-# Export
+# Export User Journeys
 
-## Overview
 
-This category covers all user journeys related to exporting project data from the SizeWise HVAC Canvas App. These exports allow users to share, archive, or transfer their designs in various formats for different purposes.
+> **Implementation**: See [Platform Adapters](../../architecture/01-platform-adapters.md) for shared interface design.
 
-## Child Documents
+This section is split by delivery mode:
 
-- [UJ-EXP-001: Export To PDF](UJ-EXP-001-ExportToPDF.md)
-- [UJ-EXP-002: Export To CSV](UJ-EXP-002-ExportToCSV.md)
-- [UJ-EXP-003: Export To JSON](UJ-EXP-003-ExportToJSON.md)
+## [Hybrid / Web](./hybrid/)
+Browser-based exports. Handles:
+- **Blob Generation** (`URL.createObjectURL`)
+- **Auto-Download** (`<a download>`)
+- [UJ-EXP-001 Export PDF](./hybrid/UJ-EXP-001-ExportToPDF.md)
+- [UJ-EXP-002 Export CSV](./hybrid/UJ-EXP-002-ExportToCSV.md)
+- [UJ-EXP-003 Export JSON](./hybrid/UJ-EXP-003-ExportToJSON.md)
 
-</details>
+## [Tauri / Native](./tauri-offline/)
+Desktop-based exports. Handles:
+- **Native Save Dialog** (`dialog.save`)
+- **Direct File Write** (`fs.write`)
+- [UJ-EXP-001 Export PDF](./tauri-offline/UJ-EXP-001-ExportToPDF.md)
+- [UJ-EXP-002 Export CSV](./tauri-offline/UJ-EXP-002-ExportToCSV.md)
+- [UJ-EXP-003 Export JSON](./tauri-offline/UJ-EXP-003-ExportToJSON.md)

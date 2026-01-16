@@ -642,7 +642,7 @@ const useEntityStore = create(
 3. **Why not persist entityStore?**
    - Too large for localStorage (1000 entities = 500KB+)
    - .sws files provide better persistence
-   - localStorage used for auto-save only (see [OS-DF-003](../05-data-flow/OS-DF-003-AutoSaveFlow.md))
+   - **localStorage** used for auto-save (see [OS-DF-003](../05-data-flow/OS-DF-003-AutoSaveFlow.md))
 
 ### Future Enhancements
 

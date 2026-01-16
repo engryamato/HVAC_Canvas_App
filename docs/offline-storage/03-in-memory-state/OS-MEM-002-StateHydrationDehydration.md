@@ -641,9 +641,9 @@ describe('Dehydration', () => {
    - Deserialize: Protect against corrupted/tampered files
 
 2. **Why not use IndexedDB for hydration?**
-   - .sws files are source of truth
-   - IndexedDB would add complexity without clear benefit
-   - localStorage used for auto-save only
+   - IndexedDB is rejected under the localStorage-only policy
+   - .sws files are source of truth on desktop
+   - localStorage is used for web persistence and auto-save
 
 3. **Why replace entire state instead of merge?**
    - Simpler: No complex merge logic

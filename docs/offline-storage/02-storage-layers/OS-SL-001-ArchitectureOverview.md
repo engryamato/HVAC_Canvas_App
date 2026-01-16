@@ -31,11 +31,8 @@ graph TB
         PLI[projectListStore<br/>Dashboard index]
     end
 
-    subgraph Cache["Layer 2: Browser Cache (localStorage)"]
-        LS1[hvac-project-{id}]
-        LS2[sws.preferences]
-        LS3[sws.projectIndex]
-        LS4[project-storage]
+    subgraph Cache["Layer 2: Browser Storage"]
+        LS["localStorage<br/>Project Data & Preferences"]
     end
 
     subgraph FileSystem["Layer 3: File System (.sws)"]
@@ -49,12 +46,12 @@ graph TB
     Dashboard --> PLI
     Toolbar --> PREF
 
-    ES -.->|Zustand persist<br/>middleware| LS1
-    PS -.->|Zustand persist<br/>middleware| LS4
-    PREF -.->|Zustand persist<br/>middleware| LS2
-    PLI -.->|Zustand persist<br/>middleware| LS3
+    ES -.->|AutoSave<br/>300s interval| LS
+    PS -.->|AutoSave| LS
+    PREF -.->|Zustand persist| LS
+    PLI -.->|Index storage| LS
 
-    ES -.->|projectIO.saveProject<br/>2s debounce| SWS
+    ES -.->|projectIO.saveProject<br/>manual save| SWS
     SWS -.->|projectIO.loadProject<br/>Zod validation| ES
 
     SWS -.->|createBackup<br/>before save| BAK
@@ -79,8 +76,8 @@ graph TB
 
 | Store | Purpose | Location | Persistence |
 |-------|---------|----------|-------------|
-| `entityStore` | Canvas entities (ducts, equipment) | `src/core/store/entityStore.ts` | Yes (localStorage) |
-| `projectStore` | Current project metadata | `src/stores/projectStore.ts` | Yes (localStorage) |
+| `entityStore` | Canvas entities (ducts, equipment) | `src/core/store/entityStore.ts` | Yes (Layer 2) |
+| `projectStore` | Current project metadata | `src/stores/projectStore.ts` | Yes (Layer 2) |
 | `viewportStore` | Pan/zoom state | `src/features/canvas/store/viewportStore.ts` | No |
 | `selectionStore` | Selected entity IDs | `src/features/canvas/store/selectionStore.ts` | No |
 | `preferencesStore` | User preferences | `src/stores/preferencesStore.ts` | Yes (localStorage) |
@@ -109,54 +106,23 @@ See `src/core/store/entityStore.ts:15-30` for the normalized pattern implementat
 
 ---
 
-## Layer 2: Browser Cache (localStorage)
+## Layer 2: Browser Storage (Hybrid)
 
 ### Purpose
-- **Automatic persistence** across page refreshes
-- Provides **fallback storage** when Tauri APIs unavailable
-- Enables **quick restore** without file system access
+- **localStorage**: Project data and user preferences (Settings, UI State)
+- **Fallback**: Enables offline capability in Web Environment
 
-### Storage Keys
+### Storage Strategy
 
-| Key | Store | Size | TTL | Purpose |
-|-----|-------|------|-----|---------|
-| `hvac-project-{projectId}` | Auto-save data | Varies | None | Current project backup |
-| `sws.preferences` | `preferencesStore` | ~1KB | None | User settings |
-| `sws.projectIndex` | `projectListStore` | ~5KB | None | Dashboard list |
-| `project-storage` | `projectStore` | ~2KB | None | Project metadata |
+| Type | Store | Technology | Purpose |
+|------|-------|------------|---------|
+| **Project** | `hvac-project-{id}` | **localStorage** | Full project graph (Entities, Connections) |
+| **Settings** | `sws.preferences` | **localStorage** | User UI preferences (Theme, Units) |
+| **Index** | `sws.projectIndex` | **localStorage** | Dashboard list |
 
-### Implementation: Zustand Persist Middleware
+### Implementation Notes
 
-```typescript
-// Example from preferencesStore.ts
-export const usePreferencesStore = create<PreferencesStore>()(
-  persist(
-    (set) => ({
-      // Store state and actions
-    }),
-    {
-      name: 'sws.preferences',  // localStorage key
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
-```
-
-**Code Reference**: `src/stores/preferencesStore.ts:40-50`
-
-### Limitations
-
-- **5MB total limit** per origin (browser-dependent)
-- **Synchronous API** (blocks main thread on large writes)
-- **String-only storage** (JSON serialization required)
-- **No indexing** or query capabilities
-- **Cleared on logout** (if browser configured)
-
-### When localStorage is Used
-
-1. **Web Browser Environment**: Primary and only persistence layer
-2. **Desktop Environment**: Fallback if Tauri APIs fail
-3. **Auto-Save Intermediate**: Quick saves between file writes
+localStorage is the only browser persistence layer; IndexedDB is rejected under the current policy.
 
 ---
 
@@ -221,7 +187,7 @@ function isTauri(): boolean {
 
 **Code Reference**: `src/core/persistence/filesystem.ts:10-12`
 
-**Fallback**: If Tauri unavailable, app uses localStorage only.
+**Fallback**: If Tauri unavailable, app uses Layer 2 (localStorage).
 
 ---
 
@@ -234,12 +200,12 @@ sequenceDiagram
     participant User
     participant UI
     participant Store as Layer 1<br/>Zustand Store
-    participant LS as Layer 2<br/>localStorage
+    participant LS as Layer 2<br/>Browser Storage
     participant FS as Layer 3<br/>.sws File
 
     User->>UI: Open application
     UI->>Store: Initialize stores
-    Store->>LS: Hydrate from localStorage<br/>(Zustand persist)
+    Store->>LS: Hydrate from localStorage
     Note over Store,LS: Immediate restore<br/>of last session
 
     User->>UI: Click "Open Project"
@@ -265,17 +231,14 @@ sequenceDiagram
 
     User->>UI: Edit entity
     UI->>Store: Update entityStore
-    Store->>LS: Auto-persist<br/>(Zustand middleware)<br/>Immediate
+    Store->>LS: Persist<br/>(localStorage)
     Store->>Hook: Notify change
-    Note over Hook: 2s debounce timer
+    Note over Hook: 300s interval timer
 
     Note over Hook: Timer expires
     Hook->>Store: Get current state
     Store->>Hook: Return entities
-    Hook->>FS: projectIO.saveProject(path, data)
-    FS->>FS: Create .bak backup
-    FS->>FS: Write .sws file
-    FS->>Hook: Save complete
+    Hook->>LS: localStorage.setItem(...)
     Hook->>UI: Update "saved" indicator
 ```
 
@@ -317,10 +280,10 @@ function isTauri(): boolean {
 
 | Feature | Desktop (Tauri) | Web Browser | Fallback |
 |---------|----------------|-------------|----------|
-| Project save | .sws file | localStorage only | localStorage → download .sws |
-| Project load | File picker | localStorage only | localStorage → upload .sws |
-| Backup | .bak file | localStorage snapshot | Browser's native persistence |
-| Auto-save | .sws + localStorage | localStorage only | N/A |
+| Project save | .sws file | localStorage | localStorage → manual .sws export |
+| Project load | File picker | localStorage | Import .sws into localStorage |
+| Backup | .bak file | Cloud backup (manual) | Manual export |
+| Auto-save | .sws file | localStorage | N/A |
 
 ### Graceful Degradation
 
@@ -330,9 +293,9 @@ async function saveProject(path: string, data: ProjectFile) {
     // Desktop: Use Tauri APIs
     await FileSystem.writeTextFile(path, JSON.stringify(data, null, 2));
   } else {
-    // Web: Fallback to localStorage + download
-    localStorage.setItem(`hvac-project-${data.project.id}`, JSON.stringify(data));
-    triggerDownload(data, path);
+    // Web: Persist to localStorage
+    localStorage.setItem(`hvac-project-${data.projectId}`, JSON.stringify(data));
+    // Optional: triggerDownload(data, path);
   }
 }
 ```
@@ -344,17 +307,17 @@ async function saveProject(path: string, data: ProjectFile) {
 ## Performance Characteristics
 
 | Operation | Layer 1 (Zustand) | Layer 2 (localStorage) | Layer 3 (.sws) |
-|-----------|------------------|----------------------|---------------|
-| Read speed | < 1ms | ~5-10ms | ~50-200ms |
-| Write speed | < 1ms | ~10-50ms | ~100-500ms |
-| Size limit | RAM limit | ~5MB | OS file system |
+|-----------|------------------|------------------------|---------------|
+| Read speed | < 1ms | ~1-5ms | ~50-200ms |
+| Write speed | < 1ms | ~2-10ms | ~100-500ms |
+| Size limit | RAM limit | ~5MB (Quota) | OS file system |
 | Persistence | Session only | Browser lifetime | Permanent |
 | Sync/Async | Sync | Sync | Async |
 
 ### Optimization Strategies
 
 1. **In-Memory First**: All UI reads from Zustand stores (Layer 1)
-2. **Debounced Writes**: 2-second debounce to Layer 3 (reduces I/O)
+2. **Interval Writes**: 300-second interval to Layer 2 (reduces churn)
 3. **Selective Persistence**: Only essential state persisted to Layer 2
 4. **Lazy Hydration**: Load Layer 3 data only when project opened
 
@@ -365,7 +328,7 @@ async function saveProject(path: string, data: ProjectFile) {
 ### Automatic Synchronization
 
 ```
-User Action → Layer 1 (immediate) → Layer 2 (immediate) → Layer 3 (debounced)
+User Action → Layer 1 (immediate) → Layer 2 (sync) → Layer 3 (manual save)
 ```
 
 ### Conflict Resolution
@@ -401,7 +364,7 @@ See [Known Limitations](../../07-error-recovery/OS-ERR-003-KnownLimitations.md) 
 
 ## Related Documentation
 
-- [localStorage Cache Details](./OS-SL-003-LocalStorageCache.md)
+- [IndexedDB Storage Details](./OS-SL-003-IndexedDBStorage.md) (Deprecated)
 - [.sws File Format](./OS-SL-002-SwsFileFormat.md)
 - [Zustand Store Architecture](../03-in-memory-state/OS-MEM-001-ZustandStoreArchitecture.md)
 - [Environment Detection](../01-initialization/OS-INIT-002-EnvironmentDetection.md)
@@ -412,17 +375,16 @@ See [Known Limitations](../../07-error-recovery/OS-ERR-003-KnownLimitations.md) 
 ## Implementation Status
 
 ✅ **Fully Implemented**
-- Three-layer architecture
+- Three-layer architecture framework
 - Zustand store pattern
-- localStorage persistence via Zustand middleware
 - File system persistence via Tauri
 - Environment detection and fallback
 
 ⚠️ **Partially Implemented**
-- Backup management (only 1 backup, not 5)
+- localStorage persistence (localStorage-only policy)
+- Backup management
 
 ❌ **Not Implemented**
-- IndexedDB layer (localStorage used instead)
 - Conflict resolution
 - Multi-device sync
 

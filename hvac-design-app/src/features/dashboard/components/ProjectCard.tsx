@@ -5,6 +5,7 @@ import { useMemo, useState, useRef, useEffect } from 'react';
 import styles from './ProjectCard.module.css';
 import type { ProjectListItem } from '../store/projectListStore';
 import { useProjectListActions } from '../store/projectListStore';
+import { estimateStorageSizeBytes, getProjectStorageKey } from '@/utils/storageKeys';
 
 interface ProjectCardProps {
   project: ProjectListItem;
@@ -63,6 +64,30 @@ export function ProjectCard({
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
   }, [project.modifiedAt]);
+
+  const storageSizeLabel = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const data = localStorage.getItem(getProjectStorageKey(project.projectId));
+    const sizeBytes = estimateStorageSizeBytes(data);
+    if (!sizeBytes) {
+      return null;
+    }
+
+    if (sizeBytes < 1024) {
+      return `${sizeBytes} B`;
+    }
+
+    const sizeKb = sizeBytes / 1024;
+    if (sizeKb < 1024) {
+      return `${sizeKb.toFixed(1)} KB`;
+    }
+
+    const sizeMb = sizeKb / 1024;
+    return `${sizeMb.toFixed(1)} MB`;
+  }, [project.projectId, project.modifiedAt]);
 
   const handleRename = () => {
     const trimmed = draftName.trim();
@@ -183,6 +208,7 @@ export function ProjectCard({
         {project.entityCount !== undefined && <span>{project.entityCount} items</span>}
         {project.projectNumber && <span>#{project.projectNumber}</span>}
         {project.clientName && <span>{project.clientName}</span>}
+        {storageSizeLabel && <span>{storageSizeLabel}</span>}
         {project.isArchived && <span className={styles.archived}>Archived</span>}
       </div>
       <div className={styles.actions}>

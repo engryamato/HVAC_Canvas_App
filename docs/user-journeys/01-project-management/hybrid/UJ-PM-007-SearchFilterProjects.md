@@ -1,29 +1,47 @@
-# [UJ-PM-007] Search & Filter Projects (Hybrid/Web)
+# [UJ-PM-007] Search and Filter Projects (Hybrid/Web)
 
 ## Overview
 
 ### Purpose
-Describe searching and filtering the project list in a browser context.
+This document describes how users search and filter projects in the Hybrid/Web platform.
 
 ### Scope
-**In Scope:**
-- Searching project metadata stored in IndexedDB
-- Sorting and filtering active vs archived projects
+- Filtering projects loaded from IndexedDB
+- Sorting by Date/Name
 
-**Out of Scope:**
-- Cloud or cross-user search
+### User Personas
+- **Primary**: Designers managing portfolios
 
-### Key Differences (Hybrid/Web)
-- List sourced from browser storage
-- Memory footprint depends on cached projects
+### Success Criteria
+- Real-time filtering
+- Fast response (<100ms)
 
-## Primary Flow Notes (Hybrid/Web)
-- Filter in memory after loading metadata from IndexedDB.
+### Platform Summary (Hybrid/Web)
+- **Data Source**: IndexedDB -> `ProjectListStore` (In-Memory)
+- **Search Engine**: Client-side Array filtering
+- **Performance**: High (all metadata in memory)
 
-## Related Base Journey
-- [Search and Filter Projects](../UJ-PM-007-SearchFilterProjects.md)
+## Prerequisites
+- Projects loaded from IDB
 
-## Related Components
-- `SearchService`
-- `IDBService`
-- `projectListStore`
+## User Journey Steps
+
+### Step 1: Type Query
+**User Action**: Type "Office".
+**System Response**: List filters to matching names.
+
+### Step 2: Change Sort
+**User Action**: Select "Name (A-Z)".
+**System Response**: List reorders.
+
+### Step 3: Clear
+**User Action**: Click Clear button.
+**System Response**: Full list shown.
+
+## Edge Cases
+- **Large Lists**: Virtualization used for rendering 100+ items.
+- **Empty State**: Show "No results found".
+
+## Related Elements
+- `SearchBar`
+- `ProjectListStore`

@@ -237,7 +237,7 @@ if (!result.success) {
 2. **Day 1, 10:05 AM**: Application crashes before first save
 3. **Day 1, 10:10 AM**: User opens project → No file exists, no backup
 
-**Recovery**: localStorage auto-save (2-second debounce means data likely saved)
+**Recovery**: localStorage auto-save (sync, 300s interval)
 
 ---
 

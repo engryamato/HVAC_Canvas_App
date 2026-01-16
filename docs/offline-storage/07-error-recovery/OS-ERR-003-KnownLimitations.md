@@ -24,15 +24,15 @@ Document the **known limitations and gaps** in the offline storage implementatio
 
 | Feature | Documentation Says | Code Actually Does | Impact | Resolution |
 |---------|-------------------|-------------------|--------|-----------|
-| **Auto-save interval** | 5 minutes | 2-second debounce | Low (2s is better UX) | Update docs to reflect 2s |
+| **Auto-save interval** | 300 seconds | 2000ms debounce | Medium | Align implementation to 300s spec |
 | **Backup retention** | Keep 5 autosaves | Only keeps 1 `.bak` file | Medium | Implement rotation or update docs |
-| **IndexedDB** | Mentioned in PRD | Not implemented (uses localStorage) | Low | Mark as "planned" |
+| **IndexedDB** | Rejected | Not implemented | Low | Remove IndexedDB references |
 | **Retry logic** | "Retry 3x on file lock" | No retry implemented | Medium | Implement or remove from docs |
 | **Idle detection** | "Pause after 30+ minutes" | Not implemented | Low | Implement or remove from docs |
 
 ### Source Documents
 
-- **PRD.md:431** - IndexedDB mentioned
+- **PRD.md:441** - localStorage specified for web persistence
 - **UJ-FM-002** - 5-minute auto-save interval documented
 - **UJ-FM-009** - Keep 5 backup versions documented
 - **UJ-FM-002** - Retry logic documented
@@ -45,17 +45,16 @@ Document the **known limitations and gaps** in the offline storage implementatio
 
 | Limitation | Impact | Current Workaround | Future Fix |
 |------------|--------|-------------------|------------|
-| **5MB quota** | Large projects can't be cached | Use .sws files for large projects | Switch to IndexedDB |
+| **5MB quota** | Large projects can't be cached | Use .sws files for large projects | Encourage export/splitting |
 | **Synchronous I/O** | Can block UI on large saves | Keep project size reasonable | Use Web Worker |
 | **No encryption** | Data stored in plain text | Desktop app has OS-level protection | Add encryption layer |
-| **No structured queries** | Can't search projects efficiently | Load all projects to search | Switch to IndexedDB with indexes |
+| **No structured queries** | Can't search projects efficiently | Load all projects to search | No alternative storage planned |
 | **Browser-dependent** | Quota varies by browser | None | Document browser requirements |
 
 **Current Usage**:
 - Preferences: ~1KB
 - Project list: ~10KB
-- Auto-save: ~100KB-500KB per project
-- **Total**: ~500KB-1MB (well under 5MB limit for now)
+- **Project Data**: Stored in localStorage
 
 ### .sws File System Limitations
 
@@ -174,21 +173,15 @@ const isIdle = useIdleDetection();
 const enabled = options.enabled && !isIdle;
 ```
 
-#### 4.4 IndexedDB Cache Layer
+#### 4.4 IndexedDB Cache Layer (Rejected)
 
-**PRD Reference**: PRD.md:431
+**PRD Reference**: PRD.md:441
 
-**Documented Behavior**: IndexedDB for structured caching
+**Documented Behavior**: localStorage-only persistence; no IndexedDB
 
-**Actual Behavior**: localStorage used instead
+**Status**: ❌ Rejected (localStorage-only policy)
 
-**Impact**: Limited to 5MB storage, no complex queries
-
-**Workaround**: localStorage is sufficient for Phase 1
-
-**Implementation Effort**: 2-3 weeks
-
-See [OS-FE-001](../04-future-enhancements/OS-FE-001-IndexedDBPlan.md) for full implementation plan.
+**Implementation Plan**: None
 
 ---
 
@@ -470,7 +463,7 @@ async function downloadProjectFile(project: ProjectFile, filename: string) {
 
 1. Add retry logic for file locks (2 days)
 2. Add error notifications for silent failures (3 days)
-3. Document actual auto-save timing (2s) (1 day)
+3. Document auto-save timing (300s spec) (1 day)
 4. Add localStorage quota check (1 day)
 
 **Total Effort**: ~1 week
@@ -490,11 +483,10 @@ async function downloadProjectFile(project: ProjectFile, filename: string) {
 
 **Priority**: High-impact, high-effort
 
-1. IndexedDB cache layer (3 weeks)
-2. Atomic writes (write to temp, rename) (1 week)
-3. Web Worker for large files (2 weeks)
-4. Encryption layer (2 weeks)
-5. File locking (1 week)
+1. Atomic writes (write to temp, rename) (1 week)
+2. Web Worker for large files (2 weeks)
+3. Encryption layer (2 weeks)
+4. File locking (1 week)
 
 **Total Effort**: ~9 weeks
 

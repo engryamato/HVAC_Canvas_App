@@ -13,9 +13,6 @@ import {
     Box,
     Circle,
     StickyNote,
-    ZoomIn,
-    ZoomOut,
-    Maximize2,
     Undo,
     Redo,
     Grid,
@@ -99,62 +96,6 @@ export const Toolbar: React.FC = () => {
 
             {/* Divider */}
             <div className="h-6 w-px bg-slate-200" />
-
-            {/* View Controls */}
-            <div className="flex items-center gap-1" role="group" aria-label="View controls" data-testid="zoom-control">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setZoom(Math.max(25, zoom - 25))}
-                    data-testid="zoom-out"
-                    aria-label="Zoom out"
-                    title="Zoom Out (Ctrl+-)"
-                    className="h-8 w-8 p-0"
-                >
-                    <ZoomOut className="w-4 h-4" />
-                </Button>
-
-                <span className="text-xs font-medium w-12 text-center select-none" data-testid="zoom-level">
-                    {zoom}%
-                </span>
-
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setZoom(Math.min(400, zoom + 25))}
-                    data-testid="zoom-in"
-                    aria-label="Zoom in"
-                    title="Zoom In (Ctrl++)"
-                    className="h-8 w-8 p-0"
-                >
-                    <ZoomIn className="w-4 h-4" />
-                </Button>
-
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={fitToScreen}
-                    data-testid="zoom-fit"
-                    aria-label="Fit to screen"
-                    title="Fit to Screen"
-                    className="h-8 w-8 p-0"
-                >
-                    <Maximize2 className="w-4 h-4" />
-                </Button>
-
-                <Button
-                    variant={gridVisible ? 'secondary' : 'ghost'}
-                    size="sm"
-                    onClick={toggleGrid}
-                    data-testid="grid-toggle"
-                    aria-label="Toggle grid"
-                    aria-pressed={gridVisible}
-                    title="Toggle Grid (Ctrl+G)"
-                    className={cn("h-8 w-8 p-0", gridVisible && "bg-slate-100")}
-                >
-                    <Grid className="w-4 h-4" />
-                </Button>
-            </div>
 
             {/* Divider */}
             <div className="h-6 w-px bg-slate-200" />

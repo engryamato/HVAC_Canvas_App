@@ -10,7 +10,7 @@
  * - Backup recovery when main file corrupted
  * - User notifications for data issues
  *
- * @spec OS-INIT-003-DatabaseIntegrityCheck.md
+ * @spec docs/offline-storage/01-initialization/OS-INIT-003-DatabaseIntegrityCheck.md
  * @created 2026-01-12
  */
 
@@ -145,7 +145,7 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
             }
         });
 
-        test('should validate project index structure', async ({ page }) => {
+        test('should validate project entry structure', async ({ page }) => {
             await page.goto('/');
 
             // Set valid returning user state
@@ -158,41 +158,57 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
             await setStorageItem(page, 'sws.projectIndex', {
                 state: {
                     projects: [{
-                        id: 'test-project-001',
-                        name: 'Test Project',
+                        projectId: 'test-project-001',
+                        projectName: 'Test Project',
                         createdAt: new Date().toISOString(),
-                        modifiedAt: new Date().toISOString()
-                    }]
+                        modifiedAt: new Date().toISOString(),
+                        storagePath: 'project-test-project-001',
+                        isArchived: false
+                    }],
+                    recentProjectIds: [],
+                    loading: false
                 },
                 version: 0
             });
 
             await page.reload();
-            try {
-                await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
-            } catch (e) {
-                const debugState = await page.getByTestId('debug-state').textContent();
-                console.log('[DEBUG FAILURE] Phase 2 Validation:', debugState);
-                throw e;
-            }
 
+            await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
             // Project should appear in list
             await expect(page.getByText('Test Project')).toBeVisible({ timeout: 5000 });
         });
     });
 
     test.describe('User Notifications', () => {
-        test('should not show error toasts for normal startup', async ({ page }) => {
+        test('should show warning toast when backup loaded', async ({ page }) => {
             await page.goto('/');
-            await clearStorage(page);
+
+            // Complete onboarding to trigger persistence
+            await setStorageItem(page, 'hvac-app-storage', {
+                state: { hasLaunched: true },
+                version: 0
+            });
             await page.reload();
-
-            // Wait for app to fully load
             await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });
+            await page.getByTestId('skip-tutorial-btn').click();
 
-            // No error toasts should appear during normal startup
-            const errorToast = page.locator('[role="alert"]').filter({ hasText: /error|failed/i });
-            await expect(errorToast).not.toBeVisible({ timeout: 2000 });
+            // Load project with mocked backup
+            await setStorageItem(page, 'hvac-project-test-project-001', {
+                schemaVersion: '1.0.0',
+                projectId: 'test-project-001',
+                savedAt: new Date().toISOString(),
+                payload: { project: {} }
+            });
+
+            // Simulate backup recovery scenario
+            await page.goto('/');
+            await page.reload();
+            await expect(page.getByTestId('app-logo')).toBeVisible();
+
+            // Check for backup-loaded warning toast
+            // The logic here is simplified for verification
+            const errorToast = page.locator('[role="alert"]').filter({ hasText: /backup|loaded/i });
+            await expect(errorToast).toBeVisible({ timeout: 2000 });
         });
     });
 
@@ -211,7 +227,6 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
             const loadTime = Date.now() - startTime;
 
             // Validation should complete within reasonable time
-            // Allow up to 5s for full page load (includes network, rendering)
             expect(loadTime).toBeLessThan(5000);
         });
     });

@@ -1,11 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import { isTauri } from '@/utils/platform';
 
 export const DeviceWarning = () => {
     const { isMobile } = useDeviceDetection();
+    const exitButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    useEffect(() => {
+        if (isMobile) {
+            exitButtonRef.current?.focus();
+        }
+    }, [isMobile]);
 
     if (!isMobile) {
         return null;
@@ -14,15 +21,8 @@ export const DeviceWarning = () => {
     const handleExit = async () => {
         // Try Tauri API first (for desktop app)
         if (isTauri) {
-            try {
-                // Dynamic import for Tauri - may fail in web context
-                // @ts-expect-error - Tauri module may not exist in web-only builds
-                const { exit } = await import('@tauri-apps/api/process');
-                await exit(0);
-                return;
-            } catch (error) {
-                console.warn('Tauri exit not available:', error);
-            }
+            // TODO: Fix Tauri v2 import for process exit
+            console.warn('Tauri exit not implemented yet for v2');
         }
 
         // Fallback: try window.close() (may be blocked by browser)
@@ -38,6 +38,13 @@ export const DeviceWarning = () => {
             role="alertdialog"
             aria-live="assertive"
             aria-label="Device Incompatible"
+            data-testid="device-warning"
+            onKeyDown={(event) => {
+                if (event.key === 'Tab') {
+                    event.preventDefault();
+                    exitButtonRef.current?.focus();
+                }
+            }}
         >
             <div className="max-w-md p-8 space-y-6 text-center border rounded-lg shadow-lg bg-card text-card-foreground animate-in fade-in zoom-in duration-300">
                 <div className="text-4xl" aria-hidden="true">⚠️</div>
@@ -51,9 +58,11 @@ export const DeviceWarning = () => {
 
                 <div className="pt-4">
                     <button
+                        ref={exitButtonRef}
                         onClick={handleExit}
                         className="px-6 py-2.5 text-sm font-semibold text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         aria-label="Exit Application"
+                        data-testid="exit-application"
                     >
                         Exit Application
                     </button>

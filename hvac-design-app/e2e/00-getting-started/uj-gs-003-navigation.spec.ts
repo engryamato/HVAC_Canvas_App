@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 /**
  * E2E Test Suite: Basic Navigation and Interface Overview
  * 
- * Maps to: docs/user-journeys/00-getting-started/UJ-GS-003-BasicNavigationAndInterfaceOverview.md
+ * @spec docs/user-journeys/00-getting-started/tauri-offline/UJ-GS-003-BasicNavigationAndInterfaceOverview.md
  * 
  * This test suite verifies the application's main interface layout, navigation patterns,
  * sidebar functionality, toolbar operations, and keyboard-driven navigation.
@@ -77,35 +77,57 @@ test.describe('Basic Navigation and Interface Overview', () => {
             await expect(page.locator('text=Help')).toBeVisible();
 
             // B. Toolbar (Fixed Height: 45px)
-            const toolbar = page.locator('[data-testid="toolbar"]');
+            const toolbar = page.getByTestId('toolbar');
             await expect(toolbar).toBeVisible();
 
             // Verify toolbar groups
-            await expect(page.locator('[data-testid="tool-select"]')).toBeVisible(); // Drawing tools
-            await expect(page.locator('[data-testid="undo-button"]')).toBeVisible(); // Edit operations
-            await expect(page.locator('[data-testid="zoom-control"]')).toBeVisible(); // View controls
+            await expect(page.getByTestId('tool-select"]')).toBeVisible(); // Drawing tools
+            await expect(page.getByTestId('undo-button"]')).toBeVisible(); // Edit operations
+            await expect(page.getByTestId('zoom-control"]')).toBeVisible(); // View controls
 
             // C. Left Sidebar (Collapsible, Default Width: 280px)
-            const leftSidebar = page.locator('[data-testid="left-sidebar"]');
+            const leftSidebar = page.getByTestId('left-sidebar');
             await expect(leftSidebar).toBeVisible();
             await expect(leftSidebar).not.toHaveClass(/collapsed/); // Default expanded state
 
-            // D. Canvas Area (Flexible)
-            const canvasArea = page.locator('[data-testid="canvas-area"]');
+            // D. Canvas Area (Flexible, Fills Remaining Space)
+            const canvasArea = page.getByTestId('canvas-area');
             await expect(canvasArea).toBeVisible();
 
             // E. Right Sidebar (Collapsible, Default Width: 320px)
-            const rightSidebar = page.locator('[data-testid="right-sidebar"]');
+            const rightSidebar = page.getByTestId('right-sidebar');
             await expect(rightSidebar).toBeVisible();
             await expect(rightSidebar).not.toHaveClass(/collapsed/); // Default expanded state
 
             // F. Status Bar (Fixed Height: 30px)
-            const statusBar = page.locator('[data-testid="status-bar"]');
+            const statusBar = page.getByTestId('status-bar');
             await expect(statusBar).toBeVisible();
 
             // Verify status bar elements
             await expect(statusBar).toContainText(/X:|Y:/i); // Cursor coordinates
             await expect(statusBar).toContainText(/Zoom:/i); // Zoom level
+            await expect(statusBar).toContainText(/Grid:/i); // Grid status
+        });
+
+        test('should display auto-save status indicator in status bar', async ({ page }) => {
+            // Open a project to navigate to Canvas
+            await page.click('[data-testid="project-card"]', { hasText: '', force: true });
+
+            // Wait for Canvas page to load
+            await expect(page).toHaveURL(/\/canvas\//);
+
+            // Verify status bar shows auto-save indicator
+            const statusBar = page.getByTestId('status-bar');
+            await expect(statusBar).toBeVisible();
+
+            // Check for auto-save indicator text (based on current implementation)
+            const hasAutoSaveIndicator = await statusBar.evaluate(el => {
+                return el.textContent.includes('Saved');
+            });
+
+            // Note: Auto-save indicator may not be implemented yet
+            // This test documents the requirement and will pass when implemented
+            await expect(hasAutoSaveIndicator).toBeTruthy();
         });
 
         test('should maintain consistent header and toolbar across Dashboard and Canvas', async ({ page }) => {

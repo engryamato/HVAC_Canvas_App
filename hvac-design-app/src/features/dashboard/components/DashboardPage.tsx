@@ -39,6 +39,12 @@ export function DashboardPage() {
     // Auto-open last project if enabled
     useAutoOpen();
 
+    useEffect(() => {
+        void (async () => {
+            await useProjectListStore.persist.rehydrate();
+        })();
+    }, []);
+
     // Keyboard shortcuts (UJ-PM-002: Step 7)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

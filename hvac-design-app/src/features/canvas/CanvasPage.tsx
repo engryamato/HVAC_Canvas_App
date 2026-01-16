@@ -10,6 +10,7 @@ import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
 // Legacy components removed: Toolbar, ProjectSidebar, StatusBar, InspectorPanel
 
 /**
@@ -37,9 +38,46 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   // Ensure preferences are loaded
   usePreferencesStore((state) => state.projectFolder);
 
+  const [toasts, setToasts] = useState<ToastProps[]>([]);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  const pushToast = useCallback((message: string, type: ToastProps['type']) => {
+    const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random()}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+  }, []);
+
   // useAutoSave now manages state internally via store
-  const { save, isDirty } = useAutoSave();
-  const triggerSave = save;
+  const { saveNow } = useAutoSave({
+    onSave: (result) => {
+      const message = result.success
+        ? result.source === 'auto'
+          ? 'Auto-saved'
+          : 'Saved locally'
+        : result.source === 'auto'
+          ? 'Auto-save failed'
+          : 'Save failed';
+      pushToast(message, result.success ? 'success' : 'error');
+    },
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const recovered = localStorage.getItem('hvac-backup-recovered');
+    if (recovered) {
+      pushToast('Backup loaded', 'warning');
+      localStorage.removeItem('hvac-backup-recovered');
+    }
+  }, [pushToast]);
+
+  const triggerSave = saveNow;
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -74,6 +112,7 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
       </div>
 
       <TutorialOverlay />
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </AppShell>
   );
 }

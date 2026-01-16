@@ -3,29 +3,54 @@
 ## Overview
 
 ### Purpose
-Describe duplicating projects in the browser with quota-aware persistence.
+This document describes how users duplicate projects in the Hybrid/Web platform.
 
 ### Scope
-**In Scope:**
-- Copying project data from IndexedDB
-- Generating new IDs and names
-- Persisting the duplicate in browser storage
+- Cloning project data in IndexedDB
+- Generating unique names (" - Copy")
+- Quota management
 
-**Out of Scope:**
-- Desktop file duplication (see Tauri version)
+### User Personas
+- **Primary**: Designers creating variants
 
-### Key Differences (Hybrid/Web)
-- Storage quota checks before writing
-- Duplicate stored in IndexedDB
+### Success Criteria
+- Exact copy created in IndexedDB
+- New project appears in Dashboard
+- ID and CreatedAt updated
 
-## Primary Flow Notes (Hybrid/Web)
-- Estimate project size before duplication.
-- Surface quota warnings when needed.
+### Platform Summary (Hybrid/Web)
+- **Storage**: IndexedDB
+- **Process**: Read object -> Deep Clone (JSON) -> Write new object
+- **Quota**: Check `navigator.storage.estimate()` before duplication. Fail if insufficient.
 
-## Related Base Journey
-- [Duplicate Project](../UJ-PM-006-DuplicateProject.md)
+## Prerequisites
+- Project exists in IndexedDB
+- Sufficient storage quota
 
-## Related Components
-- `ProjectService` (web storage)
-- `IDBService`
-- `projectListStore`
+## User Journey Steps
+
+### Step 1: Initiate Duplication
+**User Action**: Click "Duplicate" in menu.
+**System Response**: Show "Duplicating..." state.
+
+### Step 2: Processing
+**System Response**:
+1. Read source from IDB.
+2. Generate new ID (`uuid`).
+3. Generate new Name (Append " - Copy").
+4. Check Quota.
+5. Write new object to IDB.
+6. Copy Thumbnail (Blob).
+
+### Step 3: Completion
+**System Response**:
+1. Add to `ProjectListStore`.
+2. Show Success Toast.
+
+## Edge Cases
+- **Quota Exceeded**: Show error "Storage Full".
+- **IDB Transaction Error**: Rollback.
+
+## Related Elements
+- `ProjectCard`
+- `IndexedDBService`

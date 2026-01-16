@@ -528,7 +528,7 @@ describe('First Launch Setup', () => {
 export const PREFERENCES_DEFAULTS: PreferencesState = {
   projectFolder: '/projects',
   unitSystem: 'imperial',
-  autoSaveInterval: 60000, // milliseconds (60 seconds)
+  autoSaveInterval: 300000, // milliseconds (300 seconds)
   gridSize: 24, // pixels
   theme: 'light',
 };
@@ -536,7 +536,7 @@ export const PREFERENCES_DEFAULTS: PreferencesState = {
 
 **Code Reference**: `hvac-design-app/src/core/store/preferencesStore.ts:25-31`
 
-**Note**: The `autoSaveInterval` is set to 60 seconds (60000ms) by default, though the actual auto-save implementation uses a 2-second debounce (see `useAutoSave.ts:50`)
+**Note**: The `autoSaveInterval` is set to 300 seconds (300000ms) by default, though the actual auto-save implementation uses a 2-second debounce (see `useAutoSave.ts:50`)
 
 ---
 

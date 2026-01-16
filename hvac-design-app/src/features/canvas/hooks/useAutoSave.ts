@@ -1,58 +1,281 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore, useProjectActions } from '@/core/store/project.store';
 import { useViewportStore } from '../store/viewportStore';
+import { useSelectionStore } from '../store/selectionStore';
+import { useHistoryStore } from '@/core/commands/historyStore';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
+import { useSettingsStore } from '@/core/store/settingsStore';
+import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
+import { useProjectStore as useLegacyProjectStore } from '@/stores/useProjectStore';
+import { useAppStateStore } from '@/stores/useAppStateStore';
+import { useLayoutStore } from '@/stores/useLayoutStore';
+import { useToolStore as useLegacyToolStore } from '@/stores/useToolStore';
+import { useViewportStore as useLegacyViewportStore } from '@/stores/useViewportStore';
+import { useTutorialStore } from '@/stores/useTutorialStore';
+import { ProjectFileSchema, type ProjectFile, CURRENT_SCHEMA_VERSION } from '@/core/schema/project-file.schema';
+import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } from '@/utils/storageKeys';
+import { trackTelemetry } from '@/utils/telemetry';
+import { sendCloudBackup } from '@/services/cloudBackupService';
 
-const STORAGE_KEY_PREFIX = 'hvac-project-';
+const STORAGE_SCHEMA_VERSION = CURRENT_SCHEMA_VERSION;
 
-export interface StoredProject {
+export type SaveSource = 'auto' | 'manual';
+
+export interface SaveResult {
+  success: boolean;
+  source: SaveSource;
+  sizeBytes?: number;
+  error?: string;
+}
+
+export interface LocalStoragePayload {
+  project: ProjectFile;
+  selection: {
+    selectedIds: string[];
+    hoveredId: string | null;
+  };
+  viewport: {
+    panX: number;
+    panY: number;
+    zoom: number;
+    gridVisible: boolean;
+    gridSize: number;
+    snapToGrid: boolean;
+  };
+  preferences: {
+    projectFolder: string;
+    unitSystem: 'imperial' | 'metric';
+    autoSaveInterval: number;
+    gridSize: number;
+    theme: 'light' | 'dark';
+  };
+  settings: {
+    autoOpenLastProject: boolean;
+  };
+  projectIndex: {
+    projects: Array<Record<string, unknown>>;
+    recentProjectIds: string[];
+    loading: boolean;
+    error?: string;
+  };
+  legacyProjects: {
+    projects: Array<Record<string, unknown>>;
+  };
+  history: {
+    past: Array<Record<string, unknown>>;
+    future: Array<Record<string, unknown>>;
+    maxSize: number;
+  };
+  uiState: {
+    app: {
+      hasLaunched: boolean;
+      isFirstLaunch: boolean;
+      isLoading: boolean;
+    };
+    layout: {
+      leftSidebarCollapsed: boolean;
+      rightSidebarCollapsed: boolean;
+      activeLeftTab: string;
+      activeRightTab: string;
+    };
+    tool: {
+      activeTool: string | null;
+    };
+    viewport: {
+      zoom: number;
+      gridVisible: boolean;
+      panOffset: { x: number; y: number };
+      cursorPosition: { x: number; y: number };
+    };
+    tutorial: {
+      isActive: boolean;
+      currentStep: number;
+      totalSteps: number;
+      completedSteps: number[];
+      isCompleted: boolean;
+    };
+  };
+}
+
+export interface LocalStorageEnvelope {
+  schemaVersion: string;
   projectId: string;
-  projectName: string;
-  projectNumber: string;
-  clientName: string;
-  createdAt: string;
-  modifiedAt: string;
-  entities: { byId: Record<string, unknown>; allIds: string[] };
-  viewportState: { panX: number; panY: number; zoom: number };
-  settings: { unitSystem: 'imperial' | 'metric'; gridSize: number; gridVisible: boolean };
+  savedAt: string;
+  checksum: string;
+  payload: LocalStoragePayload;
 }
 
-/**
- * Save project to localStorage
- */
-export function saveProjectToStorage(projectId: string, project: StoredProject): boolean {
-  try {
-    const key = `${STORAGE_KEY_PREFIX}${projectId}`;
-    localStorage.setItem(key, JSON.stringify(project));
-    return true;
-  } catch {
-    return false;
+export interface LoadedProject {
+  payload: LocalStoragePayload;
+  source: 'primary' | 'backup';
+  savedAt: string;
+  checksum: string;
+}
+
+const EnvelopeSchema = z.object({
+  schemaVersion: z.string(),
+  projectId: z.string(),
+  savedAt: z.string(),
+  checksum: z.string(),
+  payload: z.object({
+    project: ProjectFileSchema,
+  }).passthrough(),
+});
+
+function hashString(value: string): string {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
   }
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
-/**
- * Load project from localStorage
- */
-export function loadProjectFromStorage(projectId: string): StoredProject | null {
+function buildChecksum(payload: LocalStoragePayload): string {
+  return hashString(JSON.stringify(payload));
+}
+
+function parseEnvelope(serialized: string): LocalStorageEnvelope | null {
   try {
-    const key = `${STORAGE_KEY_PREFIX}${projectId}`;
-    const data = localStorage.getItem(key);
-    if (!data) {return null;}
-    return JSON.parse(data) as StoredProject;
+    const parsed = JSON.parse(serialized) as LocalStorageEnvelope;
+    const result = EnvelopeSchema.safeParse(parsed);
+    if (!result.success) {
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
 }
 
-/**
- * Delete project from localStorage
- */
+function isEnvelopeValid(envelope: LocalStorageEnvelope): boolean {
+  if (!ProjectFileSchema.safeParse(envelope.payload.project).success) {
+    return false;
+  }
+  const checksum = buildChecksum(envelope.payload);
+  return checksum === envelope.checksum;
+}
+
+export interface StorageWriteResult {
+  success: boolean;
+  sizeBytes?: number;
+  envelope?: LocalStorageEnvelope;
+  error?: string;
+}
+
+export function saveProjectToStorage(projectId: string, payload: LocalStoragePayload): StorageWriteResult {
+  try {
+    const savedAt = new Date().toISOString();
+    const checksum = buildChecksum(payload);
+    const envelope: LocalStorageEnvelope = {
+      schemaVersion: STORAGE_SCHEMA_VERSION,
+      projectId,
+      savedAt,
+      checksum,
+      payload,
+    };
+
+    const serialized = JSON.stringify(envelope);
+    localStorage.setItem(getProjectStorageKey(projectId), serialized);
+
+    return {
+      success: true,
+      sizeBytes: estimateStorageSizeBytes(serialized),
+      envelope,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+export function saveBackupToStorage(projectId: string, payload: LocalStoragePayload): StorageWriteResult {
+  try {
+    const savedAt = new Date().toISOString();
+    const checksum = buildChecksum(payload);
+    const envelope: LocalStorageEnvelope = {
+      schemaVersion: STORAGE_SCHEMA_VERSION,
+      projectId,
+      savedAt,
+      checksum,
+      payload,
+    };
+
+    const serialized = JSON.stringify(envelope);
+    localStorage.setItem(getProjectBackupKey(projectId), serialized);
+
+    return {
+      success: true,
+      sizeBytes: estimateStorageSizeBytes(serialized),
+      envelope,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+export function loadProjectFromStorage(projectId: string): LoadedProject | null {
+  const primary = localStorage.getItem(getProjectStorageKey(projectId));
+  const backup = localStorage.getItem(getProjectBackupKey(projectId));
+
+  if (primary) {
+    const envelope = parseEnvelope(primary);
+    if (envelope && isEnvelopeValid(envelope)) {
+      return {
+        payload: envelope.payload,
+        source: 'primary',
+        savedAt: envelope.savedAt,
+        checksum: envelope.checksum,
+      };
+    }
+
+    void trackTelemetry('localstorage_corrupt', {
+      projectId,
+      source: 'primary',
+    });
+  }
+
+  if (backup) {
+    const envelope = parseEnvelope(backup);
+    if (envelope && isEnvelopeValid(envelope)) {
+      try {
+        localStorage.setItem('hvac-backup-recovered', 'true');
+      } catch {
+        // ignore
+      }
+      void trackTelemetry('localstorage_recovered', {
+        projectId,
+        source: 'backup',
+      });
+      return {
+        payload: envelope.payload,
+        source: 'backup',
+        savedAt: envelope.savedAt,
+        checksum: envelope.checksum,
+      };
+    }
+  }
+
+  void trackTelemetry('localstorage_recovery_failed', {
+    projectId,
+  });
+
+  return null;
+}
+
 export function deleteProjectFromStorage(projectId: string): boolean {
   try {
-    const key = `${STORAGE_KEY_PREFIX}${projectId}`;
-    localStorage.removeItem(key);
+    localStorage.removeItem(getProjectStorageKey(projectId));
+    localStorage.removeItem(getProjectBackupKey(projectId));
     return true;
   } catch {
     return false;
@@ -61,67 +284,42 @@ export function deleteProjectFromStorage(projectId: string): boolean {
 
 interface UseAutoSaveOptions {
   enabled?: boolean;
-  debounceDelay?: number;
   interval?: number;
-  onSave?: (success: boolean) => void;
+  onSave?: (result: SaveResult) => void;
 }
 
-/**
- * Hook for auto-saving project state to localStorage
- */
 export function useAutoSave(options: UseAutoSaveOptions = {}) {
-  const { enabled = true, debounceDelay = 2000, interval, onSave } = options;
+  const { enabled = true, interval, onSave } = options;
 
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
   const projectDetails = useProjectStore((state) => state.projectDetails);
   const storeIsDirty = useProjectStore((state) => state.isDirty);
   const { setDirty } = useProjectActions();
+  const autoSaveInterval = usePreferencesStore((state) => state.autoSaveInterval);
 
   const [isDirty, setLocalDirty] = useState(storeIsDirty);
-
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const intervalTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Track previous entity/viewport state for dirty detection
-  const prevEntityRef = useRef<string | null>(null);
-  const prevViewportRef = useRef<string | null>(null);
-
-  // Track changes for debounce reset
-  const [changeCounter, setChangeCounter] = useState(0);
-
-  // Sync isDirty with store
-  useEffect(() => {
-    setLocalDirty(storeIsDirty);
-  }, [storeIsDirty]);
-
-  // Clear timers
-  const clearTimers = useCallback(() => {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-      debounceTimer.current = null;
+  const buildProjectFile = useCallback((): ProjectFile | null => {
+    if (!currentProjectId || !projectDetails) {
+      return null;
     }
-    if (intervalTimer.current) {
-      clearInterval(intervalTimer.current);
-      intervalTimer.current = null;
-    }
-  }, []);
-
-  // Build project data for storage
-  const buildProjectData = useCallback((): StoredProject | null => {
-    if (!currentProjectId || !projectDetails) {return null;}
 
     const entityStore = useEntityStore.getState();
     const viewportStore = useViewportStore.getState();
+    const preferences = usePreferencesStore.getState();
+    const historyStore = useHistoryStore.getState();
 
     return {
+      schemaVersion: STORAGE_SCHEMA_VERSION,
       projectId: currentProjectId,
       projectName: projectDetails.projectName,
-      projectNumber: projectDetails.projectNumber || '',
-      clientName: projectDetails.clientName || '',
+      projectNumber: projectDetails.projectNumber || undefined,
+      clientName: projectDetails.clientName || undefined,
       createdAt: projectDetails.createdAt,
       modifiedAt: new Date().toISOString(),
       entities: {
-        byId: entityStore.byId as Record<string, unknown>,
+        byId: entityStore.byId,
         allIds: entityStore.allIds,
       },
       viewportState: {
@@ -130,137 +328,250 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
         zoom: viewportStore.zoom,
       },
       settings: {
-        unitSystem: 'imperial',
-        gridSize: viewportStore.gridSize || 12,
+        unitSystem: preferences.unitSystem,
+        gridSize: preferences.gridSize,
         gridVisible: viewportStore.gridVisible,
       },
+      commandHistory: {
+        commands: historyStore.past,
+        currentIndex: Math.max(historyStore.past.length - 1, 0),
+      },
+      calculations: undefined,
+      billOfMaterials: undefined,
     };
   }, [currentProjectId, projectDetails]);
 
-  // Save function
-  const save = useCallback((): boolean => {
-    if (!currentProjectId) {return false;}
+  const buildPayload = useCallback((): LocalStoragePayload | null => {
+    const project = buildProjectFile();
+    if (!project) {
+      return null;
+    }
 
-    const projectData = buildProjectData();
-    if (!projectData) {return false;}
+    const selectionState = useSelectionStore.getState();
+    const viewportStore = useViewportStore.getState();
+    const preferences = usePreferencesStore.getState();
+    const settings = useSettingsStore.getState();
+    const projectIndex = useProjectListStore.getState();
+    const legacyProjects = useLegacyProjectStore.getState();
+    const historyStore = useHistoryStore.getState();
 
-    const success = saveProjectToStorage(currentProjectId, projectData);
+    const appState = useAppStateStore.getState();
+    const layoutState = useLayoutStore.getState();
+    const legacyTool = useLegacyToolStore.getState();
+    const legacyViewport = useLegacyViewportStore.getState();
+    const tutorialState = useTutorialStore.getState();
 
-    if (success) {
+    return {
+      project,
+      selection: {
+        selectedIds: selectionState.selectedIds,
+        hoveredId: selectionState.hoveredId,
+      },
+      viewport: {
+        panX: viewportStore.panX,
+        panY: viewportStore.panY,
+        zoom: viewportStore.zoom,
+        gridVisible: viewportStore.gridVisible,
+        gridSize: viewportStore.gridSize,
+        snapToGrid: viewportStore.snapToGrid,
+      },
+      preferences: {
+        projectFolder: preferences.projectFolder,
+        unitSystem: preferences.unitSystem,
+        autoSaveInterval: preferences.autoSaveInterval,
+        gridSize: preferences.gridSize,
+        theme: preferences.theme,
+      },
+      settings: {
+        autoOpenLastProject: settings.autoOpenLastProject,
+      },
+      projectIndex: {
+        projects: projectIndex.projects as Array<Record<string, unknown>>,
+        recentProjectIds: projectIndex.recentProjectIds,
+        loading: projectIndex.loading,
+        error: projectIndex.error,
+      },
+      legacyProjects: {
+        projects: legacyProjects.projects as Array<Record<string, unknown>>,
+      },
+      history: {
+        past: historyStore.past as Array<Record<string, unknown>>,
+        future: historyStore.future as Array<Record<string, unknown>>,
+        maxSize: historyStore.maxSize,
+      },
+      uiState: {
+        app: {
+          hasLaunched: appState.hasLaunched,
+          isFirstLaunch: appState.isFirstLaunch,
+          isLoading: appState.isLoading,
+        },
+        layout: {
+          leftSidebarCollapsed: layoutState.leftSidebarCollapsed,
+          rightSidebarCollapsed: layoutState.rightSidebarCollapsed,
+          activeLeftTab: layoutState.activeLeftTab,
+          activeRightTab: layoutState.activeRightTab,
+        },
+        tool: {
+          activeTool: legacyTool.activeTool,
+        },
+        viewport: {
+          zoom: legacyViewport.zoom,
+          gridVisible: legacyViewport.gridVisible,
+          panOffset: legacyViewport.panOffset,
+          cursorPosition: legacyViewport.cursorPosition,
+        },
+        tutorial: {
+          isActive: tutorialState.isActive,
+          currentStep: tutorialState.currentStep,
+          totalSteps: tutorialState.totalSteps,
+          completedSteps: tutorialState.completedSteps,
+          isCompleted: tutorialState.isCompleted,
+        },
+      },
+    };
+  }, [buildProjectFile]);
+
+  const triggerCloudBackup = useCallback(async (envelope: LocalStorageEnvelope) => {
+    const success = await sendCloudBackup({
+      projectId: envelope.projectId,
+      savedAt: envelope.savedAt,
+      schemaVersion: envelope.schemaVersion,
+      checksum: envelope.checksum,
+      payload: envelope.payload,
+    });
+
+    void trackTelemetry(success ? 'cloud_backup_success' : 'cloud_backup_failure', {
+      projectId: envelope.projectId,
+      source: 'auto',
+    });
+  }, []);
+
+  const saveWithBackup = useCallback(
+    (source: SaveSource): SaveResult => {
+      if (!currentProjectId) {
+        return { success: false, source, error: 'Missing project id.' };
+      }
+
+      const payload = buildPayload();
+      if (!payload) {
+        return { success: false, source, error: 'Missing project payload.' };
+      }
+
+      const storageResult = saveProjectToStorage(currentProjectId, payload);
+      if (!storageResult.success || !storageResult.envelope) {
+        const error = storageResult.error ?? 'Unable to save to localStorage.';
+        const result = { success: false, source, error };
+        void trackTelemetry(`${source}_save_failure`, {
+          projectId: currentProjectId,
+          error,
+        });
+        onSave?.(result);
+        return result;
+      }
+
+      const backupResult = saveBackupToStorage(currentProjectId, payload);
+      if (backupResult.envelope) {
+        void triggerCloudBackup(backupResult.envelope);
+      }
+
       setLocalDirty(false);
       setDirty(false);
-    }
 
-    onSave?.(success);
-    return success;
-  }, [currentProjectId, buildProjectData, onSave, setDirty]);
+      const result = {
+        success: true,
+        source,
+        sizeBytes: storageResult.sizeBytes,
+      };
 
-  // Watch for entity changes to detect dirty state
+      void trackTelemetry(`${source}_save_success`, {
+        projectId: currentProjectId,
+        projectSizeBytes: storageResult.sizeBytes,
+        source,
+      });
+      onSave?.(result);
+
+      return result;
+    },
+    [currentProjectId, buildPayload, setDirty, triggerCloudBackup, onSave]
+  );
+
+  const saveNow = useCallback((): SaveResult => saveWithBackup('manual'), [saveWithBackup]);
+
   useEffect(() => {
-    // Initialize with current state
-    const initialState = useEntityStore.getState();
-    prevEntityRef.current = JSON.stringify({ byId: initialState.byId, allIds: initialState.allIds });
+    setLocalDirty(storeIsDirty);
+  }, [storeIsDirty]);
 
-    const unsubEntity = useEntityStore.subscribe((state) => {
-      const currentState = JSON.stringify({ byId: state.byId, allIds: state.allIds });
-      if (prevEntityRef.current !== null && prevEntityRef.current !== currentState) {
-        // Clear debounce timer immediately on change (synchronous reset)
-        if (debounceTimer.current) {
-          clearTimeout(debounceTimer.current);
-          debounceTimer.current = null;
-        }
-        setLocalDirty(true);
-        setDirty(true);
-        setChangeCounter((c) => c + 1);
-      }
-      prevEntityRef.current = currentState;
+  useEffect(() => {
+    const entityUnsub = useEntityStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
     });
 
-    return () => unsubEntity();
-  }, [setDirty]);
-
-  // Watch for viewport changes to detect dirty state
-  useEffect(() => {
-    // Initialize with current state
-    const initialState = useViewportStore.getState();
-    prevViewportRef.current = JSON.stringify({ panX: initialState.panX, panY: initialState.panY, zoom: initialState.zoom });
-
-    const unsubViewport = useViewportStore.subscribe((state) => {
-      const currentState = JSON.stringify({ panX: state.panX, panY: state.panY, zoom: state.zoom });
-      if (prevViewportRef.current !== null && prevViewportRef.current !== currentState) {
-        // Clear debounce timer immediately on change (synchronous reset)
-        if (debounceTimer.current) {
-          clearTimeout(debounceTimer.current);
-          debounceTimer.current = null;
-        }
-        setLocalDirty(true);
-        setDirty(true);
-        setChangeCounter((c) => c + 1);
-      }
-      prevViewportRef.current = currentState;
+    const viewportUnsub = useViewportStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
     });
 
-    return () => unsubViewport();
-  }, [setDirty]);
+    const selectionUnsub = useSelectionStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
+    });
 
-  // Debounced auto-save - reset timer when changeCounter changes
-  useEffect(() => {
-    if (!enabled || !storeIsDirty) {return;}
+    const historyUnsub = useHistoryStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
+    });
 
-    // Clear existing timer on each change (reset debounce)
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-      debounceTimer.current = null;
-    }
-
-    debounceTimer.current = setTimeout(() => {
-      save();
-    }, debounceDelay);
+    const preferencesUnsub = usePreferencesStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
+    });
 
     return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-        debounceTimer.current = null;
-      }
+      entityUnsub();
+      viewportUnsub();
+      selectionUnsub();
+      historyUnsub();
+      preferencesUnsub();
     };
-  }, [enabled, storeIsDirty, debounceDelay, save, changeCounter]);
+  }, [setDirty]);
 
-  // Interval-based auto-save
   useEffect(() => {
-    if (!enabled || !interval) {return;}
+    if (!enabled) {
+      return;
+    }
+
+    const intervalMs = interval ?? autoSaveInterval ?? 300000;
+    if (!intervalMs || intervalMs <= 0) {
+      return;
+    }
 
     intervalTimer.current = setInterval(() => {
-      if (storeIsDirty) {
-        save();
-      }
-    }, interval);
+      saveWithBackup('auto');
+    }, intervalMs);
 
     return () => {
       if (intervalTimer.current) {
         clearInterval(intervalTimer.current);
+        intervalTimer.current = null;
       }
     };
-  }, [enabled, interval, storeIsDirty, save]);
+  }, [enabled, interval, autoSaveInterval, saveWithBackup]);
 
-  // Save on beforeunload
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (storeIsDirty) {
-        save();
+        saveWithBackup('auto');
       }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [storeIsDirty, save]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return clearTimers;
-  }, [clearTimers]);
+  }, [storeIsDirty, saveWithBackup]);
 
   return {
-    save,
+    save: saveNow,
+    saveNow,
     isDirty,
   };
 }

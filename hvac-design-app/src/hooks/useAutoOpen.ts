@@ -21,10 +21,17 @@ export function useAutoOpen() {
         const timer = setTimeout(() => {
             // Only auto-open if we're still on root or dashboard
             if (pathname === '/' || pathname === '/dashboard') {
-                const lastProjectId = localStorage.getItem('lastActiveProjectId');
-                if (lastProjectId) {
-                    setHasRun(true);
-                    router.push(`/canvas/${lastProjectId}`);
+                try {
+                    const lastProjectId = typeof window !== 'undefined' 
+                        ? localStorage.getItem('lastActiveProjectId') 
+                        : null;
+                    
+                    if (lastProjectId) {
+                        setHasRun(true);
+                        router.push(`/canvas/${lastProjectId}`);
+                    }
+                } catch (e) {
+                    // Ignore storage errors
                 }
             }
         }, 100);

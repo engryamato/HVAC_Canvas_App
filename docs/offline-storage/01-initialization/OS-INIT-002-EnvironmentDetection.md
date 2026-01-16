@@ -113,10 +113,10 @@ export async function exists(path: string): Promise<boolean> {
 |---------|----------------|-------------|------------------|
 | **Save to .sws file** | ✅ Full support | ❌ Not available | Trigger download |
 | **Load from .sws file** | ✅ File picker dialog | ⚠️ Upload only | File input element |
-| **Auto-save to file** | ✅ Background save | ❌ Not available | localStorage only |
+| **Auto-save to file** | ✅ Background save | ❌ Not available | localStorage auto-save |
 | **Backup (.bak) file** | ✅ Created automatically | ❌ Not available | N/A |
 | **File exists check** | ✅ True file system check | ⚠️ Always `false` | Assume doesn't exist |
-| **localStorage** | ✅ Available | ✅ Available | None (works both) |
+| **localStorage** | ✅ Available (Projects + Settings) | ✅ Available (Projects + Settings) | None (works both) |
 | **Recent projects list** | ✅ File paths tracked | ⚠️ localStorage only | Use localStorage |
 | **Export CSV/JSON** | ✅ Save dialog | ✅ Browser download | Browser download |
 
@@ -152,12 +152,12 @@ async function saveProject(project: ProjectFile, path: string) {
       return { success: true };
     } catch (error) {
       // Tauri failed, fallback to localStorage
-      localStorage.setItem(`hvac-project-${project.project.id}`, JSON.stringify(project));
+      localStorage.setItem(`hvac-project-${project.projectId}`, JSON.stringify(project));
       return { success: true, fallback: true };
     }
   } else {
-    // Web: Use localStorage + trigger download
-    localStorage.setItem(`hvac-project-${project.project.id}`, JSON.stringify(project));
+    // Web: Use localStorage + optional download
+    localStorage.setItem(`hvac-project-${project.projectId}`, JSON.stringify(project));
     triggerDownload(project, path);
     return { success: true };
   }

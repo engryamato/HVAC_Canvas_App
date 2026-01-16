@@ -15,48 +15,24 @@ This document describes the **data integrity validation** that occurs during app
 
 ## Integrity Check Phases
 
-### Phase 1: localStorage Validation (Startup)
-
-**Timing**: Immediately when Zustand stores initialize
+### Phase 1: Startup Validation
 
 **Process**:
 
-```mermaid
-graph TD
-    Start[App Startup] --> Read[Read from localStorage]
-    Read --> Parse[Parse JSON]
-    Parse -->|Success| Hydrate[Hydrate Stores]
-    Parse -->|Parse Error| Default[Use Default State]
-    Hydrate --> Ready[App Ready]
-    Default --> Log[Log Error]
-    Log --> Ready
-```
+1.  **Preferences (localStorage)**:
+    - Checks `sws.preferences`
+    - Validates JSON integrity
+    - Falls back to default settings if corrupt
 
-**Automatic Recovery**: Yes, Zustand persist middleware handles JSON parse errors gracefully.
-
-#### Code Reference
-
-Zustand persist middleware automatically wraps JSON parsing in try-catch:
-
-```typescript
-// Conceptual example from Zustand persist middleware
-try {
-  const stored = localStorage.getItem('sws.preferences');
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    return parsed;
-  }
-} catch (error) {
-  console.error('Failed to parse localStorage:', error);
-  return defaultState; // Fallback to default
-}
-```
+2.  **Project Data (localStorage)**:
+    - Checks `hvac-project-{projectId}` entries
+    - Does NOT load full projects on startup (Lazy Loading)
+    - Validates index/metadata only
 
 **Stores Validated**:
 - `sws.preferences` → `preferencesStore`
 - `sws.projectIndex` → `projectListStore`
-- `project-storage` → `useProjectStore`
-- `hvac-project-{id}` → Auto-save snapshots
+- `hvac-project-{projectId}` → Project Data (Lazy)
 
 ---
 

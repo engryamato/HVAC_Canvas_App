@@ -10,7 +10,7 @@
  * - Feature availability indicators
  * - Error handling for unsupported operations
  *
- * @spec OS-INIT-002-EnvironmentDetection.md
+ * @spec docs/offline-storage/01-initialization/OS-INIT-002-EnvironmentDetection.md
  * @created 2026-01-12
  */
 

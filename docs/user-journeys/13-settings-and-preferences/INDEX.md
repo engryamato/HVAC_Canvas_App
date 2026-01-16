@@ -1,11 +1,18 @@
-# Settings & Preferences
+# Settings User Journeys
 
-## Overview
 
-This category covers all user journeys related to configuring application behavior and customization preferences in the SizeWise HVAC Canvas App.
+> **Implementation**: See [Platform Adapters](../../architecture/01-platform-adapters.md) for shared interface design.
 
-## Child Documents
+This section is split by delivery mode:
 
-- [UJ-SET-001: Application Settings](UJ-SET-001-ApplicationSettings.md)
+## [Hybrid / Web](./hybrid/)
+Browser-based configuration. Handles:
+- **LocalStorage** Persistence
+- **Cookie Clearing** Behavior
+- [UJ-SET-001 Application Settings](./hybrid/UJ-SET-001-ApplicationSettings.md)
 
-</details>
+## [Tauri / Native](./tauri-offline/)
+Desktop-based configuration. Handles:
+- **File System** Persistence (`%APPDATA%`)
+- **System Integation** (OS Theme / Language)
+- [UJ-SET-001 Application Settings](./tauri-offline/UJ-SET-001-ApplicationSettings.md)
