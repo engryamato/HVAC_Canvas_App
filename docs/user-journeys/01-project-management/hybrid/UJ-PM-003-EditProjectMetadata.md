@@ -1,67 +1,184 @@
 # [UJ-PM-003] Edit Project Metadata (Hybrid/Web)
 
-## Overview
+## 1. Overview
 
 ### Purpose
-This document describes how users edit existing project metadata in the canvas editor (Hybrid/Web platform). Changes are persisted to IndexedDB and synchronized with the dashboard list.
+This document describes editing project metadata in the browser, including validation, IndexedDB persistence, and dashboard synchronization.
 
 ### Scope
-- Editing project details (Name, Location, Client)
-- Editing Local Scope and Site Conditions
-- Update propagation to IndexedDB and application state
+- Opening metadata edit mode from the canvas sidebar
+- Editing project details, scope, and site conditions
+- Validation and save actions
+- IndexedDB persistence and list refresh
 
 ### User Personas
-- **Primary**: HVAC designers updating project details
-- **Secondary**: Project managers reviewing info
+- **Primary**: HVAC designers updating project details during design
+- **Secondary**: Project managers correcting client and site information
+- **Tertiary**: QA reviewers validating metadata accuracy
 
 ### Success Criteria
-- Metadata changes persist to IndexedDB
-- Dashboard and browser title update without reload
-- Invalid input prevented (e.g. empty name)
+- Metadata editor opens from canvas sidebar
+- Validation errors appear inline
+- Changes persist in IndexedDB
+- Dashboard list reflects updated metadata without reload
+- Storage errors surface with recovery guidance
 
 ### Platform Summary (Hybrid/Web)
-- **Storage**: IndexedDB (Active Project & Project List)
-- **Persistence**: Auto-save triggers IDB update transaction
-- **Sync**: Changes available immediately to other tabs (via storage events)
-- **Offline**: Fully functional offline (local IDB)
+- Storage: IndexedDB/localStorage
+- File I/O: No disk writes
+- Offline: Works for cached projects
+- Quota: Subject to browser storage limits
 
-## PRD References
-- **FR-PM-003**: Edit project metadata
-- **AC-PM-003-004**: Changes save immediately to store and IndexedDB
+## 2. PRD References
 
-## Prerequisites
-- User is in Canvas Editor
-- Project loaded in memory
+### Related PRD Sections
+- **Section 4.1: Project Management** - Metadata editing
+- **Section 6.2: Project Persistence** - Browser storage updates
 
-## User Journey Steps
+### Key Requirements Addressed
+- FR-PM-003: Edit project metadata from canvas
+- AC-PM-003-002: Editable fields (name, number, client, location)
+- AC-PM-003-004: Save updates active project and list
 
-### Step 1: Open Edit Project Metadata
-**User Action**: Click "Edit" icon in Left Sidebar (Project Details).
-**System Response**: Sidebar switches to edit mode or opens modal.
+## 3. Prerequisites
+
+### User Prerequisites
+- User is in Canvas Editor (`/canvas/{projectId}`)
+- User understands metadata fields
+
+### System Prerequisites
+- Project loaded into memory
+- Sidebar rendered and interactive
+
+### Data Prerequisites
+- Metadata schema available
+- Existing project metadata loaded
+
+### Technical Prerequisites
+- `EditProjectDialog` available in sidebar
+- `IDBService` for persistence
+- `projectListStore` for list sync
+
+## 4. User Journey Steps
+
+### Step 1: Open Metadata Editor
+
+**User Actions:**
+1. Click edit icon in Project Details accordion
+
+**System Response:**
+1. Sidebar switches to editable inputs
+2. Save/Cancel actions appear
+
+**Visual State:**
+```
+┌────────────── Sidebar ──────────────┐
+│ Project Details [Edit]              │
+│ Name: [Office Building HVAC]        │
+│ Client: [Acme Corp]                 │
+│ [Save] [Cancel]                     │
+└─────────────────────────────────────┘
+```
+
+**User Feedback:**
+- Focus lands on Project Name
+
+---
 
 ### Step 2: Edit Details
-**User Action**: Update Name, Location, Client.
-**System Response**: Input fields validate limits (max 100 chars).
 
-### Step 3: Save Changes
-**User Action**: Click "Save".
-**System Response**:
-1. Validate inputs.
-2. Update `ProjectStore` (React State).
-3. Update `ProjectListStore` (React State).
-4. **Persist**: Write updated object to IndexedDB.
-5. Update Browser Title.
-6. Show "Saved" toast.
+**User Actions:**
+1. Change name, client, and location
 
-### Step 4: Verify Updates
-**User Action**: Navigate to Dashboard.
-**System Response**: Project card shows new name/details (loaded from IDB).
+**System Response:**
+1. Inline validation on required fields
+2. Save button enabled when valid
 
-## Edge Cases
-- **Quota Exceeded**: Save fails if IDB is full (Show error).
-- **Concurrency**: If open in another tab, last save generally wins in simple IDB implementations (unless versioning is used).
+---
 
-## Related Elements
+### Step 3: Edit Scope and Site Conditions
+
+**User Actions:**
+1. Expand Project Scope and Site Conditions
+2. Adjust values and units
+
+**System Response:**
+1. Fields validate numeric input
+2. Unsaved changes indicator shown
+
+---
+
+### Step 4: Save Changes
+
+**User Actions:**
+1. Click Save
+
+**System Response:**
+1. Write updated metadata to IndexedDB
+2. Update `projectListStore` and recents in localStorage
+3. Show success toast
+
+**Hybrid-Specific Behavior:**
+- Quota check runs before save
+- If quota exceeded, show storage warning and block save
+
+---
+
+### Step 5: Verify Dashboard Updates
+
+**User Actions:**
+1. Return to dashboard
+
+**System Response:**
+1. Updated name and metadata appear in project list
+
+## 5. Edge Cases and Handling
+
+### Edge Case 1: Quota Exceeded
+- Show storage warning and keep edits unsaved
+
+### Edge Case 2: Concurrent Update
+- If same project edited in another tab, warn on save and offer overwrite
+
+### Edge Case 3: Invalid Field Values
+- Inline errors and Save disabled until fixed
+
+## 6. Error Scenarios and Recovery
+
+### Error Scenario 1: IndexedDB Write Failure
+- Show "Save failed" toast
+- Preserve unsaved changes for retry
+
+### Error Scenario 2: Storage Cleared
+- Warn user and revert to last saved metadata
+
+## 7. Keyboard Shortcuts
+
+| Action | Shortcut |
+|--------|----------|
+| Save Changes | `Ctrl/Cmd + S` |
+| Cancel Edit | `Esc` |
+
+## 8. Related Elements
+
+### Components
 - `EditProjectDialog`
+- `LeftSidebar`
+
+### Stores
 - `ProjectStore`
-- `IndexedDBService`
+- `projectListStore`
+
+### Services
+- `ProjectService` (Web)
+- `IDBService`
+
+## 9. Visual Diagrams
+
+### Edit Metadata Flow (Hybrid/Web)
+```
+Canvas → Edit Sidebar → IndexedDB Save → Dashboard Sync
+```
+
+## Related Base Journey
+- [Edit Project Metadata](../UJ-PM-003-EditProjectMetadata.md)

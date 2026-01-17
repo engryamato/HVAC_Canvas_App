@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useProjectListStore, useRecentProjects } from '../store/projectListStore';
-import { useFilteredProjects, SortOption } from '../hooks/useFilteredProjects';
+import { useProjectFilters } from '../hooks/useProjectFilters';
 import { SearchBar } from './SearchBar';
 import { RecentProjectsSection } from './RecentProjectsSection';
 import { AllProjectsSection } from './AllProjectsSection';
@@ -10,31 +10,58 @@ import { Plus, Archive } from 'lucide-react';
 import { NewProjectDialog } from '@/components/dashboard/NewProjectDialog';
 import { FileMenu } from '@/components/layout/FileMenu';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
+import { useAppStateStore } from '@/stores/useAppStateStore';
+import { useSearchParams } from 'next/navigation';
 
 /**
  * Dashboard Page - Main project management interface
  * Implements UJ-PM-002: Opening Existing Projects
+ * Implements UJ-PM-007: Search & Filter Projects
+ * Implements UJ-PM-005: Archive and restore projects
  * 
  * Features:
  * - Recent Projects section (last 5 accessed)
  * - All Projects section with search
  * - Keyboard shortcuts (Ctrl+F for search)
  * - Auto-open last project (if enabled)
+ * - Search, filter, and sort functionality
+ * - Folder rescanning (Tauri mode)
+ * - URL-based view state (?view=active or ?view=archived)
  */
 export function DashboardPage() {
     const allProjectsRaw = useProjectListStore(state => state.projects);
     const activeProjects = allProjectsRaw.filter(p => !p.isArchived);
     const archivedProjects = allProjectsRaw.filter(p => p.isArchived);
     const recentProjects = useRecentProjects();
-    const [searchTerm, setSearchTerm] = useState('');
+    const scanProjectsFromDisk = useProjectListStore(state => state.scanProjectsFromDisk);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
-    const [sortBy, setSortBy] = useState<SortOption>('modified');
-    
-    const displayedProjects = activeTab === 'active' ? activeProjects : archivedProjects;
-    const filteredProjects = useFilteredProjects(displayedProjects, searchTerm, sortBy);
+    const searchParams = useSearchParams();
+    const viewParam = searchParams.get('view') as 'active' | 'archived' | null;
+    const [activeTab, setActiveTab] = useState<'active' | 'archived'>(viewParam === 'archived' ? 'archived' : 'active');
     const _searchInputRef = useRef<HTMLInputElement>(null);
     const [focusedIndex, setFocusedIndex] = useState(0);
+    const isTauri = useAppStateStore((state) => state.isTauri);
+
+    // Sync state with URL and handle "Return to Dashboard" logic
+    useEffect(() => {
+        if (viewParam === 'archived') {
+            setActiveTab('archived');
+        } else {
+            // Default to 'active' if param is 'active' OR missing/null (e.g. root /dashboard)
+            setActiveTab('active');
+        }
+    }, [viewParam]);
+
+    // Use new filtering hook
+    const displayedProjects = activeTab === 'active' ? activeProjects : archivedProjects;
+    const {
+        filteredProjects,
+        totalCount,
+        filters,
+        setSearchQuery,
+        setSortBy,
+        setSortOrder,
+    } = useProjectFilters(displayedProjects);
 
     // Auto-open last project if enabled
     useAutoOpen();
@@ -42,8 +69,78 @@ export function DashboardPage() {
     useEffect(() => {
         void (async () => {
             await useProjectListStore.persist.rehydrate();
+            
+            // Scan projects from disk in Tauri mode
+            if (isTauri) {
+                await scanProjectsFromDisk();
+            }
         })();
-    }, []);
+    }, [isTauri, scanProjectsFromDisk]);
+
+    // Handle rescan (Tauri only)
+    const handleRescan = async () => {
+        if (!isTauri) {return;}
+        await scanProjectsFromDisk();
+    };
+
+    // Handle opening project from file (Tauri only)
+    const handleOpenFromFile = async () => {
+        if (!isTauri) {return;}
+
+        try {
+            const { TauriFileSystem } = await import('@/core/persistence/TauriFileSystem');
+            const { loadProject } = await import('@/core/persistence/projectIO');
+            const addProjectToList = useProjectListStore.getState().addProject;
+
+            // Show native open dialog
+            const filePath = await TauriFileSystem.openFileDialog();
+            
+            if (!filePath) {
+                // User cancelled
+                return;
+            }
+
+            // Load project from file
+            const result = await loadProject(filePath);
+            
+            if (!result.success || !result.project) {
+                alert(`Failed to open project: ${result.error || 'Unknown error'}`);
+                return;
+            }
+
+            // Add to project list if not already there
+            const existingProject = allProjectsRaw.find(p => p.projectId === result.project!.projectId);
+            
+            if (!existingProject) {
+                const projectListItem = {
+                    projectId: result.project.projectId,
+                    projectName: result.project.projectName,
+                    projectNumber: result.project.projectNumber,
+                    clientName: result.project.clientName,
+                    entityCount: result.project.entities?.allIds?.length || 0,
+                    createdAt: result.project.createdAt,
+                    modifiedAt: result.project.modifiedAt,
+                    storagePath: filePath,
+                    isArchived: ('isArchived' in result.project ? result.project.isArchived : false) as boolean,
+                    filePath: filePath,
+                };
+                
+                addProjectToList(projectListItem);
+            }
+
+            // Navigate to canvas
+            window.location.href = `/canvas/${result.project.projectId}`;
+        } catch (error) {
+            console.error('[DashboardPage] Failed to open project:', error);
+            alert('Failed to open project. Please check the file and try again.');
+        }
+    };
+
+    // Handle sort change from SearchBar
+    const handleSortChange = (sortBy: 'name' | 'date', sortOrder: 'asc' | 'desc') => {
+        setSortBy(sortBy);
+        setSortOrder(sortOrder);
+    };
 
     // Keyboard shortcuts (UJ-PM-002: Step 7)
     useEffect(() => {
@@ -58,8 +155,8 @@ export function DashboardPage() {
             }
 
             // Escape: Clear search
-            if (e.key === 'Escape' && searchTerm) {
-                setSearchTerm('');
+            if (e.key === 'Escape' && filters.searchQuery) {
+                setSearchQuery('');
                 return;
             }
 
@@ -85,7 +182,7 @@ export function DashboardPage() {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [searchTerm, focusedIndex, filteredProjects]);
+    }, [filters.searchQuery, focusedIndex, filteredProjects, setSearchQuery]);
 
     // Empty state (only show when NO projects exist at all)
     if (allProjectsRaw.length === 0) {
@@ -100,6 +197,18 @@ export function DashboardPage() {
                         </div>
                         <div className="flex items-center gap-3">
                             <FileMenu />
+                            {isTauri && (
+                                <button
+                                    onClick={handleOpenFromFile}
+                                    className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                                    data-testid="open-project-btn"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Open Project...
+                                </button>
+                            )}
                             <button
                                 onClick={() => setIsDialogOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -199,23 +308,18 @@ export function DashboardPage() {
                     </button>
                 </div>
 
-                {/* Search Bar and Sort */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-                    <SearchBar value={searchTerm} onChange={setSearchTerm} />
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <label htmlFor="sort-select" className="text-sm text-slate-500 whitespace-nowrap">Sort by:</label>
-                        <select
-                            id="sort-select"
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value as SortOption)}
-                            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            data-testid="sort-select"
-                        >
-                            <option value="modified">Last Modified</option>
-                            <option value="name">Name (A-Z)</option>
-                            <option value="created">Date Created</option>
-                        </select>
-                    </div>
+                {/* Search Bar with Sort and Rescan */}
+                <div style={{ marginBottom: '32px' }}>
+                    <SearchBar
+                        value={filters.searchQuery}
+                        onChange={setSearchQuery}
+                        sortBy={filters.sortBy}
+                        sortOrder={filters.sortOrder}
+                        onSortChange={handleSortChange}
+                        onRescan={isTauri ? handleRescan : undefined}
+                        totalCount={totalCount}
+                        filteredCount={filteredProjects.length}
+                    />
                 </div>
 
                 {/* Recent Projects Section - only show on Active tab */}
@@ -224,7 +328,7 @@ export function DashboardPage() {
                 {/* All Projects Section */}
                 <AllProjectsSection 
                     projects={filteredProjects} 
-                    searchTerm={searchTerm}
+                    searchTerm={filters.searchQuery}
                     emptyMessage={activeTab === 'archived' ? 'No archived projects' : undefined}
                 />
             </div>
@@ -235,4 +339,3 @@ export function DashboardPage() {
 }
 
 export default DashboardPage;
-

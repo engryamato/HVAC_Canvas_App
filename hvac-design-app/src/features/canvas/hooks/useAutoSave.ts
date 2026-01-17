@@ -116,7 +116,7 @@ export interface LoadedProject {
   checksum: string;
 }
 
-const EnvelopeSchema = z.object({
+export const EnvelopeSchema = z.object({
   schemaVersion: z.string(),
   projectId: z.string(),
   savedAt: z.string(),
@@ -457,6 +457,64 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
         return { success: false, source, error: 'Missing project payload.' };
       }
 
+      // Check if we're in Tauri mode and have a file path
+      const isTauri = useAppStateStore.getState().isTauri;
+      const projectListItem = useProjectListStore.getState().projects.find(
+        p => p.projectId === currentProjectId
+      );
+
+      if (isTauri && projectListItem?.filePath) {
+        // Save to .sws file in Tauri mode
+        void (async () => {
+          try {
+            const { saveProject } = await import('@/core/persistence/projectIO');
+            
+            // Convert payload to ProjectFile format
+            const projectFile: any = {
+              ...payload.project,
+              entities: payload.project.entities,
+              viewportState: payload.viewport,
+              settings: {
+                unitSystem: payload.preferences.unitSystem,
+                gridSize: payload.preferences.gridSize,
+                gridVisible: payload.viewport.gridVisible,
+              },
+            };
+
+            const result = await saveProject(projectFile, projectListItem.filePath!);
+            
+            if (!result.success) {
+              console.error('[useAutoSave] Failed to save to file:', result.error);
+              // Fall back to localStorage on error
+              const storageResult = saveProjectToStorage(currentProjectId, payload);
+              if (storageResult.success) {
+                void saveBackupToStorage(currentProjectId, payload);
+              }
+              return;
+            }
+
+            setLocalDirty(false);
+            setDirty(false);
+
+            void trackTelemetry(`${source}_save_success_file`, {
+              projectId: currentProjectId,
+              source,
+            });
+          } catch (error) {
+            console.error('[useAutoSave] Error during file save:', error);
+            // Fall back to localStorage
+            const storageResult = saveProjectToStorage(currentProjectId, payload);
+            if (storageResult.success) {
+              void saveBackupToStorage(currentProjectId, payload);
+            }
+          }
+        })();
+
+        // Return optimistic success for file saves
+        return { success: true, source };
+      }
+
+      // Web mode: save to localStorage
       const storageResult = saveProjectToStorage(currentProjectId, payload);
       if (!storageResult.success || !storageResult.envelope) {
         const error = storageResult.error ?? 'Unable to save to localStorage.';

@@ -2,6 +2,11 @@
 
 This section is split by delivery mode:
 
+## [Core / Shared](./UJ-ERR-001-ApplicationRecovery.md)
+React Error Boundary logic.
+- [UJ-ERR-001 Application Recovery (Core)](./UJ-ERR-001-ApplicationRecovery.md)
+
+
 ## [Hybrid / Web](./hybrid/)
 Browser-based recovery. Handles:
 - **Refresh Strategy** (F5 / Reload Context)

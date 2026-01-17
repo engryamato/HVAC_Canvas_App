@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
+import { useAppStateStore } from '@/stores/useAppStateStore';
 import { useRouter } from 'next/navigation';
 
 interface NewProjectDialogProps {
@@ -52,6 +53,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
     const router = useRouter();
 
     const isValid = projectName.trim().length > 0 && projectName.length <= 100;
+    const isTauri = useAppStateStore((state) => state.isTauri);
 
     // Helper for non-secure contexts (Docker) where crypto.randomUUID might be missing
     const generateId = () => {
@@ -81,11 +83,12 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
             if (matPvc) { materials.push({ type: 'PVC' }); }
 
             const newId = generateId();
+            const now = new Date().toISOString();
 
             const newProject = {
                 id: newId,
                 name: projectName.trim(),
-                projectNumber: projectNumber.trim() || null,
+                projectNumber: projectNumber.trim() ||null,
                 clientName: clientName.trim() || null,
                 location: location.trim() || null,
                 scope: {
@@ -101,49 +104,106 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
                     humidity: humidity.trim(),
                     localCodes: localCodes.trim()
                 },
-                createdAt: new Date().toISOString(),
-                modifiedAt: new Date().toISOString(),
+                createdAt: now,
+                modifiedAt: now,
                 entityCount: 0,
                 thumbnailUrl: null,
                 isArchived: false,
             };
 
-            // Save to project-storage (Canvas)
-            addProject(newProject);
+            // Environment-aware persistence
+            if (isTauri) {
+                // Tauri Mode: Use native file dialog and save to .sws file
+                const { TauriFileSystem } = await import('@/core/persistence/TauriFileSystem');
+                const { saveProject } = await import('@/core/persistence/projectIO');
+                const { createEmptyProject } = await import('@/core/schema/ProjectFileSchema');
 
-            // Save to sws.projectIndex (Dashboard)
-            console.error('[NewProjectDialog] Manually saving to project index');
-            const projectListItem = {
-                projectId: newProject.id,
-                projectName: newProject.name,
-                projectNumber: newProject.projectNumber || undefined,
-                clientName: newProject.clientName || undefined,
-                entityCount: newProject.entityCount,
-                createdAt: newProject.createdAt,
-                modifiedAt: newProject.modifiedAt,
-                storagePath: `project-${newProject.id}`,
-                isArchived: newProject.isArchived
-            };
+                // Show native save dialog
+                const filePath = await TauriFileSystem.saveFileDialog(projectName.trim());
+                
+                if (!filePath) {
+                    // User cancelled the dialog
+                    setIsLoading(false);
+                    return;
+                }
 
-            // Manual persistence backup due to test env reliability issues
-            try {
-                const existing = localStorage.getItem('sws.projectIndex');
-                const state = existing
-                    ? JSON.parse(existing).state
-                    : { projects: [], recentProjectIds: [], loading: false };
+                // Create ProjectFile format
+                const projectFile = createEmptyProject(projectName.trim());
+                projectFile.projectId = newId;
+                projectFile.projectNumber = newProject.projectNumber ?? undefined;
+                projectFile.clientName = newProject.clientName ?? undefined;
+                projectFile.location = newProject.location ?? undefined;
+                projectFile.scope = newProject.scope;
+                projectFile.siteConditions = newProject.siteConditions;
+                projectFile.createdAt = now;
+                projectFile.modifiedAt = now;
+                projectFile.isArchived = false;
 
-                state.projects = [projectListItem, ...(state.projects || [])];
+                // Save to file
+                const saveResult = await saveProject(projectFile, filePath);
+                
+                if (!saveResult.success) {
+                    console.error('[NewProjectDialog] File save failed:', saveResult.error);
+                    alert(`Failed to save project: ${saveResult.error}`);
+                    setIsLoading(false);
+                    return;
+                }
 
-                localStorage.setItem('sws.projectIndex', JSON.stringify({
-                    state,
-                    version: 0
-                }));
-                console.error('[NewProjectDialog] Manual save success');
-            } catch (e) {
-                console.error('[NewProjectDialog] Manual save failed', e);
+                // Add to project list with filePath
+                const projectListItem = {
+                    projectId: newProject.id,
+                    projectName: newProject.name,
+                    projectNumber: newProject.projectNumber ?? undefined,
+                    clientName: newProject.clientName ?? undefined,
+                    entityCount: newProject.entityCount,
+                    createdAt: newProject.createdAt,
+                    modifiedAt: newProject.modifiedAt,
+                    storagePath: filePath,
+                    isArchived: newProject.isArchived,
+                    filePath: filePath, // Track file path for Tauri
+                };
+
+                addProjectToList(projectListItem);
+
+                // Also save to canvas store
+                addProject(newProject);
+
+            } else {
+                // Web Mode: Use existing localStorage logic
+                addProject(newProject);
+
+                const projectListItem = {
+                    projectId: newProject.id,
+                    projectName: newProject.name,
+                    projectNumber: newProject.projectNumber ?? undefined,
+                    clientName: newProject.clientName ?? undefined,
+                    entityCount: newProject.entityCount,
+                    createdAt: newProject.createdAt,
+                    modifiedAt: newProject.modifiedAt,
+                    storagePath: `project-${newProject.id}`,
+                    isArchived: newProject.isArchived
+                };
+
+                // Manual persistence backup due to test env reliability issues
+                try {
+                    const existing = localStorage.getItem('sws.projectIndex');
+                    const state = existing
+                        ? JSON.parse(existing).state
+                        : { projects: [], recentProjectIds: [], loading: false };
+
+                    state.projects = [projectListItem, ...(state.projects || [])];
+
+                    localStorage.setItem('sws.projectIndex', JSON.stringify({
+                        state,
+                        version: 0
+                    }));
+                    console.log('[NewProjectDialog] Manual save success');
+                } catch (e) {
+                    console.error('[NewProjectDialog] Manual save failed', e);
+                }
+
+                addProjectToList(projectListItem);
             }
-
-            addProjectToList(projectListItem);
 
             onOpenChange(false);
             resetForm();

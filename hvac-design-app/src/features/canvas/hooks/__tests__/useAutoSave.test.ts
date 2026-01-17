@@ -104,7 +104,7 @@ describe('useAutoSave - Storage Functions', () => {
   });
 
   it('should save project to localStorage', () => {
-    const projectId = '11111111-1111-1111-1111-111111111111';
+    const projectId = '11111111-1111-4111-8111-111111111111';
     const result = saveProjectToStorage(projectId, basePayload(projectId));
 
     expect(result.success).toBe(true);
@@ -112,7 +112,7 @@ describe('useAutoSave - Storage Functions', () => {
   });
 
   it('should load project from localStorage', () => {
-    const projectId = '11111111-1111-1111-1111-111111111111';
+    const projectId = '11111111-1111-4111-8111-111111111111';
     saveProjectToStorage(projectId, basePayload(projectId));
 
     const loaded = loadProjectFromStorage(projectId);
@@ -122,7 +122,7 @@ describe('useAutoSave - Storage Functions', () => {
   });
 
   it('should fall back to backup when primary is corrupted', () => {
-    const projectId = '11111111-1111-1111-1111-111111111111';
+    const projectId = '11111111-1111-4111-8111-111111111111';
     saveProjectToStorage(projectId, basePayload(projectId));
     saveBackupToStorage(projectId, basePayload(projectId));
     localStorage.setItem(`hvac-project-${projectId}`, 'corrupted');
@@ -133,7 +133,7 @@ describe('useAutoSave - Storage Functions', () => {
   });
 
   it('should delete project from localStorage', () => {
-    const projectId = '11111111-1111-1111-1111-111111111111';
+    const projectId = '11111111-1111-4111-8111-111111111111';
     saveProjectToStorage(projectId, basePayload(projectId));
 
     const result = deleteProjectFromStorage(projectId);
@@ -156,9 +156,9 @@ describe('useAutoSave - Hook Behavior', () => {
       snapToGrid: true,
     });
     useProjectStore.setState({
-      currentProjectId: '22222222-2222-2222-2222-222222222222',
+      currentProjectId: '22222222-2222-4222-8222-222222222222',
       projectDetails: {
-        projectId: '22222222-2222-2222-2222-222222222222',
+        projectId: '22222222-2222-4222-8222-222222222222',
         projectName: 'Test Project',
         projectNumber: 'TP-001',
         clientName: 'Test Client',
@@ -183,7 +183,7 @@ describe('useAutoSave - Hook Behavior', () => {
       result.current.saveNow();
     });
 
-    const saved = loadProjectFromStorage('22222222-2222-2222-2222-222222222222');
+    const saved = loadProjectFromStorage('22222222-2222-4222-8222-222222222222');
     expect(saved).toBeTruthy();
     expect(saved?.payload.project.projectName).toBe('Test Project');
   });

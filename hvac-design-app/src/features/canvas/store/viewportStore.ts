@@ -31,7 +31,9 @@ interface ViewportActions {
   toggleGrid: () => void;
   setGridSize: (size: number) => void;
   toggleSnap: () => void;
+  zoomToSelection: (bounds: { x: number; y: number; width: number; height: number }) => void;
 }
+
 
 type ViewportStore = ViewportState & ViewportActions;
 
@@ -147,6 +149,33 @@ export const useViewportStore = create<ViewportStore>()(
         state.zoom = DEFAULT_ZOOM;
       }),
 
+    zoomToSelection: (bounds) =>
+      set((state) => {
+        if (typeof window === 'undefined') {
+          return;
+        }
+
+        const canvasWidth = window.innerWidth * 0.7;
+        const canvasHeight = window.innerHeight * 0.8;
+        const padding = 50;
+
+        if (bounds.width <= 0 || bounds.height <= 0) {
+          return;
+        }
+
+        const effectivePadding = Math.min(padding, canvasWidth / 4, canvasHeight / 4);
+        const zoomX = Math.max(0.1, (canvasWidth - effectivePadding * 2) / bounds.width);
+        const zoomY = Math.max(0.1, (canvasHeight - effectivePadding * 2) / bounds.height);
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.min(zoomX, zoomY)));
+
+        const centerX = bounds.x + bounds.width / 2;
+        const centerY = bounds.y + bounds.height / 2;
+        state.panX = canvasWidth / 2 - centerX * newZoom;
+        state.panY = canvasHeight / 2 - centerY * newZoom;
+        state.zoom = newZoom;
+      }),
+
+
     toggleGrid: () =>
       set((state) => {
         state.gridVisible = !state.gridVisible;
@@ -170,6 +199,8 @@ export const usePan = () => useViewportStore((state) => ({ x: state.panX, y: sta
 export const useGridVisible = () => useViewportStore((state) => state.gridVisible);
 export const useSnapToGrid = () => useViewportStore((state) => state.snapToGrid);
 export const useGridSize = () => useViewportStore((state) => state.gridSize);
+export const usePanAndZoom = () => useViewportStore((state) => ({ panX: state.panX, panY: state.panY, zoom: state.zoom }));
+
 
 // Actions hook (per naming convention)
 export const useViewportActions = () =>
@@ -184,6 +215,7 @@ export const useViewportActions = () =>
     toggleGrid: state.toggleGrid,
     setGridSize: state.setGridSize,
     toggleSnap: state.toggleSnap,
+    zoomToSelection: state.zoomToSelection,
   }));
 
 // Note: Viewport constants (MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, etc.) are now

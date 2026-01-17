@@ -3,34 +3,34 @@
 ## 1. Overview
 
 ### Purpose
-This document describes the browser-based flow for accessing and opening existing HVAC projects in the Canvas App. Users can open projects from the dashboard (IndexedDB), recent list, or import from file (.hvac/.json) via browser upload.
+This document describes the browser-based flow for accessing and opening existing HVAC projects in the Canvas App using IndexedDB, recent history, and file import.
 
 ### Scope
 - Accessing Dashboard with project list
 - Browsing and searching existing projects
 - Opening projects from recent list
-- Opening projects from file system (Import)
+- Importing projects from local file (browser upload)
 - Opening projects from cloud storage (if configured)
 - Project preview and metadata display
-- Handling project open errors and recovery
+- Handling open errors and recovery
 
 ### User Personas
-- **Primary**: Experienced HVAC designers managing multiple active projects
-- **Secondary**: Team members accessing shared projects
+- **Primary**: HVAC designers managing multiple active projects in a browser
+- **Secondary**: Team members accessing shared projects through imports
 - **Tertiary**: Project managers reviewing project status and progress
 
 ### Success Criteria
-- User can locate and open desired project within 3 clicks
-- Recent projects list shows last 5 accessed projects
-- Search and filters help locate specific projects quickly
-- Projects open within 2 seconds (typical size)
-- Error messages clearly explain issues (e.g. Quota Exceeded) and provide recovery options
+- User can locate and open a project within 3 clicks
+- Recent list shows last 5 accessed projects
+- Search and filters locate projects quickly
+- Typical projects open within 2 seconds
+- Storage and file errors surface with recovery guidance
 
 ### Platform Summary (Hybrid/Web)
-- **Storage**: IndexedDB (persistent) + localStorage (recent list)
-- **File I/O**: Browser `<input type="file">` for opening, Blob download for saving
-- **Offline**: Cached projects available without network, but cloud sync requires connection
-- **Quota**: Subject to browser storage limits (quota management required)
+- Storage: IndexedDB (projects) + localStorage (recents)
+- File I/O: Browser file upload and download only
+- Offline: Cached projects can open without network
+- Quota: Subject to browser storage limits
 
 ## 2. PRD References
 
@@ -40,114 +40,166 @@ This document describes the browser-based flow for accessing and opening existin
 - **Section 6.2: Project Persistence** - Browser storage persistence
 
 ### Key Requirements Addressed
-- REQ-PO-001: Application must display list of existing projects on Dashboard
-- REQ-PO-002: Users must be able to open projects with single click
-- REQ-PO-003: Projects must load within 2 seconds
-- REQ-PO-007: Users must be able to import projects from file system
+- REQ-PO-001: Show list of existing projects on Dashboard
+- REQ-PO-002: Open projects with single click from list
+- REQ-PO-004: Search and filter help locate projects
+- REQ-PO-007: Import projects from file system
 
 ## 3. Prerequisites
 
 ### User Prerequisites
-- Existing project saved in browser storage or available as file
+- Existing project stored in browser storage or available as file
 - Browser supports IndexedDB
 
 ### System Prerequisites
 - Dashboard loads successfully
-- IndexedDB initialized
+- IndexedDB initialized and available
+- Project schema validation ready
+
+### Data Prerequisites
+- Project metadata indexed for search
+- Recent list present in localStorage (if any)
+
+### Technical Prerequisites
+- `ProjectService` configured for web storage
+- `IDBService` available for persistence
+- `SearchService` available for filtering
 
 ## 4. User Journey Steps
 
-### Step 1: Accessing Dashboard and Project List
+### Step 1: Access Dashboard and Project List
 
 **User Actions:**
-1. User launches HVAC Canvas App in browser
-2. User views Dashboard page
-3. User observes project list (fetched from IndexedDB)
+1. User opens the app URL
+2. User lands on Dashboard
+3. User scans Recent Projects and All Projects
 
 **System Response:**
-1. System queries IndexedDB for all projects
-2. System displays Dashboard with "Recent Projects" and "All Projects"
-3. System renders project cards with thumbnails
-4. System displays empty state if IndexedDB is empty
+1. Query IndexedDB for all projects
+2. Render Recent Projects (last 5) and All Projects
+3. Display empty state if no projects exist
 
 **Visual State:**
-(Standard Dashboard Layout)
+```
+┌────────────────────────────────────────────────┐
+│ HVAC Canvas App           [Search] [+ New]     │
+├────────────────────────────────────────────────┤
+│ Recent Projects                                  │
+│ ┌──────────┐ ┌──────────┐                        │
+│ │ Thumb    │ │ Thumb    │                        │
+│ │ Project  │ │ Project  │                        │
+│ └──────────┘ └──────────┘                        │
+│ All Projects                                     │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│ │ Thumb    │ │ Thumb    │ │ Thumb    │           │
+│ └──────────┘ └──────────┘ └──────────┘           │
+└────────────────────────────────────────────────┘
+```
 
-### Step 2: Searching and Filtering Projects
+**User Feedback:**
+- Thumbnails help identify projects quickly
+- Empty state guides user to import or create new
 
-**User Actions:**
-1. User types in search box
-2. User applies filters
+**Related Elements:**
+- `DashboardPage`
+- `ProjectCard`
+- `ProjectGrid`
 
-**System Response:**
-1. System filters in-memory project list (client-side filtering)
-2. Updates grid in real-time
-3. Debounces input for performance
+---
 
-### Step 3: Opening Project from Dashboard
-
-**User Actions:**
-1. User clicks "Open" on a project card
-
-**System Response:**
-1. System retrieves project ID
-2. System reads full project object from IndexedDB
-3. System validates schema
-4. System hydrates stores (`ProjectStore`, `EntityStore`, etc.)
-5. System navigates to Canvas route `/canvas/:id`
-6. System updates "Recent Projects" in localStorage
-
-### Step 4: Opening Project from File System (Import)
-
-**User Actions:**
-1. User clicks "File > Open from File..." (or Import)
-2. Browser file picker opens
-
-**System Response:**
-1. System triggers `<input type="file" accept=".hvac,.json">`
-2. User selects file
-3. System reads file using `FileReader` API
-4. System parses JSON content and validates schema
-5. System loads project into memory
-6. **Prompt**: "Save this project to your local dashboard?"
-   - **Yes**: Save to IndexedDB (if quota allows)
-   - **No**: Open properly in "Transient Mode" (not persisted)
-7. System navigates to Canvas
-
-### Step 5: Auto-Opening Last Project
+### Step 2: Search and Filter
 
 **User Actions:**
-1. User revisits the app URL
+1. Type a query in search box
+2. Apply sort or active/archived filter
 
 **System Response:**
-1. System checks `localStorage` for `lastActiveProjectId`
-2. System attempts to load ID from IndexedDB
-3. If found, displays notification "Opening last project..."
-4. Auto-loads project and redirects to Canvas
+1. Filter projects in memory after IndexedDB load
+2. Debounce input (300ms) for performance
+3. Display count: "Showing X of Y projects"
+
+**User Feedback:**
+- Results update in real time
+- Clear button resets filters
+
+---
+
+### Step 3: Open from Dashboard
+
+**User Actions:**
+1. Click "Open" on a project card
+
+**System Response:**
+1. Load project by ID from IndexedDB
+2. Validate schema and hydrate stores
+3. Update recents in localStorage
+4. Navigate to `/canvas/{projectId}`
+
+**User Feedback:**
+- Toast: "Opening project..."
+- Canvas loads with project name in header
+
+---
+
+### Step 4: Import from File (Browser Upload)
+
+**User Actions:**
+1. Click File menu → "Open from File" (or Import)
+2. Choose a `.sws` file via browser picker
+
+**System Response:**
+1. Trigger `<input type="file" accept=".sws">`
+2. Read file with FileReader
+3. Validate JSON schema
+4. Prompt: "Save to dashboard?"
+   - Yes: persist to IndexedDB (if quota allows)
+   - No: open in transient mode
+5. Navigate to Canvas
+
+**User Feedback:**
+- Inline banner indicates whether project is saved or transient
+
+---
+
+### Step 5: Auto-Open Last Project
+
+**User Actions:**
+1. User revisits app URL
+
+**System Response:**
+1. Read `lastActiveProjectId` from localStorage
+2. Attempt IndexedDB load
+3. If found, auto-open with notification
+
+**User Feedback:**
+- Toast: "Opening last project"
 
 ## 5. Edge Cases and Handling
 
 ### Edge Case 1: Browser Storage Cleared
-- **Scenario**: User cleared browser data.
-- **Handling**: Dashboard is empty. User must import projects from backup files or cloud.
+- Dashboard empty; user prompted to import or create
 
 ### Edge Case 2: Quota Exceeded on Import
-- **Scenario**: User imports large project, IndexedDB is full.
-- **Handling**: Show "Storage Full" warning. Offer to open in "Transient Mode" (memory only) or delete old projects.
+- Show "Storage full" warning
+- Offer transient open or cleanup
 
-### Edge Case 3: Corrupted IndexedDB Data
-- **Scenario**: JSON parse error from IDB.
-- **Handling**: Show error dialog. Suggest deleting the corrupted entry or attempting repair.
+### Edge Case 3: Corrupted IndexedDB Record
+- Show "Project data invalid" dialog
+- Offer delete corrupted entry
 
 ## 6. Error Scenarios and Recovery
 
 ### Error Scenario 1: IndexedDB Read Failure
-- **Message**: "Unable to access local storage."
-- **Recovery**: Check browser privacy settings (Private mode may block IDB).
+- Message: "Unable to access local storage"
+- Recovery: Check browser privacy settings
 
 ### Error Scenario 2: Invalid File Format
-- **Message**: "The selected file is not a valid HVAC project."
-- **Recovery**: Ensure file extension is `.hvac` or `.json` and structure matches schema.
+- Message: "File is not a valid HVAC project"
+- Recovery: Require `.sws` and valid schema
+
+### Error Scenario 3: Import Validation Failure
+- Message: "Project file schema mismatch"
+- Recovery: Show file version and suggest upgrade path
 
 ## 7. Keyboard Shortcuts
 
@@ -161,11 +213,25 @@ This document describes the browser-based flow for accessing and opening existin
 
 ### Components
 - `DashboardPage`
-- `FileImportDialog` (wraps file input)
+- `FileImportDialog`
+- `ProjectCard`
 
 ### Stores
-- `ProjectStore` (IndexedDB interaction)
+- `ProjectStore`
+- `projectListStore`
 
 ### Services
-- `ProjectService` (Web implementation)
+- `ProjectService` (Web)
 - `IDBService`
+- `SearchService`
+
+## 9. Visual Diagrams
+
+### Open Existing Project (Hybrid/Web)
+```
+Dashboard → IndexedDB Load → Canvas
+File Import → Validate → IndexedDB Save → Canvas
+```
+
+## Related Base Journey
+- [Open Existing Project](../UJ-PM-002-OpenExistingProject.md)

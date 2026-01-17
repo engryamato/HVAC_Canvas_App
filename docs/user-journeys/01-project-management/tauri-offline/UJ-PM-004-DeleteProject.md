@@ -1,60 +1,169 @@
 # [UJ-PM-004] Delete Project (Tauri Offline)
 
-## Overview
+## 1. Overview
 
 ### Purpose
-This document describes how users permanently delete projects in the Tauri Desktop platform.
+This document describes deleting projects stored on disk in the Tauri desktop runtime, including `.sws` file removal, backup cleanup, and UI updates.
 
 ### Scope
-- Deleting `.sws` files from disk
-- Cleaning up backup files and thumbnails
-- Confirmation flow
+- Initiating delete from the dashboard
+- Confirmation dialog and safety checks
+- Deleting `.sws`, `.sws.bak`, and thumbnails
+- Updating dashboard list and recents
 
 ### User Personas
-- **Primary**: Designers managing local files
+- **Primary**: Designers managing local file storage
+- **Secondary**: Users cleaning up offline archives
+- **Tertiary**: Admins enforcing retention rules
 
 ### Success Criteria
-- `.sws` file removed from File System
-- Backup (`.bak`) removed
-- UI updates immediately
+- Delete requires explicit confirmation
+- `.sws` and `.sws.bak` removed from disk
+- Dashboard list updates immediately
+- File errors surface with recovery guidance
 
 ### Platform Summary (Tauri Offline)
-- **Storage**: File System
-- **Deletion**: `fs.removeFile` (Direct delete)
-- **Recovery**: None (unless Recycle Bin integration added later)
-- **Files**: Deletes Project (`.sws`), Backup (`.bak`), Thumbnail (`.png`)
+- Storage: File system
+- File I/O: Direct disk deletion via Tauri APIs
+- Offline: Full offline support
+- Recovery: None unless OS recycle bin is enabled
 
-## Prerequisites
-- Project file exists and is writable
+## 2. PRD References
 
-## User Journey Steps
+### Related PRD Sections
+- **Section 4.1: Project Management** - Delete projects
+- **Section 4.2: File Operations** - File system integration
+
+### Key Requirements Addressed
+- FR-PM-004: Delete projects from dashboard
+- AC-PM-004-004: Project file deleted from disk
+- AC-PM-004-005: Removed from list immediately
+
+## 3. Prerequisites
+
+### User Prerequisites
+- User can access dashboard list
+- User understands deletion is permanent
+
+### System Prerequisites
+- Delete dialog available
+- File system access configured
+
+### Data Prerequisites
+- Project files exist on disk
+
+### Technical Prerequisites
+- `DeleteConfirmDialog` available
+- `ProjectIO` delete operation available
+- `projectListStore` for list updates
+
+## 4. User Journey Steps
 
 ### Step 1: Initiate Delete
-**User Action**: Click "Delete" icon on Dashboard.
-**System Response**: Show Confirmation Dialog. Show file path being deleted.
+
+**User Actions:**
+1. Click Delete icon on project card
+
+**System Response:**
+1. Show confirmation dialog with file details
+2. Disable Delete until name matches
+
+**Visual State:**
+```
+┌─────────────────────────────┐
+│ Delete Project?             │
+│ File: /Projects/Office.sws  │
+│ Type name to confirm: [___] │
+│ [Cancel]        [Delete]    │
+└─────────────────────────────┘
+```
+
+---
 
 ### Step 2: Confirm Deletion
-**User Action**: Type Project Name.
-**System Response**: Enable "Delete" button.
+
+**User Actions:**
+1. Type exact project name
+
+**System Response:**
+1. Enable Delete button
+2. Show validation checkmark
+
+---
 
 ### Step 3: Execute Deletion
-**User Action**: Click "Delete".
-**System Response**:
-1. Remove from `ProjectListStore`.
-2. Tauri Command: `delete_project(path)`.
-   - Delete `.sws`
-   - Delete `.sws.bak`
-   - Delete `.thumb.png`
-3. Update specific "Recent Projects" config file.
-4. Show Success Toast.
 
-### Step 4: UI Update
-**System Response**: Project card removed.
+**User Actions:**
+1. Click Delete
 
-## Edge Cases
-- **Permission Denied**: File read-only or system locked. Show "Access Denied" error.
-- **File Missing**: If file already gone, just remove from list (silent success).
+**System Response:**
+1. Remove project from `projectListStore`
+2. Delete `.sws`, `.sws.bak`, and thumbnail files
+3. Remove recents entry from config
+4. Show success toast
 
-## Related Elements
+**Tauri-Specific Behavior:**
+- Disk deletion is immediate and irreversible
+- Permission errors must be surfaced
+
+---
+
+### Step 4: Confirm UI Update
+
+**User Actions:**
+1. Observe dashboard list
+
+**System Response:**
+1. Project card removed
+2. Empty state shown if last project
+
+## 5. Edge Cases and Handling
+
+### Edge Case 1: Permission Denied
+- Show "Access denied" and keep project listed
+
+### Edge Case 2: File Missing
+- Remove project from list and show informational banner
+
+### Edge Case 3: File Locked
+- Show "File in use" warning and allow retry
+
+## 6. Error Scenarios and Recovery
+
+### Error Scenario 1: Delete Command Fails
+- Message: "Unable to delete project file"
+- Recovery: Retry or open file location
+
+### Error Scenario 2: Partial Cleanup
+- Message: "Backup could not be deleted"
+- Recovery: Keep main file removed and retry cleanup later
+
+## 7. Keyboard Shortcuts
+
+| Action | Shortcut |
+|--------|----------|
+| Delete (dialog confirm) | `Enter` |
+| Cancel | `Esc` |
+
+## 8. Related Elements
+
+### Components
 - `DeleteConfirmDialog`
+- `ProjectCard`
+
+### Stores
+- `projectListStore`
+
+### Services
+- `ProjectIO`
 - `FileSystemService`
+
+## 9. Visual Diagrams
+
+### Delete Project Flow (Tauri Offline)
+```
+Dashboard → Confirm Delete → Disk Remove → List Refresh
+```
+
+## Related Base Journey
+- [Delete Project](../UJ-PM-004-DeleteProject.md)

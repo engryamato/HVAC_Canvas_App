@@ -5,6 +5,8 @@ import { redo, undo, deleteEntities } from '@/core/commands';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { ToastProps } from '@/components/ui/Toast';
+
 
 type ToolType = 'select' | 'room' | 'duct' | 'equipment' | 'fitting' | 'note';
 
@@ -16,9 +18,11 @@ interface ShortcutOptions {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onZoomFit?: () => void;
+  onZoomToSelection?: (result: { success: boolean; message?: string }) => void;
   onEscape?: () => void;
   enabled?: boolean;
 }
+
 
 // Tool shortcut mappings
 const TOOL_SHORTCUTS: Record<string, ToolType> = {
@@ -59,6 +63,78 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
 
       const ctrlOrMeta = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
+
+      if (ctrlOrMeta && key === '1') {
+        event.preventDefault();
+        const { fitToContent } = useViewportStore.getState();
+        const entities = useEntityStore.getState().allIds
+          .map((id) => useEntityStore.getState().byId[id])
+          .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
+
+        if (entities.length > 0) {
+          const bounds = entities.reduce(
+            (acc, entity) => {
+              const { x, y } = entity.transform;
+              const width = entity.props?.width ?? 100;
+              const height = entity.props?.height ?? 100;
+              return {
+                minX: Math.min(acc.minX, x),
+                minY: Math.min(acc.minY, y),
+                maxX: Math.max(acc.maxX, x + width),
+                maxY: Math.max(acc.maxY, y + height),
+              };
+            },
+            { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+          );
+          fitToContent({
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY,
+          });
+        }
+        options.onZoomFit?.();
+        return;
+      }
+
+      if (ctrlOrMeta && key === '2') {
+        event.preventDefault();
+        const selectedIds = useSelectionStore.getState().selectedIds;
+        if (selectedIds.length === 0) {
+          options.onZoomToSelection?.({ success: false, message: 'No selection' });
+          return;
+        }
+
+        const entities = selectedIds
+          .map((id) => useEntityStore.getState().byId[id])
+          .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
+
+        const bounds = entities.reduce(
+          (acc, entity) => {
+            const { x, y } = entity.transform;
+            const width = entity.props?.width ?? 100;
+            const height = entity.props?.height ?? 100;
+            return {
+              minX: Math.min(acc.minX, x),
+              minY: Math.min(acc.minY, y),
+              maxX: Math.max(acc.maxX, x + width),
+              maxY: Math.max(acc.maxY, y + height),
+            };
+          },
+          { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+        );
+
+        useViewportStore.getState().zoomToSelection({
+          x: bounds.minX,
+          y: bounds.minY,
+          width: bounds.maxX - bounds.minX,
+          height: bounds.maxY - bounds.minY,
+        });
+
+        options.onZoomToSelection?.({ success: true });
+        return;
+      }
+
 
       // Undo: Ctrl+Z
       if (ctrlOrMeta && key === 'z' && !event.shiftKey) {

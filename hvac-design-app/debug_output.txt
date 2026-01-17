@@ -1,0 +1,112 @@
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+ Vitest  "deps.inline" is deprecated. If you rely on vite-node directly, use "server.deps.inline" instead. Otherwise, consider using "deps.optimizer.web.include"
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Users/User/Downloads/GitHub/HVAC_Canvas_App/hvac-design-app[39m
+
+[90mstdout[2m | src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22m[2museAutoSave - Storage Functions[2m > [22m[2mshould load project from localStorage[22m[39m
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_corrupt {
+  projectId: [32m'11111111-1111-1111-1111-111111111111'[39m,
+  source: [32m'primary'[39m
+}
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed { projectId: [32m'11111111-1111-1111-1111-111111111111'[39m }
+
+[90mstdout[2m | src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22m[2museAutoSave - Storage Functions[2m > [22m[2mshould fall back to backup when primary is corrupted[22m[39m
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_corrupt {
+  projectId: [32m'11111111-1111-1111-1111-111111111111'[39m,
+  source: [32m'primary'[39m
+}
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed { projectId: [32m'11111111-1111-1111-1111-111111111111'[39m }
+
+[90mstdout[2m | src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22m[2museAutoSave - Hook Behavior[2m > [22m[2mshould save when saveNow() is called[22m[39m
+[Telemetry] Skipping telemetry; endpoint not configured. manual_save_success {
+  projectId: [32m'22222222-2222-2222-2222-222222222222'[39m,
+  projectSizeBytes: [33m1487[39m,
+  source: [32m'manual'[39m
+}
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_corrupt {
+  projectId: [32m'22222222-2222-2222-2222-222222222222'[39m,
+  source: [32m'primary'[39m
+}
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed { projectId: [32m'22222222-2222-2222-2222-222222222222'[39m }
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: [32m'22222222-2222-2222-2222-222222222222'[39m, source: [32m'auto'[39m }
+
+[90mstdout[2m | src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22m[2museAutoSave - Hook Behavior[2m > [22m[2mshould auto-save at interval[22m[39m
+[Telemetry] Skipping telemetry; endpoint not configured. auto_save_success {
+  projectId: [32m'22222222-2222-2222-2222-222222222222'[39m,
+  projectSizeBytes: [33m1851[39m,
+  source: [32m'auto'[39m
+}
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: [32m'22222222-2222-2222-2222-222222222222'[39m, source: [32m'auto'[39m }
+
+ [33mΓ¥»[39m src/features/canvas/hooks/__tests__/useAutoSave.test.ts [2m ([22m[2m7 tests[22m [2m|[22m [31m3 failed[39m[2m)[22m[90m 22[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22museAutoSave - Storage Functions[2m > [22mshould load project from localStorage[39m
+[31m     ΓåÆ expected undefined to be '11111111-1111-1111-1111-111111111111' // Object.is equality[39m
+[31m   [33mΓ¥»[31m src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22museAutoSave - Storage Functions[2m > [22mshould fall back to backup when primary is corrupted[39m
+[31m     ΓåÆ expected undefined to be 'backup' // Object.is equality[39m
+[31m   [33mΓ¥»[31m src/features/canvas/hooks/__tests__/useAutoSave.test.ts[2m > [22museAutoSave - Hook Behavior[2m > [22mshould save when saveNow() is called[39m
+[31m     ΓåÆ expected null to be truthy[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 3 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave - Storage Functions > should load project from localStorage
+AssertionError: expected undefined to be '11111111-1111-1111-1111-111111111111' // Object.is equality
+
+- Expected: 
+"11111111-1111-1111-1111-111111111111"
+
++ Received: 
+undefined
+
+ Γ¥» src/features/canvas/hooks/__tests__/useAutoSave.test.ts:120:47
+    118|     const loaded = loadProjectFromStorage(projectId);
+    119| 
+    120|     expect(loaded?.payload.project.projectId).toBe(projectId);
+       |                                               ^
+    121|     expect(loaded?.source).toBe('primary');
+    122|   });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/3]ΓÄ»
+
+ FAIL  src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave - Storage Functions > should fall back to backup when primary is corrupted
+AssertionError: expected undefined to be 'backup' // Object.is equality
+
+- Expected: 
+"backup"
+
++ Received: 
+undefined
+
+ Γ¥» src/features/canvas/hooks/__tests__/useAutoSave.test.ts:132:28
+    130|     const loaded = loadProjectFromStorage(projectId);
+    131| 
+    132|     expect(loaded?.source).toBe('backup');
+       |                            ^
+    133|   });
+    134| 
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/3]ΓÄ»
+
+ FAIL  src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave - Hook Behavior > should save when saveNow() is called
+AssertionError: expected null to be truthy
+
+- Expected: 
+null
+
++ Received: 
+false
+
+ Γ¥» src/features/canvas/hooks/__tests__/useAutoSave.test.ts:187:19
+    185| 
+    186|     const saved = loadProjectFromStorage('22222222-2222-2222-2222-2222ΓÇª
+    187|     expect(saved).toBeTruthy();
+       |                   ^
+    188|     expect(saved?.payload.project.projectName).toBe('Test Project');
+    189|   });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/3]ΓÄ»
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 13:33:12
+[2m   Duration [22m 965ms[2m (transform 107ms, setup 65ms, collect 247ms, tests 22ms, environment 270ms, prepare 63ms)[22m
+

@@ -3,33 +3,33 @@
 ## 1. Overview
 
 ### Purpose
-This document describes the desktop-based flow for accessing and opening existing HVAC projects in the Tauri application. Users can open projects from the dashboard (file system index), recent list, or directly via native OS file dialogs.
+This document describes the offline desktop flow for accessing and opening existing HVAC projects in the Tauri application using file-backed metadata, recent files, and native file dialogs.
 
 ### Scope
-- Accessing Dashboard with project list (scanned from Documents folder)
+- Accessing Dashboard with project list
 - Browsing and searching existing projects
 - Opening projects from recent list
-- Opening projects from file system (Native Dialog)
+- Opening projects from file system (native dialog)
 - Project preview and metadata display
-- Handling project open errors and recovery
+- Handling open errors and recovery
 
 ### User Personas
-- **Primary**: Experienced HVAC designers managing multiple active projects
-- **Secondary**: Team members accessing shared network drive projects
+- **Primary**: HVAC designers managing multiple active projects on desktop
+- **Secondary**: Team members accessing projects from a shared drive
 - **Tertiary**: Project managers reviewing project status
 
 ### Success Criteria
-- User can locate and open desired project within 3 clicks
-- Recent projects list shows last 5 accessed projects
-- Search and filters help locate specific projects quickly
-- Projects open within 2 seconds
-- Native file dialogs provide familiar experience
+- User can locate and open a project within 3 clicks
+- Recent list shows last 5 accessed projects
+- Search and filters locate projects quickly
+- Typical projects open within 2 seconds
+- File errors surface with clear recovery options
 
 ### Platform Summary (Tauri Offline)
-- **Storage**: File System (`.sws` files in specific directory or user-selected)
-- **File I/O**: Native OS Open/Save dialogs via Tauri APIs
-- **Offline**: Fully offline capable
-- **Backup**: Automatic `.sws.bak` generation
+- Storage: `.sws` files + `.sws.bak` backups on disk
+- File I/O: Native OS open dialogs via Tauri APIs
+- Offline: Fully offline capable
+- Recents: File paths stored in app config
 
 ## 2. PRD References
 
@@ -38,8 +38,9 @@ This document describes the desktop-based flow for accessing and opening existin
 - **Section 4.2: File Operations** - Native file system integration
 
 ### Key Requirements Addressed
-- REQ-PO-001: Application must display list of existing projects on Dashboard
-- REQ-PO-007: Users must be able to open projects from file system using native dialogs
+- REQ-PO-001: Show list of existing projects on Dashboard
+- REQ-PO-002: Open projects with single click
+- REQ-PO-007: Open projects via native dialogs
 
 ## 3. Prerequisites
 
@@ -50,91 +51,152 @@ This document describes the desktop-based flow for accessing and opening existin
 ### System Prerequisites
 - Tauri runtime initialized
 - File system access permissions granted
+- Project schema validation ready
+
+### Data Prerequisites
+- Project metadata indexed from disk
+- Recent list present in app config (if any)
+
+### Technical Prerequisites
+- `ProjectService` configured for file persistence
+- `ProjectIO` available for `.sws` reads
+- `SearchService` available for filtering
 
 ## 4. User Journey Steps
 
-### Step 1: Accessing Dashboard and Project List
+### Step 1: Access Dashboard and Project List
 
 **User Actions:**
-1. User launches HVAC Canvas App (Desktop)
-2. User views Dashboard page
-3. User observes project list (scanned from default Projects directory)
+1. Launch HVAC Canvas App (Desktop)
+2. View Dashboard
+3. Scan Recent Projects and All Projects
 
 **System Response:**
-1. System scans default directory (e.g., `Documents/HVAC Canvas/Projects`) for `.sws` files
-2. System reads metadata header from each file
-3. System displays Dashboard with "Recent Projects" and "All Projects"
-4. System renders project cards
+1. Scan default project directory for `.sws` files
+2. Read metadata headers from disk
+3. Render Recent Projects and All Projects
+4. Display empty state if no files found
 
-### Step 2: Searching and Filtering Projects
+**Visual State:**
+```
+┌────────────────────────────────────────────────┐
+│ HVAC Canvas Desktop       [Search] [+ New]     │
+├────────────────────────────────────────────────┤
+│ Recent Projects                                  │
+│ ┌──────────┐ ┌──────────┐                        │
+│ │ Thumb    │ │ Thumb    │                        │
+│ │ Project  │ │ Project  │                        │
+│ └──────────┘ └──────────┘                        │
+│ All Projects                                     │
+│ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│ │ Thumb    │ │ Thumb    │ │ Thumb    │           │
+│ └──────────┘ └──────────┘ └──────────┘           │
+└────────────────────────────────────────────────┘
+```
+
+**User Feedback:**
+- Thumbnails help identify projects quickly
+- Empty state guides user to open from file
+
+**Related Elements:**
+- `DashboardPage`
+- `ProjectCard`
+- `ProjectGrid`
+
+---
+
+### Step 2: Search and Filter
 
 **User Actions:**
-1. User types in search box
-2. User applies filters
+1. Type a query in search box
+2. Apply sort or active/archived filter
 
 **System Response:**
-1. System filters valid project list from scan
-2. Updates grid in real-time
+1. Filter in memory after file metadata scan
+2. Debounce input for performance
+3. Display count: "Showing X of Y projects"
 
-### Step 3: Opening Project from Dashboard
+**User Feedback:**
+- Results update in real time
+- Clear button resets filters
+
+---
+
+### Step 3: Open from Dashboard
 
 **User Actions:**
-1. User clicks "Open" on a project card
+1. Click "Open" on a project card
 
 **System Response:**
-1. System retrieves file path from project card
-2. System reads file content from disk using Tauri `fs` API
-3. System validates schema
-4. System hydrates stores
-5. System navigates to Canvas route `/canvas/:id`
-6. System updates "Recent Projects" list in persistent config file
+1. Resolve file path from metadata index
+2. Read `.sws` file from disk
+3. Validate schema and hydrate stores
+4. Update recents in app config
+5. Navigate to `/canvas/{projectId}`
 
-### Step 4: Opening Project from File System (Native)
+**User Feedback:**
+- Toast: "Opening project..."
+- Canvas loads with project name in header
+
+---
+
+### Step 4: Open from File (Native Dialog)
 
 **User Actions:**
-1. User clicks "File > Open..."
-2. Native OS File Dialog appears (Windows Explorer / macOS Finder)
+1. Click File menu → "Open..."
+2. Select a `.sws` file in native file dialog
 
 **System Response:**
-1. System calls `dialog.open({ filters: [{ name: 'HVAC Project', extensions: ['sws'] }] })`
-2. User selects file and clicks Open
-3. System receives file path
-4. System reads file and loads project
-5. System adds path to "Recent Projects"
+1. Call `dialog.open` with `.sws` filter
+2. Read file path and parse project
+3. Add file path to recents
+4. Navigate to Canvas
 
-### Step 5: Auto-Opening Last Project
+**User Feedback:**
+- Native dialog uses OS conventions
+- Toast confirms file opened
+
+---
+
+### Step 5: Auto-Open Last Project
 
 **User Actions:**
-1. User receives notification or auto-load on app start
+1. Launch app after previous session
 
 **System Response:**
-1. System checks `app.conf` for `lastActiveProjectPath`
-2. System verifies file still exists
-3. System auto-loads project
+1. Read `lastActiveProjectPath` from app config
+2. Verify file exists
+3. Auto-open if valid
+
+**User Feedback:**
+- Notification: "Opening last project"
 
 ## 5. Edge Cases and Handling
 
-### Edge Case 1: File Moved/Deleted
-- **Scenario**: User clicks Recent project, but file is gone.
-- **Handling**: Show "File not found" dialog. Offer to "Remove from Recent" or "Browse...".
+### Edge Case 1: File Moved or Deleted
+- Show "File not found" dialog
+- Offer "Remove from Recents" or "Browse..."
 
-### Edge Case 2: File Locked / Permission Denied
-- **Scenario**: File is open in another process or read-only.
-- **Handling**: Show "Access Denied" error. If locked, suggest closing other app.
+### Edge Case 2: Permission Denied or File Locked
+- Show "Access denied" error
+- Suggest closing other apps or adjusting permissions
 
 ### Edge Case 3: Corrupted File
-- **Scenario**: Header invalid or JSON parse fail.
-- **Handling**: Show error. Offer to try loading `.sws.bak` if available in same directory.
+- Show error and offer to load `.sws.bak`
 
 ## 6. Error Scenarios and Recovery
 
 ### Error Scenario 1: Disk Read Failure
-- **Message**: "Unable to read project file."
-- **Recovery**: Retry or check disk health/permissions.
+- Message: "Unable to read project file"
+- Recovery: Retry or check disk health
 
 ### Error Scenario 2: Legacy File Version
-- **Message**: "Project from older version detected."
-- **Recovery**: Auto-migrate data structure in memory. Warn that saving will update file version.
+- Message: "Project from older version detected"
+- Recovery: Auto-migrate in memory and warn on save
+
+### Error Scenario 3: Missing Recents Entry
+- Message: "Recent project path invalid"
+- Recovery: Remove entry and refresh list
 
 ## 7. Keyboard Shortcuts
 
@@ -148,11 +210,25 @@ This document describes the desktop-based flow for accessing and opening existin
 
 ### Components
 - `DashboardPage`
-- `NativeFileMenu` (Tauri integration)
+- `NativeFileMenu`
+- `ProjectCard`
 
 ### Stores
-- `ProjectStore` (File list + Metadata)
+- `ProjectStore`
+- `projectListStore`
 
 ### Services
-- `ProjectService` (Tauri implementation)
-- `FileSystemService` (Tauri APIs)
+- `ProjectService` (Tauri)
+- `ProjectIO`
+- `FileDialogService`
+
+## 9. Visual Diagrams
+
+### Open Existing Project (Tauri Offline)
+```
+Dashboard → File Scan → Open .sws → Canvas
+Native Dialog → Read File → Canvas
+```
+
+## Related Base Journey
+- [Open Existing Project](../UJ-PM-002-OpenExistingProject.md)

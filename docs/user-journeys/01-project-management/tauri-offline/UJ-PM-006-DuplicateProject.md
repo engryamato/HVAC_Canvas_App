@@ -1,54 +1,136 @@
 # [UJ-PM-006] Duplicate Project (Tauri Offline)
 
-## Overview
+## 1. Overview
 
 ### Purpose
-This document describes how users duplicate projects in the Tauri Desktop platform.
+This document describes duplicating projects on desktop, including file copy, metadata updates, and dashboard refresh.
 
 ### Scope
-- Cloning project files on disk
-- Generating unique filenames
+- Initiating duplication from the dashboard
+- Reading source `.sws` file
+- Writing new `.sws` and `.sws.bak`
+- Updating dashboard list
 
 ### User Personas
 - **Primary**: Designers creating variants
+- **Secondary**: Project managers creating templates
+- **Tertiary**: QA reviewers generating test copies
 
 ### Success Criteria
-- New `.sws` file created
-- New project appears in Dashboard
+- Duplicate created without modifying source project
+- New `.sws` file created with unique ID
+- Duplicate appears in dashboard list
+- File errors surface with recovery guidance
 
 ### Platform Summary (Tauri Offline)
-- **Storage**: File System
-- **Process**: Read File -> Parse -> Update Metadata -> Write New File
-- **Naming**: Ensure filename uniqueness (prevent overwrite)
+- Storage: `.sws` file + `.sws.bak` backup
+- File I/O: Direct disk read/write via Tauri
+- Offline: Full offline support
+- Naming: Ensure file name uniqueness
 
-## Prerequisites
-- Source file readable
-- Destination directory writable
+## 2. PRD References
 
-## User Journey Steps
+### Related PRD Sections
+- **Section 4.1: Project Management** - Duplicate projects
+- **Section 4.2: File Operations** - File system integration
 
-### Step 1: Initiate Duplication
-**User Action**: Click "Duplicate".
-**System Response**: Show "Duplicating...".
+### Key Requirements Addressed
+- FR-PM-006: Duplicate projects from dashboard
+- AC-PM-006-002: "- Copy" name suffix
+- AC-PM-006-003: Unique UUID
 
-### Step 2: Processing
-**System Response**:
-1. Read source file.
-2. Generate new ID.
-3. Generate new Name.
-4. Generate new Filename (`name-copy.sws`).
-5. Write new file.
-6. Copy thumbnail file (`.thumb.png`).
+## 3. Prerequisites
 
-### Step 3: Completion
-**System Response**:
-1. Add new file to `ProjectListStore`.
-2. Show Success Toast.
+### User Prerequisites
+- User can access dashboard list
+- User understands duplication creates a new project
 
-## Edge Cases
-- **Disk Full**: Write fails. Show error.
-- **Filename Collision**: Auto-increment counter (Copy 2, Copy 3).
+### System Prerequisites
+- Duplicate action enabled
+- File system access configured
 
-## Related Elements
+### Data Prerequisites
+- Source `.sws` file exists on disk
+
+### Technical Prerequisites
+- `ProjectIO` available for file operations
+- `projectListStore` for list updates
+
+## 4. User Journey Steps
+
+### Step 1: Duplicate from Dashboard
+
+**User Actions:**
+1. Click overflow menu → Duplicate
+
+**System Response:**
+1. Show loading state on card ("Duplicating...")
+2. Read source `.sws` file
+3. Clone metadata and entities
+4. Generate new UUID and "- Copy" name
+5. Write new `.sws` file
+6. Create `.sws.bak` backup
+7. Copy thumbnail if present
+8. Add duplicate to `projectListStore`
+
+**Visual State:**
+```
+┌──────────┐      ┌──────────┐
+│ Project  │  ->  │ Project  │
+│          │      │ - Copy   │
+└──────────┘      └──────────┘
+```
+
+**User Feedback:**
+- Success toast: "Project duplicated"
+- New project appears immediately in list
+
+## 5. Edge Cases and Handling
+
+### Edge Case 1: Disk Full
+- Show "Storage full" and block duplication
+
+### Edge Case 2: File Name Collision
+- Append incremental suffix ("Copy 2", "Copy 3")
+
+### Edge Case 3: Backup Write Failure
+- Warn user but keep main file intact
+
+## 6. Error Scenarios and Recovery
+
+### Error Scenario 1: File Write Failure
+- Message: "Unable to duplicate project"
+- Recovery: Retry or choose a different directory
+
+### Error Scenario 2: Thumbnail Copy Failure
+- Message: "Duplicate created without thumbnail"
+- Recovery: Regenerate thumbnail on next open
+
+## 7. Keyboard Shortcuts
+
+| Action | Shortcut |
+|--------|----------|
+| Duplicate (when focused) | `D` |
+
+## 8. Related Elements
+
+### Components
 - `ProjectCard`
+- `ProjectMenu`
+
+### Stores
+- `projectListStore`
+
+### Services
+- `ProjectIO`
 - `FileSystemService`
+
+## 9. Visual Diagrams
+
+### Duplicate Project Flow (Tauri Offline)
+```
+Project Menu → Copy .sws → Add to List
+```
+
+## Related Base Journey
+- [Duplicate Project](../UJ-PM-006-DuplicateProject.md)

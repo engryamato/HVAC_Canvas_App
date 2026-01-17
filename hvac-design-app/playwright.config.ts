@@ -56,6 +56,8 @@ export default defineConfig({
 
     /* Viewport size for consistent visual testing */
     viewport: { width: 1280, height: 720 },
+    hasTouch: true,
+
 
     /* Disable animations for consistent screenshots */
     // reducedMotion: 'reduce',

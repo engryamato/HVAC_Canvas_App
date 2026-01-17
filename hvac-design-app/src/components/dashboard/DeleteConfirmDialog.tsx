@@ -21,6 +21,7 @@ export interface DeleteConfirmDialogProps {
     projectName: string;
     entityCount?: number;
     modifiedAt?: string;
+    filePath?: string; // Tauri: absolute file path to .sws file
     onDeleted?: () => void;
 }
 
@@ -31,6 +32,7 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
     projectName,
     entityCount = 0,
     modifiedAt,
+    filePath,
     onDeleted,
 }) => {
     const [confirmText, setConfirmText] = useState('');
@@ -42,28 +44,28 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
     const isConfirmed = confirmText.trim() === projectName;
 
     const formatRelativeTime = (dateString?: string) => {
-        if (!dateString) return 'Unknown';
+        if (!dateString) {return 'Unknown';}
         const date = new Date(dateString);
         const now = new Date();
         const diffMs = now.getTime() - date.getTime();
         const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+        if (diffDays === 0) {return 'Today';}
+        if (diffDays === 1) {return 'Yesterday';}
+        if (diffDays < 7) {return `${diffDays} days ago`;}
+        if (diffDays < 30) {return `${Math.floor(diffDays / 7)} weeks ago`;}
         return date.toLocaleDateString();
     };
 
     const handleDelete = async () => {
-        if (!isConfirmed) return;
+        if (!isConfirmed) {return;}
 
         setIsDeleting(true);
         setError(null);
 
         try {
-            // Remove from store
-            removeProject(projectId);
+            // Remove from store (async in Tauri mode for file deletion)
+            await removeProject(projectId);
 
             // Close dialog
             onOpenChange(false);
@@ -82,7 +84,7 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
     };
 
     const handleClose = () => {
-        if (isDeleting) return;
+        if (isDeleting) {return;}
         setConfirmText('');
         setError(null);
         onOpenChange(false);
@@ -94,7 +96,7 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
                 className="sm:max-w-md"
                 data-testid="delete-confirm-dialog"
                 onPointerDownOutside={(e) => {
-                    if (isDeleting) e.preventDefault();
+                    if (isDeleting) {e.preventDefault();}
                 }}
             >
                 <DialogHeader>
@@ -122,6 +124,13 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
                         <p className="text-sm text-red-800">
                             <strong>⚠️ Warning:</strong> This action cannot be undone. The project file and all associated data will be permanently deleted.
                         </p>
+                        {filePath && (
+                            <div className="mt-2 space-y-1 text-xs text-red-700 font-mono">
+                                <p className="font-sans font-medium">Files to be deleted:</p>
+                                <p className="truncate" title={filePath}>• {filePath}</p>
+                                <p className="truncate" title={`${filePath}.bak`}>• {filePath}.bak</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Confirmation Input */}

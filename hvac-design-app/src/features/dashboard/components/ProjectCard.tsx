@@ -12,7 +12,7 @@ interface ProjectCardProps {
   onDelete: (projectId: string) => void;
   onArchive: (projectId: string) => void;
   onRestore: (projectId: string) => void;
-  onDuplicate: (projectId: string, newName: string) => void;
+  onDuplicate: (projectId: string) => void;
   onRename: (projectId: string, newName: string) => void;
 }
 
@@ -177,8 +177,7 @@ export function ProjectCard({
               Rename
             </button>
             <button data-testid="menu-duplicate-btn" onClick={() => {
-              const copyName = `${project.projectName} - Copy`;
-              onDuplicate(project.projectId, copyName);
+              onDuplicate(project.projectId);
               setShowMenu(false);
             }}>
               Duplicate

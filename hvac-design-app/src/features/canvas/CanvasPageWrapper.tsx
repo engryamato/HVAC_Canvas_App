@@ -14,6 +14,7 @@ import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog'
 import { useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
 import { loadProjectFromStorage, type LocalStoragePayload } from './hooks/useAutoSave';
+import { useAppStateStore } from '@/stores/useAppStateStore';
 
 interface CanvasPageWrapperProps {
   projectId: string;
@@ -95,6 +96,75 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
           modifiedAt: new Date().toISOString(),
         };
         loadProject(tutorialProject);
+        return;
+      }
+
+      // Check if we're in Tauri mode and have a file path
+      const isTauri = useAppStateStore.getState().isTauri;
+      const projectListItem = useProjectListStore.getState().projects.find(p => p.projectId === projectId);
+      
+      if (isTauri && projectListItem?.filePath) {
+        // Load from .sws file
+        void (async () => {
+          try {
+            const { loadProject: loadProjectFromFile } = await import('@/core/persistence/projectIO');
+            const result = await loadProjectFromFile(projectListItem.filePath!);
+            
+            if (!result.success || !result.project) {
+              setProjectError(`Failed to load project file: ${result.error || 'Unknown error'}`);
+              return;
+            }
+
+            // Check version compatibility
+            const proj = result.project as any; // Type assertion for dynamic import
+            const projVersion = proj.version ?? '1.0.0';
+            logger.debug(`[CanvasPageWrapper] Project: ${proj.projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
+
+            if (compareVersions(projVersion, APP_VERSION) > 0) {
+              logger.debug('[CanvasPageWrapper] Version mismatch detected');
+              setProjectVersion(projVersion);
+              setVersionWarning(true);
+              return;
+            }
+
+            // Convert ProjectFile to the format expected by loadProject
+            const projectData = {
+              id: proj.projectId,
+              name: proj.projectName,
+              projectNumber: proj.projectNumber ?? '',
+              clientName: proj.clientName ?? '',
+              location: proj.location ?? '',
+              scope: proj.scope ?? { details: [], materials: [], projectType: 'Commercial' },
+              siteConditions: proj.siteConditions ?? {
+                elevation: '0',
+                outdoorTemp: '70',
+                indoorTemp: '70',
+                windSpeed: '0',
+                humidity: '50',
+                localCodes: ''
+              },
+              createdAt: proj.createdAt,
+              modifiedAt: proj.modifiedAt,
+            };
+
+            // Hydrate stores from file
+            if (result.project.entities) {
+              useEntityStore.getState().hydrate(result.project.entities);
+            }
+            if (result.project.viewportState) {
+              useViewportStore.setState({
+                panX: result.project.viewportState.panX,
+                panY: result.project.viewportState.panY,
+                zoom: result.project.viewportState.zoom,
+              });
+            }
+
+            loadProject(projectData);
+          } catch (error) {
+            logger.error('[CanvasPageWrapper] Failed to load from file:', error);
+            setProjectError('Unable to load project file. The file may be corrupted or inaccessible.');
+          }
+        })();
         return;
       }
 

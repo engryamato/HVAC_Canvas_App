@@ -74,7 +74,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         setEditDialogOpen(true);
     };
 
-    const handleDuplicate = () => {
+    const handleDuplicate = async () => {
         setMenuOpen(false);
 
         // Generate unique copy name with smart naming
@@ -104,17 +104,32 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             ? `${cleanName} - Copy`
             : `${cleanName} - Copy ${newNumber}`;
 
-        duplicateProject(project.id, copyName);
+        try {
+            await duplicateProject(project.id, copyName);
+        } catch (error) {
+            console.error('[ProjectCard] Failed to duplicate project:', error);
+            alert('Failed to duplicate project. Please try again.');
+        }
     };
 
-    const handleArchive = () => {
+    const handleArchive = async () => {
         setMenuOpen(false);
-        archiveProject(project.id);
+        try {
+            await archiveProject(project.id);
+        } catch (error) {
+            console.error('[ProjectCard] Failed to archive project:', error);
+            alert('Failed to archive project. Please try again.');
+        }
     };
 
-    const handleRestore = () => {
+    const handleRestore = async () => {
         setMenuOpen(false);
-        restoreProject(project.id);
+        try {
+            await restoreProject(project.id);
+        } catch (error) {
+            console.error('[ProjectCard] Failed to restore project:', error);
+            alert('Failed to restore project. Please try again.');
+        }
     };
 
     const handleDelete = () => {
@@ -268,6 +283,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 projectName={project.name}
                 entityCount={project.entityCount}
                 modifiedAt={project.modifiedAt}
+                filePath={(project as any).filePath} // Tauri file path if available
             />
 
             {/* Edit Project Dialog */}

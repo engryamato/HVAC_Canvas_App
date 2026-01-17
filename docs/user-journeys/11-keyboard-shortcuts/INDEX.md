@@ -2,6 +2,11 @@
 
 This section is split by delivery mode:
 
+## [Core / Shared](./UJ-KB-001-CanvasShortcuts.md)
+Universal shortcuts handled by React hooks.
+- [UJ-KB-001 Canvas Shortcuts (Core)](./UJ-KB-001-CanvasShortcuts.md)
+
+
 ## [Hybrid / Web](./hybrid/)
 Browser-based shortcuts. Handles:
 - **Conflict Management** (`Ctrl+W`, `Ctrl+T` reserved)

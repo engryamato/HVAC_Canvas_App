@@ -9,9 +9,13 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { exportProjectPDF } from '@/features/export/pdf';
-import { createEmptyProjectFile } from '@/core/schema';
-import { useCurrentProjectId, useProjectDetails } from '@/core/store/project.store';
+import { useExport } from '@/features/export/hooks/useExport';
+import { useEntityStore } from '@/core/store/entityStore';
+import { useProjectStore } from '@/core/store/project.store';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
+import { useViewportStore } from '@/features/canvas/store/viewportStore';
+import { useHistoryStore } from '@/core/commands/historyStore';
+import { type Project } from '@/types/project';
 
 export interface ExportReportDialogProps {
     open: boolean;
@@ -33,19 +37,9 @@ export interface ExportOptions {
     orientation: Orientation;
 }
 
-function download(content: string, filename: string, mime: string) {
-    const blob = new Blob([content], { type: mime });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
+// Helper removed in favor of useExport hook
 
 export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogProps) {
-    const projectId = useCurrentProjectId();
-    const projectDetails = useProjectDetails();
-
     const [options, setOptions] = useState<ExportOptions>({
         reportType: 'full',
         includeDetails: true,
@@ -57,9 +51,11 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
         orientation: 'portrait',
     });
 
-    const [exporting, setExporting] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [status, setStatus] = useState('');
+    const { exportProject, isExporting, error } = useExport();
+    
+    // Store selectors for data aggregation
+    const currentProjectId = useProjectStore((state) => state.currentProjectId);
+    const projectDetails = useProjectStore((state) => state.projectDetails);
 
     const handleReportTypeChange = (type: ReportType) => {
         const newOptions = { ...options, reportType: type };
@@ -100,64 +96,66 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
     };
 
     const handleExport = async () => {
-        if (!projectId) {
+        if (!currentProjectId || !projectDetails) {
             return;
         }
 
-        setExporting(true);
-        setProgress(0);
-        setStatus('Collecting project data...');
+        // Aggregate project data from stores
+        const entityStore = useEntityStore.getState();
+        const viewportStore = useViewportStore.getState();
+        const preferences = usePreferencesStore.getState();
+        const historyStore = useHistoryStore.getState();
 
-        try {
-            // Simulate progress stages
-            setProgress(20);
-            setStatus('Generating calculations...');
-            await new Promise((r) => setTimeout(r, 300));
-
-            setProgress(50);
-            setStatus('Creating PDF...');
-            await new Promise((r) => setTimeout(r, 300));
-
-            // Create project file for export
-            const project = createEmptyProjectFile(
-                projectId,
-                projectDetails?.projectName ?? 'Untitled Project'
-            );
-
-            setProgress(80);
-            setStatus('Finalizing report...');
-
-            const result = await exportProjectPDF(project, {
-                pageSize: options.paperSize,
-            });
-
-            setProgress(100);
-            setStatus('Complete!');
-
-            if (result.success && result.data) {
-                download(
-                    result.data,
-                    `${projectDetails?.projectName ?? 'project'}-report.pdf`,
-                    'application/pdf'
-                );
-                setTimeout(() => {
-                    onOpenChange(false);
-                    setExporting(false);
-                    setProgress(0);
-                    setStatus('');
-                }, 500);
-            } else {
-                throw new Error(result.error ?? 'Export failed');
+        const project: Project = {
+            projectId: currentProjectId,
+            projectName: projectDetails.projectName,
+            projectNumber: projectDetails.projectNumber || undefined,
+            clientName: projectDetails.clientName || undefined,
+            location: projectDetails.location || undefined,
+            createdAt: projectDetails.createdAt,
+            modifiedAt: new Date().toISOString(),
+            entities: {
+                byId: entityStore.byId,
+                allIds: entityStore.allIds,
+            },
+            viewportState: {
+                panX: viewportStore.panX,
+                panY: viewportStore.panY,
+                zoom: viewportStore.zoom,
+            },
+            settings: {
+                unitSystem: preferences.unitSystem,
+                gridSize: preferences.gridSize,
+                gridVisible: viewportStore.gridVisible,
+            },
+            commandHistory: {
+                commands: historyStore.past,
+                currentIndex: Math.max(historyStore.past.length - 1, 0),
+            },
+            scope: {
+                projectType: 'HVAC Design', // Default
+                details: [],
+            },
+            siteConditions: {
+                // TODO: Add site conditions to store
             }
-        } catch (error) {
-            console.error('Export error:', error);
-            setStatus('Export failed');
-            setExporting(false);
+        };
+
+        const result = await exportProject(project, {
+            includeMetadata: options.includeDetails,
+            includeCalculations: options.includeCalculations,
+            includeEntities: options.includeEntities,
+            includeBOM: options.includeBOM,
+            orientation: options.orientation,
+        });
+
+        if (result.success) {
+            onOpenChange(false);
         }
     };
 
     const handleCancel = () => {
-        if (!exporting) {
+        if (!isExporting) {
             onOpenChange(false);
         }
     };
@@ -172,19 +170,24 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                     <DialogTitle>Export Project Report</DialogTitle>
                 </DialogHeader>
 
-                {exporting ? (
+                {isExporting ? (
                     <div className="py-8 space-y-4">
                         <p className="text-center font-medium">Generating Report...</p>
                         <div className="w-full bg-slate-200 rounded-full h-2">
                             <div
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${progress}%` }}
+                                className="bg-blue-600 h-2 rounded-full animate-pulse"
+                                style={{ width: '100%' }}
                             />
                         </div>
-                        <p className="text-center text-sm text-slate-500">{status}</p>
+                        <p className="text-center text-sm text-slate-500">Please wait...</p>
                     </div>
                 ) : (
                     <div className="space-y-6 py-4">
+                        {error && (
+                            <div className="p-3 bg-red-50 text-red-600 rounded-md text-sm">
+                                Error: {error}
+                            </div>
+                        )}
                         {/* Report Type */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
@@ -309,17 +312,17 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                     <Button
                         variant="ghost"
                         onClick={handleCancel}
-                        disabled={exporting}
+                        disabled={isExporting}
                         data-testid="export-cancel-btn"
                     >
                         Cancel
                     </Button>
                     <Button
                         onClick={handleExport}
-                        disabled={exporting}
+                        disabled={isExporting}
                         data-testid="export-btn"
                     >
-                        {exporting ? 'Exporting...' : 'Export'}
+                        {isExporting ? 'Exporting...' : 'Export'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

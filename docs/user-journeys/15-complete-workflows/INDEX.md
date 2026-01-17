@@ -2,6 +2,11 @@
 
 This section is split by delivery mode:
 
+## [Core / Shared](./UJ-WF-001-SmallOfficeDesign.md)
+Platform-agnostic design workflow.
+- [UJ-WF-001 Small Office Design (Core)](./UJ-WF-001-SmallOfficeDesign.md)
+
+
 ## [Hybrid / Web](./hybrid/)
 Browser-based lifecycle. Handles:
 - **Zero Install** (URL Access)

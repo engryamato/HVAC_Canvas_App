@@ -2,6 +2,11 @@
 
 This section is split by delivery mode:
 
+## [Core / Shared](./UJ-SIDE-001-EquipmentLibrary.md)
+Core drag-and-drop logic.
+- [UJ-SIDE-001 Equipment Library (Core)](./UJ-SIDE-001-EquipmentLibrary.md)
+
+
 ## [Hybrid / Web](./hybrid/)
 Touch-first interactions. Handles:
 - **Touch Events** (Drag & Drop)

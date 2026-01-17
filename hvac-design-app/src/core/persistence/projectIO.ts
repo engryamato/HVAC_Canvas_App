@@ -1,6 +1,16 @@
-import { readTextFile, writeTextFile, exists } from './filesystem';
+import { readTextFile, writeTextFile, exists, removeFile } from './filesystem';
 import { serializeProject, deserializeProject, migrateProject } from './serialization';
 import type { ProjectFile } from '@/core/schema';
+
+/**
+ * Error codes for I/O operations
+ */
+export type IOErrorCode = 
+  | 'FILE_NOT_FOUND' 
+  | 'PERMISSION_DENIED' 
+  | 'VALIDATION_ERROR' 
+  | 'PARSE_ERROR' 
+  | 'UNKNOWN';
 
 /**
  * Result of an I/O operation
@@ -8,6 +18,7 @@ import type { ProjectFile } from '@/core/schema';
 export interface IOResult {
   success: boolean;
   error?: string;
+  errorCode?: IOErrorCode;
 }
 
 /**
@@ -16,6 +27,8 @@ export interface IOResult {
 export interface LoadResult extends IOResult {
   project?: ProjectFile;
   loadedFromBackup?: boolean;
+  migrated?: boolean;
+  originalVersion?: string;
 }
 
 /**
@@ -27,13 +40,22 @@ export async function saveProject(project: ProjectFile, path: string): Promise<I
     // Serialize project
     const serialized = serializeProject(project);
     if (!serialized.success || !serialized.data) {
-      return { success: false, error: serialized.error };
+      return { 
+        success: false, 
+        error: serialized.error,
+        errorCode: 'VALIDATION_ERROR'
+      };
     }
 
     // Create backup of existing file
     if (await exists(path)) {
-      const currentContent = await readTextFile(path);
-      await writeTextFile(`${path}.bak`, currentContent);
+      try {
+        const currentContent = await readTextFile(path);
+        await writeTextFile(`${path}.bak`, currentContent);
+      } catch (backupError) {
+        console.warn('[ProjectIO] Backup creation failed:', backupError);
+        // Continue with save even if backup fails
+      }
     }
 
     // Write new file
@@ -41,9 +63,20 @@ export async function saveProject(project: ProjectFile, path: string): Promise<I
 
     return { success: true };
   } catch (error) {
+    // Determine error code based on error message
+    let errorCode: IOErrorCode = 'UNKNOWN';
+    const errorMessage = error instanceof Error ? error.message : 'Save failed';
+    
+    if (errorMessage.includes('permission') || errorMessage.includes('denied')) {
+      errorCode = 'PERMISSION_DENIED';
+    } else if (errorMessage.includes('not found') || errorMessage.includes('ENOENT')) {
+      errorCode = 'FILE_NOT_FOUND';
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Save failed',
+      error: errorMessage,
+      errorCode
     };
   }
 }
@@ -131,3 +164,105 @@ export function getBackupPath(projectPath: string): string {
   return `${projectPath}.bak`;
 }
 
+/**
+ * Delete a project file and its backup
+ * @param path Path to .sws file
+ * @returns IOResult with success status
+ */
+export async function deleteProject(path: string): Promise<IOResult> {
+  try {
+    // Delete main file
+    if (await exists(path)) {
+      await removeFile(path);
+    } else {
+      return {
+        success: false,
+        error: 'Project file not found',
+        errorCode: 'FILE_NOT_FOUND'
+      };
+    }
+    
+    // Delete backup if exists
+    const backupPath = getBackupPath(path);
+    if (await exists(backupPath)) {
+      try {
+        await removeFile(backupPath);
+      } catch (backupError) {
+        console.warn('[ProjectIO] Backup deletion failed:', backupError);
+        // Continue even if backup deletion fails
+      }
+    }
+    
+    return { success: true };
+  } catch (error) {
+    let errorCode: IOErrorCode = 'UNKNOWN';
+    const errorMessage = error instanceof Error ? error.message : 'Delete failed';
+    
+    if (errorMessage.includes('permission') || errorMessage.includes('denied')) {
+      errorCode = 'PERMISSION_DENIED';
+    }
+    
+    return {
+      success: false,
+      error: errorMessage,
+      errorCode
+    };
+  }
+}
+
+/**
+ * Duplicate a project file with a new name and UUID
+ * @param sourcePath Path to source .sws file
+ * @param newName Name for the duplicated project
+ * @param destinationPath Optional destination path (defaults to same directory with "-Copy" suffix)
+ * @returns LoadResult with duplicated project data
+ */
+export async function duplicateProject(
+  sourcePath: string,
+  newName: string,
+  destinationPath?: string
+): Promise<LoadResult> {
+  try {
+    // Load source project
+    const loadResult = await loadProject(sourcePath);
+    if (!loadResult.success || !loadResult.project) {
+      return loadResult;
+    }
+    
+    // Create duplicate with new ID and name
+    const now = new Date().toISOString();
+    const duplicate: ProjectFile = {
+      ...loadResult.project,
+      projectId: crypto.randomUUID(),
+      projectName: newName,
+      createdAt: now,
+      modifiedAt: now
+    };
+    
+    // Determine destination path
+    const destPath = destinationPath || sourcePath.replace(/\.sws$/, '-Copy.sws');
+    
+    // Save duplicate
+    const saveResult = await saveProject(duplicate, destPath);
+    
+    if (saveResult.success) {
+      return {
+        success: true,
+        project: duplicate
+      };
+    } else {
+      return {
+        success: false,
+        error: saveResult.error,
+        errorCode: saveResult.errorCode
+      };
+    }
+    
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Duplication failed',
+      errorCode: 'UNKNOWN'
+    };
+  }
+}

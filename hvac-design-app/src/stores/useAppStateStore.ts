@@ -5,11 +5,16 @@ interface AppState {
     hasLaunched: boolean;
     isFirstLaunch: boolean;
     isLoading: boolean;
+    
+    // Environment detection (UJ-GS-006)
+    isTauri: boolean;
+    environment: 'web' | 'desktop';
 
     // Actions
     setHasLaunched: (value: boolean) => void;
     setLoading: (value: boolean) => void;
     resetFirstLaunch: () => void;
+    setEnvironment: (isTauri: boolean) => void;
 }
 
 export const useAppStateStore = create<AppState>()(
@@ -18,10 +23,18 @@ export const useAppStateStore = create<AppState>()(
             hasLaunched: false,
             isFirstLaunch: true,
             isLoading: true,
+            
+            // Default to web environment until detection runs
+            isTauri: false,
+            environment: 'web' as const,
 
             setHasLaunched: (value) => set({ hasLaunched: value, isFirstLaunch: !value }),
             setLoading: (value) => set({ isLoading: value }),
             resetFirstLaunch: () => set({ hasLaunched: false, isFirstLaunch: true }),
+            setEnvironment: (isTauri) => set({ 
+                isTauri, 
+                environment: isTauri ? 'desktop' : 'web' 
+            }),
         }),
         {
             name: 'hvac-app-storage',

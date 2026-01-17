@@ -5,6 +5,11 @@
 
 This section is split by delivery mode:
 
+## [Core / Shared](./UJ-SET-001-ApplicationSettings.md)
+Global settings logic shared across platforms.
+- [UJ-SET-001 Application Settings (Core)](./UJ-SET-001-ApplicationSettings.md)
+
+
 ## [Hybrid / Web](./hybrid/)
 Browser-based configuration. Handles:
 - **LocalStorage** Persistence

@@ -64,7 +64,7 @@ export const ProjectSettingsSchema = z.object({
   gridVisible: z.boolean().default(true),
   scale: z.string().optional().describe('User-facing scale label e.g. "1/4 inch = 1 foot"'),
   planScale: PlanScaleSchema.optional(),
-});
+}).passthrough();
 
 export type ProjectSettings = z.infer<typeof ProjectSettingsSchema>;
 
@@ -143,7 +143,7 @@ export const ProjectFileSchema = z.object({
       currentIndex: z.number().int().nonnegative(),
     })
     .optional(),
-});
+}).passthrough();
 
 export type ProjectFile = z.infer<typeof ProjectFileSchema>;
 

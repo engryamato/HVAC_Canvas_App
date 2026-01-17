@@ -1,22 +1,14 @@
-# Export User Journeys
+# User Journey: Export & Output
 
+This section covers the user journeys related to exporting project data and drawings from the HVAC Canvas App.
 
-> **Implementation**: See [Platform Adapters](../../architecture/01-platform-adapters.md) for shared interface design.
+## Documents
 
-This section is split by delivery mode:
+- **[UJ-EXP-001: Export to PDF](UJ-EXP-001-ExportToPDF.md)**
+  Exporting the canvas drawing to a PDF document for printing or sharing.
 
-## [Hybrid / Web](./hybrid/)
-Browser-based exports. Handles:
-- **Blob Generation** (`URL.createObjectURL`)
-- **Auto-Download** (`<a download>`)
-- [UJ-EXP-001 Export PDF](./hybrid/UJ-EXP-001-ExportToPDF.md)
-- [UJ-EXP-002 Export CSV](./hybrid/UJ-EXP-002-ExportToCSV.md)
-- [UJ-EXP-003 Export JSON](./hybrid/UJ-EXP-003-ExportToJSON.md)
+- **[UJ-EXP-002: Export to CSV (BOM)](UJ-EXP-002-ExportToCSV.md)**
+  Generating a Bill of Materials (BOM) in CSV format for cost estimation and ordering.
 
-## [Tauri / Native](./tauri-offline/)
-Desktop-based exports. Handles:
-- **Native Save Dialog** (`dialog.save`)
-- **Direct File Write** (`fs.write`)
-- [UJ-EXP-001 Export PDF](./tauri-offline/UJ-EXP-001-ExportToPDF.md)
-- [UJ-EXP-002 Export CSV](./tauri-offline/UJ-EXP-002-ExportToCSV.md)
-- [UJ-EXP-003 Export JSON](./tauri-offline/UJ-EXP-003-ExportToJSON.md)
+- **[UJ-EXP-003: Export to JSON](UJ-EXP-003-ExportToJSON.md)**
+  Saving and exporting the full project state in JSON format for backup or transfer.

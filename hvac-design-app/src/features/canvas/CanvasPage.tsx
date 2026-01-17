@@ -4,6 +4,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { CanvasContainer } from './components/CanvasContainer';
 import { ZoomControls } from './components/ZoomControls';
+import { Minimap } from './components/Minimap';
+
 import { useAutoSave } from './hooks';
 import styles from './CanvasPage.module.css';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
@@ -91,7 +93,14 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     return () => window.removeEventListener('keydown', handleKeydown);
   }, [triggerSave]);
 
-  useKeyboardShortcuts();
+  useKeyboardShortcuts({
+    onZoomToSelection: (result) => {
+      if (!result.success && result.message) {
+        pushToast(result.message, 'warning');
+      }
+    },
+  });
+
 
   // Temporary simplified project name retrieval for AppShell header
   // Ideally this comes from the project store
@@ -107,9 +116,11 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
       />
 
       {/* Zoom Controls - positioned absolute or managed by AppShell/Viewport */}
-      <div className="absolute bottom-8 right-4 z-10">
+      <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
+        <Minimap />
         <ZoomControls />
       </div>
+
 
       <TutorialOverlay />
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
