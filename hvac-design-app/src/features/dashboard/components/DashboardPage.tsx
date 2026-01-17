@@ -272,7 +272,7 @@ export function DashboardPage() {
             {/* Main Content */}
             <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
                 {/* Tab Navigation */}
-                <div className="flex items-center gap-4 mb-6" data-testid="project-tabs">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }} data-testid="project-tabs">
                     <button
                         onClick={() => setActiveTab('active')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${

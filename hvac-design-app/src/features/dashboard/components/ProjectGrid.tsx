@@ -14,9 +14,15 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
 
     const handleDuplicate = (projectId: string) => {
         const project = allProjects.find(p => p.projectId === projectId);
-        if (!project) return;
+        if (!project) {return;}
 
-        let newName = `${project.projectName} - Copy`;
+        // Robustly determine source name
+        const rawName = project.projectName;
+        const sourceName = (rawName && rawName !== 'undefined' && rawName.trim() !== '') 
+            ? rawName 
+            : 'Untitled Project';
+
+        let newName = `${sourceName} - Copy`;
         let counter = 2;
 
         // Check against ALL projects to ensure unique name

@@ -153,7 +153,9 @@ export function ProjectCard({
             </button>
           </div>
         ) : (
-          <h3 className={styles.title}>{project.projectName}</h3>
+          <h3 className={styles.title}>
+            {(project.projectName && project.projectName !== 'undefined') ? project.projectName : 'Untitled Project'}
+          </h3>
         )}
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button

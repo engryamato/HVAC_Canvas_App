@@ -46,7 +46,7 @@ export function useProjectFilters(projects: ProjectListItem[]): UseProjectFilter
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
             result = result.filter((p) => {
-                const matchesName = p.projectName.toLowerCase().includes(query);
+                const matchesName = (p.projectName || '').toLowerCase().includes(query);
                 const matchesClient = p.clientName?.toLowerCase().includes(query) ?? false;
                 const matchesNumber = p.projectNumber?.toLowerCase().includes(query) ?? false;
                 return matchesName || matchesClient || matchesNumber;
@@ -56,7 +56,9 @@ export function useProjectFilters(projects: ProjectListItem[]): UseProjectFilter
         // 3. Sort
         result.sort((a, b) => {
             if (sortBy === 'name') {
-                const comparison = a.projectName.localeCompare(b.projectName);
+                const nameA = a.projectName || '';
+                const nameB = b.projectName || '';
+                const comparison = nameA.localeCompare(nameB);
                 return sortOrder === 'asc' ? comparison : -comparison;
             } else {
                 // Sort by date (modifiedAt)
