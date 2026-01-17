@@ -1,5 +1,4 @@
-'use client';
-
+import { Suspense } from 'react';
 import { DashboardPage } from '@/features/dashboard';
 
 /**
@@ -7,5 +6,9 @@ import { DashboardPage } from '@/features/dashboard';
  * Implements UJ-PM-002: Opening Existing Projects
  */
 export default function Dashboard() {
-    return <DashboardPage />;
+    return (
+        <Suspense fallback={<div>Loading Dashboard...</div>}>
+            <DashboardPage />
+        </Suspense>
+    );
 }
