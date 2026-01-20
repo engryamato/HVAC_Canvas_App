@@ -63,8 +63,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ open, onOp
             setProjectNumber(project.projectNumber || '');
             setClientName(project.clientName || '');
             
-            // Fetch full project data from project-storage for additional fields
-            const projectStorageRaw = localStorage.getItem('project-storage');
+            // Fetch full project data from sws.projectDetails for additional fields
+            const projectStorageRaw = localStorage.getItem('sws.projectDetails');
             if (projectStorageRaw) {
                 try {
                     const projectStorage = JSON.parse(projectStorageRaw);
@@ -161,7 +161,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ open, onOp
                 modifiedAt: new Date().toISOString(),
             };
 
-            // Update project-storage (full project data)
+            // Update sws.projectDetails (full project data)
             updateProjectStore(project.projectId, updatedProject);
 
             // Update sws.projectIndex (list item)

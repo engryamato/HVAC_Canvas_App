@@ -41,10 +41,16 @@ export const useProjectStore = create<ProjectStoreState>()(
         (set, get) => ({
             projects: [],
 
-            addProject: (project) =>
+            addProject: (project) => {
+                // Guard against undefined/empty names
+                const validatedProject = {
+                    ...project,
+                    name: project.name?.trim() || 'Untitled Project',
+                };
                 set((state) => ({
-                    projects: [project, ...state.projects],
-                })),
+                    projects: [validatedProject, ...state.projects],
+                }));
+            },
 
             getProject: (id) => {
                 return get().projects.find((p) => p.id === id);
@@ -63,7 +69,7 @@ export const useProjectStore = create<ProjectStoreState>()(
                 })),
         }),
         {
-            name: 'project-storage',
+            name: 'sws.projectDetails',
         }
     )
 );

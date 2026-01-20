@@ -32,7 +32,7 @@ async function seedProjects(page: Page, projects: any[]) {
 
         // ALSO seed the legacy/main project store (used by CanvasPage)
         // Map ProjectListItem fields to Project fields
-        const legacyStorageKey = 'project-storage';
+        const legacyStorageKey = 'sws.projectDetails';
         const legacyExisting = JSON.parse(localStorage.getItem(legacyStorageKey) || '{"state":{"projects":[]}}');
 
         const mappedProjects = projectsData.map((p: any) => ({
@@ -53,7 +53,7 @@ async function seedProjects(page: Page, projects: any[]) {
         }));
 
         legacyExisting.state.projects = [...(legacyExisting.state.projects || []), ...mappedProjects];
-        console.log('[SeedProjects] Writing to project-storage:', JSON.stringify(legacyExisting));
+        console.log('[SeedProjects] Writing to sws.projectDetails:', JSON.stringify(legacyExisting));
         localStorage.setItem(legacyStorageKey, JSON.stringify(legacyExisting));
     }, projects);
     await page.reload();
@@ -280,8 +280,8 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
             existing.state.recentProjectIds = [project.projectId, ...(existing.state.recentProjectIds || [])].slice(0, 5);
             localStorage.setItem(dashboardKey, JSON.stringify(existing));
 
-            // 2. Add to Legacy store (project-storage) for Canvas rendering
-            const legacyKey = 'project-storage';
+            // 2. Add to sws.projectDetails store for Canvas rendering
+            const legacyKey = 'sws.projectDetails';
             const legacyExisting = JSON.parse(localStorage.getItem(legacyKey) || '{"state":{"projects":[]}}');
             const mappedForLegacy = {
                 id: project.projectId,

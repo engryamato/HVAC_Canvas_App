@@ -9,6 +9,7 @@ import { Minimap } from './components/Minimap';
 import { useAutoSave } from './hooks';
 import styles from './CanvasPage.module.css';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
+import { useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -38,7 +39,9 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   // Note: Project data is now managed internally by stores via CanvasPageWrapper and useAutoSave
 
   // Ensure preferences are loaded
+  // Ensure preferences are loaded
   usePreferencesStore((state) => state.projectFolder);
+  const currentProjectId = useProjectStore((state) => state.currentProjectId);
 
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
@@ -72,12 +75,15 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
       return;
     }
 
-    const recovered = localStorage.getItem('hvac-backup-recovered');
-    if (recovered) {
-      pushToast('Backup loaded', 'warning');
-      localStorage.removeItem('hvac-backup-recovered');
+    // Only check for recovery after we have a project ID (meaning load attempted)
+    if (currentProjectId) {
+      const recovered = localStorage.getItem('hvac-backup-recovered');
+      if (recovered) {
+        pushToast('Backup loaded', 'warning');
+        localStorage.removeItem('hvac-backup-recovered');
+      }
     }
-  }, [pushToast]);
+  }, [pushToast, currentProjectId]);
 
   const triggerSave = saveNow;
 

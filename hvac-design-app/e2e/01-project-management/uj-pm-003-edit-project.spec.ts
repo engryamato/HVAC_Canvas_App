@@ -59,7 +59,7 @@ async function seedTestProject(
         isArchived: false,
     };
 
-    // Seed to project-storage
+    // Seed to sws.projectDetails (full project data)
     const projectStorage = {
         state: {
             projects: [project],
@@ -67,7 +67,7 @@ async function seedTestProject(
         version: 0,
     };
     await page.evaluate((data) => {
-        localStorage.setItem('project-storage', JSON.stringify(data));
+        localStorage.setItem('sws.projectDetails', JSON.stringify(data));
     }, projectStorage);
 
     // Seed to sws.projectIndex

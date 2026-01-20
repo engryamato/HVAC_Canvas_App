@@ -51,8 +51,13 @@ export const useProjectListStore = create<ProjectListStore>()(
       loading: false,
 
       addProject: (project) => {
-        logger.debug('[ProjectListStore] Adding project:', project);
-        set((state) => ({ projects: [project, ...state.projects] }));
+        // Guard against undefined/empty project names
+        const validatedProject = {
+          ...project,
+          projectName: project.projectName?.trim() || 'Untitled Project',
+        };
+        logger.debug('[ProjectListStore] Adding project:', validatedProject);
+        set((state) => ({ projects: [validatedProject, ...state.projects] }));
       },
 
       updateProject: (projectId, updates) => {

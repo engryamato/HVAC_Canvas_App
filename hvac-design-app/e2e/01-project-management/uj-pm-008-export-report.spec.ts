@@ -50,7 +50,7 @@ async function navigateToCanvas(page: Page) {
     // Seed to localStorage
     await page.goto('/dashboard');
     await page.evaluate((data) => {
-        localStorage.setItem('project-storage', JSON.stringify({
+        localStorage.setItem('sws.projectDetails', JSON.stringify({
             state: { projects: [data.project] },
             version: 0,
         }));

@@ -58,7 +58,7 @@ async function seedTestProjects(page: Page, names: string[]) {
         };
     });
 
-    // Seed to project-storage
+    // Seed to sws.projectDetails
     const projectStorage = {
         state: {
             projects: projectData.map((p) => p.project),
@@ -66,7 +66,7 @@ async function seedTestProjects(page: Page, names: string[]) {
         version: 0,
     };
     await page.evaluate((data) => {
-        localStorage.setItem('project-storage', JSON.stringify(data));
+        localStorage.setItem('sws.projectDetails', JSON.stringify(data));
     }, projectStorage);
 
     // Seed to sws.projectIndex

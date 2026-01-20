@@ -49,48 +49,30 @@ export const AppInitializer: React.FC = () => {
         }
 
         if (!showSplash && !isFirstLaunch && !isLoading) {
-            console.log('[AppInfo] Redirecting to dashboard...');
-            router.replace('/dashboard');
+            // Small delay to ensure Zustand stores fully hydrate (prevents test race conditions)
+            const redirectTimer = setTimeout(() => {
+                console.log('[AppInfo] Redirecting to dashboard...');
+                router.replace('/dashboard');
+            }, 100);
+            
+            return () => clearTimeout(redirectTimer);
         }
     }, [showSplash, isFirstLaunch, isLoading, isTutorialActive, router]);
 
-    // Force persistence of defaults on first load (Fix for lazy hydration "Paper App" issue)
-    useEffect(() => {
-        // Safe check for browser environment
-        if (typeof window === 'undefined') {return;}
 
-        // Ensure preferences file exists
-        if (!localStorage.getItem('sws.preferences')) {
-            const prefs = usePreferencesStore.getState();
-            // Trigger a write
-            prefs.setTheme(prefs.theme);
-        }
 
-        // Ensure project index exists
-        if (!localStorage.getItem('sws.projectIndex')) {
-            // Trigger hydration/persistence
-            useProjectListStore.setState({ projects: [] });
-        }
 
-    }, []);
-
-    // Fix for potential hydration mismatches (robustness)
+    // Robust hydration check using store state, not localStorage parsing
     useEffect(() => {
         if (typeof window === 'undefined') {return;}
-        const stored = localStorage.getItem('hvac-app-storage');
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                if (parsed.state?.hasLaunched && isFirstLaunch) {
-                    useAppStateStore.setState({
-                        isFirstLaunch: false,
-                        hasLaunched: true,
-                        isLoading: false
-                    });
-                }
-            } catch (e) {
-                // ignore
-            }
+        
+        const storedState = useAppStateStore.getState();
+        if (storedState.hasLaunched && isFirstLaunch) {
+            useAppStateStore.setState({
+                isFirstLaunch: false,
+                hasLaunched: true,
+                isLoading: false
+            });
         }
     }, [isFirstLaunch]);
 

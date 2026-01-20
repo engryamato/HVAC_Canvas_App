@@ -60,7 +60,7 @@ async function ensureProjectOnDashboard(page: Page) {
             },
             version: 0,
         }));
-        localStorage.setItem('project-storage', JSON.stringify({
+        localStorage.setItem('sws.projectDetails', JSON.stringify({
             state: {
                 projects: [{
                     id: 'shell-test-project',

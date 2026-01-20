@@ -65,12 +65,16 @@ async function seedProjects(
 
     // Seed Storage
     await page.evaluate(({ projects, listItems }) => {
-        localStorage.setItem('project-storage', JSON.stringify({
+        localStorage.setItem('sws.projectDetails', JSON.stringify({
             state: { projects },
             version: 0
         }));
         localStorage.setItem('sws.projectIndex', JSON.stringify({
             state: { projects: listItems, recentProjectIds: [], loading: false },
+            version: 0
+        }));
+        localStorage.setItem('hvac-app-storage', JSON.stringify({
+            state: { hasLaunched: true },
             version: 0
         }));
     }, { projects, listItems });

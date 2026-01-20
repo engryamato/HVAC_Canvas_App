@@ -72,6 +72,28 @@ async function seedDashboardProject(page: Page, projectId: string, projectName: 
       },
       version: 0,
     }));
+
+    // Seed sws.projectDetails for useProjectStore (needed for Edit Dialog)
+    // Map to Project interface used by useProjectStore
+    const projectDetail = {
+      id: proj.projectId,
+      name: proj.projectName,
+      projectNumber: 'PM-3',
+      clientName: 'Acme Corp',
+      location: '123 Main St, Chicago, IL',
+      scope: { details: ['HVAC'], materials: [], projectType: 'Commercial' },
+      siteConditions: { elevation: '0', outdoorTemp: '70', indoorTemp: '70', windSpeed: '0', humidity: '50', localCodes: '' },
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString(),
+      entityCount: 0,
+      isArchived: false,
+      version: '1.0.0'
+    };
+    
+    localStorage.setItem('sws.projectDetails', JSON.stringify({
+      state: { projects: [projectDetail] },
+      version: 0
+    }));
   }, { projectId, projectName, filePath });
 }
 

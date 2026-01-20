@@ -65,7 +65,7 @@ async function seedTestProjects(page: Page, configs: Array<{ name: string; isArc
         version: 0,
     };
     await page.evaluate((data) => {
-        localStorage.setItem('project-storage', JSON.stringify(data));
+        localStorage.setItem('sws.projectDetails', JSON.stringify(data));
     }, projectStorage);
 
     // Seed to sws.projectIndex
