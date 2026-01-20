@@ -69,6 +69,20 @@ export const EQUIPMENT_TYPE_DEFAULTS: Record<
     depth: 48,
     height: 60,
   },
+  furnace: {
+    capacity: 80000,
+    staticPressure: 0.5,
+    width: 24,
+    depth: 36,
+    height: 48,
+  },
+  rtu: {
+    capacity: 12000,
+    staticPressure: 1.5,
+    width: 84,
+    depth: 48,
+    height: 36,
+  },
 };
 
 /**
@@ -80,6 +94,8 @@ export const EQUIPMENT_TYPE_LABELS: Record<EquipmentType, string> = {
   diffuser: 'Diffuser',
   damper: 'Damper',
   air_handler: 'Air Handling Unit',
+  furnace: 'Furnace',
+  rtu: 'RTU',
 };
 
 /**

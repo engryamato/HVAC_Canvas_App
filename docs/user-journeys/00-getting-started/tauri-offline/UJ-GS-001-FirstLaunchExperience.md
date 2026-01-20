@@ -59,7 +59,7 @@ This document describes the complete user experience when launching the HVAC Can
 ### System Prerequisites
 - Application successfully installed and configured
 - All dependencies and libraries loaded
-- Local storage/IndexedDB available for persistence
+- localStorage available for persistence
 - Network connectivity for template downloads (optional)
 - Sufficient disk space for project files (minimum 100MB recommended)
 
@@ -73,7 +73,7 @@ This document describes the complete user experience when launching the HVAC Can
 - Browser: Chrome 90+, Firefox 88+, Safari 14+, or Edge 90+
 - JavaScript enabled
 - Canvas API support
-- LocalStorage/IndexedDB enabled
+- localStorage enabled
 - No conflicting browser extensions
 
 ## 4. User Journey Steps
@@ -340,7 +340,7 @@ This document describes the complete user experience when launching the HVAC Can
 11. System enables "Create Project" button when valid
 12. System creates new project in ProjectStore on button click
 13. System initializes empty canvas or loads template
-14. System saves project to IndexedDB
+14. System saves project to localStorage
 15. System navigates to Canvas page with new project loaded
 16. System displays success toast: "Project created successfully!"
 

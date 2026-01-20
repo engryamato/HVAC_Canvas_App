@@ -11,39 +11,12 @@ import { test, expect, Page } from '@playwright/test';
  * @mode tauri-offline
  */
 
-async function openCanvas(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem('hvac-app-storage', JSON.stringify({
-      state: { hasLaunched: true },
-      version: 0,
-    }));
-  });
-
-  await page.goto('/dashboard');
-  await expect(page).toHaveURL(/dashboard/);
-
-  const projectCards = page.locator('[data-testid="project-card"]');
-  if ((await projectCards.count()) === 0) {
-    const emptyStateButton = page.getByTestId('empty-state-create-btn');
-    const newProjectButton = page.getByTestId('new-project-btn');
-    if (await emptyStateButton.isVisible()) {
-      await emptyStateButton.click();
-    } else {
-      await newProjectButton.click();
-    }
-    await page.getByTestId('project-name-input').fill('Note Creation Project');
-    await page.getByTestId('create-button').click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  } else {
-    await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  }
-}
+import { openCanvas } from '../../utils/test-utils';
 
 test.describe('UJ-EC-004: Add Note (Tauri Offline)', () => {
   test('Step 1: Activate Note Tool', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Note Creation Project');
     });
 
     await test.step('Step 1: Activate tool via shortcut', async () => {
@@ -56,7 +29,7 @@ test.describe('UJ-EC-004: Add Note (Tauri Offline)', () => {
 
   test('Step 2-4: Place and edit note', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Note Creation Project');
     });
 
     await test.step('Activate Note tool', async () => {

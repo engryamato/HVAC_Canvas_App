@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { openCanvas } from '../../utils/test-utils';
 
 /**
  * E2E Test Suite: Draw Fitting (Wye/Tee) (UJ-EC-006)
@@ -11,52 +12,31 @@ import { test, expect, Page } from '@playwright/test';
  * @mode tauri-offline
  */
 
-async function openCanvas(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem('hvac-app-storage', JSON.stringify({
-      state: { hasLaunched: true },
-      version: 0,
-    }));
-  });
 
-  await page.goto('/dashboard');
-  await expect(page).toHaveURL(/dashboard/);
-
-  const projectCards = page.locator('[data-testid="project-card"]');
-  if ((await projectCards.count()) === 0) {
-    const emptyStateButton = page.getByTestId('empty-state-create-btn');
-    const newProjectButton = page.getByTestId('new-project-btn');
-    if (await emptyStateButton.isVisible()) {
-      await emptyStateButton.click();
-    } else {
-      await newProjectButton.click();
-    }
-    await page.getByTestId('project-name-input').fill('Wye Fitting Project');
-    await page.getByTestId('create-button').click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  } else {
-    await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  }
-}
 
 test.describe('UJ-EC-006: Draw Fitting (Wye/Tee) (Tauri Offline)', () => {
   test('Step 1: Select Fitting Type', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Wye Fitting Project');
     });
 
-    await test.step('Step 1: Activate fitting tool and select wye', async () => {
+    await test.step('Step 1: Activate fitting tool and select tee', async () => {
       await page.keyboard.press('f');
       await expect(page.getByTestId('tool-fitting')).toHaveAttribute('aria-pressed', 'true');
-      await page.getByText('Wye', { exact: false }).click();
+      
+      // Select Tee
+      await expect(page.getByTestId('fitting-type-selector')).toBeVisible();
+      await page.getByTestId('fitting-type-tee').click();
+      await expect(page.getByTestId('fitting-type-tee')).toHaveAttribute('aria-pressed', 'true');
+      
+      // Status bar might just show "Fitting Tool" unless we update it to show type
       await expect(page.getByTestId('status-bar')).toContainText('Fitting');
     });
   });
 
   test('Step 2: Position and place fitting', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Wye Fitting Project');
     });
 
     await test.step('Place wye fitting', async () => {

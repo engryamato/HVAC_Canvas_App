@@ -184,68 +184,6 @@ export function DashboardPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [filters.searchQuery, focusedIndex, filteredProjects, setSearchQuery]);
 
-    // Empty state (only show when NO projects exist at all)
-    if (allProjectsRaw.length === 0) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" data-testid="dashboard-page">
-                {/* Header */}
-                <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-                    <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-900">Project Dashboard</h1>
-                            <p className="text-sm text-slate-500">Manage your HVAC design projects</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <FileMenu />
-                            {isTauri && (
-                                <button
-                                    onClick={handleOpenFromFile}
-                                    className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
-                                    data-testid="open-project-btn"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Open Project...
-                                </button>
-                            )}
-                            <button
-                                onClick={() => setIsDialogOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                data-testid="new-project-btn"
-                            >
-                                <Plus className="w-4 h-4" />
-                                New Project
-                            </button>
-                        </div>
-                    </div>
-                </header>
-                <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-                    <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>No projects yet</h1>
-                    <p style={{ color: '#666', marginBottom: '24px' }}>
-                        Create your first project to get started!
-                    </p>
-                    <button
-                        onClick={() => setIsDialogOpen(true)}
-                        style={{
-                            padding: '12px 24px',
-                            fontSize: '16px',
-                            background: '#0070f3',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                        }}
-                        data-testid="empty-state-create-btn"
-                    >
-                        Create New Project
-                    </button>
-                </div>
-                <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" data-testid="dashboard-page">
             {/* Header */}
@@ -322,15 +260,44 @@ export function DashboardPage() {
                     />
                 </div>
 
-                {/* Recent Projects Section - only show on Active tab */}
-                {activeTab === 'active' && <RecentProjectsSection projects={recentProjects} />}
+                {/* Content Area */}
+                {allProjectsRaw.length === 0 ? (
+                    // Empty State
+                    <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+                         <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>No projects yet</h1>
+                        <p style={{ color: '#666', marginBottom: '24px' }}>
+                            Create your first project to get started!
+                        </p>
+                        <button
+                            onClick={() => setIsDialogOpen(true)}
+                            style={{
+                                padding: '12px 24px',
+                                fontSize: '16px',
+                                background: '#0070f3',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                            data-testid="empty-state-create-btn"
+                        >
+                            Create New Project
+                        </button>
+                    </div>
+                ) : (
+                    // Project Lists
+                    <>
+                        {/* Recent Projects Section - only show on Active tab */}
+                        {activeTab === 'active' && <RecentProjectsSection projects={recentProjects} />}
 
-                {/* All Projects Section */}
-                <AllProjectsSection 
-                    projects={filteredProjects} 
-                    searchTerm={filters.searchQuery}
-                    emptyMessage={activeTab === 'archived' ? 'No archived projects' : undefined}
-                />
+                        {/* All Projects Section */}
+                        <AllProjectsSection 
+                            projects={filteredProjects} 
+                            searchTerm={filters.searchQuery}
+                            emptyMessage={activeTab === 'archived' ? 'No archived projects' : undefined}
+                        />
+                    </>
+                )}
             </div>
 
             <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />

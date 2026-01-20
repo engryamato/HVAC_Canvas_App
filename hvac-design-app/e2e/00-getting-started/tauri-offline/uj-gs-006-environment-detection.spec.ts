@@ -66,4 +66,21 @@ test.describe('UJ-GS-006: Environment Detection (Tauri Offline)', () => {
     await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole('button', { name: /rescan/i })).toBeVisible();
   });
+
+  test('blocks app when localStorage is unavailable', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'localStorage', {
+        value: {
+          getItem: () => { throw new Error('localStorage disabled'); },
+          setItem: () => { throw new Error('localStorage disabled'); },
+          removeItem: () => { throw new Error('localStorage disabled'); },
+          clear: () => { throw new Error('localStorage disabled'); },
+        },
+        configurable: true,
+      });
+    });
+
+    await page.goto('/');
+    await expect(page.getByTestId('device-warning')).toBeVisible({ timeout: 10000 });
+  });
 });

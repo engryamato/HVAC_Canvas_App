@@ -158,6 +158,39 @@ test.describe('OS-INIT-001: First Launch Initialization', () => {
             expect(projectIndex).not.toBeNull();
         });
 
+        test('should hydrate project index and track last active project', async ({ page }) => {
+            await page.goto('/');
+
+            await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });
+            await page.getByTestId('skip-tutorial-btn').click();
+            await expect(page).toHaveURL(/\/dashboard/);
+
+            const projectCards = page.locator('[data-testid="project-card"]');
+            if ((await projectCards.count()) === 0) {
+                const emptyStateButton = page.getByTestId('empty-state-create-btn');
+                const newProjectButton = page.getByTestId('new-project-btn');
+                if (await emptyStateButton.isVisible()) {
+                    await emptyStateButton.click();
+                } else {
+                    await newProjectButton.click();
+                }
+                await page.getByTestId('project-name-input').fill('Init Hydration Project');
+                await page.getByTestId('create-button').click();
+                await expect(page).toHaveURL(/\/canvas\//);
+            } else {
+                await projectCards.first().click();
+                await expect(page).toHaveURL(/\/canvas\//);
+            }
+
+            await expect.poll(async () => {
+                return page.evaluate(() => localStorage.getItem('sws.projectIndex'));
+            }).not.toBeNull();
+
+            await expect.poll(async () => {
+                return page.evaluate(() => localStorage.getItem('lastActiveProjectId'));
+            }).not.toBeNull();
+        });
+
         test('should persist only hasLaunched (partialize)', async ({ page }) => {
             await page.goto('/');
             await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });

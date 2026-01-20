@@ -45,7 +45,7 @@ it('should detect web environment correctly', () => {
 | Environment | Primary Storage | Backup | File Operations |
 |-------------|-----------------|--------|-----------------|
 | Desktop (Tauri) | File system (.sws) | localStorage | ✅ Full support |
-| Web Browser | localStorage | None | ❌ Disabled |
+| Web Browser | localStorage | None | ⚠️ Limited |
 
 **Validation Method**: E2E test
 ```typescript

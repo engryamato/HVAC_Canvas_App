@@ -110,24 +110,12 @@ test.describe('Basic Navigation and Interface Overview', () => {
         });
 
         test('should display auto-save status indicator in status bar', async ({ page }) => {
-            // Open a project to navigate to Canvas
             await page.click('[data-testid="project-card"]', { hasText: '', force: true });
-
-            // Wait for Canvas page to load
             await expect(page).toHaveURL(/\/canvas\//);
 
-            // Verify status bar shows auto-save indicator
             const statusBar = page.getByTestId('status-bar');
             await expect(statusBar).toBeVisible();
-
-            // Check for auto-save indicator text (based on current implementation)
-            const hasAutoSaveIndicator = await statusBar.evaluate(el => {
-                return el.textContent.includes('Saved');
-            });
-
-            // Note: Auto-save indicator may not be implemented yet
-            // This test documents the requirement and will pass when implemented
-            await expect(hasAutoSaveIndicator).toBeTruthy();
+            await expect(statusBar).toContainText(/saved/i);
         });
 
         test('should maintain consistent header and toolbar across Dashboard and Canvas', async ({ page }) => {

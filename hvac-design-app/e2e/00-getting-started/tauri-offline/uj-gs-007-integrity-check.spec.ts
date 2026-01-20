@@ -72,10 +72,39 @@ test.describe('UJ-GS-007: Integrity Check (Tauri Offline)', () => {
 
     await page.evaluate(() => {
       localStorage.setItem('hvac-app-storage', JSON.stringify({ state: { hasLaunched: true }, version: 0 }));
-      localStorage.setItem('hvac-backup-recovered', 'true');
     });
 
-    await page.goto('/canvas/backup-project');
+    const projectId = 'backup-project';
+    const payload = {
+      schemaVersion: '1.0.0',
+      projectId,
+      savedAt: new Date().toISOString(),
+      checksum: 'test-checksum',
+      payload: { project: { projectId, projectName: 'Backup Project' } }
+    };
+
+    await page.evaluate(({ projectId, payload }) => {
+      localStorage.setItem(`hvac-project-${projectId}`, 'corrupted');
+      localStorage.setItem(`hvac-project-${projectId}-backup`, JSON.stringify(payload));
+      localStorage.setItem('sws.projectIndex', JSON.stringify({
+        state: {
+          projects: [{
+            projectId,
+            projectName: 'Backup Project',
+            createdAt: new Date().toISOString(),
+            modifiedAt: new Date().toISOString(),
+            storagePath: `project-${projectId}`,
+            isArchived: false
+          }],
+          recentProjectIds: [],
+          loading: false
+        },
+        version: 0
+      }));
+    }, { projectId, payload });
+
+    await page.goto(`/canvas/${projectId}`);
+    await expect(page.getByTestId('canvas-area')).toBeVisible({ timeout: 10000 });
     await expect(page.getByText('Backup loaded')).toBeVisible({ timeout: 5000 });
   });
 

@@ -1,4 +1,7 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { openCanvas, ensurePropertiesPanelVisible } from '../../utils/test-utils';
+
+
 
 /**
  * E2E Test Suite: Place Equipment (UJ-EC-003)
@@ -11,39 +14,10 @@ import { test, expect, Page } from '@playwright/test';
  * @mode tauri-offline
  */
 
-async function openCanvas(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem('hvac-app-storage', JSON.stringify({
-      state: { hasLaunched: true },
-      version: 0,
-    }));
-  });
-
-  await page.goto('/dashboard');
-  await expect(page).toHaveURL(/dashboard/);
-
-  const projectCards = page.locator('[data-testid="project-card"]');
-  if ((await projectCards.count()) === 0) {
-    const emptyStateButton = page.getByTestId('empty-state-create-btn');
-    const newProjectButton = page.getByTestId('new-project-btn');
-    if (await emptyStateButton.isVisible()) {
-      await emptyStateButton.click();
-    } else {
-      await newProjectButton.click();
-    }
-    await page.getByTestId('project-name-input').fill('Equipment Placement Project');
-    await page.getByTestId('create-button').click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  } else {
-    await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  }
-}
-
 test.describe('UJ-EC-003: Place Equipment (Tauri Offline)', () => {
   test('Step 1: Activate Equipment Tool', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Equipment Placement Project');
     });
 
     await test.step('Step 1: Activate tool via shortcut', async () => {
@@ -57,7 +31,7 @@ test.describe('UJ-EC-003: Place Equipment (Tauri Offline)', () => {
 
   test('Step 2-4: Select and place equipment', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Equipment Placement Project');
     });
 
     await test.step('Activate Equipment tool', async () => {
@@ -66,8 +40,14 @@ test.describe('UJ-EC-003: Place Equipment (Tauri Offline)', () => {
     });
 
     await test.step('Step 2: Select Furnace', async () => {
-      await page.getByText('Furnace', { exact: false }).click();
-      await expect(page.getByTestId('status-bar')).toContainText('Furnace');
+      // Wait for equipment type selector to be visible
+      await expect(page.getByTestId('equipment-type-selector')).toBeVisible();
+      
+      // Click Furnace button in type selector
+      await page.getByTestId('equipment-type-furnace').click();
+      
+      // Verify furnace is selected (button should be pressed)
+      await expect(page.getByTestId('equipment-type-furnace')).toHaveAttribute('aria-pressed', 'true');
     });
 
     await test.step('Step 3-4: Click to place equipment', async () => {
@@ -80,18 +60,29 @@ test.describe('UJ-EC-003: Place Equipment (Tauri Offline)', () => {
 
   test('Step 5: Configure Equipment Properties', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Equipment Placement Project');
     });
 
     await test.step('Place equipment', async () => {
       await page.keyboard.press('e');
-      const canvas = page.locator('[data-testid="canvas-area"] canvas');
-      await page.mouse.click(320, 240);
+      await expect(page.locator('[data-testid="canvas-area"] canvas')).toBeVisible();
+      await page.mouse.click(330, 250); // 320+10, 240+10
     });
 
     await test.step('Step 5: Inspector shows equipment properties', async () => {
+      // Switch to Select tool
+      await page.keyboard.press('v');
+      await expect(page.getByTestId('tool-select')).toHaveAttribute('aria-pressed', 'true');
+      
+      // Select the equipment (placed at 330, 250)
+      await page.mouse.click(330, 250);
+      
+      await ensurePropertiesPanelVisible(page);
+      
       const propertiesPanel = page.getByTestId('properties-panel');
-      await expect(propertiesPanel).toContainText('Equipment');
+      // Should show 'Furnace' if defaults work, or 'Equipment' generic
+      // Based on defaults name is "New Furnace"
+      await expect(propertiesPanel).toContainText('Furnace');
     });
   });
 });

@@ -67,12 +67,16 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             // Set mobile viewport
             await page.setViewportSize(VIEWPORTS.mobile.iphone14);
 
+            const startTime = Date.now();
+
             // Navigate to application
             await page.goto('/');
 
             // Validate blocking overlay is visible
             const deviceWarning = page.getByTestId('device-warning');
             await expect(deviceWarning).toBeVisible({ timeout: 10000 });
+            const detectionTime = Date.now() - startTime;
+            expect(detectionTime).toBeLessThan(1000);
 
             // Validate warning message content
             await expect(page.getByText('Device Incompatible')).toBeVisible();

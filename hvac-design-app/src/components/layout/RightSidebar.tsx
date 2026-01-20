@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore } from '@/stores/useLayoutStore';
+import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+import { useEntityStore } from '@/core/store/entityStore';
 import { ChevronRight, Settings, List, FileText, Calculator } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +15,32 @@ export const RightSidebar: React.FC = () => {
         activeRightTab,
         setActiveRightTab
     } = useLayoutStore();
+    const selectedIds = useSelectionStore((state) => state.selectedIds);
+    const entities = useEntityStore((state) => state.byId);
+
+    // Get the first selected entity for display
+    const selectedEntity = selectedIds.length > 0 && selectedIds[0] ? entities[selectedIds[0]] : null;
+
+    /**
+     * Get display name for an entity
+     * Returns the configured name from props, or a sensible default
+     */
+    function getEntityDisplayName(entity: typeof selectedEntity): string {
+        if (!entity) {return '';}
+        
+        // Most entities have a name in props
+        if ('props' in entity && entity.props && 'name' in entity.props) {
+            return entity.props.name as string;
+        }
+        
+        // Note entity uses content as identifier
+        if (entity.type === 'note') {
+            return 'Note';
+        }
+        
+        // Fallback to capitalized type
+        return entity.type.charAt(0).toUpperCase() + entity.type.slice(1);
+    }
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -140,13 +168,35 @@ export const RightSidebar: React.FC = () => {
                 {activeRightTab === 'properties' && (
                     <div data-testid="properties-panel">
                         <h3 className="font-semibold mb-4">Properties</h3>
-                        <div className="text-sm text-slate-500 border rounded p-4 bg-slate-50">
-                            No item selected
-                            <div className="mt-2 text-xs text-slate-400">
-                                Project: Office HVAC<br />
-                                Created: Jan 10, 2026
+                        {selectedEntity ? (
+                            <div className="space-y-4">
+                                <div className="text-sm">
+                                    <div className="font-medium text-lg mb-2">{getEntityDisplayName(selectedEntity)}</div>
+                                    <div className="space-y-2">
+                                        {selectedEntity.type === 'room' && 'props' in selectedEntity && selectedEntity.props && (
+                                            <>
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-600">Width:</span>
+                                                    <span>{(selectedEntity.props.width / 12).toFixed(1)}&apos;</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-600">Length:</span>
+                                                    <span>{(selectedEntity.props.length / 12).toFixed(1)}&apos;</span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="text-sm text-slate-500 border rounded p-4 bg-slate-50">
+                                No item selected
+                                <div className="mt-2 text-xs text-slate-400">
+                                    Project: Office HVAC<br />
+                                    Created: Jan 10, 2026
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -162,7 +212,22 @@ export const RightSidebar: React.FC = () => {
                 {activeRightTab === 'bom' && (
                     <div data-testid="bom-panel">
                         <h3 className="font-semibold mb-4">Bill of Materials</h3>
-                        <div className="text-sm text-slate-500">No items in BOM</div>
+                        {Object.values(entities).length === 0 ? (
+                            <div className="text-sm text-slate-500">No items in BOM</div>
+                        ) : (
+                            <div className="space-y-4">
+                                {Object.values(entities).map((entity) => (
+                                    <div key={entity.id} className="flex justify-between text-sm border-b pb-2 last:border-0">
+                                        <span className="font-medium">{getEntityDisplayName(entity)}</span>
+                                        <span className="text-slate-500 text-xs capitalize">{entity.type.replace('_', ' ')}</span>
+                                    </div>
+                                ))}
+                                <div className="pt-2 border-t font-semibold text-sm flex justify-between">
+                                    <span>Total Items</span>
+                                    <span>{Object.values(entities).length}</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 

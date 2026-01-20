@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { openCanvas } from '../../utils/test-utils';
 
 /**
  * E2E Test Suite: Copy/Paste Entity (UJ-EC-009)
@@ -11,39 +12,10 @@ import { test, expect, Page } from '@playwright/test';
  * @mode tauri-offline
  */
 
-async function openCanvas(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem('hvac-app-storage', JSON.stringify({
-      state: { hasLaunched: true },
-      version: 0,
-    }));
-  });
-
-  await page.goto('/dashboard');
-  await expect(page).toHaveURL(/dashboard/);
-
-  const projectCards = page.locator('[data-testid="project-card"]');
-  if ((await projectCards.count()) === 0) {
-    const emptyStateButton = page.getByTestId('empty-state-create-btn');
-    const newProjectButton = page.getByTestId('new-project-btn');
-    if (await emptyStateButton.isVisible()) {
-      await emptyStateButton.click();
-    } else {
-      await newProjectButton.click();
-    }
-    await page.getByTestId('project-name-input').fill('Copy Paste Project');
-    await page.getByTestId('create-button').click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  } else {
-    await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  }
-}
-
 test.describe('UJ-EC-009: Copy/Paste Entity (Tauri Offline)', () => {
   test('Step 1-3: Select entity, copy, and paste', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Copy Paste Project');
     });
 
     await test.step('Create and select room', async () => {

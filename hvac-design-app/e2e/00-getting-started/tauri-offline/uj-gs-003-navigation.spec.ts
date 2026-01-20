@@ -152,7 +152,7 @@ test.describe('UJ-GS-003: Navigation and Interface Overview (Tauri Offline)', ()
     await expect(page.getByTestId('tool-select')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  test('Status bar shows coordinates, zoom, and grid state', async ({ page }) => {
+  test('Status bar shows coordinates, zoom, grid state, and auto-save', async ({ page }) => {
     await page.getByTestId('project-card').first().click();
     await expect(page).toHaveURL(/\/canvas\//);
 
@@ -160,5 +160,6 @@ test.describe('UJ-GS-003: Navigation and Interface Overview (Tauri Offline)', ()
     await expect(statusBar).toContainText(/X:/i);
     await expect(statusBar).toContainText(/Zoom:/i);
     await expect(statusBar).toContainText(/Grid:/i);
+    await expect(statusBar).toContainText(/saved/i);
   });
 });

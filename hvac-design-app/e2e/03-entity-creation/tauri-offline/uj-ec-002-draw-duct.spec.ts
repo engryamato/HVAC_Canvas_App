@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 /**
  * E2E Test Suite: Draw Duct (UJ-EC-002)
@@ -11,39 +11,12 @@ import { test, expect, Page } from '@playwright/test';
  * @mode tauri-offline
  */
 
-async function openCanvas(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem('hvac-app-storage', JSON.stringify({
-      state: { hasLaunched: true },
-      version: 0,
-    }));
-  });
-
-  await page.goto('/dashboard');
-  await expect(page).toHaveURL(/dashboard/);
-
-  const projectCards = page.locator('[data-testid="project-card"]');
-  if ((await projectCards.count()) === 0) {
-    const emptyStateButton = page.getByTestId('empty-state-create-btn');
-    const newProjectButton = page.getByTestId('new-project-btn');
-    if (await emptyStateButton.isVisible()) {
-      await emptyStateButton.click();
-    } else {
-      await newProjectButton.click();
-    }
-    await page.getByTestId('project-name-input').fill('Duct Creation Project');
-    await page.getByTestId('create-button').click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  } else {
-    await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//);
-  }
-}
+import { openCanvas, ensurePropertiesPanelVisible } from '../../utils/test-utils';
 
 test.describe('UJ-EC-002: Draw Duct (Tauri Offline)', () => {
   test('Step 1: Activate Duct Tool', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Duct Creation Project');
     });
 
     await test.step('Step 1: Activate tool via shortcut', async () => {
@@ -57,7 +30,7 @@ test.describe('UJ-EC-002: Draw Duct (Tauri Offline)', () => {
 
   test('Step 2-4: Draw Duct on Canvas', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
-      await openCanvas(page);
+      await openCanvas(page, 'Duct Creation Project');
     });
 
     await test.step('Activate Duct tool', async () => {
@@ -75,6 +48,41 @@ test.describe('UJ-EC-002: Draw Duct (Tauri Offline)', () => {
       await page.mouse.up();
 
       await expect(page.getByTestId('status-bar')).toContainText('Duct');
+    });
+  });
+
+  test('Step 5: View and Edit Duct Properties', async ({ page }) => {
+    await test.step('Navigate to Canvas', async () => {
+      await openCanvas(page, 'Duct Creation Project');
+    });
+
+    await test.step('Create duct', async () => {
+      await page.keyboard.press('d');
+      const canvas = page.locator('[data-testid="canvas-area"] canvas');
+      await expect(canvas).toBeVisible();
+      
+      await page.mouse.move(200, 200);
+      await page.mouse.down();
+      await page.mouse.move(460, 220);
+      await page.mouse.up();
+      
+      await page.waitForTimeout(500);
+    });
+
+    await test.step('Step 5: Verify Properties Panel shows duct properties', async () => {
+      // Switch to Select tool
+      await page.keyboard.press('v');
+      await expect(page.getByTestId('tool-select')).toHaveAttribute('aria-pressed', 'true');
+      
+      // Click near the center of the duct to select it
+      // Drawn from (200, 200) to (460, 220). Midpoint (330, 210).
+      await page.mouse.click(330, 210);
+      
+      // Ensure properties panel is visible using helper
+      await ensurePropertiesPanelVisible(page);
+      
+      const propertiesPanel = page.getByTestId('properties-panel');
+      await expect(propertiesPanel).toContainText('Duct');
     });
   });
 });

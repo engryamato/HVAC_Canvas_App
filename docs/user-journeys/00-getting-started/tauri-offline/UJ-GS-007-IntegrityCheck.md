@@ -15,7 +15,7 @@ This user journey covers the data integrity validation that occurs during applic
 ## Prerequisites
 
 - Application is launching or loading a project
-- IndexedDB, localStorage, and/or .sws files exist from previous sessions
+- localStorage and/or .sws files exist from previous sessions
 
 ## Integrity Check Flow
 
@@ -25,7 +25,7 @@ This user journey covers the data integrity validation that occurs during applic
 
 **Scope**:
 1. **Preferences**: `localStorage` (theme, sidebar state)
-2. **Project Data**: `IndexedDB` (database connection, object store existence)
+2. **Project Data**: `localStorage` (keys, parse validity, schema checks)
 
 **Expected Behavior**:
 

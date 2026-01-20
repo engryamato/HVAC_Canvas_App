@@ -5,7 +5,7 @@ import { BaseEntitySchema } from './base.schema';
  * Equipment types for HVAC components
  * Per Notion Architecture Specs - includes air_handler for AHU units
  */
-export const EquipmentTypeSchema = z.enum(['hood', 'fan', 'diffuser', 'damper', 'air_handler']);
+export const EquipmentTypeSchema = z.enum(['hood', 'fan', 'diffuser', 'damper', 'air_handler', 'furnace', 'rtu']);
 
 export type EquipmentType = z.infer<typeof EquipmentTypeSchema>;
 
@@ -126,6 +126,28 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     height: 72,
     mountHeightUnit: 'in',
   },
+  furnace: {
+    equipmentType: 'furnace',
+    capacity: 80000,
+    capacityUnit: 'CFM',
+    staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
+    width: 24,
+    depth: 36,
+    height: 48,
+    mountHeightUnit: 'in',
+  },
+  rtu: {
+    equipmentType: 'rtu',
+    capacity: 12000,
+    capacityUnit: 'CFM',
+    staticPressure: 1.5,
+    staticPressureUnit: 'in_wg',
+    width: 84,
+    depth: 48,
+    height: 36,
+    mountHeightUnit: 'in',
+  },
 };
 
 /**
@@ -133,7 +155,10 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
  */
 export function createDefaultEquipmentProps(type: EquipmentType): EquipmentProps {
   const typeLabel =
-    type === 'air_handler' ? 'Air Handler' : type.charAt(0).toUpperCase() + type.slice(1);
+    type === 'air_handler' ? 'Air Handler' :
+    type === 'furnace' ? 'Furnace' :
+    type === 'rtu' ? 'RTU' :
+    type.charAt(0).toUpperCase() + type.slice(1);
   return {
     name: `New ${typeLabel}`,
     ...DEFAULT_EQUIPMENT_PROPS[type],

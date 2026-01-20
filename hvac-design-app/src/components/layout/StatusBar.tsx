@@ -3,19 +3,20 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { useViewportStore } from '@/stores/useViewportStore';
-import { useLayoutStore } from '@/stores/useLayoutStore';
+import { useToolStore } from '@/core/store/canvas.store';
+import { useEntityCount } from '@/core/store/entityStore';
 import { cn } from '@/lib/utils'; // Assuming cn utility exists, otherwise standard class strings
 
 interface StatusBarProps {
-    entityCount?: number;
     isConnected?: boolean;
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({
-    entityCount = 0,
     isConnected = true
 }) => {
     const { zoom, cursorPosition, gridVisible } = useViewportStore();
+    const { currentTool } = useToolStore();
+    const entityCount = useEntityCount();
 
     // Format coordinates
     const coords = `X: ${Math.round(cursorPosition.x)}, Y: ${Math.round(cursorPosition.y)}`;
@@ -28,6 +29,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({
             <div className="flex items-center gap-4">
                 <div className="min-w-[120px] font-mono" title="Cursor Coordinates">
                     {coords}
+                </div>
+
+                <div className="h-3 w-px bg-slate-300" />
+
+                <div title="Active Tool">
+                    {currentTool === 'select' ? 'Ready' : `${currentTool.charAt(0).toUpperCase() + currentTool.slice(1)} Tool`}
                 </div>
 
                 <div className="h-3 w-px bg-slate-300" />

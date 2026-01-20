@@ -7,6 +7,7 @@ import {
 import { createRoom } from '../entities/roomDefaults';
 import { createEntity } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
+import { useSelectionStore } from '../store/selectionStore';
 
 /**
  * Minimum room size in inches (12" x 12")
@@ -77,7 +78,7 @@ export class RoomTool extends BaseTool {
       const snappedPoint = this.snapToGrid(event.x, event.y);
       const dx = Math.abs(snappedPoint.x - this.state.startPoint.x);
       const dy = Math.abs(snappedPoint.y - this.state.startPoint.y);
-
+      
       // If dragged beyond minimum size, create room immediately
       if (dx >= MIN_ROOM_SIZE && dy >= MIN_ROOM_SIZE) {
         this.createRoomEntity(this.state.startPoint, snappedPoint);
@@ -166,6 +167,7 @@ export class RoomTool extends BaseTool {
 
     const room = createRoom({ x, y, width, length });
     createEntity(room);
+    useSelectionStore.getState().select(room.id);
   }
 }
 

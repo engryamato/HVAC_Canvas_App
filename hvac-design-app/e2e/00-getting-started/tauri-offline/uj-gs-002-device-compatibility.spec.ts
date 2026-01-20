@@ -48,11 +48,15 @@ test.describe('UJ-GS-002: Device Compatibility (Tauri Offline)', () => {
   });
 
   test('Mobile blocking: iPhone 14', async ({ page }) => {
+    const startTime = Date.now();
+
     await page.setViewportSize(VIEWPORTS.mobile.iphone14);
     await page.goto('/');
 
     const deviceWarning = page.getByTestId('device-warning');
     await expect(deviceWarning).toBeVisible({ timeout: 10000 });
+    const detectionTime = Date.now() - startTime;
+    expect(detectionTime).toBeLessThan(1000);
     await expect(page.getByText('Device Incompatible')).toBeVisible();
     await expect(page.getByText(/requires a larger screen/i)).toBeVisible();
     await expect(page.getByTestId('exit-application')).toBeVisible();

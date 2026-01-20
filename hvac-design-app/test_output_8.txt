@@ -1,0 +1,49 @@
+
+Running 3 tests using 3 workers
+
+Canvas Box: { x: [33m288[39m, y: [33m95[39m, width: [33m672[39m, height: [33m593[39m }
+  Γ£ô  1 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:18:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 1: Activate Room Tool (1.4s)
+  Γ£ô  2 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:32:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas (1.5s)
+  Γ£ÿ  3 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:55:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties (6.7s)
+
+
+  1) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:55:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties ΓÇ║ Create room 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('status-bar')
+    Expected substring: [32m"1 items"[39m
+    Received string:    [31m"X: 0, Y: 0Room ToolZoom: 100%Grid: On0 itemsOnline"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('status-bar')[22m
+    [2m    9 ├ù locator resolved to <div data-testid="status-bar" class="border border-slate-200 shadow-sm transition-shadow hover:shadow-md h-8 bg-slate-100 border-t flex items-center px-4 text-xs text-slate-600 justify-between rounded-none shrink-0">ΓÇª</div>[22m
+    [2m      - unexpected value "X: 0, Y: 0Room ToolZoom: 100%Grid: On0 itemsOnline"[22m
+
+
+      71 |       
+      72 |       // Verify creation via status bar item count
+    > 73 |       await expect(page.getByTestId('status-bar')).toContainText('1 items');
+         |                                                    ^
+      74 |     });
+      75 |
+      76 |     await test.step('Step 5: Inspector shows room properties', async () => {
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:73:52
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:60:5
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\03-entity-creation-tauri-o-865de-Step-5-View-Room-Properties-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\03-entity-creation-tauri-o-865de-Step-5-View-Room-Properties-chromium\error-context.md
+
+  1 failed
+    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:55:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties 
+  2 passed (7.3s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

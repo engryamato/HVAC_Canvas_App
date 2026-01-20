@@ -60,6 +60,23 @@ test.describe('OS-INIT-002: Environment Detection', () => {
             expect(canUseStorage).toBe(true);
         });
 
+        test('should block app when localStorage is unavailable', async ({ page }) => {
+            await page.addInitScript(() => {
+                Object.defineProperty(window, 'localStorage', {
+                    value: {
+                        getItem: () => { throw new Error('localStorage disabled'); },
+                        setItem: () => { throw new Error('localStorage disabled'); },
+                        removeItem: () => { throw new Error('localStorage disabled'); },
+                        clear: () => { throw new Error('localStorage disabled'); },
+                    },
+                    configurable: true,
+                });
+            });
+
+            await page.goto('/');
+            await expect(page.getByTestId('device-warning')).toBeVisible({ timeout: 10000 });
+        });
+
         test('should persist app state to localStorage', async ({ page }) => {
             await page.goto('/');
             await page.evaluate(() => localStorage.clear());

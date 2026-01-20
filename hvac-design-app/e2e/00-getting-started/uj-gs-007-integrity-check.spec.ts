@@ -192,23 +192,38 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
             await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });
             await page.getByTestId('skip-tutorial-btn').click();
 
-            // Load project with mocked backup
-            await setStorageItem(page, 'hvac-project-test-project-001', {
+            const projectId = 'test-project-001';
+            const projectPayload = {
                 schemaVersion: '1.0.0',
-                projectId: 'test-project-001',
+                projectId,
                 savedAt: new Date().toISOString(),
-                payload: { project: {} }
+                checksum: 'test-checksum',
+                payload: { project: { projectId, projectName: 'Backup Project' } }
+            };
+
+            await setStorageItem(page, `hvac-project-${projectId}`, 'corrupted');
+            await setStorageItem(page, `hvac-project-${projectId}-backup`, projectPayload);
+            await setStorageItem(page, 'sws.projectIndex', {
+                state: {
+                    projects: [{
+                        projectId,
+                        projectName: 'Backup Project',
+                        createdAt: new Date().toISOString(),
+                        modifiedAt: new Date().toISOString(),
+                        storagePath: `project-${projectId}`,
+                        isArchived: false
+                    }],
+                    recentProjectIds: [],
+                    loading: false
+                },
+                version: 0
             });
 
-            // Simulate backup recovery scenario
-            await page.goto('/');
-            await page.reload();
-            await expect(page.getByTestId('app-logo')).toBeVisible();
+            await page.goto(`/canvas/${projectId}`);
+            await expect(page.getByTestId('canvas-area')).toBeVisible({ timeout: 10000 });
 
-            // Check for backup-loaded warning toast
-            // The logic here is simplified for verification
-            const errorToast = page.locator('[role="alert"]').filter({ hasText: /backup|loaded/i });
-            await expect(errorToast).toBeVisible({ timeout: 2000 });
+            const warningToast = page.locator('[role="status"]').filter({ hasText: /backup loaded/i });
+            await expect(warningToast).toBeVisible({ timeout: 5000 });
         });
     });
 

@@ -1,0 +1,93 @@
+
+Running 3 tests using 3 workers
+
+[1A[2K[1/3] [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:56:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties
+[1A[2K[2/3] [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:33:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas
+[1A[2K[3/3] [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:18:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 1: Activate Room Tool
+[1A[2K[chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:18:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 1: Activate Room Tool
+BROWSER: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+
+[1A[2KBROWSER: [DeviceDetection] Window width: 1280px, isMobile: false
+
+[1A[2KBROWSER: [ProjectListStore] Hydration finished {projects: Array(0), recentProjectIds: Array(0), loading: false, addProject: , updateProject: }
+
+[1A[2KBROWSER: [NewProjectDialog] Manual save success
+
+[1A[2KBROWSER: [ProjectListStore] Adding project: {projectId: 40ac0a10-0cd5-4abb-8658-f3194a867812, projectName: Room Creation Project, projectNumber: undefined, clientName: undefined, entityCount: 0}
+
+[1A[2KBROWSER: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+
+[1A[2KBROWSER: [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed {projectId: 40ac0a10-0cd5-4abb-8658-f3194a867812}
+
+[1A[2KBROWSER: [CanvasPageWrapper] Project: Room Creation Project, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2KBROWSER: [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed {projectId: 40ac0a10-0cd5-4abb-8658-f3194a867812}
+
+[1A[2KBROWSER: [CanvasPageWrapper] Project: Room Creation Project, Version: 1.0.0, App Version: 1.0.0
+
+[1A[2K  1) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:33:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas ΓÇ║ Step 2-4: Drag to create room 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('status-bar')
+    Expected substring: [32m"Room"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('status-bar')[22m
+
+
+      50 |       await page.mouse.up();
+      51 |
+    > 52 |       await expect(page.getByTestId('status-bar')).toContainText('Room');
+         |                                                    ^
+      53 |     });
+      54 |   });
+      55 |
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:52:52
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:43:5
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\03-entity-creation-tauri-o-618b8-tep-2-4-Draw-Room-on-Canvas-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\03-entity-creation-tauri-o-618b8-tep-2-4-Draw-Room-on-Canvas-chromium\error-context.md
+
+
+[1A[2K  2) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:56:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties ΓÇ║ Create room 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('status-bar')
+    Expected substring: [32m"1 items"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('status-bar')[22m
+
+
+      87 |       
+      88 |       // Verify creation via status bar item count
+    > 89 |       await expect(page.getByTestId('status-bar')).toContainText('1 items');
+         |                                                    ^
+      90 |     });
+      91 |
+      92 |     await test.step('Step 5: Inspector shows room properties', async () => {
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:89:52
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:61:5
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\03-entity-creation-tauri-o-865de-Step-5-View-Room-Properties-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\03-entity-creation-tauri-o-865de-Step-5-View-Room-Properties-chromium\error-context.md
+
+
+[1A[2K  2 failed
+    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:33:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas 
+    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:56:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties 
+  1 passed (8.7s)

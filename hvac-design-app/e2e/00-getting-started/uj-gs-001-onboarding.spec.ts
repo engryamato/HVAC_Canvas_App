@@ -88,6 +88,24 @@ test.describe('UJ-GS-001: First Launch Experience', () => {
         // Should navigate directly to /dashboard
         await expect(page).toHaveURL(/\/dashboard/);
         await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
+
+        const projectCards = page.locator('[data-testid="project-card"]');
+        if ((await projectCards.count()) === 0) {
+            const emptyStateButton = page.getByTestId('empty-state-create-btn');
+            const newProjectButton = page.getByTestId('new-project-btn');
+            if (await emptyStateButton.isVisible()) {
+                await emptyStateButton.click();
+            } else {
+                await newProjectButton.click();
+            }
+            await page.getByTestId('project-name-input').fill('First Launch Project');
+            await page.getByTestId('create-button').click();
+        } else {
+            await projectCards.first().click();
+        }
+
+        await expect(page).toHaveURL(/\/canvas\//);
+        await expect(page.getByTestId('canvas-area')).toBeVisible({ timeout: 10000 });
     });
 
         test('Flow 2: Fast Track (Skip Tutorial)', async ({ page }) => {
@@ -108,6 +126,24 @@ test.describe('UJ-GS-001: First Launch Experience', () => {
 
         // Verify dashboard loads
         await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
+
+        const projectCards = page.locator('[data-testid="project-card"]');
+        if ((await projectCards.count()) === 0) {
+            const emptyStateButton = page.getByTestId('empty-state-create-btn');
+            const newProjectButton = page.getByTestId('new-project-btn');
+            if (await emptyStateButton.isVisible()) {
+                await emptyStateButton.click();
+            } else {
+                await newProjectButton.click();
+            }
+            await page.getByTestId('project-name-input').fill('First Launch Project');
+            await page.getByTestId('create-button').click();
+        } else {
+            await projectCards.first().click();
+        }
+
+        await expect(page).toHaveURL(/\/canvas\//);
+        await expect(page.getByTestId('canvas-area')).toBeVisible({ timeout: 10000 });
         });
 
 });
