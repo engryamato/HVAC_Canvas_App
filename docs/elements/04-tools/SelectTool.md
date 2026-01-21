@@ -580,11 +580,11 @@ if (this.state.hasMoved) {
 ## Related Elements
 
 - [BaseTool](./BaseTool.md) - Abstract base class
-- [SelectionStore](../02-stores/selectionStore.md) - Selection state management
-- [EntityStore](../02-stores/entityStore.md) - Entity state management
-- [HistoryStore](../02-stores/historyStore.md) - Undo/redo system
-- [entityCommands](../../core/commands/entityCommands.md) - Undo-enabled operations
-- [bounds](../../core/geometry/bounds.md) - Bounding box utilities
+- [selectionStore](../02-stores/selectionStore.md) - Selection state management
+- [entityStore](../02-stores/entityStore.md) - Entity state management
+- [HistoryStore](../09-commands/HistoryStore.md) - Undo/redo system
+- [EntityCommands](../09-commands/EntityCommands.md) - Undo-enabled operations
+- [Bounds](../11-geometry/Bounds.md) - Bounding box utilities
 
 ## Testing
 

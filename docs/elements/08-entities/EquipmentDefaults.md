@@ -12,7 +12,7 @@ src/features/canvas/entities/equipmentDefaults.ts
 
 ## Purpose
 
-- Create equipment entities for all 5 types
+- Create equipment entities for all supported types
 - Provide type-specific default dimensions and capacities
 - Auto-increment equipment names by type
 - Support customization via overrides
@@ -34,6 +34,8 @@ const EQUIPMENT_TYPE_DEFAULTS: Record<EquipmentType, {
   diffuser:    { capacity: 150,  staticPressure: 0.1, width: 24, depth: 24, height: 6 },
   damper:      { capacity: 500,  staticPressure: 0.05, width: 12, depth: 6, height: 12 },
   air_handler: { capacity: 10000, staticPressure: 2.0, width: 72, depth: 48, height: 60 },
+  furnace: { capacity: 80000, staticPressure: 0.5, width: 24, depth: 36, height: 48 },
+  rtu: { capacity: 12000, staticPressure: 1.5, width: 84, depth: 48, height: 36 },
 };
 ```
 
@@ -46,6 +48,8 @@ const EQUIPMENT_TYPE_LABELS: Record<EquipmentType, string> = {
   diffuser:    'Diffuser',
   damper:      'Damper',
   air_handler: 'Air Handling Unit',
+  furnace: 'Furnace',
+  rtu: 'RTU',
 };
 ```
 
@@ -71,6 +75,18 @@ export function createEquipment(
 ): Equipment
 ```
 
+### resetEquipmentCounter
+
+```typescript
+export function resetEquipmentCounter(): void
+```
+
+### getNextEquipmentNumber
+
+```typescript
+export function getNextEquipmentNumber(): number
+```
+
 ## Usage
 
 ```typescript
@@ -94,7 +110,13 @@ const fan = createEquipment('fan');
 const diffuser = createEquipment('diffuser');
 const damper = createEquipment('damper');
 const ahu = createEquipment('air_handler');
+const furnace = createEquipment('furnace');
+const rtu = createEquipment('rtu');
 ```
+
+## Notes
+
+- Units are fixed in the factory: `capacityUnit: 'CFM'`, `staticPressureUnit: 'in_wg'`, `mountHeightUnit: 'in'`.
 
 ## Related Elements
 

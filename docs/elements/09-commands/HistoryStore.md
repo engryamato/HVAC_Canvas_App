@@ -65,12 +65,15 @@ canRedo: () => boolean
 
 ## Usage
 
+Note: `undo`/`redo` in the history store return commands but do not execute them. For full undo/redo behavior, use `undo`/`redo` from `@/core/commands/entityCommands`.
+
 ```typescript
-import { useHistoryStore } from '@/core/commands/historyStore';
+import { useHistoryActions, useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 
 function UndoRedoButtons() {
-  const canUndo = useHistoryStore(state => state.past.length > 0);
-  const canRedo = useHistoryStore(state => state.future.length > 0);
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
+  const { undo, redo } = useHistoryActions();
 
   return (
     <>

@@ -36,6 +36,8 @@ export async function writeTextFile(path: string, content: string): Promise<void
 export async function exists(path: string): Promise<boolean>
 ```
 
+Returns `false` in web environments.
+
 ### createDir
 
 ```typescript
@@ -48,11 +50,15 @@ export async function createDir(path: string, recursive = true): Promise<void>
 export async function readDir(path: string): Promise<string[]>
 ```
 
+Returns an empty array in web environments.
+
 ### getDocumentsDir
 
 ```typescript
 export async function getDocumentsDir(): Promise<string>
 ```
+
+Returns an empty string in web environments.
 
 ### copyFile / removeFile / renameFile
 

@@ -46,11 +46,13 @@ export class EquipmentTool extends BaseTool {
   }
 
   onMouseDown(event: ToolMouseEvent): void {
+    console.log('EquipmentTool.onMouseDown', event.x, event.y, event.button);
     if (event.button !== 0) {
       return;
     }
 
     const snappedPoint = this.snapToGrid(event.x, event.y);
+    console.log('EquipmentTool.snapped', snappedPoint);
     this.createEquipmentEntity(snappedPoint.x, snappedPoint.y);
   }
 

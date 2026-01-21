@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Home Page provides the root route (/) that immediately redirects to the dashboard.
+The root route renders `AppInitializer`, which handles first-launch and routing decisions.
 
 ## Location
 
@@ -10,29 +10,24 @@ The Home Page provides the root route (/) that immediately redirects to the dash
 app/page.tsx
 ```
 
-## Purpose
-
-- Root route handler
-- Redirect to /dashboard
-- Show loading state during redirect
-
 ## Implementation
 
 ```typescript
 'use client';
 
+import { Suspense } from 'react';
+import { AppInitializer } from '@/components/onboarding/AppInitializer';
+
 export default function Home() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace('/dashboard');
-  }, [router]);
-
-  return <div>Loading...</div>;
+  return (
+    <Suspense fallback={null}>
+      <AppInitializer />
+    </Suspense>
+  );
 }
 ```
 
 ## Related Elements
 
-- [Dashboard Page](./DashboardPage.md)
+- [DashboardPage](./DashboardPage.md)
 - [Layout](./Layout.md)

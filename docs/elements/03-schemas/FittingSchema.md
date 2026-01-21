@@ -525,10 +525,7 @@ function findFittingsByDuct(
 - [BaseSchema](./BaseSchema.md) - Base entity schema
 - [DuctSchema](./DuctSchema.md) - Connected via inletDuctId/outletDuctId
 - [FittingTool](../04-tools/FittingTool.md) - Fitting creation tool
-- [FittingRenderer](../05-renderers/FittingRenderer.md) - Fitting visualization
-- [FittingInspector](../01-components/inspector/FittingInspector.md) - Fitting property editor
 - [FittingDefaults](../08-entities/FittingDefaults.md) - Fitting factory functions
-- [FittingCalculator](../06-calculators/FittingCalculator.md) - Loss calculations
 
 ## Testing
 

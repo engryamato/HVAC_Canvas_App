@@ -171,42 +171,11 @@ function fitToContent() {
 ```
 
 ## Styling
-
-```css
-.zoom-controls {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.zoom-display {
-  min-width: 48px;
-  padding: 4px 8px;
-  border: none;
-  background: transparent;
-  font-size: 12px;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.zoom-display:hover {
-  background: #f0f0f0;
-}
-
-.zoom-divider {
-  width: 1px;
-  height: 20px;
-  background: #e0e0e0;
-  margin: 0 4px;
-}
-```
+ 
+The component uses Tailwind + Glassmorphism:
+- **Container**: `bg-white/80 backdrop-blur-sm border shadow-sm rounded-lg`
+- **Button**: `hover:bg-slate-100 active:scale-95 text-slate-700`
+- **Divider**: `w-px h-4 bg-slate-200 mx-1`
 
 ## Keyboard Shortcuts
 

@@ -85,9 +85,12 @@ interface EntityState {
 ```typescript
 addEntity: (entity) =>
   set((state) => {
+    console.log('[EntityStore] addEntity', entity.id, entity.type);
     if (!state.byId[entity.id]) {
       state.byId[entity.id] = entity;
       state.allIds.push(entity.id);
+    } else {
+      console.warn('[EntityStore] addEntity: Entity already exists', entity.id);
     }
   }),
 ```
@@ -112,6 +115,7 @@ Merges updates with existing entity. Does nothing if entity doesn't exist.
 ```typescript
 removeEntity: (id) =>
   set((state) => {
+    console.log('[EntityStore] removeEntity', id);
     delete state.byId[id];
     state.allIds = state.allIds.filter((entityId) => entityId !== id);
   }),
@@ -124,6 +128,7 @@ Removes from both byId map and allIds array.
 ```typescript
 addEntities: (entities) =>
   set((state) => {
+    console.log('[EntityStore] addEntities', entities.length);
     entities.forEach((entity) => {
       if (!state.byId[entity.id]) {
         state.byId[entity.id] = entity;
@@ -135,11 +140,33 @@ addEntities: (entities) =>
 
 More efficient than calling addEntity multiple times.
 
-### 5. Hydration (File Loading)
+### 5. Remove Multiple Entities
+
+```typescript
+removeEntities: (ids) =>
+  set((state) => {
+    console.log('[EntityStore] removeEntities', ids.length);
+    ids.forEach((id) => delete state.byId[id]);
+    state.allIds = state.allIds.filter((id) => !ids.includes(id));
+  }),
+```
+
+### 6. Clear All
+
+```typescript
+clearAllEntities: () =>
+  set((state) => {
+    console.log('[EntityStore] clearAllEntities');
+    Object.assign(state, initialState);
+  }),
+```
+
+### 7. Hydration (File Loading)
 
 ```typescript
 hydrate: (newState) =>
   set((state) => {
+    console.log('[EntityStore] hydrate from newState', newState.allIds.length);
     state.byId = newState.byId;
     state.allIds = newState.allIds;
   }),
@@ -211,7 +238,7 @@ function RoomTool() {
   const { addEntity } = useEntityActions();
 
   const handleClick = (point: { x: number; y: number }) => {
-    const room = createRoom(point, { width: 240, height: 180 });
+    const room = createRoom({ x: point.x, y: point.y, width: 240, length: 180 });
     addEntity(room);
   };
 

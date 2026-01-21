@@ -1,20 +1,17 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import Link from 'next/link';
 import { CanvasContainer } from './components/CanvasContainer';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
 
 import { useAutoSave } from './hooks';
-import styles from './CanvasPage.module.css';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
-// Legacy components removed: Toolbar, ProjectSidebar, StatusBar, InspectorPanel
 
 /**
  * CanvasPage - Main canvas page with all components
@@ -70,19 +67,48 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     },
   });
 
+  // Check for backup recovery flag with polling for cross-browser stability
+  // The flag may be set slightly after component mount in some browsers
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
 
     // Only check for recovery after we have a project ID (meaning load attempted)
-    if (currentProjectId) {
+    if (!currentProjectId) {
+      return;
+    }
+
+    // Polling mechanism: check multiple times over 3 seconds to handle timing differences
+    let attempts = 0;
+    const maxAttempts = 15; // 15 * 200ms = 3 seconds max
+    const checkInterval = 200;
+
+    const checkForRecovery = () => {
       const recovered = localStorage.getItem('hvac-backup-recovered');
       if (recovered) {
-        pushToast('Backup loaded', 'warning');
+        console.log('[CanvasPage] Backup recovery flag detected, showing toast');
+        pushToast('Backup loaded - your data was recovered from a backup', 'warning');
         localStorage.removeItem('hvac-backup-recovered');
+        return true;
       }
+      return false;
+    };
+
+    // Initial immediate check
+    if (checkForRecovery()) {
+      return;
     }
+
+    // Set up polling for cases where flag is set after mount
+    const pollTimer = setInterval(() => {
+      attempts++;
+      if (checkForRecovery() || attempts >= maxAttempts) {
+        clearInterval(pollTimer);
+      }
+    }, checkInterval);
+
+    return () => clearInterval(pollTimer);
   }, [pushToast, currentProjectId]);
 
   const triggerSave = saveNow;

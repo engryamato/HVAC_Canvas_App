@@ -142,4 +142,4 @@ describe('useCalculations', () => {
 - [VentilationCalculator](../06-calculators/VentilationCalculator.md)
 - [DuctSizingCalculator](../06-calculators/DuctSizingCalculator.md)
 - [PressureDropCalculator](../06-calculators/PressureDropCalculator.md)
-- [Entity Store](../02-stores/EntityStore.md)
+- [entityStore](../02-stores/entityStore.md)

@@ -77,6 +77,7 @@ interface ViewportState {
 | `zoomOut` | `(centerX?: number, centerY?: number) => void` | Decrease zoom by ZOOM_STEP (0.1) |
 | `fitToContent` | `(bounds: Bounds, canvasDimensions?: Dimensions) => void` | Zoom and pan to fit content with padding |
 | `resetView` | `() => void` | Reset to default pan (0, 0) and zoom (1.0) |
+| `zoomToSelection` | `(bounds: Bounds) => void` | Zoom and pan to fit selected bounds |
 
 ### Grid Operations
 
@@ -165,8 +166,9 @@ fitToContent: (bounds, canvasDimensions) =>
 **Key Features**:
 - Accepts content bounds and optional canvas dimensions
 - Falls back to window size estimation (70% width, 80% height)
-- SSR-safe: checks for `window` object
+- SSR-safe: checks for `window` object and centers without zoom if unavailable
 - Adds 50px padding around content
+- Uses `effectivePadding` to avoid padding larger than the canvas
 - Uses smaller of zoomX/zoomY to ensure everything fits
 - Centers content in viewport
 - Guards against zero/negative bounds
@@ -206,6 +208,9 @@ const { x, y } = usePan();
 const gridVisible = useGridVisible();
 const gridSize = useGridSize();
 const snapToGrid = useSnapToGrid();
+
+// Get pan and zoom together
+const { panX, panY, zoom } = usePanAndZoom();
 ```
 
 ### Actions Hook
@@ -222,6 +227,7 @@ const {
   toggleGrid,
   setGridSize,
   toggleSnap,
+  zoomToSelection,
 } = useViewportActions();
 ```
 

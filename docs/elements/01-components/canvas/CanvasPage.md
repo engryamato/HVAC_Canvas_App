@@ -39,89 +39,46 @@ src/features/canvas/CanvasPage.tsx
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
+│  HEADER (AppShell)                                                      │
+│  [Logo] [Breadcrumbs]                    [Export] [Save] [User]         │
+├─────────────────────────────────────────────────────────────────────────┤
+│  TOOLBAR                                                                │
+│  [Select] [Duct] ...                                     [Undo] [Redo]  │
+├────────────────────┬─────────────────────────────────────┬──────────────┤
 │ LEFT SIDEBAR       │                                     │ RIGHT SIDEBAR│
-│ [Project Details]  │                                     │ [Bill of Qty]│
-│ Name: Building A   │                                     │  - Ducts     │
-│ Client: ACME Corp  │                                     │  - Fittings  │
-│                    │                                     │              │
-│ [Scope]            │              CANVAS                 │ [Calculation]│
-│ ☑ HVAC             │             CONTAINER               │  - Air Sys   │
-│ ☑ Metric           │                                     │  - Velocity  │
-│                    │                                     │              │
-│ [Site Conditions]  │          (Infinite Pan/Zoom)        │              │
-│ Temp: 72°F         │                                     │              │
-│ Wind: 5mph         │                                     │              │
-│                    │                                     │              │
+│ [Library]          │              CANVAS                 │ [Properties] │
+│ - AHU              │             CONTAINER               │  Width: 200  │
+│ - VAV              │                                     │  Flow: 500   │
+│                    │          (Infinite Pan/Zoom)        │              │
 ├────────────────────┴─────────────────────────────────────┴──────────────┤
-│ BOTTOM TOOLBAR                                                          │
-│ [Upload] [Export] [Process] [Save] ... [Settings] [Notification]        │
+│ STATUS BAR                                                              │
+│ 100% | (0,0) | Grid: On | 5 Entities                                    │
 └─────────────────────────────────────────────────────────────────────────┘
-   (Floating Action Button 'D' appears on canvas for tools)
+   (Floating Zoom Controls bottom-right)
 ```
 
 ## Component Implementation
 
 ```tsx
-interface CanvasPageProps {
-  projectId: string;
-}
-
-export function CanvasPage({ projectId }: CanvasPageProps) {
-  const { setProject, setDirty } = useProjectActions();
-  const { hydrate } = useEntityActions();
-  const { success, error } = useToast();
-
-  // Load project on mount
-  useEffect(() => {
-    const loadProject = async () => {
-      try {
-        const project = await loadProjectFile(projectId);
-
-        setProject(projectId, {
-          name: project.name,
-          projectNumber: project.projectNumber,
-          clientName: project.clientName,
-          createdAt: project.createdAt,
-          modifiedAt: project.modifiedAt,
-        });
-
-        hydrate(project.entities);
-      } catch (err) {
-        error('Failed to load project');
-        console.error(err);
-      }
-    };
-
-    loadProject();
-
-    return () => {
-      // Cleanup on unmount
-      clearProject();
-    };
-  }, [projectId]);
-
-  // Initialize keyboard shortcuts
-  useKeyboardShortcuts();
-
-  // Initialize auto-save
-  useAutoSave();
-
+export default function CanvasPage() {
+  // Main layout is handled by CSS Grid/Flex in global AppShell styles
   return (
-    <div className="canvas-page">
-      <div className="canvas-main">
+    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
+      <Header />
+      <Toolbar />
+      
+      <div className="flex-1 flex overflow-hidden relative">
         <LeftSidebar />
-
-        <div className="canvas-center">
-          <CanvasErrorBoundary>
-            <CanvasContainer />
-            <FABTool />
-          </CanvasErrorBoundary>
-        </div>
+        
+        <main className="flex-1 relative bg-slate-50/50">
+           <CanvasContainer />
+           <ZoomControls className="absolute bottom-4 right-4" />
+        </main>
 
         <RightSidebar />
       </div>
 
-      <BottomToolbar />
+      <StatusBar />
     </div>
   );
 }
@@ -169,68 +126,11 @@ function CanvasHeader() {
 
 ## Styling
 
-```css
-.canvas-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
+The page uses standard Tailwind utility classes:
+- **Layout**: `flex flex-col h-screen` for the full page shell.
+- **Main Area**: `flex-1 flex overflow-hidden` to fill remaining space.
+- **Canvas Area**: `relative` positioning to support floating UI elements (ZoomControls).
 
-.canvas-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
-  height: 48px;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.back-link {
-  color: #666;
-  text-decoration: none;
-}
-
-.project-name {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.unsaved-indicator {
-  color: #1976D2;
-  margin-left: 4px;
-}
-
-.canvas-main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.canvas-center {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-}
-
-.canvas-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 16px;
-  background: #f5f5f5;
-  border-top: 1px solid #e0e0e0;
-  height: 32px;
-}
-```
 
 ## Keyboard Shortcuts
 

@@ -355,7 +355,7 @@ if (result.success) {
 - [NoteSchema](./NoteSchema.md) - Extends BaseEntitySchema
 - [GroupSchema](./GroupSchema.md) - Extends BaseEntitySchema
 - [ProjectFileSchema](./ProjectFileSchema.md) - Uses EntityType enum
-- [CanvasStore](../07-stores/CanvasStore.md) - Uses BaseEntity for entity management
+- [canvasStore](../02-stores/canvasStore.md) - Uses BaseEntity for entity management
 
 ## Testing
 

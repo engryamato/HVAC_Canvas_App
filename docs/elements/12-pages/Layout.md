@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Root Layout provides the HTML document structure, metadata, and global styles for the entire application.
+Root layout defines global metadata, imports global styles, and renders `DeviceWarning` above all routes.
 
 ## Location
 
@@ -10,16 +10,13 @@ The Root Layout provides the HTML document structure, metadata, and global style
 app/layout.tsx
 ```
 
-## Purpose
-
-- Define HTML document structure
-- Set application metadata
-- Include global CSS
-- Provide app-wide context providers
-
 ## Implementation
 
 ```typescript
+import type { Metadata } from 'next'
+import './globals.css'
+import { DeviceWarning } from '@components/common/DeviceWarning'
+
 export const metadata: Metadata = {
   title: 'SizeWise HVAC Canvas',
   description: 'Professional HVAC design and estimation desktop application',
@@ -29,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <DeviceWarning />
         {children}
       </body>
     </html>
@@ -38,6 +36,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Related Elements
 
-- [Home Page](./HomePage.md)
-- [Dashboard Page](./DashboardPage.md)
-- [Canvas Editor Page](./CanvasEditorPage.md)
+- [HomePage](./HomePage.md)
+- [DashboardPage](./DashboardPage.md)
+- [CanvasEditorPage](./CanvasEditorPage.md)

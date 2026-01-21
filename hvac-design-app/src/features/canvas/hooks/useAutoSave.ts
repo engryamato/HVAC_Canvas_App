@@ -249,8 +249,9 @@ export function loadProjectFromStorage(projectId: string): LoadedProject | null 
     if (envelope && isEnvelopeValid(envelope)) {
       try {
         localStorage.setItem('hvac-backup-recovered', 'true');
+        console.log('[useAutoSave] Set backup recovery flag - backup data will be used');
       } catch {
-        // ignore
+        // ignore storage errors
       }
       void trackTelemetry('localstorage_recovered', {
         projectId,

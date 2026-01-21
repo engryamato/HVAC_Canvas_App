@@ -89,9 +89,10 @@ getEntityBounds(entity: Entity): Bounds
 **Returns bounds based on type:**
 - Room: {x, y, width: props.width, height: props.length}
 - Equipment: {x, y, width: props.width, height: props.depth}
-- Duct: {x, y, width: props.length*12, height: props.width}
+- Duct: {x, y, width: props.length*12, height: props.width \| props.height \| 10}
 - Fitting: {x-15, y-15, width: 30, height: 30}
 - Note: {x, y, width: 100, height: 50}
+- Group: {x, y, width: 100, height: 100} (placeholder)
 
 ## Usage Examples
 
@@ -122,7 +123,7 @@ function CanvasComponent() {
 const { selectInBounds, getEntityBounds } = useSelection({ screenToCanvas });
 
 // User drags selection box
-const handleMarqueeEnd = (marquee Bounds) => {
+const handleMarqueeEnd = (marqueeBounds: Bounds) => {
   selectInBounds(marquee, false);  // Replace selection
 };
 
@@ -188,8 +189,8 @@ describe('useSelection', () => {
 
 ## Related Elements
 
-- [Selection Store](../02-stores/SelectionStore.md)
-- [Entity Store](../02-stores/EntityStore.md)
+- [selectionStore](../02-stores/selectionStore.md)
+- [entityStore](../02-stores/entityStore.md)
 - [useMarquee](./useMarquee.md)
 - [useViewport](./useViewport.md)
 - [Bounds](../11-geometry/Bounds.md)

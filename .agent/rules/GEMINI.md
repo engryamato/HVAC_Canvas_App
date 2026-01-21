@@ -45,8 +45,8 @@ Agent activated → Check frontmatter "skills:" field
 | **QUESTION** | "what is", "how does", "explain" | TIER 0 only | Text Response |
 | **SURVEY/INTEL**| "analyze", "list files", "overview" | TIER 0 + Explorer | Session Intel (No File) |
 | **SIMPLE CODE** | "fix", "add", "change" (single file) | TIER 0 + TIER 1 (lite) | Inline Edit |
-| **COMPLEX CODE**| "build", "create", "implement", "refactor" | TIER 0 + TIER 1 (full) + Agent | **{task-slug}.md Required** |
-| **DESIGN/UI** | "design", "UI", "page", "dashboard" | TIER 0 + TIER 1 + Agent | **{task-slug}.md Required** |
+| **COMPLEX CODE**| "build", "create", "implement", "refactor" | TIER 0 + TIER 1 (full) + Agent | **PLAN-{task-slug}.md Required** |
+| **DESIGN/UI** | "design", "UI", "page", "dashboard" | TIER 0 + TIER 1 + Agent | **PLAN-{task-slug}.md Required** |
 | **SLASH CMD** | /create, /orchestrate, /debug | Command-specific flow | Variable |
 
 ---
@@ -144,14 +144,14 @@ When user's prompt is NOT in English:
 
 | Task Stage | Command | Purpose |
 |------------|---------|---------|
-| **Manual Audit** | `python scripts/checklist.py .` | Priority-based project audit |
-| **Pre-Deploy** | `python scripts/checklist.py . --url <URL>` | Full Suite + Performance + E2E |
+| **Manual Audit** | `python .agent/skills/lint-and-validate/scripts/lint_runner.py .` | Priority-based project audit |
+| **Pre-Deploy** | `python .agent/skills/vulnerability-scanner/scripts/security_scan.py .` | Full Suite + Performance + E2E |
 
 **Priority Execution Order:**
 1. **Security** → 2. **Lint** → 3. **Schema** → 4. **Tests** → 5. **UX** → 6. **Seo** → 7. **Lighthouse/E2E**
 
 **Rules:**
-- **Completion:** A task is NOT finished until `checklist.py` returns success.
+- **Completion:** A task is NOT finished until required scripts pass.
 - **Reporting:** If it fails, fix the **Critical** blockers first (Security/Lint).
 
 
@@ -179,15 +179,15 @@ When user's prompt is NOT in English:
 |------|-------|----------|
 | **plan** | `project-planner` | 4-phase methodology. NO CODE before Phase 4. |
 | **ask** | - | Focus on understanding. Ask questions. |
-| **edit** | `orchestrator` | Execute. Check `{task-slug}.md` first. |
+| **edit** | `orchestrator` | Execute. Check `PLAN-{task-slug}.md` first. |
 
 **Plan Mode (4-Phase):**
 1. ANALYSIS → Research, questions
-2. PLANNING → `{task-slug}.md`, task breakdown
+2. PLANNING → `PLAN-{task-slug}.md`, task breakdown
 3. SOLUTIONING → Architecture, design (NO CODE!)
 4. IMPLEMENTATION → Code + tests
 
-> 🔴 **Edit mode:** If multi-file or structural change → Offer to create `{task-slug}.md`. For single-file fixes → Proceed directly.
+> 🔴 **Edit mode:** If multi-file or structural change → Offer to create `PLAN-{task-slug}.md`. For single-file fixes → Proceed directly.
 
 ---
 
@@ -234,7 +234,7 @@ When user's prompt is NOT in English:
 | `app-builder` | Full-stack orchestration |
 | `frontend-design` | Web UI patterns |
 | `mobile-design` | Mobile UI patterns |
-| `plan-writing` | {task-slug}.md format |
+| `plan-writing` | `PLAN-{task-slug}.md` format |
 | `threejs-mastery` | 2025 3D Web (R3F, WebGPU) |
 | `behavioral-modes` | Mode switching |
 
@@ -242,7 +242,7 @@ When user's prompt is NOT in English:
 
 | Script | Path |
 |--------|------|
-| Full verify | `scripts/verify_all.py` |
+| Lint check | `.agent/skills/lint-and-validate/scripts/lint_runner.py` |
 | Security scan | `.agent/skills/vulnerability-scanner/scripts/security_scan.py` |
 | UX audit | `.agent/skills/frontend-design/scripts/ux_audit.py` |
 | Mobile audit | `.agent/skills/mobile-design/scripts/mobile_audit.py` |

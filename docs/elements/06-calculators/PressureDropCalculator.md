@@ -69,31 +69,16 @@ calculateFrictionLoss(1000, 12, 50, 0.0005);
 
 ### calculateFittingLoss
 
-Calculate pressure loss through fittings (elbows, tees, etc.).
+Calculate fitting loss using friction per 100 ft and equivalent length.
 
 ```typescript
-export function calculateFittingLoss(
-  velocityFpm: number,
-  lossCoefficient: number
-): number
+export function calculateFittingLoss(frictionPer100: number, equivalentLengthFeet: number): number
 ```
 
 **Formula:**
 ```typescript
-ΔP_fitting = C × Pv
-where:
-  C = loss coefficient (from tables like SMACNA)
-  Pv = velocity pressure = (V / 4005)²
+ΔP_fitting = (frictionPer100 / 100) * equivalentLengthFeet
 ```
-or expressed as:
-```typescript
-ΔP_fitting = K × (V² / 2g)
-```
-
-**Common Coefficients (K/C):**
-- 90° Elbow (Round): ~0.30
-- 90° Elbow (Rectangular w/ vanes): ~0.15
-- 45° Elbow: ~0.18
 
 ### calculateEquivalentDiameter
 
@@ -136,6 +121,9 @@ const velocityPressure = calculateVelocityPressure(velocity);
 
 const frictionLoss = calculateFrictionLoss(velocity, diameter, length);
 // ~0.12 in.w.g.
+
+// Equivalent length fitting loss (example: 35 ft equivalent length)
+const fittingLoss = calculateFittingLoss(0.12, 35);
 
 // For rectangular duct
 const eqDiameter = calculateEquivalentDiameter(12, 8);

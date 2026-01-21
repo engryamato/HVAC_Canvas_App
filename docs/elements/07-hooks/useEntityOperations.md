@@ -104,6 +104,6 @@ if (snapToGrid) {
 
 ## Related Elements
 
-- [Entity Commands](../09-commands/EntityCommands.md)
-- [Selection Store](../02-stores/SelectionStore.md)
-- [Viewport Store](../02-stores/ViewportStore.md)
+- [EntityCommands](../09-commands/EntityCommands.md)
+- [selectionStore](../02-stores/selectionStore.md)
+- [viewportStore](../02-stores/viewportStore.md)

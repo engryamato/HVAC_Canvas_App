@@ -32,28 +32,22 @@ src/features/canvas/tools/FittingTool.ts
 
 ```typescript
 type FittingType =
-  | 'elbow-90'
-  | 'elbow-45'
+  | 'elbow_90'
+  | 'elbow_45'
   | 'tee'
-  | 'wye'
-  | 'transition'
   | 'reducer'
-  | 'damper'
-  | 'flex-connector';
+  | 'cap';
 ```
 
 ## Fitting Type Labels
 
 ```typescript
 const FITTING_TYPE_LABELS: Record<FittingType, string> = {
-  'elbow-90': 'EL90',
-  'elbow-45': 'EL45',
-  'tee': 'TEE',
-  'wye': 'WYE',
-  'transition': 'TR',
-  'reducer': 'RD',
-  'damper': 'DMP',
-  'flex-connector': 'FC',
+  elbow_90: '90° Elbow',
+  elbow_45: '45° Elbow',
+  tee: 'Tee',
+  reducer: 'Reducer',
+  cap: 'Cap',
 };
 ```
 
@@ -310,14 +304,11 @@ function FittingSelector() {
       value={selectedFittingType}
       onChange={(e) => setSelectedFittingType(e.target.value as FittingType)}
     >
-      <option value="elbow-90">90° Elbow</option>
-      <option value="elbow-45">45° Elbow</option>
+      <option value="elbow_90">90° Elbow</option>
+      <option value="elbow_45">45° Elbow</option>
       <option value="tee">Tee</option>
-      <option value="wye">Wye</option>
-      <option value="transition">Transition</option>
       <option value="reducer">Reducer</option>
-      <option value="damper">Damper</option>
-      <option value="flex-connector">Flex Connector</option>
+      <option value="cap">Cap</option>
     </select>
   );
 }
@@ -330,7 +321,7 @@ function FittingSelector() {
 const fittingTool = new FittingTool();
 
 // Set fitting type before activating tool
-useToolStore.getState().setSelectedFittingType('elbow-90');
+useToolStore.getState().setSelectedFittingType('elbow_90');
 
 // Activate fitting tool
 fittingTool.onActivate();
@@ -413,56 +404,29 @@ Fittings are typically small and represented as point entities:
 
 ## Common Fitting Types
 
-### 90° Elbow (EL90)
+### 90° Elbow
 - Changes duct direction by 90 degrees
-- Most common fitting type
-- Typical pressure loss: 0.25" w.c.
 
-### 45° Elbow (EL45)
+### 45° Elbow
 - Changes duct direction by 45 degrees
-- Lower pressure loss than 90° elbow
-- Typical pressure loss: 0.15" w.c.
 
-### Tee (TEE)
+### Tee
 - Three-way junction
-- Splits or combines airflow
-- Requires balancing dampers
 
-### Wye (WYE)
-- Two-way split at 45° angle
-- Better airflow distribution than tee
-- Lower pressure loss
-
-### Transition (TR)
-- Changes duct size or shape
-- Rectangular to round conversion
-- Size reduction/expansion
-
-### Reducer (RD)
+### Reducer
 - Reduces duct size
-- Tapered for smooth airflow
-- Maintains pressure
 
-### Damper (DMP)
-- Flow control device
-- Balancing or shut-off
-- Manual or motorized
-
-### Flex Connector (FC)
-- Vibration isolation
-- Connects rigid to flexible duct
-- Sound attenuation
+### Cap
+- Duct end cap
 
 ## Related Elements
 
 - [BaseTool](./BaseTool.md) - Abstract base class
 - [FittingSchema](../03-schemas/FittingSchema.md) - Fitting entity validation
-- [FittingDefaults](../08-entities/fittingDefaults.md) - Fitting factory and labels
-- [FittingInspector](../01-components/inspector/FittingInspector.md) - Fitting property editing
-- [FittingRenderer](../05-renderers/FittingRenderer.md) - Fitting visualization
-- [ViewportStore](../02-stores/viewportStore.md) - Grid snapping settings
-- [CanvasStore](../02-stores/canvasStore.md) - Tool state management
-- [entityCommands](../../core/commands/entityCommands.md) - Undo support
+- [FittingDefaults](../08-entities/FittingDefaults.md) - Fitting factory and labels
+- [viewportStore](../02-stores/viewportStore.md) - Grid snapping settings
+- [canvasStore](../02-stores/canvasStore.md) - Tool state management
+- [EntityCommands](../09-commands/EntityCommands.md) - Undo support
 
 ## Testing
 
@@ -478,7 +442,7 @@ describe('FittingTool', () => {
       gridSize: 12,
     });
     mockToolStore = createMockToolStore({
-      selectedFittingType: 'elbow-90',
+      selectedFittingType: 'elbow_90',
     });
     tool = new FittingTool();
     tool.onActivate();
@@ -501,7 +465,7 @@ describe('FittingTool', () => {
       expect.objectContaining({
         type: 'fitting',
         props: expect.objectContaining({
-          fittingType: 'elbow-90',
+          fittingType: 'elbow_90',
         }),
         transform: expect.objectContaining({
           x: 96,  // Snapped to grid
@@ -601,14 +565,11 @@ describe('FittingTool', () => {
 
     // Test each fitting type
     const testCases: Array<[FittingType, string]> = [
-      ['elbow-90', 'EL90'],
-      ['elbow-45', 'EL45'],
-      ['tee', 'TEE'],
-      ['wye', 'WYE'],
-      ['transition', 'TR'],
-      ['reducer', 'RD'],
-      ['damper', 'DMP'],
-      ['flex-connector', 'FC'],
+      ['elbow_90', '90° Elbow'],
+      ['elbow_45', '45° Elbow'],
+      ['tee', 'Tee'],
+      ['reducer', 'Reducer'],
+      ['cap', 'Cap'],
     ];
 
     testCases.forEach(([type, label]) => {

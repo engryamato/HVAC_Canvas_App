@@ -27,6 +27,8 @@ export default async function CanvasRoute({ params }: { params?: Promise<CanvasR
 }
 ```
 
+The canvas index route (`app/(main)/canvas/page.tsx`) generates a tutorial project ID and redirects to `/canvas/[projectId]`.
+
 ## Components Used
 
 - CanvasPageWrapper (client component wrapper)

@@ -101,14 +101,14 @@ This user journey covers zooming the canvas viewport in the **Web Environment**.
 - Visual zoom with mouse wheel
 - Visual zoom with keyboard (Ctrl +/-)
 - Zoom indicator updates
-- Zoom slider interaction
+- Floating zoom buttons interaction
 - Cursor-based zoom centering
 - Grid visibility at different zooms
 
 **Assertions**:
 - Canvas content scales visually
 - Zoom percentage updates in UI
-- Slider position matches zoom level
+- Floating controls reflect zoom level
 - World point stays under cursor during zoom
 - Grid hidden at very low zoom
 - Smooth zoom transitions

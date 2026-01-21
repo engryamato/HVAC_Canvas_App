@@ -373,28 +373,13 @@ const note = createNote({
 
 This matches typical document annotation behavior where you click where you want the note to start.
 
-## Note Dimensions
-
-| Property | Value | Description |
-|----------|-------|-------------|
-| Default Width | 100px | Minimum note width |
-| Default Height | 50px | Minimum note height |
-| Font Size | 14px | Preview and entity text size |
-| Background | Yellow (#FFFFE8) | Sticky note appearance |
-| Border | Golden (#F9A825) | Border and pin color |
-| Icon Size | 6px diameter | Pin/tack icon |
-
 ## Note Properties
 
 ```typescript
 interface NoteProps {
-  content: string;          // Note text content
-  fontSize?: number;        // Text size (default: 14)
-  textColor?: string;       // Text color (default: #666666)
-  backgroundColor?: string; // Background color (default: #FFFFE8)
-  borderColor?: string;     // Border color (default: #F9A825)
-  width?: number;           // Note width (default: 100)
-  height?: number;          // Note height (default: 50)
+  content: string;   // Note text content
+  fontSize?: number; // Text size (default: 14)
+  color?: string;    // Text color (default: #000000)
 }
 ```
 
@@ -437,11 +422,10 @@ interface NoteProps {
 
 - [BaseTool](./BaseTool.md) - Abstract base class
 - [NoteSchema](../03-schemas/NoteSchema.md) - Note entity validation
-- [NoteDefaults](../08-entities/noteDefaults.md) - Note factory function
+- [NoteDefaults](../08-entities/NoteDefaults.md) - Note factory function
 - [NoteInspector](../01-components/inspector/NoteInspector.md) - Note editing interface
-- [NoteRenderer](../05-renderers/NoteRenderer.md) - Note visualization
-- [ViewportStore](../02-stores/viewportStore.md) - Grid snapping settings
-- [entityCommands](../../core/commands/entityCommands.md) - Undo support
+- [viewportStore](../02-stores/viewportStore.md) - Grid snapping settings
+- [EntityCommands](../09-commands/EntityCommands.md) - Undo support
 
 ## Testing
 

@@ -223,20 +223,15 @@ const {
 ```typescript
 import { useHistoryActions } from '@/core/commands/historyStore';
 import { useEntityActions } from '@/core/store/entityStore';
+import { createRoom } from '@/features/canvas/entities/roomDefaults';
 import { generateCommandId } from '@/core/commands/types';
 
-function createRoom(position: Point, size: Size) {
+function createRoomAt(position: { x: number; y: number }) {
   const { push } = useHistoryActions();
-  const { addEntity, removeEntity } = useEntityActions();
+  const { addEntity } = useEntityActions();
 
   const roomId = crypto.randomUUID();
-  const room = {
-    id: roomId,
-    type: 'room',
-    position,
-    size,
-    props: { name: 'New Room' },
-  };
+  const room = createRoom({ x: position.x, y: position.y });
 
   // Create reversible command
   const command: ReversibleCommand = {

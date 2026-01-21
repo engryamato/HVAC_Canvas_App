@@ -1,47 +1,46 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useViewportStore } from '@/stores/useViewportStore';
 import {
     MousePointer2,
     Square,
-    Minus,
     Move,
     Box,
     Circle,
     StickyNote,
     Undo,
     Redo,
-    Grid,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EquipmentTypeSelector } from '@/components/canvas/EquipmentTypeSelector';
+import { FittingTypeSelector } from '@/components/canvas/FittingTypeSelector';
 
+/**
+ * Toolbar - Modern Engineering Design 2025
+ * Clean tool selection bar with visual grouping and shortcuts
+ */
 export const Toolbar: React.FC = () => {
     const { currentTool: activeTool, setTool: setActiveTool } = useToolStore();
-    const { zoom, setZoom, fitToScreen, toggleGrid, gridVisible } = useViewportStore();
+    const { toggleGrid } = useViewportStore();
 
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Ignore if input/textarea focused
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
                 return;
             }
 
-            // Grid toggle (Ctrl+G)
             if (e.ctrlKey && (e.key === 'g' || e.key === 'G')) {
                 e.preventDefault();
                 toggleGrid();
                 return;
             }
 
-            // Tool shortcuts (matching E2E expectations)
             switch (e.key.toLowerCase()) {
                 case 'v': setActiveTool('select'); break;
-                case 'l': setActiveTool('line'); break;
                 case 'r': setActiveTool('room'); break;
                 case 'd': setActiveTool('duct'); break;
                 case 'e': setActiveTool('equipment'); break;
@@ -57,7 +56,6 @@ export const Toolbar: React.FC = () => {
 
     const tools = [
         { id: 'select', label: 'Select', icon: MousePointer2, shortcut: 'V' },
-        { id: 'line', label: 'Line', icon: Minus, shortcut: 'L' },
         { id: 'room', label: 'Room', icon: Square, shortcut: 'R' },
         { id: 'duct', label: 'Duct', icon: Move, shortcut: 'D' },
         { id: 'equipment', label: 'Equipment', icon: Box, shortcut: 'E' },
@@ -66,42 +64,46 @@ export const Toolbar: React.FC = () => {
     ] as const;
 
     return (
-        <Card
-            className="h-[45px] bg-white border-b flex items-center px-4 gap-4 rounded-none shrink-0"
+        <div
+            className="h-11 bg-white border-b border-slate-200 flex items-center px-4 gap-3 shrink-0"
             data-testid="toolbar"
         >
             {/* Tool Selection */}
-            <div className="flex gap-1" role="toolbar" aria-label="Drawing tools">
+            <div className="flex gap-0.5 bg-slate-100 p-1 rounded-lg" role="toolbar" aria-label="Drawing tools">
                 {tools.map((tool) => {
                     const Icon = tool.icon;
                     const isActive = activeTool === tool.id;
                     return (
-                        <Button
+                        <button
                             key={tool.id}
-                            variant={isActive ? 'default' : 'ghost'}
-                            size="sm"
                             onClick={() => setActiveTool(tool.id)}
-                            className={cn("gap-1 h-8") + (isActive ? " active" : "")}
+                            className={cn(
+                                "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150",
+                                isActive
+                                    ? "bg-white text-slate-900 shadow-sm"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                            )}
                             data-testid={`tool-${tool.id}`}
                             aria-label={tool.label}
                             aria-pressed={isActive}
                             title={`${tool.label} (${tool.shortcut})`}
                         >
                             <Icon className="w-4 h-4" />
-                            <span className="hidden md:inline text-xs">{tool.label}</span>
-                        </Button>
+                            <span className="hidden lg:inline text-xs">{tool.label}</span>
+                        </button>
                     );
                 })}
             </div>
 
-            {/* Divider */}
-            <div className="h-6 w-px bg-slate-200" />
+            {/* Conditional Type Selectors */}
+            {activeTool === 'equipment' && <EquipmentTypeSelector />}
+            {activeTool === 'fitting' && <FittingTypeSelector />}
 
-            {/* Divider */}
-            <div className="h-6 w-px bg-slate-200" />
+            {/* Spacer */}
+            <div className="flex-1" />
 
-            {/* Undo/Redo */}
-            <div className="flex gap-1" role="group" aria-label="History">
+            {/* Undo/Redo Group */}
+            <div className="flex items-center gap-0.5 bg-slate-100 p-1 rounded-lg" role="group" aria-label="History">
                 <Button
                     variant="ghost"
                     size="sm"
@@ -109,7 +111,7 @@ export const Toolbar: React.FC = () => {
                     data-testid="undo-button"
                     aria-label="Undo"
                     title="Undo (Ctrl+Z)"
-                    className="h-8 w-8 p-0"
+                    className="h-7 w-7 p-0 rounded-md"
                 >
                     <Undo className="w-4 h-4" />
                 </Button>
@@ -120,11 +122,11 @@ export const Toolbar: React.FC = () => {
                     data-testid="redo-button"
                     aria-label="Redo"
                     title="Redo (Ctrl+Shift+Z)"
-                    className="h-8 w-8 p-0"
+                    className="h-7 w-7 p-0 rounded-md"
                 >
                     <Redo className="w-4 h-4" />
                 </Button>
             </div>
-        </Card>
+        </div>
     );
 };

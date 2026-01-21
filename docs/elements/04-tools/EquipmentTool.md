@@ -32,14 +32,13 @@ src/features/canvas/tools/EquipmentTool.ts
 
 ```typescript
 type EquipmentType =
-  | 'air-handler'
+  | 'hood'
+  | 'fan'
+  | 'diffuser'
+  | 'damper'
+  | 'air_handler'
   | 'furnace'
-  | 'heat-pump'
-  | 'condenser'
-  | 'fan-coil'
-  | 'vav-box'
-  | 'exhaust-fan'
-  | 'make-up-air';
+  | 'rtu';
 ```
 
 ## Tool State
@@ -218,21 +217,55 @@ render(context: ToolRenderContext): void {
 
 ```typescript
 const EQUIPMENT_TYPE_DEFAULTS: Record<EquipmentType, EquipmentDefaults> = {
-  'air-handler': {
-    width: 48,      // 4 feet
-    depth: 36,      // 3 feet
-    height: 60,     // 5 feet
-    airflow: 2000,  // CFM
-    // ... other defaults
+  hood: {
+    capacity: 1200,
+    staticPressure: 0.5,
+    width: 48,
+    depth: 36,
+    height: 24,
   },
-  'furnace': {
-    width: 30,      // 2.5 feet
-    depth: 30,      // 2.5 feet
-    height: 48,     // 4 feet
-    heatingCapacity: 80000, // BTU/hr
-    // ... other defaults
+  fan: {
+    capacity: 2000,
+    staticPressure: 1.0,
+    width: 24,
+    depth: 24,
+    height: 24,
   },
-  // ... other equipment types
+  diffuser: {
+    capacity: 150,
+    staticPressure: 0.1,
+    width: 24,
+    depth: 24,
+    height: 6,
+  },
+  damper: {
+    capacity: 500,
+    staticPressure: 0.05,
+    width: 12,
+    depth: 6,
+    height: 12,
+  },
+  air_handler: {
+    capacity: 10000,
+    staticPressure: 2.0,
+    width: 72,
+    depth: 48,
+    height: 60,
+  },
+  furnace: {
+    capacity: 80000,
+    staticPressure: 0.5,
+    width: 24,
+    depth: 36,
+    height: 48,
+  },
+  rtu: {
+    capacity: 12000,
+    staticPressure: 1.5,
+    width: 84,
+    depth: 48,
+    height: 36,
+  },
 };
 ```
 
@@ -306,14 +339,13 @@ function EquipmentSelector() {
       value={selectedEquipmentType}
       onChange={(e) => setSelectedEquipmentType(e.target.value as EquipmentType)}
     >
-      <option value="air-handler">Air Handler</option>
+      <option value="hood">Exhaust Hood</option>
+      <option value="fan">Fan</option>
+      <option value="diffuser">Diffuser</option>
+      <option value="damper">Damper</option>
+      <option value="air_handler">Air Handling Unit</option>
       <option value="furnace">Furnace</option>
-      <option value="heat-pump">Heat Pump</option>
-      <option value="condenser">Condenser</option>
-      <option value="fan-coil">Fan Coil</option>
-      <option value="vav-box">VAV Box</option>
-      <option value="exhaust-fan">Exhaust Fan</option>
-      <option value="make-up-air">Make-Up Air</option>
+      <option value="rtu">RTU</option>
     </select>
   );
 }
@@ -326,7 +358,7 @@ function EquipmentSelector() {
 const equipmentTool = new EquipmentTool();
 
 // Set equipment type before activating tool
-useToolStore.getState().setSelectedEquipmentType('air-handler');
+useToolStore.getState().setSelectedEquipmentType('air_handler');
 
 // Activate equipment tool
 equipmentTool.onActivate();
@@ -364,13 +396,13 @@ function renderCanvas() {
 ```
 User Action                   Tool State              Canvas Display
 ──────────────────────────────────────────────────────────────────────
-1. Select "Air Handler"      selectedType:           No preview yet
-   in toolbar                'air-handler'
+1. Select "Air Handling Unit" selectedType:          No preview yet
+   in toolbar                 'air_handler'
 
 2. Activate Equipment Tool   Tool active             Crosshair cursor
 
 3. Move cursor to (200, 150) currentPoint:           Orange dashed rectangle
-                              (200, 150)             Label: "AIR-HANDLER"
+                              (200, 150)             Label: "AIR_HANDLER"
                                                      Follows cursor
 
 4. Click mouse               Entity created          Solid equipment entity
@@ -411,25 +443,24 @@ Default dimensions for each equipment type:
 
 | Equipment Type | Width | Depth | Height | Primary Capacity |
 |----------------|-------|-------|--------|------------------|
-| Air Handler | 48" (4ft) | 36" (3ft) | 60" (5ft) | 2000 CFM |
-| Furnace | 30" (2.5ft) | 30" (2.5ft) | 48" (4ft) | 80,000 BTU/hr |
-| Heat Pump | 36" (3ft) | 36" (3ft) | 36" (3ft) | 36,000 BTU/hr |
-| Condenser | 36" (3ft) | 36" (3ft) | 36" (3ft) | 36,000 BTU/hr |
-| Fan Coil | 24" (2ft) | 24" (2ft) | 12" (1ft) | 500 CFM |
-| VAV Box | 36" (3ft) | 24" (2ft) | 18" (1.5ft) | 1000 CFM |
-| Exhaust Fan | 24" (2ft) | 24" (2ft) | 24" (2ft) | 1000 CFM |
-| Make-Up Air | 48" (4ft) | 36" (3ft) | 36" (3ft) | 2000 CFM |
+| Exhaust Hood | 48" (4ft) | 36" (3ft) | 24" (2ft) | 1200 CFM |
+| Fan | 24" (2ft) | 24" (2ft) | 24" (2ft) | 2000 CFM |
+| Diffuser | 24" (2ft) | 24" (2ft) | 6" (0.5ft) | 150 CFM |
+| Damper | 12" (1ft) | 6" (0.5ft) | 12" (1ft) | 500 CFM |
+| Air Handling Unit | 72" (6ft) | 48" (4ft) | 60" (5ft) | 10000 CFM |
+| Furnace | 24" (2ft) | 36" (3ft) | 48" (4ft) | 80000 CFM |
+| RTU | 84" (7ft) | 48" (4ft) | 36" (3ft) | 12000 CFM |
 
 ## Related Elements
 
 - [BaseTool](./BaseTool.md) - Abstract base class
 - [EquipmentSchema](../03-schemas/EquipmentSchema.md) - Equipment entity validation
-- [EquipmentDefaults](../08-entities/equipmentDefaults.md) - Equipment factory and defaults
+- [EquipmentDefaults](../08-entities/EquipmentDefaults.md) - Equipment factory and defaults
 - [EquipmentInspector](../01-components/inspector/EquipmentInspector.md) - Equipment property editing
 - [EquipmentRenderer](../05-renderers/EquipmentRenderer.md) - Equipment visualization
-- [ViewportStore](../02-stores/viewportStore.md) - Grid snapping settings
-- [CanvasStore](../02-stores/canvasStore.md) - Tool state management
-- [entityCommands](../../core/commands/entityCommands.md) - Undo support
+- [viewportStore](../02-stores/viewportStore.md) - Grid snapping settings
+- [canvasStore](../02-stores/canvasStore.md) - Tool state management
+- [EntityCommands](../09-commands/EntityCommands.md) - Undo support
 
 ## Testing
 
@@ -445,7 +476,7 @@ describe('EquipmentTool', () => {
       gridSize: 12,
     });
     mockToolStore = createMockToolStore({
-      selectedEquipmentType: 'air-handler',
+      selectedEquipmentType: 'air_handler',
     });
     tool = new EquipmentTool();
     tool.onActivate();

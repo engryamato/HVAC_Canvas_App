@@ -177,4 +177,4 @@ undo();
 
 - [Command Types](./CommandTypes.md)
 - [History Store](./HistoryStore.md)
-- [Entity Store](../02-stores/EntityStore.md)
+- [entityStore](../02-stores/entityStore.md)

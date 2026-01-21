@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { SortBy, SortOrder } from '../hooks/useProjectFilters';
 import { useAppStateStore } from '@/stores/useAppStateStore';
+import { Search, ChevronDown, RefreshCw, X } from 'lucide-react';
 
 interface SearchBarProps {
     value: string;
@@ -16,8 +17,8 @@ interface SearchBarProps {
 }
 
 /**
- * SearchBar component with search, sort, and rescan functionality
- * Implements UJ-PM-007: Search & Filter Projects
+ * SearchBar - Modern Engineering Design 2025
+ * Clean input with icon, sort dropdown, and project count
  */
 export function SearchBar({
     value,
@@ -32,12 +33,11 @@ export function SearchBar({
     const [localValue, setLocalValue] = useState(value);
     const isTauri = useAppStateStore((state) => state.isTauri);
 
-    // Debounce the onChange callback by 300ms
+    // Debounce the onChange callback
     useEffect(() => {
         const timer = setTimeout(() => {
             onChange(localValue);
         }, 300);
-
         return () => clearTimeout(timer);
     }, [localValue, onChange]);
 
@@ -59,91 +59,65 @@ export function SearchBar({
     const currentSortValue = `${sortBy}-${sortOrder}`;
 
     return (
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '100%' }}>
+        <div className="flex items-center gap-3 flex-wrap">
             {/* Search Input */}
-            <div style={{ position: 'relative', flex: '1', maxWidth: '400px' }}>
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 <input
                     type="text"
                     placeholder="Search projects..."
                     value={localValue}
                     onChange={(e) => setLocalValue(e.target.value)}
-                    style={{
-                        width: '100%',
-                        padding: '8px 32px 8px 12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                    }}
+                    className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-200 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                     aria-label="Search projects"
                 />
                 {localValue && (
                     <button
                         onClick={handleClear}
-                        style={{
-                            position: 'absolute',
-                            right: '8px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '18px',
-                            color: '#999',
-                        }}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                         aria-label="Clear search"
                     >
-                        ×
+                        <X className="w-4 h-4" />
                     </button>
                 )}
             </div>
 
             {/* Sort Dropdown */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <label htmlFor="sort-select" style={{ fontSize: '14px', color: '#666' }}>
-                    Sort:
-                </label>
+            <div className="relative">
                 <select
                     id="sort-select"
                     value={currentSortValue}
                     onChange={handleSortChange}
-                    style={{
-                        padding: '8px 12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                    }}
+                    className="appearance-none pl-3 pr-9 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                 >
                     <option value="name-asc">Name (A-Z)</option>
                     <option value="name-desc">Name (Z-A)</option>
-                    <option value="date-desc">Date (Newest)</option>
-                    <option value="date-asc">Date (Oldest)</option>
+                    <option value="date-desc">Newest</option>
+                    <option value="date-asc">Oldest</option>
                 </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
 
-            {/* Project Count */}
-            <div style={{ fontSize: '14px', color: '#666', whiteSpace: 'nowrap' }}>
+            {/* Project Count Badge */}
+            <div className="text-sm text-slate-500 font-medium whitespace-nowrap">
                 {filteredCount === totalCount
-                    ? `${totalCount} project${totalCount !== 1 ? 's' : ''}`
-                    : `${filteredCount} of ${totalCount} projects`}
+                    ? <span>{totalCount} project{totalCount !== 1 ? 's' : ''}</span>
+                    : <span className="text-blue-600">{filteredCount}</span>
+                }
+                {filteredCount !== totalCount && (
+                    <span className="text-slate-400"> of {totalCount}</span>
+                )}
             </div>
 
             {/* Rescan Button (Tauri only) */}
             {isTauri && onRescan && (
                 <button
                     onClick={onRescan}
-                    style={{
-                        padding: '8px 16px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        background: 'white',
-                        whiteSpace: 'nowrap',
-                    }}
+                    className="btn-secondary"
                     aria-label="Rescan project folder"
                 >
-                    🔄 Rescan Folder
+                    <RefreshCw className="w-4 h-4" />
+                    Rescan
                 </button>
             )}
         </div>

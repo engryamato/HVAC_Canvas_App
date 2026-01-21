@@ -38,6 +38,18 @@ export function createDuct(overrides?: Partial<{
 }>): Duct
 ```
 
+### resetDuctCounter
+
+```typescript
+export function resetDuctCounter(): void
+```
+
+### getNextDuctNumber
+
+```typescript
+export function getNextDuctNumber(): number
+```
+
 ## Default Values
 
 ```typescript
@@ -46,9 +58,12 @@ DEFAULT_ROUND_DUCT_PROPS = {
   diameter: 12,           // inches
   length: 10,             // feet
   material: 'galvanized',
-  airflow: 400,           // CFM
-  staticPressure: 0.5,    // in.w.g.
+  airflow: 500,           // CFM
+  staticPressure: 0.1,    // in.w.g.
 };
+
+// Rectangular defaults used by createDuct when shape === 'rectangular'
+// width: 12, height: 12, length: 10, material: galvanized
 ```
 
 ## Usage
@@ -67,7 +82,7 @@ const supplyMain = createDuct({
   airflow: 2000,
 });
 
-// Rectangular duct
+// Rectangular duct (defaults width/height to 12/12 when not provided)
 const rectDuct = createDuct({
   shape: 'rectangular',
   width: 12,

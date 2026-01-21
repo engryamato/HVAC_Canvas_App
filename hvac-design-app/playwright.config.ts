@@ -82,8 +82,8 @@ export default defineConfig({
   /* Run local dev server before starting the tests */
   /* Only run webServer if NOT in CI/Docker (host mode) */
   webServer: {
-    command: 'npm run dev -- --port 3001',
-    url: 'http://localhost:3001',
+    command: 'npm run dev -- --port 3002',
+    url: 'http://localhost:3002',
     reuseExistingServer: true,
     timeout: 300 * 1000,
   },

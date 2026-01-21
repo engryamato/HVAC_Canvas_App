@@ -13,17 +13,31 @@ export interface ToastProps {
   onDismiss?: (id: string) => void;
 }
 
-export function Toast({ id, message, type = 'info', duration = 5000, onDismiss }: ToastProps) {
+export function Toast({ id, message, type = 'info', duration = 5000, onDismiss }: Readonly<ToastProps>) {
   useEffect(() => {
     const timer = setTimeout(() => onDismiss?.(id), duration);
     return () => clearTimeout(timer);
   }, [duration, id, onDismiss]);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onDismiss?.(id);
+    }
+  };
+
   return (
-    <div className={`${styles.toast} ${styles[type]}`} role="status" onClick={() => onDismiss?.(id)}>
+    <output
+      className={`${styles.toast} ${styles[type]}`}
+      aria-live="polite"
+      data-testid={`toast-${type}`}
+      onClick={() => onDismiss?.(id)}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+    >
       <span>{message}</span>
-      <button className={styles.close}>×</button>
-    </div>
+      <button className={styles.close} aria-label="Dismiss notification">×</button>
+    </output>
   );
 }
 
@@ -32,9 +46,9 @@ export interface ToastContainerProps {
   onDismiss?: (id: string) => void;
 }
 
-export function ToastContainer({ toasts, onDismiss }: ToastContainerProps) {
+export function ToastContainer({ toasts, onDismiss }: Readonly<ToastContainerProps>) {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="toast-container" aria-live="polite">
       {toasts.map((toast) => (
         <Toast key={toast.id} {...toast} onDismiss={onDismiss} />
       ))}

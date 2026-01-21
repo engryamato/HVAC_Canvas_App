@@ -28,6 +28,18 @@ export function createFitting(
 ): Fitting
 ```
 
+### resetFittingCounter
+
+```typescript
+export function resetFittingCounter(): void
+```
+
+### getNextFittingNumber
+
+```typescript
+export function getNextFittingNumber(): number
+```
+
 ## Fitting Types
 
 ```typescript

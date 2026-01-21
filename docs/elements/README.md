@@ -61,7 +61,7 @@ docs/elements/
 - [NewProjectDialog](./01-components/dashboard/NewProjectDialog.md) - New project modal
 - [ConfirmDialog](./01-components/dashboard/ConfirmDialog.md) - Confirmation modal
 
-### Stores (8 total)
+### Stores (9 total)
 - [entityStore](./02-stores/entityStore.md) - Entity state management
 - [canvasStore](./02-stores/canvasStore.md) - Canvas tool state
 - [projectStore](./02-stores/projectStore.md) - Project metadata
@@ -70,6 +70,7 @@ docs/elements/
 - [selectionStore](./02-stores/selectionStore.md) - Selection state
 - [projectListStore](./02-stores/projectListStore.md) - Project list
 - [historyStore](./02-stores/historyStore.md) - Undo/redo history
+- [settingsStore](./02-stores/settingsStore.md) - App settings
 
 ### Schemas (8 total)
 - [BaseSchema](./03-schemas/BaseSchema.md) - Base entity schema
@@ -134,7 +135,7 @@ docs/elements/
 - [Math](./11-geometry/Math.md) - Math utilities
 
 ### Pages (4 total)
-- [HomePage](./12-pages/HomePage.md) - Root redirect
+- [HomePage](./12-pages/HomePage.md) - App initializer entry
 - [DashboardPage](./12-pages/DashboardPage.md) - Project dashboard
 - [CanvasPage](./12-pages/CanvasEditorPage.md) - Canvas editor
 - [Layout](./12-pages/Layout.md) - Root layout
@@ -166,7 +167,7 @@ Each element documentation follows this structure:
 | Dashboard Components | 3 |
 | Inspector Components | 5 |
 | Export Components | 1 |
-| Zustand Stores | 8 |
+| Zustand Stores | 9 |
 | Zod Schemas | 8 |
 | Canvas Tools | 7 |
 | Renderers | 3 |
@@ -177,4 +178,4 @@ Each element documentation follows this structure:
 | Persistence Modules | 3 |
 | Geometry Modules | 2 |
 | Pages | 4 |
-| **Total Elements** | **84** |
+| **Total Elements** | **85** |

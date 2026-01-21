@@ -118,7 +118,7 @@ export type PlanReference = z.infer<typeof PlanReferenceSchema>;
 
 ### ProjectSettingsSchema
 
-Project-wide configuration and display settings.
+Project-wide configuration and display settings. Uses `passthrough()` to allow future/unknown keys.
 
 ```typescript
 export const ProjectSettingsSchema = z.object({
@@ -127,7 +127,7 @@ export const ProjectSettingsSchema = z.object({
   gridVisible: z.boolean().default(true),
   scale: z.string().optional().describe('User-facing scale label e.g. "1/4 inch = 1 foot"'),
   planScale: PlanScaleSchema.optional(),
-});
+}).passthrough();
 
 export type ProjectSettings = z.infer<typeof ProjectSettingsSchema>;
 ```
@@ -203,7 +203,7 @@ export type BillOfMaterials = z.infer<typeof BillOfMaterialsSchema>;
 
 ### ProjectFileSchema
 
-The complete root schema for .sws project files.
+The complete root schema for .sws project files. Uses `passthrough()` to preserve unknown fields.
 
 ```typescript
 export const ProjectFileSchema = z.object({
@@ -228,7 +228,7 @@ export const ProjectFileSchema = z.object({
       currentIndex: z.number().int().nonnegative(),
     })
     .optional(),
-});
+}).passthrough();
 
 export type ProjectFile = z.infer<typeof ProjectFileSchema>;
 ```
@@ -247,9 +247,40 @@ export type ProjectFile = z.infer<typeof ProjectFileSchema>;
 - `calculations`, `billOfMaterials`: Optional future features
 - `commandHistory`: Optional undo/redo support
 
+### ProjectScopeSchema
+
+Structured scope metadata for project summaries.
+
+```typescript
+export const ProjectScopeSchema = z.object({
+  details: z.array(z.string()),
+  materials: z.array(z.object({ type: z.string(), grade: z.string().optional() })),
+  projectType: z.string(),
+});
+
+export type ProjectScope = z.infer<typeof ProjectScopeSchema>;
+```
+
+### SiteConditionsSchema
+
+Environmental and code conditions tied to the project.
+
+```typescript
+export const SiteConditionsSchema = z.object({
+  elevation: z.string(),
+  outdoorTemp: z.string(),
+  indoorTemp: z.string(),
+  windSpeed: z.string(),
+  humidity: z.string(),
+  localCodes: z.string(),
+});
+
+export type SiteConditions = z.infer<typeof SiteConditionsSchema>;
+```
+
 ### ProjectDetailsSchema
 
-Simplified metadata for project listings.
+Simplified metadata for project listings, including optional location, scope, and site conditions.
 
 ```typescript
 export const ProjectDetailsSchema = z.object({
@@ -257,6 +288,9 @@ export const ProjectDetailsSchema = z.object({
   projectName: z.string().min(1).max(100),
   projectNumber: z.string().max(50).optional(),
   clientName: z.string().max(100).optional(),
+  location: z.string().max(200).optional(),
+  scope: ProjectScopeSchema.optional(),
+  siteConditions: SiteConditionsSchema.optional(),
   createdAt: z.string().datetime(),
   modifiedAt: z.string().datetime(),
 });
@@ -679,9 +713,9 @@ function getProjectSummary(project: ProjectFile): string {
 - [FittingSchema](./FittingSchema.md) - Fitting entity schema
 - [NoteSchema](./NoteSchema.md) - Note entity schema
 - [GroupSchema](./GroupSchema.md) - Group entity schema
-- [ProjectStore](../07-stores/ProjectStore.md) - Project state management
-- [FileManager](../02-services/FileManager.md) - File I/O operations
-- [NewProjectDialog](../01-components/NewProjectDialog.md) - Project creation UI
+- [projectStore](../02-stores/projectStore.md) - Project state management
+- [ProjectIO](../10-persistence/ProjectIO.md) - File I/O operations
+- [NewProjectDialog](../01-components/dashboard/NewProjectDialog.md) - Project creation UI
 
 ## Testing
 

@@ -40,7 +40,7 @@ interface PreferencesState {
 export const PREFERENCES_DEFAULTS: PreferencesState = {
   projectFolder: '/projects',
   unitSystem: 'imperial',
-  autoSaveInterval: 60000, // 1 minute
+  autoSaveInterval: 300000, // 5 minutes
   gridSize: 24, // pixels
   theme: 'light',
 };

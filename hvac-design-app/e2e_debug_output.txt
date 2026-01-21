@@ -1,0 +1,92 @@
+
+Running 4 tests using 4 workers
+
+PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PAGE LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+PAGE LOG: [ProjectListStore] No persisted state, using defaults
+PAGE LOG: [ProjectListStore] Hydration finished, projects: 0
+PAGE LOG: [NewProjectDialog] Manual save success
+PAGE LOG: [ProjectListStore] Adding project: {projectId: 2ee2ba69-7831-4c0b-9014-8340ef5429c1, projectName: RTU Placement Project, projectNumber: undefined, clientName: undefined, entityCount: 0}
+PAGE LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed {projectId: 2ee2ba69-7831-4c0b-9014-8340ef5429c1}
+PAGE LOG: [CanvasPageWrapper] Project: RTU Placement Project, Version: 1.0.0, App Version: 1.0.0
+PAGE LOG: [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed {projectId: 2ee2ba69-7831-4c0b-9014-8340ef5429c1}
+PAGE LOG: [CanvasPageWrapper] Project: RTU Placement Project, Version: 1.0.0, App Version: 1.0.0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+  Γ£ô  4 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:17:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 1: Select RTU Equipment Type (1.5s)
+  Γ£ô  2 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:35:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 2: Position and Place RTU (1.6s)
+  Γ£ÿ  3 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:54:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 3: Configure RTU Capacity (7.1s)
+  Γ£ÿ  1 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:96:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 5: Verify Equipment in BOM (7.2s)
+
+
+  1) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:54:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 3: Configure RTU Capacity ΓÇ║ Step 3: Inspector shows RTU properties 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('tool-select')
+    Expected: [32m"true"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('tool-select')[22m
+
+
+      77 |       // Switch to Select tool
+      78 |       await page.keyboard.press('v');
+    > 79 |       await expect(page.getByTestId('tool-select')).toHaveAttribute('aria-pressed', 'true');
+         |                                                     ^
+      80 |       
+      81 |       await page.waitForTimeout(300);
+      82 |       
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:79:53
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:76:5
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\03-entity-creation-tauri-o-4b61f-ep-3-Configure-RTU-Capacity-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\03-entity-creation-tauri-o-4b61f-ep-3-Configure-RTU-Capacity-chromium\error-context.md
+
+  2) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:96:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 5: Verify Equipment in BOM ΓÇ║ Place RTU 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('status-bar')
+    Expected pattern: [32m/\d+ items?/[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('status-bar')[22m
+
+
+      115 |        await page.waitForTimeout(500);
+      116 |        
+    > 117 |        await expect(page.getByTestId('status-bar')).toContainText(/\d+ items?/);
+          |                                                     ^
+      118 |     });
+      119 |
+      120 |     await test.step('Open BOM panel', async () => {
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:117:53
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:101:5
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\03-entity-creation-tauri-o-4a65b-p-5-Verify-Equipment-in-BOM-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\03-entity-creation-tauri-o-4a65b-p-5-Verify-Equipment-in-BOM-chromium\error-context.md
+
+  2 failed
+    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:54:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 3: Configure RTU Capacity 
+    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts:96:7 ΓÇ║ UJ-EC-007: Draw Equipment (RTU) (Tauri Offline) ΓÇ║ Step 5: Verify Equipment in BOM 
+  2 passed (8.0s)

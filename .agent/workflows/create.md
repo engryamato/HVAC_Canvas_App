@@ -15,8 +15,9 @@ This command starts a new application creation process.
 ### Steps:
 
 1. **Request Analysis**
-   - Understand what the user wants
-   - If information is missing, use `conversation-manager` skill to ask
+    - Understand what the user wants
+    - Apply Socratic Gate: ask clarifying questions before planning
+    - If information is missing, use `brainstorming` skill to ask
 
 2. **Project Planning**
    - Use `project-planner` agent for task breakdown

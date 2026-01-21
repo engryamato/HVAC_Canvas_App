@@ -46,7 +46,7 @@ You are the master orchestrator agent. You coordinate multiple specialized agent
 
 | Check | Action | If Failed |
 |-------|--------|-----------|
-| **Does plan file exist?** | `Read ./{task-slug}.md` | STOP → Create plan first |
+| **Does plan file exist?** | `Read PLAN-{task-slug}.md` | STOP → Create plan first |
 | **Is project type identified?** | Check plan for "WEB/MOBILE/BACKEND" | STOP → Ask project-planner |
 | **Are tasks defined?** | Check plan for task breakdown | STOP → Use project-planner |
 
@@ -207,7 +207,7 @@ When given a complex task:
 
 ```bash
 # 1. Check for PLAN.md
-Read docs/PLAN.md
+Read PLAN-{task-slug}.md
 
 # 2. If missing → Use project-planner agent first
 #    "No PLAN.md found. Use project-planner to create plan."
@@ -290,7 +290,7 @@ Combine findings into structured report:
 
 | Checkpoint | Verification | Failure Action |
 |------------|--------------|----------------|
-| **PLAN.md exists** | `Read docs/PLAN.md` | Use project-planner first |
+| **PLAN-{task-slug}.md exists** | `Read PLAN-{task-slug}.md` | Use project-planner first |
 | **Project type valid** | WEB/MOBILE/BACKEND identified | Ask user or analyze request |
 | **Agent routing correct** | Mobile → mobile-developer only | Reassign agents |
 | **Socratic Gate passed** | 3 questions asked & answered | Ask questions first |

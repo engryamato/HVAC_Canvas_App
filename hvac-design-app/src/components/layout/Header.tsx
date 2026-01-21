@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Home, Settings } from 'lucide-react';
+import { ChevronRight, Home, Settings, FolderOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FileMenu } from './FileMenu';
 import { EditMenu } from './EditMenu';
@@ -19,6 +18,10 @@ interface HeaderProps {
     showMenuBar?: boolean;
 }
 
+/**
+ * Header - Modern Engineering Design 2025
+ * Glassmorphism header with refined branding and navigation
+ */
 export const Header: React.FC<HeaderProps> = ({
     projectName,
     showBreadcrumb = true,
@@ -31,14 +34,11 @@ export const Header: React.FC<HeaderProps> = ({
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Ctrl+Shift+D: Go to Dashboard
             if (e.ctrlKey && e.shiftKey && (e.key === 'd' || e.key === 'D')) {
                 e.preventDefault();
                 router.push('/dashboard');
                 return;
             }
-
-            // Ctrl+/: Show keyboard shortcuts
             if (e.ctrlKey && e.key === '/') {
                 e.preventDefault();
                 setShortcutsOpen(true);
@@ -52,66 +52,78 @@ export const Header: React.FC<HeaderProps> = ({
 
     return (
         <>
-            <Card
-                className="h-[50px] bg-white/95 backdrop-blur-sm border-b flex items-center px-4 justify-between rounded-none shrink-0"
+            <header
+                className="h-12 glass-header flex items-center px-4 justify-between shrink-0 z-40"
                 data-testid="header"
             >
                 {/* Left: Logo + Menu Bar + Breadcrumb */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     {/* Logo / Branding */}
                     <div
-                        className="font-bold text-blue-600 mr-2 cursor-pointer"
+                        className="flex items-center gap-2 cursor-pointer group"
                         data-testid="app-logo"
                         onClick={() => router.push('/dashboard')}
                     >
-                        HVAC Canvas
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
+                            <FolderOpen className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="font-bold text-slate-800 text-sm tracking-tight">
+                            HVAC Pro
+                        </span>
                     </div>
+
+                    {/* Divider */}
+                    <div className="h-5 w-px bg-slate-200" />
 
                     {/* Menu Bar */}
                     {showMenuBar && (
-                        <div className="flex items-center gap-0.5">
+                        <nav className="flex items-center gap-0.5" role="menubar">
                             <FileMenu />
                             <EditMenu />
                             <ViewMenu onResetLayout={() => { /* TODO */ }} />
                             <ToolsMenu />
                             <HelpMenu onShowShortcuts={() => setShortcutsOpen(true)} />
-                        </div>
+                        </nav>
                     )}
 
                     {/* Breadcrumb */}
                     {showBreadcrumb && projectName && (
-                        <div className="flex items-center gap-2 text-sm ml-4" data-testid="breadcrumb">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => router.push('/dashboard')}
-                                className="gap-1 h-7"
-                                data-testid="breadcrumb-dashboard"
-                            >
-                                <Home className="w-3.5 h-3.5" />
-                                Dashboard
-                            </Button>
-                            <ChevronRight className="w-4 h-4 text-slate-400" />
-                            <span className="font-medium text-slate-700 truncate max-w-[200px]">
-                                {projectName}
-                            </span>
-                        </div>
+                        <>
+                            <div className="h-5 w-px bg-slate-200 ml-2" />
+                            <div className="flex items-center gap-1.5 text-sm" data-testid="breadcrumb">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => router.push('/dashboard')}
+                                    className="gap-1.5 h-7 px-2 text-slate-500 hover:text-slate-900"
+                                    data-testid="breadcrumb-dashboard"
+                                >
+                                    <Home className="w-3.5 h-3.5" />
+                                    <span className="hidden sm:inline">Dashboard</span>
+                                </Button>
+                                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+                                <span className="font-semibold text-slate-800 truncate max-w-[180px]">
+                                    {projectName}
+                                </span>
+                            </div>
+                        </>
                     )}
                 </div>
 
                 {/* Right: Settings */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSettingsOpen(true)}
+                        className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900"
                         data-testid="settings-button"
                         aria-label="Settings"
                     >
                         <Settings className="w-4 h-4" />
                     </Button>
                 </div>
-            </Card>
+            </header>
 
             {/* Dialogs */}
             <KeyboardShortcutsDialog

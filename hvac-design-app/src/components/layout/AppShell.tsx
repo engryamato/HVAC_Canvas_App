@@ -26,10 +26,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, projectName }) => 
             {/* Toolbar */}
             <Toolbar />
 
-            {/* Conditional Type Selectors */}
-            {currentTool === 'equipment' && <EquipmentTypeSelector />}
-            {currentTool === 'fitting' && <FittingTypeSelector />}
-
             {/* Main Content Area */}
             <div className="flex-1 flex overflow-hidden relative">
                 <LeftSidebar />

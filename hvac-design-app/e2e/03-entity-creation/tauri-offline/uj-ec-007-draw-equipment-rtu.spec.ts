@@ -16,6 +16,8 @@ import { openCanvas, ensurePropertiesPanelVisible } from '../../utils/test-utils
 test.describe('UJ-EC-007: Draw Equipment (RTU) (Tauri Offline)', () => {
   test('Step 1: Select RTU Equipment Type', async ({ page }) => {
     await test.step('Navigate to Canvas', async () => {
+      // Capture browser console logs for debugging
+      page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
       await openCanvas(page, 'RTU Placement Project');
     });
 
@@ -39,8 +41,12 @@ test.describe('UJ-EC-007: Draw Equipment (RTU) (Tauri Offline)', () => {
       await page.keyboard.press('e');
       const canvas = page.locator('[data-testid="canvas-area"] canvas');
       await expect(canvas).toBeVisible();
-      await page.mouse.click(520, 180);
-      // Status bar shows "1 items" when selected, or just check creation via tool state
+      
+      // Click center of canvas using bounding box
+      const box = await canvas.boundingBox();
+      if (!box) { throw new Error('Canvas bounding box not found'); }
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      
       await expect(page.getByTestId('status-bar')).toBeVisible();
     });
   });
@@ -52,9 +58,18 @@ test.describe('UJ-EC-007: Draw Equipment (RTU) (Tauri Offline)', () => {
 
     await test.step('Place RTU', async () => {
       await page.keyboard.press('e');
-      await expect(page.locator('[data-testid="canvas-area"] canvas')).toBeVisible();
-      await page.mouse.click(520, 180);
-      // Wait for creation
+      await expect(page.getByTestId('tool-equipment')).toHaveAttribute('aria-pressed', 'true');
+      
+      // Ensure RTU type is selected
+      await expect(page.getByTestId('equipment-type-selector')).toBeVisible();
+      await page.getByTestId('equipment-type-rtu').click();
+      
+      const canvas = page.locator('[data-testid="canvas-area"] canvas');
+      await expect(canvas).toBeVisible();
+      
+      const box = await canvas.boundingBox();
+      if (!box) { throw new Error('Canvas bounding box not found'); }
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       await page.waitForTimeout(500);
     });
 
@@ -63,11 +78,14 @@ test.describe('UJ-EC-007: Draw Equipment (RTU) (Tauri Offline)', () => {
       await page.keyboard.press('v');
       await expect(page.getByTestId('tool-select')).toHaveAttribute('aria-pressed', 'true');
       
-      await page.waitForTimeout(300); // Wait for state settling
+      await page.waitForTimeout(300);
       
-      // Click at exact placement coordinates to ensure hit
-      await page.mouse.click(520, 180);
-      await page.waitForTimeout(500); // Wait for selection update
+      // Click at center of canvas to select the equipment
+      const canvas = page.locator('[data-testid="canvas-area"] canvas');
+      const box = await canvas.boundingBox();
+      if (!box) { throw new Error('Canvas bounding box not found'); }
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+      await page.waitForTimeout(500);
       
       await ensurePropertiesPanelVisible(page);
       const propertiesPanel = page.getByTestId('properties-panel');
@@ -81,23 +99,35 @@ test.describe('UJ-EC-007: Draw Equipment (RTU) (Tauri Offline)', () => {
     });
 
     await test.step('Place RTU', async () => {
-       // Ensure we have an RTU to verify
        await page.keyboard.press('e');
+       await expect(page.getByTestId('tool-equipment')).toHaveAttribute('aria-pressed', 'true');
        
-       // Ensure RTU type selected
-       if (await page.getByTestId('equipment-type-selector').isVisible()) {
-         await page.getByTestId('equipment-type-rtu').click();
-       }
+       await expect(page.getByTestId('equipment-type-selector')).toBeVisible({ timeout: 3000 });
+       await page.getByTestId('equipment-type-rtu').click();
+       await expect(page.getByTestId('equipment-type-rtu')).toHaveAttribute('aria-pressed', 'true');
        
-       await expect(page.locator('[data-testid="canvas-area"] canvas')).toBeVisible();
-       await page.mouse.click(520, 180);
+       const canvas = page.locator('[data-testid="canvas-area"] canvas');
+       await expect(canvas).toBeVisible();
+       
+       const box = await canvas.boundingBox();
+       if (!box) { throw new Error('Canvas bounding box not found'); }
+       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
        await page.waitForTimeout(500);
+       
+       await expect(page.getByTestId('status-bar')).toContainText(/\d+ items?/);
     });
 
     await test.step('Open BOM panel', async () => {
+      // Expand sidebar if collapsed
+      const rightSidebar = page.getByTestId('right-sidebar');
+      const isCollapsed = await rightSidebar.evaluate(el => el.classList.contains('collapsed'));
+      if (isCollapsed) {
+        await page.getByTestId('right-sidebar-toggle').click();
+        await page.waitForTimeout(300);
+      }
+      
       await page.getByTestId('tab-bom').click();
-      await expect(page.getByTestId('bom-panel')).toBeVisible();
-      // It might say "New RTU" or "RTU" depending on display name logic
+      await expect(page.getByTestId('bom-panel')).toBeVisible({ timeout: 3000 });
       await expect(page.getByTestId('bom-panel')).toContainText('RTU');
     });
   });

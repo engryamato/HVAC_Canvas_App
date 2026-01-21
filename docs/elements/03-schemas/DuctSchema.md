@@ -519,7 +519,8 @@ function getDuctDimensions(props: DuctProps): string {
 - [DuctRenderer](../05-renderers/DuctRenderer.md) - Duct visualization
 - [DuctInspector](../01-components/inspector/DuctInspector.md) - Duct property editor
 - [DuctDefaults](../08-entities/DuctDefaults.md) - Duct factory functions
-- [DuctCalculator](../06-calculators/DuctCalculator.md) - Airflow and friction calculations
+- [DuctSizingCalculator](../06-calculators/DuctSizingCalculator.md) - Airflow sizing calculations
+- [PressureDropCalculator](../06-calculators/PressureDropCalculator.md) - Pressure loss calculations
 - [FittingSchema](./FittingSchema.md) - Connected to ducts via fittings
 - [EquipmentSchema](./EquipmentSchema.md) - Connected via connectedDuctId
 

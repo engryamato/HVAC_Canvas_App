@@ -13,7 +13,7 @@ src/core/schema/equipment.schema.ts
 ## Purpose
 
 - Define the structure of Equipment entity data
-- Support multiple equipment types (hood, fan, diffuser, damper, air_handler)
+- Support multiple equipment types (hood, fan, diffuser, damper, air_handler, furnace, rtu)
 - Validate equipment dimensions and performance characteristics
 - Support multiple unit systems (CFM/m³/h, in.w.g./Pa, in/mm)
 - Provide manufacturer and model information
@@ -32,7 +32,15 @@ src/core/schema/equipment.schema.ts
 Defines the allowed equipment types for HVAC components.
 
 ```typescript
-export const EquipmentTypeSchema = z.enum(['hood', 'fan', 'diffuser', 'damper', 'air_handler']);
+export const EquipmentTypeSchema = z.enum([
+  'hood',
+  'fan',
+  'diffuser',
+  'damper',
+  'air_handler',
+  'furnace',
+  'rtu',
+]);
 
 export type EquipmentType = z.infer<typeof EquipmentTypeSchema>;
 ```
@@ -43,6 +51,8 @@ export type EquipmentType = z.infer<typeof EquipmentTypeSchema>;
 - `diffuser` - Supply air diffusers
 - `damper` - Airflow control dampers
 - `air_handler` - Air Handling Units (AHU)
+- `furnace` - Gas or electric furnaces
+- `rtu` - Rooftop units
 
 ### Unit Schemas
 
@@ -182,6 +192,28 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     height: 72,
     mountHeightUnit: 'in',
   },
+  furnace: {
+    equipmentType: 'furnace',
+    capacity: 80000,
+    capacityUnit: 'CFM',
+    staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
+    width: 24,
+    depth: 36,
+    height: 48,
+    mountHeightUnit: 'in',
+  },
+  rtu: {
+    equipmentType: 'rtu',
+    capacity: 12000,
+    capacityUnit: 'CFM',
+    staticPressure: 1.5,
+    staticPressureUnit: 'in_wg',
+    width: 84,
+    depth: 48,
+    height: 36,
+    mountHeightUnit: 'in',
+  },
 };
 ```
 
@@ -190,7 +222,10 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
 ```typescript
 export function createDefaultEquipmentProps(type: EquipmentType): EquipmentProps {
   const typeLabel =
-    type === 'air_handler' ? 'Air Handler' : type.charAt(0).toUpperCase() + type.slice(1);
+    type === 'air_handler' ? 'Air Handler' :
+    type === 'furnace' ? 'Furnace' :
+    type === 'rtu' ? 'RTU' :
+    type.charAt(0).toUpperCase() + type.slice(1);
   return {
     name: `New ${typeLabel}`,
     ...DEFAULT_EQUIPMENT_PROPS[type],

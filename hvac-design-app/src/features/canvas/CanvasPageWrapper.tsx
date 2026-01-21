@@ -54,24 +54,35 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
   const hydrateFromPayload = (payload: LocalStoragePayload) => {
     try {
-      useEntityStore.getState().hydrate(payload.project.entities);
-      useViewportStore.setState({
-        panX: payload.viewport.panX,
-        panY: payload.viewport.panY,
-        zoom: payload.viewport.zoom,
-        gridVisible: payload.viewport.gridVisible,
-        gridSize: payload.viewport.gridSize,
-        snapToGrid: payload.viewport.snapToGrid,
-      });
-      useSelectionStore.setState({
-        selectedIds: payload.selection.selectedIds,
-        hoveredId: payload.selection.hoveredId,
-      });
-      useHistoryStore.setState({
-        past: payload.history.past,
-        future: payload.history.future,
-        maxSize: payload.history.maxSize,
-      });
+      if (payload?.project?.entities) {
+        useEntityStore.getState().hydrate(payload.project.entities);
+      }
+      
+      if (payload?.viewport) {
+        useViewportStore.setState({
+          panX: payload.viewport.panX,
+          panY: payload.viewport.panY,
+          zoom: payload.viewport.zoom,
+          gridVisible: payload.viewport.gridVisible,
+          gridSize: payload.viewport.gridSize,
+          snapToGrid: payload.viewport.snapToGrid,
+        });
+      }
+      
+      if (payload?.selection) {
+        useSelectionStore.setState({
+          selectedIds: payload.selection.selectedIds,
+          hoveredId: payload.selection.hoveredId,
+        });
+      }
+      
+      if (payload?.history) {
+        useHistoryStore.setState({
+          past: payload.history.past,
+          future: payload.history.future,
+          maxSize: payload.history.maxSize,
+        });
+      }
     } catch (error) {
       logger.error('[CanvasPageWrapper] Failed to hydrate from localStorage payload', error);
     }

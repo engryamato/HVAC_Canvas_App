@@ -46,24 +46,8 @@ function CanvasEditor() {
 }
 ```
 
-## Platform Detection
-
-```typescript
-function isMacOS(): boolean {
-  if (typeof navigator === 'undefined') return false;
-
-  // Modern API
-  if (navigator.userAgentData?.platform) {
-    return navigator.userAgentData.platform === 'macOS';
-  }
-
-  // Fallback
-  return navigator.platform?.toUpperCase().indexOf('MAC') >= 0;
-}
-```
-
 ## Related Elements
 
-- [Entity Commands](../09-commands/EntityCommands.md)
-- [History Store](../09-commands/HistoryStore.md)
+- [EntityCommands](../09-commands/EntityCommands.md)
+- [HistoryStore](../09-commands/HistoryStore.md)
 - [useKeyboardShortcuts](./useKeyboardShortcuts.md)

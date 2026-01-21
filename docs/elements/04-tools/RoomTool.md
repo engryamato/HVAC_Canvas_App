@@ -12,7 +12,7 @@ src/features/canvas/tools/RoomTool.ts
 
 ## Purpose
 
-- Create room entities with a two-click (corner-to-corner) workflow
+- Create room entities with drag-to-size or two-click placement
 - Show real-time preview rectangle during drawing
 - Display dimension labels while drawing
 - Enforce minimum room size constraints
@@ -22,40 +22,28 @@ src/features/canvas/tools/RoomTool.ts
 ## Dependencies
 
 - `BaseTool` - Abstract tool base class
-- `@/core/store/entityStore` - Entity state management
 - `@/features/canvas/store/viewportStore` - Grid snapping
+- `@/features/canvas/store/selectionStore` - Selection updates
 - `@/features/canvas/entities/roomDefaults` - Room factory
 - `@/core/commands/entityCommands` - Undo support
 
 ## Tool States
 
 ```typescript
-enum RoomToolState {
-  IDLE,      // Waiting for first click
-  DRAGGING,  // Drawing preview after first click
+interface RoomToolState {
+  mode: 'idle' | 'placing' | 'dragging';
+  startPoint: { x: number; y: number } | null;
+  currentPoint: { x: number; y: number } | null;
 }
 ```
 
 ## State Diagram
 
 ```
-    ┌─────────────────────────────────────────────┐
-    │                                             │
-    │  ┌──────┐   Mouse Down   ┌──────────┐      │
-    │  │ IDLE │ ─────────────▶ │ DRAGGING │      │
-    │  └──────┘                └────┬─────┘      │
-    │      ▲                        │            │
-    │      │     Mouse Up           │            │
-    │      │   (valid size)         │            │
-    │      │        ┌───────────────┘            │
-    │      │        ▼                            │
-    │      │  ┌───────────┐                      │
-    │      └──│ Create    │                      │
-    │         │ Room      │                      │
-    │         └───────────┘                      │
-    │                                             │
-    │      ▲  Escape Key                         │
-    │      └─────────────────────────────────────┘
+IDLE → (Mouse Down) → DRAGGING
+DRAGGING → (Mouse Up, valid size) → Create Room → IDLE
+DRAGGING → (Mouse Up, too small) → PLACING → (Mouse Down) → Create Room → IDLE
+Escape resets to IDLE
 ```
 
 ## Class Interface
@@ -64,29 +52,19 @@ enum RoomToolState {
 class RoomTool extends BaseTool {
   readonly name = 'room';
 
-  // Current tool state
-  private state: RoomToolState = RoomToolState.IDLE;
+  private state: RoomToolState;
 
-  // First corner position
-  private startPoint: Point | null = null;
-
-  // Current mouse position (for preview)
-  private currentPoint: Point | null = null;
-
-  // Lifecycle methods
   onActivate(): void;
   onDeactivate(): void;
-
-  // Mouse event handlers
   onMouseDown(event: ToolMouseEvent): void;
   onMouseMove(event: ToolMouseEvent): void;
   onMouseUp(event: ToolMouseEvent): void;
-
-  // Keyboard handler
   onKeyDown(event: ToolKeyEvent): void;
+  render(context: ToolRenderContext): void;
 
-  // Render preview overlay
-  onRender(ctx: CanvasRenderingContext2D): void;
+  protected reset(): void;
+  private snapToGrid(x: number, y: number): { x: number; y: number };
+  private createRoomEntity(start: Point, end: Point): void;
 }
 ```
 
@@ -95,55 +73,48 @@ class RoomTool extends BaseTool {
 ### 1. First Click (Start Point)
 ```typescript
 onMouseDown(event: ToolMouseEvent) {
-  // Snap to grid if enabled
-  const point = this.snapToGrid(event.canvasX, event.canvasY);
+  if (event.button !== 0) return;
 
-  // Store start point
-  this.startPoint = point;
-  this.state = RoomToolState.DRAGGING;
+  const snappedPoint = this.snapToGrid(event.x, event.y);
+
+  if (this.state.mode === 'idle') {
+    this.state = {
+      mode: 'dragging',
+      startPoint: snappedPoint,
+      currentPoint: snappedPoint,
+    };
+  } else if (this.state.mode === 'placing' && this.state.startPoint) {
+    this.createRoomEntity(this.state.startPoint, snappedPoint);
+    this.reset();
+  }
 }
 ```
 
 ### 2. Mouse Move (Preview)
 ```typescript
 onMouseMove(event: ToolMouseEvent) {
-  if (this.state === RoomToolState.DRAGGING) {
-    // Update current point for preview
-    this.currentPoint = this.snapToGrid(event.canvasX, event.canvasY);
-
-    // Request canvas redraw
-    this.requestRender();
+  if (this.state.mode === 'dragging' || this.state.mode === 'placing') {
+    const snappedPoint = this.snapToGrid(event.x, event.y);
+    this.state.currentPoint = snappedPoint;
   }
 }
 ```
 
-### 3. Second Click (Create Room)
+### 3. Mouse Up (Create or Switch Mode)
 ```typescript
 onMouseUp(event: ToolMouseEvent) {
-  if (this.state !== RoomToolState.DRAGGING) return;
+  if (this.state.mode === 'dragging' && this.state.startPoint) {
+    const snappedPoint = this.snapToGrid(event.x, event.y);
+    const dx = Math.abs(snappedPoint.x - this.state.startPoint.x);
+    const dy = Math.abs(snappedPoint.y - this.state.startPoint.y);
 
-  const endPoint = this.snapToGrid(event.canvasX, event.canvasY);
-
-  // Calculate dimensions
-  const width = Math.abs(endPoint.x - this.startPoint.x);
-  const height = Math.abs(endPoint.y - this.startPoint.y);
-
-  // Enforce minimum size (12 inches = 1 foot)
-  if (width >= MIN_ROOM_SIZE && height >= MIN_ROOM_SIZE) {
-    // Create room entity
-    const room = createRoom({
-      x: Math.min(this.startPoint.x, endPoint.x),
-      y: Math.min(this.startPoint.y, endPoint.y),
-      width,
-      height,
-    });
-
-    // Add to store with undo support
-    createEntity(room);
+    if (dx >= MIN_ROOM_SIZE && dy >= MIN_ROOM_SIZE) {
+      this.createRoomEntity(this.state.startPoint, snappedPoint);
+      this.reset();
+    } else {
+      this.state.mode = 'placing';
+    }
   }
-
-  // Reset state
-  this.reset();
 }
 ```
 
@@ -155,50 +126,50 @@ onKeyDown(event: ToolKeyEvent) {
   }
 }
 
-private reset() {
-  this.state = RoomToolState.IDLE;
-  this.startPoint = null;
-  this.currentPoint = null;
-  this.requestRender();
+protected reset(): void {
+  this.state = {
+    mode: 'idle',
+    startPoint: null,
+    currentPoint: null,
+  };
 }
 ```
 
 ## Preview Rendering
 
 ```typescript
-onRender(ctx: CanvasRenderingContext2D) {
-  if (this.state !== RoomToolState.DRAGGING || !this.startPoint) return;
+render(context: ToolRenderContext) {
+  if ((this.state.mode !== 'placing' && this.state.mode !== 'dragging') || !this.state.startPoint || !this.state.currentPoint) {
+    return;
+  }
 
-  const endPoint = this.currentPoint || this.startPoint;
+  const { ctx, zoom } = context;
+  const { startPoint, currentPoint } = this.state;
 
-  // Calculate bounds
-  const x = Math.min(this.startPoint.x, endPoint.x);
-  const y = Math.min(this.startPoint.y, endPoint.y);
-  const width = Math.abs(endPoint.x - this.startPoint.x);
-  const height = Math.abs(endPoint.y - this.startPoint.y);
+  const x = Math.min(startPoint.x, currentPoint.x);
+  const y = Math.min(startPoint.y, currentPoint.y);
+  const width = Math.abs(currentPoint.x - startPoint.x);
+  const height = Math.abs(currentPoint.y - startPoint.y);
 
-  // Draw preview rectangle
-  ctx.strokeStyle = '#1976D2';  // Blue
-  ctx.lineWidth = 2;
-  ctx.setLineDash([5, 5]);  // Dashed line
+  const isValid = width >= MIN_ROOM_SIZE && height >= MIN_ROOM_SIZE;
+
+  ctx.save();
+  ctx.fillStyle = isValid ? 'rgba(227, 242, 253, 0.7)' : 'rgba(255, 200, 200, 0.5)';
+  ctx.strokeStyle = isValid ? '#1976D2' : '#D32F2F';
+  ctx.lineWidth = 2 / zoom;
+  ctx.setLineDash([6 / zoom, 4 / zoom]);
+
+  ctx.fillRect(x, y, width, height);
   ctx.strokeRect(x, y, width, height);
-  ctx.setLineDash([]);  // Reset
 
-  // Draw dimension labels
-  this.renderDimensionLabels(ctx, x, y, width, height);
-}
+  const widthFt = (width / 12).toFixed(1);
+  const heightFt = (height / 12).toFixed(1);
+  ctx.font = `${12 / zoom}px sans-serif`;
+  ctx.fillStyle = isValid ? '#1976D2' : '#D32F2F';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${widthFt}' × ${heightFt}'`, x + width / 2, y + height / 2);
 
-private renderDimensionLabels(ctx, x, y, width, height) {
-  ctx.fillStyle = '#333';
-  ctx.font = '12px sans-serif';
-
-  // Width label (bottom)
-  const widthFeet = (width / 12).toFixed(1);
-  ctx.fillText(`${widthFeet} ft`, x + width/2 - 15, y + height + 16);
-
-  // Height label (right)
-  const heightFeet = (height / 12).toFixed(1);
-  ctx.fillText(`${heightFeet} ft`, x + width + 8, y + height/2);
+  ctx.restore();
 }
 ```
 
@@ -221,9 +192,7 @@ private renderDimensionLabels(ctx, x, y, width, height) {
 
 ```typescript
 getCursor(): string {
-  return this.state === RoomToolState.DRAGGING
-    ? 'crosshair'
-    : 'crosshair';
+  return 'crosshair';
 }
 ```
 
@@ -231,7 +200,7 @@ getCursor(): string {
 
 ```typescript
 // In CanvasContainer
-const roomTool = new RoomTool(entityStore, viewportStore);
+const roomTool = new RoomTool();
 
 // When R key pressed or toolbar button clicked
 toolManager.setActiveTool('room');
@@ -274,6 +243,9 @@ After Creation:
 - [RoomDefaults](../08-entities/RoomDefaults.md) - Room factory
 - [RoomSchema](../03-schemas/RoomSchema.md) - Room validation
 - [RoomInspector](../01-components/inspector/RoomInspector.md) - Room properties
+- [viewportStore](../02-stores/viewportStore.md) - Grid snapping
+- [selectionStore](../02-stores/selectionStore.md) - Selection updates
+- [EntityCommands](../09-commands/EntityCommands.md) - Undo support
 
 ## Testing
 
@@ -282,48 +254,29 @@ describe('RoomTool', () => {
   let tool: RoomTool;
 
   beforeEach(() => {
-    tool = new RoomTool(mockEntityStore, mockViewportStore);
+    tool = new RoomTool();
     tool.onActivate();
   });
 
-  it('starts in IDLE state', () => {
-    expect(tool['state']).toBe(RoomToolState.IDLE);
+  it('starts in idle mode', () => {
+    expect(tool['state'].mode).toBe('idle');
   });
 
-  it('transitions to DRAGGING on mouse down', () => {
-    tool.onMouseDown({ canvasX: 100, canvasY: 100 });
-    expect(tool['state']).toBe(RoomToolState.DRAGGING);
-    expect(tool['startPoint']).toEqual({ x: 100, y: 100 });
+  it('enters dragging mode on mouse down', () => {
+    tool.onMouseDown({ x: 100, y: 100, button: 0 } as ToolMouseEvent);
+    expect(tool['state'].mode).toBe('dragging');
   });
 
-  it('creates room on mouse up with valid size', () => {
-    tool.onMouseDown({ canvasX: 0, canvasY: 0 });
-    tool.onMouseUp({ canvasX: 120, canvasY: 120 });  // 10ft x 10ft
-
-    expect(mockEntityStore.addEntity).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'room',
-        props: expect.objectContaining({
-          width: 120,
-          height: 120,
-        }),
-      })
-    );
+  it('switches to placing when dragged below minimum', () => {
+    tool.onMouseDown({ x: 0, y: 0, button: 0 } as ToolMouseEvent);
+    tool.onMouseUp({ x: 6, y: 6, button: 0 } as ToolMouseEvent);
+    expect(tool['state'].mode).toBe('placing');
   });
 
-  it('does not create room smaller than minimum', () => {
-    tool.onMouseDown({ canvasX: 0, canvasY: 0 });
-    tool.onMouseUp({ canvasX: 6, canvasY: 6 });  // Only 0.5ft
-
-    expect(mockEntityStore.addEntity).not.toHaveBeenCalled();
-  });
-
-  it('cancels drawing on Escape', () => {
-    tool.onMouseDown({ canvasX: 100, canvasY: 100 });
-    tool.onKeyDown({ key: 'Escape' });
-
-    expect(tool['state']).toBe(RoomToolState.IDLE);
-    expect(tool['startPoint']).toBeNull();
+  it('resets on Escape', () => {
+    tool.onMouseDown({ x: 100, y: 100, button: 0 } as ToolMouseEvent);
+    tool.onKeyDown({ key: 'Escape' } as ToolKeyEvent);
+    expect(tool['state'].mode).toBe('idle');
   });
 });
 ```

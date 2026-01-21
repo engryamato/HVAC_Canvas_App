@@ -51,11 +51,11 @@ export function getNextRoomNumber(): number
 
 ```typescript
 DEFAULT_ROOM_PROPS = {
-  width: 240,              // 20 feet
-  length: 144,             // 12 feet
+  width: 120,              // 10 feet
+  length: 120,             // 10 feet
   height: 96,              // 8 feet
   occupancyType: 'office',
-  airChangesPerHour: 6,
+  airChangesPerHour: 4,
 };
 ```
 
@@ -66,7 +66,7 @@ import { createRoom } from '@/features/canvas/entities/roomDefaults';
 
 // Create with defaults
 const room1 = createRoom();
-// { name: 'Room 1', width: 240, length: 144, ... }
+// { name: 'Room 1', width: 120, length: 120, ... }
 
 // Create with overrides
 const kitchen = createRoom({
@@ -82,6 +82,10 @@ const kitchen = createRoom({
 // Reset counter for testing
 resetRoomCounter();
 ```
+
+## Notes
+
+- `createRoom` computes `calculated` using `calculateRoomValues` with the final props.
 
 ## Related Elements
 

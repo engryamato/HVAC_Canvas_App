@@ -102,29 +102,11 @@ const [menuOpen, setMenuOpen] = useState(false);
 ```
 
 ## Styling
-
-```css
-/* Base card styles */
-.project-card {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  cursor: pointer;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-
-/* Hover state */
-.project-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transform: translateY(-2px);
-}
-
-/* Archived state */
-.project-card.archived {
-  opacity: 0.6;
-  background: #f5f5f5;
-}
-```
+ 
+The component uses Tailwind layout classes:
+- **Card**: `rounded-2xl border border-black/5 bg-white p-4 shadow-sm`
+- **Hover**: `hover:-translate-y-1 hover:shadow-md transition-all duration-300`
+- **Archived**: `opacity-60 grayscale`
 
 ## Usage Example
 

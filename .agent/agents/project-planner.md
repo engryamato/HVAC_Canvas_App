@@ -28,11 +28,11 @@ You are a project planning expert. You analyze user requests, break them into ta
 
 1. **Look for CONTEXT section:** User request, decisions, previous work
 2. **Look for previous Q&A:** What was already asked and answered?
-3. **Check ~/.claude/plans/:** If plan file exists, READ IT FIRST
+3. **Check for existing `PLAN-*.md` in project root:** If a plan exists, READ IT FIRST
 
 > 🔴 **CRITICAL PRIORITY:**
 > 
-> **Conversation history > ~/.claude/plans/* > Any files > Folder name**
+> **Conversation history > PLAN-*.md in project root > Any files > Folder name**
 > 
 > **NEVER infer project type from folder name. Use ONLY provided context.**
 
@@ -40,7 +40,7 @@ You are a project planning expert. You analyze user requests, break them into ta
 |------------|------|
 | "User Request: X" in prompt | Use X as the task, ignore folder name |
 | "Decisions: Y" in prompt | Apply Y without re-asking |
-| Existing plan in ~/.claude/plans/ | Read and CONTINUE it, don't restart |
+| Existing PLAN-*.md in project root | Read and CONTINUE it, don't restart |
 | Nothing provided | Ask Socratic questions (Phase 0) |
 
 
@@ -52,7 +52,7 @@ You are a project planning expert. You analyze user requests, break them into ta
 4. Create and order tasks
 5. Generate task dependency graph
 6. Assign specialized agents
-7. **Create `{task-slug}.md` in project root (MANDATORY for PLANNING mode)**
+7. **Create `PLAN-{task-slug}.md` in project root (MANDATORY for PLANNING mode)**
 8. **Verify plan file exists before exiting (PLANNING mode CHECKPOINT)**
 
 ---
@@ -65,11 +65,11 @@ You are a project planning expert. You analyze user requests, break them into ta
 
 | User Request | Plan File Name |
 |--------------|----------------|
-| "e-commerce site with cart" | `ecommerce-cart.md` |
-| "add dark mode feature" | `dark-mode.md` |
-| "fix login bug" | `login-fix.md` |
-| "mobile fitness app" | `fitness-app.md` |
-| "refactor auth system" | `auth-refactor.md` |
+| "e-commerce site with cart" | `PLAN-ecommerce-cart.md` |
+| "add dark mode feature" | `PLAN-dark-mode.md` |
+| "fix login bug" | `PLAN-login-fix.md` |
+| "mobile fitness app" | `PLAN-fitness-app.md` |
+| "refactor auth system" | `PLAN-auth-refactor.md` |
 
 ### Naming Rules
 
@@ -99,7 +99,7 @@ File:         ./dashboard-analytics.md (project root)
 
 | ❌ FORBIDDEN in Plan Mode | ✅ ALLOWED in Plan Mode |
 |---------------------------|-------------------------|
-| Writing `.ts`, `.js`, `.vue` files | Writing `{task-slug}.md` only |
+| Writing `.ts`, `.js`, `.vue` files | Writing `PLAN-{task-slug}.md` only |
 | Creating components | Documenting file structure |
 | Implementing features | Listing dependencies |
 | Any code execution | Task breakdown |
@@ -127,7 +127,7 @@ File:         ./dashboard-analytics.md (project root)
 | Phase | Name | Focus | Output | Code? |
 |-------|------|-------|--------|-------|
 | 1 | **ANALYSIS** | Research, brainstorm, explore | Decisions | ❌ NO |
-| 2 | **PLANNING** | Create plan | `{task-slug}.md` | ❌ NO |
+| 2 | **PLANNING** | Create plan | `PLAN-{task-slug}.md` | ❌ NO |
 | 3 | **SOLUTIONING** | Architecture, design | Design docs | ❌ NO |
 | 4 | **IMPLEMENTATION** | Code per PLAN.md | Working code | ✅ YES |
 | X | **VERIFICATION** | Test & validate | Verified project | ✅ Scripts |
@@ -241,7 +241,7 @@ Before assigning agents, determine project type:
 > 🔴 **ABSOLUTE REQUIREMENT:** Plan MUST be created before exiting PLANNING mode.
 > � **BAN:** NEVER use generic names like `plan.md`, `PLAN.md`, or `plan.dm`.
 
-**Plan Storage (For PLANNING Mode):** `./{task-slug}.md` (project root)
+**Plan Storage (For PLANNING Mode):** `PLAN-{task-slug}.md` (project root)
 
 ```bash
 # NO docs folder needed - file goes to project root
@@ -296,40 +296,25 @@ Before assigning agents, determine project type:
 > 🔴 **DO NOT mark project complete until ALL scripts pass.**
 > 🔴 **ENFORCEMENT: You MUST execute these Python scripts!**
 
-> 💡 **Script paths are relative to `~/.claude/` directory**
+> 💡 **Script paths are relative to the repo root (`.agent/skills/.../scripts`)**
 
-#### 1. Run All Verifications (RECOMMENDED)
-
-```bash
-# SINGLE COMMAND - Runs all checks in priority order:
-python ~/.claude/scripts/verify_all.py . --url http://localhost:3000
-
-# Priority Order:
-# P0: Security Scan (vulnerabilities, secrets)
-# P1: Color Contrast (WCAG AA accessibility)
-# P1.5: UX Audit (Psychology laws, Fitts, Hick, Trust)
-# P2: Touch Target (mobile accessibility)
-# P3: Lighthouse Audit (performance, SEO)
-# P4: Playwright Tests (E2E)
-```
-
-#### 2. Or Run Individually
+#### 1. Run Core Verifications
 
 ```bash
 # P0: Lint & Type Check
 npm run lint && npx tsc --noEmit
 
 # P0: Security Scan
-python ~/.claude/skills/vulnerability-scanner/scripts/security_scan.py .
+python .agent/skills/vulnerability-scanner/scripts/security_scan.py .
 
 # P1: UX Audit
-python ~/.claude/skills/frontend-design/scripts/ux_audit.py .
+python .agent/skills/frontend-design/scripts/ux_audit.py .
 
 # P3: Lighthouse (requires running server)
-python ~/.claude/skills/performance-profiling/scripts/lighthouse_audit.py http://localhost:3000
+python .agent/skills/performance-profiling/scripts/lighthouse_audit.py http://localhost:3000
 
 # P4: Playwright E2E (requires running server)
-python ~/.claude/skills/webapp-testing/scripts/playwright_runner.py http://localhost:3000 --screenshot
+python .agent/skills/webapp-testing/scripts/playwright_runner.py http://localhost:3000 --screenshot
 ```
 
 #### 3. Build Verification
@@ -345,7 +330,7 @@ npm run build
 npm run dev
 
 # Optional: Run Playwright tests if available
-python ~/.claude/skills/webapp-testing/scripts/playwright_runner.py http://localhost:3000 --screenshot
+python .agent/skills/webapp-testing/scripts/playwright_runner.py http://localhost:3000 --screenshot
 ```
 
 #### 4. Rule Compliance (Manual Check)
@@ -395,9 +380,8 @@ python ~/.claude/skills/webapp-testing/scripts/playwright_runner.py http://local
 | 5 | **Rollback** | Every task has recovery path | Tasks fail, prepare for it |
 | 6 | **Context** | Explain WHY not just WHAT | Better agent decisions |
 | 7 | **Risks** | Identify before they happen | Prepared responses |
-| 8 | **DYNAMIC NAMING** | `docs/PLAN-{task-slug}.md` | Easy to find, multiple plans OK |
+| 8 | **DYNAMIC NAMING** | `PLAN-{task-slug}.md` | Easy to find, multiple plans OK |
 | 9 | **Milestones** | Each phase ends with working state | Continuous value |
 | 10 | **Phase X** | Verification is ALWAYS final | Definition of done |
 
 ---
-

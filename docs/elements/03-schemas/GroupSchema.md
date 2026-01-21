@@ -499,12 +499,8 @@ function renameGroup(group: Group, newName: string): Group {
 ## Related Elements
 
 - [BaseSchema](./BaseSchema.md) - Base entity schema
-- [GroupTool](../04-tools/GroupTool.md) - Group creation tool
-- [GroupRenderer](../05-renderers/GroupRenderer.md) - Group visualization
-- [GroupInspector](../01-components/inspector/GroupInspector.md) - Group property editor
-- [GroupDefaults](../08-entities/GroupDefaults.md) - Group factory functions
-- [SelectionManager](../07-stores/SelectionManager.md) - Multi-selection for grouping
-- [CanvasStore](../07-stores/CanvasStore.md) - Group entity management
+- [selectionStore](../02-stores/selectionStore.md) - Multi-selection for grouping
+- [canvasStore](../02-stores/canvasStore.md) - Group entity management
 
 ## Testing
 

@@ -20,7 +20,6 @@ src/core/store/project.store.ts
 ## Dependencies
 
 - `zustand` - State management library
-- `immer` - Immutable state updates
 - `@/core/schema/project-file.schema` - Project type definitions
 
 ## Store Structure
@@ -38,9 +37,13 @@ interface ProjectState {
 }
 
 interface ProjectDetails {
-  name: string;
+  projectId: string;
+  projectName: string;
   projectNumber?: string;
   clientName?: string;
+  location?: string;
+  scope?: ProjectScope;
+  siteConditions?: SiteConditions;
   createdAt: string;
   modifiedAt: string;
 }
@@ -66,7 +69,8 @@ setProject: (id: string, details: ProjectDetails) => void
 const { setProject } = useProjectStore();
 
 setProject('proj-123', {
-  name: 'HVAC Layout - Building A',
+  projectId: 'proj-123',
+  projectName: 'HVAC Layout - Building A',
   projectNumber: 'P-2025-001',
   clientName: 'Acme Corp',
   createdAt: '2025-12-01T10:00:00Z',
@@ -113,19 +117,6 @@ clearProject: () => void
 - Resets `isDirty` to `false`
 - Called when navigating away from canvas
 
-### updateProjectDetails
-
-Updates project metadata without changing ID.
-
-```typescript
-updateProjectDetails: (updates: Partial<ProjectDetails>) => void
-```
-
-**Behavior:**
-- Merges updates with existing `projectDetails`
-- Updates `modifiedAt` timestamp
-- Sets `isDirty` to `true`
-
 ## Selectors
 
 ```typescript
@@ -153,7 +144,6 @@ export const useProjectActions = () => useProjectStore((state) => ({
   setProject: state.setProject,
   setDirty: state.setDirty,
   clearProject: state.clearProject,
-  updateProjectDetails: state.updateProjectDetails,
 }));
 
 // Selector hooks
@@ -178,9 +168,13 @@ function useOpenProject() {
 
     // Set project metadata
     setProject(projectId, {
-      name: projectFile.name,
+      projectId: projectFile.projectId,
+      projectName: projectFile.projectName,
       projectNumber: projectFile.projectNumber,
       clientName: projectFile.clientName,
+      location: projectFile.location,
+      scope: projectFile.scope,
+      siteConditions: projectFile.siteConditions,
       createdAt: projectFile.createdAt,
       modifiedAt: projectFile.modifiedAt,
     });
@@ -272,13 +266,14 @@ describe('projectStore', () => {
     const { setProject } = useProjectStore.getState();
 
     setProject('proj-123', {
-      name: 'Test Project',
+      projectId: 'proj-123',
+      projectName: 'Test Project',
       createdAt: '2025-12-28T00:00:00Z',
       modifiedAt: '2025-12-28T00:00:00Z',
     });
 
     expect(useProjectStore.getState().currentProjectId).toBe('proj-123');
-    expect(useProjectStore.getState().projectDetails?.name).toBe('Test Project');
+    expect(useProjectStore.getState().projectDetails?.projectName).toBe('Test Project');
     expect(useProjectStore.getState().isDirty).toBe(false);
   });
 
@@ -295,7 +290,7 @@ describe('projectStore', () => {
   it('clears project state', () => {
     const { setProject, clearProject } = useProjectStore.getState();
 
-    setProject('proj-123', { name: 'Test', createdAt: '', modifiedAt: '' });
+    setProject('proj-123', { projectId: 'proj-123', projectName: 'Test', createdAt: '', modifiedAt: '' });
     clearProject();
 
     expect(useProjectStore.getState().currentProjectId).toBeNull();

@@ -38,9 +38,12 @@ export const useEntityStore = create<EntityStore>()(
 
     addEntity: (entity) =>
       set((state) => {
+        console.log('[EntityStore] addEntity', entity.id, entity.type);
         if (!state.byId[entity.id]) {
           state.byId[entity.id] = entity;
           state.allIds.push(entity.id);
+        } else {
+            console.warn('[EntityStore] addEntity: Entity already exists', entity.id);
         }
       }),
 
@@ -53,12 +56,14 @@ export const useEntityStore = create<EntityStore>()(
 
     removeEntity: (id) =>
       set((state) => {
+        console.log('[EntityStore] removeEntity', id);
         delete state.byId[id];
         state.allIds = state.allIds.filter((entityId) => entityId !== id);
       }),
 
     addEntities: (entities) =>
       set((state) => {
+        console.log('[EntityStore] addEntities', entities.length);
         entities.forEach((entity) => {
           if (!state.byId[entity.id]) {
             state.byId[entity.id] = entity;
@@ -69,14 +74,19 @@ export const useEntityStore = create<EntityStore>()(
 
     removeEntities: (ids) =>
       set((state) => {
+        console.log('[EntityStore] removeEntities', ids.length);
         ids.forEach((id) => delete state.byId[id]);
         state.allIds = state.allIds.filter((id) => !ids.includes(id));
       }),
 
-    clearAllEntities: () => set(initialState),
+    clearAllEntities: () => set((state) => {
+        console.log('[EntityStore] clearAllEntities');
+        Object.assign(state, initialState);
+    }),
 
     hydrate: (newState) =>
       set((state) => {
+        console.log('[EntityStore] hydrate from newState', newState.allIds.length);
         state.byId = newState.byId;
         state.allIds = newState.allIds;
       }),

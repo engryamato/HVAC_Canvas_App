@@ -289,16 +289,13 @@ function RoomTool() {
 
 Available via `selectedEquipmentType`:
 
-- `fan` - General fan
-- `ahu` - Air Handling Unit
+- `hood` - Exhaust hood
+- `fan` - Fan
+- `diffuser` - Diffuser
+- `damper` - Damper
+- `air_handler` - Air Handling Unit
+- `furnace` - Furnace
 - `rtu` - Rooftop Unit
-- `fcu` - Fan Coil Unit
-- `exhaust_fan` - Exhaust Fan
-- `supply_fan` - Supply Fan
-- `vav` - VAV Box
-- `heat_pump` - Heat Pump
-- `chiller` - Chiller
-- `boiler` - Boiler
 
 ## Fitting Types
 
@@ -308,7 +305,7 @@ Available via `selectedFittingType`:
 - `elbow_45` - 45-degree elbow
 - `tee` - T-junction
 - `reducer` - Size reducer
-- `damper` - Airflow damper
+- `cap` - Duct cap
 
 ## Backward Compatibility
 
@@ -368,10 +365,10 @@ describe('toolStore', () => {
 
   it('changes equipment type', () => {
     act(() => {
-      useToolStore.getState().setEquipmentType('ahu');
+      useToolStore.getState().setEquipmentType('air_handler');
     });
 
-    expect(useToolStore.getState().selectedEquipmentType).toBe('ahu');
+    expect(useToolStore.getState().selectedEquipmentType).toBe('air_handler');
   });
 
   it('changes fitting type', () => {
@@ -384,13 +381,13 @@ describe('toolStore', () => {
 
   it('maintains equipment type when switching tools', () => {
     act(() => {
-      useToolStore.getState().setEquipmentType('exhaust_fan');
+      useToolStore.getState().setEquipmentType('fan');
       useToolStore.getState().setTool('room');
       useToolStore.getState().setTool('equipment');
     });
 
     // Equipment type should persist
-    expect(useToolStore.getState().selectedEquipmentType).toBe('exhaust_fan');
+    expect(useToolStore.getState().selectedEquipmentType).toBe('fan');
   });
 });
 ```

@@ -34,10 +34,12 @@ interface ProjectListItem {
   projectName: string;     // User-visible project name
   projectNumber?: string;  // Optional project number (e.g., "2024-001")
   clientName?: string;     // Optional client name
+  entityCount?: number;    // Optional count of entities
   createdAt: string;       // ISO 8601 timestamp
   modifiedAt: string;      // ISO 8601 timestamp
   storagePath: string;     // Storage key for project data
   isArchived: boolean;     // Whether project is archived
+  filePath?: string;       // Absolute .sws path in Tauri mode
 }
 ```
 
@@ -46,8 +48,9 @@ interface ProjectListItem {
 ```typescript
 interface ProjectListState {
   projects: ProjectListItem[]; // Array of all projects
-  loading: boolean;            // Loading state (currently unused)
-  error?: string;              // Error message (currently unused)
+  recentProjectIds: string[];  // Recent project IDs (most recent first)
+  loading: boolean;            // Loading state for disk scan/sync
+  error?: string;              // Error message for disk operations
 }
 ```
 
@@ -55,14 +58,16 @@ interface ProjectListState {
 ```typescript
 {
   projects: [],
+  recentProjectIds: [],
   loading: false
 }
 ```
 
 **Persistence**:
 - Persisted to localStorage under key: `sws.projectIndex`
-- Only metadata stored here (full project data stored separately)
-- Automatically syncs on state changes
+- Stores project metadata plus recentProjectIds
+- Automatically syncs on state changes in web mode
+- Tauri mode uses file-backed operations plus persisted index
 
 ## Actions
 
@@ -72,20 +77,35 @@ interface ProjectListState {
 |--------|-----------|-------------|
 | `addProject` | `(project: ProjectListItem) => void` | Add new project to list (prepends to array) |
 | `updateProject` | `(projectId: string, updates: Partial<ProjectListItem>) => void` | Update project metadata, auto-updates modifiedAt |
-| `removeProject` | `(projectId: string) => void` | Permanently remove project from list |
+| `removeProject` | `(projectId: string) => Promise<void>` | Remove project (deletes files in Tauri mode) |
 
 ### Archive Operations
 
 | Action | Signature | Description |
 |--------|-----------|-------------|
-| `archiveProject` | `(projectId: string) => void` | Mark project as archived, updates modifiedAt |
-| `restoreProject` | `(projectId: string) => void` | Unarchive project, updates modifiedAt |
+| `archiveProject` | `(projectId: string) => Promise<void>` | Mark archived; persists to disk in Tauri mode |
+| `restoreProject` | `(projectId: string) => Promise<void>` | Unarchive; persists to disk in Tauri mode |
 
 ### Duplication
 
 | Action | Signature | Description |
 |--------|-----------|-------------|
-| `duplicateProject` | `(projectId: string, newName: string) => void` | Create copy of project with new name and ID |
+| `duplicateProject` | `(projectId: string, newName: string) => Promise<void>` | Duplicate project (copies file in Tauri mode) |
+
+### Recent Projects
+
+| Action | Signature | Description |
+|--------|-----------|-------------|
+| `markAsOpened` | `(projectId: string) => void` | Track recent projects (max 5) |
+
+### Disk Operations (Tauri)
+
+| Action | Signature | Description |
+|--------|-----------|-------------|
+| `scanProjectsFromDisk` | `() => Promise<void>` | Scan default directory for .sws files |
+| `syncProjectFromDisk` | `(projectId: string) => Promise<void>` | Refresh metadata for a project |
+| `setLoading` | `(loading: boolean) => void` | Update loading state |
+| `setError` | `(error?: string) => void` | Update error state |
 
 ## Implementation Details
 
@@ -124,7 +144,8 @@ updateProject: (projectId, updates) => {
 ### 3. Remove Project
 
 ```typescript
-removeProject: (projectId) => {
+removeProject: async (projectId) => {
+  // Deletes .sws file in Tauri mode when filePath is present
   set((state) => ({
     projects: state.projects.filter((p) => p.projectId !== projectId),
   }));
@@ -177,7 +198,7 @@ restoreProject: (projectId) => {
 ### 6. Duplicate Project
 
 ```typescript
-duplicateProject: (projectId, newName) => {
+duplicateProject: async (projectId, newName) => {
   const source = get().projects.find((p) => p.projectId === projectId);
   if (!source) {
     return;
@@ -205,7 +226,7 @@ duplicateProject: (projectId, newName) => {
 - Prepends to project list
 - Does nothing if source project not found
 
-**Note**: This only duplicates metadata. Caller must duplicate actual project data separately.
+**Note**: In Tauri mode, this duplicates the .sws file. In web mode, it duplicates metadata only.
 
 ## Selectors
 
@@ -222,6 +243,9 @@ const activeProjects = useActiveProjects();
 
 // Get only archived projects
 const archivedProjects = useArchivedProjects();
+
+// Get recent projects (ordered, excludes archived)
+const recentProjects = useRecentProjects();
 ```
 
 ### Actions Hook
@@ -234,6 +258,9 @@ const {
   archiveProject,
   restoreProject,
   duplicateProject,
+  markAsOpened,
+  scanProjectsFromDisk,
+  syncProjectFromDisk,
 } = useProjectListActions();
 ```
 
@@ -511,6 +538,10 @@ This separation allows:
 1. Fast project list loading (no need to parse full project data)
 2. Independent project metadata updates
 3. Efficient search/filter operations
+
+### Rehydration
+
+`skipHydration: true` is set to avoid SSR mismatches. Call `rehydrateProjectList()` after app startup when the client is ready.
 
 ## Performance Optimization
 

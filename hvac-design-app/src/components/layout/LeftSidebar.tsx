@@ -4,9 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { ChevronLeft, Search, Box, Layers, Clock, ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronLeft, Search, Box, Layers, Clock, ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * LeftSidebar - Modern Engineering Design 2025
+ * Clean equipment library with refined tabs and drag-friendly items
+ */
 export const LeftSidebar: React.FC = () => {
     const {
         leftSidebarCollapsed,
@@ -15,7 +19,6 @@ export const LeftSidebar: React.FC = () => {
         setActiveLeftTab
     } = useLayoutStore();
 
-    // Local state for search and categories
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
         'air-handling-units': true,
@@ -40,8 +43,8 @@ export const LeftSidebar: React.FC = () => {
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        globalThis.addEventListener('keydown', handleKeyDown);
+        return () => globalThis.removeEventListener('keydown', handleKeyDown);
     }, [toggleLeftSidebar]);
 
     const tabs = [
@@ -52,61 +55,65 @@ export const LeftSidebar: React.FC = () => {
 
     if (leftSidebarCollapsed) {
         return (
-            <div
-                className="w-12 bg-white border-r flex flex-col items-center pt-4 transition-all duration-300 collapsed"
+            <aside
+                className="w-12 bg-white border-r border-slate-200 flex flex-col items-center py-3 transition-all duration-200 collapsed"
                 data-testid="left-sidebar"
             >
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={toggleLeftSidebar}
+                    className="h-8 w-8 p-0 mb-3"
                     data-testid="left-sidebar-toggle"
                     aria-label="Expand sidebar"
                 >
-                    <ChevronLeft className="w-4 h-4 rotate-180" />
+                    <ChevronRight className="w-4 h-4" />
                 </Button>
 
-                {/* Vertical Tabs */}
-                <div className="mt-4 flex flex-col gap-2 w-full px-1">
+                <div className="flex flex-col gap-1 w-full px-1.5">
                     {tabs.map(tab => {
                         const Icon = tab.icon;
                         const isActive = activeLeftTab === tab.id;
                         return (
-                            <Button
+                            <button
                                 key={tab.id}
-                                variant={isActive ? 'secondary' : 'ghost'}
-                                size="sm"
                                 onClick={() => {
                                     setActiveLeftTab(tab.id);
-                                    toggleLeftSidebar(); // Expand on tab click
+                                    toggleLeftSidebar();
                                 }}
-                                className={cn("w-full h-10 p-0 justify-center") + (isActive ? " active" : "")}
+                                className={cn(
+                                    "w-full h-9 flex items-center justify-center rounded-lg transition-colors",
+                                    isActive
+                                        ? "bg-blue-50 text-blue-600"
+                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                                )}
                                 title={tab.label}
                                 data-testid={`tab-${tab.id}`}
                                 role="tab"
                                 aria-selected={isActive}
                             >
                                 <Icon className="w-4 h-4" />
-                            </Button>
+                            </button>
                         );
                     })}
                 </div>
-            </div>
+            </aside>
         );
     }
 
     return (
         <aside
-            className="w-72 bg-white border-r flex flex-col transition-all duration-300"
+            className="w-72 bg-white border-r border-slate-200 flex flex-col transition-all duration-200"
             data-testid="left-sidebar"
         >
-            {/* Header with Toggle */}
-            <div className="h-12 border-b flex items-center justify-between px-3 shrink-0">
-                <h3 className="font-semibold text-sm">Library</h3>
+            {/* Header */}
+            <div className="h-11 border-b border-slate-100 flex items-center justify-between px-3 shrink-0">
+                <h3 className="font-semibold text-sm text-slate-800">Library</h3>
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={toggleLeftSidebar}
+                    className="h-7 w-7 p-0"
                     data-testid="left-sidebar-toggle"
                     aria-label="Collapse sidebar"
                 >
@@ -115,7 +122,7 @@ export const LeftSidebar: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b">
+            <div className="flex border-b border-slate-100 px-2 py-1.5 gap-1 bg-slate-50/50">
                 {tabs.map(tab => {
                     const Icon = tab.icon;
                     const isActive = activeLeftTab === tab.id;
@@ -124,33 +131,33 @@ export const LeftSidebar: React.FC = () => {
                             key={tab.id}
                             onClick={() => setActiveLeftTab(tab.id)}
                             className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium transition-colors border-b-2",
+                                "flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-lg transition-all",
                                 isActive
-                                    ? "text-blue-600 border-blue-600 bg-blue-50/50"
-                                    : "text-slate-600 border-transparent hover:bg-slate-50"
-                            ) + (isActive ? " active" : "")}
+                                    ? "bg-white text-slate-900 shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                            )}
                             data-testid={`tab-${tab.id}`}
                             role="tab"
                             aria-selected={isActive}
                         >
-                            <Icon className="w-4 h-4" />
+                            <Icon className="w-3.5 h-3.5" />
                             {tab.label}
                         </button>
                     );
                 })}
             </div>
 
-            {/* Content Area */}
+            {/* Content */}
             <div className="flex-1 overflow-hidden flex flex-col">
                 {activeLeftTab === 'equipment' && (
                     <div className="flex-1 flex flex-col" data-testid="equipment-panel">
                         {/* Search */}
-                        <div className="p-3 border-b">
+                        <div className="p-3 border-b border-slate-100">
                             <div className="relative">
-                                <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-slate-400" />
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <Input
                                     placeholder="Search equipment..."
-                                    className="pl-9"
+                                    className="pl-9 h-9 text-sm bg-slate-50 border-slate-200"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     data-testid="equipment-search"
@@ -163,7 +170,7 @@ export const LeftSidebar: React.FC = () => {
                             <EquipmentCategory
                                 id="air-handling-units"
                                 label="Air Handling Units"
-                                expanded={expandedCategories['air-handling-units']}
+                                expanded={expandedCategories['air-handling-units'] ?? false}
                                 onToggle={() => toggleCategory('air-handling-units')}
                                 searchQuery={searchQuery}
                                 items={[
@@ -175,7 +182,7 @@ export const LeftSidebar: React.FC = () => {
                             <EquipmentCategory
                                 id="vav-boxes"
                                 label="VAV Boxes"
-                                expanded={expandedCategories['vav-boxes']}
+                                expanded={expandedCategories['vav-boxes'] ?? false}
                                 onToggle={() => toggleCategory('vav-boxes')}
                                 searchQuery={searchQuery}
                                 items={[
@@ -186,7 +193,7 @@ export const LeftSidebar: React.FC = () => {
                             <EquipmentCategory
                                 id="fans"
                                 label="Fans"
-                                expanded={expandedCategories['fans']}
+                                expanded={expandedCategories['fans'] ?? false}
                                 onToggle={() => toggleCategory('fans')}
                                 searchQuery={searchQuery}
                                 items={[
@@ -197,7 +204,7 @@ export const LeftSidebar: React.FC = () => {
                             <EquipmentCategory
                                 id="ducts"
                                 label="Ductwork"
-                                expanded={expandedCategories['ducts']}
+                                expanded={expandedCategories['ducts'] ?? false}
                                 onToggle={() => toggleCategory('ducts')}
                                 searchQuery={searchQuery}
                                 items={[
@@ -211,20 +218,24 @@ export const LeftSidebar: React.FC = () => {
                 )}
 
                 {activeLeftTab === 'layers' && (
-                    <div className="flex-1 p-4" data-testid="layers-panel">
-                        <div className="text-center text-slate-500">
-                            <Layers className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                            <p className="text-sm">Layer management</p>
+                    <div className="flex-1 flex items-center justify-center p-6" data-testid="layers-panel">
+                        <div className="text-center">
+                            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                                <Layers className="w-7 h-7 text-slate-400" />
+                            </div>
+                            <p className="text-sm font-medium text-slate-600">Layer Management</p>
                             <p className="text-xs text-slate-400 mt-1">Coming soon</p>
                         </div>
                     </div>
                 )}
 
                 {activeLeftTab === 'recent' && (
-                    <div className="flex-1 p-4" data-testid="recent-panel">
-                        <div className="text-center text-slate-500">
-                            <Clock className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                            <p className="text-sm">No recent items</p>
+                    <div className="flex-1 flex items-center justify-center p-6" data-testid="recent-panel">
+                        <div className="text-center">
+                            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                                <Clock className="w-7 h-7 text-slate-400" />
+                            </div>
+                            <p className="text-sm font-medium text-slate-600">No recent items</p>
                             <p className="text-xs text-slate-400 mt-1">Recently used equipment will appear here</p>
                         </div>
                     </div>
@@ -247,13 +258,11 @@ const EquipmentCategory: React.FC<{
     searchQuery: string;
     items: EquipmentItem[];
 }> = ({ id, label, expanded, onToggle, searchQuery, items }) => {
-    // Filter items based on search
     const filteredItems = items.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.desc.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // If searching, always expand if matches found
     const isExpanded = searchQuery ? filteredItems.length > 0 : expanded;
 
     if (searchQuery && filteredItems.length === 0) { return null; }
@@ -262,26 +271,35 @@ const EquipmentCategory: React.FC<{
         <div className="mb-1" data-testid={`category-${id}`}>
             <button
                 onClick={onToggle}
-                className="w-full flex items-center gap-1 p-2 hover:bg-slate-100 rounded text-sm font-medium"
+                className="w-full flex items-center gap-1.5 p-2 hover:bg-slate-50 rounded-lg text-sm font-medium text-slate-700 transition-colors"
             >
                 <div data-testid="expand-icon" data-expanded={isExpanded}>
-                    {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                    ) : (
+                        <ChevronRight className="w-4 h-4 text-slate-400" />
+                    )}
                 </div>
-                <span>{label}</span>
-                <span className="text-xs text-slate-400 ml-auto">{filteredItems.length}</span>
+                <span className="flex-1 text-left">{label}</span>
+                <span className="badge badge-slate text-[10px]">{filteredItems.length}</span>
             </button>
 
             {isExpanded && (
-                <div className="pl-4 mt-1 space-y-1">
+                <div className="pl-3 mt-1 space-y-1">
                     {filteredItems.map((item, idx) => (
                         <div
                             key={idx}
-                            className="p-2 border rounded hover:bg-blue-50 cursor-move transition-colors group bg-white"
+                            className="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50/50 cursor-grab transition-all group"
                             data-testid="equipment-item"
                             draggable
                         >
-                            <div className="font-medium text-sm group-hover:text-blue-700">{item.name}</div>
-                            <div className="text-xs text-slate-500">{item.desc}</div>
+                            <GripVertical className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400" />
+                            <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm text-slate-800 group-hover:text-blue-700 truncate">
+                                    {item.name}
+                                </div>
+                                <div className="text-xs text-slate-500 truncate">{item.desc}</div>
+                            </div>
                         </div>
                     ))}
                 </div>

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The useAutoSave hook provides automatic project saving to localStorage with debouncing, dirty state tracking, and viewport state persistence. It monitors entity and viewport changes and automatically saves the project state.
+The useAutoSave hook provides automatic project saving to localStorage or disk (Tauri mode). It tracks dirty state across entities, selection, viewport, history, and preferences, and writes a versioned envelope with checksum plus backup support.
 
 ## Location
 
@@ -12,18 +12,18 @@ src/features/canvas/hooks/useAutoSave.ts
 
 ## Purpose
 
-- Auto-save project state to localStorage
-- Track dirty state when entities or viewport change
-- Debounce saves to avoid excessive writes (default 2 seconds)
+- Auto-save project state to localStorage (web) or .sws file (Tauri)
+- Track dirty state when stores change
 - Support interval-based autosave
 - Save on browser beforeunload event
-- Persist entities, viewport state, and project metadata
+- Persist entities, viewport state, selection, preferences, history, and UI state
 
 ## Hook Signature
 
 ```typescript
 export function useAutoSave(options: UseAutoSaveOptions = {}): {
-  save: () => boolean;
+  save: () => SaveResult;
+  saveNow: () => SaveResult;
   isDirty: boolean;
 }
 ```
@@ -32,26 +32,21 @@ export function useAutoSave(options: UseAutoSaveOptions = {}): {
 
 ```typescript
 interface UseAutoSaveOptions {
-  enabled?: boolean;         // Enable/disable auto-save (default: true)
-  debounceDelay?: number;    // Debounce delay in ms (default: 2000)
-  interval?: number;         // Interval-based save in ms (optional)
-  onSave?: (success: boolean) => void;  // Callback after save
+  enabled?: boolean;       // Enable/disable auto-save (default: true)
+  interval?: number;       // Interval-based save in ms (optional)
+  onSave?: (result: SaveResult) => void; // Callback after save
 }
 ```
 
 ## Saved Data Structure
 
 ```typescript
-export interface StoredProject {
+export interface LocalStorageEnvelope {
+  schemaVersion: string;
   projectId: string;
-  projectName: string;
-  projectNumber: string;
-  clientName: string;
-  createdAt: string;
-  modifiedAt: string;
-  entities: { byId: Record<string, unknown>; allIds: string[] };
-  viewportState: { panX: number; panY: number; zoom: number };
-  settings: { unitSystem: 'imperial' | 'metric'; gridSize: number; gridVisible: boolean };
+  savedAt: string;
+  checksum: string;
+  payload: LocalStoragePayload;
 }
 ```
 
@@ -62,25 +57,29 @@ export interface StoredProject {
 Save project to localStorage with error handling.
 
 ```typescript
-export function saveProjectToStorage(projectId: string, project: StoredProject): boolean
+export function saveProjectToStorage(projectId: string, payload: LocalStoragePayload): StorageWriteResult
 ```
 
-**Storage Key:** `hvac-project-{projectId}`
+**Storage Key:** `getProjectStorageKey(projectId)`
+
+### saveBackupToStorage
+
+Save backup envelope to localStorage.
+
+```typescript
+export function saveBackupToStorage(projectId: string, payload: LocalStoragePayload): StorageWriteResult
+```
 
 ### loadProjectFromStorage
 
-Load project from localStorage.
+Load and validate envelope from localStorage (primary or backup).
 
 ```typescript
-export function loadProjectFromStorage(projectId: string): StoredProject | null
-```
+export function loadProjectFromStorage(projectId: string): LoadedProject | null
 
 ### deleteProjectFromStorage
 
-Remove project from localStorage.
-
-```typescript
-export function deleteProjectFromStorage(projectId: string): boolean
+Remove project and backup from localStorage.
 ```
 
 ## Usage Examples
@@ -102,28 +101,19 @@ function CanvasEditor({ projectId }: { projectId: string }) {
 }
 ```
 
-### Custom Debounce and Callback
+### Interval and Callback
 
 ```typescript
 const { save, isDirty } = useAutoSave({
   enabled: true,
-  debounceDelay: 5000,  // 5 seconds
-  onSave: (success) => {
-    if (success) {
-      console.log('Project saved!');
+  interval: 60000,
+  onSave: (result) => {
+    if (result.success) {
+      console.log('Project saved!', result.sizeBytes);
     } else {
-      console.error('Save failed');
+      console.error('Save failed', result.error);
     }
   },
-});
-```
-
-### With Interval-Based Saving
-
-```typescript
-const { save, isDirty } = useAutoSave({
-  debounceDelay: 2000,   // Debounced save after 2s of inactivity
-  interval: 60000,       // Also save every 60 seconds if dirty
 });
 ```
 
@@ -134,8 +124,8 @@ const { save } = useAutoSave({ enabled: false });
 
 // Manually trigger save
 const handleSaveClick = () => {
-  const success = save();
-  if (success) {
+  const result = save();
+  if (result.success) {
     alert('Saved successfully!');
   }
 };
@@ -145,23 +135,7 @@ const handleSaveClick = () => {
 
 ### Dirty State Tracking
 
-The hook monitors:
-- Entity store changes (byId, allIds)
-- Viewport store changes (panX, panY, zoom)
-
-Changes trigger:
-1. Set isDirty to true
-2. Clear existing debounce timer
-3. Start new debounce timer
-
-### Debounced Auto-Save
-
-When entities or viewport change:
-```
-Change detected → Clear timer → Wait 2s → Save
-                                   ↑
-New change → Reset timer ──────────┘
-```
+The hook marks dirty when entity, viewport, selection, history, or preference stores change.
 
 ### Save on Unload
 
@@ -183,14 +157,12 @@ describe('useAutoSave', () => {
   });
 
   it('saves project to localStorage', () => {
-    const { result } = renderHook(() => useAutoSave());
+    const { result } = renderHook(() => useAutoSave({ enabled: false }));
 
     act(() => {
-      result.current.save();
+      const saveResult = result.current.save();
+      expect(saveResult.success).toBe(true);
     });
-
-    const saved = loadProjectFromStorage('test-project');
-    expect(saved).not.toBeNull();
   });
 
   it('tracks dirty state on entity changes', () => {
@@ -205,28 +177,14 @@ describe('useAutoSave', () => {
     expect(result.current.isDirty).toBe(true);
   });
 
-  it('debounces saves', async () => {
-    jest.useFakeTimers();
-    const onSave = jest.fn();
+  it('tracks dirty state on entity changes', () => {
+    const { result } = renderHook(() => useAutoSave({ enabled: false }));
 
-    renderHook(() => useAutoSave({ debounceDelay: 1000, onSave }));
-
-    // Make multiple changes
-    act(() => {
-      useEntityStore.getState().addEntity(createRoom());
-    });
     act(() => {
       useEntityStore.getState().addEntity(createRoom());
     });
 
-    // Should not save immediately
-    expect(onSave).not.toHaveBeenCalled();
-
-    // Fast forward past debounce
-    jest.advanceTimersByTime(1000);
-
-    // Should save once
-    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(result.current.isDirty).toBe(true);
   });
 });
 ```

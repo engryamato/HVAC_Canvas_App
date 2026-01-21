@@ -29,10 +29,10 @@ src/features/canvas/calculators/ductSizing.ts
  Calculate duct cross-sectional area in square inches.
  
  ```typescript
- export function calculateDuctArea(
-   shape: DuctShape,
-   dimensions: { diameter?: number; width?: number; height?: number; majorAxis?: number; minorAxis?: number }
- ): number
+  export function calculateDuctArea(
+    shape: DuctShape,
+    dimensions: { diameter?: number; width?: number; height?: number }
+  ): number
  ```
  
  **Formulas:**
@@ -49,12 +49,7 @@ src/features/canvas/calculators/ductSizing.ts
  where:
    D = diameter (in)
  
- // Oval duct
- A = (π × a × b) / 4
- where:
-   a = major axis (in)
-   b = minor axis (in)
- ```
+  ```
  
  **Examples:**
  ```typescript
@@ -67,25 +62,25 @@ src/features/canvas/calculators/ductSizing.ts
  // 12 × 8 = 96 sq in
  ```
  
- ### calculateVelocity
+### calculateVelocity
  
- Calculate air velocity (V) from Airflow (Q) and Area (A).
+Calculate air velocity (V) from Airflow (Q) and Area (A). Rounds to the nearest 10 FPM.
  
  ```typescript
  export function calculateVelocity(cfm: number, areaSqIn: number): number
  ```
  
- **Formula:**
- ```typescript
- V = Q / A
- where:
-   V = air velocity (FPM)
-   Q = airflow (CFM)
-   A = duct area (sq ft)
-   
- Note: Since input area is in sq in, we convert:
- V = CFM / (area_sq_in / 144)
- ```
+**Formula:**
+```typescript
+V = Q / A
+where:
+  V = air velocity (FPM)
+  Q = airflow (CFM)
+  A = duct area (sq ft)
+
+Note: Since input area is in sq in, we convert:
+V = CFM / (area_sq_in / 144)
+```
  
  **Example:**
  ```typescript
@@ -94,49 +89,27 @@ src/features/canvas/calculators/ductSizing.ts
  // 800 / (113.1/144) = 1017 FPM
  ```
  
- ### calculateAirflow
+### calculateRoundDuctDiameter
+
+Calculate round duct diameter (inches) given CFM and target velocity.
+
+```typescript
+export function calculateRoundDuctDiameter(cfm: number, velocityFpm: number): number
+```
  
- Calculate Airflow (Q) from Velocity (V) and Area (A).
+### calculateEquivalentDiameter
  
- ```typescript
- export function calculateAirflow(velocityFpm: number, areaSqIn: number): number
- ```
- 
- **Formula:**
- ```typescript
- Q = V × A
- ```
- 
- ### calculateDuctSizeFromArea
- 
- Calculate required dimensions based on target area.
- 
- **Formulas:**
- ```typescript
- // For Round Duct (Diameter):
- D = sqrt((4 × A) / π)
- 
- // For Rectangular Duct (Width or Height):
- // If width is fixed:
- H = A / W
- 
- // If height is fixed:
- W = A / H
- ```
- 
- ### calculateEquivalentDiameter
- 
- Calculate equivalent round diameter for rectangular duct.
+Calculate equivalent round diameter for rectangular duct.
  
  ```typescript
- export function calculateEquivalentDiameter(width: number, height: number): number
+export function calculateEquivalentDiameter(width: number, height: number): number
  ```
  
- **Formula:**
- ```typescript
- De = 1.30 × ((a×b)^0.625) / ((a+b)^0.25)
- where a, b are width and height
- ```
+**Formula:**
+```typescript
+De = 1.30 × ((a×b)^0.625) / ((a+b)^0.25)
+where a, b are width and height
+```
 
 ## Usage Examples
 

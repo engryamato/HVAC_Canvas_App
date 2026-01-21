@@ -1,113 +1,929 @@
 
-Running 3 tests using 3 workers
+Running 30 tests using 8 workers
 
-  Γ£ÿ  3 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:32:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas (6.3s)
-  Γ£ÿ  2 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:18:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 1: Activate Room Tool (6.3s)
-  Γ£ÿ  1 [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:55:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties (6.4s)
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô localStorage projectIndex valid
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] ΓÜá localStorage preferences corrupted, resetting to defaults
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γ£ô localStorage projectIndex valid
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+  Γ£ô   2 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:111:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should handle empty localStorage values (2.0s)
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+  Γ£ô   4 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:74:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should recover from corrupted localStorage JSON (3.0s)
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] ΓÜá localStorage preferences corrupted, resetting to defaults
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+  Γ£ô   3 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:61:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should handle clean localStorage gracefully (4.9s)
+  Γ£ô   6 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:95:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should recover from corrupted app state (4.9s)
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [AppInfo] Redirecting to dashboard...
+  Γ£ô   9 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:282:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Performance ΓÇ║ should complete startup validation quickly (3.7s)
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] STORAGE DUMP: {"hvac-app-storage":"{\"state\":{\"hasLaunched\":true},\"version\":0}","sws.preferences":"{\"state\":{\"projectFolder\":\"/projects\",\"unitSystem\":\"imperial\",\"autoSaveInterval\":300000,\"gridSize\":24,\"theme\":\"light\"},\"version\":0}","hvac-tutorial-storage":"{\"state\":{\"isActive\":false,\"currentStep\":1,\"totalSteps\":5,\"completedSteps\":[],\"isCompleted\":false},\"version\":0}","sws.projectDetails":"{\"state\":{\"projects\":[]},\"version\":0}","sws.projectIndex":"{\"state\":{\"projects\":[],\"recentProjectIds\":[],\"loading\":false},\"version\":0}","sws.settings":"{\"state\":{\"autoOpenLastProject\":false},\"version\":0}"}
+[Browser] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+  Γ£ô   5 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:44:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Debug: Storage Dump ΓÇ║ should dump real storage content (6.0s)
+[Browser] [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [Telemetry] Skipping telemetry; endpoint not configured. localstorage_corrupt {projectId: 123e4567-e89b-12d3-a456-426614174000, source: primary}
+[Browser] [useAutoSave] Set backup recovery flag - backup data will be used
+[Browser] [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovered {projectId: 123e4567-e89b-12d3-a456-426614174000, source: backup}
+[Browser] [CanvasPageWrapper] Project: Backup Project, Version: 1.0.0, App Version: 1.0.0
+[Browser] [ProjectListStore] Adding project: {projectId: 123e4567-e89b-12d3-a456-426614174000, projectName: Backup Project, projectNumber: undefined, clientName: undefined, createdAt: 2026-01-20T22:41:05.128Z}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [CanvasPage] Backup recovery flag detected, showing toast
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] ΓÜá localStorage preferences corrupted, resetting to defaults
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+  Γ£ô  13 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:74:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should recover from corrupted localStorage JSON (3.7s)
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+  Γ£ô  15 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:111:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should handle empty localStorage values (977ms)
+  Γ£ô  12 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:61:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should handle clean localStorage gracefully (5.7s)
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+  Γ£ÿ   1 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:126:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should handle missing project index gracefully (11.9s)
+  Γ£ÿ   8 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:148:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should validate project entry structure (11.8s)
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] STORAGE DUMP: {"sws.preferences":"{\"state\":{\"projectFolder\":\"/projects\",\"unitSystem\":\"imperial\",\"autoSaveInterval\":300000,\"gridSize\":24,\"theme\":\"light\"},\"version\":0}","hvac-tutorial-storage":"{\"state\":{\"isActive\":false,\"currentStep\":1,\"totalSteps\":5,\"completedSteps\":[],\"isCompleted\":false},\"version\":0}","sws.projectIndex":"{\"state\":{\"projects\":[],\"recentProjectIds\":[],\"loading\":false},\"version\":0}","hvac-app-storage":"{\"state\":{\"hasLaunched\":true},\"version\":0}","sws.projectDetails":"{\"state\":{\"projects\":[]},\"version\":0}","sws.settings":"{\"state\":{\"autoOpenLastProject\":false},\"version\":0}"}
+  Γ£ô  11 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:44:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Debug: Storage Dump ΓÇ║ should dump real storage content (6.1s)
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority
+  Γ£ô  14 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:95:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should recover from corrupted app state (5.3s)
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γ£ô localStorage projectIndex valid
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] ΓÜá localStorage preferences corrupted, resetting to defaults
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+  Γ£ÿ  10 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:301:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ State Consistency ΓÇ║ should maintain consistent state after recovery (10.6s)
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+  -  20 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:188:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ User Notifications ΓÇ║ should show warning toast when backup loaded
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 1
+[Browser] [ProjectListStore] Hydration finished, projects: 1
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] ΓÜá localStorage preferences corrupted, resetting to defaults
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+  Γ£ô  16 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:126:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should handle missing project index gracefully (5.2s)
+  Γ£ô  17 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:148:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should validate project entry structure (5.8s)
+  Γ£ô  18 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:301:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ State Consistency ΓÇ║ should maintain consistent state after recovery (5.1s)
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo Render] JSHandle@object
+[Browser] [AppInfo] State: JSHandle@object
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" was detected as the Largest Contentful Paint (LCP). Please add the "priority" property if this image is above the fold.
+Read more: https://nextjs.org/docs/api-reference/next/image#priority
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+  Γ£ô  23 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:74:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should recover from corrupted localStorage JSON (2.5s)
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+  Γ£ô  19 [firefox] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:282:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Performance ΓÇ║ should complete startup validation quickly (5.2s)
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+  Γ£ô  22 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:61:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should handle clean localStorage gracefully (4.6s)
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γ£ô localStorage projectIndex valid
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+  -  29 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:188:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ User Notifications ΓÇ║ should show warning toast when backup loaded
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] STORAGE DUMP: {"sws.projectDetails":"{\"state\":{\"projects\":[]},\"version\":0}","sws.projectIndex":"{\"state\":{\"projects\":[],\"recentProjectIds\":[],\"loading\":false},\"version\":0}","hvac-app-storage":"{\"state\":{\"hasLaunched\":true},\"version\":0}","sws.preferences":"{\"state\":{\"projectFolder\":\"/projects\",\"unitSystem\":\"imperial\",\"autoSaveInterval\":300000,\"gridSize\":24,\"theme\":\"light\"},\"version\":0}","sws.settings":"{\"state\":{\"autoOpenLastProject\":false},\"version\":0}","hvac-tutorial-storage":"{\"state\":{\"isActive\":false,\"currentStep\":1,\"totalSteps\":5,\"completedSteps\":[],\"isCompleted\":false},\"version\":0}"}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+  Γ£ô  21 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:44:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Debug: Storage Dump ΓÇ║ should dump real storage content (6.6s)
+  Γ£ô  26 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:111:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should handle empty localStorage values (2.0s)
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] Γ£ô localStorage preferences valid
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [DeviceDetection] Window width: 1280px, isMobile: false
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInitializer] Environment detected: Web Browser
+[Browser] [AppInitializer] Running integrity checks...
+[Browser] [AppInitializer] ΓÜá localStorage preferences corrupted, resetting to defaults
+[Browser] [AppInitializer] Γä╣ No projectIndex found (first launch)
+[Browser] [AppInitializer] Γ£ô IndexedDB available
+[Browser] [AppInitializer] Γ£ô Integrity checks complete
+[Browser] [AppInfo] State: {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: true, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+  Γ£ÿ   7 [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:188:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ User Notifications ΓÇ║ should show warning toast when backup loaded (22.2s)
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: true, isTutorialActive: false}
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [ProjectListStore] Hydration finished, projects: 1
+[Browser] [ProjectListStore] Hydration finished, projects: 1
+  Γ£ô  24 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:95:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 1: localStorage Validation (Startup) ΓÇ║ should recover from corrupted app state (4.9s)
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: true, isLoading: false, isTutorialActive: false}
+[Browser] Image with src "/icons/drag-drop.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/auto-routing.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/export.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[Browser] Image with src "/icons/calculations.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+  Γ£ô  25 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:148:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should validate project entry structure (5.8s)
+  Γ£ô  28 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:282:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Performance ΓÇ║ should complete startup validation quickly (5.0s)
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo Render] {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+[Browser] [AppInfo] State: {showSplash: false, isFirstLaunch: false, isLoading: false, isTutorialActive: false}
+  Γ£ô  27 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:126:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should handle missing project index gracefully (5.5s)
+[Browser] [AppInfo] Redirecting to dashboard...
+[Browser] [ProjectListStore] No persisted state, using defaults
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+[Browser] [ProjectListStore] Hydration finished, projects: 0
+  Γ£ô  30 [webkit] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:301:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ State Consistency ΓÇ║ should maintain consistent state after recovery (5.2s)
 
 
-  1) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:18:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 1: Activate Room Tool ΓÇ║ Step 1: Activate tool via shortcut 
+  1) [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:126:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should handle missing project index gracefully 
 
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
 
-    Locator: getByTestId('status-bar')
-    Expected substring: [32m"Room Tool"[39m
-    Received string:    [31m"X: 0, Y: 0Zoom: 100%Grid: On0 itemsOnline"[39m
-    Timeout: 5000ms
+    Expected pattern: [32m/\/dashboard/[39m
+    Received string:  [31m"http://localhost:3001/"[39m
+    Timeout: 10000ms
 
     Call log:
-    [2m  - Expect "toContainText" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('status-bar')[22m
-    [2m    9 ├ù locator resolved to <div data-testid="status-bar" class="border border-slate-200 shadow-sm transition-shadow hover:shadow-md h-8 bg-slate-100 border-t flex items-center px-4 text-xs text-slate-600 justify-between rounded-none shrink-0">ΓÇª</div>[22m
-    [2m      - unexpected value "X: 0, Y: 0Zoom: 100%Grid: On0 itemsOnline"[22m
+    [2m  - Expect "toHaveURL" with timeout 10000ms[22m
+    [2m    13 ├ù unexpected value "http://localhost:3001/"[22m
 
 
-      26 |       await expect(roomTool).toHaveAttribute('aria-pressed', 'true');
-      27 |       const statusBar = page.getByTestId('status-bar');
-    > 28 |       await expect(statusBar).toContainText('Room Tool');
-         |                               ^
-      29 |     });
-      30 |   });
-      31 |
-        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:28:31
-        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:23:5
+      137 |
+      138 |             // Should go to dashboard (not welcome)
+    > 139 |             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
+          |                                ^
+      140 |
+      141 |             // Should show empty state (no projects found)
+      142 |             const projectList = page.getByTestId('project-list');
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:139:32
 
     attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-    test-results\03-entity-creation-tauri-o-166d8-e-Step-1-Activate-Room-Tool-chromium\test-failed-1.png
+    test-results\00-getting-started-uj-gs-0-e0680-ng-project-index-gracefully-chromium\test-failed-1.png
     ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
-    Error Context: test-results\03-entity-creation-tauri-o-166d8-e-Step-1-Activate-Room-Tool-chromium\error-context.md
+    Error Context: test-results\00-getting-started-uj-gs-0-e0680-ng-project-index-gracefully-chromium\error-context.md
 
-  2) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:32:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas ΓÇ║ Step 2-4: Drag to create room 
+  2) [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:148:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should validate project entry structure 
 
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
 
-    Locator: getByTestId('status-bar')
-    Expected substring: [32m"Room"[39m
-    Received string:    [31m"X: 0, Y: 0Zoom: 100%Grid: On0 itemsOnline"[39m
-    Timeout: 5000ms
+    Expected pattern: [32m/\/dashboard/[39m
+    Received string:  [31m"http://localhost:3001/"[39m
+    Timeout: 10000ms
 
     Call log:
-    [2m  - Expect "toContainText" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('status-bar')[22m
-    [2m    9 ├ù locator resolved to <div data-testid="status-bar" class="border border-slate-200 shadow-sm transition-shadow hover:shadow-md h-8 bg-slate-100 border-t flex items-center px-4 text-xs text-slate-600 justify-between rounded-none shrink-0">ΓÇª</div>[22m
-    [2m      - unexpected value "X: 0, Y: 0Zoom: 100%Grid: On0 itemsOnline"[22m
+    [2m  - Expect "toHaveURL" with timeout 10000ms[22m
+    [2m    13 ├ù unexpected value "http://localhost:3001/"[22m
 
 
-      49 |       await page.mouse.up();
-      50 |
-    > 51 |       await expect(page.getByTestId('status-bar')).toContainText('Room');
-         |                                                    ^
-      52 |     });
-      53 |   });
-      54 |
-        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:51:52
-        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:42:5
+      175 |             await page.reload();
+      176 |
+    > 177 |             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
+          |                                ^
+      178 |             // Wait for store hydration to complete
+      179 |             await page.waitForLoadState('networkidle');
+      180 |             await page.waitForTimeout(500); // Extra buffer for Zustand rehydration
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:177:32
 
     attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-    test-results\03-entity-creation-tauri-o-618b8-tep-2-4-Draw-Room-on-Canvas-chromium\test-failed-1.png
+    test-results\00-getting-started-uj-gs-0-ca6d6-ate-project-entry-structure-chromium\test-failed-1.png
     ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
-    Error Context: test-results\03-entity-creation-tauri-o-618b8-tep-2-4-Draw-Room-on-Canvas-chromium\error-context.md
+    Error Context: test-results\00-getting-started-uj-gs-0-ca6d6-ate-project-entry-structure-chromium\error-context.md
 
-  3) [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:55:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties ΓÇ║ Step 5: Inspector shows room properties 
+  3) [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:188:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ User Notifications ΓÇ║ should show warning toast when backup loaded 
 
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
 
-    Locator: getByTestId('properties-panel')
-    Expected substring: [32m"Room"[39m
-    Received string:    [31m"PropertiesNo item selectedProject: Office HVACCreated: Jan 10, 2026"[39m
-    Timeout: 5000ms
+    Locator: locator('[role="status"]').filter({ hasText: /backup loaded/i })
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
 
     Call log:
-    [2m  - Expect "toContainText" with timeout 5000ms[22m
-    [2m  - waiting for getByTestId('properties-panel')[22m
-    [2m    9 ├ù locator resolved to <div data-testid="properties-panel">ΓÇª</div>[22m
-    [2m      - unexpected value "PropertiesNo item selectedProject: Office HVACCreated: Jan 10, 2026"[22m
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('[role="status"]').filter({ hasText: /backup loaded/i })[22m
 
 
-      69 |     await test.step('Step 5: Inspector shows room properties', async () => {
-      70 |       const propertiesPanel = page.getByTestId('properties-panel');
-    > 71 |       await expect(propertiesPanel).toContainText('Room');
-         |                                     ^
-      72 |     });
-      73 |   });
-      74 | });
-        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:71:37
-        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:69:16
+      275 |             // Now check for toast - it should appear immediately after project loads
+      276 |             const warningToast = page.locator('[role="status"]').filter({ hasText: /backup loaded/i });
+    > 277 |             await expect(warningToast).toBeVisible({ timeout: 15000 });
+          |                                        ^
+      278 |         });
+      279 |     });
+      280 |
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:277:40
 
     attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-    test-results\03-entity-creation-tauri-o-865de-Step-5-View-Room-Properties-chromium\test-failed-1.png
+    test-results\00-getting-started-uj-gs-0-9f96f-ng-toast-when-backup-loaded-chromium\test-failed-1.png
     ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
-    Error Context: test-results\03-entity-creation-tauri-o-865de-Step-5-View-Room-Properties-chromium\error-context.md
+    Error Context: test-results\00-getting-started-uj-gs-0-9f96f-ng-toast-when-backup-loaded-chromium\error-context.md
 
-  3 failed
-    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:18:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 1: Activate Room Tool 
-    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:32:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 2-4: Draw Room on Canvas 
-    [chromium] ΓÇ║ e2e\03-entity-creation\tauri-offline\uj-ec-001-draw-room.spec.ts:55:7 ΓÇ║ UJ-EC-001: Draw Room (Tauri Offline) ΓÇ║ Step 5: View Room Properties 
+  4) [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:301:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ State Consistency ΓÇ║ should maintain consistent state after recovery 
 
-To open last HTML report run:
-[36m[39m
-[36m  npx playwright show-report[39m
-[36m[39m
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/dashboard/[39m
+    Received string:  [31m"http://localhost:3001/"[39m
+    Timeout: 10000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 10000ms[22m
+    [2m    13 ├ù unexpected value "http://localhost:3001/"[22m
+
+
+      312 |
+      313 |             // App should recover preferences to defaults
+    > 314 |             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
+          |                                ^
+      315 |
+      316 |             // Verify preferences are valid (check via localStorage)
+      317 |             const prefs = await page.evaluate(() => {
+        at C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:314:32
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\00-getting-started-uj-gs-0-08d2a-istent-state-after-recovery-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\00-getting-started-uj-gs-0-08d2a-istent-state-after-recovery-chromium\error-context.md
+
+  4 failed
+    [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:126:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should handle missing project index gracefully 
+    [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:148:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ Phase 2: Project Data Validation ΓÇ║ should validate project entry structure 
+    [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:188:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ User Notifications ΓÇ║ should show warning toast when backup loaded 
+    [chromium] ΓÇ║ e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts:301:13 ΓÇ║ OS-INIT-003: Database Integrity Check ΓÇ║ State Consistency ΓÇ║ should maintain consistent state after recovery 
+  2 skipped
+  24 passed (26.2s)

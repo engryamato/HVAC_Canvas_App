@@ -38,6 +38,7 @@ interface ShortcutOptions {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onZoomFit?: () => void;
+  onZoomToSelection?: (result: { success: boolean; message?: string }) => void;
   onEscape?: () => void;
   enabled?: boolean;  // Enable/disable shortcuts (default: true)
 }
@@ -54,6 +55,8 @@ interface ShortcutOptions {
 | Ctrl+Shift+Z | Redo (alternative) |
 | Ctrl+S | Save project |
 | Ctrl+A | Select all entities |
+| Ctrl+1 | Zoom to fit all content |
+| Ctrl+2 | Zoom to selection |
 | Delete | Delete selected |
 | Backspace | Delete selected |
 | Escape | Clear selection |
@@ -123,8 +126,8 @@ function CanvasPage() {
 
   useKeyboardShortcuts({
     onSave: () => {
-      const success = save();
-      toast(success ? 'Saved!' : 'Save failed');
+      const result = save();
+      toast(result.success ? 'Saved!' : 'Save failed');
     },
     onDelete: () => {
       deleteSelected();
@@ -215,5 +218,5 @@ describe('useKeyboardShortcuts', () => {
 
 - [useUndoRedo](./useUndoRedo.md)
 - [useEntityOperations](./useEntityOperations.md)
-- [Entity Commands](../09-commands/EntityCommands.md)
-- [Viewport Store](../02-stores/ViewportStore.md)
+- [EntityCommands](../09-commands/EntityCommands.md)
+- [viewportStore](../02-stores/viewportStore.md)

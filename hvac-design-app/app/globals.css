@@ -72,5 +72,143 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Modern Engineering Dashboard Utilities */
+@layer components {
+  /* Glassmorphism Header */
+  .glass-header {
+    @apply bg-white/70 backdrop-blur-xl border-b border-slate-200/50;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+  }
+  .dark .glass-header {
+    @apply bg-slate-900/70 border-slate-700/50;
+    background: linear-gradient(to bottom, rgba(15,23,42,0.9), rgba(15,23,42,0.7));
+  }
+
+  /* Grid Background Pattern */
+  .grid-pattern {
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  .dark .grid-pattern {
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  }
+
+  /* Modern Segmented Control (Pill Tabs) */
+  .segmented-control {
+    @apply inline-flex bg-slate-100 p-1 rounded-xl gap-1;
+  }
+  .dark .segmented-control {
+    @apply bg-slate-800;
+  }
+  .segmented-control button {
+    @apply px-4 py-2 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200;
+  }
+  .segmented-control button:hover {
+    @apply text-slate-900;
+  }
+  .dark .segmented-control button {
+    @apply text-slate-400;
+  }
+  .dark .segmented-control button:hover {
+    @apply text-slate-100;
+  }
+  .segmented-control button.active {
+    @apply bg-white text-slate-900 shadow-sm;
+  }
+  .dark .segmented-control button.active {
+    @apply bg-slate-700 text-white;
+  }
+
+  /* Modern Project Card */
+  .project-card {
+    @apply bg-white border border-slate-200/80 rounded-2xl p-5 transition-all duration-300 cursor-pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02);
+  }
+  .project-card:hover {
+    @apply border-slate-300 -translate-y-1;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  .dark .project-card {
+    @apply bg-slate-800/50 border-slate-700/50;
+  }
+  .dark .project-card:hover {
+    @apply border-slate-600 bg-slate-800;
+  }
+
+  /* Status Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-blue {
+    @apply bg-blue-50 text-blue-700 border border-blue-100;
+  }
+  .dark .badge-blue {
+    @apply bg-blue-900/30 text-blue-300 border-blue-800;
+  }
+  .badge-green {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-100;
+  }
+  .dark .badge-green {
+    @apply bg-emerald-900/30 text-emerald-300 border-emerald-800;
+  }
+  .badge-amber {
+    @apply bg-amber-50 text-amber-700 border border-amber-100;
+  }
+  .dark .badge-amber {
+    @apply bg-amber-900/30 text-amber-300 border-amber-800;
+  }
+  .badge-slate {
+    @apply bg-slate-100 text-slate-600 border border-slate-200;
+  }
+  .dark .badge-slate {
+    @apply bg-slate-700 text-slate-300 border-slate-600;
+  }
+
+  /* Modern Button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm;
+    @apply bg-blue-600 text-white shadow-sm;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:bg-blue-700 hover:shadow-md;
+    @apply active:scale-[0.97] active:shadow-sm;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm;
+    @apply bg-white text-slate-700 border border-slate-200 shadow-sm;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:bg-slate-50 hover:border-slate-300;
+    @apply active:scale-[0.97];
+  }
+  .dark .btn-secondary {
+    @apply bg-slate-800 text-slate-200 border-slate-700;
+    @apply hover:bg-slate-700 hover:border-slate-600;
+  }
+}
+
+/* Staggered Animation Utilities */
+@layer utilities {
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+    opacity: 0;
+  }
+  .animation-delay-100 { animation-delay: 0.1s; }
+  .animation-delay-200 { animation-delay: 0.2s; }
+  .animation-delay-300 { animation-delay: 0.3s; }
+  .animation-delay-400 { animation-delay: 0.4s; }
+  .animation-delay-500 { animation-delay: 0.5s; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -73,6 +73,25 @@ export const AppInitializer: React.FC = () => {
                 hasLaunched: true,
                 isLoading: false
             });
+        } else if (isFirstLaunch) {
+            // Fail-safe: Check localStorage directly in case hydration missed it or race condition
+            try {
+                const raw = localStorage.getItem('hvac-app-storage');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    // Check if hasLaunched is explicitly true in persisted state
+                    if (parsed?.state?.hasLaunched === true) {
+                        console.warn('[AppInitializer] ⚠ Detected hasLaunched in localStorage but store missed it. Forcing update.');
+                        useAppStateStore.setState({
+                            isFirstLaunch: false,
+                            hasLaunched: true,
+                            isLoading: false
+                        });
+                    }
+                }
+            } catch (e) {
+                // Ignore parse errors, standard checks will handle them
+            }
         }
     }, [isFirstLaunch]);
 
@@ -87,7 +106,7 @@ export const AppInitializer: React.FC = () => {
     const performIntegrityChecks = () => {
         console.log('[AppInitializer] Running integrity checks...');
         
-        // Phase 1: localStorage validation
+        // Phase 1: localStorage preferences validation
         try {
             const prefsKey = 'sws.preferences';
             const prefsData = localStorage.getItem(prefsKey);
@@ -102,6 +121,48 @@ export const AppInitializer: React.FC = () => {
             // Force re-hydration with defaults
             const prefs = usePreferencesStore.getState();
             prefs.setTheme(prefs.theme);
+        }
+        
+        // Phase 1.5: projectIndex validation
+        try {
+            const indexKey = 'sws.projectIndex';
+            const indexData = localStorage.getItem(indexKey);
+            
+            if (indexData) {
+                const parsed = JSON.parse(indexData);
+                
+                // Validate expected structure
+                const hasValidState = parsed?.state && typeof parsed.state === 'object';
+                const hasValidProjects = !parsed?.state?.projects || Array.isArray(parsed.state.projects);
+                
+                if (!hasValidState || !hasValidProjects) {
+                    throw new Error('Invalid projectIndex structure');
+                }
+                
+                // Validate each project entry has required fields
+                if (parsed.state.projects?.length > 0) {
+                    const hasInvalidProject = parsed.state.projects.some(
+                        (p: Record<string, unknown>) => !p.projectId || !p.projectName
+                    );
+                    if (hasInvalidProject) {
+                        console.warn('[AppInitializer] ⚠ Found projects with missing required fields');
+                    }
+                }
+                
+                console.log('[AppInitializer] ✓ localStorage projectIndex valid');
+            } else {
+                console.log('[AppInitializer] ℹ No projectIndex found (first launch)');
+            }
+        } catch (error) {
+            console.warn('[AppInitializer] ⚠ localStorage projectIndex corrupted, resetting to defaults');
+            localStorage.removeItem('sws.projectIndex');
+            // Reset project list store to empty state
+            useProjectListStore.setState({
+                projects: [],
+                recentProjectIds: [],
+                loading: false,
+                error: undefined,
+            });
         }
         
         // Phase 2: IndexedDB health check

@@ -118,65 +118,12 @@ export function StatusBar({ mousePosition, className }: StatusBarProps) {
 ```
 
 ## Styling
-
-```css
-.status-bar {
-  display: flex;
-  align-items: center;
-  height: 28px;
-  padding: 0 12px;
-  background: #f5f5f5;
-  border-top: 1px solid #e0e0e0;
-  font-size: 12px;
-  color: #666;
-  gap: 8px;
-}
-
-.status-section {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-divider {
-  width: 1px;
-  height: 16px;
-  background: #ddd;
-}
-
-.status-label {
-  color: #999;
-}
-
-.status-value {
-  font-family: monospace;
-  font-weight: 500;
-  color: #333;
-  min-width: 40px;
-}
-
-.status-indicator {
-  padding: 2px 6px;
-  border-radius: 3px;
-  background: #e0e0e0;
-  color: #666;
-}
-
-.status-indicator.active {
-  background: #e3f2fd;
-  color: #1976D2;
-}
-
-.status-selection {
-  color: #1976D2;
-  font-weight: 500;
-}
-
-.status-selection-empty {
-  color: #999;
-  font-style: italic;
-}
-```
+ 
+The component uses Tailwind utility classes:
+- **Bar**: `h-8 bg-slate-100 border-t flex items-center px-4 text-xs text-slate-600 justify-between shrink-0`
+- **Section**: `flex items-center gap-4`
+- **Divider**: `h-4 w-px bg-slate-300`
+- **Value**: `font-mono font-medium text-slate-900`
 
 ## Usage
 

@@ -1,16 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { useViewportStore } from '@/stores/useViewportStore';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityCount } from '@/core/store/entityStore';
-import { cn } from '@/lib/utils'; // Assuming cn utility exists, otherwise standard class strings
+import { cn } from '@/lib/utils';
+import { Wifi, WifiOff, Grid3X3, MousePointer2 } from 'lucide-react';
 
 interface StatusBarProps {
     isConnected?: boolean;
 }
 
+/**
+ * StatusBar - Modern Engineering Design 2025
+ * Clean status bar with refined typography and visual indicators
+ */
 export const StatusBar: React.FC<StatusBarProps> = ({
     isConnected = true
 }) => {
@@ -18,55 +22,80 @@ export const StatusBar: React.FC<StatusBarProps> = ({
     const { currentTool } = useToolStore();
     const entityCount = useEntityCount();
 
-    // Format coordinates
-    const coords = `X: ${Math.round(cursorPosition.x)}, Y: ${Math.round(cursorPosition.y)}`;
+    const coords = `${Math.round(cursorPosition.x)}, ${Math.round(cursorPosition.y)}`;
 
     return (
-        <Card
-            className="h-8 bg-slate-100 border-t flex items-center px-4 text-xs text-slate-600 justify-between rounded-none shrink-0"
+        <footer
+            className="h-7 bg-slate-50 border-t border-slate-200 flex items-center px-4 text-xs justify-between shrink-0"
             data-testid="status-bar"
         >
             <div className="flex items-center gap-4">
-                <div className="min-w-[120px] font-mono" title="Cursor Coordinates">
-                    {coords}
+                {/* Coordinates */}
+                <div 
+                    className="flex items-center gap-1.5 text-slate-500 font-mono text-[11px] min-w-[90px]" 
+                    title="Cursor Coordinates"
+                >
+                    <span className="text-slate-400">X,Y:</span>
+                    <span className="text-slate-700">{coords}</span>
                 </div>
 
-                <div className="h-3 w-px bg-slate-300" />
+                <div className="h-3 w-px bg-slate-200" />
 
-                <div title="Active Tool">
-                    {currentTool === 'select' ? 'Ready' : `${currentTool.charAt(0).toUpperCase() + currentTool.slice(1)} Tool`}
-                </div>
-
-                <div className="h-3 w-px bg-slate-300" />
-
-                <div title="Zoom Level">
-                    Zoom: <span className="font-medium text-slate-900">{zoom}%</span>
-                </div>
-
-                <div className="h-3 w-px bg-slate-300" />
-
-                <div title="Grid Status">
-                    Grid: <span className={cn("font-medium", gridVisible ? "text-slate-900" : "text-slate-400")}>
-                        {gridVisible ? 'On' : 'Off'}
+                {/* Active Tool */}
+                <div className="flex items-center gap-1.5" title="Active Tool">
+                    <MousePointer2 className="w-3 h-3 text-slate-400" />
+                    <span className="text-slate-600">
+                        {currentTool === 'select' ? 'Ready' : `${currentTool.charAt(0).toUpperCase() + currentTool.slice(1)}`}
                     </span>
                 </div>
 
-                <div className="h-3 w-px bg-slate-300" />
+                <div className="h-3 w-px bg-slate-200" />
 
-                <div>
-                    <span className="font-medium text-slate-900">{entityCount}</span> items
+                {/* Zoom Level */}
+                <div className="flex items-center gap-1" title="Zoom Level">
+                    <span className="text-slate-400">Zoom</span>
+                    <span className="font-semibold text-slate-700">{zoom}%</span>
+                </div>
+
+                <div className="h-3 w-px bg-slate-200" />
+
+                {/* Grid Status */}
+                <div className="flex items-center gap-1.5" title="Grid Status">
+                    <Grid3X3 className={cn(
+                        "w-3 h-3",
+                        gridVisible ? "text-blue-500" : "text-slate-300"
+                    )} />
+                    <span className={cn(
+                        "font-medium",
+                        gridVisible ? "text-blue-600" : "text-slate-400"
+                    )}>
+                        {gridVisible ? 'Grid On' : 'Grid Off'}
+                    </span>
+                </div>
+
+                <div className="h-3 w-px bg-slate-200" />
+
+                {/* Entity Count */}
+                <div className="flex items-center gap-1">
+                    <span className="font-semibold text-slate-700">{entityCount}</span>
+                    <span className="text-slate-400">items</span>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2">
-                <div className={cn(
-                    "w-2 h-2 rounded-full",
-                    isConnected ? "bg-green-500" : "bg-red-500"
-                )} />
-                <span className={isConnected ? "text-slate-700" : "text-red-600"}>
-                    {isConnected ? 'Online' : 'Offline'}
-                </span>
+            {/* Connection Status */}
+            <div className="flex items-center gap-1.5">
+                {isConnected ? (
+                    <>
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-emerald-600 font-medium">Online</span>
+                    </>
+                ) : (
+                    <>
+                        <WifiOff className="w-3 h-3 text-red-500" />
+                        <span className="text-red-600 font-medium">Offline</span>
+                    </>
+                )}
             </div>
-        </Card>
+        </footer>
     );
 };

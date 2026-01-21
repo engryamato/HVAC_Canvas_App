@@ -181,7 +181,7 @@ describe('useViewport', () => {
 
     // Set viewport state
     useViewportStore.getState().setPan(100, 50);
-    useViewportStore.getState().setZoom(2.0);
+    useViewportStore.getState().zoomTo(2.0);
 
     const canvas = result.current.screenToCanvas(500, 300);
 
@@ -215,6 +215,6 @@ describe('useViewport', () => {
 
 ## Related Elements
 
-- [Viewport Store](../02-stores/ViewportStore.md)
+- [viewportStore](../02-stores/viewportStore.md)
 - [useSelection](./useSelection.md)
 - [useMarquee](./useMarquee.md)

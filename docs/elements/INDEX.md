@@ -19,7 +19,12 @@ Zustand stores for application-wide state management.
 - [entityStore.md](./02-stores/entityStore.md) - Central repository for design entities
 - [canvasStore.md](./02-stores/canvasStore.md) - UI state (active tool, cursor)
 - [projectStore.md](./02-stores/projectStore.md) - Active project metadata
+- [projectListStore.md](./02-stores/projectListStore.md) - Project list and recents
+- [preferencesStore.md](./02-stores/preferencesStore.md) - User preferences
+- [settingsStore.md](./02-stores/settingsStore.md) - App-level settings
+- [selectionStore.md](./02-stores/selectionStore.md) - Selection state
 - [viewportStore.md](./02-stores/viewportStore.md) - Pan, zoom, and grid settings
+- [historyStore.md](./02-stores/historyStore.md) - Undo/redo history
 
 ## 03. Schemas
 Zod schemas for data validation and type safety.
@@ -54,7 +59,7 @@ HVAC engineering calculations for ventilation, duct sizing, and pressure drop.
 ## 07. Hooks (10 files)
 React hooks for canvas interactions, state management, and operations.
 
-- [useAutoSave.md](./07-hooks/useAutoSave.md) - Auto-save with debouncing and dirty tracking
+- [useAutoSave.md](./07-hooks/useAutoSave.md) - Auto-save with dirty tracking and backups
 - [useSelection.md](./07-hooks/useSelection.md) - Entity selection and hit testing
 - [useViewport.md](./07-hooks/useViewport.md) - Pan, zoom, and coordinate conversion
 - [useKeyboardShortcuts.md](./07-hooks/useKeyboardShortcuts.md) - Global keyboard shortcuts
@@ -97,7 +102,7 @@ Math and geometry utilities for canvas operations.
 ## 12. Pages (4 files)
 Next.js page components and routing.
 
-- [HomePage.md](./12-pages/HomePage.md) - Root route with redirect
+- [HomePage.md](./12-pages/HomePage.md) - App initializer entry route
 - [DashboardPage.md](./12-pages/DashboardPage.md) - Project list and management
 - [CanvasEditorPage.md](./12-pages/CanvasEditorPage.md) - Main canvas workspace
 - [Layout.md](./12-pages/Layout.md) - Root layout and metadata

@@ -469,10 +469,7 @@ function createWarningNote(content: string): NoteProps {
 
 - [BaseSchema](./BaseSchema.md) - Base entity schema
 - [NoteTool](../04-tools/NoteTool.md) - Note creation tool
-- [NoteRenderer](../05-renderers/NoteRenderer.md) - Note visualization
-- [NoteInspector](../01-components/inspector/NoteInspector.md) - Note property editor
 - [NoteDefaults](../08-entities/NoteDefaults.md) - Note factory functions
-- [TextEditor](../01-components/TextEditor.md) - Rich text editing component
 
 ## Testing
 

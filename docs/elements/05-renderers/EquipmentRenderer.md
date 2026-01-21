@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Equipment Renderer visualizes HVAC equipment entities on the canvas with type-specific icons, color coding, and labels. It supports five equipment types: hood, fan, diffuser, damper, and air handler, each with distinct visual representation.
+The Equipment Renderer visualizes HVAC equipment entities on the canvas with type-specific icons, color coding, and labels. It currently renders hood, fan, diffuser, damper, and air_handler with distinct visual representation.
 
 ## Location
 
@@ -18,6 +18,10 @@ src/features/canvas/renderers/EquipmentRenderer.ts
 - Apply selection highlighting
 - Scale visual elements with zoom level
 - Provide clear visual distinction between equipment types
+
+## Notes
+
+- Only the five types listed above are currently mapped in `EQUIPMENT_COLORS` and icon rendering. If new equipment types are introduced, update the renderer to avoid missing color/icon mappings.
 
 ## Dependencies
 
@@ -202,7 +206,7 @@ renderEquipment(fan, context);
 // Renders with blue selection border and fan blade icon
 ```
 
-### Rendering All Equipment Types
+### Rendering Supported Equipment Types
 
 ```typescript
 const equipmentTypes: EquipmentType[] = [
@@ -224,7 +228,7 @@ equipmentTypes.forEach((type, index) => {
   renderEquipment(equipment, context);
   ctx.restore();
 });
-// Renders all 5 equipment types in a row
+// Renders supported equipment types in a row
 ```
 
 ## Icon Designs

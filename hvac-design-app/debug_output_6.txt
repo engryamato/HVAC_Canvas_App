@@ -1,0 +1,52 @@
+
+Running 1 test using 1 worker
+
+[WebServer]  Γ¿» Failed to start server
+[WebServer] Error: listen EADDRINUSE: address already in use :::3002
+[WebServer]     at <unknown> (Error: listen EADDRINUSE: address already in use :::3002)
+[WebServer]     at new Promise (<anonymous>) {
+[WebServer]   code: 'EADDRINUSE',
+[WebServer]   errno: -4091,
+[WebServer]   syscall: 'listen',
+[WebServer]   address: '::',
+[WebServer]   port: 3002
+[WebServer] }
+--- Starting Debug Test ---
+PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PAGE LOG: [DeviceDetection] Window width: 1280px, isMobile: false
+PAGE LOG: [ProjectListStore] No persisted state, using defaults
+PAGE LOG: [ProjectListStore] Hydration finished, projects: 0
+PAGE LOG: [NewProjectDialog] Manual save success
+PAGE LOG: [ProjectListStore] Adding project: {projectId: e7e9fd33-0b92-44c5-9aa9-3c86c2c42b88, projectName: Debug Selector Project, projectNumber: undefined, clientName: undefined, entityCount: 0}
+PAGE LOG: [DEPRECATED] Use `createWithEqualityFn` instead of `create` or use `useStoreWithEqualityFn` instead of `useStore`. They can be imported from 'zustand/traditional'. https://github.com/pmndrs/zustand/discussions/1937
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed {projectId: e7e9fd33-0b92-44c5-9aa9-3c86c2c42b88}
+PAGE LOG: [CanvasPageWrapper] Project: Debug Selector Project, Version: 1.0.0, App Version: 1.0.0
+PAGE LOG: [Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovery_failed {projectId: e7e9fd33-0b92-44c5-9aa9-3c86c2c42b88}
+PAGE LOG: [CanvasPageWrapper] Project: Debug Selector Project, Version: 1.0.0, App Version: 1.0.0
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+Canvas opened
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+Pressed "e"
+Tool button aria-pressed: true
+Selector count: 1
+Selector visible: true
+Selector HTML: <span class="text-xs font-medium text-slate-600">Equipment Type:</span><div class="flex gap-1"><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 py-2 h-7 px-2 text-xs" data-testid="equipment-type-hood" aria-pressed="false">Hood</button><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white shadow-lg shadow-blue-200/50 hover:bg-blue-700 hover:shadow-blue-300/50 hover:scale-[1.02] active:scale-[0.98] py-2 h-7 px-2 text-xs" data-testid="equipment-type-fan" aria-pressed="true">Fan</button><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 py-2 h-7 px-2 text-xs" data-testid="equipment-type-diffuser" aria-pressed="false">Diffuser</button><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 py-2 h-7 px-2 text-xs" data-testid="equipment-type-damper" aria-pressed="false">Damper</button><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 py-2 h-7 px-2 text-xs" data-testid="equipment-type-air_handler" aria-pressed="false">Air Handler</button><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 py-2 h-7 px-2 text-xs" data-testid="equipment-type-furnace" aria-pressed="false">Furnace</button><button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 py-2 h-7 px-2 text-xs" data-testid="equipment-type-rtu" aria-pressed="false">RTU</button></div>
+RTU Button visible: true
+--- Debugging Entity Creation ---
+PAGE LOG: [StatusBar] Render, count: 0
+PAGE LOG: [StatusBar] Render, count: 0
+Selected RTU type
+PAGE LOG: EquipmentTool.onMouseDown 12 205 0
+PAGE LOG: EquipmentTool.snapped {x: 24, y: 216}
+PAGE LOG: [EntityStore] addEntity 835659fd-8574-40ec-9fc8-828424e4b6fb equipment
+PAGE LOG: [StatusBar] Render, count: 1
+PAGE LOG: [StatusBar] Render, count: 1
+Clicked canvas at 300,300
+Store Evidence: { statusBarText: [90mundefined[39m, propertiesText: [90mundefined[39m }
+  Γ£ô  1 [chromium] ΓÇ║ e2e\debug-selector.spec.ts:5:5 ΓÇ║ Debug: Equipment Type Selector Visibility (3.2s)
+
+  1 passed (4.3s)

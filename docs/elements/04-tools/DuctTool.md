@@ -441,11 +441,11 @@ createDuctEntity({ x: 100, y: 120 }, { x: 100, y: 0 });
 
 - [BaseTool](./BaseTool.md) - Abstract base class
 - [DuctSchema](../03-schemas/DuctSchema.md) - Duct entity validation
-- [DuctDefaults](../08-entities/ductDefaults.md) - Duct factory function
+- [DuctDefaults](../08-entities/DuctDefaults.md) - Duct factory function
 - [DuctInspector](../01-components/inspector/DuctInspector.md) - Duct property editing
 - [DuctRenderer](../05-renderers/DuctRenderer.md) - Duct visualization
-- [ViewportStore](../02-stores/viewportStore.md) - Grid snapping settings
-- [entityCommands](../../core/commands/entityCommands.md) - Undo support
+- [viewportStore](../02-stores/viewportStore.md) - Grid snapping settings
+- [EntityCommands](../09-commands/EntityCommands.md) - Undo support
 
 ## Testing
 

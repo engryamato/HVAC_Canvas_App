@@ -8,15 +8,18 @@ interface ProjectGridProps {
     projects: ProjectListItem[];
 }
 
+/**
+ * ProjectGrid - Modern Engineering Bento Grid 2025
+ * Responsive grid layout with staggered animation delays
+ */
 export function ProjectGrid({ projects }: ProjectGridProps) {
     const actions = useProjectListActions();
     const allProjects = useProjects();
 
     const handleDuplicate = (projectId: string) => {
         const project = allProjects.find(p => p.projectId === projectId);
-        if (!project) {return;}
+        if (!project) return;
 
-        // Robustly determine source name
         const rawName = project.projectName;
         const sourceName = (rawName && rawName !== 'undefined' && rawName.trim() !== '') 
             ? rawName 
@@ -25,9 +28,8 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
         let newName = `${sourceName} - Copy`;
         let counter = 2;
 
-        // Check against ALL projects to ensure unique name
         while (allProjects.some(p => p.projectName === newName)) {
-            newName = `${project.projectName} - Copy ${counter}`;
+            newName = `${sourceName} - Copy ${counter}`;
             counter++;
         }
 
@@ -35,14 +37,8 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
     };
 
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '16px',
-            }}
-        >
-            {projects.map((project) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {projects.map((project, index) => (
                 <ProjectCard
                     key={project.projectId}
                     project={project}
@@ -51,6 +47,7 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
                     onRestore={actions.restoreProject}
                     onDuplicate={handleDuplicate}
                     onRename={(id, name) => actions.updateProject(id, { projectName: name })}
+                    animationDelay={index * 50}
                 />
             ))}
         </div>

@@ -24,6 +24,18 @@ export function createNote(overrides?: Partial<{
 }>): Note
 ```
 
+### resetNoteCounter
+
+```typescript
+export function resetNoteCounter(): void
+```
+
+### getNextNoteNumber
+
+```typescript
+export function getNextNoteNumber(): number
+```
+
 ## Default Values
 
 ```typescript

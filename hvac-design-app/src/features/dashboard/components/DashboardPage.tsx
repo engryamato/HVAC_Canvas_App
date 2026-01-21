@@ -6,7 +6,7 @@ import { useProjectFilters } from '../hooks/useProjectFilters';
 import { SearchBar } from './SearchBar';
 import { RecentProjectsSection } from './RecentProjectsSection';
 import { AllProjectsSection } from './AllProjectsSection';
-import { Plus, Archive } from 'lucide-react';
+import { Plus, Archive, FolderOpen, Search as SearchIcon } from 'lucide-react';
 import { NewProjectDialog } from '@/components/dashboard/NewProjectDialog';
 import { FileMenu } from '@/components/layout/FileMenu';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
@@ -14,19 +14,12 @@ import { useAppStateStore } from '@/stores/useAppStateStore';
 import { useSearchParams } from 'next/navigation';
 
 /**
- * Dashboard Page - Main project management interface
+ * Dashboard Page - Modern Engineering Project Management Interface
+ * 2025 Design: Glassmorphism, Bento Grid, Segmented Controls
+ * 
  * Implements UJ-PM-002: Opening Existing Projects
  * Implements UJ-PM-007: Search & Filter Projects
  * Implements UJ-PM-005: Archive and restore projects
- * 
- * Features:
- * - Recent Projects section (last 5 accessed)
- * - All Projects section with search
- * - Keyboard shortcuts (Ctrl+F for search)
- * - Auto-open last project (if enabled)
- * - Search, filter, and sort functionality
- * - Folder rescanning (Tauri mode)
- * - URL-based view state (?view=active or ?view=archived)
  */
 export function DashboardPage() {
     const allProjectsRaw = useProjectListStore(state => state.projects);
@@ -38,21 +31,14 @@ export function DashboardPage() {
     const searchParams = useSearchParams();
     const viewParam = searchParams.get('view') as 'active' | 'archived' | null;
     const [activeTab, setActiveTab] = useState<'active' | 'archived'>(viewParam === 'archived' ? 'archived' : 'active');
-    const _searchInputRef = useRef<HTMLInputElement>(null);
     const [focusedIndex, setFocusedIndex] = useState(0);
     const isTauri = useAppStateStore((state) => state.isTauri);
 
-    // Sync state with URL and handle "Return to Dashboard" logic
+    // Sync state with URL
     useEffect(() => {
-        if (viewParam === 'archived') {
-            setActiveTab('archived');
-        } else {
-            // Default to 'active' if param is 'active' OR missing/null (e.g. root /dashboard)
-            setActiveTab('active');
-        }
+        setActiveTab(viewParam === 'archived' ? 'archived' : 'active');
     }, [viewParam]);
 
-    // Use new filtering hook
     const displayedProjects = activeTab === 'active' ? activeProjects : archivedProjects;
     const {
         filteredProjects,
@@ -63,54 +49,36 @@ export function DashboardPage() {
         setSortOrder,
     } = useProjectFilters(displayedProjects);
 
-    // Auto-open last project if enabled
     useAutoOpen();
 
     useEffect(() => {
         void (async () => {
             await useProjectListStore.persist.rehydrate();
-            
-            // Scan projects from disk in Tauri mode
             if (isTauri) {
                 await scanProjectsFromDisk();
             }
         })();
     }, [isTauri, scanProjectsFromDisk]);
 
-    // Handle rescan (Tauri only)
     const handleRescan = async () => {
-        if (!isTauri) {return;}
+        if (!isTauri) return;
         await scanProjectsFromDisk();
     };
 
-    // Handle opening project from file (Tauri only)
     const handleOpenFromFile = async () => {
-        if (!isTauri) {return;}
-
+        if (!isTauri) return;
         try {
             const { TauriFileSystem } = await import('@/core/persistence/TauriFileSystem');
             const { loadProject } = await import('@/core/persistence/projectIO');
             const addProjectToList = useProjectListStore.getState().addProject;
-
-            // Show native open dialog
             const filePath = await TauriFileSystem.openFileDialog();
-            
-            if (!filePath) {
-                // User cancelled
-                return;
-            }
-
-            // Load project from file
+            if (!filePath) return;
             const result = await loadProject(filePath);
-            
             if (!result.success || !result.project) {
                 alert(`Failed to open project: ${result.error || 'Unknown error'}`);
                 return;
             }
-
-            // Add to project list if not already there
             const existingProject = allProjectsRaw.find(p => p.projectId === result.project!.projectId);
-            
             if (!existingProject) {
                 const projectListItem = {
                     projectId: result.project.projectId,
@@ -124,11 +92,8 @@ export function DashboardPage() {
                     isArchived: ('isArchived' in result.project ? result.project.isArchived : false) as boolean,
                     filePath: filePath,
                 };
-                
                 addProjectToList(projectListItem);
             }
-
-            // Navigate to canvas
             window.location.href = `/canvas/${result.project.projectId}`;
         } catch (error) {
             console.error('[DashboardPage] Failed to open project:', error);
@@ -136,68 +101,64 @@ export function DashboardPage() {
         }
     };
 
-    // Handle sort change from SearchBar
     const handleSortChange = (sortBy: 'name' | 'date', sortOrder: 'asc' | 'desc') => {
         setSortBy(sortBy);
         setSortOrder(sortOrder);
     };
 
-    // Keyboard shortcuts (UJ-PM-002: Step 7)
+    // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Ctrl+F or Cmd+F: Focus search
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                 e.preventDefault();
-                // Find the search input nested in SearchBar
                 const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
                 searchInput?.focus();
                 return;
             }
-
-            // Escape: Clear search
             if (e.key === 'Escape' && filters.searchQuery) {
                 setSearchQuery('');
                 return;
             }
-
-            // Arrow key navigation
             if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
                 e.preventDefault();
                 setFocusedIndex((prev) => Math.min(prev + 1, filteredProjects.length - 1));
                 return;
             }
-
             if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
                 e.preventDefault();
                 setFocusedIndex((prev) => Math.max(prev - 1, 0));
                 return;
             }
-
-            // Enter: Open focused project
             if (e.key === 'Enter' && filteredProjects[focusedIndex]) {
-                const project = filteredProjects[focusedIndex];
-                window.location.href = `/canvas/${project.projectId}`;
+                window.location.href = `/canvas/${filteredProjects[focusedIndex].projectId}`;
             }
         };
-
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [filters.searchQuery, focusedIndex, filteredProjects, setSearchQuery]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" data-testid="dashboard-page">
-            {/* Header */}
-            <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-                <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Project Dashboard</h1>
-                        <p className="text-sm text-slate-500">Manage your HVAC design projects</p>
+        <div className="min-h-screen bg-slate-50 grid-pattern" data-testid="dashboard-page">
+            {/* Glassmorphism Header */}
+            <header className="glass-header sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                    {/* Logo & Title */}
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                            <FolderOpen className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold text-slate-900 tracking-tight">HVAC Pro Design</h1>
+                            <p className="text-xs text-slate-500">Project Dashboard</p>
+                        </div>
                     </div>
+
+                    {/* Header Actions */}
                     <div className="flex items-center gap-3">
                         <FileMenu />
                         <button
                             onClick={() => setIsDialogOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            className="btn-primary"
                             data-testid="new-project-btn"
                         >
                             <Plus className="w-4 h-4" />
@@ -208,46 +169,35 @@ export function DashboardPage() {
             </header>
 
             {/* Main Content */}
-            <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
-                {/* Tab Navigation */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }} data-testid="project-tabs">
-                    <button
-                        onClick={() => setActiveTab('active')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                            activeTab === 'active'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'text-slate-600 hover:bg-slate-100'
-                        }`}
-                        data-testid="tab-active"
-                    >
-                        Active
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${
-                            activeTab === 'active' ? 'bg-blue-200' : 'bg-slate-200'
-                        }`}>
-                            {activeProjects.length}
-                        </span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('archived')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                            activeTab === 'archived'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'text-slate-600 hover:bg-slate-100'
-                        }`}
-                        data-testid="tab-archived"
-                    >
-                        <Archive className="w-4 h-4" />
-                        Archived
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${
-                            activeTab === 'archived' ? 'bg-blue-200' : 'bg-slate-200'
-                        }`}>
-                            {archivedProjects.length}
-                        </span>
-                    </button>
-                </div>
+            <main className="max-w-7xl mx-auto px-6 py-8">
+                {/* Controls Row: Tabs + Search */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                    {/* Segmented Control Tabs */}
+                    <div className="segmented-control" data-testid="project-tabs">
+                        <button
+                            onClick={() => setActiveTab('active')}
+                            className={activeTab === 'active' ? 'active' : ''}
+                            data-testid="tab-active"
+                        >
+                            <span className="flex items-center gap-2">
+                                Active
+                                <span className="badge badge-slate">{activeProjects.length}</span>
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('archived')}
+                            className={activeTab === 'archived' ? 'active' : ''}
+                            data-testid="tab-archived"
+                        >
+                            <span className="flex items-center gap-2">
+                                <Archive className="w-3.5 h-3.5" />
+                                Archived
+                                <span className="badge badge-slate">{archivedProjects.length}</span>
+                            </span>
+                        </button>
+                    </div>
 
-                {/* Search Bar with Sort and Rescan */}
-                <div style={{ marginBottom: '32px' }}>
+                    {/* Search Bar */}
                     <SearchBar
                         value={filters.searchQuery}
                         onChange={setSearchQuery}
@@ -263,42 +213,43 @@ export function DashboardPage() {
                 {/* Content Area */}
                 {allProjectsRaw.length === 0 ? (
                     // Empty State
-                    <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-                         <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>No projects yet</h1>
-                        <p style={{ color: '#666', marginBottom: '24px' }}>
-                            Create your first project to get started!
+                    <div className="flex flex-col items-center justify-center py-24 text-center animate-slide-up">
+                        <div className="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center mb-6">
+                            <FolderOpen className="w-10 h-10 text-slate-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">No projects yet</h2>
+                        <p className="text-slate-500 mb-8 max-w-md">
+                            Create your first HVAC design project to get started with professional floor plans and equipment layouts.
                         </p>
                         <button
                             onClick={() => setIsDialogOpen(true)}
-                            style={{
-                                padding: '12px 24px',
-                                fontSize: '16px',
-                                background: '#0070f3',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                            }}
+                            className="btn-primary text-base px-6 py-3"
                             data-testid="empty-state-create-btn"
                         >
+                            <Plus className="w-5 h-5" />
                             Create New Project
                         </button>
                     </div>
                 ) : (
-                    // Project Lists
                     <>
-                        {/* Recent Projects Section - only show on Active tab */}
-                        {activeTab === 'active' && <RecentProjectsSection projects={recentProjects} />}
+                        {/* Recent Projects Section - only on Active tab */}
+                        {activeTab === 'active' && recentProjects.length > 0 && (
+                            <div className="mb-10 animate-slide-up">
+                                <RecentProjectsSection projects={recentProjects} />
+                            </div>
+                        )}
 
                         {/* All Projects Section */}
-                        <AllProjectsSection 
-                            projects={filteredProjects} 
-                            searchTerm={filters.searchQuery}
-                            emptyMessage={activeTab === 'archived' ? 'No archived projects' : undefined}
-                        />
+                        <div className="animate-slide-up animation-delay-100">
+                            <AllProjectsSection 
+                                projects={filteredProjects} 
+                                searchTerm={filters.searchQuery}
+                                emptyMessage={activeTab === 'archived' ? 'No archived projects' : undefined}
+                            />
+                        </div>
                     </>
                 )}
-            </div>
+            </main>
 
             <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </div>

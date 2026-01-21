@@ -63,5 +63,4 @@ function BOMPanel() {
 
 ## Related Elements
 
-- [Entity Store](../02-stores/EntityStore.md)
-- [CSV Export](../01-components/export/CSVExport.md)
+- [entityStore](../02-stores/entityStore.md)

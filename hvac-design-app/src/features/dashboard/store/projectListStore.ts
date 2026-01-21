@@ -375,8 +375,51 @@ export const useProjectListStore = create<ProjectListStore>()(
         }
         return localStorage;
       }),
-      onRehydrateStorage: () => (state) => {
-        console.log('[ProjectListStore] Hydration finished', state);
+      // Merge function ensures corrupted/missing data defaults to valid state
+      merge: (persistedState: unknown, currentState: ProjectListStore): ProjectListStore => {
+        const persisted = persistedState as Partial<ProjectListState> | null;
+        
+        if (!persisted) {
+          console.log('[ProjectListStore] No persisted state, using defaults');
+          return currentState;
+        }
+        
+        // Validate and filter projects array
+        let validProjects: ProjectListItem[] = [];
+        if (Array.isArray(persisted.projects)) {
+          validProjects = persisted.projects.filter(
+            (p): p is ProjectListItem => 
+              typeof p === 'object' && 
+              p !== null && 
+              typeof p.projectId === 'string' && 
+              typeof p.projectName === 'string'
+          );
+          
+          if (validProjects.length !== persisted.projects.length) {
+            console.warn('[ProjectListStore] Filtered out invalid project entries');
+          }
+        }
+        
+        // Validate recentProjectIds array
+        const validRecentIds = Array.isArray(persisted.recentProjectIds)
+          ? persisted.recentProjectIds.filter((id): id is string => typeof id === 'string')
+          : [];
+        
+        return {
+          ...currentState,
+          projects: validProjects,
+          recentProjectIds: validRecentIds,
+          loading: false,
+          error: undefined,
+        };
+      },
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('[ProjectListStore] Hydration failed:', error);
+          // State will already be the currentState from merge, which has valid defaults
+          return;
+        }
+        console.log('[ProjectListStore] Hydration finished, projects:', state?.projects?.length ?? 0);
       },
       skipHydration: true, // Prevent hydration mismatch on SSR
     }
