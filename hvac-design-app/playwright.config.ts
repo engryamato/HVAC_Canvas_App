@@ -21,7 +21,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   /* Reporter to use */
-  reporter: [['html', { open: 'never' }], ['list']],
+  reporter: [['html', { open: 'never' }], ['list'], ['@trunkio/trunk-playwright-reporter']],
 
   /* Expect configuration for visual testing */
   expect: {

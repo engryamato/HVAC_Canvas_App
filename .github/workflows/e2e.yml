@@ -1,0 +1,46 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  e2e-tests:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hvac-design-app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npm run e2e
+        env:
+          CI: true
+
+      - name: Upload Test Results to Trunk.io
+        if: ${{ !cancelled() }} # Upload the results even if the tests fail
+        continue-on-error: true # don't fail this job if the upload fails
+        uses: trunk-io/analytics-uploader@main
+        with:
+          junit-paths: "hvac-design-app/junit.xml"
+          org-slug: sizewise
+          token: ${{ secrets.TRUNK_API_TOKEN }}

@@ -9,6 +9,7 @@ coverage/
 test-results/
 test-results.json
 playwright-report/
+junit.xml
 
 # Next.js
 .next/
