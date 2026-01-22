@@ -212,3 +212,149 @@
     transform: translateY(0);
   }
 }
+
+.left-sidebar,
+.right-sidebar {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  border-bottom: none;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-sidebar {
+  border-left: none;
+}
+
+.right-sidebar {
+  border-right: none;
+}
+
+.sidebar-content {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.resize-handle:hover {
+  background: #1976d2;
+}
+
+.scope-section {
+  margin-bottom: 12px;
+}
+
+.scope-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scope-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.sidebar-section {
+  margin-bottom: 16px;
+}
+
+.sidebar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.sidebar-empty {
+  color: #999;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.sidebar-close {
+  border: none;
+  background: #e0e0e0;
+  padding: 8px 12px;
+  margin: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bottom-toolbar {
+  display: flex;
+  gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  background: #f5f5f5;
+}
+
+.bottom-toolbar-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 8px;
+}
+
+.fab-tool {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.fab-trigger {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: #1976d2;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(25, 118, 210, 0.3);
+}
+
+.fab-menu {
+  position: absolute;
+  bottom: 56px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 8px;
+  border-radius: 8px;
+  min-width: 160px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.fab-item {
+  border: none;
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
