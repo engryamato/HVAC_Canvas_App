@@ -2,16 +2,106 @@
 
 Complete documentation for all HVAC Canvas App elements.
 
-## 01. Components
+## 01. Components (78 total)
 UI components for the canvas editor and general application.
 
-- [CanvasPage.md](./01-components/canvas/CanvasPage.md) - Main editor layout
-- [LeftSidebar.md](./01-components/canvas/LeftSidebar.md) - Project context and site conditions
-- [RightSidebar.md](./01-components/canvas/RightSidebar.md) - Engineering BOQ and calculations
-- [BottomToolbar.md](./01-components/canvas/BottomToolbar.md) - Global actions and settings
-- [FABTool.md](./01-components/canvas/FABTool.md) - Floating quick-create menu
+### Onboarding Components (6)
+- [AppInitializer.md](./01-components/onboarding/AppInitializer.md) - App initialization and first-run detection
+- [SplashScreen.md](./01-components/onboarding/SplashScreen.md) - Animated loading screen with progress
+- [WelcomeScreen.md](./01-components/onboarding/WelcomeScreen.md) - First-time user welcome with feature highlights
+- [FeatureHighlightCard.md](./01-components/onboarding/FeatureHighlightCard.md) - Individual feature card with icon
+- [TutorialOverlay.md](./01-components/onboarding/TutorialOverlay.md) - Interactive guided tour system
+- [ProjectCreationScreen.md](./01-components/onboarding/ProjectCreationScreen.md) - Onboarding project creation
+
+### Layout Components (11)
+- [AppShell.md](./01-components/layout/AppShell.md) - Root layout wrapper with header and sidebars
+- [Header.md](./01-components/layout/Header.md) - Top navigation with menus and project title
+- [FileMenu.md](./01-components/layout/FileMenu.md) - File operations menu
+- [EditMenu.md](./01-components/layout/EditMenu.md) - Edit operations menu
+- [ViewMenu.md](./01-components/layout/ViewMenu.md) - View options menu
+- [ToolsMenu.md](./01-components/layout/ToolsMenu.md) - Tools menu
+- [HelpMenu.md](./01-components/layout/HelpMenu.md) - Help menu
+- [Toolbar.md](./01-components/layout/Toolbar.md) - Main toolbar with tool buttons
+- [StatusBar.md](./01-components/layout/StatusBar.md) - Bottom status bar
+- [LeftSidebar.md](./01-components/layout/LeftSidebar.md) - Left sidebar container
+- [RightSidebar.md](./01-components/layout/RightSidebar.md) - Right sidebar container
+
+### Dialog Components (5)
+- [ErrorDialog.md](./01-components/dialogs/ErrorDialog.md) - Error display modal
+- [KeyboardShortcutsDialog.md](./01-components/dialogs/KeyboardShortcutsDialog.md) - Keyboard shortcuts reference
+- [SettingsDialog.md](./01-components/dialogs/SettingsDialog.md) - Application settings editor
+- [UnsavedChangesDialog.md](./01-components/dialogs/UnsavedChangesDialog.md) - Unsaved changes warning
+- [VersionWarningDialog.md](./01-components/dialogs/VersionWarningDialog.md) - Version compatibility warning
+
+### Dashboard Components (10)
+- [DashboardPage.md](./01-components/dashboard/DashboardPage.md) - Main project management interface
+- [ProjectCard.md](./01-components/dashboard/ProjectCard.md) - Project display card
+- [ProjectGrid.md](./01-components/dashboard/ProjectGrid.md) - Responsive grid layout for projects
+- [SearchBar.md](./01-components/dashboard/SearchBar.md) - Project search with filters
+- [AllProjectsSection.md](./01-components/dashboard/AllProjectsSection.md) - All projects section
+- [RecentProjectsSection.md](./01-components/dashboard/RecentProjectsSection.md) - Recent projects section
+- [NewProjectDialog.md](./01-components/dashboard/NewProjectDialog.md) - New project creation modal
+- [EditProjectDialog.md](./01-components/dashboard/EditProjectDialog.md) - Project metadata editor
+- [DeleteConfirmDialog.md](./01-components/dashboard/DeleteConfirmDialog.md) - Type-to-confirm deletion
+- [ConfirmDialog.md](./01-components/dashboard/ConfirmDialog.md) - Generic confirmation modal
+
+### Canvas Components (18)
+- [CanvasPage.md](./01-components/canvas/CanvasPage.md) - Main canvas page layout
+- [CanvasPageWrapper.md](./01-components/canvas/CanvasPageWrapper.md) - Canvas page wrapper with providers
 - [CanvasContainer.md](./01-components/canvas/CanvasContainer.md) - Main rendering workspace
-- [InspectorPanel.md](./01-components/inspector/InspectorPanel.md) - Detail property editor
+- [Toolbar.md](./01-components/canvas/Toolbar.md) - Tool selection toolbar
+- [EquipmentTypeSelector.md](./01-components/canvas/EquipmentTypeSelector.md) - Equipment type selector
+- [FittingTypeSelector.md](./01-components/canvas/FittingTypeSelector.md) - Fitting type selector
+- [StatusBar.md](./01-components/canvas/StatusBar.md) - Canvas status display
+- [BottomToolbar.md](./01-components/canvas/BottomToolbar.md) - Bottom toolbar container
+- [LeftSidebar.md](./01-components/canvas/LeftSidebar.md) - Canvas left sidebar
+- [ProjectSidebar.md](./01-components/canvas/ProjectSidebar.md) - Project metadata sidebar
+- [RightSidebar.md](./01-components/canvas/RightSidebar.md) - Canvas right sidebar
+- [ZoomControls.md](./01-components/canvas/ZoomControls.md) - Zoom buttons and controls
+- [GridSettings.md](./01-components/canvas/GridSettings.md) - Grid configuration panel
+- [SelectionMarquee.md](./01-components/canvas/SelectionMarquee.md) - Marquee selection
+- [BOMPanel.md](./01-components/canvas/BOMPanel.md) - Bill of materials panel
+- [BOMTable.md](./01-components/canvas/BOMTable.md) - Bill of materials table
+- [Minimap.md](./01-components/canvas/Minimap.md) - Canvas minimap navigation
+- [FABTool.md](./01-components/canvas/FABTool.md) - Floating action button
+
+### Inspector Components (6)
+- [InspectorPanel.md](./01-components/inspector/InspectorPanel.md) - Main inspector panel
+- [CanvasPropertiesInspector.md](./01-components/inspector/CanvasPropertiesInspector.md) - Canvas-level properties
+- [RoomInspector.md](./01-components/inspector/RoomInspector.md) - Room properties editor
+- [DuctInspector.md](./01-components/inspector/DuctInspector.md) - Duct properties editor
+- [EquipmentInspector.md](./01-components/inspector/EquipmentInspector.md) - Equipment properties editor
+- [PropertyField.md](./01-components/inspector/PropertyField.md) - Property input field
+
+### UI Components (19)
+- [ErrorBoundary.md](./01-components/ui/ErrorBoundary.md) - Error handling with fallback UI
+- [CollapsibleSection.md](./01-components/ui/CollapsibleSection.md) - Expandable sections
+- [Dropdown.md](./01-components/ui/Dropdown.md) - Selection dropdown
+- [IconButton.md](./01-components/ui/IconButton.md) - Icon-only buttons
+- [LoadingIndicator.md](./01-components/ui/LoadingIndicator.md) - Loading state indicators
+- [LoadingSpinner.md](./01-components/ui/LoadingSpinner.md) - Animated spinner component
+- [StatCard.md](./01-components/ui/StatCard.md) - Statistics display cards
+- [Toast.md](./01-components/ui/Toast.md) - Notification toasts
+- [ValidatedInput.md](./01-components/ui/ValidatedInput.md) - Validated form inputs
+- [accordion.md](./01-components/ui/accordion.md) - Accordion primitive (shadcn/ui)
+- [button.md](./01-components/ui/button.md) - Button primitive (shadcn/ui)
+- [card.md](./01-components/ui/card.md) - Card primitive (shadcn/ui)
+- [checkbox.md](./01-components/ui/checkbox.md) - Checkbox primitive (shadcn/ui)
+- [dialog.md](./01-components/ui/dialog.md) - Dialog primitive (shadcn/ui)
+- [input.md](./01-components/ui/input.md) - Input primitive (shadcn/ui)
+- [label.md](./01-components/ui/label.md) - Label primitive (shadcn/ui)
+- [progress.md](./01-components/ui/progress.md) - Progress primitive (shadcn/ui)
+- [select.md](./01-components/ui/select.md) - Select primitive (shadcn/ui)
+- [switch.md](./01-components/ui/switch.md) - Switch primitive (shadcn/ui)
+
+### Export Components (1)
+- [ExportMenu.md](./01-components/export/ExportMenu.md) - Export functionality menu
+
+### Common Components (1)
+- [DeviceWarning.md](./01-components/common/DeviceWarning.md) - Mobile device warning screen
+
+### Error Components (1)
+- [ErrorPage.md](./01-components/error/ErrorPage.md) - Error page for 404 and failures
 
 ## 02. Stores
 Zustand stores for application-wide state management.
@@ -161,6 +251,16 @@ All documentation follows a consistent template:
 
 ## Total Documentation
 
-- **33 New Files** across 8 categories
-- **Combined with existing** components, stores, schemas, and tools
-- **Complete coverage** of the HVAC Canvas App codebase
+- **78 Component Files** across 10 categories (onboarding, layout, dialogs, dashboard, canvas, inspector, UI, export, common, error)
+- **9 Store Files** for state management
+- **8 Schema Files** for validation
+- **7 Tool Files** for canvas interactions
+- **3 Renderer Files** for entity visualization
+- **3 Calculator Files** for HVAC engineering
+- **10 Hook Files** for React logic
+- **5 Entity Factory Files** for defaults
+- **3 Command Files** for undo/redo
+- **3 Persistence Files** for I/O
+- **2 Geometry Files** for math utilities
+- **4 Page Files** for routing
+- **135 Total Documented Elements** - Complete coverage of the HVAC Canvas App codebase
