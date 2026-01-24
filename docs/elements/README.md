@@ -7,10 +7,16 @@ This directory contains comprehensive documentation for every component, store, 
 ```
 docs/elements/
 ├── 01-components/          # React UI Components
-│   ├── ui/                 # Reusable UI components
+│   ├── onboarding/         # Onboarding and first-run UX
+│   ├── layout/             # App shell, header, menus, sidebars
+│   ├── dialogs/            # Shared dialogs
 │   ├── canvas/             # Canvas-specific components
 │   ├── dashboard/          # Dashboard components
 │   ├── export/             # Export feature components
+│   ├── help/               # Help and reference UI
+│   ├── ui/                 # Reusable UI components
+│   ├── common/             # Shared common screens
+│   ├── error/              # Error pages
 │   └── inspector/          # Inspector panel components
 ├── 02-stores/              # Zustand state stores
 ├── 03-schemas/             # Zod validation schemas
@@ -27,39 +33,110 @@ docs/elements/
 
 ## Quick Navigation
 
-### Components (45+ total)
+### Components (81 total)
 
-#### UI Components
+#### Onboarding Components (6)
+- [AppInitializer](./01-components/onboarding/AppInitializer.md) - Handles app initialization and first-run detection
+- [SplashScreen](./01-components/onboarding/SplashScreen.md) - Animated loading screen with progress
+- [WelcomeScreen](./01-components/onboarding/WelcomeScreen.md) - First-time user welcome with feature highlights
+- [FeatureHighlightCard](./01-components/onboarding/FeatureHighlightCard.md) - Individual feature card with icon and description
+- [TutorialOverlay](./01-components/onboarding/TutorialOverlay.md) - Interactive guided tour system
+- [ProjectCreationScreen](./01-components/onboarding/ProjectCreationScreen.md) - Onboarding project creation form
+
+#### Layout Components (11)
+- [AppShell](./01-components/layout/AppShell.md) - Root layout wrapper with header and sidebars
+- [Header](./01-components/layout/Header.md) - Top navigation with menus and project title
+- [FileMenu](./01-components/layout/FileMenu.md) - File operations menu (New, Open, Save)
+- [EditMenu](./01-components/layout/EditMenu.md) - Edit operations menu (Undo, Redo, Cut, Copy, Paste)
+- [ViewMenu](./01-components/layout/ViewMenu.md) - View options menu (Zoom, Grid, Panels)
+- [ToolsMenu](./01-components/layout/ToolsMenu.md) - Tools menu (Export, Calculations)
+- [HelpMenu](./01-components/layout/HelpMenu.md) - Help menu (Shortcuts, About, Version)
+- [Toolbar](./01-components/layout/Toolbar.md) - Main toolbar with tool buttons
+- [StatusBar](./01-components/layout/StatusBar.md) - Bottom status bar with indicators
+- [LeftSidebar](./01-components/layout/LeftSidebar.md) - Left sidebar container
+- [RightSidebar](./01-components/layout/RightSidebar.md) - Right sidebar container
+
+#### Dialog Components (5)
+- [ErrorDialog](./01-components/dialogs/ErrorDialog.md) - Error display modal with details
+- [KeyboardShortcutsDialog](./01-components/dialogs/KeyboardShortcutsDialog.md) - Keyboard shortcuts reference
+- [SettingsDialog](./01-components/dialogs/SettingsDialog.md) - Application settings editor
+- [UnsavedChangesDialog](./01-components/dialogs/UnsavedChangesDialog.md) - Unsaved changes warning
+- [VersionWarningDialog](./01-components/dialogs/VersionWarningDialog.md) - Version compatibility warning
+
+#### Dashboard Components (10)
+- [DashboardPage](./01-components/dashboard/DashboardPage.md) - Main project management interface
+- [ProjectCard](./01-components/dashboard/ProjectCard.md) - Project display card with metadata
+- [ProjectGrid](./01-components/dashboard/ProjectGrid.md) - Responsive grid layout for projects
+- [SearchBar](./01-components/dashboard/SearchBar.md) - Project search with filters
+- [AllProjectsSection](./01-components/dashboard/AllProjectsSection.md) - All projects section
+- [RecentProjectsSection](./01-components/dashboard/RecentProjectsSection.md) - Recent projects section
+- [NewProjectDialog](./01-components/dashboard/NewProjectDialog.md) - New project creation modal
+- [EditProjectDialog](./01-components/dashboard/EditProjectDialog.md) - Project metadata editor
+- [DeleteConfirmDialog](./01-components/dashboard/DeleteConfirmDialog.md) - Type-to-confirm deletion
+- [ConfirmDialog](./01-components/dashboard/ConfirmDialog.md) - Generic confirmation modal
+
+#### Canvas Components (18)
+- [CanvasPage](./01-components/canvas/CanvasPage.md) - Main canvas page layout
+- [CanvasPageWrapper](./01-components/canvas/CanvasPageWrapper.md) - Canvas page wrapper with providers
+- [CanvasContainer](./01-components/canvas/CanvasContainer.md) - Main rendering workspace
+- [Toolbar](./01-components/canvas/Toolbar.md) - Tool selection toolbar
+- [EquipmentTypeSelector](./01-components/canvas/EquipmentTypeSelector.md) - Equipment type selector
+- [FittingTypeSelector](./01-components/canvas/FittingTypeSelector.md) - Fitting type selector
+- [StatusBar](./01-components/canvas/StatusBar.md) - Canvas status display
+- [BottomToolbar](./01-components/canvas/BottomToolbar.md) - Bottom toolbar container
+- [LeftSidebar](./01-components/canvas/LeftSidebar.md) - Canvas left sidebar
+- [ProjectSidebar](./01-components/canvas/ProjectSidebar.md) - Project metadata sidebar
+- [RightSidebar](./01-components/canvas/RightSidebar.md) - Canvas right sidebar
+- [ZoomControls](./01-components/canvas/ZoomControls.md) - Zoom buttons and controls
+- [GridSettings](./01-components/canvas/GridSettings.md) - Grid configuration panel
+- [SelectionMarquee](./01-components/canvas/SelectionMarquee.md) - Marquee selection rectangle
+- [BOMPanel](./01-components/canvas/BOMPanel.md) - Bill of materials panel
+- [BOMTable](./01-components/canvas/BOMTable.md) - Bill of materials table
+- [Minimap](./01-components/canvas/Minimap.md) - Canvas minimap navigation
+- [FABTool](./01-components/canvas/FABTool.md) - Floating action button
+
+#### Inspector Components (6)
+- [InspectorPanel](./01-components/inspector/InspectorPanel.md) - Main inspector panel
+- [CanvasPropertiesInspector](./01-components/inspector/CanvasPropertiesInspector.md) - Canvas-level properties
+- [RoomInspector](./01-components/inspector/RoomInspector.md) - Room properties editor
+- [DuctInspector](./01-components/inspector/DuctInspector.md) - Duct properties editor
+- [EquipmentInspector](./01-components/inspector/EquipmentInspector.md) - Equipment properties editor
+- [PropertyField](./01-components/inspector/PropertyField.md) - Property input field
+
+#### UI Components (19)
 - [ErrorBoundary](./01-components/ui/ErrorBoundary.md) - Error handling with fallback UI
 - [CollapsibleSection](./01-components/ui/CollapsibleSection.md) - Expandable sections
 - [Dropdown](./01-components/ui/Dropdown.md) - Selection dropdown
 - [IconButton](./01-components/ui/IconButton.md) - Icon-only buttons
-- [LoadingIndicator](./01-components/ui/LoadingIndicator.md) - Loading spinners
+- [LoadingIndicator](./01-components/ui/LoadingIndicator.md) - Loading state indicators
+- [LoadingSpinner](./01-components/ui/LoadingSpinner.md) - Animated spinner component
 - [StatCard](./01-components/ui/StatCard.md) - Statistics display cards
 - [Toast](./01-components/ui/Toast.md) - Notification toasts
 - [ValidatedInput](./01-components/ui/ValidatedInput.md) - Validated form inputs
+- [accordion](./01-components/ui/accordion.md) - Accordion primitive (shadcn/ui)
+- [button](./01-components/ui/button.md) - Button primitive (shadcn/ui)
+- [card](./01-components/ui/card.md) - Card primitive (shadcn/ui)
+- [checkbox](./01-components/ui/checkbox.md) - Checkbox primitive (shadcn/ui)
+- [dialog](./01-components/ui/dialog.md) - Dialog primitive (shadcn/ui)
+- [input](./01-components/ui/input.md) - Input primitive (shadcn/ui)
+- [label](./01-components/ui/label.md) - Label primitive (shadcn/ui)
+- [progress](./01-components/ui/progress.md) - Progress primitive (shadcn/ui)
+- [select](./01-components/ui/select.md) - Select primitive (shadcn/ui)
+- [switch](./01-components/ui/switch.md) - Switch primitive (shadcn/ui)
 
-#### Canvas Components
-- [CanvasPage](./01-components/canvas/CanvasPage.md) - Main canvas page
-- [CanvasContainer](./01-components/canvas/CanvasContainer.md) - Canvas rendering
-- [Toolbar](./01-components/canvas/Toolbar.md) - Tool selection toolbar
-- [StatusBar](./01-components/canvas/StatusBar.md) - Canvas status display
-- [ZoomControls](./01-components/canvas/ZoomControls.md) - Zoom buttons
-- [GridSettings](./01-components/canvas/GridSettings.md) - Grid configuration
-- [BOMPanel](./01-components/canvas/BOMPanel.md) - Bill of materials panel
-- [SelectionMarquee](./01-components/canvas/SelectionMarquee.md) - Marquee selection
+#### Export Components (3)
+- [ExportReportDialog](./01-components/export/ExportReportDialog.md) - Export project report (PDF)
+- [ExportDialog](./01-components/export/ExportDialog.md) - Lightweight export options dialog
+- [ExportMenu](./01-components/export/ExportMenu.md) - Legacy export menu (currently unused)
 
-#### Inspector Components
-- [InspectorPanel](./01-components/inspector/InspectorPanel.md) - Main inspector
-- [RoomInspector](./01-components/inspector/RoomInspector.md) - Room properties
-- [DuctInspector](./01-components/inspector/DuctInspector.md) - Duct properties
-- [EquipmentInspector](./01-components/inspector/EquipmentInspector.md) - Equipment properties
-- [PropertyField](./01-components/inspector/PropertyField.md) - Property input field
+#### Help Components (1)
+- [KeyboardShortcutsDialog](./01-components/help/KeyboardShortcutsDialog.md) - Global shortcuts reference (Ctrl+/)
 
-#### Dashboard Components
-- [ProjectCard](./01-components/dashboard/ProjectCard.md) - Project display card
-- [NewProjectDialog](./01-components/dashboard/NewProjectDialog.md) - New project modal
-- [ConfirmDialog](./01-components/dashboard/ConfirmDialog.md) - Confirmation modal
+#### Common Components (1)
+- [DeviceWarning](./01-components/common/DeviceWarning.md) - Mobile device warning screen
+
+#### Error Components (1)
+- [ErrorPage](./01-components/error/ErrorPage.md) - Error page for 404 and failures
 
 ### Stores (9 total)
 - [entityStore](./02-stores/entityStore.md) - Entity state management
@@ -162,11 +239,16 @@ Each element documentation follows this structure:
 
 | Category | Count |
 |----------|-------|
-| UI Components | 9 |
-| Canvas Components | 10 |
-| Dashboard Components | 3 |
-| Inspector Components | 5 |
+| Onboarding Components | 6 |
+| Layout Components | 11 |
+| Dialog Components | 5 |
+| Dashboard Components | 10 |
+| Canvas Components | 18 |
+| Inspector Components | 6 |
+| UI Components | 19 |
 | Export Components | 1 |
+| Common Components | 1 |
+| Error Components | 1 |
 | Zustand Stores | 9 |
 | Zod Schemas | 8 |
 | Canvas Tools | 7 |
@@ -178,4 +260,4 @@ Each element documentation follows this structure:
 | Persistence Modules | 3 |
 | Geometry Modules | 2 |
 | Pages | 4 |
-| **Total Elements** | **85** |
+| **Total Elements** | **135** |
