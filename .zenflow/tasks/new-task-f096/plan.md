@@ -64,3 +64,9 @@ Implement the task according to the technical specification and general engineer
    - What was implemented
    - How the solution was tested
    - The biggest issues or challenges encountered
+
+### [x] Step: Review
+<!-- chat-id: f4f7a617-9bbd-4212-a613-7c13f819c8ee -->
+<!-- agent: codex-gpt-5-2 -->
+
+Review what has been implemented to keep the logic aligned.

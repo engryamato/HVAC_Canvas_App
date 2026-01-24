@@ -7,10 +7,16 @@ This directory contains comprehensive documentation for every component, store, 
 ```
 docs/elements/
 ├── 01-components/          # React UI Components
-│   ├── ui/                 # Reusable UI components
+│   ├── onboarding/         # Onboarding and first-run UX
+│   ├── layout/             # App shell, header, menus, sidebars
+│   ├── dialogs/            # Shared dialogs
 │   ├── canvas/             # Canvas-specific components
 │   ├── dashboard/          # Dashboard components
 │   ├── export/             # Export feature components
+│   ├── help/               # Help and reference UI
+│   ├── ui/                 # Reusable UI components
+│   ├── common/             # Shared common screens
+│   ├── error/              # Error pages
 │   └── inspector/          # Inspector panel components
 ├── 02-stores/              # Zustand state stores
 ├── 03-schemas/             # Zod validation schemas
@@ -27,7 +33,7 @@ docs/elements/
 
 ## Quick Navigation
 
-### Components (78 total)
+### Components (81 total)
 
 #### Onboarding Components (6)
 - [AppInitializer](./01-components/onboarding/AppInitializer.md) - Handles app initialization and first-run detection
@@ -118,8 +124,13 @@ docs/elements/
 - [select](./01-components/ui/select.md) - Select primitive (shadcn/ui)
 - [switch](./01-components/ui/switch.md) - Switch primitive (shadcn/ui)
 
-#### Export Components (1)
-- [ExportMenu](./01-components/export/ExportMenu.md) - Export functionality menu
+#### Export Components (3)
+- [ExportReportDialog](./01-components/export/ExportReportDialog.md) - Export project report (PDF)
+- [ExportDialog](./01-components/export/ExportDialog.md) - Lightweight export options dialog
+- [ExportMenu](./01-components/export/ExportMenu.md) - Legacy export menu (currently unused)
+
+#### Help Components (1)
+- [KeyboardShortcutsDialog](./01-components/help/KeyboardShortcutsDialog.md) - Global shortcuts reference (Ctrl+/)
 
 #### Common Components (1)
 - [DeviceWarning](./01-components/common/DeviceWarning.md) - Mobile device warning screen

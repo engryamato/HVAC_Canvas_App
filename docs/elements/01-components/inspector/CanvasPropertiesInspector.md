@@ -187,14 +187,14 @@ const showCanvasProps = !selectedEntity && !selectedRoom && !selectedDuct;
 ## Related Elements
 
 ### Components
-- [CollapsibleSection](../../ui/CollapsibleSection.md) - Accordion sections
-- [Dropdown](../../ui/Dropdown.md) - Select inputs
-- [Inspector](./Inspector.md) - Parent inspector container
-- [ProjectSidebar](../ProjectSidebar.md) - Alternative project info display
+- [CollapsibleSection](../ui/CollapsibleSection.md) - Accordion sections
+- [Dropdown](../ui/Dropdown.md) - Select inputs
+- [InspectorPanel](./InspectorPanel.md) - Parent inspector container
+- [ProjectSidebar](../canvas/ProjectSidebar.md) - Alternative project info display
 
 ### Stores
 - [viewportStore](../../02-stores/viewportStore.md) - Grid settings
-- [project.store](../../02-stores/project.store.md) - Project details
+- [projectStore](../../02-stores/projectStore.md) - Project details
 
 ## Testing
 

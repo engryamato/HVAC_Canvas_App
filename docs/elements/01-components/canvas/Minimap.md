@@ -154,7 +154,7 @@ const [minimapDocked, setMinimapDocked] = useState(true);
 
 ### Future Dependencies
 - [viewportStore](../../02-stores/viewportStore.md) - Viewport bounds for indicator
-- [Canvas](./Canvas.md) - Canvas content to render in thumbnail
+- [CanvasContainer](./CanvasContainer.md) - Canvas content to render in thumbnail
 
 ## Testing
 

@@ -2,7 +2,7 @@
 
 Complete documentation for all HVAC Canvas App elements.
 
-## 01. Components (78 total)
+## 01. Components (81 total)
 UI components for the canvas editor and general application.
 
 ### Onboarding Components (6)
@@ -94,8 +94,13 @@ UI components for the canvas editor and general application.
 - [select.md](./01-components/ui/select.md) - Select primitive (shadcn/ui)
 - [switch.md](./01-components/ui/switch.md) - Switch primitive (shadcn/ui)
 
-### Export Components (1)
-- [ExportMenu.md](./01-components/export/ExportMenu.md) - Export functionality menu
+### Export Components (3)
+- [ExportReportDialog.md](./01-components/export/ExportReportDialog.md) - Export project report (PDF)
+- [ExportDialog.md](./01-components/export/ExportDialog.md) - Lightweight export options dialog
+- [ExportMenu.md](./01-components/export/ExportMenu.md) - Legacy export menu (currently unused)
+
+### Help Components (1)
+- [KeyboardShortcutsDialog.md](./01-components/help/KeyboardShortcutsDialog.md) - Global shortcuts reference (Ctrl+/)
 
 ### Common Components (1)
 - [DeviceWarning.md](./01-components/common/DeviceWarning.md) - Mobile device warning screen
@@ -251,7 +256,7 @@ All documentation follows a consistent template:
 
 ## Total Documentation
 
-- **78 Component Files** across 10 categories (onboarding, layout, dialogs, dashboard, canvas, inspector, UI, export, common, error)
+- **81 Component Files** across 11 categories (onboarding, layout, dialogs, dashboard, canvas, inspector, UI, export, help, common, error)
 - **9 Store Files** for state management
 - **8 Schema Files** for validation
 - **7 Tool Files** for canvas interactions
@@ -263,4 +268,4 @@ All documentation follows a consistent template:
 - **3 Persistence Files** for I/O
 - **2 Geometry Files** for math utilities
 - **4 Page Files** for routing
-- **135 Total Documented Elements** - Complete coverage of the HVAC Canvas App codebase
+- **138 Total Documented Elements** - Complete coverage of the HVAC Canvas App codebase

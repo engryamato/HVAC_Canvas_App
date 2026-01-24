@@ -153,10 +153,10 @@ console.log(selectedType); // 'elbow_90' | 'elbow_45' | 'tee' | etc.
 - [Toolbar](../layout/Toolbar.md) - Parent toolbar with tool selection
 
 ### Stores
-- [canvas.store](../../02-stores/canvas.store.md) - `selectedFittingType`, `setFittingType`
+- [canvasStore](../../02-stores/canvasStore.md) - `selectedFittingType`, `setFittingType`
 
 ### Schemas
-- [fitting.schema](../../04-schemas/fitting.schema.md) - `FittingType` type definition
+- [FittingSchema](../../03-schemas/FittingSchema.md) - `FittingType` type definition
 
 ## Testing
 

@@ -155,10 +155,10 @@ console.log(selectedType); // 'hood' | 'fan' | 'diffuser' | etc.
 - [Toolbar](../layout/Toolbar.md) - Parent toolbar with tool selection
 
 ### Stores
-- [canvas.store](../../02-stores/canvas.store.md) - `selectedEquipmentType`, `setEquipmentType`
+- [canvasStore](../../02-stores/canvasStore.md) - `selectedEquipmentType`, `setEquipmentType`
 
 ### Schemas
-- [equipment.schema](../../04-schemas/equipment.schema.md) - `EquipmentType` type definition
+- [EquipmentSchema](../../03-schemas/EquipmentSchema.md) - `EquipmentType` type definition
 
 ## Testing
 

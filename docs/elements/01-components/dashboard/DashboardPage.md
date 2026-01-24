@@ -313,12 +313,12 @@ Ensures persisted projects loaded before rendering.
 
 ### Stores
 - [projectListStore](../../02-stores/projectListStore.md) - Project list data
-- [useAppStateStore](../../02-stores/useAppStateStore.md) - App state (isTauri)
+- `useAppStateStore` (`src/stores/useAppStateStore.ts`) - App state (isTauri)
 
 ### Hooks
-- [useProjectFilters](../../03-hooks/useProjectFilters.md) - Search/filter/sort logic
-- [useAutoOpen](../../03-hooks/useAutoOpen.md) - Auto-open project handling
-- [useRecentProjects](../../03-hooks/useRecentProjects.md) - Recent projects hook
+- `useProjectFilters` (`src/features/dashboard/hooks/useProjectFilters.ts`) - Search/filter/sort logic
+- `useAutoOpen` (`src/hooks/useAutoOpen.ts`) - Auto-open project handling
+- `useRecentProjects` (`src/features/dashboard/store/projectListStore.ts`) - Recent projects selector
 
 ## Testing
 

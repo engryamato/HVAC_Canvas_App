@@ -221,14 +221,14 @@ const {
 
 ### Components
 - [AppShell](../layout/AppShell.md) - May contain ProjectSidebar
-- [EditProjectDialog](../../dashboard/EditProjectDialog.md) - Edits project metadata
+- [EditProjectDialog](../dashboard/EditProjectDialog.md) - Edits project metadata
 - [CanvasPropertiesInspector](../inspector/CanvasPropertiesInspector.md) - Shows subset of project info
 
 ### Stores
-- [project.store](../../02-stores/project.store.md) - `projectDetails`
+- [projectStore](../../02-stores/projectStore.md) - `projectDetails`
 
 ### UI Primitives
-- [Accordion](../../ui/accordion.md) - Collapsible sections
+- [Accordion](../ui/accordion.md) - Collapsible sections
 
 ## Testing
 

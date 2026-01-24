@@ -297,7 +297,7 @@ localStorage.setItem('sws.projectIndex', JSON.stringify({ state, version: 0 }));
 - [NewProjectDialog](./NewProjectDialog.md) - Similar form for new projects
 
 ### Stores
-- [useProjectStore](../../02-stores/useProjectStore.md) - Full project data
+- [projectStore](../../02-stores/projectStore.md) - Full project data
 - [projectListStore](../../02-stores/projectListStore.md) - Project list items
 
 ### UI Primitives

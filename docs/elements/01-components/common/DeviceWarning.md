@@ -147,7 +147,7 @@ export default function RootLayout({ children }) {
 ## Related Elements
 
 ### Hooks
-- [useDeviceDetection](../../03-hooks/useDeviceDetection.md) - Device detection logic
+- `useDeviceDetection` (`src/hooks/useDeviceDetection.ts`) - Device detection logic
 
 ### Utilities
 - Platform utilities (`isTauri`)

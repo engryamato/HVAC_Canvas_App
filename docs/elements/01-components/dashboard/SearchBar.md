@@ -254,10 +254,10 @@ Prevents memory leaks by clearing timers on unmount.
 - [AllProjectsSection](./AllProjectsSection.md) - Displays filtered results
 
 ### Hooks
-- [useProjectFilters](../../03-hooks/useProjectFilters.md) - Provides filtering logic
+- `useProjectFilters` (`src/features/dashboard/hooks/useProjectFilters.ts`) - Provides filtering logic
 
 ### Stores
-- [useAppStateStore](../../02-stores/useAppStateStore.md) - Provides `isTauri` state
+- `useAppStateStore` (`src/stores/useAppStateStore.ts`) - Provides `isTauri` state
 
 ## Testing
 
