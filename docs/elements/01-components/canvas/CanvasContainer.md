@@ -294,10 +294,10 @@ function CanvasPage() {
 - [Toolbar](./Toolbar.md) - Tool selection toolbar
 - [StatusBar](./StatusBar.md) - Cursor position display
 - [ZoomControls](./ZoomControls.md) - Zoom buttons
-- [ViewportStore](../02-stores/viewportStore.md) - Pan/zoom state
-- [SelectionStore](../02-stores/selectionStore.md) - Selection state
-- [BaseTool](../04-tools/BaseTool.md) - Tool interface
-- [RoomRenderer](../05-renderers/RoomRenderer.md) - Room rendering
+- [ViewportStore](../../02-stores/viewportStore.md) - Pan/zoom state
+- [SelectionStore](../../02-stores/selectionStore.md) - Selection state
+- [BaseTool](../../04-tools/BaseTool.md) - Tool interface
+- [RoomRenderer](../../05-renderers/RoomRenderer.md) - Room rendering
 
 ## Testing
 
