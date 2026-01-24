@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NoteTool } from '../NoteTool';
 import { useViewportStore } from '../../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import type { ToolMouseEvent, ToolKeyEvent } from '../BaseTool';
+import { createMockToolEvent, createMockKeyEvent } from './test-utils';
 
 describe('NoteTool', () => {
   let tool: NoteTool;
@@ -25,16 +25,12 @@ describe('NoteTool', () => {
 
   describe('mouse interactions', () => {
     it('should create note entity on left mouse click', () => {
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -48,16 +44,13 @@ describe('NoteTool', () => {
     });
 
     it('should ignore right mouse click', () => {
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
         button: 2, // Right click
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -68,16 +61,12 @@ describe('NoteTool', () => {
     it('should snap to grid when enabled', () => {
       useViewportStore.setState({ snapToGrid: true, gridSize: 24 });
 
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 50,
         y: 50,
         screenX: 50,
         screenY: 50,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -90,16 +79,12 @@ describe('NoteTool', () => {
     it('should not snap to grid when disabled', () => {
       useViewportStore.setState({ snapToGrid: false });
 
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 50,
         y: 50,
         screenX: 50,
         screenY: 50,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -110,16 +95,12 @@ describe('NoteTool', () => {
     });
 
     it('should create note with default content', () => {
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -134,16 +115,12 @@ describe('NoteTool', () => {
     });
 
     it('should have high zIndex for rendering on top', () => {
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -155,27 +132,19 @@ describe('NoteTool', () => {
 
   describe('keyboard interactions', () => {
     it('should reset state on Escape key', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
 
-      const keyEvent: ToolKeyEvent = {
+      const keyEvent = createMockKeyEvent({
         key: 'Escape',
         code: 'Escape',
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-        repeat: false,
-      };
+      });
 
       tool.onKeyDown(keyEvent);
 
@@ -198,16 +167,12 @@ describe('NoteTool', () => {
     });
 
     it('should reset state on deactivate', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
       tool.onDeactivate();
@@ -224,16 +189,12 @@ describe('NoteTool', () => {
 
   describe('render', () => {
     it('should render preview when mouse is moved', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
 
@@ -278,16 +239,12 @@ describe('NoteTool', () => {
     });
 
     it('should render with proper text preview', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
 

@@ -8,6 +8,7 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useViewportStore } from './store/viewportStore';
 import { useSelectionStore } from './store/selectionStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
+import { type ReversibleCommand } from '@/core/commands/types';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
@@ -78,8 +79,8 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       
       if (payload?.history) {
         useHistoryStore.setState({
-          past: payload.history.past,
-          future: payload.history.future,
+          past: payload.history.past as unknown as ReversibleCommand[],
+          future: payload.history.future as unknown as ReversibleCommand[],
           maxSize: payload.history.maxSize,
         });
       }

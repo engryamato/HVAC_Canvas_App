@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useProjectListStore, useRecentProjects } from '../store/projectListStore';
 import { useProjectFilters } from '../hooks/useProjectFilters';
 import { SearchBar } from './SearchBar';
 import { RecentProjectsSection } from './RecentProjectsSection';
 import { AllProjectsSection } from './AllProjectsSection';
-import { Plus, Archive, FolderOpen, Search as SearchIcon } from 'lucide-react';
-import { NewProjectDialog } from '@/components/dashboard/NewProjectDialog';
+import { Plus, Archive, FolderOpen } from 'lucide-react';
+import { NewProjectDialog } from './NewProjectDialog';
 import { FileMenu } from '@/components/layout/FileMenu';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
 import { useAppStateStore } from '@/stores/useAppStateStore';
@@ -63,42 +63,6 @@ export function DashboardPage() {
     const handleRescan = async () => {
         if (!isTauri) return;
         await scanProjectsFromDisk();
-    };
-
-    const handleOpenFromFile = async () => {
-        if (!isTauri) return;
-        try {
-            const { TauriFileSystem } = await import('@/core/persistence/TauriFileSystem');
-            const { loadProject } = await import('@/core/persistence/projectIO');
-            const addProjectToList = useProjectListStore.getState().addProject;
-            const filePath = await TauriFileSystem.openFileDialog();
-            if (!filePath) return;
-            const result = await loadProject(filePath);
-            if (!result.success || !result.project) {
-                alert(`Failed to open project: ${result.error || 'Unknown error'}`);
-                return;
-            }
-            const existingProject = allProjectsRaw.find(p => p.projectId === result.project!.projectId);
-            if (!existingProject) {
-                const projectListItem = {
-                    projectId: result.project.projectId,
-                    projectName: result.project.projectName,
-                    projectNumber: result.project.projectNumber,
-                    clientName: result.project.clientName,
-                    entityCount: result.project.entities?.allIds?.length || 0,
-                    createdAt: result.project.createdAt,
-                    modifiedAt: result.project.modifiedAt,
-                    storagePath: filePath,
-                    isArchived: ('isArchived' in result.project ? result.project.isArchived : false) as boolean,
-                    filePath: filePath,
-                };
-                addProjectToList(projectListItem);
-            }
-            window.location.href = `/canvas/${result.project.projectId}`;
-        } catch (error) {
-            console.error('[DashboardPage] Failed to open project:', error);
-            alert('Failed to open project. Please check the file and try again.');
-        }
     };
 
     const handleSortChange = (sortBy: 'name' | 'date', sortOrder: 'asc' | 'desc') => {

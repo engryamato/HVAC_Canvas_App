@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment configuration validation
 - Auto-save functionality with debouncing
 - Project export to JSON and CSV formats
+- Vibe Kanban Web Companion (dev-only) rendered at the app root
 
 ### Changed
 - Improved test coverage from 40% to 70-75%

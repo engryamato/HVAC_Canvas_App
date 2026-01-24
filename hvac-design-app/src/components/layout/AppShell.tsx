@@ -1,14 +1,12 @@
 'use client';
 
 import React, { ReactNode } from 'react';
+// Removed unused imports
 import { Header } from './Header';
 import { Toolbar } from './Toolbar';
 import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { StatusBar } from './StatusBar';
-import { EquipmentTypeSelector } from '@/components/canvas/EquipmentTypeSelector';
-import { FittingTypeSelector } from '@/components/canvas/FittingTypeSelector';
-import { useCurrentTool } from '@/core/store/canvas.store';
 
 interface AppShellProps {
     children: ReactNode;
@@ -16,7 +14,7 @@ interface AppShellProps {
 }
 
 export const AppShell: React.FC<AppShellProps> = ({ children, projectName }) => {
-    const currentTool = useCurrentTool();
+    // Removed unused currentTool variable
 
     return (
         <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-50 text-slate-900">

@@ -1,0 +1,443 @@
+
+> sizewise-hvac-canvas@0.1.0 lint
+> eslint . --ext .ts,.tsx,.js,.jsx
+
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\tauri-offline\uj-gs-001-first-launch.spec.ts
+   9:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\tauri-offline\uj-gs-002-device-compatibility.spec.ts
+  29:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\tauri-offline\uj-gs-003-navigation.spec.ts
+  5:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\tauri-offline\uj-gs-006-environment-detection.spec.ts
+   6:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\tauri-offline\uj-gs-007-integrity-check.spec.ts
+    6:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   11:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   12:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   13:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  163:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-001-onboarding.spec.ts
+  49:13  warning  Unexpected console statement  no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-002-device-compatibility.spec.ts
+   19:30  warning  'BrowserContext' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+   96:19  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  465:13  warning  Unexpected console statement                                                       no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-003-navigation.spec.ts
+    2:15  warning  'Page' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  527:19  warning  'toolbar' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  827:77  warning  'page' is defined but never used. Allowed unused args must match /^_/u              @typescript-eslint/no-unused-vars
+  857:70  warning  'page' is defined but never used. Allowed unused args must match /^_/u              @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-005-initialization.spec.ts
+   31:70  warning  Unexpected any. Specify a different type                                                  @typescript-eslint/no-explicit-any
+  152:19  warning  'preferences' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  223:19  warning  'isFirstLaunch' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  225:35  warning  Unexpected any. Specify a different type                                                  @typescript-eslint/no-explicit-any
+  283:40  error    Expected { after 'if' condition                                                           curly
+  297:78  warning  'context' is defined but never used. Allowed unused args must match /^_/u                 @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-006-environment-detection.spec.ts
+  17:24  warning  'Page' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\00-getting-started\uj-gs-007-integrity-check.spec.ts
+  34:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-001-create-project.spec.ts
+    9:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   15:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   16:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   17:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   18:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-002-open-project.spec.ts
+   9:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-003-edit-project.spec.ts
+    7:48  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+   10:16  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+   11:16  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+   12:16  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+   13:42  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+   31:68  warning  'filePath' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  127:61  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+  128:49  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-004-delete-project.spec.ts
+   7:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  74:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-005-archive-project.spec.ts
+   7:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  70:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  70:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-006-duplicate-project.spec.ts
+    7:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   11:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   12:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   13:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-007-search-filter.spec.ts
+   5:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   6:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\tauri-offline\uj-pm-008-export-report.spec.ts
+    7:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   11:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   12:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   13:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   14:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:31  warning  Unexpected console statement              no-console
+  117:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\01-project-management\uj-pm-002-open-project.spec.ts
+   16:51  warning  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+   27:45  warning  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+   38:53  warning  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+   56:9   warning  Unexpected console statement                                                                no-console
+   78:62  warning  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+   93:20  warning  Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+  124:35  warning  Unexpected console statement                                                                no-console
+  401:23  warning  'originalSetItem' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  404:55  warning  'key' is defined but never used. Allowed unused args must match /^_/u                       @typescript-eslint/no-unused-vars
+  404:60  warning  'value' is defined but never used. Allowed unused args must match /^_/u                     @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\02-hvac-design\uj-hd-001-design-workflow.spec.ts
+  1:29  warning  'Page' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\02-hvac-design\uj-hd-002-critical-journey.spec.ts
+    1:29  warning  'Page' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   24:9   warning  Unexpected console statement                                            no-console
+   69:9   warning  Unexpected console statement                                            no-console
+   75:9   warning  Unexpected console statement                                            no-console
+   99:9   warning  Unexpected console statement                                            no-console
+  105:9   warning  Unexpected console statement                                            no-console
+  108:9   warning  Unexpected console statement                                            no-console
+  119:9   warning  Unexpected console statement                                            no-console
+  122:9   warning  Unexpected console statement                                            no-console
+  130:9   warning  Unexpected console statement                                            no-console
+  133:9   warning  Unexpected console statement                                            no-console
+  151:9   warning  Unexpected console statement                                            no-console
+  154:9   warning  Unexpected console statement                                            no-console
+  161:9   warning  Unexpected console statement                                            no-console
+  164:9   warning  Unexpected console statement                                            no-console
+  178:9   warning  Unexpected console statement                                            no-console
+  179:9   warning  Unexpected console statement                                            no-console
+  185:9   warning  Unexpected console statement                                            no-console
+  188:9   warning  Unexpected console statement                                            no-console
+  196:9   warning  Unexpected console statement                                            no-console
+  199:9   warning  Unexpected console statement                                            no-console
+  206:9   warning  Unexpected console statement                                            no-console
+  209:9   warning  Unexpected console statement                                            no-console
+  213:9   warning  Unexpected console statement                                            no-console
+  216:9   warning  Unexpected console statement                                            no-console
+  220:9   warning  Unexpected console statement                                            no-console
+  223:9   warning  Unexpected console statement                                            no-console
+  233:9   warning  Unexpected console statement                                            no-console
+  236:9   warning  Unexpected console statement                                            no-console
+  240:9   warning  Unexpected console statement                                            no-console
+  243:9   warning  Unexpected console statement                                            no-console
+  247:9   warning  Unexpected console statement                                            no-console
+  248:9   warning  Unexpected console statement                                            no-console
+  254:9   warning  Unexpected console statement                                            no-console
+  257:9   warning  Unexpected console statement                                            no-console
+  262:13  warning  Unexpected console statement                                            no-console
+  264:13  warning  Unexpected console statement                                            no-console
+  268:9   warning  Unexpected console statement                                            no-console
+  287:17  warning  Unexpected console statement                                            no-console
+  290:17  warning  Unexpected console statement                                            no-console
+  293:13  warning  Unexpected console statement                                            no-console
+  296:9   warning  Unexpected console statement                                            no-console
+  302:9   warning  Unexpected console statement                                            no-console
+  315:9   warning  Unexpected console statement                                            no-console
+  326:13  warning  Unexpected console statement                                            no-console
+  329:9   warning  Unexpected console statement                                            no-console
+  330:9   warning  Unexpected console statement                                            no-console
+  331:9   warning  Unexpected console statement                                            no-console
+  332:9   warning  Unexpected console statement                                            no-console
+  339:9   warning  Unexpected console statement                                            no-console
+  413:9   warning  Unexpected console statement                                            no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-004-add-note.spec.ts
+  1:24  warning  'Page' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-007-draw-equipment-rtu.spec.ts
+  20:33  warning  Unexpected console statement  no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-009-copy-paste-entity.spec.ts
+  23:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-010-delete-entity.spec.ts
+  51:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-011-duplicate-entity.spec.ts
+  51:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-012-modify-entity-properties.spec.ts
+  51:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-013-attach-note-to-entity.spec.ts
+  51:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-015-connect-duct-to-entity.spec.ts
+  51:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  60:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\03-entity-creation\tauri-offline\uj-ec-016-disconnect-duct.spec.ts
+  51:13  warning  'canvas' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\e2e\debug-selector.spec.ts
+   7:29  warning  Unexpected console statement                                                                                         no-console
+   9:3   warning  Unexpected console statement                                                                                         no-console
+  12:3   warning  Unexpected console statement                                                                                         no-console
+  15:3   warning  Unexpected console statement                                                                                         no-console
+  23:3   warning  Unexpected console statement                                                                                         no-console
+  28:3   warning  Unexpected console statement                                                                                         no-console
+  32:5   warning  Unexpected console statement                                                                                         no-console
+  34:5   warning  Unexpected console statement                                                                                         no-console
+  38:5   warning  Unexpected console statement                                                                                         no-console
+  40:5   warning  Unexpected console statement                                                                                         no-console
+  43:5   warning  Unexpected console statement                                                                                         no-console
+  49:3   warning  Unexpected console statement                                                                                         no-console
+  51:3   warning  Unexpected console statement                                                                                         no-console
+  57:7   warning  Unexpected console statement                                                                                         no-console
+  59:7   warning  Unexpected console statement                                                                                         no-console
+  61:7   warning  Unexpected console statement                                                                                         no-console
+  70:5   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  80:3   warning  Unexpected console statement                                                                                         no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\__tests__\user-journeys\calculation-workflow.test.ts
+  31:34  warning  'calculateEquivalentDuctDiameter' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\__tests__\user-journeys\canvas-design-workflow.test.ts
+  25:3   warning  'selectAllEntities' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  38:3   warning  'redo' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  40:47  warning  'Entity' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\__tests__\user-journeys\entity-manipulation.test.ts
+  17:3   warning  'selectAllEntities' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  18:3   warning  'selectEntitiesByType' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  34:47  warning  'Entity' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\__tests__\user-journeys\export-workflow.test.ts
+   20:3   warning  'selectEntityCount' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  338:74  warning  'i' is defined but never used. Allowed unused args must match /^_/u                  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\__tests__\user-journeys\project-lifecycle.test.ts
+  15:44  warning  'vi' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\layout\EditMenu.tsx
+  5:10  warning  'Pencil' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\layout\StatusBar.tsx
+  8:10  warning  'Wifi' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\onboarding\AppInitializer.tsx
+   15:13  warning  'hasLaunched' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                         @typescript-eslint/no-unused-vars
+   22:5   warning  Unexpected console statement                                                                                                                                   no-console
+   38:8   warning  React Hook useEffect has missing dependencies: 'performEnvironmentDetection' and 'performIntegrityChecks'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+   43:9   warning  Unexpected console statement                                                                                                                                   no-console
+   47:13  warning  Unexpected console statement                                                                                                                                   no-console
+   54:17  warning  Unexpected console statement                                                                                                                                   no-console
+  101:9   warning  Unexpected console statement                                                                                                                                   no-console
+  107:9   warning  Unexpected console statement                                                                                                                                   no-console
+  116:17  warning  Unexpected console statement                                                                                                                                   no-console
+  152:17  warning  Unexpected console statement                                                                                                                                   no-console
+  154:17  warning  Unexpected console statement                                                                                                                                   no-console
+  171:17  warning  Unexpected console statement                                                                                                                                   no-console
+  184:9   warning  Unexpected console statement                                                                                                                                   no-console
+  194:17  warning  Unexpected console statement                                                                                                                                   no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\onboarding\ProjectCreationScreen.tsx
+  10:8  warning  'Image' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\components\ui\switch.tsx
+  21:27  error    Expected { after 'if' condition           curly
+  41:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\core\persistence\TauriFileSystem.ts
+  58:89  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\core\persistence\__tests__\filesystem.test.ts
+   29:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   34:25  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   42:7   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   43:29  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   52:22  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   60:25  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  128:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  152:25  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\core\persistence\__tests__\projectIO.test.ts
+  5:39  warning  'ProjectFile' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\core\store\__tests__\integration\store.integration.test.ts
+  1:44  warning  'afterEach' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\core\store\entityStore.ts
+  41:9  warning  Unexpected console statement  no-console
+  59:9  warning  Unexpected console statement  no-console
+  66:9  warning  Unexpected console statement  no-console
+  77:9  warning  Unexpected console statement  no-console
+  83:9  warning  Unexpected console statement  no-console
+  89:9  warning  Unexpected console statement  no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\CanvasPage.tsx
+  32:30  warning  'className' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  90:9   warning  Unexpected console statement                                                          no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\CanvasPageWrapper.tsx
+  131:44  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  203:48  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  224:6   warning  React Hook useEffect has a missing dependency: 'loadProject'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  243:6   warning  React Hook useEffect has a missing dependency: 'loadProject'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  245:42  warning  Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\__tests__\integration\canvas-rendering.integration.test.ts
+  348:13  warning  'equipment' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\components\Inspector\CanvasPropertiesInspector.tsx
+  115:15  warning  Unexpected console statement  no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\components\LeftSidebar.tsx
+  170:6  warning  React Hook React.useEffect has a missing dependency: 'handleResizeMove'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\hooks\__tests__\useAutoSave.test.ts
+  40:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\hooks\__tests__\useUndoRedo.test.ts
+  4:30  warning  'redo' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\hooks\useAutoSave.ts
+  252:9   warning  Unexpected console statement              no-console
+  474:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\hooks\useKeyboardShortcuts.ts
+    8:10  warning  'ToastProps' is defined but never used. Allowed unused vars must match /^_/u                                    @typescript-eslint/no-unused-vars
+  231:5   warning  React Hook useCallback has a missing dependency: 'isEnabled'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\canvas\tools\EquipmentTool.ts
+  49:5  warning  Unexpected console statement  no-console
+  55:5  warning  Unexpected console statement  no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\dashboard\components\DashboardPage.tsx
+  64:23  error  Expected { after 'if' condition  curly
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\dashboard\components\NewProjectDialog.tsx
+  200:21  warning  Unexpected console statement  no-console
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\dashboard\components\ProjectCard.tsx
+   50:24  error    Expected { after 'if' condition                                                                                           curly
+   65:28  error    Expected { after 'if' condition                                                                                           curly
+   70:29  error    Expected { after 'if' condition                                                                                           curly
+   75:44  error    Expected { after 'if' condition                                                                                           curly
+   78:25  error    Expected { after 'if' condition                                                                                           curly
+   79:31  error    Expected { after 'if' condition                                                                                           curly
+   81:28  error    Expected { after 'if' condition                                                                                           curly
+   83:8   warning  React Hook useMemo has an unnecessary dependency: 'project.modifiedAt'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  137:56  error    Expected { after 'if' condition                                                                                           curly
+  138:57  error    Expected { after 'if' condition                                                                                           curly
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\dashboard\components\ProjectGrid.tsx
+  21:23  error  Expected { after 'if' condition  curly
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\dashboard\hooks\useProjectFilters.test.ts
+  2:34  warning  'ProjectFilters' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\dashboard\store\__tests__\projectListStore.test.ts
+  4:3  warning  'useProjects' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+  5:3  warning  'useActiveProjects' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  6:3  warning  'useArchivedProjects' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\export\ExportMenu.tsx
+  41:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\export\__tests__\export.test.ts
+  303:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  315:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  328:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\features\export\services\ReportGenerator.ts
+   78:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\services\FileSystemService.ts
+  21:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\stores\useAppStateStore.ts
+  43:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\types\project.ts
+  10:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\User\Downloads\GitHub\HVAC_Canvas_App\hvac-design-app\src\utils\logger.ts
+  20:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:34  warning  Unexpected console statement              no-console
+  23:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:33  warning  Unexpected console statement              no-console
+  26:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 295 problems (13 errors, 282 warnings)
+  13 errors and 0 warnings potentially fixable with the `--fix` option.
+

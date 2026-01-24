@@ -15,8 +15,8 @@ import {
     Redo,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EquipmentTypeSelector } from '@/components/canvas/EquipmentTypeSelector';
-import { FittingTypeSelector } from '@/components/canvas/FittingTypeSelector';
+import { EquipmentTypeSelector } from '@/features/canvas/components/EquipmentTypeSelector';
+import { FittingTypeSelector } from '@/features/canvas/components/FittingTypeSelector';
 
 /**
  * Toolbar - Modern Engineering Design 2025

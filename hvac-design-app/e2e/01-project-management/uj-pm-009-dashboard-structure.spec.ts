@@ -6,6 +6,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test';
+import { TestProject, TestProjectListItem } from '../e2e-types';
 
 /**
  * Helper: Seed projects via localStorage
@@ -16,8 +17,8 @@ async function seedProjects(
     archivedCount: number
 ) {
     const now = Date.now();
-    const projects: any[] = [];
-    const listItems: any[] = [];
+    const projects: TestProject[] = [];
+    const listItems: TestProjectListItem[] = [];
 
     // Create Active Projects
     for (let i = 0; i < activeCount; i++) {

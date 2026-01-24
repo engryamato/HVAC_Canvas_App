@@ -3,7 +3,7 @@ import { FittingTool } from '../FittingTool';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useViewportStore } from '../../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import type { ToolMouseEvent, ToolKeyEvent } from '../BaseTool';
+import { createMockToolEvent, createMockKeyEvent } from './test-utils';
 
 describe('FittingTool', () => {
   let tool: FittingTool;
@@ -27,16 +27,12 @@ describe('FittingTool', () => {
 
   describe('mouse interactions', () => {
     it('should create fitting entity on left mouse click', () => {
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -50,16 +46,13 @@ describe('FittingTool', () => {
     });
 
     it('should ignore right mouse click', () => {
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
         button: 2, // Right click
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -70,16 +63,12 @@ describe('FittingTool', () => {
     it('should snap to grid when enabled', () => {
       useViewportStore.setState({ snapToGrid: true, gridSize: 24 });
 
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 50,
         y: 50,
         screenX: 50,
         screenY: 50,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -92,16 +81,12 @@ describe('FittingTool', () => {
     it('should not snap to grid when disabled', () => {
       useViewportStore.setState({ snapToGrid: false });
 
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 50,
         y: 50,
         screenX: 50,
         screenY: 50,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -114,16 +99,12 @@ describe('FittingTool', () => {
     it('should create fitting with selected type', () => {
       useToolStore.setState({ selectedFittingType: 'tee' });
 
-      const mouseEvent: ToolMouseEvent = {
+      const mouseEvent = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseDown(mouseEvent);
 
@@ -138,27 +119,19 @@ describe('FittingTool', () => {
 
   describe('keyboard interactions', () => {
     it('should reset state on Escape key', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
 
-      const keyEvent: ToolKeyEvent = {
+      const keyEvent = createMockKeyEvent({
         key: 'Escape',
         code: 'Escape',
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-        repeat: false,
-      };
+      });
 
       tool.onKeyDown(keyEvent);
 
@@ -196,16 +169,12 @@ describe('FittingTool', () => {
     });
 
     it('should reset state on deactivate', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
       tool.onDeactivate();
@@ -223,16 +192,12 @@ describe('FittingTool', () => {
 
   describe('render', () => {
     it('should render preview when mouse is moved', () => {
-      const mouseMove: ToolMouseEvent = {
+      const mouseMove = createMockToolEvent({
         x: 100,
         y: 100,
         screenX: 100,
         screenY: 100,
-        button: 0,
-        shiftKey: false,
-        ctrlKey: false,
-        altKey: false,
-      };
+      });
 
       tool.onMouseMove(mouseMove);
 

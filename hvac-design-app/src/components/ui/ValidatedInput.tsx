@@ -13,6 +13,7 @@ type BaseProps = {
   disabled?: boolean;
   error?: string;
   warning?: string;
+  label?: string;
   className?: string;
 };
 
@@ -39,7 +40,7 @@ type ValidatedInputProps = TextProps | NumberProps | SelectProps;
  * Supports text, number, and select inputs.
  */
 export function ValidatedInput(props: ValidatedInputProps) {
-  const { id, value, onChange, disabled, error, warning, className } = props;
+  const { id, value, onChange, disabled, error, warning, label, className } = props;
   const inputClassNames = [
     styles.input,
     error ? styles.inputError : '',
@@ -60,7 +61,8 @@ export function ValidatedInput(props: ValidatedInputProps) {
 
   if (props.type === 'select') {
     return (
-      <div>
+      <div className={className}>
+        {label && <label htmlFor={id} className={styles.label}>{label}</label>}
         <select
           id={id}
           className={inputClassNames}
@@ -82,7 +84,8 @@ export function ValidatedInput(props: ValidatedInputProps) {
   if (props.type === 'number') {
     const { min, max, step } = props;
     return (
-      <div>
+      <div className={className}>
+        {label && <label htmlFor={id} className={styles.label}>{label}</label>}
         <input
           id={id}
           type="number"
@@ -103,7 +106,8 @@ export function ValidatedInput(props: ValidatedInputProps) {
   }
 
   return (
-    <div>
+    <div className={className}>
+      {label && <label htmlFor={id} className={styles.label}>{label}</label>}
       <input
         id={id}
         type="text"

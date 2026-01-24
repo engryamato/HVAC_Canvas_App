@@ -165,13 +165,7 @@ describe('filesystem utilities', () => {
 
   describe('error handling', () => {
     it('should provide meaningful error messages', async () => {
-      try {
-        await readTextFile('/test/path');
-        fail('Should have thrown');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toContain('Tauri');
-      }
+      await expect(readTextFile('/test/path')).rejects.toThrow(/Tauri/);
     });
 
     it('should not throw for graceful fallback functions', async () => {

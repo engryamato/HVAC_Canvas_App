@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { DeviceWarning } from '@components/common/DeviceWarning'
+import { VibeKanbanWebCompanionClient } from '@components/common/VibeKanbanWebCompanionClient'
 
 export const metadata: Metadata = {
   title: 'SizeWise HVAC Canvas',
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <DeviceWarning />
+        <VibeKanbanWebCompanionClient />
         {children}
       </body>
     </html>

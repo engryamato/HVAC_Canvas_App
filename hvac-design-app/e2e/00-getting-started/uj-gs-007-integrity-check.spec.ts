@@ -14,6 +14,7 @@
  * @created 2026-01-12
  */
 
+/* eslint-disable no-console */
 import { test, expect, Page } from '@playwright/test';
 
 /**
@@ -29,10 +30,10 @@ async function clearStorage(page: Page) {
 /**
  * Helper: Set localStorage item
  */
-async function setStorageItem(page: Page, key: string, value: any) {
-    await page.evaluate(([k, v]) => {
+async function setStorageItem(page: Page, key: string, value: unknown) {
+    await page.evaluate(([k, v]: [string, any]) => {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
-    }, [key, value]);
+    }, [key, value] as [string, any]);
 }
 
 test.describe('OS-INIT-003: Database Integrity Check', () => {

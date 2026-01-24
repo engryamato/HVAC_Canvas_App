@@ -1,0 +1,20 @@
+worktree C:/Users/User/Downloads/GitHub/HVAC_Canvas_App
+HEAD e9117470e0d6cd13e4395c9709cf37564a002f77
+branch refs/heads/main
+
+worktree C:/Users/User/.local/share/opencode/worktree/95947efda68d1f3cf6d5c6268ef8d5b01742af79/quiet-forest
+HEAD f0d5c10154b140dc1d40c83c004104038a61ce81
+branch refs/heads/opencode/quiet-forest
+
+worktree C:/Users/User/.local/share/opencode/worktree/95947efda68d1f3cf6d5c6268ef8d5b01742af79/stellar-lagoon
+HEAD 0afb54ea60825d74caefef51279e80ede6b5cc79
+branch refs/heads/opencode/stellar-lagoon
+
+worktree C:/Users/User/AppData/Local/Temp/vibe-kanban/worktrees/0612-elements-impleme/HVAC_Canvas_App
+HEAD 3b6e78f47247ec2d37c3b32d886fc77631e39e32
+branch refs/heads/vk/0612-elements-impleme
+
+worktree C:/Users/User/AppData/Local/Temp/vibe-kanban/worktrees/f5c7-install-and-inte/HVAC_Canvas_App
+HEAD c6162149a368b88c393283aa07d9161bb8715fba
+branch refs/heads/vk/f5c7-install-and-inte
+

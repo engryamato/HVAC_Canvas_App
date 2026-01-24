@@ -350,7 +350,7 @@ export const useProjectListStore = create<ProjectListStore>()(
               projectNumber: result.project.projectNumber,
               clientName: result.project.clientName,
               modifiedAt: result.project.modifiedAt,
-              isArchived: result.project.isArchived,
+              isArchived: !!result.project.isArchived,
             });
             logger.debug('[ProjectListStore] Synced project from disk:', projectId);
           }
@@ -366,7 +366,7 @@ export const useProjectListStore = create<ProjectListStore>()(
       name: INDEX_KEY,
       storage: createJSONStorage(() => {
         // Handle SSR - return dummy storage if window is undefined
-        if (typeof window === 'undefined') {
+        if (typeof globalThis.window === 'undefined') {
           return {
             getItem: () => null,
             setItem: () => {},
@@ -377,10 +377,13 @@ export const useProjectListStore = create<ProjectListStore>()(
       }),
       // Merge function ensures corrupted/missing data defaults to valid state
       merge: (persistedState: unknown, currentState: ProjectListStore): ProjectListStore => {
-        const persisted = persistedState as Partial<ProjectListState> | null;
+        // Safe cast with unknown check
+        const persisted = (persistedState && typeof persistedState === 'object') 
+          ? persistedState as Partial<ProjectListState> 
+          : null;
         
         if (!persisted) {
-          console.log('[ProjectListStore] No persisted state, using defaults');
+          logger.debug('[ProjectListStore] No persisted state, using defaults');
           return currentState;
         }
         
@@ -396,7 +399,7 @@ export const useProjectListStore = create<ProjectListStore>()(
           );
           
           if (validProjects.length !== persisted.projects.length) {
-            console.warn('[ProjectListStore] Filtered out invalid project entries');
+            logger.warn('[ProjectListStore] Filtered out invalid project entries');
           }
         }
         
@@ -419,7 +422,7 @@ export const useProjectListStore = create<ProjectListStore>()(
           // State will already be the currentState from merge, which has valid defaults
           return;
         }
-        console.log('[ProjectListStore] Hydration finished, projects:', state?.projects?.length ?? 0);
+        logger.debug('[ProjectListStore] Hydration finished, projects:', state?.projects?.length ?? 0);
       },
       skipHydration: true, // Prevent hydration mismatch on SSR
     }

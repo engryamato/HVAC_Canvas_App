@@ -8,6 +8,8 @@ export interface CollapsibleSectionProps {
   defaultExpanded?: boolean;
   children: React.ReactNode;
   className?: string;
+  onToggle?: (expanded: boolean) => void;
+  expanded?: boolean;
 }
 
 /**
@@ -26,19 +28,33 @@ export interface CollapsibleSectionProps {
  * </CollapsibleSection>
  * ```
  */
-export function CollapsibleSection({ 
-  title, 
-  defaultExpanded = true, 
-  children, 
-  className 
-}: CollapsibleSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+export function CollapsibleSection(props: CollapsibleSectionProps) {
+  const { 
+    title, 
+    defaultExpanded = true, 
+    children, 
+    className,
+    onToggle,
+    expanded
+  } = props;
+
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  
+  const isExpanded = expanded !== undefined ? expanded : internalExpanded;
+
+  const handleToggle = () => {
+    const newExpanded = !isExpanded;
+    if (expanded === undefined) {
+      setInternalExpanded(newExpanded);
+    }
+    onToggle?.(newExpanded);
+  };
 
   return (
     <div className={`${styles.section} ${className || ''}`}>
       <button 
         className={styles.header} 
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
         aria-expanded={isExpanded}
         type="button"
       >
