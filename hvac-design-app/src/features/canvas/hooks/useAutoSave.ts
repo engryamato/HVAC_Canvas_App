@@ -235,7 +235,7 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
   };
 }
 
-export function createLocalStoragePayloadFromProjectFile(project: ProjectFile): LocalStoragePayload {
+export function createLocalStoragePayloadFromProjectFileWithDefaults(project: ProjectFile): LocalStoragePayload {
   const preferences = usePreferencesStore.getState();
   const settings = useSettingsStore.getState();
   const projectIndex = useProjectListStore.getState();
@@ -557,19 +557,11 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
         void (async () => {
           try {
             const { saveProject } = await import('@/core/persistence/projectIO');
-            
-            // Convert payload to ProjectFile format
-            const projectFile: any = {
-              ...payload.project,
-              entities: payload.project.entities,
-              viewportState: payload.project.viewportState,
-              settings: {
-                unitSystem: payload.preferences.unitSystem,
-                gridSize: payload.preferences.gridSize,
-                gridVisible: payload.viewport.gridVisible,
-                snapToGrid: payload.viewport.snapToGrid,
-              },
-            };
+
+            const projectFile = buildProjectFileFromStores();
+            if (!projectFile) {
+              throw new Error('Missing project data');
+            }
 
             const result = await saveProject(projectFile, projectListItem.filePath!);
             

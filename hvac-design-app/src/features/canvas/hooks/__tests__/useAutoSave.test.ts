@@ -6,6 +6,7 @@ import {
   saveBackupToStorage,
   loadProjectFromStorage,
   deleteProjectFromStorage,
+  createLocalStoragePayloadFromProjectFileWithDefaults,
   type LocalStoragePayload,
 } from '../useAutoSave';
 import { useEntityStore } from '@/core/store/entityStore';
@@ -140,6 +141,34 @@ describe('useAutoSave - Storage Functions', () => {
 
     expect(result).toBe(true);
     expect(localStorage.getItem(`hvac-project-${projectId}`)).toBeNull();
+  });
+});
+
+describe('useAutoSave - Payload helpers', () => {
+  beforeEach(() => {
+    useViewportStore.setState({
+      panX: 0,
+      panY: 0,
+      zoom: 1,
+      gridVisible: true,
+      gridSize: 12,
+      snapToGrid: true,
+    });
+  });
+
+  it('hydrates snapToGrid from project settings when available', () => {
+    const projectId = '33333333-3333-4333-8333-333333333333';
+    const payload = createLocalStoragePayloadFromProjectFileWithDefaults({
+      ...basePayload(projectId).project,
+      settings: {
+        unitSystem: 'imperial',
+        gridSize: 12,
+        gridVisible: true,
+        snapToGrid: false,
+      },
+    } as any);
+
+    expect(payload.viewport.snapToGrid).toBe(false);
   });
 });
 

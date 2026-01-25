@@ -48,6 +48,23 @@ None (self-contained)
 | Save Project As... | `Ctrl+Shift+S` | `handleSaveAs()` |
 | Export Report... | `Ctrl+P` | Opens `ExportReportDialog` |
 
+## Keyboard Shortcuts
+- `Ctrl+N`: New project (opens `/dashboard/new`)
+- `Ctrl+O`: Open from file
+- `Ctrl+S`: Save project
+- `Ctrl+Shift+S`: Save project as
+
+Shortcuts are ignored while typing in inputs/textareas.
+
+## Dirty State Guard
+If the current project has unsaved changes, `New Project...` and `Open from File...` open `UnsavedChangesDialog` with:
+- Save and Leave
+- Leave Without Saving
+- Cancel
+
+## Version Warning
+If an opened `.sws` file has a newer schema version than the app expects, the app shows `VersionWarningDialog` before continuing.
+
 ## Behavior
 
 ### Open from File
@@ -146,7 +163,7 @@ export function Header() {
 ## Related Elements
 - **Parent**: [`Header`](./Header.md)
 - **Dialogs**: `ExportReportDialog`
-- **Services**: `FileSystemService`
+- **Persistence**: `projectIO`, `TauriFileSystem`, `webProjectFileIO`
 - **Routes**: `/dashboard`, `/dashboard?view=archived`, `/canvas/[projectId]`
 
 ## Testing

@@ -10,9 +10,11 @@ import { useAppStateStore } from '@/stores/useAppStateStore';
 import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
 import { ProjectAlreadyExistsDialog } from '@/components/dialogs/ProjectAlreadyExistsDialog';
 import { UnsavedChangesDialog } from '@/components/dialogs/UnsavedChangesDialog';
-import { useCurrentProjectId, useIsDirty } from '@/core/store/project.store';
+import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
+import { useCurrentProjectId, useIsDirty, useProjectActions } from '@/core/store/project.store';
 import {
-  createLocalStoragePayloadFromProjectFile,
+  buildProjectFileFromStores,
+  createLocalStoragePayloadFromProjectFileWithDefaults,
   saveProjectToStorage,
 } from '@/features/canvas/hooks/useAutoSave';
 import { setWebProjectFileHandle } from '@/core/persistence/webFileHandles';
@@ -29,12 +31,15 @@ export function FileMenu() {
     const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false);
     const [existingProjectDialogOpen, setExistingProjectDialogOpen] = useState(false);
     const [existingProjectId, setExistingProjectId] = useState<string | null>(null);
+    const [existingProjectFilePath, setExistingProjectFilePath] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<null | 'open' | 'new'>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
     const isTauri = useAppStateStore((state) => state.isTauri);
     const isDirty = useIsDirty();
     const currentProjectId = useCurrentProjectId();
+    const { setDirty } = useProjectActions();
     const canSave = Boolean(currentProjectId && pathname.startsWith('/canvas/'));
 
     // Close menu when clicking outside
@@ -79,18 +84,21 @@ export function FileMenu() {
                 if (!filePath) {
                     return;
                 }
-
-                const existing = useProjectListStore.getState().projects.find(p => p.filePath === filePath);
-                if (existing) {
-                    setExistingProjectId(existing.projectId);
-                    setExistingProjectDialogOpen(true);
-                    return;
-                }
-
                 const { loadProject } = await import('@/core/persistence/projectIO');
                 const result = await loadProject(filePath);
                 if (!result.success || !result.project) {
                     throw new Error(result.error || 'Failed to load project');
+                }
+
+                const projectListStore = useProjectListStore.getState();
+                const existing = projectListStore.projects.find(
+                    p => p.filePath === filePath || p.projectId === result.project!.projectId
+                );
+                if (existing) {
+                    setExistingProjectId(existing.projectId);
+                    setExistingProjectFilePath(filePath);
+                    setExistingProjectDialogOpen(true);
+                    return;
                 }
 
                 const projectListStore = useProjectListStore.getState();
@@ -130,11 +138,11 @@ export function FileMenu() {
                 throw new Error(parsed.error || 'Invalid project file');
             }
 
-            const payload = createLocalStoragePayloadFromProjectFile(parsed.data);
-            const storageResult = saveProjectToStorage(parsed.data.projectId, payload);
-            if (!storageResult.success) {
-                throw new Error(storageResult.error || 'Failed to save imported project');
-            }
+                const payload = createLocalStoragePayloadFromProjectFileWithDefaults(parsed.data);
+                const storageResult = saveProjectToStorage(parsed.data.projectId, payload);
+                if (!storageResult.success) {
+                    throw new Error(storageResult.error || 'Failed to save imported project');
+                }
 
             setWebProjectFileHandle(parsed.data.projectId, opened.fileHandle);
 
@@ -176,7 +184,11 @@ export function FileMenu() {
             await handleOpenFromFileInternal();
         } catch (error) {
             console.error('Failed to open file:', error);
-            alert('Failed to open project file. Please ensure it is a valid .sws file.');
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to open project file. Please ensure it is a valid .sws file.'
+            );
         }
     };
 
@@ -205,16 +217,23 @@ export function FileMenu() {
                 return;
             }
 
-            useProjectListStore.getState().updateProject(currentProjectId!, {
-                filePath,
-                storagePath: filePath,
-            });
+            const projectFile = buildProjectFileFromStores();
+            if (!projectFile) {
+                return;
+            }
 
-            requestCanvasSave();
+            const { saveProject } = await import('@/core/persistence/projectIO');
+            const result = await saveProject(projectFile, filePath);
+            if (!result.success) {
+                setErrorMessage(result.error || 'Failed to save project');
+                return;
+            }
+
+            useProjectListStore.getState().updateProject(currentProjectId!, { filePath, storagePath: filePath });
+            setDirty(false);
             return;
         }
 
-        const { buildProjectFileFromStores } = await import('@/features/canvas/hooks/useAutoSave');
         const projectFile = buildProjectFileFromStores();
         if (!projectFile) {
             return;
@@ -223,6 +242,45 @@ export function FileMenu() {
         await saveProjectAsAndRememberHandle(projectFile);
         requestCanvasSave();
     };
+
+    useEffect(() => {
+        const isEditableTarget = (target: EventTarget | null) => {
+            if (!(target instanceof HTMLElement)) {
+                return false;
+            }
+            const tagName = target.tagName.toLowerCase();
+            return tagName === 'input' || tagName === 'textarea' || target.isContentEditable;
+        };
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (isEditableTarget(event.target)) {
+                return;
+            }
+
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 's') {
+                if (!canSave) {
+                    return;
+                }
+                event.preventDefault();
+                void handleSaveAs();
+                return;
+            }
+
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'o') {
+                event.preventDefault();
+                void handleOpenFromFile();
+                return;
+            }
+
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'n') {
+                event.preventDefault();
+                handleNewProject();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [canSave, handleOpenFromFile, handleNewProject, handleSaveAs]);
 
     const handleExportReport = () => {
         setIsOpen(false);
@@ -351,12 +409,20 @@ export function FileMenu() {
                     : 'Project'}
                 onContinue={() => {
                     const projectId = existingProjectId;
+                    const filePath = existingProjectFilePath;
                     setExistingProjectDialogOpen(false);
                     setExistingProjectId(null);
+                    setExistingProjectFilePath(null);
                     if (!projectId) {
                         return;
                     }
                     void (async () => {
+                        if (filePath) {
+                            useProjectListStore.getState().updateProject(projectId, {
+                                filePath,
+                                storagePath: filePath,
+                            });
+                        }
                         await useProjectListStore.getState().syncProjectFromDisk(projectId);
                         router.push(`/canvas/${projectId}`);
                     })();
@@ -364,8 +430,16 @@ export function FileMenu() {
                 onCancel={() => {
                     setExistingProjectDialogOpen(false);
                     setExistingProjectId(null);
+                    setExistingProjectFilePath(null);
                 }}
             />
+
+            {errorMessage && (
+                <ErrorDialog
+                    message={errorMessage}
+                    onClose={() => setErrorMessage(null)}
+                />
+            )}
         </>
     );
 }
