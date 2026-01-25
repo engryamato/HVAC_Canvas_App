@@ -16,6 +16,7 @@ export function EditMenu() {
     const menuRef = useRef<HTMLDivElement>(null);
     const canUndo = useCanUndo();
     const canRedo = useCanRedo();
+    const hasSelection = useSelectionStore((state) => state.selectedIds.length > 0);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -73,7 +74,8 @@ export function EditMenu() {
                             void cutSelectionToClipboard();
                             setIsOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between"
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between disabled:opacity-50 disabled:hover:bg-transparent"
+                        disabled={!hasSelection}
                     >
                         Cut <span className="text-xs opacity-50">Ctrl+X</span>
                     </button>
@@ -82,7 +84,8 @@ export function EditMenu() {
                             void copySelectionToClipboard();
                             setIsOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between"
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between disabled:opacity-50 disabled:hover:bg-transparent"
+                        disabled={!hasSelection}
                     >
                         Copy <span className="text-xs opacity-50">Ctrl+C</span>
                     </button>

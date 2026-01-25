@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { EntitySchema, type Entity } from '@/core/schema';
 
-export const CANVAS_CLIPBOARD_TYPE = 'sizewise-hvac-canvas-clipboard';
+export const CANVAS_CLIPBOARD_TYPE = 'hvac-canvas-clipboard';
+export const LEGACY_CANVAS_CLIPBOARD_TYPE = 'sizewise-hvac-canvas-clipboard';
 export const CANVAS_CLIPBOARD_VERSION = 1;
 
 export const CanvasClipboardPayloadSchema = z.object({
-  type: z.literal(CANVAS_CLIPBOARD_TYPE),
+  type: z.enum([CANVAS_CLIPBOARD_TYPE, LEGACY_CANVAS_CLIPBOARD_TYPE]),
   version: z.literal(CANVAS_CLIPBOARD_VERSION),
   entities: z.array(EntitySchema),
   meta: z
@@ -41,4 +42,3 @@ export function createClipboardPayload(entities: Entity[]): CanvasClipboardPaylo
     },
   };
 }
-

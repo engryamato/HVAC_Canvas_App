@@ -63,6 +63,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
   const setLastCanvasPoint = useCursorStore((state) => state.setLastCanvasPoint);
+  const clearLastCanvasPoint = useCursorStore((state) => state.clearLastCanvasPoint);
   const entities = useEntityStore(
     useShallow((state) => {
       const byId = state.byId;
@@ -416,7 +417,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     if (onMouseLeave) {
       onMouseLeave();
     }
-  }, [onMouseLeave]);
+
+    clearLastCanvasPoint();
+  }, [onMouseLeave, clearLastCanvasPoint]);
 
   /**
    * Handle keyboard events - delegate to active tool
