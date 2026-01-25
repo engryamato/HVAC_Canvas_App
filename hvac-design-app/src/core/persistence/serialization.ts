@@ -75,6 +75,28 @@ export function deserializeProject(json: string): DeserializationResult {
 }
 
 /**
+ * Deserialize JSON string to project state without enforcing schemaVersion equality.
+ *
+ * This is used for forward-compat loading where we want to show a warning
+ * (handled in the UI) but still allow opening the file.
+ */
+export function deserializeProjectLenient(json: string): DeserializationResult {
+  try {
+    const parsed = JSON.parse(json);
+    const validated = ProjectFileSchema.parse(parsed);
+    return { success: true, data: validated };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return { success: false, error: 'Invalid JSON format' };
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Deserialization failed',
+    };
+  }
+}
+
+/**
  * Migrate project from older schema version
  * Currently supports migration from 1.0.0 (no changes needed)
  * Future versions will add migration logic here

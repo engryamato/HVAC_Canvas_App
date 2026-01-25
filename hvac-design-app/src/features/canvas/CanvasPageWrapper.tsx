@@ -129,7 +129,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
             // Check version compatibility
             const proj = result.project as any; // Type assertion for dynamic import
-            const projVersion = proj.version ?? '1.0.0';
+            const projVersion = (proj as any).schemaVersion ?? proj.version ?? '1.0.0';
             logger.debug(`[CanvasPageWrapper] Project: ${proj.projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
 
             if (compareVersions(projVersion, APP_VERSION) > 0) {
@@ -200,7 +200,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
 
       // Check version compatibility
-      const projVersion = (persistedProject as any)?.version || '1.0.0';
+      const projVersion = storedPayload?.project?.schemaVersion ?? (persistedProject as any)?.version ?? '1.0.0';
       logger.debug(`[CanvasPageWrapper] Project: ${projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
 
       if (compareVersions(projVersion, APP_VERSION) > 0) {

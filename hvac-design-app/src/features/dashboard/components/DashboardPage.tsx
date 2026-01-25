@@ -21,13 +21,17 @@ import { useSearchParams } from 'next/navigation';
  * Implements UJ-PM-007: Search & Filter Projects
  * Implements UJ-PM-005: Archive and restore projects
  */
-export function DashboardPage() {
+interface DashboardPageProps {
+    initialNewProjectOpen?: boolean;
+}
+
+export function DashboardPage({ initialNewProjectOpen = false }: DashboardPageProps = {}) {
     const allProjectsRaw = useProjectListStore(state => state.projects);
     const activeProjects = allProjectsRaw.filter(p => !p.isArchived);
     const archivedProjects = allProjectsRaw.filter(p => p.isArchived);
     const recentProjects = useRecentProjects();
     const scanProjectsFromDisk = useProjectListStore(state => state.scanProjectsFromDisk);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(initialNewProjectOpen);
     const searchParams = useSearchParams();
     const viewParam = searchParams.get('view') as 'active' | 'archived' | null;
     const [activeTab, setActiveTab] = useState<'active' | 'archived'>(viewParam === 'archived' ? 'archived' : 'active');

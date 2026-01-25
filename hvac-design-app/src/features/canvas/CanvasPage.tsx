@@ -128,6 +128,15 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     return () => window.removeEventListener('keydown', handleKeydown);
   }, [triggerSave]);
 
+  useEffect(() => {
+    const handleSaveRequest = () => {
+      void triggerSave();
+    };
+
+    window.addEventListener('sws:canvas-save', handleSaveRequest);
+    return () => window.removeEventListener('sws:canvas-save', handleSaveRequest);
+  }, [triggerSave]);
+
   useKeyboardShortcuts({
     onZoomToSelection: (result) => {
       if (!result.success && result.message) {

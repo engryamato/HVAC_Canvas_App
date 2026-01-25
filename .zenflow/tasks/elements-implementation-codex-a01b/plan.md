@@ -60,7 +60,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 - Refactor `hvac-design-app/src/features/canvas/CanvasPage.tsx` to use `src/features/canvas/components/*` for toolbar/sidebars/status.
 - Resolve duplicate layout-vs-canvas components by converging on canonical implementations.
 
-### [ ] Step: File workflows (Web + Tauri)
+### [x] Step: File workflows (Web + Tauri)
 <!-- chat-id: 238a6f92-de6d-434d-9c8b-33c524525bb9 -->
 - Implement New/Open/Save/Save As per docs in `FileMenu`.
 - Add Tauri commands for open/save dialogs and file read/write.

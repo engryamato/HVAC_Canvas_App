@@ -11,7 +11,7 @@ src/components/dialogs/ErrorDialog.tsx
 ## Purpose
 - Displays error messages to users when project loading fails
 - Provides a clear call-to-action to return to dashboard
-- Handles corrupted `.hvac` files or invalid JSON
+- Handles corrupted `.sws` files or invalid JSON
 - Blocks interaction with background content via modal overlay
 - Offers user-friendly error communication
 
