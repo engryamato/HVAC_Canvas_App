@@ -54,7 +54,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 ### [x] Step: Write repo plan file
 - Create/update `PLAN-elements-workflows.md` in project root with verifiable steps.
 
-### [ ] Step: Canvas composition refactor
+### [x] Step: Canvas composition refactor
 <!-- chat-id: 7984ea3b-4706-4c42-9ee2-95e7a7e6b39b -->
 - Refactor `hvac-design-app/src/components/layout/AppShell.tsx` to global header/menu only.
 - Refactor `hvac-design-app/src/features/canvas/CanvasPage.tsx` to use `src/features/canvas/components/*` for toolbar/sidebars/status.

@@ -7,6 +7,7 @@ import { useBOM } from '../hooks/useBOM';
 import { downloadBomCsv } from '@/features/export/csv';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { useShallow } from 'zustand/react/shallow';
 import styles from './BOMPanel.module.css';
 
 /**
@@ -24,10 +25,12 @@ export function BOMPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
   const { ducts, equipment, fittings } = useBOM();
   
-  const entities = useEntityStore((state) => ({
-    byId: state.byId,
-    allIds: state.allIds,
-  }));
+  const entities = useEntityStore(
+    useShallow((state) => ({
+      byId: state.byId,
+      allIds: state.allIds,
+    }))
+  );
   
   const projectDetails = useProjectStore((state) => state.projectDetails);
   const projectName = projectDetails?.projectName || 'Untitled';

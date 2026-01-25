@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { logger } from '@/utils/logger';
@@ -434,29 +436,42 @@ export const rehydrateProjectList = async () => {
 };
 
 export const useProjects = () => useProjectListStore((state) => state.projects);
-export const useActiveProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => !p.isArchived));
-export const useArchivedProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => p.isArchived));
+
+export const useActiveProjects = () => {
+  const projects = useProjects();
+  return useMemo(() => projects.filter((p) => !p.isArchived), [projects]);
+};
+
+export const useArchivedProjects = () => {
+  const projects = useProjects();
+  return useMemo(() => projects.filter((p) => p.isArchived), [projects]);
+};
 
 // Selector for recent projects (max 10, ordered by access time)
-export const useRecentProjects = () =>
-  useProjectListStore((state) => {
-    // Ensure hydration has occurred or fallback
-    return (state.recentProjectIds || [])
-      .map((id) => (state.projects || []).find((p) => p.projectId === id))
-      .filter((p): p is ProjectListItem => p !== undefined && !p.isArchived);
-  });
+export const useRecentProjects = () => {
+  const projects = useProjects();
+  const recentProjectIds = useProjectListStore((state) => state.recentProjectIds);
+
+  return useMemo(
+    () =>
+      recentProjectIds
+        .map((id) => projects.find((p) => p.projectId === id))
+        .filter((project): project is ProjectListItem => project !== undefined && !project.isArchived),
+    [projects, recentProjectIds]
+  );
+};
 
 export const useProjectListActions = () =>
-  useProjectListStore((state) => ({
-    addProject: state.addProject,
-    updateProject: state.updateProject,
-    removeProject: state.removeProject,
-    archiveProject: state.archiveProject,
-    restoreProject: state.restoreProject,
-    duplicateProject: state.duplicateProject,
-    markAsOpened: state.markAsOpened,
-    scanProjectsFromDisk: state.scanProjectsFromDisk,
-    syncProjectFromDisk: state.syncProjectFromDisk,
-  }));
+  useProjectListStore(
+    useShallow((state) => ({
+      addProject: state.addProject,
+      updateProject: state.updateProject,
+      removeProject: state.removeProject,
+      archiveProject: state.archiveProject,
+      restoreProject: state.restoreProject,
+      duplicateProject: state.duplicateProject,
+      markAsOpened: state.markAsOpened,
+      scanProjectsFromDisk: state.scanProjectsFromDisk,
+      syncProjectFromDisk: state.syncProjectFromDisk,
+    }))
+  );

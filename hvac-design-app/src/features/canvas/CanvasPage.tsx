@@ -4,13 +4,17 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
+import { LeftSidebar } from './components/LeftSidebar';
+import { RightSidebar } from './components/RightSidebar';
 
 import { useAutoSave } from './hooks';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
-import { useProjectStore } from '@/core/store/project.store';
+import { useProjectDetails, useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { Toolbar } from '@/components/layout/Toolbar';
+import { StatusBar } from '@/components/layout/StatusBar';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
 
 /**
@@ -35,10 +39,9 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
   // Note: Project data is now managed internally by stores via CanvasPageWrapper and useAutoSave
 
-  // Ensure preferences are loaded
-  // Ensure preferences are loaded
   usePreferencesStore((state) => state.projectFolder);
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
+  const projectDetails = useProjectDetails();
 
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
@@ -134,28 +137,31 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   });
 
 
-  // Temporary simplified project name retrieval for AppShell header
-  // Ideally this comes from the project store
-  // const { projectDetails } = useProjectStore(); 
-  const projectName = "Proposed Layout"; // Placeholder or from store
+  const projectName = projectDetails?.projectName ?? 'Untitled Project';
 
   return (
     <AppShell projectName={projectName}>
-      <CanvasContainer
-        className="w-full h-full"
-      // Mouse handling moved to global standard or handled within CanvasContainer
-      // If StatusBar needs it, StatusBar should subscribe to viewport store
-      />
+      <Toolbar />
 
-      {/* Zoom Controls - positioned absolute or managed by AppShell/Viewport */}
-      <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
-        <Minimap />
-        <ZoomControls />
+      <div className={`flex-1 flex overflow-hidden relative ${className}`}>
+        <LeftSidebar />
+
+        <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern">
+          <CanvasContainer className="w-full h-full" />
+
+          <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
+            <Minimap />
+            <ZoomControls />
+          </div>
+
+          <TutorialOverlay />
+          <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+        </main>
+
+        <RightSidebar />
       </div>
 
-
-      <TutorialOverlay />
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      <StatusBar />
     </AppShell>
   );
 }

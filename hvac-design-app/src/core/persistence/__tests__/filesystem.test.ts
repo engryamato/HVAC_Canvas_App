@@ -132,15 +132,16 @@ describe('filesystem utilities', () => {
       mockTauriExists = vi.fn().mockResolvedValue(true);
 
       // Mock dynamic imports
-      vi.doMock('@tauri-apps/api/fs', () => ({
+      vi.doMock('@tauri-apps/plugin-fs', () => ({
         readTextFile: mockTauriReadTextFile,
         writeTextFile: mockTauriWriteTextFile,
+        writeFile: vi.fn().mockResolvedValue(undefined),
         exists: mockTauriExists,
-        createDir: vi.fn().mockResolvedValue(undefined),
+        mkdir: vi.fn().mockResolvedValue(undefined),
         readDir: vi.fn().mockResolvedValue([{ name: 'file1.txt' }, { name: 'file2.txt' }]),
         copyFile: vi.fn().mockResolvedValue(undefined),
-        removeFile: vi.fn().mockResolvedValue(undefined),
-        renameFile: vi.fn().mockResolvedValue(undefined),
+        remove: vi.fn().mockResolvedValue(undefined),
+        rename: vi.fn().mockResolvedValue(undefined),
       }));
 
       vi.doMock('@tauri-apps/api/path', () => ({
@@ -150,7 +151,7 @@ describe('filesystem utilities', () => {
 
     afterEach(() => {
       delete (window as any).__TAURI__;
-      vi.doUnmock('@tauri-apps/api/fs');
+      vi.doUnmock('@tauri-apps/plugin-fs');
       vi.doUnmock('@tauri-apps/api/path');
     });
 

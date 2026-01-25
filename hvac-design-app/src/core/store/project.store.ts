@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import type { ProjectDetails } from '../schema/project-file.schema';
 
 interface ProjectState {
@@ -46,8 +47,10 @@ export const useHasProject = () => useProjectStore((state) => state.currentProje
 
 // Actions hook (per naming convention)
 export const useProjectActions = () =>
-  useProjectStore((state) => ({
-    setProject: state.setProject,
-    setDirty: state.setDirty,
-    clearProject: state.clearProject,
-  }));
+  useProjectStore(
+    useShallow((state) => ({
+      setProject: state.setProject,
+      setDirty: state.setDirty,
+      clearProject: state.clearProject,
+    }))
+  );

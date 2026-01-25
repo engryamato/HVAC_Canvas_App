@@ -28,7 +28,7 @@ export class TauriFileSystem {
     }
     
     try {
-      const { open } = await import('@tauri-apps/api/dialog');
+      const { open } = await import('@tauri-apps/plugin-dialog');
       const selected = await open({
         multiple: false,
         filters: [{
@@ -62,7 +62,7 @@ export class TauriFileSystem {
     }
     
     try {
-      const { save } = await import('@tauri-apps/api/dialog');
+      const { save } = await import('@tauri-apps/plugin-dialog');
       
       let options = {};
       
@@ -93,9 +93,8 @@ export class TauriFileSystem {
    */
   static async writeBinaryFile(filePath: string, data: Uint8Array): Promise<boolean> {
       try {
-          const fs = await import('@tauri-apps/api/fs');
-          // Cast to any because writeBinaryFile might be missing from the type definition in older versions
-          await (fs as any).writeBinaryFile(filePath, data);
+          const { writeFile } = await import('@tauri-apps/plugin-fs');
+          await writeFile(filePath, data);
           return true;
       } catch (error) {
           console.error('[TauriFileSystem] Failed to write binary file:', error);

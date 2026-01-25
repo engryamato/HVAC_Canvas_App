@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { shallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../store/selectionStore';
@@ -62,8 +62,10 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
   const entities = useEntityStore(
-    (state) => state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined),
-    shallow
+    useShallow((state) => {
+      const byId = state.byId;
+      return state.allIds.map((id) => byId[id]).filter((e): e is Entity => e !== undefined);
+    })
   );
 
   // Enable viewport pan/zoom interactions (space-drag, middle-mouse, wheel zoom)

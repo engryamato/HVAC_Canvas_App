@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { useShallow } from 'zustand/react/shallow';
 import {
   MIN_ZOOM,
   MAX_ZOOM,
@@ -195,28 +196,34 @@ export const useViewportStore = create<ViewportStore>()(
 
 // Hook selectors (for React components with reactivity)
 export const useZoom = () => useViewportStore((state) => state.zoom);
-export const usePan = () => useViewportStore((state) => ({ x: state.panX, y: state.panY }));
+export const usePan = () =>
+  useViewportStore(useShallow((state) => ({ x: state.panX, y: state.panY })));
 export const useGridVisible = () => useViewportStore((state) => state.gridVisible);
 export const useSnapToGrid = () => useViewportStore((state) => state.snapToGrid);
 export const useGridSize = () => useViewportStore((state) => state.gridSize);
-export const usePanAndZoom = () => useViewportStore((state) => ({ panX: state.panX, panY: state.panY, zoom: state.zoom }));
+export const usePanAndZoom = () =>
+  useViewportStore(
+    useShallow((state) => ({ panX: state.panX, panY: state.panY, zoom: state.zoom }))
+  );
 
 
 // Actions hook (per naming convention)
 export const useViewportActions = () =>
-  useViewportStore((state) => ({
-    pan: state.pan,
-    setPan: state.setPan,
-    zoomTo: state.zoomTo,
-    zoomIn: state.zoomIn,
-    zoomOut: state.zoomOut,
-    fitToContent: state.fitToContent,
-    resetView: state.resetView,
-    toggleGrid: state.toggleGrid,
-    setGridSize: state.setGridSize,
-    toggleSnap: state.toggleSnap,
-    zoomToSelection: state.zoomToSelection,
-  }));
+  useViewportStore(
+    useShallow((state) => ({
+      pan: state.pan,
+      setPan: state.setPan,
+      zoomTo: state.zoomTo,
+      zoomIn: state.zoomIn,
+      zoomOut: state.zoomOut,
+      fitToContent: state.fitToContent,
+      resetView: state.resetView,
+      toggleGrid: state.toggleGrid,
+      setGridSize: state.setGridSize,
+      toggleSnap: state.toggleSnap,
+      zoomToSelection: state.zoomToSelection,
+    }))
+  );
 
 // Note: Viewport constants (MIN_ZOOM, MAX_ZOOM, ZOOM_STEP, etc.) are now
 // centralized in @/core/constants/viewport and re-exported from ./index.ts

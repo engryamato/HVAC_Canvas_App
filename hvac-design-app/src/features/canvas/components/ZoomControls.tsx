@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { useZoom, useViewportActions } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useShallow } from 'zustand/react/shallow';
 import { MIN_ZOOM, MAX_ZOOM } from '@/core/constants/viewport';
 import type { Entity } from '@/core/schema';
 import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
@@ -31,8 +32,10 @@ interface ZoomControlsProps {
 export function ZoomControls({ className = '' }: ZoomControlsProps): React.ReactElement {
     const zoom = useZoom();
     const { zoomIn, zoomOut, resetView, fitToContent } = useViewportActions();
-    const entities = useEntityStore((state) =>
-        state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined)
+    const entities = useEntityStore(
+        useShallow((state) =>
+            state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined)
+        )
     );
 
     const handleZoomIn = useCallback(() => zoomIn(), [zoomIn]);
