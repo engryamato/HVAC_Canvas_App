@@ -8,6 +8,7 @@
  * - Viewport (pan/zoom): @/features/canvas/store/viewportStore
  */
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import type { EquipmentType } from '../schema/equipment.schema';
 import type { FittingType } from '../schema/fitting.schema';
 
@@ -68,12 +69,14 @@ export const useSelectedFittingType = () => useToolStore((state) => state.select
 
 // Actions hook (per naming convention)
 export const useToolActions = () =>
-  useToolStore((state) => ({
-    setTool: state.setTool,
-    resetTool: state.resetTool,
-    setEquipmentType: state.setEquipmentType,
-    setFittingType: state.setFittingType,
-  }));
+  useToolStore(
+    useShallow((state) => ({
+      setTool: state.setTool,
+      resetTool: state.resetTool,
+      setEquipmentType: state.setEquipmentType,
+      setFittingType: state.setFittingType,
+    }))
+  );
 
 /**
  * @deprecated Use useToolStore instead. This alias is provided for backward compatibility.

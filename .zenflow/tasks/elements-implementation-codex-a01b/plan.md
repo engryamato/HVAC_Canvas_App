@@ -66,7 +66,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 - Add Tauri commands for open/save dialogs and file read/write.
 - Ensure stores hydrate consistently when opening a file.
 
-### [ ] Step: Edit workflows (Undo/Redo + OS clipboard)
+### [x] Step: Edit workflows (Undo/Redo + OS clipboard)
 <!-- chat-id: 9b6b00e4-e0c5-48a3-861e-ea18763a86f7 -->
 - Wire `EditMenu` actions to `historyStore`.
 - Implement OS clipboard Cut/Copy/Paste for entities:

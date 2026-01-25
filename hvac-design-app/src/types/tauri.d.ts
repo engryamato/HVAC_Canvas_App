@@ -20,6 +20,11 @@ declare module '@tauri-apps/plugin-dialog' {
   export function save(options?: unknown): Promise<string | null>;
 }
 
+declare module '@tauri-apps/plugin-clipboard-manager' {
+  export function readText(): Promise<string>;
+  export function writeText(text: string): Promise<void>;
+}
+
 declare module '@tauri-apps/api/path' {
   export function documentDir(): Promise<string>;
 }

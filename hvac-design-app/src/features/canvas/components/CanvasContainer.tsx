@@ -8,6 +8,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
 import type { Entity, Room, Duct, Equipment } from '@/core/schema';
 import { useViewport } from '../hooks/useViewport';
+import { useCursorStore } from '../store/cursorStore';
 
 // Tools
 import {
@@ -61,6 +62,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const currentTool = useToolStore((state) => state.currentTool);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
+  const setLastCanvasPoint = useCursorStore((state) => state.setLastCanvasPoint);
   const entities = useEntityStore(
     useShallow((state) => {
       const byId = state.byId;
@@ -382,6 +384,8 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const { x, y } = screenToCanvas(e.clientX, e.clientY);
 
+      setLastCanvasPoint({ x, y });
+
       // Notify parent component
       if (onMouseMove) {
         onMouseMove(x, y);
@@ -391,7 +395,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       const toolEvent = createToolMouseEvent(e);
       activeTool.onMouseMove(toolEvent);
     },
-    [onMouseMove, screenToCanvas, createToolMouseEvent, activeTool]
+    [onMouseMove, screenToCanvas, createToolMouseEvent, activeTool, setLastCanvasPoint]
   );
 
   /**

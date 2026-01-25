@@ -6,6 +6,11 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { ToastProps } from '@/components/ui/Toast';
+import {
+  copySelectionToClipboard,
+  cutSelectionToClipboard,
+  pasteFromClipboard,
+} from '@/features/canvas/clipboard/entityClipboard';
 
 
 type ToolType = 'select' | 'room' | 'duct' | 'equipment' | 'fitting' | 'note';
@@ -63,6 +68,33 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
 
       const ctrlOrMeta = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
+
+      // Clipboard shortcuts (canvas entities)
+      if (ctrlOrMeta && key === 'c' && !event.shiftKey) {
+        const selectedIds = useSelectionStore.getState().selectedIds;
+        if (selectedIds.length === 0) {
+          return;
+        }
+        event.preventDefault();
+        void copySelectionToClipboard();
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'x' && !event.shiftKey) {
+        const selectedIds = useSelectionStore.getState().selectedIds;
+        if (selectedIds.length === 0) {
+          return;
+        }
+        event.preventDefault();
+        void cutSelectionToClipboard();
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'v' && !event.shiftKey) {
+        event.preventDefault();
+        void pasteFromClipboard();
+        return;
+      }
 
       if (ctrlOrMeta && key === '1') {
         event.preventDefault();
