@@ -18,7 +18,7 @@ Do not make assumptions on important decisions — get clarification first.
 
 ## Workflow Steps
 
-### [ ] Step: Technical Specification
+### [x] Step: Technical Specification
 <!-- chat-id: 1a11f39b-c909-4063-992d-fac5741b7b03 -->
 
 Assess the task's difficulty, as underestimating it leads to poor outcomes.
@@ -53,13 +53,46 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 
 ### [ ] Step: Implementation
 
-Implement the task according to the technical specification and general engineering best practices.
+### [x] Step: Write repo plan file
+- Create/update `PLAN-elements-workflows.md` in project root with verifiable steps.
 
-1. Break the task into steps where possible.
-2. Implement the required changes in the codebase.
-3. Add and run relevant tests and linters.
-4. Perform basic manual verification if applicable.
-5. After completion, write a report to `{@artifacts_path}/report.md` describing:
-   - What was implemented
-   - How the solution was tested
-   - The biggest issues or challenges encountered
+### [ ] Step: Canvas composition refactor
+- Refactor `hvac-design-app/src/components/layout/AppShell.tsx` to global header/menu only.
+- Refactor `hvac-design-app/src/features/canvas/CanvasPage.tsx` to use `src/features/canvas/components/*` for toolbar/sidebars/status.
+- Resolve duplicate layout-vs-canvas components by converging on canonical implementations.
+
+### [ ] Step: File workflows (Web + Tauri)
+- Implement New/Open/Save/Save As per docs in `FileMenu`.
+- Add Tauri commands for open/save dialogs and file read/write.
+- Ensure stores hydrate consistently when opening a file.
+
+### [ ] Step: Edit workflows (Undo/Redo + OS clipboard)
+- Wire `EditMenu` actions to `historyStore`.
+- Implement OS clipboard Cut/Copy/Paste for entities:
+  - Web: `navigator.clipboard` (with fallback)
+  - Tauri: clipboard commands
+
+### [ ] Step: Settings workflows
+- Implement real settings toggles + persistence.
+- Apply settings to canvas behavior.
+
+### [ ] Step: Dialog UX completeness
+- Ensure Escape handling and focus management for documented dialogs.
+- Remove/merge duplicate `KeyboardShortcutsDialog` implementations.
+
+### [ ] Step: Inspector + side panels wiring
+- Wire `InspectorPanel`, `CanvasPropertiesInspector`, `ProjectSidebar` into feature `RightSidebar`.
+- Implement unit system switching if required by docs.
+
+### [ ] Step: Export workflows (real PDF)
+- Replace placeholder PDF export with real binary PDF generation.
+- Web: download as Blob.
+- Tauri: save bytes to disk.
+
+### [ ] Step: Tests + verification
+- Add/adjust Vitest tests for implemented behaviors.
+- Add small number of Playwright smoke flows.
+- Run: `pnpm type-check`, `pnpm test`, `pnpm e2e`.
+
+### [ ] Step: Report
+- Write `{@artifacts_path}/report.md` with what was implemented and how verified.
