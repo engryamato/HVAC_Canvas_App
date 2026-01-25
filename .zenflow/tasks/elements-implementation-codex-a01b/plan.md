@@ -74,6 +74,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
   - Tauri: clipboard commands
 
 ### [ ] Step: Settings workflows
+<!-- chat-id: ff81eaa0-7b4b-4f73-a379-55c7999aa5e6 -->
 - Implement real settings toggles + persistence.
 - Apply settings to canvas behavior.
 
