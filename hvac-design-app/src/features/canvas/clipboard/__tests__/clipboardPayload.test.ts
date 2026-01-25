@@ -5,6 +5,7 @@ import {
   createClipboardPayload,
   decodeCanvasClipboardPayload,
   encodeCanvasClipboardPayload,
+  LEGACY_CANVAS_CLIPBOARD_TYPE,
 } from '../clipboardPayload';
 import type { Entity } from '@/core/schema';
 
@@ -54,5 +55,20 @@ describe('canvas clipboard payload', () => {
   it('returns null for non-matching payload', () => {
     expect(decodeCanvasClipboardPayload('{"hello":"world"}')).toBeNull();
   });
-});
 
+  it('decodes legacy clipboard type for backwards compatibility', () => {
+    const entities: Entity[] = [makeRoom(crypto.randomUUID(), 10, 20)];
+    const legacyPayload = {
+      type: LEGACY_CANVAS_CLIPBOARD_TYPE,
+      version: CANVAS_CLIPBOARD_VERSION,
+      entities,
+      meta: {
+        copiedAt: new Date().toISOString(),
+      },
+    };
+
+    const decoded = decodeCanvasClipboardPayload(JSON.stringify(legacyPayload));
+    expect(decoded).not.toBeNull();
+    expect(decoded!.entities).toHaveLength(1);
+  });
+});
