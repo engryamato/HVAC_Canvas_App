@@ -1,5 +1,7 @@
-# Kilocode configuration with secrets
-.kilocode/mcp.json
+# Kilocode and Tooling
+.kilocode/
+decoded_config.json
+screenshots/
 
 # Node modules
 node_modules/
