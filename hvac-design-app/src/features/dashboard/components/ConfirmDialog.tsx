@@ -1,7 +1,15 @@
 'use client';
 
-import React from 'react';
-import styles from './ConfirmDialog.module.css';
+import React, { useRef } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -24,32 +32,53 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  if (!isOpen) {return null;}
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  const confirmVariant = variant === 'danger' ? 'destructive' : 'default';
+
+  const titleClassName =
+    variant === 'danger'
+      ? 'text-red-600'
+      : variant === 'warning'
+        ? 'text-yellow-700'
+        : 'text-slate-900';
 
   return (
-    <div className={styles.overlay} onClick={onCancel}>
-      <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.header}>
-          <h2>{title}</h2>
-        </div>
+    <Dialog
+      open
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          onCancel();
+        }
+      }}
+    >
+      <DialogContent
+        className="max-w-md"
+        data-testid="confirm-dialog"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          cancelButtonRef.current?.focus();
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle className={titleClassName}>{title}</DialogTitle>
+          <DialogDescription className="text-slate-600">{message}</DialogDescription>
+        </DialogHeader>
 
-        <div className={styles.content}>
-          <p>{message}</p>
-        </div>
-
-        <div className={styles.actions}>
-          <button className={styles.cancelButton} onClick={onCancel}>
+        <DialogFooter className="flex gap-2 mt-4">
+          <Button ref={cancelButtonRef} variant="outline" onClick={onCancel}>
             {cancelLabel}
-          </button>
-          <button
-            className={`${styles.confirmButton} ${styles[variant]}`}
-            onClick={onConfirm}
-          >
+          </Button>
+          <Button variant={confirmVariant} onClick={onConfirm}>
             {confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -21,8 +21,8 @@ src/features/dashboard/components/ConfirmDialog.tsx
 
 ## Dependencies
 
-- React core
-- Shared styles from `ConfirmDialog.module.css`
+- **UI Primitives**: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter` (shadcn/ui)
+- **UI Components**: `Button`
 
 ## Props
 
@@ -111,13 +111,8 @@ Dialog is completely unmounted when closed (not just hidden).
 
 ### 2. Backdrop Click Handling
 
-```tsx
-<div className={styles.overlay} onClick={onCancel}>
-  <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-    {/* Dialog content */}
-  </div>
-</div>
-```
+- Backdrop click closes dialog and triggers `onCancel`.
+- `Escape` closes dialog and triggers `onCancel`.
 
 - Clicking the backdrop (overlay) triggers `onCancel`
 - Clicking inside the dialog stops event propagation (prevents closing)

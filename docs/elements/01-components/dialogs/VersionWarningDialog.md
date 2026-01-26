@@ -16,7 +16,8 @@ src/components/dialogs/VersionWarningDialog.tsx
 - Protects against data corruption from newer features
 
 ## Dependencies
-None (vanilla React component)
+- **UI Primitives**: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter` (shadcn/ui)
+- **UI Components**: `Button`
 
 ## Props
 
@@ -64,27 +65,20 @@ export function VersionWarningDialog({
   onCancel
 }: VersionWarningDialogProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-md shadow-xl">
-        <h2 className="text-xl font-bold mb-2 text-yellow-600">
-          Newer Project Version
-        </h2>
-        <p className="text-gray-700 mb-2">
-          This project was created with a newer version of the application.
-        </p>
-        <p className="text-sm text-gray-600 mb-4">
-          Project version: <strong>{projectVersion}</strong><br />
-          App version: <strong>{appVersion}</strong>
-        </p>
-        <p className="text-gray-700 mb-4">
-          Some features may not work correctly. Would you like to continue?
-        </p>
-        <div className="flex gap-2">
-          <button onClick={onContinue}>Open Anyway</button>
-          <button onClick={onCancel}>Cancel</button>
-        </div>
-      </div>
-    </div>
+    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Newer Project Version</DialogTitle>
+          <DialogDescription>
+            This project was created with a newer version of the application.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          <Button onClick={onContinue}>Open Anyway</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 ```
@@ -210,7 +204,7 @@ const shouldShowWarning = (projectVer: string, appVer: string): boolean => {
 ### Keyboard Navigation
 - **Tab**: Navigate between buttons
 - **Enter/Space**: Activate focused button
-- **Note**: No Escape key handling (requires explicit choice)
+- **Escape**: Closes dialog and triggers Cancel
 
 ### Screen Reader Support
 - Title announces warning state
@@ -229,17 +223,13 @@ const shouldShowWarning = (projectVer: string, appVer: string): boolean => {
 
 ## Known Limitations
 
-1. **No Escape Key Handling**: User cannot dismiss with Escape
-2. **No shadcn/ui Integration**: Custom modal instead of `Dialog` primitive
-3. **No Close X Button**: Only two dismissal methods (buttons)
-4. **No Auto-Focus**: Buttons do not receive focus on open
+1. **No Close X Button**: Only two dismissal methods (buttons)
+2. **No Version Details**: Doesn't show what features are incompatible
 5. **No Version Details**: Doesn't show what features are incompatible
 
 ### Future Improvements
-- Migrate to `Dialog` component from shadcn/ui
-- Add Escape key handler (defaults to Cancel)
 - Add close X button
-- Auto-focus "Cancel" button (safer default)
+- Show detailed changelog or breaking changes
 - Show detailed changelog or breaking changes
 - Add "Don't show this again" checkbox (risky!)
 - Implement version migration logic

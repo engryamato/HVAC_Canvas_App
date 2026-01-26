@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -27,11 +27,26 @@ export function UnsavedChangesDialog({
     onLeaveWithoutSaving,
     onCancel,
 }: UnsavedChangesDialogProps) {
+    const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={(nextOpen) => {
+                if (!nextOpen) {
+                    onCancel();
+                    return;
+                }
+                onOpenChange(nextOpen);
+            }}
+        >
             <DialogContent
                 className="max-w-md"
                 data-testid="unsaved-changes-dialog"
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault();
+                    cancelButtonRef.current?.focus();
+                }}
             >
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
@@ -45,6 +60,7 @@ export function UnsavedChangesDialog({
 
                 <DialogFooter className="flex gap-2 mt-4">
                     <Button
+                        ref={cancelButtonRef}
                         variant="outline"
                         onClick={onCancel}
                         data-testid="cancel-button"

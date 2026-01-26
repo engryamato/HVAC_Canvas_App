@@ -26,7 +26,16 @@ export function ProjectAlreadyExistsDialog({
   onCancel,
 }: ProjectAlreadyExistsDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          onCancel();
+          return;
+        }
+        onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent className="max-w-md" data-testid="project-already-exists-dialog">
         <DialogHeader>
           <DialogTitle>Project already exists</DialogTitle>
@@ -47,4 +56,3 @@ export function ProjectAlreadyExistsDialog({
     </Dialog>
   );
 }
-

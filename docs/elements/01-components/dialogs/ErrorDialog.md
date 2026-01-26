@@ -16,7 +16,8 @@ src/components/dialogs/ErrorDialog.tsx
 - Offers user-friendly error communication
 
 ## Dependencies
-None (vanilla React component)
+- **UI Primitives**: `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter` (shadcn/ui)
+- **UI Components**: `Button`
 
 ## Props
 
@@ -50,20 +51,17 @@ interface ErrorDialogProps {
 
 export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-md shadow-xl">
-        <h2 className="text-xl font-bold mb-2 text-red-600">
-          Project Cannot Be Opened
-        </h2>
-        <p className="text-gray-700 mb-4">{message}</p>
-        <button
-          onClick={onClose}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Back to Dashboard
-        </button>
-      </div>
-    </div>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Project Cannot Be Opened</DialogTitle>
+          <DialogDescription>{message}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button onClick={onClose}>Back to Dashboard</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 ```
@@ -71,18 +69,17 @@ export function ErrorDialog({ message, onClose }: ErrorDialogProps) {
 ## Behavior
 
 ### Modal Overlay
-- Fixed positioning with full viewport coverage
-- Semi-transparent black background (`bg-black/50`)
+- Uses `DialogOverlay` from shadcn/ui
 - Blocks clicks on background elements
-- Z-index 50 to ensure top-layer rendering
+- Supports close via backdrop click
 
 ### Close Action
 ```typescript
 onClick={onClose}
 ```
 - Typically navigates user back to dashboard
-- Does not auto-dismiss (user must click button)
-- No escape key handling (must click button)
+- Can be dismissed by clicking backdrop
+- Can be dismissed by pressing `Escape`
 
 ## Styling
 
@@ -183,17 +180,12 @@ return (
 
 ## Known Limitations
 
-1. **No Escape Key Handling**: User cannot close with Escape (requires button click)
-2. **No shadcn/ui Integration**: Uses custom modal implementation instead of `Dialog` primitive
-3. **Fixed Title**: Cannot customize "Project Cannot Be Opened" text
-4. **No Close X Button**: Only one dismissal method (button)
-5. **No Auto-Focus**: Button does not receive focus on open
+1. **Fixed Title**: Cannot customize "Project Cannot Be Opened" text
+2. **No Close X Button**: Only one explicit CTA (button)
 
 ### Future Improvements
-- Migrate to `Dialog` component from shadcn/ui
-- Add Escape key handler
 - Add close X button in top-right
-- Auto-focus button on dialog open
+- Support customizable title/severity
 - Make title customizable via prop
 - Add error severity levels (warning, error, critical)
 
