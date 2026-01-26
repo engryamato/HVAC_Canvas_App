@@ -5,7 +5,7 @@ import { redo, undo, deleteEntities } from '@/core/commands';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { ToastProps } from '@/components/ui/Toast';
+import type { Entity } from '@/core/schema';
 import {
   copySelectionToClipboard,
   cutSelectionToClipboard,
@@ -38,6 +38,23 @@ const TOOL_SHORTCUTS: Record<string, ToolType> = {
   f: 'fitting',
   n: 'note',
 };
+
+function getEntityDimensions(entity: Entity): { width: number; height: number } {
+  switch (entity.type) {
+    case 'room':
+      return { width: entity.props.width, height: entity.props.length };
+    case 'duct': {
+      const size = entity.props.shape === 'rectangular'
+        ? { width: entity.props.width ?? 100, height: entity.props.height ?? 100 }
+        : { width: entity.props.diameter ?? 100, height: entity.props.diameter ?? 100 };
+      return size;
+    }
+    case 'equipment':
+      return { width: entity.props.width, height: entity.props.height };
+    default:
+      return { width: 100, height: 100 };
+  }
+}
 
 /**
  * Global keyboard handler for canvas shortcuts
@@ -107,8 +124,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
           const bounds = entities.reduce(
             (acc, entity) => {
               const { x, y } = entity.transform;
-              const width = entity.props?.width ?? 100;
-              const height = entity.props?.height ?? 100;
+              const { width, height } = getEntityDimensions(entity);
               return {
                 minX: Math.min(acc.minX, x),
                 minY: Math.min(acc.minY, y),
@@ -144,8 +160,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         const bounds = entities.reduce(
           (acc, entity) => {
             const { x, y } = entity.transform;
-            const width = entity.props?.width ?? 100;
-            const height = entity.props?.height ?? 100;
+            const { width, height } = getEntityDimensions(entity);
             return {
               minX: Math.min(acc.minX, x),
               minY: Math.min(acc.minY, y),

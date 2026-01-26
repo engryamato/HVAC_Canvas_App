@@ -28,7 +28,6 @@ import {
   calculateDuctArea,
   calculateVelocity,
   calculateRoundDuctDiameter,
-  calculateEquivalentDiameter as calculateEquivalentDuctDiameter,
 } from '@/features/canvas/calculators/ductSizing';
 import {
   calculateVelocityPressure,

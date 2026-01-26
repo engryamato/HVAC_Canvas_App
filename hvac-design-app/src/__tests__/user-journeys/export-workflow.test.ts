@@ -17,7 +17,6 @@ import {
   useEntityStore,
   selectAllEntities,
   selectEntitiesByType,
-  selectEntityCount,
 } from '@/core/store/entityStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
@@ -335,10 +334,16 @@ describe('Export Workflow User Journey', () => {
     });
 
     it('should preserve entity order in allIds', () => {
-      const entities = ['room-1', 'duct-1', 'equip-1', 'fit-1'].map((id, i) => {
-        if (id.startsWith('room')) {return createMockRoom(id, 'Room');}
-        if (id.startsWith('duct')) {return createMockDuct(id, 'Duct');}
-        if (id.startsWith('equip')) {return createMockEquipment(id, 'Equip', 'fan');}
+      const entities = ['room-1', 'duct-1', 'equip-1', 'fit-1'].map((id) => {
+        if (id.startsWith('room')) {
+          return createMockRoom(id, 'Room');
+        }
+        if (id.startsWith('duct')) {
+          return createMockDuct(id, 'Duct');
+        }
+        if (id.startsWith('equip')) {
+          return createMockEquipment(id, 'Equip', 'fan');
+        }
         return createMockFitting(id, 'elbow_90');
       });
 
@@ -415,9 +420,12 @@ describe('Export Workflow User Journey', () => {
       const ductItems = bom.filter((item) => item.category === 'duct');
       expect(ductItems).toHaveLength(1);
 
+      const [ductItem] = ductItems;
+      expect(ductItem).toBeDefined();
+
       // Total length should be sum
-      expect(ductItems[0].quantity).toBe(45); // 10 + 15 + 20
-      expect(ductItems[0].entityIds).toHaveLength(3);
+      expect(ductItem!.quantity).toBe(45); // 10 + 15 + 20
+      expect(ductItem!.entityIds).toHaveLength(3);
     });
 
     it('should separate ducts by material', () => {
@@ -467,6 +475,11 @@ describe('Export Workflow User Journey', () => {
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
       const item = bom[0];
+
+      expect(item).toBeDefined();
+      if (!item) {
+        throw new Error('Expected a BOM item');
+      }
 
       expect(item.id).toBeDefined();
       expect(item.category).toBe('duct');
@@ -653,14 +666,18 @@ describe('Export Workflow User Journey', () => {
       room.calculated = { area: 1200, volume: 14400, requiredCFM: 2400 };
 
       createEntity(room);
-
-      const entities = selectAllEntities();
       const projectFile = createProjectFile('Test', {
-        byId: { 'room-1': entities[0] },
+        byId: { 'room-1': room },
         allIds: ['room-1'],
       });
 
-      const exported = projectFile.entities.byId['room-1'] as Room;
+      const exported = projectFile.entities.byId['room-1'];
+      expect(exported).toBeDefined();
+
+      if (!exported || exported.type !== 'room') {
+        throw new Error('Expected exported room entity');
+      }
+
       expect(exported.props.name).toBe('Conference Room');
       expect(exported.props.width).toBe(480);
       expect(exported.props.occupancyType).toBe('conference');
@@ -672,14 +689,17 @@ describe('Export Workflow User Journey', () => {
       duct.transform = { x: 150, y: 250, rotation: 45, scaleX: 1.5, scaleY: 1 };
 
       createEntity(duct);
-
-      const entities = selectAllEntities();
       const projectFile = createProjectFile('Test', {
-        byId: { 'duct-1': entities[0] },
+        byId: { 'duct-1': duct },
         allIds: ['duct-1'],
       });
 
       const exported = projectFile.entities.byId['duct-1'];
+      expect(exported).toBeDefined();
+
+      if (!exported) {
+        throw new Error('Expected exported duct entity');
+      }
       expect(exported.transform.x).toBe(150);
       expect(exported.transform.y).toBe(250);
       expect(exported.transform.rotation).toBe(45);
@@ -694,9 +714,9 @@ describe('Export Workflow User Journey', () => {
       const entities = selectAllEntities();
       const byId = Object.fromEntries(entities.map((e) => [e.id, e]));
 
-      expect(byId['room-1'].zIndex).toBe(0);
-      expect(byId['duct-1'].zIndex).toBe(5);
-      expect(byId['fit-1'].zIndex).toBe(10);
+      expect(byId['room-1']!.zIndex).toBe(0);
+      expect(byId['duct-1']!.zIndex).toBe(5);
+      expect(byId['fit-1']!.zIndex).toBe(10);
     });
   });
 

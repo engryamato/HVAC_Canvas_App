@@ -12,7 +12,7 @@ function supportsSaveFilePicker(): boolean {
 
 function buildSuggestedFileName(projectName: string, fallbackBase: string): string {
   const base = projectName.trim() || fallbackBase;
-  const sanitized = base.replaceAll(/[^a-zA-Z0-9 _-]/g, '').trim();
+  const sanitized = base.replace(/[^a-zA-Z0-9 _-]/g, '').trim();
   return `${sanitized || fallbackBase}.sws`;
 }
 
@@ -121,4 +121,3 @@ export async function openProjectFromPicker(): Promise<
     throw error;
   }
 }
-

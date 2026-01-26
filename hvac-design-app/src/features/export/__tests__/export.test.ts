@@ -16,7 +16,8 @@ beforeEach(() => {
 });
 
 const createMockProject = (): ProjectFile => ({
-  projectId: 'test-project',
+  schemaVersion: '1.0.0',
+  projectId: '00000000-0000-4000-8000-000000000001',
   projectName: 'Test HVAC Project',
   projectNumber: 'HVAC-2025-001',
   clientName: 'Test Client Inc.',
@@ -50,12 +51,15 @@ const createMockProject = (): ProjectFile => ({
         modifiedAt: '2025-01-01T00:00:00.000Z',
         props: {
           name: 'Main Duct',
+          shape: 'rectangular',
           length: 120,
           width: 12,
           height: 8,
-          material: 'galvanized_steel',
+          material: 'galvanized',
+          airflow: 500,
+          staticPressure: 0.1,
         },
-        calculated: { area: 2.67, perimeter: 40, velocity: 800, pressureLoss: 0.15 },
+        calculated: { area: 2.67, velocity: 800, frictionLoss: 0.15 },
       },
       'equipment-1': {
         id: 'equipment-1',
@@ -71,9 +75,13 @@ const createMockProject = (): ProjectFile => ({
           depth: 24,
           height: 18,
           manufacturer: 'Acme HVAC',
-          modelNumber: 'SF-5000',
+          model: 'SF-5000',
+          capacity: 2000,
+          capacityUnit: 'CFM',
+          staticPressure: 1.5,
+          staticPressureUnit: 'in_wg',
+          mountHeightUnit: 'in',
         },
-        calculated: { staticPressure: 1.5, airflow: 2000 },
       },
     },
     allIds: ['room-1', 'duct-1', 'equipment-1'],
@@ -140,8 +148,9 @@ describe('Export - CSV', () => {
 
     it('should escape special characters in CSV', () => {
       const project = createMockProject();
-      if (project.entities.byId['room-1']) {
-        project.entities.byId['room-1'].props.name = 'Room "A", Level 1';
+      const room = project.entities.byId['room-1'];
+      if (room?.type === 'room') {
+        room.props.name = 'Room "A", Level 1';
       }
 
       const csv = exportProjectToCsv(project);
@@ -365,23 +374,22 @@ describe('Export - Integration', () => {
 
   it('should preserve precision of calculated values', () => {
     const project = createMockProject();
-    if (project.entities.byId['duct-1']) {
-      project.entities.byId['duct-1'].calculated = {
+    const ductEntity = project.entities.byId['duct-1'];
+    if (ductEntity?.type === 'duct') {
+      ductEntity.calculated = {
         area: 2.6666666666,
-        perimeter: 40.123456,
         velocity: 800.9876,
-        pressureLoss: 0.15432,
+        frictionLoss: 0.15432,
       };
     }
 
     const json = exportProjectToJson(project);
     const reimported = JSON.parse(json);
 
-    const duct = reimported.entities.byId['duct-1'];
-    expect(duct.calculated.area).toBeCloseTo(2.6666666666, 10);
-    expect(duct.calculated.perimeter).toBeCloseTo(40.123456, 6);
-    expect(duct.calculated.velocity).toBeCloseTo(800.9876, 4);
-    expect(duct.calculated.pressureLoss).toBeCloseTo(0.15432, 5);
+    const importedDuct = reimported.entities.byId['duct-1'];
+    expect(importedDuct.calculated.area).toBeCloseTo(2.6666666666, 10);
+    expect(importedDuct.calculated.velocity).toBeCloseTo(800.9876, 4);
+    expect(importedDuct.calculated.frictionLoss).toBeCloseTo(0.15432, 5);
   });
 });
 

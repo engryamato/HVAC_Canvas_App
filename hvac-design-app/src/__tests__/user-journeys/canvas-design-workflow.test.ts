@@ -22,7 +22,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   useEntityStore,
   selectEntity,
-  selectAllEntities,
   selectEntitiesByType,
   selectEntityCount,
 } from '@/core/store/entityStore';
@@ -35,9 +34,8 @@ import {
   deleteEntity,
   moveEntities,
   undo,
-  redo,
 } from '@/core/commands/entityCommands';
-import type { Room, Duct, Equipment, Fitting, Entity } from '@/core/schema';
+import type { Room, Duct, Equipment, Fitting } from '@/core/schema';
 import {
   MIN_ZOOM,
   MAX_ZOOM,

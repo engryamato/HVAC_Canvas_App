@@ -1,9 +1,6 @@
 import { describe, it, beforeEach, expect } from 'vitest';
 import {
   useProjectListStore,
-  useProjects,
-  useActiveProjects,
-  useArchivedProjects,
   type ProjectListItem,
 } from '../projectListStore';
 
@@ -41,7 +38,7 @@ describe('ProjectListStore', () => {
 
       const state = useProjectListStore.getState();
       expect(state.projects).toHaveLength(1);
-      expect(state.projects[0].projectName).toBe('First Project');
+      expect(state.projects[0]!.projectName).toBe('First Project');
     });
 
     it('should prepend new projects (most recent first)', () => {
@@ -53,8 +50,8 @@ describe('ProjectListStore', () => {
 
       const state = useProjectListStore.getState();
       expect(state.projects).toHaveLength(2);
-      expect(state.projects[0].projectName).toBe('Second');
-      expect(state.projects[1].projectName).toBe('First');
+      expect(state.projects[0]!.projectName).toBe('Second');
+      expect(state.projects[1]!.projectName).toBe('First');
     });
 
     it('should persist project to localStorage', () => {
@@ -63,7 +60,7 @@ describe('ProjectListStore', () => {
 
       const stored = JSON.parse(localStorage.getItem('sws.projectIndex') ?? '{}');
       expect(stored.state.projects).toHaveLength(1);
-      expect(stored.state.projects[0].projectId).toBe(project.projectId);
+      expect(stored.state.projects[0]!.projectId).toBe(project.projectId);
     });
   });
 
@@ -77,7 +74,7 @@ describe('ProjectListStore', () => {
       });
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].projectName).toBe('Updated Name');
+      expect(state.projects[0]!.projectName).toBe('Updated Name');
     });
 
     it('should update modifiedAt timestamp on update', () => {
@@ -90,8 +87,8 @@ describe('ProjectListStore', () => {
       });
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].modifiedAt).not.toBe(originalDate);
-      expect(new Date(state.projects[0].modifiedAt).getTime()).toBeGreaterThan(
+      expect(state.projects[0]!.modifiedAt).not.toBe(originalDate);
+      expect(new Date(state.projects[0]!.modifiedAt).getTime()).toBeGreaterThan(
         new Date(originalDate).getTime()
       );
     });
@@ -104,7 +101,7 @@ describe('ProjectListStore', () => {
       });
 
       const stored = JSON.parse(localStorage.getItem('sws.projectIndex') ?? '{}');
-      expect(stored.state.projects[0].projectName).toBe('Persisted Update');
+      expect(stored.state.projects[0]!.projectName).toBe('Persisted Update');
     });
   });
 
@@ -137,7 +134,7 @@ describe('ProjectListStore', () => {
 
       const state = useProjectListStore.getState();
       expect(state.projects).toHaveLength(1);
-      expect(state.projects[0].projectName).toBe('Keep');
+      expect(state.projects[0]!.projectName).toBe('Keep');
     });
   });
 
@@ -148,7 +145,7 @@ describe('ProjectListStore', () => {
       useProjectListStore.getState().archiveProject(project.projectId);
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].isArchived).toBe(true);
+      expect(state.projects[0]!.isArchived).toBe(true);
     });
 
     it('should update modifiedAt timestamp', () => {
@@ -158,7 +155,7 @@ describe('ProjectListStore', () => {
       useProjectListStore.getState().archiveProject(project.projectId);
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].modifiedAt).not.toBe(originalDate);
+      expect(state.projects[0]!.modifiedAt).not.toBe(originalDate);
     });
   });
 
@@ -169,7 +166,7 @@ describe('ProjectListStore', () => {
       useProjectListStore.getState().restoreProject(project.projectId);
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].isArchived).toBe(false);
+      expect(state.projects[0]!.isArchived).toBe(false);
     });
   });
 
@@ -181,8 +178,8 @@ describe('ProjectListStore', () => {
 
       const state = useProjectListStore.getState();
       expect(state.projects).toHaveLength(2);
-      expect(state.projects[0].projectName).toBe('Copy of Original');
-      expect(state.projects[0].projectId).not.toBe(project.projectId);
+      expect(state.projects[0]!.projectName).toBe('Copy of Original');
+      expect(state.projects[0]!.projectId).not.toBe(project.projectId);
     });
 
     it('should set new storagePath for duplicate', () => {
@@ -191,8 +188,8 @@ describe('ProjectListStore', () => {
       useProjectListStore.getState().duplicateProject(project.projectId, 'Duplicate');
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].storagePath).not.toBe(project.storagePath);
-      expect(state.projects[0].storagePath).toContain('project-');
+      expect(state.projects[0]!.storagePath).not.toBe(project.storagePath);
+      expect(state.projects[0]!.storagePath).toContain('project-');
     });
 
     it('should reset isArchived to false for duplicate', () => {
@@ -201,7 +198,7 @@ describe('ProjectListStore', () => {
       useProjectListStore.getState().duplicateProject(project.projectId, 'Duplicate');
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].isArchived).toBe(false);
+      expect(state.projects[0]!.isArchived).toBe(false);
     });
 
     it('should set new timestamps for duplicate', () => {
@@ -211,8 +208,8 @@ describe('ProjectListStore', () => {
       useProjectListStore.getState().duplicateProject(project.projectId, 'Duplicate');
 
       const state = useProjectListStore.getState();
-      expect(state.projects[0].createdAt).not.toBe(oldDate);
-      expect(state.projects[0].modifiedAt).not.toBe(oldDate);
+      expect(state.projects[0]!.createdAt).not.toBe(oldDate);
+      expect(state.projects[0]!.modifiedAt).not.toBe(oldDate);
     });
 
     it('should do nothing if source project not found', () => {
@@ -232,7 +229,7 @@ describe('ProjectListStore', () => {
       // Simulate hook behavior
       const activeProjects = useProjectListStore.getState().projects.filter((p) => !p.isArchived);
       expect(activeProjects).toHaveLength(1);
-      expect(activeProjects[0].projectName).toBe('Active');
+      expect(activeProjects[0]!.projectName).toBe('Active');
     });
 
     it('useArchivedProjects should return only archived projects', () => {
@@ -245,7 +242,7 @@ describe('ProjectListStore', () => {
       // Simulate hook behavior
       const archivedProjects = useProjectListStore.getState().projects.filter((p) => p.isArchived);
       expect(archivedProjects).toHaveLength(1);
-      expect(archivedProjects[0].projectName).toBe('Archived');
+      expect(archivedProjects[0]!.projectName).toBe('Archived');
     });
   });
 
@@ -273,7 +270,7 @@ describe('ProjectListStore', () => {
 
       const state = useProjectListStore.getState();
       expect(state.projects).toHaveLength(1);
-      expect(state.projects[0].projectName).toBe('Persisted');
+      expect(state.projects[0]!.projectName).toBe('Persisted');
     });
 
     it('should validate ProjectListItem structure', () => {
@@ -282,6 +279,8 @@ describe('ProjectListStore', () => {
 
       const stored = JSON.parse(localStorage.getItem('sws.projectIndex') ?? '{}');
       const storedProject = stored.state.projects[0];
+
+      expect(storedProject).toBeDefined();
 
       // Verify all required fields are present
       expect(storedProject).toHaveProperty('projectId');
@@ -292,9 +291,9 @@ describe('ProjectListStore', () => {
       expect(storedProject).toHaveProperty('isArchived');
 
       // Verify types
-      expect(typeof storedProject.projectId).toBe('string');
-      expect(typeof storedProject.projectName).toBe('string');
-      expect(typeof storedProject.isArchived).toBe('boolean');
+      expect(typeof storedProject!.projectId).toBe('string');
+      expect(typeof storedProject!.projectName).toBe('string');
+      expect(typeof storedProject!.isArchived).toBe('boolean');
     });
   });
 });

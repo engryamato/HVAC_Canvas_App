@@ -39,18 +39,18 @@ function normalizeMaterialSelection(value: unknown): MaterialSelection | null {
 export function ProjectSidebar({ className }: ProjectSidebarProps) {
     const { projectDetails } = useProjectStore();
 
+    const normalizedScopeMaterials = useMemo(() => {
+        const materials = (projectDetails?.scope?.materials ?? []) as unknown[];
+        return materials
+            .map(normalizeMaterialSelection)
+            .filter((material): material is MaterialSelection => material !== null);
+    }, [projectDetails?.scope]);
+
     if (!projectDetails) {
         return <div className={cn("w-64 bg-background border-r p-4", className)}>No Project Loaded</div>;
     }
 
     const { projectName, projectNumber, clientName, location, scope, siteConditions } = projectDetails;
-
-    const normalizedScopeMaterials = useMemo(() => {
-        const materials = (scope?.materials ?? []) as unknown[];
-        return materials
-            .map(normalizeMaterialSelection)
-            .filter((material): material is MaterialSelection => material !== null);
-    }, [scope]);
 
     return (
         <div className={cn("w-64 bg-background border-r flex flex-col overflow-hidden", className)}>

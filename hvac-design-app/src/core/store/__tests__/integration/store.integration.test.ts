@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useEntityStore } from '../../entityStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
@@ -24,6 +24,7 @@ describe('Store Integration Tests', () => {
         projectNumber: 'TEST-001',
         clientName: 'Test Client',
         createdAt: new Date().toISOString(),
+        modifiedAt: new Date().toISOString(),
       },
       isDirty: false,
     });
@@ -132,7 +133,12 @@ describe('Store Integration Tests', () => {
 
       // Selection should still contain the entity
       expect(useSelectionStore.getState().selectedIds).toContain('room-1');
-      expect(useEntityStore.getState().byId['room-1'].props.name).toBe('Updated Room');
+      const updatedRoom = useEntityStore.getState().byId['room-1'];
+      expect(updatedRoom).toBeDefined();
+      expect(updatedRoom!.type).toBe('room');
+      if (updatedRoom?.type === 'room') {
+        expect(updatedRoom.props.name).toBe('Updated Room');
+      }
     });
   });
 
@@ -304,7 +310,7 @@ describe('Store Integration Tests', () => {
       };
 
       createEntity(room);
-      expect(useEntityStore.getState().byId['room-1'].type).toBe('room');
+      expect(useEntityStore.getState().byId['room-1']?.type).toBe('room');
 
       useToolStore.setState({ currentTool: 'duct' });
       expect(useToolStore.getState().currentTool).toBe('duct');
@@ -318,21 +324,23 @@ describe('Store Integration Tests', () => {
         modifiedAt: new Date().toISOString(),
         props: {
           name: 'Test Duct',
+          shape: 'rectangular',
           length: 120,
           width: 12,
           height: 8,
-          material: 'galvanized_steel',
+          material: 'galvanized',
+          airflow: 500,
+          staticPressure: 0.1,
         },
         calculated: {
           area: 2.67,
-          perimeter: 40,
           velocity: 800,
-          pressureLoss: 0.15,
+          frictionLoss: 0.15,
         },
       };
 
       createEntity(duct);
-      expect(useEntityStore.getState().byId['duct-1'].type).toBe('duct');
+      expect(useEntityStore.getState().byId['duct-1']?.type).toBe('duct');
     });
 
     it('should switch to select tool after entity creation (if configured)', () => {
@@ -375,6 +383,7 @@ describe('Store Integration Tests', () => {
           projectNumber: 'WF-001',
           clientName: 'Test Client',
           createdAt: new Date().toISOString(),
+          modifiedAt: new Date().toISOString(),
         },
         isDirty: false,
       });

@@ -12,7 +12,7 @@ import { isTauri } from '@/core/persistence/filesystem';
 
 export const AppInitializer: React.FC = () => {
     const router = useRouter();
-    const { hasLaunched, isFirstLaunch, isLoading, setEnvironment } = useAppStateStore();
+    const { isFirstLaunch, isLoading, setEnvironment } = useAppStateStore();
     const { isActive: isTutorialActive } = useTutorialStore();
     const searchParams = useSearchParams();
     const skipSplash = searchParams.get('skipSplash') === 'true';
@@ -69,6 +69,8 @@ export const AppInitializer: React.FC = () => {
             
             return () => clearTimeout(redirectTimer);
         }
+
+        return;
     }, [showSplash, isFirstLaunch, isLoading, isTutorialActive, router]);
 
 

@@ -266,18 +266,23 @@ export function LeftSidebar({
           onToggle={() => toggleSection('project-details')}
         >
           <ValidatedInput
+            id="project-name"
             label="Name"
+            type="text"
             value={details?.projectName ?? ''}
             onChange={(val) => updateProjectDetails({ projectName: String(val) })}
-            required
           />
           <ValidatedInput
+            id="project-location"
             label="Location"
+            type="text"
             value={details?.location ?? ''}
             onChange={(val) => updateProjectDetails({ location: String(val) })}
           />
           <ValidatedInput
+            id="project-client"
             label="Client"
+            type="text"
             value={details?.clientName ?? ''}
             onChange={(val) => updateProjectDetails({ clientName: String(val) })}
           />
@@ -370,37 +375,44 @@ export function LeftSidebar({
           onToggle={() => toggleSection('site-conditions')}
         >
           <ValidatedInput
+            id="site-elevation"
             label="Elevation (ft)"
             type="number"
             value={siteConditions.elevation ?? ''}
             onChange={(val) => updateSiteConditions({ elevation: String(val) })}
           />
           <ValidatedInput
+            id="site-outdoor-temp"
             label="Outdoor Temperature (°F)"
             type="number"
             value={siteConditions.outdoorTemp ?? ''}
             onChange={(val) => updateSiteConditions({ outdoorTemp: String(val) })}
           />
           <ValidatedInput
+            id="site-indoor-temp"
             label="Indoor Temperature (°F)"
             type="number"
             value={siteConditions.indoorTemp ?? ''}
             onChange={(val) => updateSiteConditions({ indoorTemp: String(val) })}
           />
           <ValidatedInput
+            id="site-wind-speed"
             label="Wind Speed (MPH)"
             type="number"
             value={siteConditions.windSpeed ?? ''}
             onChange={(val) => updateSiteConditions({ windSpeed: String(val) })}
           />
           <ValidatedInput
+            id="site-humidity"
             label="Humidity (%)"
             type="number"
             value={siteConditions.humidity ?? ''}
             onChange={(val) => updateSiteConditions({ humidity: String(val) })}
           />
           <ValidatedInput
+            id="site-local-codes"
             label="Local Codes"
+            type="text"
             value={siteConditions.localCodes ?? ''}
             onChange={(val) => updateSiteConditions({ localCodes: String(val) })}
           />

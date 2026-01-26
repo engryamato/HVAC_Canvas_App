@@ -149,7 +149,11 @@ export function exportProjectToCsv(project: ProjectFile, options: ExportCsvOptio
       specs = `${props.length}ft, ${props.width}" x ${props.height}"`;
     } else if (entityType === 'equipment') {
       const manufacturer = props.manufacturer ? `${props.manufacturer}` : '';
-      const model = props.modelNumber ? ` ${props.modelNumber}` : '';
+      const model = props.model
+        ? ` ${props.model}`
+        : props.modelNumber
+          ? ` ${props.modelNumber}`
+          : '';
       specs = `${manufacturer}${model}`.trim();
     }
 

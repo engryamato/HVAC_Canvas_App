@@ -64,7 +64,10 @@ describe('Tool Workflow Integration Tests', () => {
       roomTool.onDeactivate();
 
       expect(getEntityStore().allIds.length).toBe(2);
-      const rooms = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'room') as Room[];
+      const rooms = getEntityStore()
+        .allIds
+        .map((id) => getEntityStore().byId[id])
+        .filter((e): e is Room => e?.type === 'room');
       expect(rooms.length).toBe(2);
 
       // Step 2: Add equipment to first room
@@ -73,7 +76,10 @@ describe('Tool Workflow Integration Tests', () => {
       equipmentTool.onDeactivate();
 
       expect(getEntityStore().allIds.length).toBe(3);
-      const equipment = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'equipment') as Equipment[];
+      const equipment = getEntityStore()
+        .allIds
+        .map((id) => getEntityStore().byId[id])
+        .filter((e): e is Equipment => e?.type === 'equipment');
       expect(equipment.length).toBe(1);
 
       // Step 3: Create duct connecting the rooms
@@ -84,7 +90,10 @@ describe('Tool Workflow Integration Tests', () => {
       ductTool.onDeactivate();
 
       expect(getEntityStore().allIds.length).toBe(4);
-      const ducts = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'duct') as Duct[];
+      const ducts = getEntityStore()
+        .allIds
+        .map((id) => getEntityStore().byId[id])
+        .filter((e): e is Duct => e?.type === 'duct');
       expect(ducts.length).toBe(1);
 
       // Step 4: Add fittings at duct ends
@@ -94,7 +103,10 @@ describe('Tool Workflow Integration Tests', () => {
       fittingTool.onDeactivate();
 
       expect(getEntityStore().allIds.length).toBe(6);
-      const fittings = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'fitting') as Fitting[];
+      const fittings = getEntityStore()
+        .allIds
+        .map((id) => getEntityStore().byId[id])
+        .filter((e): e is Fitting => e?.type === 'fitting');
       expect(fittings.length).toBe(2);
 
       // Step 5: Add annotation note
@@ -103,7 +115,10 @@ describe('Tool Workflow Integration Tests', () => {
       noteTool.onDeactivate();
 
       expect(getEntityStore().allIds.length).toBe(7);
-      const notes = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'note') as Note[];
+      const notes = getEntityStore()
+        .allIds
+        .map((id) => getEntityStore().byId[id])
+        .filter((e): e is Note => e?.type === 'note');
       expect(notes.length).toBe(1);
 
       // Verify final design
@@ -139,12 +154,25 @@ describe('Tool Workflow Integration Tests', () => {
       noteTool.onMouseDown({ x: 180, y: 180, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       noteTool.onDeactivate();
 
-      const entities = getEntityStore().allIds.map(id => getEntityStore().byId[id]);
-      const room = entities.find(e => e.type === 'room') as Room;
-      const duct = entities.find(e => e.type === 'duct') as Duct;
-      const equipment = entities.find(e => e.type === 'equipment') as Equipment;
-      const fitting = entities.find(e => e.type === 'fitting') as Fitting;
-      const note = entities.find(e => e.type === 'note') as Note;
+      const entities = getEntityStore().allIds
+        .map((id) => getEntityStore().byId[id])
+        .filter(Boolean) as Array<Room | Duct | Equipment | Fitting | Note>;
+
+      const room = entities.find((e) => e.type === 'room');
+      const duct = entities.find((e) => e.type === 'duct');
+      const equipment = entities.find((e) => e.type === 'equipment');
+      const fitting = entities.find((e) => e.type === 'fitting');
+      const note = entities.find((e) => e.type === 'note');
+
+      expect(room).toBeDefined();
+      expect(duct).toBeDefined();
+      expect(equipment).toBeDefined();
+      expect(fitting).toBeDefined();
+      expect(note).toBeDefined();
+
+      if (!room || !duct || !equipment || !fitting || !note) {
+        throw new Error('Expected all entity types to be present');
+      }
 
       // Verify z-index ordering: room(0) < duct(5) < fitting(10) < equipment(5) < note(100)
       expect(room.zIndex).toBe(0);
@@ -171,8 +199,8 @@ describe('Tool Workflow Integration Tests', () => {
       roomTool.onMouseUp({ x: 400, y: 200, button: 0 });
       roomTool.onDeactivate();
 
-      const room1Id = getEntityStore().allIds[0];
-      const room2Id = getEntityStore().allIds[1];
+      const room1Id = getEntityStore().allIds[0]!;
+      const room2Id = getEntityStore().allIds[1]!;
 
       // Switch to select tool and select first room
       selectTool.onActivate();
@@ -187,15 +215,15 @@ describe('Tool Workflow Integration Tests', () => {
       expect(getSelectionStore().selectedIds.length).toBe(2);
 
       // Move selected rooms
-      const room1Before = getEntityStore().byId[room1Id];
-      const room2Before = getEntityStore().byId[room2Id];
+      const room1Before = getEntityStore().byId[room1Id]!;
+      const room2Before = getEntityStore().byId[room2Id]!;
 
       selectTool.onMouseDown({ x: 150, y: 150, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       selectTool.onMouseMove({ x: 200, y: 200 });
       selectTool.onMouseUp({ x: 200, y: 200, button: 0 });
 
-      const room1After = getEntityStore().byId[room1Id];
-      const room2After = getEntityStore().byId[room2Id];
+      const room1After = getEntityStore().byId[room1Id]!;
+      const room2After = getEntityStore().byId[room2Id]!;
 
       // Both rooms should have moved
       expect(room1After.transform.x).not.toBe(room1Before.transform.x);
@@ -216,8 +244,8 @@ describe('Tool Workflow Integration Tests', () => {
       ductTool.onMouseUp({ x: 250, y: 150, button: 0 });
       ductTool.onDeactivate();
 
-      const roomId = getEntityStore().allIds[0];
-      const ductId = getEntityStore().allIds[1];
+      const roomId = getEntityStore().allIds[0]!;
+      const ductId = getEntityStore().allIds[1]!;
 
       // Select room
       selectTool.onActivate();
@@ -264,22 +292,30 @@ describe('Tool Workflow Integration Tests', () => {
       // Undo last operation (equipment)
       undo();
       expect(getEntityStore().allIds.length).toBe(2);
-      expect(getEntityStore().allIds.every(id => getEntityStore().byId[id].type !== 'equipment')).toBe(true);
+      expect(
+        getEntityStore()
+          .allIds
+          .every((id) => getEntityStore().byId[id]?.type !== 'equipment')
+      ).toBe(true);
 
       // Undo second operation (duct)
       undo();
       expect(getEntityStore().allIds.length).toBe(1);
-      expect(getEntityStore().byId[getEntityStore().allIds[0]].type).toBe('room');
+      expect(getEntityStore().byId[getEntityStore().allIds[0]!]?.type).toBe('room');
 
       // Redo duct creation
       redo();
       expect(getEntityStore().allIds.length).toBe(2);
-      expect(getEntityStore().allIds.some(id => getEntityStore().byId[id].type === 'duct')).toBe(true);
+      expect(
+        getEntityStore().allIds.some((id) => getEntityStore().byId[id]?.type === 'duct')
+      ).toBe(true);
 
       // Redo equipment creation
       redo();
       expect(getEntityStore().allIds.length).toBe(3);
-      expect(getEntityStore().allIds.some(id => getEntityStore().byId[id].type === 'equipment')).toBe(true);
+      expect(
+        getEntityStore().allIds.some((id) => getEntityStore().byId[id]?.type === 'equipment')
+      ).toBe(true);
     });
 
     it('should maintain history stack across complex workflows', () => {
@@ -328,7 +364,7 @@ describe('Tool Workflow Integration Tests', () => {
       roomTool.onMouseUp({ x: 205, y: 207, button: 0 });
       roomTool.onDeactivate();
 
-      const room = getEntityStore().byId[getEntityStore().allIds[0]] as Room;
+      const room = getEntityStore().byId[getEntityStore().allIds[0]!] as Room;
       // Should snap to nearest grid (default 24px grid size based on viewport constants)
       expect(room.transform.x % 24).toBe(0);
       expect(room.transform.y % 24).toBe(0);
@@ -339,7 +375,7 @@ describe('Tool Workflow Integration Tests', () => {
       ductTool.onMouseUp({ x: 253, y: 149, button: 0 });
       ductTool.onDeactivate();
 
-      const duct = getEntityStore().byId[getEntityStore().allIds[1]] as Duct;
+      const duct = getEntityStore().byId[getEntityStore().allIds[1]!] as Duct;
       expect(duct.transform.x % 24).toBe(0);
       expect(duct.transform.y % 24).toBe(0);
 
@@ -348,7 +384,7 @@ describe('Tool Workflow Integration Tests', () => {
       equipmentTool.onMouseDown({ x: 198, y: 202, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
 
-      const equipment = getEntityStore().byId[getEntityStore().allIds[2]] as Equipment;
+      const equipment = getEntityStore().byId[getEntityStore().allIds[2]!] as Equipment;
       expect(equipment.transform.x % 24).toBe(0);
       expect(equipment.transform.y % 24).toBe(0);
     });

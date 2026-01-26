@@ -25,6 +25,11 @@ describe('Canvas Rendering Integration Tests', () => {
   // Helper to get fresh store state
   const getEntityStore = () => useEntityStore.getState();
 
+  const getAllEntities = () =>
+    getEntityStore()
+      .allIds.map((id) => getEntityStore().byId[id])
+      .filter(Boolean) as Array<Room | Duct | Equipment | Fitting | Note>;
+
   beforeEach(() => {
     // Create canvas and context
     canvas = document.createElement('canvas');
@@ -140,14 +145,14 @@ describe('Canvas Rendering Integration Tests', () => {
       ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       ductTool.onMouseUp({ x: 300, y: 100, button: 0 });
 
-      const horizontalDuct = getEntityStore().byId[getEntityStore().allIds[0]] as Duct;
+      const horizontalDuct = getEntityStore().byId[getEntityStore().allIds[0]!] as Duct;
       expect(horizontalDuct.transform.rotation).toBeCloseTo(0, 1);
 
       // Vertical duct
       ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       ductTool.onMouseUp({ x: 100, y: 300, button: 0 });
 
-      const verticalDuct = getEntityStore().byId[getEntityStore().allIds[1]] as Duct;
+      const verticalDuct = getEntityStore().byId[getEntityStore().allIds[1]!] as Duct;
       expect(Math.abs(verticalDuct.transform.rotation)).toBeCloseTo(90, 1);
 
       ductTool.onDeactivate();
@@ -159,7 +164,7 @@ describe('Canvas Rendering Integration Tests', () => {
       ductTool.onMouseUp({ x: 300, y: 100, button: 0 });
       ductTool.onDeactivate();
 
-      const duct = getEntityStore().byId[getEntityStore().allIds[0]] as Duct;
+      const duct = getEntityStore().byId[getEntityStore().allIds[0]!] as Duct;
       expect(duct.props.length).toBeGreaterThan(0);
     });
   });
@@ -185,7 +190,7 @@ describe('Canvas Rendering Integration Tests', () => {
       equipmentTool.onMouseDown({ x: 200, y: 200, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
 
-      const equipment = getEntityStore().byId[getEntityStore().allIds[0]] as Equipment;
+      const equipment = getEntityStore().byId[getEntityStore().allIds[0]!] as Equipment;
       expect(equipment.props.width).toBeGreaterThan(0);
       expect(equipment.props.depth).toBeGreaterThan(0);
       expect(equipment.props.height).toBeGreaterThan(0);
@@ -255,9 +260,9 @@ describe('Canvas Rendering Integration Tests', () => {
       fittingTool.onMouseDown({ x: 400, y: 300, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       fittingTool.onDeactivate();
 
-      const room = getEntityStore().byId[getEntityStore().allIds[0]] as Room;
-      const duct = getEntityStore().byId[getEntityStore().allIds[1]] as Duct;
-      const fitting = getEntityStore().byId[getEntityStore().allIds[2]] as Fitting;
+      const room = getEntityStore().byId[getEntityStore().allIds[0]!] as Room;
+      const duct = getEntityStore().byId[getEntityStore().allIds[1]!] as Duct;
+      const fitting = getEntityStore().byId[getEntityStore().allIds[2]!] as Fitting;
 
       // Fitting should be above duct and room
       expect(fitting.zIndex).toBeGreaterThan(room.zIndex);
@@ -306,11 +311,15 @@ describe('Canvas Rendering Integration Tests', () => {
       noteTool.onMouseDown({ x: 175, y: 175, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       noteTool.onDeactivate();
 
-      const note = getEntityStore().byId[getEntityStore().allIds[4]] as Note;
+      const note = getEntityStore().byId[getEntityStore().allIds[4]!] as Note;
 
       // Note should have highest z-index
-      const allEntities = getEntityStore().allIds.map(id => getEntityStore().byId[id]);
-      const maxZIndex = Math.max(...allEntities.filter(e => e.type !== 'note').map(e => e.zIndex));
+      const allEntities = getAllEntities();
+      const maxZIndex = Math.max(
+        ...allEntities
+          .filter((e) => e.type !== 'note')
+          .map((e) => e.zIndex)
+      );
       expect(note.zIndex).toBeGreaterThan(maxZIndex);
     });
   });
@@ -344,11 +353,20 @@ describe('Canvas Rendering Integration Tests', () => {
       expect(getEntityStore().allIds.length).toBe(6);
 
       // Verify z-index ordering
-      const room = getEntityStore().allIds.map(id => getEntityStore().byId[id]).find(e => e.type === 'room')!;
-      const equipment = getEntityStore().allIds.map(id => getEntityStore().byId[id]).find(e => e.type === 'equipment')!;
-      const duct = getEntityStore().allIds.map(id => getEntityStore().byId[id]).find(e => e.type === 'duct')!;
-      const fitting = getEntityStore().allIds.map(id => getEntityStore().byId[id]).filter(e => e.type === 'fitting')[0]!;
-      const note = getEntityStore().allIds.map(id => getEntityStore().byId[id]).find(e => e.type === 'note')!;
+      const entities = getAllEntities();
+      const room = entities.find((e) => e.type === 'room');
+      const duct = entities.find((e) => e.type === 'duct');
+      const fitting = entities.filter((e) => e.type === 'fitting')[0];
+      const note = entities.find((e) => e.type === 'note');
+
+      expect(room).toBeDefined();
+      expect(duct).toBeDefined();
+      expect(fitting).toBeDefined();
+      expect(note).toBeDefined();
+
+      if (!room || !duct || !fitting || !note) {
+        throw new Error('Expected all entity types to be present');
+      }
 
       expect(room.zIndex).toBeLessThanOrEqual(duct.zIndex);
       expect(duct.zIndex).toBeLessThanOrEqual(fitting.zIndex);

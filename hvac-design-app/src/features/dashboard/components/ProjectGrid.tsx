@@ -18,7 +18,9 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
 
     const handleDuplicate = (projectId: string) => {
         const project = allProjects.find(p => p.projectId === projectId);
-        if (!project) return;
+        if (!project) {
+            return;
+        }
 
         const rawName = project.projectName;
         const sourceName = (rawName && rawName !== 'undefined' && rawName.trim() !== '') 

@@ -138,6 +138,7 @@ class ReportGenerator implements ReportGeneratorService {
 
         // Bill of Materials (BOM)
         if (options.includeBOM && project.entities) {
+            const entitiesState = project.entities;
             // Check if we need a new page
             if (yPosition > 250) {
                 doc.addPage();
@@ -149,7 +150,9 @@ class ReportGenerator implements ReportGeneratorService {
             doc.text('Bill of Materials', 20, yPosition);
             yPosition += 8;
 
-            const entities = project.entities.allIds.map(id => project.entities.byId[id]);
+            const entities = entitiesState.allIds
+                .map((id) => entitiesState.byId[id])
+                .filter(Boolean);
             const bomData = entities.map((entity, index) => [
                 (index + 1).toString(),
                 entity.type || 'Unknown',
@@ -172,6 +175,7 @@ class ReportGenerator implements ReportGeneratorService {
 
         // Entity Summary
         if (options.includeEntities && project.entities) {
+            const entitiesState = project.entities;
             if (yPosition > 250) {
                 doc.addPage();
                 yPosition = 20;
@@ -184,13 +188,13 @@ class ReportGenerator implements ReportGeneratorService {
 
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
-            doc.text(`Total Entities: ${project.entities.allIds.length}`, 20, yPosition);
+            doc.text(`Total Entities: ${entitiesState.allIds.length}`, 20, yPosition);
             yPosition += 6;
 
             // Group by type
             const entityCounts: Record<string, number> = {};
-            project.entities.allIds.forEach(id => {
-                const entity = project.entities.byId[id];
+            entitiesState.allIds.forEach(id => {
+                const entity = entitiesState.byId[id];
                 const type = entity.type || 'Unknown';
                 entityCounts[type] = (entityCounts[type] || 0) + 1;
             });

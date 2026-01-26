@@ -101,7 +101,6 @@ export function FileMenu() {
                     return;
                 }
 
-                const projectListStore = useProjectListStore.getState();
                 const existingById = projectListStore.projects.find(
                     p => p.projectId === result.project!.projectId
                 );
@@ -138,35 +137,36 @@ export function FileMenu() {
                 throw new Error(parsed.error || 'Invalid project file');
             }
 
-                const payload = createLocalStoragePayloadFromProjectFileWithDefaults(parsed.data);
-                const storageResult = saveProjectToStorage(parsed.data.projectId, payload);
+            const projectFile = parsed.data;
+            const payload = createLocalStoragePayloadFromProjectFileWithDefaults(projectFile);
+            const storageResult = saveProjectToStorage(projectFile.projectId, payload);
                 if (!storageResult.success) {
                     throw new Error(storageResult.error || 'Failed to save imported project');
                 }
 
-            setWebProjectFileHandle(parsed.data.projectId, opened.fileHandle);
+            setWebProjectFileHandle(projectFile.projectId, opened.fileHandle);
 
             const projectListStore = useProjectListStore.getState();
-            const existingById = projectListStore.projects.find(p => p.projectId === parsed.data.projectId);
+            const existingById = projectListStore.projects.find(p => p.projectId === projectFile.projectId);
             const projectListItem = {
-                projectId: parsed.data.projectId,
-                projectName: parsed.data.projectName,
-                projectNumber: parsed.data.projectNumber,
-                clientName: parsed.data.clientName,
-                entityCount: parsed.data.entities.allIds.length,
-                createdAt: parsed.data.createdAt,
-                modifiedAt: parsed.data.modifiedAt,
+                projectId: projectFile.projectId,
+                projectName: projectFile.projectName,
+                projectNumber: projectFile.projectNumber,
+                clientName: projectFile.clientName,
+                entityCount: projectFile.entities.allIds.length,
+                createdAt: projectFile.createdAt,
+                modifiedAt: projectFile.modifiedAt,
                 storagePath: `file:${opened.fileName}`,
-                isArchived: Boolean((parsed.data as any).isArchived),
+                isArchived: Boolean((projectFile as any).isArchived),
             };
 
             if (existingById) {
-                projectListStore.updateProject(parsed.data.projectId, projectListItem);
+                projectListStore.updateProject(projectFile.projectId, projectListItem);
             } else {
                 projectListStore.addProject(projectListItem);
             }
 
-            router.push(`/canvas/${parsed.data.projectId}`);
+            router.push(`/canvas/${projectFile.projectId}`);
         } finally {
             setIsLoading(false);
         }

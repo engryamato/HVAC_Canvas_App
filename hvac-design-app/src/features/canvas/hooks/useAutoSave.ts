@@ -200,17 +200,17 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
       autoOpenLastProject: settings.autoOpenLastProject,
     },
     projectIndex: {
-      projects: projectIndex.projects as Array<Record<string, unknown>>,
+      projects: projectIndex.projects as unknown as Array<Record<string, unknown>>,
       recentProjectIds: projectIndex.recentProjectIds,
       loading: projectIndex.loading,
       error: projectIndex.error,
     },
     legacyProjects: {
-      projects: legacyProjects.projects as Array<Record<string, unknown>>,
+      projects: legacyProjects.projects as unknown as Array<Record<string, unknown>>,
     },
     history: {
-      past: historyStore.past as Array<Record<string, unknown>>,
-      future: historyStore.future as Array<Record<string, unknown>>,
+      past: historyStore.past as unknown as Array<Record<string, unknown>>,
+      future: historyStore.future as unknown as Array<Record<string, unknown>>,
       maxSize: historyStore.maxSize,
     },
     uiState: {
@@ -285,13 +285,13 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
       autoOpenLastProject: settings.autoOpenLastProject,
     },
     projectIndex: {
-      projects: projectIndex.projects as Array<Record<string, unknown>>,
+      projects: projectIndex.projects as unknown as Array<Record<string, unknown>>,
       recentProjectIds: projectIndex.recentProjectIds,
       loading: projectIndex.loading,
       error: projectIndex.error,
     },
     legacyProjects: {
-      projects: legacyProjects.projects as Array<Record<string, unknown>>,
+      projects: legacyProjects.projects as unknown as Array<Record<string, unknown>>,
     },
     history: {
       past: [],

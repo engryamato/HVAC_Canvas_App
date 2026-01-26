@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { saveProject, loadProject, loadBackup, projectExists, getBackupPath } from '../projectIO';
 import * as filesystem from '../filesystem';
 import * as serialization from '../serialization';
-import { createEmptyProjectFile, type ProjectFile } from '@/core/schema';
+import { createEmptyProjectFile } from '@/core/schema';
 
 // Mock the filesystem module
 vi.mock('../filesystem', () => ({

@@ -18,7 +18,9 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
         }, [checked])
 
         const handleClick = () => {
-            if (disabled) return
+            if (disabled) {
+                return
+            }
             const newValue = !isChecked
             setIsChecked(newValue)
             onCheckedChange?.(newValue)

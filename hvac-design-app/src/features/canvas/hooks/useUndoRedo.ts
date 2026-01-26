@@ -4,23 +4,6 @@ import { useEffect } from 'react';
 import { undo, redo } from '@/core/commands/entityCommands';
 
 /**
- * Detect if user is on macOS (SSR-safe)
- */
-function _isMacOS(): boolean {
-  if (typeof navigator === 'undefined') {
-    return false;
-  }
-  // Use userAgentData if available (modern browsers)
-  // Type assertion needed as userAgentData is not in standard Navigator type yet
-  const nav = navigator as Navigator & { userAgentData?: { platform: string } };
-  if (nav.userAgentData?.platform) {
-    return nav.userAgentData.platform === 'macOS';
-  }
-  // Fallback to deprecated platform property for older browsers
-  return navigator.platform?.toUpperCase().indexOf('MAC') >= 0;
-}
-
-/**
  * Hook to register global undo/redo keyboard shortcuts
  * - Ctrl+Z / Cmd+Z: Undo
  * - Ctrl+Y / Ctrl+Shift+Z / Cmd+Shift+Z: Redo

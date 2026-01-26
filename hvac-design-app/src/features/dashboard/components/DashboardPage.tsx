@@ -65,7 +65,9 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
     }, [isTauri, scanProjectsFromDisk]);
 
     const handleRescan = async () => {
-        if (!isTauri) return;
+        if (!isTauri) {
+            return;
+        }
         await scanProjectsFromDisk();
     };
 

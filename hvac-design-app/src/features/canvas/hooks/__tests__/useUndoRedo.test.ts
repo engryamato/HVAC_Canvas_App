@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useUndoRedo } from '../useUndoRedo';
-import { createEntity, undo, redo } from '@/core/commands/entityCommands';
+import { createEntity, undo } from '@/core/commands/entityCommands';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import type { Room } from '@/core/schema';

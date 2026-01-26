@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useToolStore } from '@/core/store/canvas.store';
+import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
 
 export function ToolsMenu() {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +22,7 @@ export function ToolsMenu() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen]);
 
-    const selectTool = (tool: string) => {
+    const selectTool = (tool: CanvasTool) => {
         setTool(tool);
         setIsOpen(false);
     };
@@ -47,10 +47,10 @@ export function ToolsMenu() {
                         Select Tool <span className="text-xs opacity-50">V</span>
                     </button>
                     <button
-                        onClick={() => selectTool('line')}
+                        onClick={() => selectTool('room')}
                         className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between"
                     >
-                        Line Tool <span className="text-xs opacity-50">L</span>
+                        Room Tool <span className="text-xs opacity-50">R</span>
                     </button>
                     <button
                         onClick={() => selectTool('duct')}
