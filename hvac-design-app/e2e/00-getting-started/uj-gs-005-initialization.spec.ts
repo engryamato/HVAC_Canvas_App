@@ -280,7 +280,9 @@ test.describe('OS-INIT-001: First Launch Initialization', () => {
             // For now, we'll verify persistence via direct store manipulation
             await page.evaluate(() => {
                 const prefsStore = JSON.parse(localStorage.getItem('sws.preferences') || '{"state":{}}');
-                if (!prefsStore.state) prefsStore.state = {};
+                if (!prefsStore.state) {
+                    prefsStore.state = {};
+                }
                 prefsStore.state.theme = 'dark';
                 localStorage.setItem('sws.preferences', JSON.stringify(prefsStore));
             });

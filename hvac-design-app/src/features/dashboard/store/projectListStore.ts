@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { logger } from '@/utils/logger';
@@ -41,7 +42,10 @@ interface ProjectListActions {
 
 type ProjectListStore = ProjectListState & ProjectListActions;
 
+// Constant to prevent creating new array references
+const EMPTY_ARRAY: never[] = [];
 const INDEX_KEY = 'sws.projectIndex';
+let hasSubscribed = false;
 
 export const useProjectListStore = create<ProjectListStore>()(
   persist(
@@ -433,20 +437,57 @@ export const rehydrateProjectList = async () => {
   await useProjectListStore.persist.rehydrate();
 };
 
-export const useProjects = () => useProjectListStore((state) => state.projects);
-export const useActiveProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => !p.isArchived));
-export const useArchivedProjects = () =>
-  useProjectListStore((state) => state.projects.filter((p) => p.isArchived));
+if (process.env.NODE_ENV !== 'production' && !hasSubscribed) {
+  hasSubscribed = true;
+  const logState = (label: string) => {
+    const state = useProjectListStore.getState();
+    // eslint-disable-next-line no-console
+    console.debug(`[ProjectListStore] ${label}`, {
+      projects: state.projects.length,
+      recentProjectIds: state.recentProjectIds.length,
+      loading: state.loading,
+    });
+  };
 
-// Selector for recent projects (max 10, ordered by access time)
-export const useRecentProjects = () =>
-  useProjectListStore((state) => {
-    // Ensure hydration has occurred or fallback
-    return (state.recentProjectIds || [])
-      .map((id) => (state.projects || []).find((p) => p.projectId === id))
+  logState('init');
+  useProjectListStore.subscribe(() => logState('update'));
+}
+
+// Base selector - returns stable reference
+export const useProjects = () => useProjectListStore((state) => state.projects);
+
+// Memoized hook for active projects - uses useMemo to cache filtered results
+export const useActiveProjects = () => {
+  const projects = useProjectListStore((state) => state.projects);
+  return useMemo(
+    () => (projects || EMPTY_ARRAY).filter((p) => !p.isArchived),
+    [projects]
+  );
+};
+
+// Memoized hook for archived projects
+export const useArchivedProjects = () => {
+  const projects = useProjectListStore((state) => state.projects);
+  return useMemo(
+    () => (projects || EMPTY_ARRAY).filter((p) => p.isArchived),
+    [projects]
+  );
+};
+
+// Memoized hook for recent projects (max 10, ordered by access time)
+export const useRecentProjects = () => {
+  const recentProjectIds = useProjectListStore((state) => state.recentProjectIds);
+  const projects = useProjectListStore((state) => state.projects);
+  
+  return useMemo(() => {
+    const recentIds = recentProjectIds || EMPTY_ARRAY;
+    const projectList = projects || EMPTY_ARRAY;
+    
+    return recentIds
+      .map((id) => projectList.find((p) => p.projectId === id))
       .filter((p): p is ProjectListItem => p !== undefined && !p.isArchived);
-  });
+  }, [recentProjectIds, projects]);
+};
 
 export const useProjectListActions = () =>
   useProjectListStore((state) => ({

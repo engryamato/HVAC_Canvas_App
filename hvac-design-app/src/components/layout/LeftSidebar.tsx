@@ -1,11 +1,57 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { ChevronLeft, Search, Box, Layers, Clock, ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
+import { ChevronLeft, Search, Box, Layers, Clock, ChevronDown, ChevronRight, GripVertical, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { ValidatedInput } from '@/components/ui/ValidatedInput';
+import { useProjectActions, useProjectDetails } from '@/core/store/project.store';
+
+// Project configuration constants
+const PROJECT_TYPE_OPTIONS = [
+  { value: 'residential', label: 'Residential' },
+  { value: 'commercial', label: 'Commercial' },
+  { value: 'industrial', label: 'Industrial' },
+];
+
+const SCOPE_OPTIONS = [
+  { value: 'hvac', label: 'HVAC' },
+  { value: 'future', label: 'Future Systems' },
+];
+
+const MATERIAL_OPTIONS = [
+  { value: 'galvanized', label: 'Galvanized Steel' },
+  { value: 'stainless', label: 'Stainless Steel' },
+  { value: 'aluminum', label: 'Aluminum' },
+  { value: 'pvs', label: 'PVS' },
+];
+
+const STAINLESS_GRADES = [
+  { value: '304', label: '304 S.S.' },
+  { value: '316', label: '316 S.S.' },
+  { value: '409', label: '409 S.S.' },
+  { value: '430', label: '430 S.S.' },
+  { value: '444', label: '444 S.S.' },
+];
+
+const GALVANIZED_GRADES = [
+  { value: 'g-60', label: 'G-60' },
+  { value: 'g-90', label: 'G-90' },
+];
+
+function toggleArrayValue(values: string[] | undefined, value: string): string[] {
+  const next = new Set(values ?? []);
+  if (next.has(value)) {
+    next.delete(value);
+  } else {
+    next.add(value);
+  }
+  return Array.from(next);
+}
 
 /**
  * LeftSidebar - Modern Engineering Design 2025
@@ -19,6 +65,10 @@ export const LeftSidebar: React.FC = () => {
         setActiveLeftTab
     } = useLayoutStore();
 
+    // Project store integration
+    const projectDetails = useProjectDetails();
+    const { setProject } = useProjectActions();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
         'air-handling-units': true,
@@ -26,6 +76,11 @@ export const LeftSidebar: React.FC = () => {
         'fans': false,
         'ducts': false,
     });
+    const [expandedProjectSections, setExpandedProjectSections] = useState<string[]>([
+        'project-details',
+        'project-scope',
+        'site-conditions',
+    ]);
 
     const toggleCategory = (catId: string) => {
         setExpandedCategories(prev => ({
@@ -47,8 +102,65 @@ export const LeftSidebar: React.FC = () => {
         return () => globalThis.removeEventListener('keydown', handleKeyDown);
     }, [toggleLeftSidebar]);
 
+    // Project data helpers
+    const details = projectDetails;
+
+    const projectScope = useMemo(() => {
+        const scope = details?.scope ?? { details: [], materials: [], projectType: 'commercial' };
+        return {
+            details: scope.details ?? [],
+            materials: scope.materials ?? [],
+            projectType: scope.projectType ?? 'commercial',
+        };
+    }, [details]);
+
+    const siteConditions = useMemo(() => {
+        return details?.siteConditions ?? {
+            elevation: '',
+            outdoorTemp: '',
+            indoorTemp: '',
+            windSpeed: '',
+            humidity: '',
+            localCodes: '',
+        };
+    }, [details]);
+
+    const updateProjectDetails = (partial: Record<string, unknown>) => {
+        if (!details) {
+            return;
+        }
+        setProject(details.projectId, { ...details, ...partial });
+    };
+
+    const updateScope = (partial: Record<string, unknown>) => {
+        if (!details) {
+            return;
+        }
+        setProject(details.projectId, {
+            ...details,
+            scope: { ...projectScope, ...partial },
+        });
+    };
+
+    const updateSiteConditions = (partial: Record<string, unknown>) => {
+        if (!details) {
+            return;
+        }
+        setProject(details.projectId, {
+            ...details,
+            siteConditions: { ...siteConditions, ...partial },
+        });
+    };
+
+    const toggleProjectSection = (sectionId: string) => {
+        setExpandedProjectSections((prev) =>
+            prev.includes(sectionId) ? prev.filter((id) => id !== sectionId) : [...prev, sectionId]
+        );
+    };
+
     const tabs = [
         { id: 'equipment', label: 'Equipment', icon: Box },
+        { id: 'project', label: 'Project', icon: FileText },
         { id: 'layers', label: 'Layers', icon: Layers },
         { id: 'recent', label: 'Recent', icon: Clock },
     ];
@@ -214,6 +326,168 @@ export const LeftSidebar: React.FC = () => {
                                 ]}
                             />
                         </div>
+                    </div>
+                )}
+
+                {activeLeftTab === 'project' && (
+                    <div className="flex-1 overflow-y-auto p-3" data-testid="project-panel">
+                        <CollapsibleSection
+                            title="Project Details"
+                            defaultExpanded={expandedProjectSections.includes('project-details')}
+                            onToggle={() => toggleProjectSection('project-details')}
+                        >
+                            <ValidatedInput
+                                id="project-name"
+                                type="text"
+                                label="Name"
+                                value={details?.projectName ?? ''}
+                                onChange={(val) => updateProjectDetails({ projectName: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="project-location"
+                                type="text"
+                                label="Location"
+                                value={details?.location ?? ''}
+                                onChange={(val) => updateProjectDetails({ location: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="project-client"
+                                type="text"
+                                label="Client"
+                                value={details?.clientName ?? ''}
+                                onChange={(val) => updateProjectDetails({ clientName: String(val) })}
+                            />
+                        </CollapsibleSection>
+
+                        <CollapsibleSection
+                            title="Project Scope"
+                            defaultExpanded={expandedProjectSections.includes('project-scope')}
+                            onToggle={() => toggleProjectSection('project-scope')}
+                        >
+                            <div className="space-y-3">
+                                <div>
+                                    <div className="text-xs font-semibold text-slate-600 mb-2">Scope</div>
+                                    {SCOPE_OPTIONS.map((option) => {
+                                        const selected = projectScope.details.includes(option.value);
+                                        return (
+                                            <label key={option.value} className="flex items-center gap-2 py-1.5 text-sm cursor-pointer hover:bg-slate-50 rounded px-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected}
+                                                    onChange={() =>
+                                                        updateScope({
+                                                            details: toggleArrayValue(projectScope.details, option.value),
+                                                        })
+                                                    }
+                                                    className="rounded border-slate-300"
+                                                />
+                                                <span className="text-slate-700">{option.label}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+
+                                <div>
+                                    <div className="text-xs font-semibold text-slate-600 mb-2">Materials</div>
+                                    {MATERIAL_OPTIONS.map((option) => {
+                                        const selected = projectScope.materials.includes(option.value);
+                                        return (
+                                            <label key={option.value} className="flex items-center gap-2 py-1.5 text-sm cursor-pointer hover:bg-slate-50 rounded px-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected}
+                                                    onChange={() =>
+                                                        updateScope({
+                                                            materials: toggleArrayValue(projectScope.materials, option.value),
+                                                        })
+                                                    }
+                                                    className="rounded border-slate-300"
+                                                />
+                                                <span className="text-slate-700">{option.label}</span>
+                                            </label>
+                                        );
+                                    })}
+
+                                    {projectScope.materials.includes('galvanized') && (
+                                        <div className="mt-2">
+                                            <Dropdown
+                                                label="Galvanized Grade"
+                                                options={GALVANIZED_GRADES}
+                                                value={(details?.scope as { galvanizedGrade?: string })?.galvanizedGrade ?? 'g-60'}
+                                                onChange={(val) => updateScope({ galvanizedGrade: String(val) })}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {projectScope.materials.includes('stainless') && (
+                                        <div className="mt-2">
+                                            <Dropdown
+                                                label="Stainless Grade"
+                                                options={STAINLESS_GRADES}
+                                                value={(details?.scope as { stainlessGrade?: string })?.stainlessGrade ?? '304'}
+                                                onChange={(val) => updateScope({ stainlessGrade: String(val) })}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <Dropdown
+                                    label="Project Type"
+                                    options={PROJECT_TYPE_OPTIONS}
+                                    value={projectScope.projectType}
+                                    onChange={(val) => updateScope({ projectType: String(val) })}
+                                />
+                            </div>
+                        </CollapsibleSection>
+
+                        <CollapsibleSection
+                            title="Site Conditions"
+                            defaultExpanded={expandedProjectSections.includes('site-conditions')}
+                            onToggle={() => toggleProjectSection('site-conditions')}
+                        >
+                            <ValidatedInput
+                                id="site-elevation"
+                                label="Elevation (ft)"
+                                type="number"
+                                value={siteConditions.elevation ?? ''}
+                                onChange={(val) => updateSiteConditions({ elevation: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="site-outdoor-temp"
+                                label="Outdoor Temperature (°F)"
+                                type="number"
+                                value={siteConditions.outdoorTemp ?? ''}
+                                onChange={(val) => updateSiteConditions({ outdoorTemp: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="site-indoor-temp"
+                                label="Indoor Temperature (°F)"
+                                type="number"
+                                value={siteConditions.indoorTemp ?? ''}
+                                onChange={(val) => updateSiteConditions({ indoorTemp: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="site-wind-speed"
+                                label="Wind Speed (MPH)"
+                                type="number"
+                                value={siteConditions.windSpeed ?? ''}
+                                onChange={(val) => updateSiteConditions({ windSpeed: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="site-humidity"
+                                label="Humidity (%)"
+                                type="number"
+                                value={siteConditions.humidity ?? ''}
+                                onChange={(val) => updateSiteConditions({ humidity: String(val) })}
+                            />
+                            <ValidatedInput
+                                id="site-local-codes"
+                                type="text"
+                                label="Local Codes"
+                                value={siteConditions.localCodes ?? ''}
+                                onChange={(val) => updateSiteConditions({ localCodes: String(val) })}
+                            />
+                        </CollapsibleSection>
                     </div>
                 )}
 

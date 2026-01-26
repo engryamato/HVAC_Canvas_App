@@ -44,10 +44,12 @@ export const useProjectDetails = () => useProjectStore((state) => state.projectD
 export const useIsDirty = () => useProjectStore((state) => state.isDirty);
 export const useHasProject = () => useProjectStore((state) => state.currentProjectId !== null);
 
-// Actions hook (per naming convention)
-export const useProjectActions = () =>
-  useProjectStore((state) => ({
-    setProject: state.setProject,
-    setDirty: state.setDirty,
-    clearProject: state.clearProject,
-  }));
+// Actions hook (per naming convention) - stable selectors to prevent infinite loops
+export const useProjectActions = () => {
+  const setProject = useProjectStore((state) => state.setProject);
+  const setDirty = useProjectStore((state) => state.setDirty);
+  const clearProject = useProjectStore((state) => state.clearProject);
+  
+  // Return same object reference across renders
+  return { setProject, setDirty, clearProject };
+};

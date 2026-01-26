@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useProjectListStore, useRecentProjects } from '../store/projectListStore';
 import { useProjectFilters } from '../hooks/useProjectFilters';
 import { SearchBar } from './SearchBar';
@@ -22,6 +22,7 @@ import { useSearchParams } from 'next/navigation';
  * Implements UJ-PM-005: Archive and restore projects
  */
 export function DashboardPage() {
+    const renderCountRef = useRef(0);
     const allProjectsRaw = useProjectListStore(state => state.projects);
     const activeProjects = allProjectsRaw.filter(p => !p.isArchived);
     const archivedProjects = allProjectsRaw.filter(p => p.isArchived);
@@ -33,6 +34,14 @@ export function DashboardPage() {
     const [activeTab, setActiveTab] = useState<'active' | 'archived'>(viewParam === 'archived' ? 'archived' : 'active');
     const [focusedIndex, setFocusedIndex] = useState(0);
     const isTauri = useAppStateStore((state) => state.isTauri);
+
+    if (process.env.NODE_ENV !== 'production') {
+        renderCountRef.current += 1;
+        // eslint-disable-next-line no-console
+        console.debug('[DashboardPage] render', { renderCount: renderCountRef.current, isTauri, projects: allProjectsRaw.length });
+        // eslint-disable-next-line no-console
+        console.debug('[DashboardPage] deps', { scanProjectsFromDisk, viewParam });
+    }
 
     // Sync state with URL
     useEffect(() => {
@@ -61,7 +70,7 @@ export function DashboardPage() {
     }, [isTauri, scanProjectsFromDisk]);
 
     const handleRescan = async () => {
-        if (!isTauri) return;
+        if (!isTauri) {return;}
         await scanProjectsFromDisk();
     };
 

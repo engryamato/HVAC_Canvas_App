@@ -7,6 +7,7 @@ import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { ChevronRight, ChevronLeft, Settings, List, FileText, Calculator, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { InspectorPanel } from '@/features/canvas/components/Inspector/InspectorPanel';
 
 /**
  * RightSidebar - Modern Engineering Design 2025
@@ -21,17 +22,6 @@ export const RightSidebar: React.FC = () => {
     } = useLayoutStore();
     const selectedIds = useSelectionStore((state) => state.selectedIds);
     const entities = useEntityStore((state) => state.byId);
-
-    const selectedEntity = selectedIds.length > 0 && selectedIds[0] ? entities[selectedIds[0]] : null;
-
-    function getEntityDisplayName(entity: typeof selectedEntity): string {
-        if (!entity) { return ''; }
-        if ('props' in entity && entity.props && 'name' in entity.props) {
-            return entity.props.name as string;
-        }
-        if (entity.type === 'note') { return 'Note'; }
-        return entity.type.charAt(0).toUpperCase() + entity.type.slice(1);
-    }
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -161,43 +151,8 @@ export const RightSidebar: React.FC = () => {
             {/* Panel Content */}
             <div className="flex-1 overflow-y-auto">
                 {activeRightTab === 'properties' && (
-                    <div className="p-4" data-testid="properties-panel">
-                        {selectedEntity ? (
-                            <div className="space-y-4">
-                                {/* Entity Header */}
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                        <Settings className="w-5 h-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-slate-900">
-                                            {getEntityDisplayName(selectedEntity)}
-                                        </h3>
-                                        <p className="text-xs text-slate-500 capitalize">{selectedEntity.type}</p>
-                                    </div>
-                                </div>
-
-                                {/* Properties */}
-                                <div className="space-y-3 pt-2">
-                                    {selectedEntity.type === 'room' && 'props' in selectedEntity && selectedEntity.props && (
-                                        <>
-                                            <PropertyRow label="Width" value={`${(selectedEntity.props.width / 12).toFixed(1)}'`} />
-                                            <PropertyRow label="Length" value={`${(selectedEntity.props.length / 12).toFixed(1)}'`} />
-                                        </>
-                                    )}
-                                    <PropertyRow label="X Position" value={`${Math.round(selectedEntity.transform.x)}`} />
-                                    <PropertyRow label="Y Position" value={`${Math.round(selectedEntity.transform.y)}`} />
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-12 text-center">
-                                <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mb-4">
-                                    <Info className="w-7 h-7 text-slate-400" />
-                                </div>
-                                <p className="text-sm font-medium text-slate-600">No Selection</p>
-                                <p className="text-xs text-slate-400 mt-1">Select an item to view properties</p>
-                            </div>
-                        )}
+                    <div className="h-full" data-testid="properties-panel">
+                       <InspectorPanel className="h-full border-none shadow-none" />
                     </div>
                 )}
 
@@ -230,7 +185,7 @@ export const RightSidebar: React.FC = () => {
                                         key={entity.id} 
                                         className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm"
                                     >
-                                        <span className="font-medium text-slate-800">{getEntityDisplayName(entity)}</span>
+                                        <span className="font-medium text-slate-800">{entity.type}</span>
                                         <span className="badge badge-slate capitalize">{entity.type}</span>
                                     </div>
                                 ))}
@@ -256,10 +211,3 @@ export const RightSidebar: React.FC = () => {
         </aside>
     );
 };
-
-const PropertyRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-    <div className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-        <span className="text-sm text-slate-500">{label}</span>
-        <span className="text-sm font-medium text-slate-800 font-mono">{value}</span>
-    </div>
-);
