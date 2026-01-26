@@ -84,6 +84,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 - Remove/merge duplicate `KeyboardShortcutsDialog` implementations.
 
 ### [ ] Step: Inspector + side panels wiring
+<!-- chat-id: 196e530a-f7d2-4564-b51e-5b5800abf5fe -->
 - Wire `InspectorPanel`, `CanvasPropertiesInspector`, `ProjectSidebar` into feature `RightSidebar`.
 - Implement unit system switching if required by docs.
 
