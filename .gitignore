@@ -23,5 +23,10 @@ build/
 .auto-claude-status
 .claude_settings.json
 
+# Local agent artifacts
+.tmp/
+typecheck-*.txt
+typecheck-*.count.txt
+
 # Windows junk
 nul
