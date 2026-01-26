@@ -86,7 +86,9 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 ### [x] Step: Inspector + side panels wiring
 <!-- chat-id: 196e530a-f7d2-4564-b51e-5b5800abf5fe -->
 - Wire `InspectorPanel`, `CanvasPropertiesInspector`, `ProjectSidebar` into feature `RightSidebar`.
-- Implement unit system switching if required by docs.
+- Add left sidebar tabs (Project Properties, Product Catalog).
+- Add right sidebar tabs (Properties, BOM, Calculations).
+- Implement unit system switching + persistence (preferences + project file).
 
 ### [ ] Step: Export workflows (real PDF)
 - Replace placeholder PDF export with real binary PDF generation.

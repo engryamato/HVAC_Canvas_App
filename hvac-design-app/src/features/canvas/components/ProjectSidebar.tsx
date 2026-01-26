@@ -12,6 +12,30 @@ interface ProjectSidebarProps {
     className?: string;
 }
 
+type MaterialSelection = { type: string; grade?: string };
+
+function normalizeMaterialSelection(value: unknown): MaterialSelection | null {
+    if (typeof value === 'string') {
+        return { type: value };
+    }
+
+    if (!value || typeof value !== 'object') {
+        return null;
+    }
+
+    const recordValue = value as Record<string, unknown>;
+    const type = recordValue.type;
+    if (typeof type !== 'string' || type.length === 0) {
+        return null;
+    }
+
+    const grade = recordValue.grade;
+    return {
+        type,
+        grade: typeof grade === 'string' && grade.length > 0 ? grade : undefined,
+    };
+}
+
 export function ProjectSidebar({ className }: ProjectSidebarProps) {
     const { projectDetails } = useProjectStore();
 
@@ -22,15 +46,10 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
     const { projectName, projectNumber, clientName, location, scope, siteConditions } = projectDetails;
 
     const normalizedScopeMaterials = useMemo(() => {
-        const materials = scope?.materials ?? [];
+        const materials = (scope?.materials ?? []) as unknown[];
         return materials
-            .map((material: any) => {
-                if (typeof material === 'string') {
-                    return { type: material };
-                }
-                return material;
-            })
-            .filter((material: any) => Boolean(material?.type));
+            .map(normalizeMaterialSelection)
+            .filter((material): material is MaterialSelection => material !== null);
     }, [scope]);
 
     return (
@@ -65,7 +84,7 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
                                     </ul>
                                     <div className="font-medium mt-2">Materials</div>
                                     <ul className="list-disc list-inside pl-1 text-muted-foreground">
-                                        {normalizedScopeMaterials.map((m: any) => (
+                                        {normalizedScopeMaterials.map((m) => (
                                             <li key={m.type}>{m.type} {m.grade ? `(${m.grade})` : ''}</li>
                                         ))}
                                     </ul>

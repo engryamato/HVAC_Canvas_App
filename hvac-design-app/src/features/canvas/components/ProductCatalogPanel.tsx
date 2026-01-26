@@ -142,6 +142,12 @@ export function ProductCatalogPanel() {
                   key={item.id}
                   className="rounded border border-slate-200 bg-white p-2"
                   data-testid="catalog-item"
+                  draggable
+                  onDragStart={(event) => {
+                    event.dataTransfer.effectAllowed = 'copy';
+                    event.dataTransfer.setData('application/x-hvac-catalog-item', JSON.stringify(item));
+                    event.dataTransfer.setData('text/plain', `${item.name} | ${item.brand} ${item.model}`);
+                  }}
                 >
                   <div className="text-sm font-medium text-slate-800">{item.name}</div>
                   <div className="text-xs text-slate-600">
@@ -159,4 +165,3 @@ export function ProductCatalogPanel() {
 }
 
 export default ProductCatalogPanel;
-

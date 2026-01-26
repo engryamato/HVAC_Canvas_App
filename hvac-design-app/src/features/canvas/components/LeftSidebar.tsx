@@ -88,7 +88,7 @@ function normalizeLeftTab(value: string): LeftTabId {
   if (value === 'project' || value === 'catalog') {
     return value;
   }
-  return 'catalog';
+  return 'project';
 }
 
 export function LeftSidebar({

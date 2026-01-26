@@ -2,7 +2,10 @@
 
 ## Overview
 
-The LeftSidebar is a resizable drawer layer dedicated to project-level information and context. It provides inputs for project metadata, scope configuration, and site conditions that affect HVAC calculations.
+The LeftSidebar is a resizable drawer layer with two tabs:
+
+- **Project Properties**: project metadata, scope configuration, and site conditions.
+- **Product Catalog**: catalog browser for equipment and metal products (ducts, fittings, etc.) with brand/model (drag-to-canvas is future work).
 
 ## Location
 
