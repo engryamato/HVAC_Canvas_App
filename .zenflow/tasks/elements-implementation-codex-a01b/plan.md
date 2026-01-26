@@ -91,6 +91,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 - Implement unit system switching + persistence (preferences + project file).
 
 ### [ ] Step: Export workflows (real PDF)
+<!-- chat-id: dc1b459c-0094-46f1-a05c-9a8127797532 -->
 - Replace placeholder PDF export with real binary PDF generation.
 - Web: download as Blob.
 - Tauri: save bytes to disk.
