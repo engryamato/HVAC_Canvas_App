@@ -143,6 +143,27 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     return () => window.removeEventListener('sws:canvas-save', handleSaveRequest);
   }, [triggerSave]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const handleToastRequest = (event: Event) => {
+      const toastEvent = event as CustomEvent<{ message?: string; type?: ToastProps['type'] }>;
+      const message = toastEvent.detail?.message;
+      const type = toastEvent.detail?.type;
+
+      if (!message || !type) {
+        return;
+      }
+
+      pushToast(message, type);
+    };
+
+    window.addEventListener('sws:toast', handleToastRequest);
+    return () => window.removeEventListener('sws:toast', handleToastRequest);
+  }, [pushToast]);
+
   useKeyboardShortcuts({
     onZoomToSelection: (result) => {
       if (!result.success && result.message) {

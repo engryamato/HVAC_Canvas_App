@@ -51,7 +51,11 @@ export function useExport() {
                 return { success: true, filePath };
             } else {
                 // Web mode: Trigger browser download
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const arrayBuffer = pdfBytes.buffer.slice(
+                    pdfBytes.byteOffset,
+                    pdfBytes.byteOffset + pdfBytes.byteLength
+                ) as ArrayBuffer;
+                const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;

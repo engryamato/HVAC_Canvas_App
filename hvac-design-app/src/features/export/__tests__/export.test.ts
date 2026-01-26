@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { exportProjectToCsv } from '../csv';
 import { exportProjectToJson } from '../json';
+import { exportProjectPDF } from '../pdf';
 import { downloadFile } from '../download';
 import type { ProjectFile } from '@/core/schema';
 
@@ -381,5 +382,19 @@ describe('Export - Integration', () => {
     expect(duct.calculated.perimeter).toBeCloseTo(40.123456, 6);
     expect(duct.calculated.velocity).toBeCloseTo(800.9876, 4);
     expect(duct.calculated.pressureLoss).toBeCloseTo(0.15432, 5);
+  });
+});
+
+describe('Export - PDF', () => {
+  it('generates a valid PDF file header', async () => {
+    const project = createMockProject();
+
+    const result = await exportProjectPDF(project, { pageSize: 'a3' });
+    expect(result.success).toBe(true);
+    expect(result.data).toBeInstanceOf(Uint8Array);
+
+    const bytes = result.data ?? new Uint8Array();
+    const header = new TextDecoder().decode(bytes.slice(0, 5));
+    expect(header).toBe('%PDF-');
   });
 });
