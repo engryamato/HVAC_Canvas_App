@@ -168,7 +168,9 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
-  if (!isOpen) {return null;}
+  if (!isOpen) {
+    return null;
+  }
 
   const confirmVariant = variant === 'danger' ? 'destructive' : 'default';
 
@@ -191,7 +193,7 @@ export function ConfirmDialog({
       >
         <DialogHeader>
           <DialogTitle className={titleClassName}>{title}</DialogTitle>
-          <DialogDescription>{message}</DialogDescription>
+          <DialogDescription className="text-slate-600">{message}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex gap-2 mt-4">
           <Button ref={cancelButtonRef} variant="outline" onClick={onCancel}>
@@ -414,5 +416,9 @@ describe('ConfirmDialog', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
+
+  // Note: Depending on your test setup, Radix `Dialog` Escape handling may require
+  // a more complete JSDOM environment (focus management / portals). If this flakes,
+  // consider asserting via `onOpenChange` behavior in an integration-style test.
 });
 ```
