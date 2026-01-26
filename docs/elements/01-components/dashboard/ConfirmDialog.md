@@ -121,9 +121,6 @@ Implementation note: uses Radix `Dialog` `onOpenChange` to detect close via over
 - **Cancel button**: Calls `onCancel` and closes dialog.
 - **Confirm button**: Calls `onConfirm` (caller decides whether to close).
 
-- **Cancel button**: Calls `onCancel`, closes dialog
-- **Confirm button**: Calls `onConfirm`, typically closes dialog after action completes
-
 ### 4. Variant Styling
 
 The `variant` prop changes the confirm button color:
@@ -137,7 +134,7 @@ The `variant` prop changes the confirm button color:
 ```tsx
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -169,6 +166,8 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
   if (!isOpen) {return null;}
 
   const confirmVariant = variant === 'danger' ? 'destructive' : 'default';
@@ -182,13 +181,20 @@ export function ConfirmDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="max-w-md">
+      <DialogContent
+        className="max-w-md"
+        data-testid="confirm-dialog"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          cancelButtonRef.current?.focus();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className={titleClassName}>{title}</DialogTitle>
           <DialogDescription>{message}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex gap-2 mt-4">
-          <Button variant="outline" onClick={onCancel}>
+          <Button ref={cancelButtonRef} variant="outline" onClick={onCancel}>
             {cancelLabel}
           </Button>
           <Button variant={confirmVariant} onClick={onConfirm}>
@@ -302,110 +308,19 @@ function ExportButton() {
 
 ## Styling
 
-```css
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.dialog {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  width: 90%;
-  max-width: 420px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.header h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-}
-
-.content {
-  margin: 16px 0;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.cancelButton {
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  background: white;
-  color: #374151;
-}
-
-.confirmButton {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  color: white;
-}
-
-.confirmButton.danger {
-  background: #dc2626;
-}
-
-.confirmButton.warning {
-  background: #f59e0b;
-}
-
-.confirmButton.info {
-  background: #2563eb;
-}
-```
+- Layout: `DialogContent` uses `max-w-md`.
+- Title severity: `text-red-600` (danger), `text-yellow-700` (warning), default `text-slate-900`.
+- Footer: `DialogFooter` uses `flex gap-2 mt-4`.
+- Buttons:
+  - Cancel uses `Button` `variant="outline"`.
+  - Confirm uses `variant="destructive"` when `variant === 'danger'`.
 
 ## Accessibility
 
-### Keyboard Support
-
-Consider adding keyboard handlers in parent component:
-
-```tsx
-useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (!isOpen) return;
-
-    if (e.key === 'Escape') {
-      onCancel();
-    } else if (e.key === 'Enter') {
-      onConfirm();
-    }
-  };
-
-  document.addEventListener('keydown', handleKeyDown);
-  return () => document.removeEventListener('keydown', handleKeyDown);
-}, [isOpen, onCancel, onConfirm]);
-```
-
-### Focus Management
-
-Consider auto-focusing the cancel button when dialog opens:
-
-```tsx
-const cancelButtonRef = useRef<HTMLButtonElement>(null);
-
-useEffect(() => {
-  if (isOpen) {
-    cancelButtonRef.current?.focus();
-  }
-}, [isOpen]);
-```
+- Focus trap and `Escape` handling are provided by Radix `Dialog`.
+- Close via backdrop/Escape is routed through `onOpenChange`, which calls `onCancel`.
+- Initial focus is set via `onOpenAutoFocus` to the safe default (Cancel).
+- ARIA semantics are provided by `DialogTitle` and `DialogDescription`.
 
 ## Related Elements
 
@@ -420,21 +335,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ConfirmDialog } from './ConfirmDialog';
 
 describe('ConfirmDialog', () => {
-  const mockOnConfirm = vi.fn();
-  const mockOnCancel = vi.fn();
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('renders when isOpen is true', () => {
     render(
       <ConfirmDialog
-        isOpen={true}
+        isOpen
         title="Test Title"
         message="Test message"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        onConfirm={() => {}}
+        onCancel={() => {}}
       />
     );
 
@@ -448,105 +356,63 @@ describe('ConfirmDialog', () => {
         isOpen={false}
         title="Test"
         message="Test"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        onConfirm={() => {}}
+        onCancel={() => {}}
       />
     );
 
     expect(screen.queryByText('Test')).not.toBeInTheDocument();
   });
 
-  it('calls onConfirm when confirm button clicked', () => {
+  it('calls onConfirm when confirm clicked', async () => {
+    const onConfirm = vi.fn();
+
     render(
       <ConfirmDialog
-        isOpen={true}
+        isOpen
         title="Test"
         message="Test"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        onConfirm={onConfirm}
+        onCancel={() => {}}
       />
     );
 
-    fireEvent.click(screen.getByText('Confirm'));
-    expect(mockOnConfirm).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onCancel when cancel button clicked', () => {
+  it('calls onCancel when cancel clicked', async () => {
+    const onCancel = vi.fn();
+
     render(
       <ConfirmDialog
-        isOpen={true}
+        isOpen
         title="Test"
         message="Test"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        onConfirm={() => {}}
+        onCancel={onCancel}
       />
     );
 
-    fireEvent.click(screen.getByText('Cancel'));
-    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onCancel when backdrop clicked', () => {
+  it('calls onCancel when Escape pressed', async () => {
+    const onCancel = vi.fn();
+
     render(
       <ConfirmDialog
-        isOpen={true}
+        isOpen
         title="Test"
         message="Test"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        onConfirm={() => {}}
+        onCancel={onCancel}
       />
     );
 
-    fireEvent.click(screen.getByText('Test Title').closest('.overlay')!);
-    expect(mockOnCancel).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not close when dialog interior clicked', () => {
-    render(
-      <ConfirmDialog
-        isOpen={true}
-        title="Test"
-        message="Test"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
-      />
-    );
-
-    fireEvent.click(screen.getByText('Test message'));
-    expect(mockOnCancel).not.toHaveBeenCalled();
-  });
-
-  it('renders custom button labels', () => {
-    render(
-      <ConfirmDialog
-        isOpen={true}
-        title="Test"
-        message="Test"
-        confirmLabel="Delete"
-        cancelLabel="Keep"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
-      />
-    );
-
-    expect(screen.getByText('Delete')).toBeInTheDocument();
-    expect(screen.getByText('Keep')).toBeInTheDocument();
-  });
-
-  it('applies danger variant styling', () => {
-    render(
-      <ConfirmDialog
-        isOpen={true}
-        title="Test"
-        message="Test"
-        variant="danger"
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
-      />
-    );
-
-    const confirmButton = screen.getByText('Confirm');
-    expect(confirmButton).toHaveClass('danger');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 });
 ```
