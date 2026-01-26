@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,8 @@ export function ProjectAlreadyExistsDialog({
   onContinue,
   onCancel,
 }: ProjectAlreadyExistsDialogProps) {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
   return (
     <Dialog
       open={open}
@@ -36,7 +39,14 @@ export function ProjectAlreadyExistsDialog({
         onOpenChange(nextOpen);
       }}
     >
-      <DialogContent className="max-w-md" data-testid="project-already-exists-dialog">
+      <DialogContent
+        className="max-w-md"
+        data-testid="project-already-exists-dialog"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          cancelButtonRef.current?.focus();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Project already exists</DialogTitle>
           <DialogDescription>
@@ -45,7 +55,12 @@ export function ProjectAlreadyExistsDialog({
         </DialogHeader>
 
         <DialogFooter className="flex gap-2 mt-4">
-          <Button variant="outline" onClick={onCancel} data-testid="project-exists-cancel">
+          <Button
+            ref={cancelButtonRef}
+            variant="outline"
+            onClick={onCancel}
+            data-testid="project-exists-cancel"
+          >
             Cancel
           </Button>
           <Button onClick={onContinue} data-testid="project-exists-continue">

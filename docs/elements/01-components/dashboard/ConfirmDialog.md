@@ -114,24 +114,12 @@ Dialog is completely unmounted when closed (not just hidden).
 - Backdrop click closes dialog and triggers `onCancel`.
 - `Escape` closes dialog and triggers `onCancel`.
 
-- Clicking the backdrop (overlay) triggers `onCancel`
-- Clicking inside the dialog stops event propagation (prevents closing)
+Implementation note: uses Radix `Dialog` `onOpenChange` to detect close via overlay/Escape and invoke `onCancel`.
 
 ### 3. Button Actions
 
-```tsx
-<div className={styles.actions}>
-  <button className={styles.cancelButton} onClick={onCancel}>
-    {cancelLabel}
-  </button>
-  <button
-    className={`${styles.confirmButton} ${styles[variant]}`}
-    onClick={onConfirm}
-  >
-    {confirmLabel}
-  </button>
-</div>
-```
+- **Cancel button**: Calls `onCancel` and closes dialog.
+- **Confirm button**: Calls `onConfirm` (caller decides whether to close).
 
 - **Cancel button**: Calls `onCancel`, closes dialog
 - **Confirm button**: Calls `onConfirm`, typically closes dialog after action completes
@@ -150,7 +138,15 @@ The `variant` prop changes the confirm button color:
 'use client';
 
 import React from 'react';
-import styles from './ConfirmDialog.module.css';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -173,32 +169,34 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
+
+  const confirmVariant = variant === 'danger' ? 'destructive' : 'default';
+
+  const titleClassName =
+    variant === 'danger'
+      ? 'text-red-600'
+      : variant === 'warning'
+        ? 'text-yellow-700'
+        : 'text-slate-900';
 
   return (
-    <div className={styles.overlay} onClick={onCancel}>
-      <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.header}>
-          <h2>{title}</h2>
-        </div>
-
-        <div className={styles.content}>
-          <p>{message}</p>
-        </div>
-
-        <div className={styles.actions}>
-          <button className={styles.cancelButton} onClick={onCancel}>
+    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className={titleClassName}>{title}</DialogTitle>
+          <DialogDescription>{message}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex gap-2 mt-4">
+          <Button variant="outline" onClick={onCancel}>
             {cancelLabel}
-          </button>
-          <button
-            className={`${styles.confirmButton} ${styles[variant]}`}
-            onClick={onConfirm}
-          >
+          </Button>
+          <Button variant={confirmVariant} onClick={onConfirm}>
             {confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
