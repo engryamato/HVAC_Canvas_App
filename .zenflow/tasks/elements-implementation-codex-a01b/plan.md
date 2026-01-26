@@ -79,6 +79,7 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 - Apply settings to canvas behavior.
 
 ### [ ] Step: Dialog UX completeness
+<!-- chat-id: 151cb9f0-7455-4adb-88a7-0098c30597dc -->
 - Ensure Escape handling and focus management for documented dialogs.
 - Remove/merge duplicate `KeyboardShortcutsDialog` implementations.
 
