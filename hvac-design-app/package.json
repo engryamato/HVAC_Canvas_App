@@ -54,13 +54,13 @@
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.562.0",
     "nanoid": "^5.1.6",
-    "next": "^15.0.0",
+    "next": "^15.5.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "vibe-kanban-web-companion": "^0.0.5",
-    "zod": "4.3.5",
+    "zod": "4.3.6",
     "zustand": "5.0.10"
   },
   "devDependencies": {
