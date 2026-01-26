@@ -5,6 +5,11 @@ export type PdfPageSize = 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'letter' | 'legal' 
 
 export interface ExportPdfOptions {
   pageSize?: PdfPageSize;
+  snapshot?: {
+    dataUrl: string;
+    widthPx: number;
+    heightPx: number;
+  };
 }
 
 export interface PdfExportResult {
@@ -25,7 +30,7 @@ export async function exportProjectPDF(project: ProjectFile, options?: ExportPdf
     const pageSize = options?.pageSize ?? 'letter';
     const doc = new jsPDF({
       unit: 'mm',
-      format: pageSize,
+      format: getPdfFormat(pageSize),
     });
 
     const entityList = project.entities.allIds
@@ -46,21 +51,31 @@ export async function exportProjectPDF(project: ProjectFile, options?: ExportPdf
       }))
     );
 
-    let yPosition = 18;
+    const marginX = 14;
+    const marginY = 14;
+    let yPosition = marginY + 4;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text(project.projectName, 14, yPosition);
+    doc.text(project.projectName, marginX, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, yPosition);
-    yPosition += 10;
+    doc.text(`Generated: ${new Date().toLocaleString()}`, marginX, yPosition);
+    yPosition += 8;
+
+    if (options?.snapshot?.dataUrl) {
+      yPosition = addSnapshotToPdf(doc, options.snapshot, { marginX, yPosition, marginY });
+    }
+
+    doc.addPage();
+
+    yPosition = marginY + 4;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('Entity Summary', 14, yPosition);
+    doc.text('Entity Summary', marginX, yPosition);
     yPosition += 4;
 
     autoTable(doc, {
@@ -76,7 +91,7 @@ export async function exportProjectPDF(project: ProjectFile, options?: ExportPdf
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('Bill of Materials', 14, yPosition);
+    doc.text('Bill of Materials', marginX, yPosition);
     yPosition += 4;
 
     autoTable(doc, {
@@ -134,6 +149,51 @@ function getEntitySizeLabel(entity: Entity): string | undefined {
   }
 
   return undefined;
+}
+
+function getPdfFormat(pageSize: PdfPageSize): [number, number] {
+  switch (pageSize) {
+    case 'a0':
+      return [841, 1189];
+    case 'a1':
+      return [594, 841];
+    case 'a2':
+      return [420, 594];
+    case 'a3':
+      return [297, 420];
+    case 'a4':
+      return [210, 297];
+    case 'legal':
+      return [216, 356];
+    case 'tabloid':
+      return [279, 432];
+    case 'letter':
+    default:
+      return [216, 279];
+  }
+}
+
+function addSnapshotToPdf(
+  doc: any,
+  snapshot: { dataUrl: string; widthPx: number; heightPx: number },
+  layout: { marginX: number; marginY: number; yPosition: number }
+): number {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const availableWidth = pageWidth - layout.marginX * 2;
+  const availableHeight = pageHeight - layout.yPosition - layout.marginY;
+
+  const aspectRatio = snapshot.widthPx > 0 ? snapshot.heightPx / snapshot.widthPx : 1;
+  let renderWidth = availableWidth;
+  let renderHeight = renderWidth * aspectRatio;
+
+  if (renderHeight > availableHeight) {
+    renderHeight = availableHeight;
+    renderWidth = renderHeight / aspectRatio;
+  }
+
+  doc.addImage(snapshot.dataUrl, 'PNG', layout.marginX, layout.yPosition, renderWidth, renderHeight);
+  return layout.yPosition + renderHeight + 6;
 }
 
 function getEntityDisplayName(entity: Entity): string | undefined {

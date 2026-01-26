@@ -10,6 +10,7 @@ import { downloadFile } from './download';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
 import type { PdfPageSize } from './pdf';
+import { captureCanvasSnapshot } from './canvasSnapshot';
 
 const PDF_PAGE_SIZES: Array<{ label: string; value: PdfPageSize }> = [
   { label: 'Letter', value: 'letter' },
@@ -76,7 +77,9 @@ export function ExportMenu() {
       return;
     }
 
-    const pdfResult = await exportProjectPDF(project, { pageSize: pdfPageSize });
+    const snapshot = await captureCanvasSnapshot();
+
+    const pdfResult = await exportProjectPDF(project, { pageSize: pdfPageSize, snapshot: snapshot ?? undefined });
     if (!pdfResult.success || !pdfResult.data) {
       pushToast(pdfResult.error ?? 'PDF export failed', 'error');
       return;
