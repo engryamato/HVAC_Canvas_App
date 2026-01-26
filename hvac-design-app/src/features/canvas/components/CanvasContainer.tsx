@@ -3,12 +3,14 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useViewportStore } from '../store/viewportStore';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../store/selectionStore';
 import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
 import type { Entity, Room, Duct, Equipment } from '@/core/schema';
 import { useViewport } from '../hooks/useViewport';
 import { useCursorStore } from '../store/cursorStore';
+import { RulersOverlay } from './RulersOverlay';
 
 // Tools
 import {
@@ -59,6 +61,8 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   // Store state
   const { panX, panY, zoom, gridVisible, gridSize } = useViewportStore();
+  const showRulers = usePreferencesStore((state) => state.showRulers);
+  const unitSystem = usePreferencesStore((state) => state.unitSystem);
   const currentTool = useToolStore((state) => state.currentTool);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
@@ -471,6 +475,15 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   return (
     <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
+      {showRulers && (
+        <RulersOverlay
+          containerRef={containerRef}
+          panX={panX}
+          panY={panY}
+          zoom={zoom}
+          unitSystem={unitSystem}
+        />
+      )}
       <canvas
         ref={canvasRef}
         className="absolute inset-0"

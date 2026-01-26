@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
-import { RulersOverlay } from './components/RulersOverlay';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
 import { LeftSidebar } from './components/LeftSidebar';
@@ -43,7 +42,6 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
   usePreferencesStore((state) => state.projectFolder);
   const snapToGridPreference = usePreferencesStore((state) => state.snapToGrid);
-  const showRulers = usePreferencesStore((state) => state.showRulers);
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
   const projectDetails = useProjectDetails();
 
@@ -164,7 +162,6 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
         <LeftSidebar />
 
         <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern">
-          {showRulers && <RulersOverlay />}
           <CanvasContainer className="w-full h-full" />
 
           <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">

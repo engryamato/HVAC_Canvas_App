@@ -28,9 +28,13 @@ src/core/store/preferencesStore.ts
 interface PreferencesState {
   projectFolder: string;
   unitSystem: 'imperial' | 'metric';
+  autoSaveEnabled: boolean;
   autoSaveInterval: number; // milliseconds
   gridSize: number; // pixels
   theme: 'light' | 'dark';
+  compactMode: boolean;
+  snapToGrid: boolean;
+  showRulers: boolean;
 }
 ```
 
@@ -40,9 +44,13 @@ interface PreferencesState {
 export const PREFERENCES_DEFAULTS: PreferencesState = {
   projectFolder: '/projects',
   unitSystem: 'imperial',
+  autoSaveEnabled: true,
   autoSaveInterval: 300000, // 5 minutes
   gridSize: 24, // pixels
   theme: 'light',
+  compactMode: false,
+  snapToGrid: true,
+  showRulers: false,
 };
 ```
 
@@ -52,9 +60,13 @@ export const PREFERENCES_DEFAULTS: PreferencesState = {
 |--------|-----------|-------------|
 | `setProjectFolder` | `(path: string) => void` | Set default project directory |
 | `setUnitSystem` | `(system: 'imperial' \| 'metric') => void` | Switch between imperial/metric |
+| `setAutoSaveEnabled` | `(enabled: boolean) => void` | Enable/disable auto-save |
 | `setAutoSaveInterval` | `(ms: number) => void` | Set auto-save interval |
 | `setGridSize` | `(size: number) => void` | Set canvas grid size |
 | `setTheme` | `(theme: 'light' \| 'dark') => void` | Switch theme mode |
+| `setCompactMode` | `(enabled: boolean) => void` | Enable/disable compact mode |
+| `setSnapToGrid` | `(enabled: boolean) => void` | Enable/disable snap-to-grid |
+| `setShowRulers` | `(enabled: boolean) => void` | Enable/disable rulers overlay |
 
 ## Persistence
 
@@ -65,9 +77,13 @@ Preferences are stored in localStorage under the key `sws.preferences`:
   "state": {
     "projectFolder": "/Users/john/hvac-projects",
     "unitSystem": "imperial",
+    "autoSaveEnabled": true,
     "autoSaveInterval": 30000,
     "gridSize": 24,
-    "theme": "dark"
+    "theme": "dark",
+    "compactMode": false,
+    "snapToGrid": true,
+    "showRulers": false
   },
   "version": 0
 }
