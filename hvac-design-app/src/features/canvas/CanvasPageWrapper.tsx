@@ -8,6 +8,7 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useViewportStore } from './store/viewportStore';
 import { useSelectionStore } from './store/selectionStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { type ReversibleCommand } from '@/core/commands/types';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
@@ -60,13 +61,14 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
       
       if (payload?.viewport) {
+        const preferences = usePreferencesStore.getState();
         useViewportStore.setState({
           panX: payload.viewport.panX,
           panY: payload.viewport.panY,
           zoom: payload.viewport.zoom,
           gridVisible: payload.viewport.gridVisible,
           gridSize: payload.viewport.gridSize,
-          snapToGrid: payload.viewport.snapToGrid,
+          snapToGrid: preferences.snapToGrid,
         });
       }
       

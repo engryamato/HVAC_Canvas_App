@@ -8,6 +8,7 @@ import {
   DEFAULT_ZOOM,
   DEFAULT_GRID_SIZE,
 } from '@/core/constants/viewport';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 
 interface ViewportState {
   panX: number;
@@ -190,6 +191,7 @@ export const useViewportStore = create<ViewportStore>()(
     toggleSnap: () =>
       set((state) => {
         state.snapToGrid = !state.snapToGrid;
+        usePreferencesStore.getState().setSnapToGrid(state.snapToGrid);
       }),
   }))
 );

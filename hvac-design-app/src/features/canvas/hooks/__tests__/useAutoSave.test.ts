@@ -11,6 +11,7 @@ import {
 } from '../useAutoSave';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useViewportStore } from '../../store/viewportStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import type { Room } from '@/core/schema';
@@ -77,9 +78,13 @@ const basePayload = (projectId: string): LocalStoragePayload => ({
   preferences: {
     projectFolder: '/projects',
     unitSystem: 'imperial',
+    autoSaveEnabled: true,
     autoSaveInterval: 300000,
     gridSize: 24,
     theme: 'light',
+    compactMode: false,
+    snapToGrid: true,
+    showRulers: false,
   },
   settings: { autoOpenLastProject: false },
   projectIndex: { projects: [], recentProjectIds: [], loading: false },
@@ -146,6 +151,7 @@ describe('useAutoSave - Storage Functions', () => {
 
 describe('useAutoSave - Payload helpers', () => {
   beforeEach(() => {
+    usePreferencesStore.setState({ snapToGrid: true });
     useViewportStore.setState({
       panX: 0,
       panY: 0,
@@ -156,8 +162,11 @@ describe('useAutoSave - Payload helpers', () => {
     });
   });
 
-  it('hydrates snapToGrid from project settings when available', () => {
+  it('hydrates snapToGrid from global preferences', () => {
     const projectId = '33333333-3333-4333-8333-333333333333';
+
+    usePreferencesStore.setState({ snapToGrid: false });
+
     const payload = createLocalStoragePayloadFromProjectFileWithDefaults({
       ...basePayload(projectId).project,
       settings: {
@@ -175,6 +184,7 @@ describe('useAutoSave - Payload helpers', () => {
 describe('useAutoSave - Hook Behavior', () => {
   beforeEach(() => {
     localStorage.clear();
+    usePreferencesStore.setState({ autoSaveEnabled: true });
     useEntityStore.getState().clearAllEntities();
     useViewportStore.setState({
       panX: 0,

@@ -2,10 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
+import { RulersOverlay } from './components/RulersOverlay';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
 import { LeftSidebar } from './components/LeftSidebar';
 import { RightSidebar } from './components/RightSidebar';
+import { useViewportStore } from './store/viewportStore';
 
 import { useAutoSave } from './hooks';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
@@ -40,6 +42,8 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   // Note: Project data is now managed internally by stores via CanvasPageWrapper and useAutoSave
 
   usePreferencesStore((state) => state.projectFolder);
+  const snapToGridPreference = usePreferencesStore((state) => state.snapToGrid);
+  const showRulers = usePreferencesStore((state) => state.showRulers);
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
   const projectDetails = useProjectDetails();
 
@@ -117,6 +121,10 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const triggerSave = saveNow;
 
   useEffect(() => {
+    useViewportStore.setState({ snapToGrid: snapToGridPreference });
+  }, [snapToGridPreference]);
+
+  useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
@@ -156,6 +164,7 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
         <LeftSidebar />
 
         <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern">
+          {showRulers && <RulersOverlay />}
           <CanvasContainer className="w-full h-full" />
 
           <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">

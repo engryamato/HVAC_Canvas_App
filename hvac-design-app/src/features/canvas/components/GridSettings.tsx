@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useViewportStore } from '../store/viewportStore';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 
 /**
  * Grid size options with labels for display
@@ -21,8 +22,8 @@ interface GridSettingsProps {
  * Grid settings component for controlling grid visibility, snap, and size.
  */
 export function GridSettings({ className }: GridSettingsProps) {
-  const { gridVisible, gridSize, toggleGrid, setGridSize, snapToGrid, toggleSnap } =
-    useViewportStore();
+  const { gridVisible, gridSize, toggleGrid, setGridSize, snapToGrid } = useViewportStore();
+  const setSnapToGrid = usePreferencesStore((state) => state.setSnapToGrid);
 
   return (
     <div className={`flex items-center gap-4 p-2 bg-gray-100 rounded ${className || ''}`}>
@@ -40,7 +41,7 @@ export function GridSettings({ className }: GridSettingsProps) {
         <input
           type="checkbox"
           checked={snapToGrid}
-          onChange={toggleSnap}
+          onChange={(event) => setSnapToGrid(event.target.checked)}
           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <span className="text-sm text-gray-700">Snap to Grid</span>

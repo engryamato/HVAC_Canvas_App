@@ -50,9 +50,13 @@ export interface LocalStoragePayload {
   preferences: {
     projectFolder: string;
     unitSystem: 'imperial' | 'metric';
+    autoSaveEnabled: boolean;
     autoSaveInterval: number;
     gridSize: number;
     theme: 'light' | 'dark';
+    compactMode: boolean;
+    snapToGrid: boolean;
+    showRulers: boolean;
   };
   settings: {
     autoOpenLastProject: boolean;
@@ -182,9 +186,13 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
     preferences: {
       projectFolder: preferences.projectFolder,
       unitSystem: preferences.unitSystem,
+      autoSaveEnabled: preferences.autoSaveEnabled,
       autoSaveInterval: preferences.autoSaveInterval,
       gridSize: preferences.gridSize,
       theme: preferences.theme,
+      compactMode: preferences.compactMode,
+      snapToGrid: preferences.snapToGrid,
+      showRulers: preferences.showRulers,
     },
     settings: {
       autoOpenLastProject: settings.autoOpenLastProject,
@@ -258,14 +266,18 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
       zoom: project.viewportState.zoom,
       gridVisible: project.settings.gridVisible ?? true,
       gridSize: project.settings.gridSize ?? preferences.gridSize,
-      snapToGrid: (project.settings as any).snapToGrid ?? true,
+      snapToGrid: preferences.snapToGrid,
     },
     preferences: {
       projectFolder: preferences.projectFolder,
       unitSystem: project.settings.unitSystem ?? preferences.unitSystem,
+      autoSaveEnabled: preferences.autoSaveEnabled,
       autoSaveInterval: preferences.autoSaveInterval,
       gridSize: project.settings.gridSize ?? preferences.gridSize,
       theme: preferences.theme,
+      compactMode: preferences.compactMode,
+      snapToGrid: preferences.snapToGrid,
+      showRulers: preferences.showRulers,
     },
     settings: {
       autoOpenLastProject: settings.autoOpenLastProject,
@@ -510,7 +522,10 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
   const storeIsDirty = useProjectStore((state) => state.isDirty);
   const { setDirty } = useProjectActions();
+  const autoSaveEnabled = usePreferencesStore((state) => state.autoSaveEnabled);
   const autoSaveInterval = usePreferencesStore((state) => state.autoSaveInterval);
+
+  const isAutoSaveActive = enabled && autoSaveEnabled;
 
   const [isDirty, setLocalDirty] = useState(storeIsDirty);
   const intervalTimer = useRef<NodeJS.Timeout | null>(null);
@@ -687,7 +702,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
   }, [setDirty]);
 
   useEffect(() => {
-    if (!enabled) {
+    if (!isAutoSaveActive) {
       return;
     }
 
@@ -706,18 +721,18 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
         intervalTimer.current = null;
       }
     };
-  }, [enabled, interval, autoSaveInterval, saveWithBackup]);
+  }, [isAutoSaveActive, interval, autoSaveInterval, saveWithBackup]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (storeIsDirty) {
+      if (isAutoSaveActive && storeIsDirty) {
         saveWithBackup('auto');
       }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [storeIsDirty, saveWithBackup]);
+  }, [isAutoSaveActive, storeIsDirty, saveWithBackup]);
 
   return {
     save: saveNow,

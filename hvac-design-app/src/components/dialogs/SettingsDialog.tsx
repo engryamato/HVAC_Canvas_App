@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 
 interface SettingsDialogProps {
     open: boolean;
@@ -16,6 +17,25 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+    const theme = usePreferencesStore((state) => state.theme);
+    const compactMode = usePreferencesStore((state) => state.compactMode);
+    const snapToGrid = usePreferencesStore((state) => state.snapToGrid);
+    const showRulers = usePreferencesStore((state) => state.showRulers);
+    const autoSaveEnabled = usePreferencesStore((state) => state.autoSaveEnabled);
+    const {
+        setTheme,
+        setCompactMode,
+        setSnapToGrid,
+        setShowRulers,
+        setAutoSaveEnabled,
+    } = usePreferencesStore((state) => ({
+        setTheme: state.setTheme,
+        setCompactMode: state.setCompactMode,
+        setSnapToGrid: state.setSnapToGrid,
+        setShowRulers: state.setShowRulers,
+        setAutoSaveEnabled: state.setAutoSaveEnabled,
+    }));
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
@@ -33,11 +53,19 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="dark-mode">Dark Mode</Label>
-                                <Switch id="dark-mode" disabled />
+                                <Switch
+                                    id="dark-mode"
+                                    checked={theme === 'dark'}
+                                    onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                                />
                             </div>
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="compact-mode">Compact Mode</Label>
-                                <Switch id="compact-mode" disabled />
+                                <Switch
+                                    id="compact-mode"
+                                    checked={compactMode}
+                                    onCheckedChange={setCompactMode}
+                                />
                             </div>
                         </div>
                     </div>
@@ -48,11 +76,19 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="snap-grid">Snap to Grid</Label>
-                                <Switch id="snap-grid" defaultChecked />
+                                <Switch
+                                    id="snap-grid"
+                                    checked={snapToGrid}
+                                    onCheckedChange={setSnapToGrid}
+                                />
                             </div>
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="show-rulers">Show Rulers</Label>
-                                <Switch id="show-rulers" />
+                                <Switch
+                                    id="show-rulers"
+                                    checked={showRulers}
+                                    onCheckedChange={setShowRulers}
+                                />
                             </div>
                         </div>
                     </div>
@@ -63,7 +99,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="auto-save">Enable Auto-save</Label>
-                                <Switch id="auto-save" defaultChecked />
+                                <Switch
+                                    id="auto-save"
+                                    checked={autoSaveEnabled}
+                                    onCheckedChange={setAutoSaveEnabled}
+                                />
                             </div>
                         </div>
                     </div>

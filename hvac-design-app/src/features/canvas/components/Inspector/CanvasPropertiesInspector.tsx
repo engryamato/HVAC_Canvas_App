@@ -5,6 +5,7 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { useViewportStore } from '../../store/viewportStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import styles from './CanvasPropertiesInspector.module.css';
 
 const GRID_SIZE_OPTIONS = [
@@ -38,8 +39,9 @@ export function CanvasPropertiesInspector() {
     snapToGrid,
     setGridSize,
     toggleGrid,
-    toggleSnap,
   } = useViewportStore();
+
+  const setSnapToGrid = usePreferencesStore((state) => state.setSnapToGrid);
 
   const projectDetails = useProjectStore((state) => state.projectDetails);
   const projectName = projectDetails?.projectName || 'Untitled';
@@ -96,7 +98,7 @@ export function CanvasPropertiesInspector() {
             <input
               type="checkbox"
               checked={snapToGrid}
-              onChange={toggleSnap}
+              onChange={(event) => setSnapToGrid(event.target.checked)}
               className={styles.checkbox}
             />
             <span>Snap to Grid</span>

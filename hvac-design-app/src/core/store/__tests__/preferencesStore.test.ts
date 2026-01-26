@@ -17,9 +17,13 @@ describe('PreferencesStore', () => {
       const state = usePreferencesStore.getState();
       expect(state.projectFolder).toBe('/projects');
       expect(state.unitSystem).toBe('imperial');
+      expect(state.autoSaveEnabled).toBe(true);
       expect(state.autoSaveInterval).toBe(300000);
       expect(state.gridSize).toBe(24);
       expect(state.theme).toBe('light');
+      expect(state.compactMode).toBe(false);
+      expect(state.snapToGrid).toBe(true);
+      expect(state.showRulers).toBe(false);
     });
   });
 
@@ -68,6 +72,19 @@ describe('PreferencesStore', () => {
     });
   });
 
+  describe('setAutoSaveEnabled', () => {
+    it('updates auto-save enabled', () => {
+      usePreferencesStore.getState().setAutoSaveEnabled(false);
+      expect(usePreferencesStore.getState().autoSaveEnabled).toBe(false);
+    });
+
+    it('persists auto-save enabled to localStorage', () => {
+      usePreferencesStore.getState().setAutoSaveEnabled(false);
+      const stored = JSON.parse(localStorage.getItem('sws.preferences') ?? '{}');
+      expect(stored.state.autoSaveEnabled).toBe(false);
+    });
+  });
+
   describe('setGridSize', () => {
     it('updates grid size', () => {
       usePreferencesStore.getState().setGridSize(48);
@@ -100,22 +117,51 @@ describe('PreferencesStore', () => {
     });
   });
 
+  describe('setCompactMode', () => {
+    it('updates compact mode', () => {
+      usePreferencesStore.getState().setCompactMode(true);
+      expect(usePreferencesStore.getState().compactMode).toBe(true);
+    });
+  });
+
+  describe('setSnapToGrid', () => {
+    it('updates snap-to-grid', () => {
+      usePreferencesStore.getState().setSnapToGrid(false);
+      expect(usePreferencesStore.getState().snapToGrid).toBe(false);
+    });
+  });
+
+  describe('setShowRulers', () => {
+    it('updates show rulers', () => {
+      usePreferencesStore.getState().setShowRulers(true);
+      expect(usePreferencesStore.getState().showRulers).toBe(true);
+    });
+  });
+
   describe('multiple preference updates', () => {
     it('updates individual preferences', () => {
       const actions = usePreferencesStore.getState();
 
       actions.setProjectFolder('/custom');
       actions.setUnitSystem('metric');
+      actions.setAutoSaveEnabled(false);
       actions.setAutoSaveInterval(120000);
       actions.setGridSize(12);
       actions.setTheme('dark');
+      actions.setCompactMode(true);
+      actions.setSnapToGrid(false);
+      actions.setShowRulers(true);
 
       expect(usePreferencesStore.getState()).toMatchObject({
         projectFolder: '/custom',
         unitSystem: 'metric',
+        autoSaveEnabled: false,
         autoSaveInterval: 120000,
         gridSize: 12,
         theme: 'dark',
+        compactMode: true,
+        snapToGrid: false,
+        showRulers: true,
       });
     });
 
@@ -123,17 +169,25 @@ describe('PreferencesStore', () => {
       const actions = usePreferencesStore.getState();
       actions.setProjectFolder('/my/projects');
       actions.setUnitSystem('metric');
+      actions.setAutoSaveEnabled(false);
       actions.setAutoSaveInterval(90000);
       actions.setGridSize(36);
       actions.setTheme('dark');
+      actions.setCompactMode(true);
+      actions.setSnapToGrid(false);
+      actions.setShowRulers(true);
 
       const stored = JSON.parse(localStorage.getItem('sws.preferences') ?? '{}');
       expect(stored.state).toMatchObject({
         projectFolder: '/my/projects',
         unitSystem: 'metric',
+        autoSaveEnabled: false,
         autoSaveInterval: 90000,
         gridSize: 36,
         theme: 'dark',
+        compactMode: true,
+        snapToGrid: false,
+        showRulers: true,
       });
     });
   });
@@ -150,9 +204,13 @@ describe('PreferencesStore', () => {
         state: {
           projectFolder: '/restored/path',
           unitSystem: 'metric',
+          autoSaveEnabled: false,
           autoSaveInterval: 45000,
           gridSize: 16,
           theme: 'dark',
+          compactMode: true,
+          snapToGrid: false,
+          showRulers: true,
         },
         version: 0,
       };
@@ -164,9 +222,13 @@ describe('PreferencesStore', () => {
       const state = usePreferencesStore.getState();
       expect(state.projectFolder).toBe('/restored/path');
       expect(state.unitSystem).toBe('metric');
+      expect(state.autoSaveEnabled).toBe(false);
       expect(state.autoSaveInterval).toBe(45000);
       expect(state.gridSize).toBe(16);
       expect(state.theme).toBe('dark');
+      expect(state.compactMode).toBe(true);
+      expect(state.snapToGrid).toBe(false);
+      expect(state.showRulers).toBe(true);
     });
 
     it('validates PreferencesState structure in localStorage', () => {
@@ -177,14 +239,22 @@ describe('PreferencesStore', () => {
       // Verify all required fields are present
       expect(stored.state).toHaveProperty('projectFolder');
       expect(stored.state).toHaveProperty('unitSystem');
+      expect(stored.state).toHaveProperty('autoSaveEnabled');
       expect(stored.state).toHaveProperty('autoSaveInterval');
       expect(stored.state).toHaveProperty('gridSize');
       expect(stored.state).toHaveProperty('theme');
+      expect(stored.state).toHaveProperty('compactMode');
+      expect(stored.state).toHaveProperty('snapToGrid');
+      expect(stored.state).toHaveProperty('showRulers');
 
       // Verify types
       expect(typeof stored.state.projectFolder).toBe('string');
       expect(typeof stored.state.autoSaveInterval).toBe('number');
       expect(typeof stored.state.gridSize).toBe('number');
+      expect(typeof stored.state.autoSaveEnabled).toBe('boolean');
+      expect(typeof stored.state.compactMode).toBe('boolean');
+      expect(typeof stored.state.snapToGrid).toBe('boolean');
+      expect(typeof stored.state.showRulers).toBe('boolean');
       expect(['imperial', 'metric']).toContain(stored.state.unitSystem);
       expect(['light', 'dark']).toContain(stored.state.theme);
     });
