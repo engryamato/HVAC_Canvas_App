@@ -8,6 +8,13 @@
   flex-direction: column;
 }
 
+.embedded {
+  width: auto;
+  min-width: 0;
+  border-left: none;
+  background: transparent;
+}
+
 .content {
   padding: 1rem;
   overflow-y: auto;

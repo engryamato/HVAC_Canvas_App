@@ -5,6 +5,9 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
 import { useProjectActions, useProjectDetails } from '@/core/store/project.store';
+import { useLayoutStore } from '@/stores/useLayoutStore';
+import { ProjectSidebar } from './ProjectSidebar';
+import { ProductCatalogPanel } from './ProductCatalogPanel';
 
 interface LeftSidebarProps {
   isOpen?: boolean;
@@ -56,6 +59,38 @@ function toggleArrayValue(values: string[] | undefined, value: string): string[]
   return Array.from(next);
 }
 
+type MaterialSelection = { type: string; grade?: string };
+
+function toggleMaterial(materials: MaterialSelection[] | undefined, type: string): MaterialSelection[] {
+  const current = materials ?? [];
+  const exists = current.some((m) => m.type === type);
+  if (exists) {
+    return current.filter((m) => m.type !== type);
+  }
+  return [...current, { type }];
+}
+
+function setMaterialGrade(
+  materials: MaterialSelection[] | undefined,
+  type: string,
+  grade: string
+): MaterialSelection[] {
+  return (materials ?? []).map((m) => (m.type === type ? { ...m, grade } : m));
+}
+
+function getMaterialGrade(materials: MaterialSelection[] | undefined, type: string): string | undefined {
+  return (materials ?? []).find((m) => m.type === type)?.grade;
+}
+
+type LeftTabId = 'project' | 'catalog';
+
+function normalizeLeftTab(value: string): LeftTabId {
+  if (value === 'project' || value === 'catalog') {
+    return value;
+  }
+  return 'catalog';
+}
+
 export function LeftSidebar({
   isOpen = true,
   onClose,
@@ -64,6 +99,9 @@ export function LeftSidebar({
   maxWidth = 500,
   className = '',
 }: LeftSidebarProps) {
+  const activeLeftTab = useLayoutStore((state) => normalizeLeftTab(state.activeLeftTab));
+  const setActiveLeftTab = useLayoutStore((state) => state.setActiveLeftTab);
+
   const projectDetails = useProjectDetails();
   const { setProject } = useProjectActions();
   const [sidebarWidth, setSidebarWidth] = useState<number>(defaultWidth);
@@ -78,9 +116,18 @@ export function LeftSidebar({
 
   const projectScope = useMemo(() => {
     const scope = details?.scope ?? { details: [], materials: [], projectType: 'commercial' };
+    const rawMaterials = (scope.materials ?? []) as unknown[];
+    const normalizedMaterials = rawMaterials
+      .map((material) => {
+        if (typeof material === 'string') {
+          return { type: material };
+        }
+        return material as MaterialSelection;
+      })
+      .filter((material) => Boolean(material?.type));
     return {
       details: scope.details ?? [],
-      materials: scope.materials ?? [],
+      materials: normalizedMaterials,
       projectType: scope.projectType ?? 'commercial',
     };
   }, [details]);
@@ -180,7 +227,39 @@ export function LeftSidebar({
       data-testid="left-sidebar"
     >
       <div className="resize-handle" onMouseDown={handleResizeStart} />
+
+      <div className="border-b border-slate-200 bg-white px-3 py-2">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveLeftTab('project')}
+            className={`rounded px-2 py-1 text-sm transition-colors ${
+              activeLeftTab === 'project'
+                ? 'bg-slate-200 text-slate-900'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+            data-testid="tab-project"
+          >
+            Project Properties
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveLeftTab('catalog')}
+            className={`rounded px-2 py-1 text-sm transition-colors ${
+              activeLeftTab === 'catalog'
+                ? 'bg-slate-200 text-slate-900'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+            data-testid="tab-catalog"
+          >
+            Product Catalog
+          </button>
+        </div>
+      </div>
       <div className="sidebar-content">
+        {activeLeftTab === 'project' && (
+          <div className="space-y-4">
+            <ProjectSidebar className="w-full border-r-0" />
         <CollapsibleSection
           title="Project Details"
           defaultExpanded={expandedSections.includes('project-details')}
@@ -233,7 +312,7 @@ export function LeftSidebar({
           <div className="scope-section">
             <div className="scope-title">Materials</div>
             {MATERIAL_OPTIONS.map((option) => {
-              const selected = projectScope.materials.includes(option.value);
+              const selected = projectScope.materials.some((material) => material.type === option.value);
               return (
                 <label key={option.value} className="scope-row">
                   <input
@@ -241,7 +320,7 @@ export function LeftSidebar({
                     checked={selected}
                     onChange={() =>
                       updateScope({
-                        materials: toggleArrayValue(projectScope.materials, option.value),
+                        materials: toggleMaterial(projectScope.materials, option.value),
                       })
                     }
                   />
@@ -250,21 +329,29 @@ export function LeftSidebar({
               );
             })}
 
-            {projectScope.materials.includes('galvanized') && (
+            {projectScope.materials.some((material) => material.type === 'galvanized') && (
               <Dropdown
                 label="Galvanized Grade"
                 options={GALVANIZED_GRADES}
-                value={(details?.scope as { galvanizedGrade?: string })?.galvanizedGrade ?? 'g-60'}
-                onChange={(val) => updateScope({ galvanizedGrade: String(val) })}
+                value={getMaterialGrade(projectScope.materials, 'galvanized') ?? 'g-60'}
+                onChange={(val) =>
+                  updateScope({
+                    materials: setMaterialGrade(projectScope.materials, 'galvanized', String(val)),
+                  })
+                }
               />
             )}
 
-            {projectScope.materials.includes('stainless') && (
+            {projectScope.materials.some((material) => material.type === 'stainless') && (
               <Dropdown
                 label="Stainless Grade"
                 options={STAINLESS_GRADES}
-                value={(details?.scope as { stainlessGrade?: string })?.stainlessGrade ?? '304'}
-                onChange={(val) => updateScope({ stainlessGrade: String(val) })}
+                value={getMaterialGrade(projectScope.materials, 'stainless') ?? '304'}
+                onChange={(val) =>
+                  updateScope({
+                    materials: setMaterialGrade(projectScope.materials, 'stainless', String(val)),
+                  })
+                }
               />
             )}
           </div>
@@ -318,6 +405,10 @@ export function LeftSidebar({
             onChange={(val) => updateSiteConditions({ localCodes: String(val) })}
           />
         </CollapsibleSection>
+          </div>
+        )}
+
+        {activeLeftTab === 'catalog' && <ProductCatalogPanel />}
       </div>
 
       {onClose && (

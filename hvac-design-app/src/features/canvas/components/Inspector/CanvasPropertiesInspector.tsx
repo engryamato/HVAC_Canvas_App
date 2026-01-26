@@ -39,11 +39,17 @@ export function CanvasPropertiesInspector() {
     snapToGrid,
     setGridSize,
     toggleGrid,
+    toggleSnap,
   } = useViewportStore();
 
-  const setSnapToGrid = usePreferencesStore((state) => state.setSnapToGrid);
+  const preferencesUnitSystem = usePreferencesStore((state) => state.unitSystem);
+  const setUnitSystem = usePreferencesStore((state) => state.setUnitSystem);
 
   const projectDetails = useProjectStore((state) => state.projectDetails);
+  const projectUnitSystem = useProjectStore((state) => state.projectSettings?.unitSystem);
+  const setProjectSettings = useProjectStore((state) => state.setProjectSettings);
+
+  const unitSystem = projectUnitSystem ?? preferencesUnitSystem;
   const projectName = projectDetails?.projectName || 'Untitled';
   const projectNumber = projectDetails?.projectNumber;
   const clientName = projectDetails?.clientName;
@@ -98,7 +104,7 @@ export function CanvasPropertiesInspector() {
             <input
               type="checkbox"
               checked={snapToGrid}
-              onChange={(event) => setSnapToGrid(event.target.checked)}
+              onChange={toggleSnap}
               className={styles.checkbox}
             />
             <span>Snap to Grid</span>
@@ -111,10 +117,11 @@ export function CanvasPropertiesInspector() {
           <Dropdown
             label="Unit System"
             options={UNIT_SYSTEM_OPTIONS}
-            value="imperial"
-            onChange={() => {
-              // TODO: Implement unit system switching
-              console.log('Unit system change not yet implemented');
+            value={unitSystem}
+            onChange={(value) => {
+              const nextUnitSystem = value === 'metric' ? 'metric' : 'imperial';
+              setUnitSystem(nextUnitSystem);
+              setProjectSettings({ unitSystem: nextUnitSystem });
             }}
           />
         </div>

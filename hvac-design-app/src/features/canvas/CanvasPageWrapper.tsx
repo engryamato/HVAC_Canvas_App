@@ -46,7 +46,7 @@ function compareVersions(v1: string, v2: string): number {
  */
 export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const router = useRouter();
-  const { setProject, clearProject } = useSessionStore();
+  const { setProject, clearProject, setProjectSettings } = useSessionStore();
   const { getProject } = usePersistenceStore();
 
   const [projectError, setProjectError] = useState<string | null>(null);
@@ -56,6 +56,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
   const hydrateFromPayload = (payload: LocalStoragePayload) => {
     try {
+      if (payload?.project?.settings?.unitSystem) {
+        const unitSystem = payload.project.settings.unitSystem;
+        usePreferencesStore.getState().setUnitSystem(unitSystem);
+        setProjectSettings({ unitSystem });
+      }
+
       if (payload?.project?.entities) {
         useEntityStore.getState().hydrate(payload.project.entities);
       }
@@ -171,6 +177,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
                 panY: result.project.viewportState.panY,
                 zoom: result.project.viewportState.zoom,
               });
+            }
+
+            if (result.project.settings?.unitSystem) {
+              const unitSystem = result.project.settings.unitSystem;
+              usePreferencesStore.getState().setUnitSystem(unitSystem);
+              setProjectSettings({ unitSystem });
             }
 
             loadProject(projectData);

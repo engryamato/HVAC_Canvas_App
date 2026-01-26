@@ -117,6 +117,8 @@ export function buildProjectFileFromStores(): ProjectFile | null {
   const preferences = usePreferencesStore.getState();
   const historyStore = useHistoryStore.getState();
 
+  const unitSystem = projectStore.projectSettings?.unitSystem ?? preferences.unitSystem;
+
   return {
     schemaVersion: STORAGE_SCHEMA_VERSION,
     projectId: projectStore.currentProjectId,
@@ -135,7 +137,7 @@ export function buildProjectFileFromStores(): ProjectFile | null {
       zoom: viewportStore.zoom,
     },
     settings: {
-      unitSystem: preferences.unitSystem,
+      unitSystem,
       gridSize: preferences.gridSize,
       gridVisible: viewportStore.gridVisible,
       snapToGrid: viewportStore.snapToGrid,

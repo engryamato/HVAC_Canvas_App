@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     Accordion,
     AccordionContent,
@@ -20,6 +20,18 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
     }
 
     const { projectName, projectNumber, clientName, location, scope, siteConditions } = projectDetails;
+
+    const normalizedScopeMaterials = useMemo(() => {
+        const materials = scope?.materials ?? [];
+        return materials
+            .map((material: any) => {
+                if (typeof material === 'string') {
+                    return { type: material };
+                }
+                return material;
+            })
+            .filter((material: any) => Boolean(material?.type));
+    }, [scope]);
 
     return (
         <div className={cn("w-64 bg-background border-r flex flex-col overflow-hidden", className)}>
@@ -53,7 +65,7 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
                                     </ul>
                                     <div className="font-medium mt-2">Materials</div>
                                     <ul className="list-disc list-inside pl-1 text-muted-foreground">
-                                        {scope.materials?.map((m) => (
+                                        {normalizedScopeMaterials.map((m: any) => (
                                             <li key={m.type}>{m.type} {m.grade ? `(${m.grade})` : ''}</li>
                                         ))}
                                     </ul>
