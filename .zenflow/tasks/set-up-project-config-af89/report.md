@@ -14,10 +14,10 @@ Created `.zenflow/settings.json` with Zenflow configuration for the HVAC Canvas 
 - **Rationale**: Starts Next.js development server for web preview
 
 ### Verification Script
-- **Command**: `cd hvac-design-app && pnpm type-check && pnpm test`
+- **Command**: `cd hvac-design-app && pnpm lint && pnpm type-check && pnpm test`
 - **Rationale**: 
-  - Pre-commit hooks already run: eslint, prettier (via lint-staged)
-  - Included checks NOT covered by hooks: type-check, unit tests
+  - Includes comprehensive validation: linting, type checking, unit tests
+  - While pre-commit hooks run lint-staged on staged files, verification runs after every agent turn and validates all modified files
   - Excluded: E2E tests (too slow for after-turn checks)
 
 ### Copy Files
