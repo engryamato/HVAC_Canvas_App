@@ -1,0 +1,6 @@
+{
+  "setup_script": "cd hvac-design-app && pnpm install",
+  "dev_script": "cd hvac-design-app && pnpm dev",
+  "verification_script": "cd hvac-design-app && pnpm type-check && pnpm test",
+  "copy_files": ["hvac-design-app/.env.local"]
+}
