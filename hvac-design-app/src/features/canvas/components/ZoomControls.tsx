@@ -90,6 +90,7 @@ export function ZoomControls({ className = '' }: ZoomControlsProps): React.React
         <div
             className={`flex items-center gap-0.5 bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-xl shadow-lg p-1 ${className}`}
             aria-label="Zoom controls"
+            data-testid="zoom-control"
         >
             {/* Zoom Out */}
             <button

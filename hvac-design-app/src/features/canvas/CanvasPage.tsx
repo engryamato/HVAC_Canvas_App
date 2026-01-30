@@ -13,8 +13,8 @@ import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectDetails, useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
-import { Toolbar } from '@/components/layout/Toolbar';
-import { StatusBar } from '@/components/layout/StatusBar';
+import { Toolbar } from './components/Toolbar';
+import { StatusBar } from './components/StatusBar';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
 

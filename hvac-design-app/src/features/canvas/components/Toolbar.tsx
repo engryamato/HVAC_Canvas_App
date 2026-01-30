@@ -23,7 +23,7 @@ interface ToolButtonProps {
   onClick: () => void;
 }
 
-function ToolButton({ icon, label, shortcut, isActive, onClick }: ToolButtonProps) {
+function ToolButton({ tool, icon, label, shortcut, isActive, onClick }: ToolButtonProps) {
   return (
     <button
       type="button"
@@ -33,13 +33,14 @@ function ToolButton({ icon, label, shortcut, isActive, onClick }: ToolButtonProp
         transition-colors duration-150 relative group
         ${
           isActive
-            ? 'bg-blue-500 text-white shadow-md'
+            ? 'active bg-blue-600 text-white shadow-md'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }
       `}
       title={`${label} (${shortcut})`}
       aria-label={label}
       aria-pressed={isActive}
+      data-testid={`tool-${tool}`}
     >
       {icon}
       {/* Tooltip */}
@@ -101,9 +102,16 @@ const NoteIcon = () => (
   </svg>
 );
 
+const LineIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="4" y1="20" x2="20" y2="4" strokeLinecap="round" />
+  </svg>
+);
+
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
+  { tool: 'line', icon: <LineIcon />, label: 'Line', shortcut: 'L' },
   { tool: 'duct', icon: <DuctIcon />, label: 'Duct', shortcut: 'D' },
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
   { tool: 'fitting', icon: <FittingIcon />, label: 'Fitting', shortcut: 'F' },
@@ -131,12 +139,14 @@ function UndoRedoButton({
   icon,
   label,
   shortcut,
+  testId,
 }: {
   onClick: () => void;
   disabled: boolean;
   icon: React.ReactNode;
   label: string;
   shortcut: string;
+  testId?: string;
 }) {
   return (
     <button
@@ -152,6 +162,7 @@ function UndoRedoButton({
       `}
       title={`${label} (${shortcut})`}
       aria-label={`${label} (${shortcut})`}
+      data-testid={testId}
     >
       {icon}
     </button>
@@ -327,6 +338,9 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         case 'r':
           setTool('room');
           break;
+        case 'l':
+          setTool('line');
+          break;
         case 'd':
           setTool('duct');
           break;
@@ -367,6 +381,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       `}
       role="toolbar"
       aria-label="Canvas tools"
+      data-testid="toolbar"
     >
       {TOOLS.map(({ tool, icon, label, shortcut }) => (
         <ToolButton
@@ -393,6 +408,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
           }
           label="Undo"
           shortcut="Ctrl+Z"
+          testId="undo-button"
         />
         <UndoRedoButton
           onClick={redo}
@@ -405,6 +421,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
           }
           label="Redo"
           shortcut="Ctrl+Y"
+          testId="redo-button"
         />
       </div>
 

@@ -5,6 +5,7 @@ import { redo, undo, deleteEntities } from '@/core/commands';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useLayoutStore } from '@/stores/useLayoutStore';
 import type { Entity } from '@/core/schema';
 import {
   copySelectionToClipboard,
@@ -194,6 +195,13 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
       if ((ctrlOrMeta && key === 'y') || (ctrlOrMeta && event.shiftKey && key === 'z')) {
         event.preventDefault();
         redo();
+        return;
+      }
+
+      // Toggle Sidebar: Ctrl+B
+      if (ctrlOrMeta && key === 'b') {
+        event.preventDefault();
+        useLayoutStore.getState().toggleLeftSidebar();
         return;
       }
 

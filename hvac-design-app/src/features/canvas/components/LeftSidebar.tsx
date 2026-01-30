@@ -82,13 +82,13 @@ function getMaterialGrade(materials: MaterialSelection[] | undefined, type: stri
   return (materials ?? []).find((m) => m.type === type)?.grade;
 }
 
-type LeftTabId = 'project' | 'catalog';
+type LeftTabId = 'equipment' | 'layers' | 'recent' | 'project';
 
 function normalizeLeftTab(value: string): LeftTabId {
-  if (value === 'project' || value === 'catalog') {
+  if (value === 'equipment' || value === 'layers' || value === 'recent' || value === 'project') {
     return value;
   }
-  return 'project';
+  return 'equipment';
 }
 
 export function LeftSidebar({
@@ -101,6 +101,8 @@ export function LeftSidebar({
 }: LeftSidebarProps) {
   const activeLeftTab = useLayoutStore((state) => normalizeLeftTab(state.activeLeftTab));
   const setActiveLeftTab = useLayoutStore((state) => state.setActiveLeftTab);
+  const leftSidebarCollapsed = useLayoutStore((state) => state.leftSidebarCollapsed);
+  const toggleLeftSidebar = useLayoutStore((state) => state.toggleLeftSidebar);
 
   const projectDetails = useProjectDetails();
   const { setProject } = useProjectActions();
@@ -222,43 +224,124 @@ export function LeftSidebar({
 
   return (
     <aside
-      className={`left-sidebar ${className}`}
-      style={{ width: `${sidebarWidth}px` }}
+      className={`left-sidebar ${leftSidebarCollapsed ? 'collapsed' : ''} ${className}`}
+      style={{ width: leftSidebarCollapsed ? '0px' : `${sidebarWidth}px` }}
       data-testid="left-sidebar"
     >
       <div className="resize-handle" onMouseDown={handleResizeStart} />
 
-      <div className="border-b border-slate-200 bg-white px-3 py-2">
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setActiveLeftTab('project')}
-            className={`rounded px-2 py-1 text-sm transition-colors ${
-              activeLeftTab === 'project'
-                ? 'bg-slate-200 text-slate-900'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-            data-testid="tab-project"
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2">
+        {!leftSidebarCollapsed && (
+          <div className="flex gap-2" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'equipment'}
+              aria-controls="equipment-panel"
+              onClick={() => setActiveLeftTab('equipment')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'equipment'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-equipment"
+            >
+              Equipment
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'layers'}
+              aria-controls="layers-panel"
+              onClick={() => setActiveLeftTab('layers')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'layers'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-layers"
+            >
+              Layers
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'recent'}
+              aria-controls="recent-panel"
+              onClick={() => setActiveLeftTab('recent')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'recent'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-recent"
+            >
+              Recent
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'project'}
+              aria-controls="project-panel"
+              onClick={() => setActiveLeftTab('project')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'project'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-project"
+            >
+              Project
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={toggleLeftSidebar}
+          className={`p-1 rounded hover:bg-slate-100 text-slate-500 transition-transform ${
+            leftSidebarCollapsed ? 'rotate-180 absolute left-2 top-2 z-50 bg-white shadow-md border border-slate-200' : ''
+          }`}
+          data-testid="left-sidebar-toggle"
+          aria-label={leftSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            Project Properties
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveLeftTab('catalog')}
-            className={`rounded px-2 py-1 text-sm transition-colors ${
-              activeLeftTab === 'catalog'
-                ? 'bg-slate-200 text-slate-900'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-            data-testid="tab-catalog"
-          >
-            Product Catalog
-          </button>
-        </div>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
       </div>
-      <div className="sidebar-content">
+      {!leftSidebarCollapsed && (
+        <div className="sidebar-content overflow-y-auto">
+          {activeLeftTab === 'equipment' && (
+            <div className="p-3" data-testid="equipment-panel" id="equipment-panel" role="tabpanel">
+              <ProductCatalogPanel />
+            </div>
+          )}
+
+        {activeLeftTab === 'layers' && (
+          <div className="p-3" data-testid="layers-panel" id="layers-panel" role="tabpanel">
+            <h3 className="text-sm font-semibold mb-2">Layers</h3>
+            <div className="text-xs text-slate-500">Layer management coming soon.</div>
+          </div>
+        )}
+
+        {activeLeftTab === 'recent' && (
+          <div className="p-3" data-testid="recent-panel" id="recent-panel" role="tabpanel">
+            <h3 className="text-sm font-semibold mb-2">Recent Items</h3>
+            <div className="text-xs text-slate-500">Recently used items will appear here.</div>
+          </div>
+        )}
+
         {activeLeftTab === 'project' && (
-          <div className="space-y-4">
+          <div className="space-y-4" id="project-panel" role="tabpanel">
             <ProjectSidebar className="w-full border-r-0" />
         <CollapsibleSection
           title="Project Details"
@@ -422,6 +505,7 @@ export function LeftSidebar({
 
         {activeLeftTab === 'catalog' && <ProductCatalogPanel />}
       </div>
+      )}
 
       {onClose && (
         <button type="button" className="sidebar-close" onClick={onClose} aria-label="Close sidebar">

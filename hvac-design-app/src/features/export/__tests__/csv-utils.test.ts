@@ -5,7 +5,6 @@ describe('csv helpers', () => {
   it('exportBOMtoCSV outputs UTF-8 BOM and escapes quotes', () => {
     const csv = exportBOMtoCSV([
       {
-        id: 'item-1',
         category: 'duct',
         subcategory: 'Round Duct',
         description: 'Main "Supply" Duct',
@@ -13,7 +12,6 @@ describe('csv helpers', () => {
         unit: 'LF',
         size: '12"',
         material: 'galvanized',
-        entityIds: ['duct-1'],
       },
     ]);
 
@@ -38,4 +36,3 @@ describe('csv helpers', () => {
     expect(items[0]?.name).toBe('Fan');
   });
 });
-

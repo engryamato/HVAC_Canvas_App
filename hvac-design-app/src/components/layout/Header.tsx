@@ -16,6 +16,7 @@ interface HeaderProps {
     projectName?: string;
     showBreadcrumb?: boolean;
     showMenuBar?: boolean;
+    rightActions?: React.ReactNode;
 }
 
 /**
@@ -25,7 +26,8 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
     projectName,
     showBreadcrumb = true,
-    showMenuBar = true
+    showMenuBar = true,
+    rightActions
 }) => {
     const router = useRouter();
     const [shortcutsOpen, setShortcutsOpen] = React.useState(false);
@@ -87,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
 
                     {/* Breadcrumb */}
-                    {showBreadcrumb && projectName && (
+                    {showBreadcrumb && (
                         <>
                             <div className="h-5 w-px bg-slate-200 ml-2" />
                             <div className="flex items-center gap-1.5 text-sm" data-testid="breadcrumb">
@@ -101,17 +103,22 @@ export const Header: React.FC<HeaderProps> = ({
                                     <Home className="w-3.5 h-3.5" />
                                     <span className="hidden sm:inline">Dashboard</span>
                                 </Button>
-                                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-                                <span className="font-semibold text-slate-800 truncate max-w-[180px]">
-                                    {projectName}
-                                </span>
+                                {projectName && (
+                                    <>
+                                        <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+                                        <span className="font-semibold text-slate-800 truncate max-w-[180px]">
+                                            {projectName}
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         </>
                     )}
                 </div>
 
                 {/* Right: Settings */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
+                    {rightActions}
                     <Button
                         variant="ghost"
                         size="sm"

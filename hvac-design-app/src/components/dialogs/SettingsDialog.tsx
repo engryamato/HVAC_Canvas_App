@@ -10,6 +10,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface SettingsDialogProps {
     open: boolean;
@@ -28,13 +29,15 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         setSnapToGrid,
         setShowRulers,
         setAutoSaveEnabled,
-    } = usePreferencesStore((state) => ({
-        setTheme: state.setTheme,
-        setCompactMode: state.setCompactMode,
-        setSnapToGrid: state.setSnapToGrid,
-        setShowRulers: state.setShowRulers,
-        setAutoSaveEnabled: state.setAutoSaveEnabled,
-    }));
+    } = usePreferencesStore(
+        useShallow((state) => ({
+            setTheme: state.setTheme,
+            setCompactMode: state.setCompactMode,
+            setSnapToGrid: state.setSnapToGrid,
+            setShowRulers: state.setShowRulers,
+            setAutoSaveEnabled: state.setAutoSaveEnabled,
+        }))
+    );
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

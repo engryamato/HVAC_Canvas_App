@@ -81,9 +81,9 @@ test.describe('Basic Navigation and Interface Overview', () => {
             await expect(toolbar).toBeVisible();
 
             // Verify toolbar groups
-            await expect(page.getByTestId('tool-select"]')).toBeVisible(); // Drawing tools
-            await expect(page.getByTestId('undo-button"]')).toBeVisible(); // Edit operations
-            await expect(page.getByTestId('zoom-control"]')).toBeVisible(); // View controls
+            await expect(page.getByTestId('tool-select')).toBeVisible(); // Drawing tools
+            await expect(page.getByTestId('undo-button')).toBeVisible(); // Edit operations
+            await expect(page.getByTestId('zoom-control')).toBeVisible(); // View controls
 
             // C. Left Sidebar (Collapsible, Default Width: 280px)
             const leftSidebar = page.getByTestId('left-sidebar');

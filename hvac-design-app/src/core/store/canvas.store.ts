@@ -15,7 +15,7 @@ import type { FittingType } from '../schema/fitting.schema';
 /**
  * Available canvas tool types
  */
-export type CanvasTool = 'select' | 'duct' | 'equipment' | 'room' | 'fitting' | 'note';
+export type CanvasTool = 'select' | 'duct' | 'equipment' | 'room' | 'fitting' | 'note' | 'line';
 
 interface ToolState {
   /** Currently active tool */

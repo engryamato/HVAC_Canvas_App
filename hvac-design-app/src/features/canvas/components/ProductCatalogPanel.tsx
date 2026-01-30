@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
-type CatalogCategoryId = 'equipment' | 'ducts' | 'fittings' | 'accessories';
+type CatalogCategoryId = 'air-handling-units' | 'ducts' | 'fittings' | 'accessories';
 
 interface CatalogItem {
   id: string;
@@ -22,12 +22,12 @@ interface CatalogCategory {
 
 const CATALOG_CATEGORIES: CatalogCategory[] = [
   {
-    id: 'equipment',
-    title: 'Equipment',
+    id: 'air-handling-units',
+    title: 'Air Handling Units',
     items: [
       {
         id: 'ahu-york-mca',
-        name: 'Air Handling Unit',
+        name: 'Air Handling Unit (AHU)',
         brand: 'York',
         model: 'MCA',
         description: '5000 CFM',
@@ -124,25 +124,26 @@ export function ProductCatalogPanel() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search products, brand, model..."
-            data-testid="catalog-search"
+            data-testid="equipment-search"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2" data-testid="equipment-category-tree">
         {filteredCategories.length === 0 && (
           <div className="text-sm text-slate-500">No catalog items match your search.</div>
         )}
 
         {filteredCategories.map((category) => (
-          <CollapsibleSection key={category.id} title={category.title} defaultExpanded>
-            <div className="space-y-2">
-              {category.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="rounded border border-slate-200 bg-white p-2"
-                  data-testid="catalog-item"
-                  draggable
+          <div key={category.id} data-testid={`category-${category.id}`}>
+            <CollapsibleSection title={category.title} defaultExpanded>
+              <div className="space-y-2">
+                {category.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded border border-slate-200 bg-white p-2"
+                    data-testid="equipment-item"
+                    draggable
                   onDragStart={(event) => {
                     event.dataTransfer.effectAllowed = 'copy';
                     event.dataTransfer.setData('application/x-hvac-catalog-item', JSON.stringify(item));
@@ -158,6 +159,7 @@ export function ProductCatalogPanel() {
               ))}
             </div>
           </CollapsibleSection>
+          </div>
         ))}
       </div>
     </div>
