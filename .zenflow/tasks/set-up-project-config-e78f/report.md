@@ -19,7 +19,7 @@ Created `.zenflow/settings.json` with configuration for Zenflow worktree automat
 - Pre-commit hooks already handle linting and formatting (via lint-staged), so excluded to avoid duplication
 - Completes in under 60 seconds
 
-**Copy Files**: `["hvac-design-app/.env.local"]`
+**Copy Files**: `["hvac-design-app/.env", "hvac-design-app/.env.local"]`
 - Template files `.env.example` and `.env.local.example` exist in the repo
-- Documentation indicates users should copy `.env.local.example` to `.env.local` for local development
-- `.env.local` is gitignored and contains local configuration/secrets
+- Both `.env` and `.env.local` are gitignored and contain local configuration/secrets
+- Documentation indicates users should copy template files for local development
