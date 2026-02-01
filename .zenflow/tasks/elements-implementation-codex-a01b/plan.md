@@ -104,3 +104,9 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 
 ### [x] Step: Report
 - Write `{@artifacts_path}/report.md` with what was implemented and how verified.
+
+---
+
+### [x] Step: Resolve merge divergence
+- Fast-forward local `main` to `origin/main` and confirm GitHub is up to date.
+- Delete merged branches (`elements-implementation-codex-a01b`, `merge-to-main-elements-a01b`).

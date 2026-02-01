@@ -60,9 +60,9 @@ export const RoomPropsSchema = z.object({
   length: z.number()
     .min(1, 'Length must be at least 1 inch')
     .max(10000, 'Length cannot exceed 10,000 inches'),
-  height: z.number()
-    .min(1, 'Height must be at least 1 inch')
-    .max(500, 'Height cannot exceed 500 inches'),
+  ceilingHeight: z.number()
+    .min(1, 'Ceiling height must be at least 1 inch')
+    .max(500, 'Ceiling height cannot exceed 500 inches'),
   occupancyType: OccupancyTypeSchema,
   airChangesPerHour: z.number()
     .min(1, 'ACH must be at least 1')
@@ -106,7 +106,7 @@ export const DEFAULT_ROOM_PROPS: RoomProps = {
   name: 'New Room',
   width: 120, // 10 feet
   length: 120, // 10 feet
-  height: 96, // 8 feet
+  ceilingHeight: 96, // 8 feet
   occupancyType: 'office',
   airChangesPerHour: 4,
 };
@@ -128,7 +128,7 @@ const validRoom = {
     name: 'Kitchen',
     width: 180,
     length: 240,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'kitchen_commercial',
     airChangesPerHour: 12,
   },
@@ -152,7 +152,7 @@ const invalidRoom = {
     name: 'Closet',
     width: 0,  // ❌ Below minimum 1 inch
     length: 6,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'office',
     airChangesPerHour: 6,
   },
@@ -170,7 +170,7 @@ const result = RoomSchema.safeParse(invalidRoom);
 area = (width / 12) * (length / 12)
 
 // Volume (cubic feet)
-volume = area * (height / 12)
+volume = area * (ceilingHeight / 12)
 
 // Required CFM using ACH method
 requiredCFM = (volume * airChangesPerHour) / 60
@@ -195,7 +195,7 @@ Room Entity
 │   ├── name: string
 │   ├── width: number (inches)
 │   ├── length: number (inches)
-│   ├── height: number (inches)
+│   ├── ceilingHeight: number (inches)
 │   ├── occupancyType: OccupancyType
 │   ├── airChangesPerHour: number
 │   └── notes?: string

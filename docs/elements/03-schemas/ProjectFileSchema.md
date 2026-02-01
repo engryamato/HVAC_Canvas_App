@@ -377,7 +377,7 @@ const completeProject = {
           length: 180,
           ceilingHeight: 96,
           occupancyType: 'conference',
-          achRequired: 6,
+          airChangesPerHour: 6,
         },
       },
     },
