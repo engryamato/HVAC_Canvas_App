@@ -73,7 +73,7 @@ export function calculateACHtoCFM(ach: number, volumeCuFt: number): number {
  */
 export function calculateRoomValues(room: Room): Room['calculated'] {
   const area = calculateRoomArea(room.props.width, room.props.length);
-  const volume = calculateRoomVolume(room.props.width, room.props.length, room.props.height);
+  const volume = calculateRoomVolume(room.props.width, room.props.length, room.props.ceilingHeight);
   const achCFM = calculateACHtoCFM(room.props.airChangesPerHour, volume);
   const ventilationCFM = calculateVentilationCFM(room.props.occupancyType, area);
   // Use the higher of ACH-based and ventilation-based requirements

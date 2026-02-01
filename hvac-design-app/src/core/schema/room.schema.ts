@@ -27,7 +27,7 @@ export const RoomPropsSchema = z.object({
   // Dimensions in inches
   width: z.number().min(1, 'Width must be at least 1 inch').max(10000, 'Width cannot exceed 10,000 inches'),
   length: z.number().min(1, 'Length must be at least 1 inch').max(10000, 'Length cannot exceed 10,000 inches'),
-  height: z.number().min(1, 'Height must be at least 1 inch').max(500, 'Height cannot exceed 500 inches'),
+  ceilingHeight: z.number().min(1, 'Ceiling height must be at least 1 inch').max(500, 'Ceiling height cannot exceed 500 inches'),
   occupancyType: OccupancyTypeSchema,
   airChangesPerHour: z.number().min(1, 'ACH must be at least 1').max(100, 'ACH cannot exceed 100'),
   notes: z.string().max(5000).optional(),
@@ -64,7 +64,7 @@ export const DEFAULT_ROOM_PROPS: RoomProps = {
   name: 'New Room',
   width: 120, // 10 feet in inches
   length: 120, // 10 feet in inches
-  height: 96, // 8 feet in inches
+  ceilingHeight: 96, // 8 feet in inches
   occupancyType: 'office',
   airChangesPerHour: 4,
 };

@@ -49,7 +49,7 @@ const createTestRoom = (overrides?: Partial<Room['props']>): Room => ({
     name: 'Test Room',
     width: 120, // 10 feet
     length: 120, // 10 feet
-    height: 96, // 8 feet
+    ceilingHeight: 96, // 8 feet
     occupancyType: 'office',
     airChangesPerHour: 4,
     ...overrides,
@@ -512,7 +512,7 @@ describe('Calculation Workflow User Journey', () => {
       const room = createTestRoom({
         width: 240, // 20 feet
         length: 180, // 15 feet
-        height: 108, // 9 feet
+        ceilingHeight: 108, // 9 feet
         occupancyType: 'office',
         airChangesPerHour: 6,
       });
@@ -534,7 +534,7 @@ describe('Calculation Workflow User Journey', () => {
       const room = createTestRoom({
         width: 360, // 30 feet
         length: 240, // 20 feet
-        height: 144, // 12 feet
+        ceilingHeight: 144, // 12 feet
         occupancyType: 'kitchen_commercial',
         airChangesPerHour: 25,
       });

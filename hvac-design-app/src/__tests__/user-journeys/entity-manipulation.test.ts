@@ -43,7 +43,7 @@ const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
     name,
     width: 240,
     length: 180,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'office',
     airChangesPerHour: 4,
   },
@@ -590,14 +590,14 @@ describe('Entity Manipulation User Journey', () => {
 
         const updated: Room = {
           ...room,
-          props: { ...room.props, width: 360, length: 240, height: 120 },
+          props: { ...room.props, width: 360, length: 240, ceilingHeight: 120 },
         };
         updateEntity(updated);
 
         const saved = selectEntity('room-1') as Room;
         expect(saved.props.width).toBe(360);
         expect(saved.props.length).toBe(240);
-        expect(saved.props.height).toBe(120);
+        expect(saved.props.ceilingHeight).toBe(120);
       });
 
       it('should update room occupancy type', () => {

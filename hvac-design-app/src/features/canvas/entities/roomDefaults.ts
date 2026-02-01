@@ -31,7 +31,7 @@ export function createRoom(
     y: number;
     width: number;
     length: number;
-    height: number;
+    ceilingHeight: number;
     occupancyType: Room['props']['occupancyType'];
     airChangesPerHour: number;
   }>
@@ -43,7 +43,7 @@ export function createRoom(
     name: overrides?.name ?? `Room ${roomNumber}`,
     width: overrides?.width ?? DEFAULT_ROOM_PROPS.width,
     length: overrides?.length ?? DEFAULT_ROOM_PROPS.length,
-    height: overrides?.height ?? DEFAULT_ROOM_PROPS.height,
+    ceilingHeight: overrides?.ceilingHeight ?? DEFAULT_ROOM_PROPS.ceilingHeight,
     occupancyType: overrides?.occupancyType ?? DEFAULT_ROOM_PROPS.occupancyType,
     airChangesPerHour: overrides?.airChangesPerHour ?? DEFAULT_ROOM_PROPS.airChangesPerHour,
   };

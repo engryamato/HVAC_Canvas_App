@@ -36,7 +36,7 @@ describe('ventilation calculations', () => {
         name: 'Test',
         width: 120,
         length: 120,
-        height: 96,
+        ceilingHeight: 96,
         occupancyType: 'office' as const,
         airChangesPerHour: 6,
       },

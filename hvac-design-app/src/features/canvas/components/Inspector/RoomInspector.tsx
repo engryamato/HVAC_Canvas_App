@@ -93,16 +93,16 @@ export function RoomInspector({ entity }: RoomInspectorProps) {
             onChange={(val) => commit('length', Number(val))}
           />
         </PropertyField>
-        <PropertyField label="Height (in)" htmlFor="room-height">
+        <PropertyField label="Ceiling Height (in)" htmlFor="room-height">
           <ValidatedInput
             id="room-height"
             type="number"
             min={72}
             max={500}
             step={1}
-            value={entity.props.height}
-            error={errors['height']}
-            onChange={(val) => commit('height', Number(val))}
+            value={entity.props.ceilingHeight}
+            error={errors['ceilingHeight']}
+            onChange={(val) => commit('ceilingHeight', Number(val))}
           />
         </PropertyField>
       </div>
