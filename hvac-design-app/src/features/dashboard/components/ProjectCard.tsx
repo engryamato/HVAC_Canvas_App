@@ -47,7 +47,9 @@ export function ProjectCard({
 
     // Close menu when clicking outside
     useEffect(() => {
-        if (!showMenu) return;
+        if (!showMenu) {
+            return;
+        }
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setShowMenu(false);
@@ -62,23 +64,35 @@ export function ProjectCard({
         const now = new Date();
         const diffMs = now.getTime() - date.getTime();
         const diffHours = diffMs / (1000 * 60 * 60);
-        if (diffHours < 1) return 'Just now';
+        if (diffHours < 1) {
+            return 'Just now';
+        }
         if (diffHours < 24) {
             const hours = Math.floor(diffHours);
             return `${hours}h ago`;
         }
-        if (diffHours < 48) return 'Yesterday';
+        if (diffHours < 48) {
+            return 'Yesterday';
+        }
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }, [project.modifiedAt]);
 
     const storageSizeLabel = useMemo(() => {
-        if (typeof window === 'undefined') return null;
+        if (typeof window === 'undefined') {
+            return null;
+        }
         const data = localStorage.getItem(getProjectStorageKey(project.projectId));
         const sizeBytes = estimateStorageSizeBytes(data);
-        if (!sizeBytes) return null;
-        if (sizeBytes < 1024) return `${sizeBytes} B`;
+        if (!sizeBytes) {
+            return null;
+        }
+        if (sizeBytes < 1024) {
+            return `${sizeBytes} B`;
+        }
         const sizeKb = sizeBytes / 1024;
-        if (sizeKb < 1024) return `${sizeKb.toFixed(1)} KB`;
+        if (sizeKb < 1024) {
+            return `${sizeKb.toFixed(1)} KB`;
+        }
         return `${(sizeKb / 1024).toFixed(1)} MB`;
     }, [project.projectId, project.modifiedAt]);
 
@@ -134,8 +148,16 @@ export function ProjectCard({
                             value={draftName}
                             onChange={(e) => setDraftName(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleRename();
-                                if (e.key === 'Escape') setEditing(false);
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleRename();
+                                }
+                                if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setEditing(false);
+                                }
                             }}
                             className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />

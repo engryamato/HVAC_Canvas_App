@@ -1,4 +1,20 @@
-import { Page, expect } from '@playwright/test';
+import { type Locator, Page, expect } from '@playwright/test';
+
+async function clickWithRetry(locator: Locator, maxAttempts = 3): Promise<void> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      await locator.click({ timeout: 5000 });
+      return;
+    } catch (error) {
+      lastError = error;
+      await locator.page().waitForTimeout(200);
+    }
+  }
+
+  throw lastError;
+}
 
 /**
  * Initializes the application state and navigates to the canvas.
@@ -23,6 +39,7 @@ export async function openCanvas(page: Page, projectName: string = 'E2E Test Pro
   // 2. Go to Dashboard
   await page.goto('/dashboard');
   await expect(page).toHaveURL(/dashboard/);
+  await page.waitForLoadState('networkidle');
 
   // 3. Check for existing projects or create new one
   const projectCards = page.locator('[data-testid="project-card"]');
@@ -32,11 +49,17 @@ export async function openCanvas(page: Page, projectName: string = 'E2E Test Pro
     // Create new project
     const emptyStateButton = page.getByTestId('empty-state-create-btn');
     const newProjectButton = page.getByTestId('new-project-btn');
-    
-    if (await emptyStateButton.isVisible()) {
-      await emptyStateButton.click();
+
+    await page.waitForSelector('[data-testid="empty-state-create-btn"], [data-testid="new-project-btn"]', {
+      timeout: 10000,
+    });
+
+    if (await emptyStateButton.isVisible().catch(() => false)) {
+      await clickWithRetry(emptyStateButton);
+    } else if (await newProjectButton.isVisible().catch(() => false)) {
+      await clickWithRetry(newProjectButton);
     } else {
-      await newProjectButton.click();
+      throw new Error('Unable to find a create-project button on the dashboard');
     }
     
     // Fill project details
@@ -44,14 +67,14 @@ export async function openCanvas(page: Page, projectName: string = 'E2E Test Pro
     await page.getByTestId('create-button').click();
     
     // Verify redirection to canvas
-    await expect(page).toHaveURL(/\/canvas\//);
+    await expect(page).toHaveURL(/\/canvas\//, { timeout: 15000 });
   } else {
     // Open first existing project
     // Note: In a real "clean slate" test env, we might want to always create new,
     // but for local dev/faster tests, reusing is fine if state is reset.
     // For specific tests, generating a unique project name helps.
     await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//);
+    await expect(page).toHaveURL(/\/canvas\//, { timeout: 15000 });
   }
 }
 

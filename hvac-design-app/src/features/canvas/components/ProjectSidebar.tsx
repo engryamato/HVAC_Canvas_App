@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     Accordion,
     AccordionContent,
@@ -12,8 +12,39 @@ interface ProjectSidebarProps {
     className?: string;
 }
 
+type MaterialSelection = { type: string; grade?: string };
+
+function normalizeMaterialSelection(value: unknown): MaterialSelection | null {
+    if (typeof value === 'string') {
+        return { type: value };
+    }
+
+    if (!value || typeof value !== 'object') {
+        return null;
+    }
+
+    const recordValue = value as Record<string, unknown>;
+    const type = recordValue.type;
+    if (typeof type !== 'string' || type.length === 0) {
+        return null;
+    }
+
+    const grade = recordValue.grade;
+    return {
+        type,
+        grade: typeof grade === 'string' && grade.length > 0 ? grade : undefined,
+    };
+}
+
 export function ProjectSidebar({ className }: ProjectSidebarProps) {
     const { projectDetails } = useProjectStore();
+
+    const normalizedScopeMaterials = useMemo(() => {
+        const materials = (projectDetails?.scope?.materials ?? []) as unknown[];
+        return materials
+            .map(normalizeMaterialSelection)
+            .filter((material): material is MaterialSelection => material !== null);
+    }, [projectDetails?.scope]);
 
     if (!projectDetails) {
         return <div className={cn("w-64 bg-background border-r p-4", className)}>No Project Loaded</div>;
@@ -53,7 +84,7 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
                                     </ul>
                                     <div className="font-medium mt-2">Materials</div>
                                     <ul className="list-disc list-inside pl-1 text-muted-foreground">
-                                        {scope.materials?.map((m) => (
+                                        {normalizedScopeMaterials.map((m) => (
                                             <li key={m.type}>{m.type} {m.grade ? `(${m.grade})` : ''}</li>
                                         ))}
                                     </ul>

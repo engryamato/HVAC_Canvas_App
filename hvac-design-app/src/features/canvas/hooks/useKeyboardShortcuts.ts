@@ -5,7 +5,13 @@ import { redo, undo, deleteEntities } from '@/core/commands';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { ToastProps } from '@/components/ui/Toast';
+import { useLayoutStore } from '@/stores/useLayoutStore';
+import type { Entity } from '@/core/schema';
+import {
+  copySelectionToClipboard,
+  cutSelectionToClipboard,
+  pasteFromClipboard,
+} from '@/features/canvas/clipboard/entityClipboard';
 
 
 type ToolType = 'select' | 'room' | 'duct' | 'equipment' | 'fitting' | 'note';
@@ -33,6 +39,23 @@ const TOOL_SHORTCUTS: Record<string, ToolType> = {
   f: 'fitting',
   n: 'note',
 };
+
+function getEntityDimensions(entity: Entity): { width: number; height: number } {
+  switch (entity.type) {
+    case 'room':
+      return { width: entity.props.width, height: entity.props.length };
+    case 'duct': {
+      const size = entity.props.shape === 'rectangular'
+        ? { width: entity.props.width ?? 100, height: entity.props.height ?? 100 }
+        : { width: entity.props.diameter ?? 100, height: entity.props.diameter ?? 100 };
+      return size;
+    }
+    case 'equipment':
+      return { width: entity.props.width, height: entity.props.height };
+    default:
+      return { width: 100, height: 100 };
+  }
+}
 
 /**
  * Global keyboard handler for canvas shortcuts
@@ -64,6 +87,33 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
       const ctrlOrMeta = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
 
+      // Clipboard shortcuts (canvas entities)
+      if (ctrlOrMeta && key === 'c' && !event.shiftKey) {
+        const selectedIds = useSelectionStore.getState().selectedIds;
+        if (selectedIds.length === 0) {
+          return;
+        }
+        event.preventDefault();
+        void copySelectionToClipboard();
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'x' && !event.shiftKey) {
+        const selectedIds = useSelectionStore.getState().selectedIds;
+        if (selectedIds.length === 0) {
+          return;
+        }
+        event.preventDefault();
+        void cutSelectionToClipboard();
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'v' && !event.shiftKey) {
+        event.preventDefault();
+        void pasteFromClipboard();
+        return;
+      }
+
       if (ctrlOrMeta && key === '1') {
         event.preventDefault();
         const { fitToContent } = useViewportStore.getState();
@@ -75,8 +125,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
           const bounds = entities.reduce(
             (acc, entity) => {
               const { x, y } = entity.transform;
-              const width = entity.props?.width ?? 100;
-              const height = entity.props?.height ?? 100;
+              const { width, height } = getEntityDimensions(entity);
               return {
                 minX: Math.min(acc.minX, x),
                 minY: Math.min(acc.minY, y),
@@ -112,8 +161,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         const bounds = entities.reduce(
           (acc, entity) => {
             const { x, y } = entity.transform;
-            const width = entity.props?.width ?? 100;
-            const height = entity.props?.height ?? 100;
+            const { width, height } = getEntityDimensions(entity);
             return {
               minX: Math.min(acc.minX, x),
               minY: Math.min(acc.minY, y),
@@ -147,6 +195,47 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
       if ((ctrlOrMeta && key === 'y') || (ctrlOrMeta && event.shiftKey && key === 'z')) {
         event.preventDefault();
         redo();
+        return;
+      }
+
+      // Toggle Sidebar: Ctrl+B
+      if (ctrlOrMeta && event.shiftKey && key === 'b') {
+        event.preventDefault();
+        useLayoutStore.getState().toggleRightSidebar();
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'b' && !event.shiftKey) {
+        event.preventDefault();
+        useLayoutStore.getState().toggleLeftSidebar();
+        return;
+      }
+
+      // Right sidebar tab shortcuts: Ctrl+P (Properties), Ctrl+M (BOM)
+      if (ctrlOrMeta && key === 'p' && !event.shiftKey) {
+        event.preventDefault();
+        const layout = useLayoutStore.getState();
+        if (layout.rightSidebarCollapsed) {
+          layout.toggleRightSidebar();
+        }
+        layout.setActiveRightTab('properties');
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'm' && !event.shiftKey) {
+        event.preventDefault();
+        const layout = useLayoutStore.getState();
+        if (layout.rightSidebarCollapsed) {
+          layout.toggleRightSidebar();
+        }
+        layout.setActiveRightTab('bom');
+        return;
+      }
+
+      // Toggle Grid: Ctrl+G
+      if (ctrlOrMeta && key === 'g' && !event.shiftKey) {
+        event.preventDefault();
+        useViewportStore.getState().toggleGrid();
         return;
       }
 

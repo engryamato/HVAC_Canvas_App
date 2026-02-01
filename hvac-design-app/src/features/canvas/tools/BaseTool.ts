@@ -7,17 +7,19 @@ export interface ToolMouseEvent {
   /** Y coordinate in canvas space */
   y: number;
   /** X coordinate in screen space */
-  screenX: number;
+  screenX?: number;
   /** Y coordinate in screen space */
-  screenY: number;
+  screenY?: number;
+  /** Whether meta key is pressed */
+  metaKey?: boolean;
   /** Whether shift key is pressed */
-  shiftKey: boolean;
+  shiftKey?: boolean;
   /** Whether ctrl/cmd key is pressed */
-  ctrlKey: boolean;
+  ctrlKey?: boolean;
   /** Whether alt key is pressed */
-  altKey: boolean;
+  altKey?: boolean;
   /** Mouse button (0=left, 1=middle, 2=right) */
-  button: number;
+  button?: number;
 }
 
 /**

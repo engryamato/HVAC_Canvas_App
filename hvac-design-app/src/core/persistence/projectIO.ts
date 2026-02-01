@@ -1,5 +1,5 @@
 import { readTextFile, writeTextFile, exists, removeFile } from './filesystem';
-import { serializeProject, deserializeProject, migrateProject } from './serialization';
+import { deserializeProject, deserializeProjectLenient, migrateProject, serializeProject } from './serialization';
 import type { ProjectFile } from '@/core/schema';
 
 /**
@@ -105,6 +105,16 @@ export async function loadProject(path: string): Promise<LoadResult> {
         const migrated = migrateProject(parsed, result.foundVersion);
         if (migrated.success) {
           return { success: true, project: migrated.data };
+        }
+
+        const lenient = deserializeProjectLenient(content);
+        if (lenient.success && lenient.data) {
+          return {
+            success: true,
+            project: lenient.data,
+            migrated: false,
+            originalVersion: result.foundVersion,
+          };
         }
       }
 

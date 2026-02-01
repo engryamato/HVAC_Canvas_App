@@ -15,7 +15,6 @@ const TabsList = React.forwardRef<
 >(({ className, orientation = "horizontal", ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
-    orientation={orientation}
     className={cn(
       "inline-flex items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-500",
       orientation === "vertical"

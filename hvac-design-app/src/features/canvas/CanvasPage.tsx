@@ -1,17 +1,22 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
+import { LeftSidebar } from './components/LeftSidebar';
+import { RightSidebar } from './components/RightSidebar';
+import { useViewportStore } from './store/viewportStore';
 
 import { useAutoSave } from './hooks';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
-import { useProjectStore } from '@/core/store/project.store';
+import { useProjectDetails, useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
+import { Toolbar } from './components/Toolbar';
+import { StatusBar } from './components/StatusBar';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 
 /**
  * CanvasPage - Main canvas page with all components
@@ -35,22 +40,17 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
   // Note: Project data is now managed internally by stores via CanvasPageWrapper and useAutoSave
 
-  // Ensure preferences are loaded
-  // Ensure preferences are loaded
   usePreferencesStore((state) => state.projectFolder);
+  const snapToGridPreference = usePreferencesStore((state) => state.snapToGrid);
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
+  const projectDetails = useProjectDetails();
 
-  const [toasts, setToasts] = useState<ToastProps[]>([]);
+  const pushToast = useCallback((message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-  const dismissToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  }, []);
-
-  const pushToast = useCallback((message: string, type: ToastProps['type']) => {
-    const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
+    window.dispatchEvent(new CustomEvent('sws:toast', { detail: { message, type } }));
   }, []);
 
   // useAutoSave now manages state internally via store
@@ -114,6 +114,10 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const triggerSave = saveNow;
 
   useEffect(() => {
+    useViewportStore.setState({ snapToGrid: snapToGridPreference });
+  }, [snapToGridPreference]);
+
+  useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
@@ -125,6 +129,15 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     return () => window.removeEventListener('keydown', handleKeydown);
   }, [triggerSave]);
 
+  useEffect(() => {
+    const handleSaveRequest = () => {
+      void triggerSave();
+    };
+
+    window.addEventListener('sws:canvas-save', handleSaveRequest);
+    return () => window.removeEventListener('sws:canvas-save', handleSaveRequest);
+  }, [triggerSave]);
+
   useKeyboardShortcuts({
     onZoomToSelection: (result) => {
       if (!result.success && result.message) {
@@ -133,29 +146,33 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     },
   });
 
+  useResponsiveLayout();
 
-  // Temporary simplified project name retrieval for AppShell header
-  // Ideally this comes from the project store
-  // const { projectDetails } = useProjectStore(); 
-  const projectName = "Proposed Layout"; // Placeholder or from store
+
+  const projectName = projectDetails?.projectName ?? 'Untitled Project';
 
   return (
     <AppShell projectName={projectName}>
-      <CanvasContainer
-        className="w-full h-full"
-      // Mouse handling moved to global standard or handled within CanvasContainer
-      // If StatusBar needs it, StatusBar should subscribe to viewport store
-      />
+      <Toolbar />
 
-      {/* Zoom Controls - positioned absolute or managed by AppShell/Viewport */}
-      <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
-        <Minimap />
-        <ZoomControls />
+      <div className={`flex-1 flex overflow-hidden relative ${className}`}>
+        <LeftSidebar />
+
+        <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern">
+          <CanvasContainer className="w-full h-full" />
+
+          <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
+            <Minimap />
+            <ZoomControls />
+          </div>
+
+          <TutorialOverlay />
+        </main>
+
+        <RightSidebar />
       </div>
 
-
-      <TutorialOverlay />
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      <StatusBar />
     </AppShell>
   );
 }

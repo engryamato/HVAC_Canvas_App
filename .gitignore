@@ -15,6 +15,13 @@ node_modules/
 dist/
 build/
 
+# Playwright artifacts
+playwright-report/
+test-results/
+hvac-design-app/playwright-report/
+hvac-design-app/test-results/
+pw-*.json
+
 # IDE and Metadata
 .vscode/
 .idea/
@@ -24,6 +31,11 @@ build/
 .auto-claude/
 .auto-claude-status
 .claude_settings.json
+
+# Local agent artifacts
+.tmp/
+typecheck-*.txt
+typecheck-*.count.txt
 
 # Windows junk
 nul

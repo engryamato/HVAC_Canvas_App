@@ -6,9 +6,11 @@ import type { Entity } from '@/core/schema';
 import RoomInspector from './RoomInspector';
 import DuctInspector from './DuctInspector';
 import EquipmentInspector from './EquipmentInspector';
+import { CanvasPropertiesInspector } from './CanvasPropertiesInspector';
 
 interface InspectorPanelProps {
   className?: string;
+  embedded?: boolean;
 }
 
 function renderInspector(entity: Entity | null) {
@@ -28,7 +30,7 @@ function renderInspector(entity: Entity | null) {
   }
 }
 
-export function InspectorPanel({ className }: InspectorPanelProps) {
+export function InspectorPanel({ className, embedded = false }: InspectorPanelProps) {
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const selectedId = selectedIds.length === 1 ? selectedIds[0] : null;
 
@@ -39,7 +41,7 @@ export function InspectorPanel({ className }: InspectorPanelProps) {
   let content: React.ReactNode = null;
 
   if (selectedIds.length === 0) {
-    content = <div className={styles.emptyState}>Select an entity to edit its properties.</div>;
+    content = <CanvasPropertiesInspector />;
   } else if (selectedIds.length > 1) {
     content = (
       <div className={styles.multiState}>
@@ -52,9 +54,9 @@ export function InspectorPanel({ className }: InspectorPanelProps) {
   }
 
   return (
-    <aside className={`${styles.panel} ${className ?? ''}`}>
+    <div className={`${styles.panel} ${embedded ? styles.embedded : ''} ${className ?? ''}`}>
       <div className={styles.content}>{content}</div>
-    </aside>
+    </div>
   );
 }
 

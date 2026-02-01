@@ -17,7 +17,8 @@
  * @created 2026-01-08
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { openCanvas } from '../utils/test-utils';
 
 /**
  * E2E Test Suite: Application Shell (UJ-GS-003)
@@ -38,62 +39,11 @@ import { test, expect, Page } from '@playwright/test';
  * @created 2026-01-08
  */
 
-async function ensureProjectOnDashboard(page: Page) {
-    await page.goto('/');
-    await page.evaluate(() => {
-        localStorage.setItem('hvac-app-storage', JSON.stringify({
-            state: { hasLaunched: true },
-            version: 0,
-        }));
-        localStorage.setItem('sws.projectIndex', JSON.stringify({
-            state: {
-                projects: [{
-                    projectId: 'shell-test-project',
-                    projectName: 'Shell Test Project',
-                    createdAt: new Date().toISOString(),
-                    modifiedAt: new Date().toISOString(),
-                    storagePath: 'project-shell-test-project',
-                    isArchived: false,
-                }],
-                recentProjectIds: [],
-                loading: false,
-            },
-            version: 0,
-        }));
-        localStorage.setItem('sws.projectDetails', JSON.stringify({
-            state: {
-                projects: [{
-                    id: 'shell-test-project',
-                    name: 'Shell Test Project',
-                    projectNumber: '',
-                    clientName: '',
-                    location: '',
-                    scope: { details: [], materials: [], projectType: 'Commercial' },
-                    siteConditions: { elevation: '', outdoorTemp: '', indoorTemp: '', windSpeed: '', humidity: '', localCodes: '' },
-                    createdAt: new Date().toISOString(),
-                    modifiedAt: new Date().toISOString(),
-                    entityCount: 0,
-                    isArchived: false,
-                }],
-            },
-            version: 0,
-        }));
-    });
-    await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
-}
-
 test.describe('UJ-GS-003: Application Shell', () => {
 
     // Setup: Seed localStorage and navigate to canvas
     test.beforeEach(async ({ page }) => {
-        await ensureProjectOnDashboard(page);
-
-        // Open project card to navigate to canvas
-        await page.getByTestId('project-card').first().click();
-
-        // Verify we are on the Canvas page
-        await expect(page).toHaveURL(/\/canvas\//);
+        await openCanvas(page, 'Shell Test Project');
         await expect(page.getByTestId('canvas-area')).toBeVisible({ timeout: 10000 });
     });
 
@@ -115,11 +65,11 @@ test.describe('UJ-GS-003: Application Shell', () => {
 
         // 1. Collapse via Button
         await toggleBtn.click();
-        await expect(sidebar).toHaveClass(/w-12/); // Check for collapsed class
+        await expect(sidebar).toHaveClass(/collapsed/);
 
         // 2. Expand via Keyboard (Ctrl+B)
         await page.keyboard.press('Control+b');
-        await expect(sidebar).toHaveClass(/w-72/); // Check for expanded class
+        await expect(sidebar).not.toHaveClass(/collapsed/);
     });
 
     test('Right Sidebar: Tab Switching and Toggle', async ({ page }) => {
@@ -133,17 +83,17 @@ test.describe('UJ-GS-003: Application Shell', () => {
         await expect(page.getByTestId('bom-panel')).toBeVisible();
         await expect(page.getByTestId('properties-panel')).not.toBeVisible();
 
-        // 3. Switch to Notes tab
-        await page.getByTestId('tab-notes').click();
-        await expect(page.getByTestId('notes-panel')).toBeVisible();
+        // 3. Switch to Calculations tab
+        await page.getByTestId('tab-calculations').click();
+        await expect(page.getByTestId('calculations-panel')).toBeVisible();
 
         // 4. Toggle collapse via Button
         await page.getByTestId('right-sidebar-toggle').first().click();
-        await expect(sidebar).toHaveClass(/w-12/); // Check for collapsed class
+        await expect(sidebar).toHaveClass(/collapsed/);
 
         // 5. Expand via Button
         await page.getByTestId('right-sidebar-toggle').first().click();
-        await expect(sidebar).toHaveClass(/w-80/); // Check for expanded class
+        await expect(sidebar).not.toHaveClass(/collapsed/);
     });
 
     test('Toolbar: Tool Selection and Zoom', async ({ page }) => {

@@ -14,8 +14,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   useEntityStore,
   selectEntity,
-  selectAllEntities,
-  selectEntitiesByType,
   selectEntityCount,
 } from '@/core/store/entityStore';
 import { useHistoryStore, MAX_HISTORY_SIZE } from '@/core/commands/historyStore';
@@ -31,7 +29,7 @@ import {
   undo,
   redo,
 } from '@/core/commands/entityCommands';
-import type { Room, Duct, Equipment, Fitting, Entity } from '@/core/schema';
+import type { Room, Duct, Equipment, Fitting } from '@/core/schema';
 
 // Entity factories
 const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
@@ -345,7 +343,7 @@ describe('Entity Manipulation User Journey', () => {
         entities.forEach((e) => createEntity(e));
         expect(selectEntityCount()).toBe(3);
 
-        deleteEntities([entities[0], entities[1]]);
+        deleteEntities([entities[0]!, entities[1]!]);
         expect(selectEntityCount()).toBe(1);
         expect(selectEntity('room-1')).toBeUndefined();
         expect(selectEntity('room-2')).toBeUndefined();
@@ -357,10 +355,14 @@ describe('Entity Manipulation User Journey', () => {
         createEntity(createMockRoom('room-2', 'Room 2'));
         useHistoryStore.getState().clear();
 
-        deleteEntities([
-          useEntityStore.getState().byId['room-1'] as Room,
-          useEntityStore.getState().byId['room-2'] as Room,
-        ]);
+        const room1 = useEntityStore.getState().byId['room-1'];
+        const room2 = useEntityStore.getState().byId['room-2'];
+
+        if (!room1 || !room2) {
+          throw new Error('Expected test rooms to exist');
+        }
+
+        deleteEntities([room1 as Room, room2 as Room]);
 
         expect(useHistoryStore.getState().past).toHaveLength(1);
       });

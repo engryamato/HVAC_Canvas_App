@@ -5,7 +5,7 @@ import { useViewportStore } from '@/stores/useViewportStore';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityCount } from '@/core/store/entityStore';
 import { cn } from '@/lib/utils';
-import { Wifi, WifiOff, Grid3X3, MousePointer2 } from 'lucide-react';
+import { WifiOff, Grid3X3, MousePointer2 } from 'lucide-react';
 
 interface StatusBarProps {
     isConnected?: boolean;

@@ -129,7 +129,11 @@ export function updateEntity(
     actualPreviousState = previousState!;
   } else {
     id = entityOrId.id;
-    actualPreviousState = useEntityStore.getState().byId[id];
+    const previous = useEntityStore.getState().byId[id];
+    if (!previous) {
+      return;
+    }
+    actualPreviousState = previous;
     actualUpdates = entityOrId;
   }
 
@@ -167,10 +171,11 @@ export function deleteEntity(entityOrId: Entity | string, options?: CommandOptio
 
   if (typeof entityOrId === 'string') {
     entityId = entityOrId;
-    entity = useEntityStore.getState().byId[entityId];
-    if (!entity) {
+    const storedEntity = useEntityStore.getState().byId[entityId];
+    if (!storedEntity) {
       return; // Entity doesn't exist
     }
+    entity = storedEntity;
   } else {
     entity = entityOrId;
     entityId = entity.id;

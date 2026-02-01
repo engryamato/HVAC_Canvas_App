@@ -58,7 +58,11 @@ export function CollapsibleSection(props: CollapsibleSectionProps) {
         aria-expanded={isExpanded}
         type="button"
       >
-        <span className={`${styles.icon} ${isExpanded ? styles.expanded : ''}`}>
+        <span 
+          className={`${styles.icon} ${isExpanded ? styles.expanded : ''}`}
+          data-testid="expand-icon"
+          data-expanded={isExpanded.toString()}
+        >
           ▶
         </span>
         <span className={styles.title}>{title}</span>

@@ -96,14 +96,18 @@ export const useEntityStore = create<EntityStore>()(
 // Standalone selectors (for use outside React components)
 export const selectEntity = (id: string) => useEntityStore.getState().byId[id];
 
+const isDefined = <T>(value: T | undefined): value is T => value !== undefined;
+
 export const selectAllEntities = () => {
   const { byId, allIds } = useEntityStore.getState();
-  return allIds.map((id) => byId[id]).filter(Boolean);
+  return allIds.map((id) => byId[id]).filter(isDefined);
 };
 
 export const selectEntitiesByType = (type: EntityType) => {
   const { byId, allIds } = useEntityStore.getState();
-  return allIds.map((id) => byId[id]).filter((entity) => entity?.type === type);
+  return allIds
+    .map((id) => byId[id])
+    .filter((entity): entity is Entity => entity !== undefined && entity.type === type);
 };
 
 export const selectEntityCount = () => useEntityStore.getState().allIds.length;

@@ -6,12 +6,17 @@ vi.mock('@tauri-apps/api/tauri', () => ({
   invoke: vi.fn()
 }))
 
-vi.mock('@tauri-apps/api/fs', () => ({
+vi.mock('@tauri-apps/plugin-fs', () => ({
   readTextFile: vi.fn(),
+  readTextFileLines: vi.fn(),
+  readFile: vi.fn(),
   writeTextFile: vi.fn(),
+  writeFile: vi.fn(),
   readDir: vi.fn(),
-  createDir: vi.fn(),
+  mkdir: vi.fn(),
   copyFile: vi.fn(),
+  remove: vi.fn(),
+  rename: vi.fn(),
   exists: vi.fn()
 }))
 
@@ -22,7 +27,7 @@ vi.mock('@tauri-apps/api/path', () => ({
   join: vi.fn((...paths: string[]) => paths.join('/'))
 }))
 
-vi.mock('@tauri-apps/api/dialog', () => ({
+vi.mock('@tauri-apps/plugin-dialog', () => ({
   save: vi.fn(),
   open: vi.fn(),
   message: vi.fn(),

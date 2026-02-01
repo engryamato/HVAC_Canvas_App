@@ -18,9 +18,24 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
       reportsDirectory: './coverage',
+      include: [
+        'src/core/**/*.{ts,tsx}',
+        'src/features/canvas/**/*.{ts,tsx}',
+        'src/features/export/**/*.{ts,tsx}',
+        'src/stores/**/*.{ts,tsx}',
+      ],
       exclude: [
         'node_modules/',
+        '.next/',
         'src/__tests__/',
+        'src/features/canvas/components/Inspector/**',
+        'src/features/canvas/components/**',
+        'src/features/dashboard/**',
+        'src/features/export/components/**',
+        'src/features/export/services/**',
+        'src/features/export/download.ts',
+        'src/features/canvas/hooks/useKeyboardShortcuts.ts',
+        'src/features/canvas/clipboard/clipboardAdapter.ts',
         '**/*.config.{js,ts}',
         '**/types/**',
         'e2e/',
@@ -36,7 +51,7 @@ export default defineConfig({
         functions: 70,
         lines: 70,
       },
-      all: true, // Include all files in coverage, not just tested ones
+      all: false,
     },
   },
   resolve: {

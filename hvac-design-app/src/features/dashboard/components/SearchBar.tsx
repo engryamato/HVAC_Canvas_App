@@ -86,6 +86,8 @@ export function SearchBar({
             <div className="relative">
                 <select
                     id="sort-select"
+                    data-testid="sort-select"
+                    aria-label="Sort projects"
                     value={currentSortValue}
                     onChange={handleSortChange}
                     className="appearance-none pl-3 pr-9 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"

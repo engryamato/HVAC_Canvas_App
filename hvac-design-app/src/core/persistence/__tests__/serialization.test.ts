@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   serializeProject,
   deserializeProject,
+  deserializeProjectLenient,
   migrateProject,
   isValidProjectFile,
   getSchemaVersion,
@@ -81,6 +82,18 @@ describe('serialization', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
+    });
+  });
+
+  describe('deserializeProjectLenient', () => {
+    it('should deserialize regardless of schemaVersion mismatch', () => {
+      const project = createEmptyProjectFile();
+      const modified = { ...project, schemaVersion: '9.9.9' };
+      const json = JSON.stringify(modified);
+      const result = deserializeProjectLenient(json);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.schemaVersion).toBe('9.9.9');
     });
   });
 

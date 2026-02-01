@@ -1,5 +1,6 @@
+import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useProjectFilters, type ProjectFilters } from '../hooks/useProjectFilters';
+import { useProjectFilters } from '../hooks/useProjectFilters';
 import type { ProjectListItem } from '../store/projectListStore';
 
 const mockProjects: ProjectListItem[] = [
@@ -55,7 +56,7 @@ describe('useProjectFilters', () => {
             result.current.setFilterType('archived');
         });
         expect(result.current.filteredProjects).toHaveLength(1);
-        expect(result.current.filteredProjects[0].isArchived).toBe(true);
+        expect(result.current.filteredProjects[0]!.isArchived).toBe(true);
     });
 
     it('should filter by search query', () => {
@@ -65,7 +66,7 @@ describe('useProjectFilters', () => {
             result.current.setSearchQuery('Alpha');
         });
         expect(result.current.filteredProjects).toHaveLength(1);
-        expect(result.current.filteredProjects[0].projectName).toBe('Alpha Project');
+        expect(result.current.filteredProjects[0]!.projectName).toBe('Alpha Project');
 
         act(() => {
             result.current.setSearchQuery('Client A');
@@ -81,15 +82,15 @@ describe('useProjectFilters', () => {
             result.current.setSortBy('name');
             result.current.setSortOrder('asc');
         });
-        expect(result.current.filteredProjects[0].projectName).toBe('Alpha Project');
-        expect(result.current.filteredProjects[1].projectName).toBe('Archived Project'); // Alpha -> Archived -> Beta
+        expect(result.current.filteredProjects[0]!.projectName).toBe('Alpha Project');
+        expect(result.current.filteredProjects[1]!.projectName).toBe('Archived Project'); // Alpha -> Archived -> Beta
 
         // Sort by Date Desc (Newest first)
         act(() => {
             result.current.setSortBy('date');
             result.current.setSortOrder('desc');
         });
-        expect(result.current.filteredProjects[0].projectName).toBe('Beta Project'); // 2023-01-02
-        expect(result.current.filteredProjects[2].projectName).toBe('Archived Project'); // 2022
+        expect(result.current.filteredProjects[0]!.projectName).toBe('Beta Project'); // 2023-01-02
+        expect(result.current.filteredProjects[2]!.projectName).toBe('Archived Project'); // 2022
     });
 });

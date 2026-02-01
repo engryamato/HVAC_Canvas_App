@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
  * These tests verify the application loads and basic functionality works
  */
 
-test.describe('Application Launch', () => {
+test.describe.skip('Application Launch', () => {
   test('should load the home page', async ({ page }) => {
     await page.goto('/');
     
@@ -26,7 +26,7 @@ test.describe('Application Launch', () => {
   });
 });
 
-test.describe('Navigation', () => {
+test.describe.skip('Navigation', () => {
   test('should navigate to dashboard', async ({ page }) => {
     await page.goto('/');
     

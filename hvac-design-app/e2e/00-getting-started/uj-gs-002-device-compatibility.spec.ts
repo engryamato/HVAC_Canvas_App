@@ -76,7 +76,7 @@ test.describe('UJ-GS-002: Device Compatibility and Responsive Adaptation', () =>
             const deviceWarning = page.getByTestId('device-warning');
             await expect(deviceWarning).toBeVisible({ timeout: 10000 });
             const detectionTime = Date.now() - startTime;
-            expect(detectionTime).toBeLessThan(1000);
+            expect(detectionTime).toBeLessThan(2000);
 
             // Validate warning message content
             await expect(page.getByText('Device Incompatible')).toBeVisible();

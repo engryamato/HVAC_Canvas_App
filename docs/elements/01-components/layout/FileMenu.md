@@ -9,7 +9,7 @@ src/components/layout/FileMenu.tsx
 ```
 
 ## Purpose
-- Opens `.hvac` or `.json` project files from file system
+- Opens `.sws` project files from file system
 - Navigates to dashboard and archived projects
 - Exports project reports (PDF, CSV, etc.)
 - Provides keyboard shortcut hints for common actions
@@ -19,7 +19,7 @@ src/components/layout/FileMenu.tsx
 ## Dependencies
 - **UI Components**: `Button` (shadcn/ui)
 - **Icons**: `FileText` (lucide-react)
-- **Services**: `FileSystemService` (project import/export)
+- **Persistence**: `TauriFileSystem`, `projectIO`, `webProjectFileIO`
 - **Router**: `useRouter` (Next.js)
 - **Dialogs**: `ExportReportDialog`
 
@@ -42,10 +42,28 @@ None (self-contained)
 |--------|----------|---------|
 | Go to Dashboard | `Ctrl+Shift+D` | Navigate to `/dashboard` |
 | Archived Projects | - | Navigate to `/dashboard?view=archived` |
-| New Project... | `Ctrl+N` | TODO (not implemented) |
+| New Project... | `Ctrl+N` | Navigate to `/dashboard/new` |
 | Open from File... | `Ctrl+O` | `handleOpenFromFile()` |
-| Save Project | `Ctrl+S` | TODO (not implemented) |
+| Save Project | `Ctrl+S` | Triggers manual save |
+| Save Project As... | `Ctrl+Shift+S` | `handleSaveAs()` |
 | Export Report... | `Ctrl+P` | Opens `ExportReportDialog` |
+
+## Keyboard Shortcuts
+- `Ctrl+N`: New project (opens `/dashboard/new`)
+- `Ctrl+O`: Open from file
+- `Ctrl+S`: Save project
+- `Ctrl+Shift+S`: Save project as
+
+Shortcuts are ignored while typing in inputs/textareas.
+
+## Dirty State Guard
+If the current project has unsaved changes, `New Project...` and `Open from File...` open `UnsavedChangesDialog` with:
+- Save and Leave
+- Leave Without Saving
+- Cancel
+
+## Version Warning
+If an opened `.sws` file has a newer schema version than the app expects, the app shows `VersionWarningDialog` before continuing.
 
 ## Behavior
 
@@ -54,20 +72,14 @@ None (self-contained)
 const handleOpenFromFile = async () => {
   setIsOpen(false);
   setIsLoading(true);
-  
-  const projectData = await FileSystemService.openProjectFromFile();
-  if (projectData) {
-    const projectId = await FileSystemService.importProject(projectData);
-    router.push(`/canvas/${projectId}`);
-  }
-  
-  setIsLoading(false);
+  // Web: showOpenFilePicker -> deserialize -> persist -> navigate
+  // Tauri: openFileDialog -> loadProject -> navigate
 };
 ```
 
 **Flow**:
 1. Close menu dropdown
-2. Open native file picker (`.hvac`, `.json`)
+2. Open native file picker (`.sws`)
 3. Import project data to stores
 4. Navigate to canvas with new project ID
 5. Show error alert if file is invalid
@@ -151,7 +163,7 @@ export function Header() {
 ## Related Elements
 - **Parent**: [`Header`](./Header.md)
 - **Dialogs**: `ExportReportDialog`
-- **Services**: `FileSystemService`
+- **Persistence**: `projectIO`, `TauriFileSystem`, `webProjectFileIO`
 - **Routes**: `/dashboard`, `/dashboard?view=archived`, `/canvas/[projectId]`
 
 ## Testing

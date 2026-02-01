@@ -110,14 +110,14 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         await expect(page.getByTestId('tab-archived')).toContainText('1');
 
         // Verify Active tab shows 2 projects
-        await expect(page.getByTestId('project-card')).toHaveCount(2);
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(2);
 
         // Switch to Archived tab
         await page.getByTestId('tab-archived').click();
 
         // Verify Archived tab shows 1 project
-        await expect(page.getByTestId('project-card')).toHaveCount(1);
-        await expect(page.getByRole('heading', { name: 'Archived Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Archived Project' })).toBeVisible();
     });
 
     test('File menu navigation switches to Archived tab', async ({ page }) => {
@@ -136,8 +136,8 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         await expect(page).toHaveURL(/.*view=archived/);
         
         // Verify Archived tab is active
-        await expect(page.getByTestId('project-card')).toHaveCount(1);
-        await expect(page.getByRole('heading', { name: 'Archived Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Archived Project' })).toBeVisible();
 
         // NOW: Return to Dashboard
         await page.getByRole('button', { name: 'File' }).click();
@@ -150,8 +150,8 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         
         await expect(page.getByTestId('tab-active')).toBeVisible();
         // Check that we see the active project again
-        await expect(page.getByRole('heading', { name: 'Active Project' })).toBeVisible();
-        await expect(page.getByTestId('project-card')).toHaveCount(1);
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Active Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
     });
 
     test('Archive action moves project to Archived tab', async ({ page }) => {
@@ -162,7 +162,7 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         ]);
 
         // Verify 2 active projects
-        await expect(page.getByTestId('project-card')).toHaveCount(2);
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(2);
 
         // Archive the first project
         await page.getByTestId('project-card-menu-btn').first().click();
@@ -174,16 +174,16 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         await expect(page.getByTestId('tab-archived')).toContainText('1');
         
         // STRICT VISIBILITY: Verify 'Project to Archive' is GONE from Active tab
-        await expect(page.getByRole('heading', { name: 'Project to Archive' })).not.toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Project to Archive' })).not.toBeVisible();
         
         // SWITCH to Archived tab
         await page.getByTestId('tab-archived').click();
         
         // Verify 'Project to Archive' IS present
-        await expect(page.getByRole('heading', { name: 'Project to Archive' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Project to Archive' })).toBeVisible();
         
         // Verify 'Remaining Project' is NOT present in Archived
-        await expect(page.getByRole('heading', { name: 'Remaining Project' })).not.toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Remaining Project' })).not.toBeVisible();
     });
 
     test('Restore action moves project back to Active tab', async ({ page }) => {
@@ -197,8 +197,8 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         await page.getByTestId('tab-archived').click();
 
         // Verify 1 archived project
-        await expect(page.getByTestId('project-card')).toHaveCount(1);
-        await expect(page.getByRole('heading', { name: 'Archived Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Archived Project' })).toBeVisible();
 
         // Restore the project
         await page.getByTestId('project-card-menu-btn').first().click();
@@ -210,12 +210,12 @@ test.describe('UJ-PM-005: Archive/Restore Project', () => {
         await expect(page.getByTestId('tab-archived')).toContainText('0');
         
         // Verify 'Archived Project' is GONE from Archived tab
-        await expect(page.getByRole('heading', { name: 'Archived Project' })).not.toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Archived Project' })).not.toBeVisible();
         
         // SWITCH to Active tab
         await page.getByTestId('tab-active').click();
         
         // Verify 'Archived Project' IS present in Active tab
-        await expect(page.getByRole('heading', { name: 'Archived Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Archived Project' })).toBeVisible();
     });
 });

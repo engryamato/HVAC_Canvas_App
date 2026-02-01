@@ -1,8 +1,20 @@
-# Right Sidebar (Engineering)
+# Right Sidebar (Canvas)
 
 ## Overview
 
-The Right Sidebar is the engineering hub of the application. It displays the real-time Bill of Quantities (BOQ) and detailed calculation breakdowns. It is a sizable drawer layer.
+The Right Sidebar is a tabbed sidebar for canvas workflows. It includes entity/canvas properties, Bill of Quantities (BOQ), and calculations.
+
+## Location
+
+```
+hvac-design-app/src/features/canvas/components/RightSidebar.tsx
+```
+
+## Tabs
+
+- **Properties**: Inspector panel (entity or canvas-level)
+- **BOM**: Bill of Quantities table
+- **Calculations**: Calculation breakdown (currently placeholder)
 
 ## Structure
 

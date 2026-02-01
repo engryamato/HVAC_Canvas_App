@@ -121,7 +121,7 @@ test.describe('UJ-PM-003: Edit Project Metadata', () => {
         });
 
         // Verify original name shows
-        await expect(page.getByRole('heading', { name: 'Project Before Rename' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Project Before Rename' })).toBeVisible();
 
         // Open rename mode
         await page.getByTestId('project-card-menu-btn').first().click();
@@ -140,7 +140,7 @@ test.describe('UJ-PM-003: Edit Project Metadata', () => {
         await page.waitForTimeout(300);
 
         // Verify new name shows in the list
-        await expect(page.getByRole('heading', { name: 'Project After Rename' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Project After Rename' })).toBeVisible();
     });
 
     test('Escape key cancels rename', async ({ page }) => {
@@ -162,7 +162,7 @@ test.describe('UJ-PM-003: Edit Project Metadata', () => {
         await page.keyboard.press('Escape');
 
         // Original name should still be visible
-        await expect(page.getByRole('heading', { name: 'Unchanged Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Unchanged Project' })).toBeVisible();
     });
 
     test('Enter key saves the new name', async ({ page }) => {
@@ -185,6 +185,6 @@ test.describe('UJ-PM-003: Edit Project Metadata', () => {
         await page.waitForTimeout(300);
 
         // Verify new name shows
-        await expect(page.getByRole('heading', { name: 'New Name via Enter' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'New Name via Enter' })).toBeVisible();
     });
 });

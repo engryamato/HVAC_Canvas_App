@@ -103,18 +103,14 @@ test.describe('UJ-PM-004: Delete Project', () => {
         await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(2);
 
         // Delete the first project
-        await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        await page.getByTestId('project-card-menu-btn').first().click({ force: true });
         await expect(page.getByTestId('project-card-menu')).toBeVisible();
         await page.getByTestId('menu-delete-btn').click();
-
-        // Confirm delete
-        await expect(page.getByRole('dialog')).toBeVisible();
-        await page.getByRole('button', { name: 'Delete Project' }).click();
 
         // Verify project is removed
         await expect(page.getByText('Project to Delete')).not.toBeVisible();
         await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
-        await expect(page.getByRole('heading', { name: 'Remaining Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Remaining Project' })).toBeVisible();
     });
 
     test('Deleting last project shows empty state', async ({ page }) => {
@@ -124,15 +120,11 @@ test.describe('UJ-PM-004: Delete Project', () => {
         await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
 
         // Delete the project
-        await page.getByTestId('project-card-menu-btn').first().evaluate(node => (node as HTMLElement).click());
+        await page.getByTestId('project-card-menu-btn').first().click({ force: true });
         await expect(page.getByTestId('project-card-menu')).toBeVisible();
         await page.getByTestId('menu-delete-btn').click();
 
-        // Confirm delete
-        await expect(page.getByRole('dialog')).toBeVisible();
-        await page.getByRole('button', { name: 'Delete Project' }).click();
-
         // Should show empty state
-        await expect(page.getByText('No projects found')).toBeVisible();
+        await expect(page.getByText(/no projects yet/i)).toBeVisible();
     });
 });

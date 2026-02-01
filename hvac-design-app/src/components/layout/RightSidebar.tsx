@@ -3,9 +3,8 @@
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { ChevronRight, ChevronLeft, Settings, List, FileText, Calculator, Info } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Settings, List, FileText, Calculator } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InspectorPanel } from '@/features/canvas/components/Inspector/InspectorPanel';
 
@@ -20,7 +19,6 @@ export const RightSidebar: React.FC = () => {
         activeRightTab,
         setActiveRightTab
     } = useLayoutStore();
-    const selectedIds = useSelectionStore((state) => state.selectedIds);
     const entities = useEntityStore((state) => state.byId);
 
     // Keyboard shortcuts

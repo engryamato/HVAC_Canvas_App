@@ -74,7 +74,9 @@ test.describe('OS-INIT-002: Environment Detection', () => {
             });
 
             await page.goto('/');
-            await expect(page.getByTestId('device-warning')).toBeVisible({ timeout: 10000 });
+            const toast = page.getByTestId('toast-error');
+            await expect(toast).toBeVisible({ timeout: 10000 });
+            await expect(toast).toContainText(/local storage unavailable/i);
         });
 
         test('should persist app state to localStorage', async ({ page }) => {
@@ -119,15 +121,13 @@ test.describe('OS-INIT-002: Environment Detection', () => {
             // In web mode, export should trigger browser download (not file save)
             // This is a capability check, not full flow test
 
-            await page.goto('/');
-            await page.evaluate(() => {
-                // Simulate returning user
-                localStorage.setItem('hvac-app-storage', JSON.stringify({
-                    state: { hasLaunched: true },
-                    version: 0
-                }));
+            await page.addInitScript(() => {
+                localStorage.setItem(
+                    'hvac-app-storage',
+                    JSON.stringify({ state: { hasLaunched: true }, version: 0 })
+                );
             });
-            await page.reload();
+            await page.goto('/?skipSplash=true');
 
             // Wait for dashboard
             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });

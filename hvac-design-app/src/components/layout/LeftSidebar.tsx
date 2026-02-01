@@ -24,10 +24,10 @@ const SCOPE_OPTIONS = [
 ];
 
 const MATERIAL_OPTIONS = [
-  { value: 'galvanized', label: 'Galvanized Steel' },
-  { value: 'stainless', label: 'Stainless Steel' },
-  { value: 'aluminum', label: 'Aluminum' },
-  { value: 'pvs', label: 'PVS' },
+  { value: 'Galvanized Steel', label: 'Galvanized Steel' },
+  { value: 'Stainless Steel', label: 'Stainless Steel' },
+  { value: 'Aluminum', label: 'Aluminum' },
+  { value: 'PVC', label: 'PVC' },
 ];
 
 const STAINLESS_GRADES = [
@@ -51,6 +51,25 @@ function toggleArrayValue(values: string[] | undefined, value: string): string[]
     next.add(value);
   }
   return Array.from(next);
+}
+
+type ScopeMaterial = { type: string; grade?: string };
+
+function toggleMaterial(materials: ScopeMaterial[], type: string): ScopeMaterial[] {
+  if (materials.some((material) => material.type === type)) {
+    return materials.filter((material) => material.type !== type);
+  }
+
+  const grade =
+    type === 'Galvanized Steel' ? 'g-60' : type === 'Stainless Steel' ? '304' : undefined;
+
+  return [...materials, { type, grade }];
+}
+
+function setMaterialGrade(materials: ScopeMaterial[], type: string, grade: string): ScopeMaterial[] {
+  return materials.map((material) =>
+    material.type === type ? { ...material, grade } : material
+  );
 }
 
 /**
@@ -109,7 +128,7 @@ export const LeftSidebar: React.FC = () => {
         const scope = details?.scope ?? { details: [], materials: [], projectType: 'commercial' };
         return {
             details: scope.details ?? [],
-            materials: scope.materials ?? [],
+            materials: (scope.materials ?? []) as ScopeMaterial[],
             projectType: scope.projectType ?? 'commercial',
         };
     }, [details]);
@@ -390,7 +409,9 @@ export const LeftSidebar: React.FC = () => {
                                 <div>
                                     <div className="text-xs font-semibold text-slate-600 mb-2">Materials</div>
                                     {MATERIAL_OPTIONS.map((option) => {
-                                        const selected = projectScope.materials.includes(option.value);
+                                        const selected = projectScope.materials.some(
+                                          (material) => material.type === option.value
+                                        );
                                         return (
                                             <label key={option.value} className="flex items-center gap-2 py-1.5 text-sm cursor-pointer hover:bg-slate-50 rounded px-2">
                                                 <input
@@ -398,7 +419,7 @@ export const LeftSidebar: React.FC = () => {
                                                     checked={selected}
                                                     onChange={() =>
                                                         updateScope({
-                                                            materials: toggleArrayValue(projectScope.materials, option.value),
+                                                            materials: toggleMaterial(projectScope.materials, option.value),
                                                         })
                                                     }
                                                     className="rounded border-slate-300"
@@ -408,24 +429,48 @@ export const LeftSidebar: React.FC = () => {
                                         );
                                     })}
 
-                                    {projectScope.materials.includes('galvanized') && (
+                                    {projectScope.materials.some((m) => m.type === 'Galvanized Steel') && (
                                         <div className="mt-2">
                                             <Dropdown
                                                 label="Galvanized Grade"
                                                 options={GALVANIZED_GRADES}
-                                                value={(details?.scope as { galvanizedGrade?: string })?.galvanizedGrade ?? 'g-60'}
-                                                onChange={(val) => updateScope({ galvanizedGrade: String(val) })}
+                                                value={
+                                                  projectScope.materials.find(
+                                                    (m) => m.type === 'Galvanized Steel'
+                                                  )?.grade ?? 'g-60'
+                                                }
+                                                onChange={(val) =>
+                                                  updateScope({
+                                                    materials: setMaterialGrade(
+                                                      projectScope.materials,
+                                                      'Galvanized Steel',
+                                                      String(val)
+                                                    ),
+                                                  })
+                                                }
                                             />
                                         </div>
                                     )}
 
-                                    {projectScope.materials.includes('stainless') && (
+                                    {projectScope.materials.some((m) => m.type === 'Stainless Steel') && (
                                         <div className="mt-2">
                                             <Dropdown
                                                 label="Stainless Grade"
                                                 options={STAINLESS_GRADES}
-                                                value={(details?.scope as { stainlessGrade?: string })?.stainlessGrade ?? '304'}
-                                                onChange={(val) => updateScope({ stainlessGrade: String(val) })}
+                                                value={
+                                                  projectScope.materials.find(
+                                                    (m) => m.type === 'Stainless Steel'
+                                                  )?.grade ?? '304'
+                                                }
+                                                onChange={(val) =>
+                                                  updateScope({
+                                                    materials: setMaterialGrade(
+                                                      projectScope.materials,
+                                                      'Stainless Steel',
+                                                      String(val)
+                                                    ),
+                                                  })
+                                                }
                                             />
                                         </div>
                                     )}

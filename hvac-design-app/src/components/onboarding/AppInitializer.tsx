@@ -12,7 +12,7 @@ import { isTauri } from '@/core/persistence/filesystem';
 
 export const AppInitializer: React.FC = () => {
     const router = useRouter();
-    const { hasLaunched, isFirstLaunch, isLoading, setEnvironment } = useAppStateStore();
+    const { isFirstLaunch, isLoading, setEnvironment } = useAppStateStore();
     const { isActive: isTutorialActive } = useTutorialStore();
     const searchParams = useSearchParams();
     const skipSplash = searchParams.get('skipSplash') === 'true';
@@ -23,6 +23,18 @@ export const AppInitializer: React.FC = () => {
 
     // Force preferences hydration on startup
     usePreferencesStore();
+
+    const theme = usePreferencesStore((state) => state.theme);
+    const compactMode = usePreferencesStore((state) => state.compactMode);
+
+    useEffect(() => {
+        if (typeof document === 'undefined') {
+            return;
+        }
+
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('compact', compactMode);
+    }, [theme, compactMode]);
 
     // Auto-open last project if enabled
     useAutoOpen();
@@ -57,6 +69,8 @@ export const AppInitializer: React.FC = () => {
             
             return () => clearTimeout(redirectTimer);
         }
+
+        return;
     }, [showSplash, isFirstLaunch, isLoading, isTutorialActive, router]);
 
 

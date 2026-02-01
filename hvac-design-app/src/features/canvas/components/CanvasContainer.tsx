@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { shallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 import { useViewportStore } from '../store/viewportStore';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../store/selectionStore';
 import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
 import type { Entity, Room, Duct, Equipment } from '@/core/schema';
 import { useViewport } from '../hooks/useViewport';
+import { useCursorStore } from '../store/cursorStore';
+import { RulersOverlay } from './RulersOverlay';
 
 // Tools
 import {
@@ -40,6 +43,7 @@ function createToolInstances(): Record<CanvasTool, ITool> {
   return {
     select: new SelectTool(),
     room: new RoomTool(),
+    line: new DuctTool(),
     duct: new DuctTool(),
     equipment: new EquipmentTool(),
     fitting: new FittingTool(),
@@ -58,12 +62,18 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   // Store state
   const { panX, panY, zoom, gridVisible, gridSize } = useViewportStore();
+  const showRulers = usePreferencesStore((state) => state.showRulers);
+  const unitSystem = usePreferencesStore((state) => state.unitSystem);
   const currentTool = useToolStore((state) => state.currentTool);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
+  const setLastCanvasPoint = useCursorStore((state) => state.setLastCanvasPoint);
+  const clearLastCanvasPoint = useCursorStore((state) => state.clearLastCanvasPoint);
   const entities = useEntityStore(
-    (state) => state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined),
-    shallow
+    useShallow((state) => {
+      const byId = state.byId;
+      return state.allIds.map((id) => byId[id]).filter((e): e is Entity => e !== undefined);
+    })
   );
 
   // Enable viewport pan/zoom interactions (space-drag, middle-mouse, wheel zoom)
@@ -380,6 +390,8 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const { x, y } = screenToCanvas(e.clientX, e.clientY);
 
+      setLastCanvasPoint({ x, y });
+
       // Notify parent component
       if (onMouseMove) {
         onMouseMove(x, y);
@@ -389,7 +401,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       const toolEvent = createToolMouseEvent(e);
       activeTool.onMouseMove(toolEvent);
     },
-    [onMouseMove, screenToCanvas, createToolMouseEvent, activeTool]
+    [onMouseMove, screenToCanvas, createToolMouseEvent, activeTool, setLastCanvasPoint]
   );
 
   /**
@@ -410,7 +422,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     if (onMouseLeave) {
       onMouseLeave();
     }
-  }, [onMouseLeave]);
+
+    clearLastCanvasPoint();
+  }, [onMouseLeave, clearLastCanvasPoint]);
 
   /**
    * Handle keyboard events - delegate to active tool
@@ -462,6 +476,15 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   return (
     <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
+      {showRulers && (
+        <RulersOverlay
+          containerRef={containerRef}
+          panX={panX}
+          panY={panY}
+          zoom={zoom}
+          unitSystem={unitSystem}
+        />
+      )}
       <canvas
         ref={canvasRef}
         className="absolute inset-0"

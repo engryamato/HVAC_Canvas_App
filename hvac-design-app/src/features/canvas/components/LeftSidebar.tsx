@@ -5,6 +5,9 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
 import { useProjectActions, useProjectDetails } from '@/core/store/project.store';
+import { useLayoutStore } from '@/stores/useLayoutStore';
+import { ProjectSidebar } from './ProjectSidebar';
+import { ProductCatalogPanel } from './ProductCatalogPanel';
 
 interface LeftSidebarProps {
   isOpen?: boolean;
@@ -56,6 +59,38 @@ function toggleArrayValue(values: string[] | undefined, value: string): string[]
   return Array.from(next);
 }
 
+type MaterialSelection = { type: string; grade?: string };
+
+function toggleMaterial(materials: MaterialSelection[] | undefined, type: string): MaterialSelection[] {
+  const current = materials ?? [];
+  const exists = current.some((m) => m.type === type);
+  if (exists) {
+    return current.filter((m) => m.type !== type);
+  }
+  return [...current, { type }];
+}
+
+function setMaterialGrade(
+  materials: MaterialSelection[] | undefined,
+  type: string,
+  grade: string
+): MaterialSelection[] {
+  return (materials ?? []).map((m) => (m.type === type ? { ...m, grade } : m));
+}
+
+function getMaterialGrade(materials: MaterialSelection[] | undefined, type: string): string | undefined {
+  return (materials ?? []).find((m) => m.type === type)?.grade;
+}
+
+type LeftTabId = 'equipment' | 'layers' | 'recent' | 'project';
+
+function normalizeLeftTab(value: string): LeftTabId {
+  if (value === 'equipment' || value === 'layers' || value === 'recent' || value === 'project') {
+    return value;
+  }
+  return 'equipment';
+}
+
 export function LeftSidebar({
   isOpen = true,
   onClose,
@@ -64,6 +99,11 @@ export function LeftSidebar({
   maxWidth = 500,
   className = '',
 }: LeftSidebarProps) {
+  const activeLeftTab = useLayoutStore((state) => normalizeLeftTab(state.activeLeftTab));
+  const setActiveLeftTab = useLayoutStore((state) => state.setActiveLeftTab);
+  const leftSidebarCollapsed = useLayoutStore((state) => state.leftSidebarCollapsed);
+  const toggleLeftSidebar = useLayoutStore((state) => state.toggleLeftSidebar);
+
   const projectDetails = useProjectDetails();
   const { setProject } = useProjectActions();
   const [sidebarWidth, setSidebarWidth] = useState<number>(defaultWidth);
@@ -78,9 +118,18 @@ export function LeftSidebar({
 
   const projectScope = useMemo(() => {
     const scope = details?.scope ?? { details: [], materials: [], projectType: 'commercial' };
+    const rawMaterials = (scope.materials ?? []) as unknown[];
+    const normalizedMaterials = rawMaterials
+      .map((material) => {
+        if (typeof material === 'string') {
+          return { type: material };
+        }
+        return material as MaterialSelection;
+      })
+      .filter((material) => Boolean(material?.type));
     return {
       details: scope.details ?? [],
-      materials: scope.materials ?? [],
+      materials: normalizedMaterials,
       projectType: scope.projectType ?? 'commercial',
     };
   }, [details]);
@@ -175,30 +224,148 @@ export function LeftSidebar({
 
   return (
     <aside
-      className={`left-sidebar ${className}`}
-      style={{ width: `${sidebarWidth}px` }}
+      className={`left-sidebar ${leftSidebarCollapsed ? 'collapsed' : ''} ${className}`}
+      style={{ width: leftSidebarCollapsed ? '48px' : `${sidebarWidth}px` }}
       data-testid="left-sidebar"
     >
       <div className="resize-handle" onMouseDown={handleResizeStart} />
-      <div className="sidebar-content">
+
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2">
+        {!leftSidebarCollapsed && (
+          <div className="flex gap-2" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'equipment'}
+              aria-controls="equipment-panel"
+              onClick={() => setActiveLeftTab('equipment')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'equipment'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-equipment"
+            >
+              Equipment
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'layers'}
+              aria-controls="layers-panel"
+              onClick={() => setActiveLeftTab('layers')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'layers'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-layers"
+            >
+              Layers
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'recent'}
+              aria-controls="recent-panel"
+              onClick={() => setActiveLeftTab('recent')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'recent'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-recent"
+            >
+              Recent
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeLeftTab === 'project'}
+              aria-controls="project-panel"
+              onClick={() => setActiveLeftTab('project')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'project'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-project"
+            >
+              Project
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={toggleLeftSidebar}
+          className={`p-1 rounded hover:bg-slate-100 text-slate-500 transition-transform ${
+            leftSidebarCollapsed ? 'rotate-180 absolute left-2 top-2 z-50 bg-white shadow-md border border-slate-200' : ''
+          }`}
+          data-testid="left-sidebar-toggle"
+          aria-label={leftSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+      </div>
+      {!leftSidebarCollapsed && (
+        <div className="sidebar-content overflow-y-auto">
+          {activeLeftTab === 'equipment' && (
+            <div className="p-3" data-testid="equipment-panel" id="equipment-panel" role="tabpanel">
+              <ProductCatalogPanel />
+            </div>
+          )}
+
+        {activeLeftTab === 'layers' && (
+          <div className="p-3" data-testid="layers-panel" id="layers-panel" role="tabpanel">
+            <h3 className="text-sm font-semibold mb-2">Layers</h3>
+            <div className="text-xs text-slate-500">Layer management coming soon.</div>
+          </div>
+        )}
+
+        {activeLeftTab === 'recent' && (
+          <div className="p-3" data-testid="recent-panel" id="recent-panel" role="tabpanel">
+            <h3 className="text-sm font-semibold mb-2">Recent Items</h3>
+            <div className="text-xs text-slate-500">Recently used items will appear here.</div>
+          </div>
+        )}
+
+        {activeLeftTab === 'project' && (
+          <div className="space-y-4" id="project-panel" role="tabpanel">
+            <ProjectSidebar className="w-full border-r-0" />
         <CollapsibleSection
           title="Project Details"
           defaultExpanded={expandedSections.includes('project-details')}
           onToggle={() => toggleSection('project-details')}
         >
           <ValidatedInput
+            id="project-name"
             label="Name"
+            type="text"
             value={details?.projectName ?? ''}
             onChange={(val) => updateProjectDetails({ projectName: String(val) })}
-            required
           />
           <ValidatedInput
+            id="project-location"
             label="Location"
+            type="text"
             value={details?.location ?? ''}
             onChange={(val) => updateProjectDetails({ location: String(val) })}
           />
           <ValidatedInput
+            id="project-client"
             label="Client"
+            type="text"
             value={details?.clientName ?? ''}
             onChange={(val) => updateProjectDetails({ clientName: String(val) })}
           />
@@ -233,7 +400,7 @@ export function LeftSidebar({
           <div className="scope-section">
             <div className="scope-title">Materials</div>
             {MATERIAL_OPTIONS.map((option) => {
-              const selected = projectScope.materials.includes(option.value);
+              const selected = projectScope.materials.some((material) => material.type === option.value);
               return (
                 <label key={option.value} className="scope-row">
                   <input
@@ -241,7 +408,7 @@ export function LeftSidebar({
                     checked={selected}
                     onChange={() =>
                       updateScope({
-                        materials: toggleArrayValue(projectScope.materials, option.value),
+                        materials: toggleMaterial(projectScope.materials, option.value),
                       })
                     }
                   />
@@ -250,21 +417,29 @@ export function LeftSidebar({
               );
             })}
 
-            {projectScope.materials.includes('galvanized') && (
+            {projectScope.materials.some((material) => material.type === 'galvanized') && (
               <Dropdown
                 label="Galvanized Grade"
                 options={GALVANIZED_GRADES}
-                value={(details?.scope as { galvanizedGrade?: string })?.galvanizedGrade ?? 'g-60'}
-                onChange={(val) => updateScope({ galvanizedGrade: String(val) })}
+                value={getMaterialGrade(projectScope.materials, 'galvanized') ?? 'g-60'}
+                onChange={(val) =>
+                  updateScope({
+                    materials: setMaterialGrade(projectScope.materials, 'galvanized', String(val)),
+                  })
+                }
               />
             )}
 
-            {projectScope.materials.includes('stainless') && (
+            {projectScope.materials.some((material) => material.type === 'stainless') && (
               <Dropdown
                 label="Stainless Grade"
                 options={STAINLESS_GRADES}
-                value={(details?.scope as { stainlessGrade?: string })?.stainlessGrade ?? '304'}
-                onChange={(val) => updateScope({ stainlessGrade: String(val) })}
+                value={getMaterialGrade(projectScope.materials, 'stainless') ?? '304'}
+                onChange={(val) =>
+                  updateScope({
+                    materials: setMaterialGrade(projectScope.materials, 'stainless', String(val)),
+                  })
+                }
               />
             )}
           </div>
@@ -283,42 +458,52 @@ export function LeftSidebar({
           onToggle={() => toggleSection('site-conditions')}
         >
           <ValidatedInput
+            id="site-elevation"
             label="Elevation (ft)"
             type="number"
             value={siteConditions.elevation ?? ''}
             onChange={(val) => updateSiteConditions({ elevation: String(val) })}
           />
           <ValidatedInput
+            id="site-outdoor-temp"
             label="Outdoor Temperature (°F)"
             type="number"
             value={siteConditions.outdoorTemp ?? ''}
             onChange={(val) => updateSiteConditions({ outdoorTemp: String(val) })}
           />
           <ValidatedInput
+            id="site-indoor-temp"
             label="Indoor Temperature (°F)"
             type="number"
             value={siteConditions.indoorTemp ?? ''}
             onChange={(val) => updateSiteConditions({ indoorTemp: String(val) })}
           />
           <ValidatedInput
+            id="site-wind-speed"
             label="Wind Speed (MPH)"
             type="number"
             value={siteConditions.windSpeed ?? ''}
             onChange={(val) => updateSiteConditions({ windSpeed: String(val) })}
           />
           <ValidatedInput
+            id="site-humidity"
             label="Humidity (%)"
             type="number"
             value={siteConditions.humidity ?? ''}
             onChange={(val) => updateSiteConditions({ humidity: String(val) })}
           />
           <ValidatedInput
+            id="site-local-codes"
             label="Local Codes"
+            type="text"
             value={siteConditions.localCodes ?? ''}
             onChange={(val) => updateSiteConditions({ localCodes: String(val) })}
           />
         </CollapsibleSection>
+          </div>
+        )}
       </div>
+      )}
 
       {onClose && (
         <button type="button" className="sidebar-close" onClick={onClose} aria-label="Close sidebar">

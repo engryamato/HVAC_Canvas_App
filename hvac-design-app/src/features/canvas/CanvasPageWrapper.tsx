@@ -8,6 +8,7 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useViewportStore } from './store/viewportStore';
 import { useSelectionStore } from './store/selectionStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { type ReversibleCommand } from '@/core/commands/types';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
@@ -45,7 +46,7 @@ function compareVersions(v1: string, v2: string): number {
  */
 export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const router = useRouter();
-  const { setProject, clearProject } = useSessionStore();
+  const { setProject, clearProject, setProjectSettings } = useSessionStore();
   const { getProject } = usePersistenceStore();
 
   const [projectError, setProjectError] = useState<string | null>(null);
@@ -55,18 +56,25 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
   const hydrateFromPayload = (payload: LocalStoragePayload) => {
     try {
+      if (payload?.project?.settings?.unitSystem) {
+        const unitSystem = payload.project.settings.unitSystem;
+        usePreferencesStore.getState().setUnitSystem(unitSystem);
+        setProjectSettings({ unitSystem });
+      }
+
       if (payload?.project?.entities) {
         useEntityStore.getState().hydrate(payload.project.entities);
       }
       
       if (payload?.viewport) {
+        const preferences = usePreferencesStore.getState();
         useViewportStore.setState({
           panX: payload.viewport.panX,
           panY: payload.viewport.panY,
           zoom: payload.viewport.zoom,
           gridVisible: payload.viewport.gridVisible,
           gridSize: payload.viewport.gridSize,
-          snapToGrid: payload.viewport.snapToGrid,
+          snapToGrid: preferences.snapToGrid,
         });
       }
       
@@ -129,7 +137,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
             // Check version compatibility
             const proj = result.project as any; // Type assertion for dynamic import
-            const projVersion = proj.version ?? '1.0.0';
+            const projVersion = (proj as any).schemaVersion ?? proj.version ?? '1.0.0';
             logger.debug(`[CanvasPageWrapper] Project: ${proj.projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
 
             if (compareVersions(projVersion, APP_VERSION) > 0) {
@@ -171,6 +179,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
               });
             }
 
+            if (result.project.settings?.unitSystem) {
+              const unitSystem = result.project.settings.unitSystem;
+              usePreferencesStore.getState().setUnitSystem(unitSystem);
+              setProjectSettings({ unitSystem });
+            }
+
             loadProject(projectData);
           } catch (error) {
             logger.error('[CanvasPageWrapper] Failed to load from file:', error);
@@ -200,7 +214,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
 
       // Check version compatibility
-      const projVersion = (persistedProject as any)?.version || '1.0.0';
+      const projVersion = storedPayload?.project?.schemaVersion ?? (persistedProject as any)?.version ?? '1.0.0';
       logger.debug(`[CanvasPageWrapper] Project: ${projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
 
       if (compareVersions(projVersion, APP_VERSION) > 0) {

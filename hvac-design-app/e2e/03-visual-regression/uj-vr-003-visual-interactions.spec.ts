@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { openCanvas, ensurePropertiesPanelVisible } from '../utils/test-utils';
 
 /**
  * Visual Regression Tests for UI Interactions
@@ -13,14 +14,14 @@ test.describe('UI Interaction Visual Tests', () => {
     });
 
     test('should display button default state', async ({ page }) => {
-      const primaryBtn = page.getByRole('button', { name: /new project/i });
+      const primaryBtn = page.getByTestId('new-project-btn');
       if (await primaryBtn.isVisible()) {
         await expect(primaryBtn).toHaveScreenshot('button-default.png');
       }
     });
 
     test('should display button hover state', async ({ page }) => {
-      const primaryBtn = page.getByRole('button', { name: /new project/i });
+      const primaryBtn = page.getByTestId('new-project-btn');
       if (await primaryBtn.isVisible()) {
         await primaryBtn.hover();
         await page.waitForTimeout(200); // Wait for hover transition
@@ -29,7 +30,7 @@ test.describe('UI Interaction Visual Tests', () => {
     });
 
     test('should display button focus state', async ({ page }) => {
-      const primaryBtn = page.getByRole('button', { name: /new project/i });
+      const primaryBtn = page.getByTestId('new-project-btn');
       if (await primaryBtn.isVisible()) {
         await primaryBtn.focus();
         await page.waitForTimeout(150);
@@ -38,7 +39,7 @@ test.describe('UI Interaction Visual Tests', () => {
     });
 
     test('should display button active/pressed state', async ({ page }) => {
-      const primaryBtn = page.getByRole('button', { name: /new project/i });
+      const primaryBtn = page.getByTestId('new-project-btn');
       if (await primaryBtn.isVisible()) {
         await primaryBtn.hover();
         await page.mouse.down();
@@ -53,7 +54,7 @@ test.describe('UI Interaction Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/dashboard');
       await page.waitForLoadState('networkidle');
-      await page.getByRole('button', { name: /new project/i }).click();
+      await page.getByTestId('new-project-btn').click();
       await page.waitForTimeout(300);
     });
 
@@ -77,9 +78,11 @@ test.describe('UI Interaction Visual Tests', () => {
 
     test('should display input error state', async ({ page }) => {
       const input = page.getByLabel(/project name/i);
-      await input.fill('');
-      await page.getByRole('button', { name: /create/i }).click();
-      await page.waitForTimeout(200);
+      await input.fill('   ');
+      await input.blur();
+
+      const createButton = page.getByRole('dialog').getByTestId('create-button');
+      await expect(createButton).toBeDisabled();
 
       // Capture the input and its error message
       const inputGroup = input.locator('..');
@@ -246,32 +249,12 @@ test.describe('UI Interaction Visual Tests', () => {
 
   test.describe('Icon Button States', () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to canvas for icon buttons
-      await page.goto('/dashboard');
-      await page.evaluate(() => localStorage.clear());
-      await page.reload();
-      await page.waitForLoadState('networkidle');
-
-      await page.getByRole('button', { name: /new project/i }).click();
-      await page.waitForTimeout(300);
-      await page.getByLabel(/project name/i).fill('Icon Test');
-      await page.getByRole('button', { name: /create/i }).click();
-      await page.waitForTimeout(500);
-
-      const projectCard = page.getByText('Icon Test');
-      if (await projectCard.isVisible()) {
-        await projectCard.click();
-      }
-      await page.waitForURL(/canvas/);
+      await openCanvas(page, 'Icon Test');
       await page.waitForLoadState('networkidle');
     });
 
     test('should display icon button default state', async ({ page }) => {
-      const iconBtn = page.locator('[data-testid="icon-button"]').first().or(
-        page.locator('.icon-button').first()
-      ).or(
-        page.locator('button svg').first().locator('..')
-      );
+      const iconBtn = page.getByTestId('zoom-in');
 
       if (await iconBtn.isVisible()) {
         await expect(iconBtn).toHaveScreenshot('icon-button-default.png');
@@ -279,11 +262,7 @@ test.describe('UI Interaction Visual Tests', () => {
     });
 
     test('should display icon button hover state', async ({ page }) => {
-      const iconBtn = page.locator('[data-testid="icon-button"]').first().or(
-        page.locator('.icon-button').first()
-      ).or(
-        page.locator('button svg').first().locator('..')
-      );
+      const iconBtn = page.getByTestId('zoom-in');
 
       if (await iconBtn.isVisible()) {
         await iconBtn.hover();
@@ -295,24 +274,9 @@ test.describe('UI Interaction Visual Tests', () => {
 
   test.describe('Collapsible Section Animations', () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to canvas and create entity for inspector
-      await page.goto('/dashboard');
-      await page.evaluate(() => localStorage.clear());
-      await page.reload();
+      await openCanvas(page, 'Collapse Test');
       await page.waitForLoadState('networkidle');
-
-      await page.getByRole('button', { name: /new project/i }).click();
-      await page.waitForTimeout(300);
-      await page.getByLabel(/project name/i).fill('Collapse Test');
-      await page.getByRole('button', { name: /create/i }).click();
-      await page.waitForTimeout(500);
-
-      const projectCard = page.getByText('Collapse Test');
-      if (await projectCard.isVisible()) {
-        await projectCard.click();
-      }
-      await page.waitForURL(/canvas/);
-      await page.waitForLoadState('networkidle');
+      await ensurePropertiesPanelVisible(page);
 
       // Create a room to populate inspector
       await page.keyboard.press('r');
@@ -328,66 +292,39 @@ test.describe('UI Interaction Visual Tests', () => {
     });
 
     test('should display collapsible section expanded state', async ({ page }) => {
-      const collapsible = page.locator('[data-testid="collapsible-section"]').or(
-        page.locator('.collapsible-section')
-      );
-
-      if (await collapsible.first().isVisible()) {
-        await expect(collapsible.first()).toHaveScreenshot('collapsible-expanded.png');
+      const propertiesPanel = page.getByTestId('properties-panel');
+      const header = propertiesPanel.getByRole('button', { name: 'Project Info' });
+      if (await header.isVisible()) {
+        await expect(header.locator('..')).toHaveScreenshot('collapsible-expanded.png');
       }
     });
 
     test('should display collapsible section collapsed state', async ({ page }) => {
-      const collapsibleHeader = page.locator('[data-testid="collapsible-header"]').or(
-        page.locator('.collapsible-header')
-      ).or(
-        page.getByRole('button', { name: /dimensions|properties|general/i })
-      );
-
-      if (await collapsibleHeader.first().isVisible()) {
-        await collapsibleHeader.first().click();
+      const propertiesPanel = page.getByTestId('properties-panel');
+      const header = propertiesPanel.getByRole('button', { name: 'Project Info' });
+      if (await header.isVisible()) {
+        await header.click();
         await page.waitForTimeout(200);
-
-        const section = collapsibleHeader.first().locator('..');
-        await expect(section).toHaveScreenshot('collapsible-collapsed.png');
+        await expect(header.locator('..')).toHaveScreenshot('collapsible-collapsed.png');
       }
     });
   });
 
   test.describe('Tooltip Display', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/dashboard');
-      await page.waitForLoadState('networkidle');
-
-      await page.getByRole('button', { name: /new project/i }).click();
-      await page.waitForTimeout(300);
-      await page.getByLabel(/project name/i).fill('Tooltip Test');
-      await page.getByRole('button', { name: /create/i }).click();
-      await page.waitForTimeout(500);
-
-      const projectCard = page.getByText('Tooltip Test');
-      if (await projectCard.isVisible()) {
-        await projectCard.click();
-      }
-      await page.waitForURL(/canvas/);
+      await openCanvas(page, 'Tooltip Test');
       await page.waitForLoadState('networkidle');
     });
 
     test('should display tooltip on tool button hover', async ({ page }) => {
-      const toolBtn = page.getByRole('button', { name: /room/i });
+      const toolBtn = page.getByTestId('tool-room');
       if (await toolBtn.isVisible()) {
         await toolBtn.hover();
-        await page.waitForTimeout(800); // Tooltips often have delay
+        await page.waitForTimeout(200);
 
-        const tooltip = page.getByRole('tooltip').or(
-          page.locator('[data-testid="tooltip"]')
-        ).or(
-          page.locator('.tooltip')
-        );
-
-        if (await tooltip.isVisible()) {
-          await expect(tooltip).toHaveScreenshot('tooltip-tool-button.png');
-        }
+        const tooltip = toolBtn.locator('div').filter({ hasText: /^Room/ }).first();
+        await expect(tooltip).toBeVisible({ timeout: 2000 });
+        await expect(tooltip).toHaveScreenshot('tooltip-tool-button.png');
       }
     });
   });

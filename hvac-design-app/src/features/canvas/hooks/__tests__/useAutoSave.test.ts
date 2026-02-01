@@ -6,10 +6,12 @@ import {
   saveBackupToStorage,
   loadProjectFromStorage,
   deleteProjectFromStorage,
+  createLocalStoragePayloadFromProjectFileWithDefaults,
   type LocalStoragePayload,
 } from '../useAutoSave';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useViewportStore } from '../../store/viewportStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import type { Room } from '@/core/schema';
@@ -76,9 +78,13 @@ const basePayload = (projectId: string): LocalStoragePayload => ({
   preferences: {
     projectFolder: '/projects',
     unitSystem: 'imperial',
+    autoSaveEnabled: true,
     autoSaveInterval: 300000,
     gridSize: 24,
     theme: 'light',
+    compactMode: false,
+    snapToGrid: true,
+    showRulers: false,
   },
   settings: { autoOpenLastProject: false },
   projectIndex: { projects: [], recentProjectIds: [], loading: false },
@@ -143,9 +149,42 @@ describe('useAutoSave - Storage Functions', () => {
   });
 });
 
+describe('useAutoSave - Payload helpers', () => {
+  beforeEach(() => {
+    usePreferencesStore.setState({ snapToGrid: true });
+    useViewportStore.setState({
+      panX: 0,
+      panY: 0,
+      zoom: 1,
+      gridVisible: true,
+      gridSize: 12,
+      snapToGrid: true,
+    });
+  });
+
+  it('hydrates snapToGrid from global preferences', () => {
+    const projectId = '33333333-3333-4333-8333-333333333333';
+
+    usePreferencesStore.setState({ snapToGrid: false });
+
+    const payload = createLocalStoragePayloadFromProjectFileWithDefaults({
+      ...basePayload(projectId).project,
+      settings: {
+        unitSystem: 'imperial',
+        gridSize: 12,
+        gridVisible: true,
+        snapToGrid: false,
+      },
+    } as any);
+
+    expect(payload.viewport.snapToGrid).toBe(false);
+  });
+});
+
 describe('useAutoSave - Hook Behavior', () => {
   beforeEach(() => {
     localStorage.clear();
+    usePreferencesStore.setState({ autoSaveEnabled: true });
     useEntityStore.getState().clearAllEntities();
     useViewportStore.setState({
       panX: 0,

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { openCanvas } from '../utils/test-utils';
 
 /**
  * Visual Regression Tests for Canvas Page
@@ -7,28 +8,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Canvas Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Create a project and navigate to canvas by clicking the card
-    // Per PRD FR-DASH-003 and US-PM-002: clicking project card navigates to canvas
-    await page.goto('/dashboard');
-    await page.evaluate(() => {
-      localStorage.removeItem('sws.projectIndex');
-    });
-    await page.reload();
+    await openCanvas(page, 'Visual Test Canvas');
     await page.waitForLoadState('networkidle');
-
-    // Create a new project
-    await page.getByRole('button', { name: /new project/i }).click();
-    await page.waitForTimeout(300);
-    await page.getByLabel(/project name/i).fill('Visual Test Canvas');
-    await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
-    await page.waitForTimeout(500);
-
-    // Click project card to navigate to canvas (per PRD specification)
-    const projectCard = page.locator('[data-testid="project-card"]').first();
-    await projectCard.click();
-    await page.waitForURL(/canvas/);
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
   });
 
   test.describe('Full Canvas Layout', () => {
@@ -89,7 +70,7 @@ test.describe('Canvas Visual Tests', () => {
       await page.keyboard.press('d');
       await page.waitForTimeout(100);
 
-      const ductBtn = page.getByRole('button', { name: /duct/i });
+      const ductBtn = page.getByTestId('tool-duct');
       if (await ductBtn.isVisible()) {
         await expect(ductBtn).toHaveScreenshot('tool-duct-active.png');
       }
@@ -109,7 +90,7 @@ test.describe('Canvas Visual Tests', () => {
       await page.keyboard.press('f');
       await page.waitForTimeout(100);
 
-      const fittingBtn = page.getByRole('button', { name: /fitting/i });
+      const fittingBtn = page.getByTestId('tool-fitting');
       if (await fittingBtn.isVisible()) {
         await expect(fittingBtn).toHaveScreenshot('tool-fitting-active.png');
       }
@@ -222,7 +203,7 @@ test.describe('Canvas Visual Tests', () => {
 
   test.describe('Zoom Controls', () => {
     test('should display zoom controls panel', async ({ page }) => {
-      const zoomControls = page.locator('[data-testid="zoom-controls"]').or(
+      const zoomControls = page.locator('[data-testid="zoom-control"]').or(
         page.locator('.zoom-controls')
       );
 
@@ -232,7 +213,7 @@ test.describe('Canvas Visual Tests', () => {
     });
 
     test('should display zoom percentage', async ({ page }) => {
-      const zoomIndicator = page.getByText(/100%|zoom/i);
+      const zoomIndicator = page.getByTestId('zoom-level');
       if (await zoomIndicator.isVisible()) {
         await expect(zoomIndicator).toHaveScreenshot('zoom-indicator.png');
       }
@@ -375,22 +356,13 @@ test.describe('Canvas Visual Tests', () => {
 
   test.describe('Grid Settings Panel', () => {
     test('should display grid settings when opened', async ({ page }) => {
-      // Look for grid settings button
-      const gridSettingsBtn = page.getByRole('button', { name: /grid settings|grid/i }).or(
-        page.locator('[data-testid="grid-settings-btn"]')
-      );
+      const propertiesPanel = page.getByTestId('properties-panel');
+      await expect(propertiesPanel).toBeVisible({ timeout: 5000 });
 
-      if (await gridSettingsBtn.isVisible()) {
-        await gridSettingsBtn.click();
-        await page.waitForTimeout(200);
-
-        const gridPanel = page.locator('[data-testid="grid-settings"]').or(
-          page.locator('.grid-settings-panel')
-        );
-
-        if (await gridPanel.isVisible()) {
-          await expect(gridPanel).toHaveScreenshot('grid-settings-panel.png');
-        }
+      const gridSectionHeader = propertiesPanel.getByRole('button', { name: 'Grid Settings' });
+      if (await gridSectionHeader.isVisible()) {
+        const section = gridSectionHeader.locator('..');
+        await expect(section).toHaveScreenshot('grid-settings-panel.png');
       }
     });
   });

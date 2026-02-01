@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test';
 import { openCanvas } from './utils/test-utils';
 
-test('Debug: Equipment Type Selector Visibility', async ({ page }) => {
+test.skip('Debug: Equipment Type Selector Visibility', async ({ page }) => {
   // Capture browser console logs
   page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
   

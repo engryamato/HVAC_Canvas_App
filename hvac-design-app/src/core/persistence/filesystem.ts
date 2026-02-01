@@ -16,7 +16,7 @@ export function isTauri(): boolean {
  */
 export async function readTextFile(path: string): Promise<string> {
   if (isTauri()) {
-    const { readTextFile: tauriRead } = await import('@tauri-apps/api/fs');
+    const { readTextFile: tauriRead } = await import('@tauri-apps/plugin-fs');
     return tauriRead(path);
   }
   throw new Error('File system access requires Tauri runtime');
@@ -28,7 +28,7 @@ export async function readTextFile(path: string): Promise<string> {
  */
 export async function writeTextFile(path: string, content: string): Promise<void> {
   if (isTauri()) {
-    const { writeTextFile: tauriWrite } = await import('@tauri-apps/api/fs');
+    const { writeTextFile: tauriWrite } = await import('@tauri-apps/plugin-fs');
     await tauriWrite(path, content);
     return;
   }
@@ -41,7 +41,7 @@ export async function writeTextFile(path: string, content: string): Promise<void
  */
 export async function exists(path: string): Promise<boolean> {
   if (isTauri()) {
-    const { exists: tauriExists } = await import('@tauri-apps/api/fs');
+    const { exists: tauriExists } = await import('@tauri-apps/plugin-fs');
     return tauriExists(path);
   }
   return false;
@@ -53,8 +53,8 @@ export async function exists(path: string): Promise<boolean> {
  */
 export async function createDir(path: string, recursive = true): Promise<void> {
   if (isTauri()) {
-    const { createDir: tauriCreateDir } = await import('@tauri-apps/api/fs');
-    await tauriCreateDir(path, { recursive });
+    const { mkdir: tauriMkdir } = await import('@tauri-apps/plugin-fs');
+    await tauriMkdir(path, { recursive });
     return;
   }
   throw new Error('Directory creation requires Tauri runtime');
@@ -66,7 +66,7 @@ export async function createDir(path: string, recursive = true): Promise<void> {
  */
 export async function readDir(path: string): Promise<string[]> {
   if (isTauri()) {
-    const { readDir: tauriReadDir } = await import('@tauri-apps/api/fs');
+    const { readDir: tauriReadDir } = await import('@tauri-apps/plugin-fs');
     const entries = await tauriReadDir(path);
     return entries.map((entry) => entry.name || '').filter(Boolean);
   }
@@ -91,7 +91,7 @@ export async function getDocumentsDir(): Promise<string> {
  */
 export async function copyFile(source: string, destination: string): Promise<void> {
   if (isTauri()) {
-    const { copyFile: tauriCopy } = await import('@tauri-apps/api/fs');
+    const { copyFile: tauriCopy } = await import('@tauri-apps/plugin-fs');
     await tauriCopy(source, destination);
     return;
   }
@@ -104,7 +104,7 @@ export async function copyFile(source: string, destination: string): Promise<voi
  */
 export async function removeFile(path: string): Promise<void> {
   if (isTauri()) {
-    const { removeFile: tauriRemove } = await import('@tauri-apps/api/fs');
+    const { remove: tauriRemove } = await import('@tauri-apps/plugin-fs');
     await tauriRemove(path);
     return;
   }
@@ -117,7 +117,7 @@ export async function removeFile(path: string): Promise<void> {
  */
 export async function renameFile(oldPath: string, newPath: string): Promise<void> {
   if (isTauri()) {
-    const { renameFile: tauriRename } = await import('@tauri-apps/api/fs');
+    const { rename: tauriRename } = await import('@tauri-apps/plugin-fs');
     await tauriRename(oldPath, newPath);
     return;
   }

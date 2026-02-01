@@ -97,7 +97,7 @@ test.describe('UJ-PM-006: Duplicate Project', () => {
         await seedTestProjects(page, ['Original Project']);
 
         // Verify 1 project initially
-        await expect(page.getByTestId('project-card')).toHaveCount(1);
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(1);
 
         // Duplicate the project
         await page.getByTestId('project-card-menu-btn').first().click();
@@ -105,7 +105,7 @@ test.describe('UJ-PM-006: Duplicate Project', () => {
         await page.getByTestId('menu-duplicate-btn').click();
 
         // Wait for update - should now have 2 projects
-        await expect(page.getByTestId('project-card')).toHaveCount(2, { timeout: 5000 });
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(2, { timeout: 5000 });
     });
 
     test('Original project remains unchanged after duplicate', async ({ page }) => {
@@ -117,9 +117,9 @@ test.describe('UJ-PM-006: Duplicate Project', () => {
         await page.getByTestId('menu-duplicate-btn').click();
 
         // Wait for update
-        await expect(page.getByTestId('project-card')).toHaveCount(2, { timeout: 5000 });
+        await expect(page.getByTestId('all-projects').getByTestId('project-card')).toHaveCount(2, { timeout: 5000 });
 
         // Original project name should still exist
-        await expect(page.getByRole('heading', { name: 'My Project' })).toBeVisible();
+        await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'My Project', exact: true })).toBeVisible();
     });
 });

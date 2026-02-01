@@ -39,7 +39,7 @@ This component has no props. It reads state from Zustand stores.
 
 | Hook | Returns | Purpose |
 |------|---------|---------|
-| `useAllEntities()` | `Entity[]` | All entities in current project |
+| `useEntityStore()` | `{ byId, allIds }` | Normalized entity state for export |
 | `useCurrentProjectId()` | `string \| null` | Current project ID |
 | `useProjectDetails()` | `ProjectDetails \| null` | Project name and metadata |
 
@@ -123,34 +123,39 @@ Fittings,90° Elbow,8,ea,"12"" round"
 
 ### 3. PDF Export
 
-Generates printable PDF with project layout and BOM:
+Generates printable PDF with project layout and BOM.
+
+The PDF includes:
+- Page 1: Project title + generated timestamp + embedded canvas snapshot (scaled to fit)
+- Page 2: Entity summary table
+- Page 3+: Bill of materials table (if it overflows)
 
 ```typescript
 const handleExportPdf = async () => {
   if (!project) return;
 
-  const pdfResult = await exportProjectPDF(project, { pageSize: 'letter' });
+  const snapshot = await captureCanvasSnapshot();
+  const pdfResult = await exportProjectPDF(project, {
+    pageSize: selectedPageSize,
+    snapshot: snapshot ?? undefined,
+  });
 
   if (pdfResult.success && pdfResult.data) {
-    download(pdfResult.data, `${project.projectName}.pdf`, 'application/pdf');
+    downloadFile(pdfResult.data, `${project.projectName}.pdf`, 'application/pdf');
   } else {
-    alert(pdfResult.error ?? 'PDF export failed');
+    toast.error(pdfResult.error ?? 'PDF export failed');
   }
 };
 ```
 
 **Output file**: `My HVAC Layout.pdf`
 
-**Contents**:
-- Page 1: Project title, metadata, canvas layout (scaled to fit)
-- Page 2+: Bill of materials table
-
 ### 4. Download Helper
 
 Internal function to trigger browser file download:
 
 ```typescript
-function download(content: string, filename: string, mime: string) {
+function downloadFile(content: string | Uint8Array, filename: string, mime: string) {
   const blob = new Blob([content], { type: mime });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
@@ -169,11 +174,11 @@ const project = useMemo(() => {
   if (!projectId) return null;
 
   const base = createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
-  return { ...base, entities: { byId: {}, allIds: [] } };
-}, [projectDetails?.projectName, projectId]);
+  return { ...base, entities: { byId: entitiesById, allIds: entityIds } };
+}, [entitiesById, entityIds, projectDetails?.projectName, projectId]);
 ```
 
-**Note**: Entities are populated from the store during export, not stored in this memo.
+**Note**: The memo includes the current normalized entity store state.
 
 ## Component Implementation
 
@@ -184,8 +189,9 @@ import { useMemo } from 'react';
 import styles from './ExportMenu.module.css';
 import { exportProjectJSON, exportBOMtoCSV, exportProjectPDF, generateBOM } from './';
 import { createEmptyProjectFile } from '@/core/schema';
-import { useAllEntities } from '@/core/store/entityStore';
+import { useEntityStore } from '@/core/store/entityStore';
 import { useCurrentProjectId, useProjectDetails } from '@/core/store/project.store';
+import { captureCanvasSnapshot } from './canvasSnapshot';
 
 function download(content: string, filename: string, mime: string) {
   const blob = new Blob([content], { type: mime });
@@ -197,15 +203,16 @@ function download(content: string, filename: string, mime: string) {
 }
 
 export function ExportMenu() {
-  const entities = useAllEntities();
+  const entitiesById = useEntityStore((state) => state.byId);
+  const entityIds = useEntityStore((state) => state.allIds);
   const projectId = useCurrentProjectId();
   const projectDetails = useProjectDetails();
 
   const project = useMemo(() => {
     if (!projectId) return null;
     const base = createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
-    return { ...base, entities: { byId: {}, allIds: [] } };
-  }, [projectDetails?.projectName, projectId]);
+    return { ...base, entities: { byId: entitiesById, allIds: entityIds } };
+  }, [entitiesById, entityIds, projectDetails?.projectName, projectId]);
 
   const handleExportJson = () => { /* ... */ };
   const handleExportCsv = () => { /* ... */ };
@@ -217,6 +224,7 @@ export function ExportMenu() {
       <div className={styles.actions}>
         <button onClick={handleExportJson}>JSON</button>
         <button onClick={handleExportCsv}>CSV</button>
+        <select aria-label="PDF page size">{/* Letter, Legal, Tabloid, A0-A3 */}</select>
         <button onClick={handleExportPdf}>PDF</button>
       </div>
     </div>
@@ -266,7 +274,11 @@ function CanvasToolbar() {
 
 - **Use case**: Printing, client presentations, documentation
 - **Size**: ~50-500 KB (includes embedded canvas image)
-- **Includes**: Project layout, BOM table, metadata
+- **Includes**:
+  - Page 1: Canvas snapshot image (scaled to fit)
+  - Page 2+: Entity summary + BOM tables
+  - Title + generated timestamp
+- **Page sizes (dropdown)**: `Letter`, `Legal`, `Tabloid`, `A0`, `A1`, `A2`, `A3`
 - **Page size**: Letter (8.5" × 11")
 
 ## Error Handling
@@ -281,13 +293,13 @@ No error handling needed (synchronous, always succeeds).
 
 ### PDF Export
 
-Displays alert on failure:
+Displays toast/notification on failure:
 
 ```typescript
 if (pdfResult.success && pdfResult.data) {
   download(pdfResult.data, `${project.projectName}.pdf`, 'application/pdf');
 } else {
-  alert(pdfResult.error ?? 'PDF export failed');
+  toast.error(pdfResult.error ?? 'PDF export failed');
 }
 ```
 

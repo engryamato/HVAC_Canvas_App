@@ -8,6 +8,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
 
+  // Default to running web E2E only. Enable the Tauri suite explicitly.
+  testIgnore: process.env.PLAYWRIGHT_TAURI_OFFLINE ? [] : ['**/tauri-offline/**'],
+
   /* Run tests in files in parallel */
   fullyParallel: true,
 
@@ -82,8 +85,8 @@ export default defineConfig({
   /* Run local dev server before starting the tests */
   /* Only run webServer if NOT in CI/Docker (host mode) */
   webServer: {
-    command: 'npm run dev -- --port 3002',
-    url: 'http://localhost:3002',
+    command: 'npm run dev -- --port 3001',
+    url: 'http://localhost:3001',
     reuseExistingServer: true,
     timeout: 300 * 1000,
   },

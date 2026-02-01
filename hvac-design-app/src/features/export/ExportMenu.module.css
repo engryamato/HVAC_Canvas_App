@@ -21,6 +21,14 @@
   background: #e5e7eb;
 }
 
+.sizeSelect {
+  padding: 0.45rem 0.6rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .label {
   font-weight: 600;
   color: #374151;

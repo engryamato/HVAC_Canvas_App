@@ -20,6 +20,7 @@ import { ProjectFileSchema, type ProjectFile, CURRENT_SCHEMA_VERSION } from '@/c
 import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } from '@/utils/storageKeys';
 import { trackTelemetry } from '@/utils/telemetry';
 import { sendCloudBackup } from '@/services/cloudBackupService';
+import { saveProjectToExistingHandleOrDownload } from '@/core/persistence/webProjectFileIO';
 
 const STORAGE_SCHEMA_VERSION = CURRENT_SCHEMA_VERSION;
 
@@ -49,9 +50,13 @@ export interface LocalStoragePayload {
   preferences: {
     projectFolder: string;
     unitSystem: 'imperial' | 'metric';
+    autoSaveEnabled: boolean;
     autoSaveInterval: number;
     gridSize: number;
     theme: 'light' | 'dark';
+    compactMode: boolean;
+    snapToGrid: boolean;
+    showRulers: boolean;
   };
   settings: {
     autoOpenLastProject: boolean;
@@ -98,6 +103,230 @@ export interface LocalStoragePayload {
       completedSteps: number[];
       isCompleted: boolean;
     };
+  };
+}
+
+export function buildProjectFileFromStores(): ProjectFile | null {
+  const projectStore = useProjectStore.getState();
+  if (!projectStore.currentProjectId || !projectStore.projectDetails) {
+    return null;
+  }
+
+  const entityStore = useEntityStore.getState();
+  const viewportStore = useViewportStore.getState();
+  const preferences = usePreferencesStore.getState();
+  const historyStore = useHistoryStore.getState();
+
+  const unitSystem = projectStore.projectSettings?.unitSystem ?? preferences.unitSystem;
+
+  return {
+    schemaVersion: STORAGE_SCHEMA_VERSION,
+    projectId: projectStore.currentProjectId,
+    projectName: projectStore.projectDetails.projectName,
+    projectNumber: projectStore.projectDetails.projectNumber || undefined,
+    clientName: projectStore.projectDetails.clientName || undefined,
+    createdAt: projectStore.projectDetails.createdAt,
+    modifiedAt: new Date().toISOString(),
+    entities: {
+      byId: entityStore.byId,
+      allIds: entityStore.allIds,
+    },
+    viewportState: {
+      panX: viewportStore.panX,
+      panY: viewportStore.panY,
+      zoom: viewportStore.zoom,
+    },
+    settings: {
+      unitSystem,
+      gridSize: preferences.gridSize,
+      gridVisible: viewportStore.gridVisible,
+      snapToGrid: viewportStore.snapToGrid,
+    },
+    commandHistory: {
+      commands: historyStore.past,
+      currentIndex: Math.max(historyStore.past.length - 1, 0),
+    },
+    calculations: undefined,
+    billOfMaterials: undefined,
+  };
+}
+
+export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile): LocalStoragePayload | null {
+  const project = projectOverride ?? buildProjectFileFromStores();
+  if (!project) {
+    return null;
+  }
+
+  const selectionState = useSelectionStore.getState();
+  const viewportStore = useViewportStore.getState();
+  const preferences = usePreferencesStore.getState();
+  const settings = useSettingsStore.getState();
+  const projectIndex = useProjectListStore.getState();
+  const legacyProjects = useLegacyProjectStore.getState();
+  const historyStore = useHistoryStore.getState();
+
+  const appState = useAppStateStore.getState();
+  const layoutState = useLayoutStore.getState();
+  const legacyTool = useLegacyToolStore.getState();
+  const legacyViewport = useLegacyViewportStore.getState();
+  const tutorialState = useTutorialStore.getState();
+
+  return {
+    project,
+    selection: {
+      selectedIds: selectionState.selectedIds,
+      hoveredId: selectionState.hoveredId,
+    },
+    viewport: {
+      panX: viewportStore.panX,
+      panY: viewportStore.panY,
+      zoom: viewportStore.zoom,
+      gridVisible: viewportStore.gridVisible,
+      gridSize: viewportStore.gridSize,
+      snapToGrid: viewportStore.snapToGrid,
+    },
+    preferences: {
+      projectFolder: preferences.projectFolder,
+      unitSystem: preferences.unitSystem,
+      autoSaveEnabled: preferences.autoSaveEnabled,
+      autoSaveInterval: preferences.autoSaveInterval,
+      gridSize: preferences.gridSize,
+      theme: preferences.theme,
+      compactMode: preferences.compactMode,
+      snapToGrid: preferences.snapToGrid,
+      showRulers: preferences.showRulers,
+    },
+    settings: {
+      autoOpenLastProject: settings.autoOpenLastProject,
+    },
+    projectIndex: {
+      projects: projectIndex.projects as unknown as Array<Record<string, unknown>>,
+      recentProjectIds: projectIndex.recentProjectIds,
+      loading: projectIndex.loading,
+      error: projectIndex.error,
+    },
+    legacyProjects: {
+      projects: legacyProjects.projects as unknown as Array<Record<string, unknown>>,
+    },
+    history: {
+      past: historyStore.past as unknown as Array<Record<string, unknown>>,
+      future: historyStore.future as unknown as Array<Record<string, unknown>>,
+      maxSize: historyStore.maxSize,
+    },
+    uiState: {
+      app: {
+        hasLaunched: appState.hasLaunched,
+        isFirstLaunch: appState.isFirstLaunch,
+        isLoading: appState.isLoading,
+      },
+      layout: {
+        leftSidebarCollapsed: layoutState.leftSidebarCollapsed,
+        rightSidebarCollapsed: layoutState.rightSidebarCollapsed,
+        activeLeftTab: layoutState.activeLeftTab,
+        activeRightTab: layoutState.activeRightTab,
+      },
+      tool: {
+        activeTool: legacyTool.activeTool,
+      },
+      viewport: {
+        zoom: legacyViewport.zoom,
+        gridVisible: legacyViewport.gridVisible,
+        panOffset: legacyViewport.panOffset,
+        cursorPosition: legacyViewport.cursorPosition,
+      },
+      tutorial: {
+        isActive: tutorialState.isActive,
+        currentStep: tutorialState.currentStep,
+        totalSteps: tutorialState.totalSteps,
+        completedSteps: tutorialState.completedSteps,
+        isCompleted: tutorialState.isCompleted,
+      },
+    },
+  };
+}
+
+export function createLocalStoragePayloadFromProjectFileWithDefaults(project: ProjectFile): LocalStoragePayload {
+  const preferences = usePreferencesStore.getState();
+  const settings = useSettingsStore.getState();
+  const projectIndex = useProjectListStore.getState();
+  const legacyProjects = useLegacyProjectStore.getState();
+  const appState = useAppStateStore.getState();
+  const layoutState = useLayoutStore.getState();
+  const legacyTool = useLegacyToolStore.getState();
+  const legacyViewport = useLegacyViewportStore.getState();
+  const tutorialState = useTutorialStore.getState();
+
+  return {
+    project,
+    selection: {
+      selectedIds: [],
+      hoveredId: null,
+    },
+    viewport: {
+      panX: project.viewportState.panX,
+      panY: project.viewportState.panY,
+      zoom: project.viewportState.zoom,
+      gridVisible: project.settings.gridVisible ?? true,
+      gridSize: project.settings.gridSize ?? preferences.gridSize,
+      snapToGrid: preferences.snapToGrid,
+    },
+    preferences: {
+      projectFolder: preferences.projectFolder,
+      unitSystem: project.settings.unitSystem ?? preferences.unitSystem,
+      autoSaveEnabled: preferences.autoSaveEnabled,
+      autoSaveInterval: preferences.autoSaveInterval,
+      gridSize: project.settings.gridSize ?? preferences.gridSize,
+      theme: preferences.theme,
+      compactMode: preferences.compactMode,
+      snapToGrid: preferences.snapToGrid,
+      showRulers: preferences.showRulers,
+    },
+    settings: {
+      autoOpenLastProject: settings.autoOpenLastProject,
+    },
+    projectIndex: {
+      projects: projectIndex.projects as unknown as Array<Record<string, unknown>>,
+      recentProjectIds: projectIndex.recentProjectIds,
+      loading: projectIndex.loading,
+      error: projectIndex.error,
+    },
+    legacyProjects: {
+      projects: legacyProjects.projects as unknown as Array<Record<string, unknown>>,
+    },
+    history: {
+      past: [],
+      future: [],
+      maxSize: 100,
+    },
+    uiState: {
+      app: {
+        hasLaunched: appState.hasLaunched,
+        isFirstLaunch: appState.isFirstLaunch,
+        isLoading: appState.isLoading,
+      },
+      layout: {
+        leftSidebarCollapsed: layoutState.leftSidebarCollapsed,
+        rightSidebarCollapsed: layoutState.rightSidebarCollapsed,
+        activeLeftTab: layoutState.activeLeftTab,
+        activeRightTab: layoutState.activeRightTab,
+      },
+      tool: {
+        activeTool: legacyTool.activeTool,
+      },
+      viewport: {
+        zoom: legacyViewport.zoom,
+        gridVisible: legacyViewport.gridVisible,
+        panOffset: legacyViewport.panOffset,
+        cursorPosition: legacyViewport.cursorPosition,
+      },
+      tutorial: {
+        isActive: tutorialState.isActive,
+        currentStep: tutorialState.currentStep,
+        totalSteps: tutorialState.totalSteps,
+        completedSteps: tutorialState.completedSteps,
+        isCompleted: tutorialState.isCompleted,
+      },
+    },
   };
 }
 
@@ -293,144 +522,20 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
   const { enabled = true, interval, onSave } = options;
 
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
-  const projectDetails = useProjectStore((state) => state.projectDetails);
   const storeIsDirty = useProjectStore((state) => state.isDirty);
   const { setDirty } = useProjectActions();
+  const autoSaveEnabled = usePreferencesStore((state) => state.autoSaveEnabled);
   const autoSaveInterval = usePreferencesStore((state) => state.autoSaveInterval);
+
+  const isAutoSaveActive = enabled && autoSaveEnabled;
 
   const [isDirty, setLocalDirty] = useState(storeIsDirty);
   const intervalTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const buildProjectFile = useCallback((): ProjectFile | null => {
-    if (!currentProjectId || !projectDetails) {
-      return null;
-    }
-
-    const entityStore = useEntityStore.getState();
-    const viewportStore = useViewportStore.getState();
-    const preferences = usePreferencesStore.getState();
-    const historyStore = useHistoryStore.getState();
-
-    return {
-      schemaVersion: STORAGE_SCHEMA_VERSION,
-      projectId: currentProjectId,
-      projectName: projectDetails.projectName,
-      projectNumber: projectDetails.projectNumber || undefined,
-      clientName: projectDetails.clientName || undefined,
-      createdAt: projectDetails.createdAt,
-      modifiedAt: new Date().toISOString(),
-      entities: {
-        byId: entityStore.byId,
-        allIds: entityStore.allIds,
-      },
-      viewportState: {
-        panX: viewportStore.panX,
-        panY: viewportStore.panY,
-        zoom: viewportStore.zoom,
-      },
-      settings: {
-        unitSystem: preferences.unitSystem,
-        gridSize: preferences.gridSize,
-        gridVisible: viewportStore.gridVisible,
-      },
-      commandHistory: {
-        commands: historyStore.past,
-        currentIndex: Math.max(historyStore.past.length - 1, 0),
-      },
-      calculations: undefined,
-      billOfMaterials: undefined,
-    };
-  }, [currentProjectId, projectDetails]);
-
-  const buildPayload = useCallback((): LocalStoragePayload | null => {
-    const project = buildProjectFile();
-    if (!project) {
-      return null;
-    }
-
-    const selectionState = useSelectionStore.getState();
-    const viewportStore = useViewportStore.getState();
-    const preferences = usePreferencesStore.getState();
-    const settings = useSettingsStore.getState();
-    const projectIndex = useProjectListStore.getState();
-    const legacyProjects = useLegacyProjectStore.getState();
-    const historyStore = useHistoryStore.getState();
-
-    const appState = useAppStateStore.getState();
-    const layoutState = useLayoutStore.getState();
-    const legacyTool = useLegacyToolStore.getState();
-    const legacyViewport = useLegacyViewportStore.getState();
-    const tutorialState = useTutorialStore.getState();
-
-    return {
-      project,
-      selection: {
-        selectedIds: selectionState.selectedIds,
-        hoveredId: selectionState.hoveredId,
-      },
-      viewport: {
-        panX: viewportStore.panX,
-        panY: viewportStore.panY,
-        zoom: viewportStore.zoom,
-        gridVisible: viewportStore.gridVisible,
-        gridSize: viewportStore.gridSize,
-        snapToGrid: viewportStore.snapToGrid,
-      },
-      preferences: {
-        projectFolder: preferences.projectFolder,
-        unitSystem: preferences.unitSystem,
-        autoSaveInterval: preferences.autoSaveInterval,
-        gridSize: preferences.gridSize,
-        theme: preferences.theme,
-      },
-      settings: {
-        autoOpenLastProject: settings.autoOpenLastProject,
-      },
-      projectIndex: {
-        projects: projectIndex.projects as Array<Record<string, unknown>>,
-        recentProjectIds: projectIndex.recentProjectIds,
-        loading: projectIndex.loading,
-        error: projectIndex.error,
-      },
-      legacyProjects: {
-        projects: legacyProjects.projects as Array<Record<string, unknown>>,
-      },
-      history: {
-        past: historyStore.past as Array<Record<string, unknown>>,
-        future: historyStore.future as Array<Record<string, unknown>>,
-        maxSize: historyStore.maxSize,
-      },
-      uiState: {
-        app: {
-          hasLaunched: appState.hasLaunched,
-          isFirstLaunch: appState.isFirstLaunch,
-          isLoading: appState.isLoading,
-        },
-        layout: {
-          leftSidebarCollapsed: layoutState.leftSidebarCollapsed,
-          rightSidebarCollapsed: layoutState.rightSidebarCollapsed,
-          activeLeftTab: layoutState.activeLeftTab,
-          activeRightTab: layoutState.activeRightTab,
-        },
-        tool: {
-          activeTool: legacyTool.activeTool,
-        },
-        viewport: {
-          zoom: legacyViewport.zoom,
-          gridVisible: legacyViewport.gridVisible,
-          panOffset: legacyViewport.panOffset,
-          cursorPosition: legacyViewport.cursorPosition,
-        },
-        tutorial: {
-          isActive: tutorialState.isActive,
-          currentStep: tutorialState.currentStep,
-          totalSteps: tutorialState.totalSteps,
-          completedSteps: tutorialState.completedSteps,
-          isCompleted: tutorialState.isCompleted,
-        },
-      },
-    };
-  }, [buildProjectFile]);
+  const buildPayload = useCallback(
+    (): LocalStoragePayload | null => buildLocalStoragePayloadFromStores(),
+    []
+  );
 
   const triggerCloudBackup = useCallback(async (envelope: LocalStorageEnvelope) => {
     const success = await sendCloudBackup({
@@ -469,18 +574,11 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
         void (async () => {
           try {
             const { saveProject } = await import('@/core/persistence/projectIO');
-            
-            // Convert payload to ProjectFile format
-            const projectFile: any = {
-              ...payload.project,
-              entities: payload.project.entities,
-              viewportState: payload.viewport,
-              settings: {
-                unitSystem: payload.preferences.unitSystem,
-                gridSize: payload.preferences.gridSize,
-                gridVisible: payload.viewport.gridVisible,
-              },
-            };
+
+            const projectFile = buildProjectFileFromStores();
+            if (!projectFile) {
+              throw new Error('Missing project data');
+            }
 
             const result = await saveProject(projectFile, projectListItem.filePath!);
             
@@ -531,6 +629,16 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
       const backupResult = saveBackupToStorage(currentProjectId, payload);
       if (backupResult.envelope) {
         void triggerCloudBackup(backupResult.envelope);
+      }
+
+      if (source === 'manual') {
+        void (async () => {
+          try {
+            await saveProjectToExistingHandleOrDownload(payload.project);
+          } catch (error) {
+            console.error('[useAutoSave] Manual save output failed:', error);
+          }
+        })();
       }
 
       setLocalDirty(false);
@@ -596,7 +704,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
   }, [setDirty]);
 
   useEffect(() => {
-    if (!enabled) {
+    if (!isAutoSaveActive) {
       return;
     }
 
@@ -615,18 +723,18 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
         intervalTimer.current = null;
       }
     };
-  }, [enabled, interval, autoSaveInterval, saveWithBackup]);
+  }, [isAutoSaveActive, interval, autoSaveInterval, saveWithBackup]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (storeIsDirty) {
+      if (isAutoSaveActive && storeIsDirty) {
         saveWithBackup('auto');
       }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [storeIsDirty, saveWithBackup]);
+  }, [isAutoSaveActive, storeIsDirty, saveWithBackup]);
 
   return {
     save: saveNow,

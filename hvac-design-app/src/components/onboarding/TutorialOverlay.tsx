@@ -32,7 +32,12 @@ export const TutorialOverlay: React.FC = () => {
         { title: "Help Access", text: "Click the Help icon to access documentation and support" }
     ];
 
-    const currentStepData = steps[currentStep - 1] || steps[0];
+    const firstStep = steps[0];
+    if (!firstStep) {
+        return null;
+    }
+
+    const currentStepData = steps[currentStep - 1] ?? firstStep;
 
     return (
         <Dialog open={isActive} onOpenChange={(open) => { if (!open) { handleSkip(); } }}>

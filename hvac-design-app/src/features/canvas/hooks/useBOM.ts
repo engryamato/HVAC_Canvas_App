@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useShallow } from 'zustand/react/shallow';
 import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
 
 /**
@@ -22,10 +23,12 @@ export interface GroupedBomItems {
  * @returns Grouped BOM items
  */
 export function useBOM(): GroupedBomItems {
-  const entities = useEntityStore((state) => ({
-    byId: state.byId,
-    allIds: state.allIds,
-  }));
+  const entities = useEntityStore(
+    useShallow((state) => ({
+      byId: state.byId,
+      allIds: state.allIds,
+    }))
+  );
 
   // Generate BOM items from entities
   const bomItems = useMemo(() => {

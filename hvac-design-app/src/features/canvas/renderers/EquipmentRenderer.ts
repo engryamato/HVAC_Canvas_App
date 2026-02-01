@@ -12,6 +12,8 @@ const EQUIPMENT_COLORS: Record<EquipmentType, { fill: string; stroke: string }> 
   diffuser: { fill: '#E8F5E9', stroke: '#388E3C' },
   damper: { fill: '#FBE9E7', stroke: '#BF360C' },
   air_handler: { fill: '#ECEFF1', stroke: '#37474F' },
+  furnace: { fill: '#FFF8E1', stroke: '#FF8F00' },
+  rtu: { fill: '#E0F7FA', stroke: '#006064' },
 };
 
 /**
@@ -76,6 +78,10 @@ function renderEquipmentIcon(
       renderDamperIcon(ctx, centerX, centerY, iconSize, zoom);
       break;
     case 'air_handler':
+      renderAhuIcon(ctx, centerX, centerY, iconSize, zoom);
+      break;
+    case 'furnace':
+    case 'rtu':
       renderAhuIcon(ctx, centerX, centerY, iconSize, zoom);
       break;
   }

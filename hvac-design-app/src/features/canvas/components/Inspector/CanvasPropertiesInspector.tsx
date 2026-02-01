@@ -5,6 +5,7 @@ import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { useViewportStore } from '../../store/viewportStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 import styles from './CanvasPropertiesInspector.module.css';
 
 const GRID_SIZE_OPTIONS = [
@@ -41,7 +42,14 @@ export function CanvasPropertiesInspector() {
     toggleSnap,
   } = useViewportStore();
 
+  const preferencesUnitSystem = usePreferencesStore((state) => state.unitSystem);
+  const setUnitSystem = usePreferencesStore((state) => state.setUnitSystem);
+
   const projectDetails = useProjectStore((state) => state.projectDetails);
+  const projectUnitSystem = useProjectStore((state) => state.projectSettings?.unitSystem);
+  const setProjectSettings = useProjectStore((state) => state.setProjectSettings);
+
+  const unitSystem = projectUnitSystem ?? preferencesUnitSystem;
   const projectName = projectDetails?.projectName || 'Untitled';
   const projectNumber = projectDetails?.projectNumber;
   const clientName = projectDetails?.clientName;
@@ -109,10 +117,11 @@ export function CanvasPropertiesInspector() {
           <Dropdown
             label="Unit System"
             options={UNIT_SYSTEM_OPTIONS}
-            value="imperial"
-            onChange={() => {
-              // TODO: Implement unit system switching
-              console.log('Unit system change not yet implemented');
+            value={unitSystem}
+            onChange={(value) => {
+              const nextUnitSystem = value === 'metric' ? 'metric' : 'imperial';
+              setUnitSystem(nextUnitSystem);
+              setProjectSettings({ unitSystem: nextUnitSystem });
             }}
           />
         </div>

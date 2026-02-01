@@ -106,8 +106,10 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
             { name: 'Alpha Center' },
         ]);
 
+        const allProjects = page.getByTestId('all-projects');
+
         // All 3 projects should be visible initially
-        await expect(page.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
 
         // Type search term
         const searchInput = page.getByPlaceholder('Search projects...');
@@ -118,10 +120,10 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
         await page.waitForTimeout(500);
 
         // Verify filtered results
-        await expect(page.getByTestId('project-card')).toHaveCount(2, { timeout: 5000 });
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(2, { timeout: 5000 });
         // Verify correct projects are shown
-        await expect(page.getByRole('heading', { name: 'Alpha Building' })).toBeVisible({ timeout: 5000 });
-        await expect(page.getByRole('heading', { name: 'Alpha Center' })).toBeVisible({ timeout: 5000 });
+        await expect(allProjects.getByRole('heading', { name: 'Alpha Building' })).toBeVisible({ timeout: 5000 });
+        await expect(allProjects.getByRole('heading', { name: 'Alpha Center' })).toBeVisible({ timeout: 5000 });
     });
 
     test('Clear search shows all projects', async ({ page }) => {
@@ -131,13 +133,15 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
             { name: 'Gamma' },
         ]);
 
+        const allProjects = page.getByTestId('all-projects');
+
         // Search to filter
         const searchInput = page.getByPlaceholder('Search projects...');
         await searchInput.fill('Alpha');
 
         // Wait for debounce and filtering
         await page.waitForTimeout(500);
-        await expect(page.getByTestId('project-card')).toHaveCount(1, { timeout: 5000 });
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(1, { timeout: 5000 });
 
         // Clear search by clearing input
         await searchInput.clear();
@@ -146,7 +150,7 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
         await page.waitForTimeout(500);
 
         // Now all projects should be visible
-        await expect(page.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
     });
 
     test('Sort select is visible', async ({ page }) => {
@@ -158,8 +162,7 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
         // Wait a moment for page to settle
         await page.waitForTimeout(200);
 
-        // Verify default sort is selected
-        await expect(page.getByRole('combobox', { name: /sort/i })).toContainText('Last Modified', { timeout: 3000 });
+        await expect(page.getByTestId('sort-select')).toHaveValue('date-desc');
     });
 
     test('Sort by Name orders alphabetically', async ({ page }) => {
@@ -169,8 +172,8 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
             { name: 'Beta Project' },
         ]);
 
-        // Change sort to Name
-        await page.getByTestId('sort-select').selectOption('name');
+        // Change sort to Name (A-Z)
+        await page.getByTestId('sort-select').selectOption('name-asc');
 
         // Wait a moment for re-render
         await page.waitForTimeout(300);

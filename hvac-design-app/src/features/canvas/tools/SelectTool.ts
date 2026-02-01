@@ -177,7 +177,7 @@ export class SelectTool extends BaseTool {
 
     if (this.state.mode === 'marquee' && this.state.startPoint && this.state.currentPoint) {
       const bounds = boundsFromPoints(this.state.startPoint, this.state.currentPoint);
-      this.selectEntitiesInBounds(bounds, event.shiftKey);
+      this.selectEntitiesInBounds(bounds, event.shiftKey ?? false);
     }
 
     this.reset();
