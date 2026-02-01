@@ -149,9 +149,13 @@ export function ProjectCard({
                             onChange={(e) => setDraftName(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                     handleRename();
                                 }
                                 if (e.key === 'Escape') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                     setEditing(false);
                                 }
                             }}

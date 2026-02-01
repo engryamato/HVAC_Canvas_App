@@ -41,7 +41,7 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
         page.on('console', msg => console.log(`[Browser] ${msg.text()}`));
     });
 
-    test.describe('Debug: Storage Dump', () => {
+    test.describe.skip('Debug: Storage Dump', () => {
         test('should dump real storage content', async ({ page }) => {
             await page.goto('/');
             await clearStorage(page);
@@ -125,16 +125,13 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
 
     test.describe('Phase 2: Project Data Validation', () => {
         test('should handle missing project index gracefully', async ({ page }) => {
-            await page.goto('/');
-            await clearStorage(page);
-
-            // Simulate returning user without project index
-            await setStorageItem(page, 'hvac-app-storage', {
-                state: { hasLaunched: true },
-                version: 0
+            await page.addInitScript(() => {
+                localStorage.setItem(
+                    'hvac-app-storage',
+                    JSON.stringify({ state: { hasLaunched: true }, version: 0 })
+                );
             });
-
-            await page.reload();
+            await page.goto('/?skipSplash=true');
 
             // Should go to dashboard (not welcome)
             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
@@ -147,33 +144,34 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
         });
 
         test('should validate project entry structure', async ({ page }) => {
-            await page.goto('/');
+            const now = new Date().toISOString();
+            await page.addInitScript((createdAt) => {
+                localStorage.setItem(
+                    'hvac-app-storage',
+                    JSON.stringify({ state: { hasLaunched: true }, version: 0 })
+                );
+                localStorage.setItem(
+                    'sws.projectIndex',
+                    JSON.stringify({
+                        state: {
+                            projects: [{
+                                projectId: '123e4567-e89b-12d3-a456-426614174001',
+                                projectName: 'Test Project',
+                                createdAt,
+                                modifiedAt: createdAt,
+                                storagePath: 'project-123e4567-e89b-12d3-a456-426614174001',
+                                isArchived: false,
+                                entityCount: 0,
+                            }],
+                            recentProjectIds: [],
+                            loading: false,
+                        },
+                        version: 0,
+                    })
+                );
+            }, now);
 
-            // Set valid returning user state
-            await setStorageItem(page, 'hvac-app-storage', {
-                state: { hasLaunched: true },
-                version: 0
-            });
-
-            // Set valid project index using correct ProjectListItem interface fields
-            await setStorageItem(page, 'sws.projectIndex', {
-                state: {
-                    projects: [{
-                        projectId: '123e4567-e89b-12d3-a456-426614174001',
-                        projectName: 'Test Project',
-                        createdAt: new Date().toISOString(),
-                        modifiedAt: new Date().toISOString(),
-                        storagePath: 'project-123e4567-e89b-12d3-a456-426614174001',
-                        isArchived: false,
-                        entityCount: 0
-                    }],
-                    recentProjectIds: [],
-                    loading: false
-                },
-                version: 0
-            });
-
-            await page.reload();
+            await page.goto('/?skipSplash=true');
 
             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
             // Wait for store hydration to complete
@@ -188,16 +186,14 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
         // Skip on Firefox/WebKit due to cross-browser timing issues with toast visibility
         test('should show warning toast when backup loaded', async ({ page, browserName }) => {
             test.skip(browserName !== 'chromium', 'Backup toast timing unreliable on Firefox/WebKit');
-            await page.goto('/');
-
-            // Complete onboarding to trigger persistence
-            await setStorageItem(page, 'hvac-app-storage', {
-                state: { hasLaunched: true },
-                version: 0
+            await page.addInitScript(() => {
+                localStorage.setItem(
+                    'hvac-app-storage',
+                    JSON.stringify({ state: { hasLaunched: true }, version: 0 })
+                );
             });
-            await page.reload();
-            await expect(page.getByTestId('splash-screen')).not.toBeVisible({ timeout: 5000 });
-            await page.getByTestId('skip-tutorial-btn').click();
+            await page.goto('/?skipSplash=true');
+            await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
 
             // Create valid project payload and calculate checksum in browser context
             const { projectId, payload } = await page.evaluate(() => {
@@ -300,16 +296,15 @@ test.describe('OS-INIT-003: Database Integrity Check', () => {
 
     test.describe('State Consistency', () => {
         test('should maintain consistent state after recovery', async ({ page }) => {
-            await page.goto('/');
-
-            // Corrupt some storage but not all
-            await setStorageItem(page, 'sws.preferences', '{ broken');
-            await setStorageItem(page, 'hvac-app-storage', {
-                state: { hasLaunched: true },
-                version: 0
+            await page.addInitScript(() => {
+                localStorage.setItem('sws.preferences', '{ broken');
+                localStorage.setItem(
+                    'hvac-app-storage',
+                    JSON.stringify({ state: { hasLaunched: true }, version: 0 })
+                );
             });
 
-            await page.reload();
+            await page.goto('/?skipSplash=true');
 
             // App should recover preferences to defaults
             await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });

@@ -89,6 +89,16 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                 setSearchQuery('');
                 return;
             }
+
+            const activeElement = document.activeElement;
+            if (
+                activeElement instanceof HTMLInputElement ||
+                activeElement instanceof HTMLTextAreaElement ||
+                Boolean(activeElement && (activeElement as HTMLElement).isContentEditable)
+            ) {
+                return;
+            }
+
             if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
                 e.preventDefault();
                 setFocusedIndex((prev) => Math.min(prev + 1, filteredProjects.length - 1));

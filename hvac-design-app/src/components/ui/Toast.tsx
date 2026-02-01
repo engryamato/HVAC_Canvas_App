@@ -29,6 +29,7 @@ export function Toast({ id, message, type = 'info', duration = 5000, onDismiss }
   return (
     <output
       className={`${styles.toast} ${styles[type]}`}
+      role="status"
       aria-live="polite"
       data-testid={`toast-${type}`}
       onClick={() => onDismiss?.(id)}

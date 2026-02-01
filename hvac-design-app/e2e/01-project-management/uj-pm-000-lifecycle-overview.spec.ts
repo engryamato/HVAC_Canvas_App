@@ -341,12 +341,12 @@ test.describe('Project Management - Dashboard', () => {
       // Navigate back to dashboard for navigation tests
       await page.goto('/dashboard');
       await page.waitForLoadState('networkidle');
-      await expect(page.getByText('Canvas Test Project')).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Canvas Test Project' })).toBeVisible({ timeout: 5000 });
     });
 
     test('should navigate to canvas editor from project card', async ({ page }) => {
-      // Click open project
-      await page.getByRole('link', { name: /open project/i }).click();
+      // Click project card (opens project)
+      await page.getByTestId('project-card').first().click();
 
       // Wait for navigation to canvas
       await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
@@ -354,30 +354,27 @@ test.describe('Project Management - Dashboard', () => {
       // Wait for page to fully load
       await page.waitForLoadState('networkidle');
 
-      // Canvas should be visible
-      await expect(page.locator('canvas')).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId('canvas-area')).toBeVisible({ timeout: 10000 });
     });
 
     test('should show back to dashboard link in canvas', async ({ page }) => {
-      await page.getByRole('link', { name: /open project/i }).click();
+      await page.getByTestId('project-card').first().click();
       await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
 
       // Wait for page to fully load
       await page.waitForLoadState('networkidle');
 
-      // Back link should be visible
-      await expect(page.getByRole('link', { name: /back.*dashboard/i })).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId('breadcrumb-dashboard')).toBeVisible({ timeout: 5000 });
     });
 
     test('should navigate back to dashboard from canvas', async ({ page }) => {
-      await page.getByRole('link', { name: /open project/i }).click();
+      await page.getByTestId('project-card').first().click();
       await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
 
       // Wait for page to fully load
       await page.waitForLoadState('networkidle');
 
-      // Click back
-      await page.getByRole('link', { name: /back.*dashboard/i }).click();
+      await page.getByTestId('breadcrumb-dashboard').click();
 
       // Wait for navigation to dashboard
       await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
@@ -385,7 +382,7 @@ test.describe('Project Management - Dashboard', () => {
       // Wait for page to fully load
       await page.waitForLoadState('networkidle');
 
-      await expect(page.getByText('Canvas Test Project')).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'Canvas Test Project' })).toBeVisible({ timeout: 5000 });
     });
   });
 });
@@ -582,16 +579,23 @@ test.describe('Empty State Handling', () => {
     const newProjectBtn = page.getByTestId('new-project-btn');
     await newProjectBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
-    await page.getByLabel(/project name/i).fill('Active Project');
+   await page.getByLabel(/project name/i).fill('Active Project');
     await page.getByRole('button', { name: /create/i }).click();
-    await page.waitForTimeout(500);
+
+    // Project creation navigates to canvas; return to dashboard to verify tabs.
+    await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
+    await page.getByTestId('breadcrumb-dashboard').click();
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
 
     // Switch to archived tab
-    await page.getByRole('button', { name: /archived/i }).click();
+    await page.getByTestId('tab-archived').click();
     await page.waitForTimeout(200);
 
     // Should show empty state for archived
-    await expect(page.getByText(/no archived projects/i)).toBeVisible({ timeout: 5000 });
+    await expect(
+      page.getByTestId('all-projects').getByText(/no archived projects/i)
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('should provide create button in empty state', async ({ page }) => {

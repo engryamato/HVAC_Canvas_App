@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
@@ -16,7 +16,6 @@ import { AppShell } from '@/components/layout/AppShell';
 import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 
 /**
@@ -46,17 +45,12 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
   const currentProjectId = useProjectStore((state) => state.currentProjectId);
   const projectDetails = useProjectDetails();
 
-  const [toasts, setToasts] = useState<ToastProps[]>([]);
+  const pushToast = useCallback((message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-  const dismissToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  }, []);
-
-  const pushToast = useCallback((message: string, type: ToastProps['type']) => {
-    const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
+    window.dispatchEvent(new CustomEvent('sws:toast', { detail: { message, type } }));
   }, []);
 
   // useAutoSave now manages state internally via store
@@ -144,27 +138,6 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
     return () => window.removeEventListener('sws:canvas-save', handleSaveRequest);
   }, [triggerSave]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const handleToastRequest = (event: Event) => {
-      const toastEvent = event as CustomEvent<{ message?: string; type?: ToastProps['type'] }>;
-      const message = toastEvent.detail?.message;
-      const type = toastEvent.detail?.type;
-
-      if (!message || !type) {
-        return;
-      }
-
-      pushToast(message, type);
-    };
-
-    window.addEventListener('sws:toast', handleToastRequest);
-    return () => window.removeEventListener('sws:toast', handleToastRequest);
-  }, [pushToast]);
-
   useKeyboardShortcuts({
     onZoomToSelection: (result) => {
       if (!result.success && result.message) {
@@ -194,7 +167,6 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
           </div>
 
           <TutorialOverlay />
-          <ToastContainer toasts={toasts} onDismiss={dismissToast} />
         </main>
 
         <RightSidebar />

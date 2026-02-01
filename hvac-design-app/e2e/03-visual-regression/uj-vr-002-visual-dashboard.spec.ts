@@ -1,4 +1,16 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+async function createProjectAndReturnToDashboard(page: Page, projectName: string) {
+  await page.getByTestId('new-project-btn').click();
+  await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
+  await page.getByTestId('project-name-input').fill(projectName);
+  await page.getByTestId('create-button').click();
+
+  await expect(page).toHaveURL(/\/canvas\//, { timeout: 15000 });
+  await page.getByTestId('breadcrumb-dashboard').click();
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
+  await page.waitForLoadState('networkidle');
+}
 
 /**
  * Visual Regression Tests for Dashboard
@@ -37,7 +49,7 @@ test.describe('Dashboard Visual Tests', () => {
     });
 
     test('should display "New Project" button prominently', async ({ page }) => {
-      const newProjectBtn = page.getByRole('button', { name: /new project/i });
+      const newProjectBtn = page.getByTestId('new-project-btn');
       if (await newProjectBtn.isVisible()) {
         await expect(newProjectBtn).toHaveScreenshot('new-project-button.png');
       }
@@ -57,7 +69,7 @@ test.describe('Dashboard Visual Tests', () => {
   test.describe('New Project Dialog', () => {
     test('should display new project dialog correctly', async ({ page }) => {
       // Open new project dialog
-      await page.getByRole('button', { name: /new project/i }).click();
+      await page.getByTestId('new-project-btn').click();
 
       // Wait for dialog animation
       await page.waitForTimeout(300);
@@ -69,7 +81,7 @@ test.describe('Dashboard Visual Tests', () => {
     });
 
     test('should display all form fields in dialog', async ({ page }) => {
-      await page.getByRole('button', { name: /new project/i }).click();
+      await page.getByTestId('new-project-btn').click();
       await page.waitForTimeout(300);
 
       // Verify form fields are visible
@@ -83,12 +95,12 @@ test.describe('Dashboard Visual Tests', () => {
     });
 
     test('should display validation error states', async ({ page }) => {
-      await page.getByRole('button', { name: /new project/i }).click();
+      await page.getByTestId('new-project-btn').click();
       await page.waitForTimeout(300);
 
-      // Try to submit empty form (use exact match to avoid ambiguity)
-      await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
-      await page.waitForTimeout(200);
+      // The create button should be disabled when form is invalid.
+      const createButton = page.getByRole('dialog').getByTestId('create-button');
+      await expect(createButton).toBeDisabled();
 
       // Screenshot with validation errors
       const dialog = page.getByRole('dialog');
@@ -96,7 +108,7 @@ test.describe('Dashboard Visual Tests', () => {
     });
 
     test('should display filled form correctly', async ({ page }) => {
-      await page.getByRole('button', { name: /new project/i }).click();
+      await page.getByTestId('new-project-btn').click();
       await page.waitForTimeout(300);
 
       // Fill in all fields
@@ -118,26 +130,17 @@ test.describe('Dashboard Visual Tests', () => {
 
   test.describe('Project Cards', () => {
     test.beforeEach(async ({ page }) => {
-      // Create a test project first
-      await page.getByRole('button', { name: /new project/i }).click();
-      await page.waitForTimeout(300);
-      await page.getByLabel(/project name/i).fill('Test Project Alpha');
-      const projectNumber = page.getByLabel(/project number/i);
-      if (await projectNumber.isVisible()) {
-        await projectNumber.fill('TP-001');
-      }
-      await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
-      await page.waitForTimeout(500);
+      await createProjectAndReturnToDashboard(page, 'Test Project Alpha');
     });
 
     test('should display project card correctly', async ({ page }) => {
-      const projectCard = page.getByTestId('project-card').first();
+      const projectCard = page.getByTestId('all-projects').getByTestId('project-card').first();
       await expect(projectCard).toBeVisible();
       await expect(projectCard).toHaveScreenshot('project-card.png');
     });
 
     test('should display project card hover state', async ({ page }) => {
-      const projectCard = page.getByTestId('project-card').first();
+      const projectCard = page.getByTestId('all-projects').getByTestId('project-card').first();
       await expect(projectCard).toBeVisible();
       await projectCard.hover();
       await page.waitForTimeout(200);
@@ -146,9 +149,10 @@ test.describe('Dashboard Visual Tests', () => {
 
     test('should display project context menu', async ({ page }) => {
       // Right-click or click menu button on project card
-      const menuButton = page.locator('[data-testid="project-menu"]').first().or(
-        page.getByRole('button', { name: /menu|options|more/i }).first()
-      );
+      const menuButton = page
+        .getByTestId('all-projects')
+        .locator('[data-testid="project-menu"]')
+        .first();
 
       if (await menuButton.isVisible()) {
         await menuButton.click();
@@ -160,11 +164,7 @@ test.describe('Dashboard Visual Tests', () => {
     test('should display multiple project cards in grid', async ({ page }) => {
       // Create additional projects
       for (let i = 2; i <= 4; i++) {
-        await page.getByRole('button', { name: /new project/i }).click();
-        await page.waitForTimeout(300);
-        await page.getByLabel(/project name/i).fill(`Test Project ${i}`);
-        await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
-        await page.waitForTimeout(500);
+        await createProjectAndReturnToDashboard(page, `Test Project ${i}`);
       }
 
       // Screenshot the grid layout
@@ -178,18 +178,12 @@ test.describe('Dashboard Visual Tests', () => {
     test.beforeEach(async ({ page }) => {
       // Create test projects
       for (let i = 1; i <= 3; i++) {
-        await page.getByRole('button', { name: /new project/i }).click();
-        await page.waitForTimeout(300);
-        await page.getByLabel(/project name/i).fill(`Project ${i}`);
-        await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
-        await page.waitForTimeout(500);
+        await createProjectAndReturnToDashboard(page, `Project ${i}`);
       }
     });
 
     test('should display search bar correctly', async ({ page }) => {
-      const searchBar = page.getByRole('searchbox').or(
-        page.getByPlaceholder(/search/i)
-      );
+      const searchBar = page.getByLabel('Search projects');
 
       if (await searchBar.isVisible()) {
         await expect(searchBar).toHaveScreenshot('search-bar.png');
@@ -197,9 +191,7 @@ test.describe('Dashboard Visual Tests', () => {
     });
 
     test('should display search with input', async ({ page }) => {
-      const searchBar = page.getByRole('searchbox').or(
-        page.getByPlaceholder(/search/i)
-      );
+      const searchBar = page.getByLabel('Search projects');
 
       if (await searchBar.isVisible()) {
         await searchBar.fill('Project 1');
@@ -211,14 +203,9 @@ test.describe('Dashboard Visual Tests', () => {
     });
 
     test('should display sort dropdown', async ({ page }) => {
-      const sortButton = page.getByRole('button', { name: /sort/i }).or(
-        page.locator('[data-testid="sort-dropdown"]')
-      );
-
-      if (await sortButton.isVisible()) {
-        await sortButton.click();
-        await page.waitForTimeout(200);
-        await expect(page).toHaveScreenshot('sort-dropdown-open.png');
+      const sortSelect = page.getByTestId('sort-select');
+      if (await sortSelect.isVisible()) {
+        await expect(sortSelect).toHaveScreenshot('sort-dropdown.png');
       }
     });
   });

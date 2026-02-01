@@ -96,11 +96,11 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 - Web: download as Blob.
 - Tauri: save bytes to disk.
 
-### [ ] Step: Tests + verification
+### [x] Step: Tests + verification
 <!-- chat-id: 6d9c0180-4d1a-48b0-85f0-119a8e7bb21f -->
 - Add/adjust Vitest tests for implemented behaviors.
 - Add small number of Playwright smoke flows.
 - Run: `pnpm type-check`, `pnpm test`, `pnpm e2e`.
 
-### [ ] Step: Report
+### [x] Step: Report
 - Write `{@artifacts_path}/report.md` with what was implemented and how verified.

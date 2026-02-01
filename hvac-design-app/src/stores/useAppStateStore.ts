@@ -41,8 +41,14 @@ export const useAppStateStore = create<AppState>()(
             partialize: (state) => ({ hasLaunched: state.hasLaunched }),
             // Custom merge to ensure isFirstLaunch is derived from hasLaunched after rehydration
             merge: (persistedState: any, currentState) => {
-                const persisted = persistedState as Partial<AppState>;
-                const hasLaunched = persisted?.hasLaunched ?? currentState.hasLaunched;
+                const persistedHasLaunched =
+                    typeof persistedState?.hasLaunched === 'boolean'
+                        ? persistedState.hasLaunched
+                        : typeof persistedState?.state?.hasLaunched === 'boolean'
+                            ? persistedState.state.hasLaunched
+                            : undefined;
+
+                const hasLaunched = persistedHasLaunched ?? currentState.hasLaunched;
                 return {
                     ...currentState,
                     hasLaunched,
