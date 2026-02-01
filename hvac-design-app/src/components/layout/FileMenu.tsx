@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
@@ -32,7 +32,7 @@ export function FileMenu() {
     const [existingProjectDialogOpen, setExistingProjectDialogOpen] = useState(false);
     const [existingProjectId, setExistingProjectId] = useState<string | null>(null);
     const [existingProjectFilePath, setExistingProjectFilePath] = useState<string | null>(null);
-    const [pendingAction, setPendingAction] = useState<null | 'open' | 'new'>(null);
+    const [pendingAction, setPendingAction] = useState<null | 'open' | 'new' | 'dashboard'>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -66,13 +66,44 @@ export function FileMenu() {
         window.dispatchEvent(new Event('sws:canvas-save'));
     };
 
-    const proceedAfterSaveOrDiscard = async (action: 'open' | 'new') => {
+    const proceedAfterSaveOrDiscard = async (action: 'open' | 'new' | 'dashboard') => {
         if (action === 'new') {
             router.push('/dashboard/new');
             return;
         }
+
+        if (action === 'dashboard') {
+            setDirty(false);
+            router.push('/dashboard');
+            return;
+        }
         await handleOpenFromFileInternal();
     };
+
+    const handleNavigateDashboard = useCallback(() => {
+        setIsOpen(false);
+        if (!pathname.startsWith('/canvas/')) {
+            router.push('/dashboard');
+            return;
+        }
+
+        if (isDirty) {
+            setPendingAction('dashboard');
+            setUnsavedDialogOpen(true);
+            return;
+        }
+
+        router.push('/dashboard');
+    }, [isDirty, pathname, router]);
+
+    useEffect(() => {
+        const handleNavigateEvent = () => {
+            handleNavigateDashboard();
+        };
+
+        window.addEventListener('sws:navigate-dashboard', handleNavigateEvent);
+        return () => window.removeEventListener('sws:navigate-dashboard', handleNavigateEvent);
+    }, [handleNavigateDashboard]);
 
     const handleOpenFromFileInternal = async () => {
         setIsOpen(false);
@@ -304,8 +335,7 @@ export function FileMenu() {
                     <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50 flex flex-col items-start">
                         <button
                             onClick={() => {
-                                setIsOpen(false);
-                                router.push('/dashboard');
+                                handleNavigateDashboard();
                             }}
                             className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
                             data-testid="menu-dashboard"

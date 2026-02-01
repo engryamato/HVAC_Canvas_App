@@ -181,7 +181,7 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                                 data-testid="empty-state-create-btn"
                             >
                                 <Plus className="w-5 h-5" />
-                                Create New Project
+                                Create Project
                             </button>
                         </div>
                     ) : (

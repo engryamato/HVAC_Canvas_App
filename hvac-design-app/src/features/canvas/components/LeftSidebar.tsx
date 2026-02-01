@@ -225,7 +225,7 @@ export function LeftSidebar({
   return (
     <aside
       className={`left-sidebar ${leftSidebarCollapsed ? 'collapsed' : ''} ${className}`}
-      style={{ width: leftSidebarCollapsed ? '0px' : `${sidebarWidth}px` }}
+      style={{ width: leftSidebarCollapsed ? '48px' : `${sidebarWidth}px` }}
       data-testid="left-sidebar"
     >
       <div className="resize-handle" onMouseDown={handleResizeStart} />
@@ -502,8 +502,6 @@ export function LeftSidebar({
         </CollapsibleSection>
           </div>
         )}
-
-        {activeLeftTab === 'catalog' && <ProductCatalogPanel />}
       </div>
       )}
 

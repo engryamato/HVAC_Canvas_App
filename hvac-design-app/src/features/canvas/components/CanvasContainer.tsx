@@ -43,6 +43,7 @@ function createToolInstances(): Record<CanvasTool, ITool> {
   return {
     select: new SelectTool(),
     room: new RoomTool(),
+    line: new DuctTool(),
     duct: new DuctTool(),
     equipment: new EquipmentTool(),
     fitting: new FittingTool(),

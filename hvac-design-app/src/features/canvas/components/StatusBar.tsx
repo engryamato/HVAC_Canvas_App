@@ -103,7 +103,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
             <line x1="9" y1="3" x2="9" y2="21" />
             <line x1="15" y1="3" x2="15" y2="21" />
           </svg>
-          <span className="text-gray-400 mr-1">Grid:</span>
+          <span className="text-gray-400">Grid:</span>{' '}
           <span>{snapToGrid ? 'SNAP' : 'FREE'}</span>
         </div>
 
@@ -161,7 +161,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <span className="text-gray-400 mr-1">Zoom:</span>
+          <span className="text-gray-400">Zoom:</span>{' '}
           <span>{zoomPercentage}%</span>
         </div>
       </div>

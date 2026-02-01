@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { useZoom, useViewportActions } from '../store/viewportStore';
+import { useZoom, useGridVisible, useViewportActions } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useShallow } from 'zustand/react/shallow';
 import { MIN_ZOOM, MAX_ZOOM } from '@/core/constants/viewport';
 import type { Entity } from '@/core/schema';
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, Grid3X3 } from 'lucide-react';
 
 const ENTITY_DIMENSIONS = {
     room: { width: 200, height: 200 },
@@ -31,7 +31,8 @@ interface ZoomControlsProps {
  */
 export function ZoomControls({ className = '' }: ZoomControlsProps): React.ReactElement {
     const zoom = useZoom();
-    const { zoomIn, zoomOut, resetView, fitToContent } = useViewportActions();
+    const gridVisible = useGridVisible();
+    const { zoomIn, zoomOut, resetView, fitToContent, toggleGrid } = useViewportActions();
     const entities = useEntityStore(
         useShallow((state) =>
             state.allIds.map((id) => state.byId[id]).filter((e): e is Entity => e !== undefined)
@@ -41,6 +42,7 @@ export function ZoomControls({ className = '' }: ZoomControlsProps): React.React
     const handleZoomIn = useCallback(() => zoomIn(), [zoomIn]);
     const handleZoomOut = useCallback(() => zoomOut(), [zoomOut]);
     const handleReset = useCallback(() => resetView(), [resetView]);
+    const handleToggleGrid = useCallback(() => toggleGrid(), [toggleGrid]);
 
     const handleFitToContent = useCallback(() => {
         if (entities.length === 0) { return; }
@@ -132,6 +134,23 @@ export function ZoomControls({ className = '' }: ZoomControlsProps): React.React
 
             {/* Divider */}
             <div className="h-5 w-px bg-slate-200 mx-0.5" />
+
+            {/* Toggle Grid */}
+            <button
+                type="button"
+                onClick={handleToggleGrid}
+                data-testid="grid-toggle"
+                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all active:scale-95 ${
+                    gridVisible
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                aria-label="Toggle grid"
+                aria-pressed={gridVisible}
+                title="Toggle grid"
+            >
+                <Grid3X3 className="w-4 h-4" />
+            </button>
 
             {/* Fit to Content */}
             <button

@@ -96,7 +96,9 @@ export const Header: React.FC<HeaderProps> = ({
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => router.push('/dashboard')}
+                                    onClick={() => {
+                                        window.dispatchEvent(new Event('sws:navigate-dashboard'));
+                                    }}
                                     className="gap-1.5 h-7 px-2 text-slate-500 hover:text-slate-900"
                                     data-testid="breadcrumb-dashboard"
                                 >

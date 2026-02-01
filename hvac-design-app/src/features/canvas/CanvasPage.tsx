@@ -17,6 +17,7 @@ import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { ToastContainer, type ToastProps } from '@/components/ui/Toast';
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 
 /**
  * CanvasPage - Main canvas page with all components
@@ -171,6 +172,8 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
       }
     },
   });
+
+  useResponsiveLayout();
 
 
   const projectName = projectDetails?.projectName ?? 'Untitled Project';

@@ -21,6 +21,6 @@ services:
       - /app/node_modules
     depends_on:
       - hvac-app
-    command: npx playwright test
+    command: npm run e2e
     environment:
       - CI=true

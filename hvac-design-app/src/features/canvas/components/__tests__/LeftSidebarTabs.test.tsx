@@ -41,13 +41,13 @@ describe('Canvas LeftSidebar Tabs', () => {
 
     expect(screen.getAllByText('Project Details').length).toBeGreaterThan(0);
     expect(screen.getByTestId('tab-project')).toBeDefined();
-    expect(screen.getByTestId('tab-catalog')).toBeDefined();
+    expect(screen.getByTestId('tab-equipment')).toBeDefined();
   });
 
   it('switches to Product Catalog tab', () => {
     render(<LeftSidebar />);
 
-    fireEvent.click(screen.getByTestId('tab-catalog'));
-    expect(screen.getByTestId('catalog-search')).toBeDefined();
+    fireEvent.click(screen.getByTestId('tab-equipment'));
+    expect(screen.getByTestId('equipment-search')).toBeDefined();
   });
 });

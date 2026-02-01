@@ -199,9 +199,43 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
       }
 
       // Toggle Sidebar: Ctrl+B
-      if (ctrlOrMeta && key === 'b') {
+      if (ctrlOrMeta && event.shiftKey && key === 'b') {
+        event.preventDefault();
+        useLayoutStore.getState().toggleRightSidebar();
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'b' && !event.shiftKey) {
         event.preventDefault();
         useLayoutStore.getState().toggleLeftSidebar();
+        return;
+      }
+
+      // Right sidebar tab shortcuts: Ctrl+P (Properties), Ctrl+M (BOM)
+      if (ctrlOrMeta && key === 'p' && !event.shiftKey) {
+        event.preventDefault();
+        const layout = useLayoutStore.getState();
+        if (layout.rightSidebarCollapsed) {
+          layout.toggleRightSidebar();
+        }
+        layout.setActiveRightTab('properties');
+        return;
+      }
+
+      if (ctrlOrMeta && key === 'm' && !event.shiftKey) {
+        event.preventDefault();
+        const layout = useLayoutStore.getState();
+        if (layout.rightSidebarCollapsed) {
+          layout.toggleRightSidebar();
+        }
+        layout.setActiveRightTab('bom');
+        return;
+      }
+
+      // Toggle Grid: Ctrl+G
+      if (ctrlOrMeta && key === 'g' && !event.shiftKey) {
+        event.preventDefault();
+        useViewportStore.getState().toggleGrid();
         return;
       }
 

@@ -37,6 +37,14 @@ export const useResponsiveLayout = () => {
                 if (!stateRef.current.rightCollapsed) {
                     toggleRightSidebar();
                 }
+            } else {
+                // Restore full layout when returning to desktop width.
+                if (stateRef.current.leftCollapsed) {
+                    toggleLeftSidebar();
+                }
+                if (stateRef.current.rightCollapsed) {
+                    toggleRightSidebar();
+                }
             }
         };
 
