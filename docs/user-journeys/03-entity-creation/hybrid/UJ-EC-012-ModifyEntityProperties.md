@@ -29,6 +29,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Click on Room A (200×150 at position 100, 100)
 
 **Expected Result**:
+
 - Room A selected
 - Selection state:
   - `selectedIds`: ['room-a']
@@ -64,6 +65,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Change name from "Office" to "Conference Room"
 
 **Expected Result**:
+
 - Name field interaction:
   - Click in name field
   - Field becomes focused (blue border)
@@ -101,6 +103,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Change width from 200" to 250"
 
 **Expected Result**:
+
 - Width field interaction:
   - Click in width field
   - Field focused
@@ -144,6 +147,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Change Supply CFM from 500 to 750
 
 **Expected Result**:
+
 - CFM field interaction:
   - Click in Supply CFM field
   - Type "750"
@@ -183,6 +187,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Change color from #E0E0E0 (light gray) to #B3D9FF (light blue)
 
 **Expected Result**:
+
 - Color picker interaction:
   - Click on color swatch
   - Color picker modal opens
@@ -218,6 +223,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Enter width "-50" (negative number)
 
 **Expected Behavior**:
+
 - Input validation triggers:
   - Value: -50
   - Minimum: 12
@@ -246,6 +252,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Select 3 rooms, change Supply CFM to 600
 
 **Expected Behavior**:
+
 - Multi-selection: Rooms A, B, C selected
 - Inspector shows:
   - Title: "Multiple Rooms (3)"
@@ -278,6 +285,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Resize room smaller, connected duct endpoint outside bounds
 
 **Expected Behavior**:
+
 - Original: Room 200×150, duct connects to right edge (200, 75)
 - Resize: Width 200 → 120
 - Connection issue:
@@ -307,6 +315,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Change room dimensions, area-dependent properties recalculate
 
 **Expected Behavior**:
+
 - Original: 200×150 = 260 sq ft, 500 CFM = 1.92 CFM/sq ft
 - Change: Width 200 → 300
 - New area: 300×150 = 390 sq ft
@@ -335,6 +344,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **User Action**: Type in width field rapidly: 200 → 210 → 220 → 230 → 240 → 250
 
 **Expected Behavior**:
+
 - Input debouncing:
   - User types: 2, 5, 0
   - Each keystroke triggers onChange
@@ -368,6 +378,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **Scenario**: Enter invalid CFM value "abc" (non-numeric)
 
 **Expected Handling**:
+
 - Input: "abc"
 - Parsing: parseInt("abc") = NaN
 - Validation: isNaN(value) = true → invalid
@@ -396,6 +407,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **Scenario**: Property A depends on B, B depends on A (circular)
 
 **Expected Handling**:
+
 - Example:
   - Room area = width × height
   - Width = area / height
@@ -425,6 +437,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 **Scenario**: User edits name while auto-calculation updates area
 
 **Expected Handling**:
+
 - Concurrent updates:
   - User types: name "Office" → "Conference Room"
   - Background: Area recalculates due to dimension change
@@ -451,7 +464,7 @@ This user journey covers editing entity properties through the Inspector panel, 
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Focus First Inspector Field | `Ctrl/Cmd + I` |
 | Next Field | `Tab` |
 | Previous Field | `Shift + Tab` |
@@ -461,22 +474,39 @@ This user journey covers editing entity properties through the Inspector panel, 
 
 ---
 
+## Related Journeys
+
+- [Select Single Entity](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md)
+- [Select Multiple Entities](../04-selection-and-manipulation/UJ-SM-002-SelectMultipleEntities.md)
+- [Draw Room](./UJ-EC-001-DrawRoom.md)
+
+---
+
 ## Related Elements
 
-- [Inspector](../../elements/01-components/inspector/Inspector.md) - Property editing UI
-- [PropertyEditor](../../elements/01-components/inspector/PropertyEditor.md) - Field components
-- [UpdatePropertyCommand](../../elements/09-commands/UpdatePropertyCommand.md) - Property change undo/redo
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity state management
-- [ValidationService](../../elements/11-services/ValidationService.md) - Property validation
-- [CalculationEngine](../../elements/11-services/CalculationEngine.md) - Dependent calculations
-- [UJ-SM-001](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md) - Entity selection
-- [UJ-PE-001](../09-property-editing/UJ-PE-001-EditRoomProperties.md) - Detailed room properties
+### Components
+
+- [Inspector](../../../elements/01-components/inspector/Inspector.md)
+- [PropertyEditor](../../../elements/01-components/inspector/PropertyEditor.md)
+
+### Services
+
+- [ValidationService](../../../elements/11-services/ValidationService.md)
+- [CalculationEngine](../../../elements/11-services/CalculationEngine.md)
+
+### Stores
+
+- [entityStore](../../../elements/02-stores/entityStore.md)
+
+### Commands
+
+- [UpdatePropertyCommand](../../../elements/09-commands/UpdatePropertyCommand.md)
 
 ---
 
 ## Visual Diagram
 
-```
+```text
 Property Update Flow
 ┌────────────────────────────────────────────────────────┐
 │  1. User Selects Entity                                │

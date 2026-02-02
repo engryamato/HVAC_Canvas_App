@@ -39,5 +39,10 @@ This user journey covers the minimap navigation in the **Web Environment**. It u
 ## Performance
 - **Throttling**: Thumbnail updates throttled to 1fps when Minimap is hidden or User is performing high-cost actions (like pan/zoom).
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [Minimap](../../../../elements/01-components/canvas/Minimap.md)
+
+## Related Journeys
 - [Zoom Canvas](./UJ-CN-002-ZoomCanvas.md)

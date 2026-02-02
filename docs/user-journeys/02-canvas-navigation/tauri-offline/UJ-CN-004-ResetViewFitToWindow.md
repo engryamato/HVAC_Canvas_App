@@ -28,5 +28,13 @@ This user journey describes how users reset the canvas viewport to fit all entit
 **Handling**:
 - **Scale Factor**: App listens for `scale-factor-changed` to adjust zoom level so content *physically* remains similar size if desired, or *logically* scales to match OS preference.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Fit to View](./UJ-CN-003-FitToView.md)

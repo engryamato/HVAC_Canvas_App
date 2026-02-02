@@ -84,3 +84,13 @@ if (isTauri()) {
 ## Related Elements
 
 - [ProjectIO](./ProjectIO.md)
+
+## Platform Availability
+
+- **Platform-Specific**: Unified API with disparate implementations for Tauri (full file system access) and Web (graceful fallbacks or no-op).
+
+## Related User Journeys
+
+- [UJ-PM-001 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-001-CreateNewProject.md)
+- [UJ-PM-001 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-001-CreateNewProject.md)
+- [UJ-PM-008 (Tauri)](../../user-journeys/tauri-offline/08-file-management/UJ-PM-008-ExportReport.md)

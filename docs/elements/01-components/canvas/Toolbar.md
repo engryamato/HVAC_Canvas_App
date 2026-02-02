@@ -7,7 +7,7 @@ The Toolbar provides quick access to primary design tools (Select, Duct, Pipe, e
 ## Location
 
 ```
-src/components/layout/Toolbar.tsx
+src/features/canvas/components/Toolbar.tsx
 ```
 
 ## Layout

@@ -28,6 +28,7 @@ This user journey covers placing HVAC equipment entities (furnaces, air handlers
 **User Action**: Press `E` key OR click "Equipment" button in toolbar OR select from **FAB (Floating Action Button)** tool menu
 
 **Expected Result**:
+
 - Equipment tool becomes active
 - Toolbar shows Equipment button as selected (highlighted)
 - Equipment type selector panel opens:
@@ -43,6 +44,7 @@ This user journey covers placing HVAC equipment entities (furnaces, air handlers
 - Inspector panel shows hint: "Place equipment to see properties"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('e');
 
@@ -58,6 +60,7 @@ await expect(page.locator('.status-bar')).toContainText('Equipment Tool');
 **User Action**: Click "Furnace" in equipment type selector (already selected by default, or choose different type)
 
 **Expected Result**:
+
 - Selected type highlights in selector panel
 - Equipment icon updates in cursor preview
 - Equipment size determined by type:
@@ -69,6 +72,7 @@ await expect(page.locator('.status-bar')).toContainText('Equipment Tool');
 - Hover preview shows equipment outline at cursor position
 
 **Validation Method**: Unit test
+
 ```typescript
 it('updates equipment type and preview on selection', () => {
   const equipmentTool = new EquipmentTool();
@@ -88,6 +92,7 @@ it('updates equipment type and preview on selection', () => {
 **User Action**: Move cursor to desired placement location (e.g., x: 300, y: 200)
 
 **Expected Result**:
+
 - Visual preview follows cursor:
   - **Preview Rectangle**:
     - Size: 48" × 24" (furnace default)
@@ -104,6 +109,7 @@ it('updates equipment type and preview on selection', () => {
 - Status bar shows: "Furnace at (25.0, 16.7)" (in feet)
 
 **Validation Method**: Integration test
+
 ```typescript
 it('shows equipment preview at cursor position', () => {
   const equipmentTool = new EquipmentTool();
@@ -129,8 +135,10 @@ it('shows equipment preview at cursor position', () => {
 **User Action**: Click at desired location
 
 **Expected Result**:
+
 - Equipment entity created at click position
 - New equipment entity:
+
 ```typescript
 const newEquipment: Equipment = {
   id: crypto.randomUUID(),
@@ -164,6 +172,7 @@ const newEquipment: Equipment = {
   }
 };
 ```
+
 - Command executed: `createEntity(newEquipment)`
 - Equipment added to store and rendered
 - Equipment automatically selected
@@ -171,6 +180,7 @@ const newEquipment: Equipment = {
 - Success toast: "Furnace placed"
 
 **Validation Method**: Integration test
+
 ```typescript
 it('creates equipment entity on click', () => {
   const equipmentTool = new EquipmentTool();
@@ -198,6 +208,7 @@ it('creates equipment entity on click', () => {
 **User Action**: Equipment is automatically selected after placement
 
 **Expected Result**:
+
 - Selection store updated: `selectedIds = ['equipment-abc123']`
 - Equipment rendered with selection highlight:
   - Thicker blue outline (3px)
@@ -229,6 +240,7 @@ it('creates equipment entity on click', () => {
 - Status bar shows: "1 entity selected"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('e');
 await page.click('.equipment-type:has-text("Furnace")');
@@ -250,6 +262,7 @@ await expect(page.locator('input[name="height"]')).toHaveValue('2');
 **User Action**: Click to place equipment partially outside visible canvas area
 
 **Expected Behavior**:
+
 - Equipment placed at click position (no clamping)
 - Equipment may be partially offscreen
 - User can pan canvas to see full equipment
@@ -265,6 +278,7 @@ await expect(page.locator('input[name="height"]')).toHaveValue('2');
 **User Action**: Place furnace on top of existing room
 
 **Expected Behavior**:
+
 - Preview shows orange outline (warning)
 - Click still creates equipment (no collision prevention)
 - Equipment renders based on zIndex:
@@ -279,6 +293,7 @@ await expect(page.locator('input[name="height"]')).toHaveValue('2');
 **User Action**: Select equipment, change type from "Furnace" to "AHU" in inspector
 
 **Expected Behavior**:
+
 - Equipment type updates immediately
 - Icon changes to AHU icon
 - Default size updates: 48"×24" → 60"×36"
@@ -294,6 +309,7 @@ await expect(page.locator('input[name="height"]')).toHaveValue('2');
 **User Action**: Click 10 times rapidly to place 10 furnaces
 
 **Expected Behavior**:
+
 - Each click creates new equipment instance
 - Auto-incrementing names: "Furnace 1", "Furnace 2", ..., "Furnace 10"
 - No performance degradation
@@ -302,6 +318,7 @@ await expect(page.locator('input[name="height"]')).toHaveValue('2');
 - Tool remains active throughout
 
 **Test**:
+
 ```typescript
 it('handles rapid equipment placement', () => {
   const equipmentTool = new EquipmentTool();
@@ -326,6 +343,7 @@ it('handles rapid equipment placement', () => {
 **User Action**: Press `E` again while equipment tool is active
 
 **Expected Behavior**:
+
 - Tool remains active (doesn't deactivate)
 - Equipment type selector toggles:
   - If open → closes (compact mode)
@@ -343,6 +361,7 @@ it('handles rapid equipment placement', () => {
 **Scenario**: User edits width to negative value (-10 ft) in inspector
 
 **Expected Handling**:
+
 - Input validation catches invalid value
 - Error message: "Width must be greater than 0"
 - Value reverts to previous valid value
@@ -350,6 +369,7 @@ it('handles rapid equipment placement', () => {
 - No save to store until valid
 
 **Test**:
+
 ```typescript
 it('validates equipment dimensions', () => {
   const equipment = createMockEquipment();
@@ -371,6 +391,7 @@ it('validates equipment dimensions', () => {
 **Scenario**: Capacity calculation throws error (invalid input values)
 
 **Expected Handling**:
+
 - Equipment created with basic properties
 - Calculated values set to `null`
 - Warning in inspector: "Calculation error - check specifications"
@@ -384,6 +405,7 @@ it('validates equipment dimensions', () => {
 **Scenario**: Project already has 5000 entities
 
 **Expected Handling**:
+
 - Before creating equipment, check entity count
 - Error toast: "Cannot place equipment. Maximum entity limit (5000) reached."
 - No entity created
@@ -395,7 +417,7 @@ it('validates equipment dimensions', () => {
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Equipment Tool | `E` |
 | Cycle Equipment Types | `Tab` (while tool active) |
 | Rotate Equipment 90° | `R` (while placing) |
@@ -406,21 +428,38 @@ it('validates equipment dimensions', () => {
 
 ---
 
+## Related Journeys
+
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+- [Select Entities](../04-selection-and-manipulation/hybrid/UJ-SM-001-SelectEntity.md)
+
+---
+
 ## Related Elements
 
-- [EquipmentTool](../../elements/04-tools/EquipmentTool.md) - Placement tool implementation
-- [EquipmentRenderer](../../elements/05-renderers/EquipmentRenderer.md) - Canvas rendering
-- [EquipmentSchema](../../elements/03-schemas/EquipmentSchema.md) - Data validation
-- [EquipmentLibrary](../../elements/11-libraries/EquipmentLibrary.md) - Equipment type definitions
-- [EntityCommands](../../elements/09-commands/EntityCommands.md) - Undo/redo support
-- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md) - Property editing
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity state management
+### Components
+
+- [EquipmentTool](../../elements/04-tools/EquipmentTool.md)
+- [EquipmentRenderer](../../elements/05-renderers/EquipmentRenderer.md)
+- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md)
+
+### Stores
+
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Core
+
+- [EquipmentSchema](../../elements/03-schemas/EquipmentSchema.md)
+- [EquipmentLibrary](../../elements/11-libraries/EquipmentLibrary.md)
+- [EntityCommands](../../elements/09-commands/EntityCommands.md)
 
 ---
 
 ## Test Implementation
 
 ### Unit Tests
+
 - `src/__tests__/tools/EquipmentTool.test.ts`
   - Type selection
   - Click handling
@@ -428,6 +467,7 @@ it('validates equipment dimensions', () => {
   - Name auto-increment
 
 ### Integration Tests
+
 - `src/__tests__/integration/equipment-placement.test.ts`
   - Entity creation flow
   - Store updates
@@ -436,6 +476,7 @@ it('validates equipment dimensions', () => {
   - Connection logic
 
 ### E2E Tests
+
 - `e2e/entity-creation/place-equipment.spec.ts`
   - Complete placement workflow
   - Multiple equipment types
@@ -622,16 +663,19 @@ export class EquipmentTool extends BaseTool {
 ### Equipment Type Library
 
 **Heating Equipment**:
+
 - Furnace (Gas, Electric, Oil)
 - Boiler (Hot water, Steam)
 - Heat Pump
 
 **Cooling Equipment**:
+
 - Air Conditioning Unit
 - Chiller
 - Evaporative Cooler
 
 **Ventilation Equipment**:
+
 - Air Handling Unit (AHU)
 - Exhaust Fan
 - Supply Fan
@@ -639,6 +683,7 @@ export class EquipmentTool extends BaseTool {
 - HRV (Heat Recovery Ventilator)
 
 **Distribution Equipment**:
+
 - Diffuser (Ceiling, Floor, Wall)
 - Grille (Return, Exhaust)
 - Register (Supply)
@@ -656,6 +701,7 @@ export class EquipmentTool extends BaseTool {
 ### Visual Design
 
 **Equipment Appearance**:
+
 - Rectangle with rounded corners (4px radius)
 - Category-specific color:
   - Heating: Red tint (#dc2626)
@@ -666,6 +712,7 @@ export class EquipmentTool extends BaseTool {
 - Label below: Equipment name
 
 **Selection State**:
+
 - Thicker outline (3px)
 - Glow effect
 - Corner handles for resizing

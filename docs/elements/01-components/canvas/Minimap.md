@@ -8,6 +8,10 @@ Placeholder minimap component with undock capability for canvas overview navigat
 hvac-design-app/src/features/canvas/components/Minimap.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+- **Note**: Pop-out/Floating window functionality may be limited to Desktop/Tauri environments.
+
 ## Purpose
 - Provides visual overview of canvas (placeholder implementation)
 - Allows undocking from sidebar to floating window
@@ -145,6 +149,9 @@ const [minimapDocked, setMinimapDocked] = useState(true);
 ### Screen Reader Support
 - Group announced as "Minimap"
 - Button labeled "Undock"
+
+## Related User Journeys
+- [Minimap Navigation (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-008-MinimapNavigation.md)
 
 ## Related Elements
 

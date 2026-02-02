@@ -29,6 +29,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Click "Note" tool in left toolbar
 
 **Expected Result**:
+
 - Note tool activated
 - Tool state:
   - `currentTool`: 'note'
@@ -59,6 +60,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Click on Room A (200×150 at position 100, 100)
 
 **Expected Result**:
+
 - Entity clicked: Room A
 - Entity validation:
   - Room entities are attachable ✓
@@ -106,6 +108,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Type "Supply: 500 CFM @ 800 FPM"
 
 **Expected Result**:
+
 - Text input active:
   - Cursor in note text field
   - Type characters
@@ -144,6 +147,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Click outside note or press Escape
 
 **Expected Result**:
+
 - Note edit complete:
   - Text finalized: "Supply: 500 CFM @ 800 FPM"
   - Edit mode exits
@@ -179,6 +183,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Drag Room A from (100, 100) to (300, 200)
 
 **Expected Result**:
+
 - Room movement:
   - Room A selected
   - User drags to new position
@@ -221,6 +226,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Create 3 notes attached to Room A
 
 **Expected Behavior**:
+
 - First note: Offset +50, -100 (right, above)
 - Second note: Offset +50, +100 (right, below)
 - Third note: Offset -150, 0 (left, middle)
@@ -250,6 +256,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Note positioned with other entities between it and attached entity
 
 **Expected Behavior**:
+
 - Scenario:
   - Room A at (100, 100)
   - Note at (400, 100) - far right
@@ -277,6 +284,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Delete Room A which has note attached
 
 **Expected Behavior**:
+
 - Room deletion:
   - Room A deleted via Delete key
   - Note still exists (not deleted)
@@ -310,6 +318,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Double-click note to edit text
 
 **Expected Behavior**:
+
 - Edit trigger:
   - Double-click on note
   - Note enters edit mode
@@ -343,6 +352,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **User Action**: Create note in different positions around entity
 
 **Expected Behavior**:
+
 - Attachment point logic:
   - Calculate closest point on entity to note
   - Snap to entity edge (not corner)
@@ -376,6 +386,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **Scenario**: Click duct entity to attach note
 
 **Expected Handling**:
+
 - Duct clicked
 - Entity type check: `entity.type === 'duct'`
 - Ducts not attachable:
@@ -401,6 +412,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **Scenario**: Entity near canvas edge, calculated note position off-canvas
 
 **Expected Handling**:
+
 - Entity at (1850, 50) - top-right corner
 - Default offset: +50, -100
 - Calculated position: (1900, -50) - off-canvas
@@ -429,6 +441,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 **Scenario**: User creates note but doesn't enter text (empty string)
 
 **Expected Handling**:
+
 - Note created with empty text
 - Visual appearance:
   - Empty note box
@@ -455,7 +468,7 @@ This user journey covers creating annotations by attaching text notes to specifi
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Note Tool | `N` |
 | Edit Selected Note | `F2` or `Enter` |
 | Finish Editing Note | `Escape` |
@@ -464,21 +477,37 @@ This user journey covers creating annotations by attaching text notes to specifi
 
 ---
 
+## Related Journeys
+
+- [Add Note](./UJ-EC-004-AddNote.md)
+- [Draw Note](./UJ-EC-008-DrawNote.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+
+---
+
 ## Related Elements
 
-- [NoteTool](../../elements/04-tools/NoteTool.md) - Note creation tool
-- [NoteEntity](../../elements/03-entities/NoteEntity.md) - Note data structure
-- [LeaderLineRenderer](../../elements/05-renderers/LeaderLineRenderer.md) - Leader line drawing
-- [CreateNoteCommand](../../elements/09-commands/CreateNoteCommand.md) - Note creation undo/redo
-- [AttachmentService](../../elements/11-services/AttachmentService.md) - Note attachment logic
-- [UJ-EC-008](./UJ-EC-008-DrawNote.md) - Draw standalone note
-- [UJ-PE-005](../09-property-editing/UJ-PE-005-EditNoteProperties.md) - Note property editing
+### Components
+
+- [NoteTool](../../../elements/04-tools/NoteTool.md)
+
+### Schemas
+
+- [NoteSchema](../../../elements/03-schemas/NoteSchema.md)
+
+### Stores
+
+- [entityStore](../../../elements/02-stores/entityStore.md)
+
+### Core
+
+- [CreateNoteCommand](../../../elements/09-commands/CreateNoteCommand.md)
 
 ---
 
 ## Visual Diagram
 
-```
+```text
 Note Attachment Flow
 ┌────────────────────────────────────────────────────────┐
 │  1. Activate Note Tool                                 │

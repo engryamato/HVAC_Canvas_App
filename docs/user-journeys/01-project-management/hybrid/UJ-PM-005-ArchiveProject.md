@@ -155,14 +155,14 @@ To return to the main view:
 ## 8. Related Elements
 
 ### Components
-- `ArchiveDialog`
-- `ProjectCard`
+- [ConfirmDialog](../../../elements/01-components/dashboard/ConfirmDialog.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `IDBService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

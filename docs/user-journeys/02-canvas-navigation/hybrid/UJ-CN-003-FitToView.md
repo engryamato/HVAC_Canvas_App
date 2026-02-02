@@ -40,5 +40,13 @@ This user journey covers automatically adjusting the viewport to fit entities in
 ## Performance
 - **Debounce**: Resize events debounced (e.g. 100ms) to prevent Thrashing during drag-resize.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Zoom Canvas](./UJ-CN-002-ZoomCanvas.md)

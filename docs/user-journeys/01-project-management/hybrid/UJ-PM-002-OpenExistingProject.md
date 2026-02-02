@@ -101,9 +101,9 @@ This document describes the browser-based flow for accessing and opening existin
 - Empty state guides user to import or create new
 
 **Related Elements:**
-- `DashboardPage`
-- `ProjectCard`
-- `ProjectGrid`
+- [DashboardPage](../../../elements/01-components/dashboard/DashboardPage.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
+- [ProjectGrid](../../../elements/01-components/dashboard/ProjectGrid.md)
 
 ---
 
@@ -212,18 +212,16 @@ This document describes the browser-based flow for accessing and opening existin
 ## 8. Related Elements
 
 ### Components
-- `DashboardPage`
+- [DashboardPage](../../../elements/01-components/dashboard/DashboardPage.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 - `FileImportDialog`
-- `ProjectCard`
 
 ### Stores
-- `ProjectStore`
-- `projectListStore`
+- [projectStore](../../../elements/02-stores/projectStore.md)
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectService` (Web)
-- `IDBService`
-- `SearchService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

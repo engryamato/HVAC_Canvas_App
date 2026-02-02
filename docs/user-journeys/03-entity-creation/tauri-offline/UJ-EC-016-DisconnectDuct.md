@@ -29,6 +29,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Click on duct connected to Room A
 
 **Expected Result**:
+
 - Duct selected:
   - Duct ID: `duct-uuid-123`
   - Selection state: `selectedIds: ['duct-uuid-123']`
@@ -65,6 +66,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Drag end handle from (300, 150) to (400, 200)
 
 **Expected Result**:
+
 - Endpoint drag initiated:
   - User grabs end handle
   - Cursor: Move cursor (four arrows)
@@ -99,6 +101,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Release mouse button at new position (400, 200)
 
 **Expected Result**:
+
 - Drag complete:
   - Endpoint finalized at (400, 200)
   - Duct endpoint updated
@@ -145,6 +148,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: (Automatic, verify state after disconnect)
 
 **Expected Result**:
+
 - Orphaned duct state:
   - Disconnected from all entities
   - Both endpoints free
@@ -185,6 +189,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Press Ctrl+Z to undo disconnect
 
 **Expected Result**:
+
 - Undo command executed:
   - `DisconnectDuctCommand.undo()` called
   - Restore previous state
@@ -259,6 +264,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Disconnect start and end, creating fully orphaned duct
 
 **Expected Behavior**:
+
 - Initial: Duct connected at both ends
   - Start: Room A
   - End: Room B
@@ -295,6 +301,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Disconnect duct from RTU, affecting downstream rooms
 
 **Expected Behavior**:
+
 - Airflow network before:
   - RTU (2000 CFM) → Main Duct → 4 Branch Ducts → 4 Rooms
   - All rooms receiving airflow
@@ -329,6 +336,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Start dragging endpoint, then press Escape
 
 **Expected Behavior**:
+
 - Drag initiated:
   - User grabs endpoint
   - Starts dragging away
@@ -361,6 +369,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **User Action**: Drag endpoint to proximity of different entity (reconnect)
 
 **Expected Behavior**:
+
 - Initial: Duct connected to Room A
 - Drag endpoint:
   - Away from Room A (disconnect at 10px)
@@ -399,6 +408,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **Scenario**: Alt+Click orphaned duct endpoint
 
 **Expected Handling**:
+
 - Duct state: Already disconnected
 - User action: Alt+Click endpoint
 - Connection check:
@@ -424,6 +434,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **Scenario**: Duct connected to locked entity, attempt to disconnect
 
 **Expected Handling**:
+
 - Entity state: Room A is locked
 - Duct connected to Room A
 - User drags duct endpoint:
@@ -455,6 +466,7 @@ This user journey covers breaking connections between ducts and entities to allo
 **Scenario**: Disconnect duct, leaving room with no supply
 
 **Expected Handling**:
+
 - Initial state:
   - Room A: Single supply duct
   - Room A CFM: 500
@@ -485,7 +497,7 @@ This user journey covers breaking connections between ducts and entities to allo
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Disconnect Duct (Alt+Click) | `Alt + Click` connection dot |
 | Cancel Drag | `Escape` during drag |
 | Undo Disconnect | `Ctrl/Cmd + Z` |
@@ -494,21 +506,38 @@ This user journey covers breaking connections between ducts and entities to allo
 
 ---
 
+## Related Journeys
+
+- [Connect Duct to Entity](./UJ-EC-015-ConnectDuctToEntity.md)
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Airflow Calculations](../../06-calculations/tauri-offline/UJ-CA-001-AirflowCalculations.md)
+
+---
+
 ## Related Elements
 
-- [DuctTool](../../elements/04-tools/DuctTool.md) - Duct manipulation
-- [DisconnectDuctCommand](../../elements/09-commands/DisconnectDuctCommand.md) - Disconnect undo/redo
-- [connectionStore](../../elements/02-stores/connectionStore.md) - Connection state management
-- [ValidationService](../../elements/11-services/ValidationService.md) - Connection validation
-- [CalculationEngine](../../elements/11-services/CalculationEngine.md) - Airflow recalculation
-- [UJ-EC-015](./UJ-EC-015-ConnectDuctToEntity.md) - Duct connection
-- [UJ-CA-001](../10-calculations/UJ-CA-001-CalculateAirflow.md) - Airflow calculations
+### Components
+
+- [DuctTool](../../../elements/04-tools/DuctTool.md)
+
+### Commands
+
+- [DisconnectDuctCommand](../../../elements/09-commands/DisconnectDuctCommand.md)
+
+### Stores
+
+- `connectionStore` (Documentation pending)
+
+### Services
+
+- [ValidationService](../../../elements/11-services/ValidationService.md)
+- [CalculationEngine](../../../elements/11-services/CalculationEngine.md)
 
 ---
 
 ## Visual Diagram
 
-```
+```text
 Disconnect via Endpoint Drag
 ┌────────────────────────────────────────────────────────┐
 │  1. Initial State (Connected)                          │

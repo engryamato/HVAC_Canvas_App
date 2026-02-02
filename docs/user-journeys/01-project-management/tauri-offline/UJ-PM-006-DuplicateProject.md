@@ -115,15 +115,15 @@ This document describes duplicating projects on desktop, including file copy, me
 ## 8. Related Elements
 
 ### Components
-- `ProjectCard`
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 - `ProjectMenu`
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectIO`
-- `FileSystemService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
+- [FileSystem](../../../elements/10-persistence/FileSystem.md)
 
 ## 9. Visual Diagrams
 

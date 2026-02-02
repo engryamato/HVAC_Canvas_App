@@ -148,15 +148,15 @@ This document describes deleting projects stored on disk in the Tauri desktop ru
 ## 8. Related Elements
 
 ### Components
-- `DeleteConfirmDialog`
-- `ProjectCard`
+- [DeleteConfirmDialog](../../../elements/01-components/dashboard/DeleteConfirmDialog.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectIO`
-- `FileSystemService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
+- [FileSystem](../../../elements/10-persistence/FileSystem.md)
 
 ## 9. Visual Diagrams
 

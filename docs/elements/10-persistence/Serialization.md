@@ -76,3 +76,14 @@ if (result.requiresMigration) {
 
 - [ProjectIO](./ProjectIO.md)
 - [Project Schema](../03-schemas/ProjectFileSchema.md)
+
+## Platform Availability
+
+- **Universal**: Available on both Tauri (Desktop) and Web platforms.
+
+## Related User Journeys
+
+- [UJ-PM-003 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-003-OpenProject.md)
+- [UJ-PM-006 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-006-CloseProject.md)
+- [UJ-PM-003 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-003-OpenProject.md)
+- [UJ-PM-006 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-006-CloseProject.md)

@@ -27,6 +27,7 @@ This user journey covers adding text note annotations to the canvas for document
 **User Action**: Press `N` key OR click "Note" button in toolbar
 
 **Expected Result**:
+
 - Note tool becomes active
 - Toolbar shows Note button as selected (highlighted)
 - Cursor changes to text cursor (I-beam) when over canvas
@@ -39,6 +40,7 @@ This user journey covers adding text note annotations to the canvas for document
   - Color picker for text color
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('n');
 
@@ -53,6 +55,7 @@ await expect(page.locator('.status-bar')).toContainText('Note Tool');
 **User Action**: Click at desired note location (e.g., x: 400, y: 100)
 
 **Expected Result**:
+
 - New note entity created at click position
 - Note appears as editable text box:
   - Default size: 200px × 100px
@@ -62,6 +65,7 @@ await expect(page.locator('.status-bar')).toContainText('Note Tool');
   - Text cursor blinking inside box
   - Auto-focused for immediate typing
 - New note entity structure:
+
 ```typescript
 const newNote: Note = {
   id: crypto.randomUUID(),
@@ -87,12 +91,14 @@ const newNote: Note = {
   }
 };
 ```
+
 - Command executed: `createEntity(newNote)`
 - Note added to store
 - Note rendered with edit mode active
 - Tool switches to Select tool automatically (single note mode)
 
 **Validation Method**: Integration test
+
 ```typescript
 it('creates note entity on click', () => {
   const noteTool = new NoteTool();
@@ -118,6 +124,7 @@ it('creates note entity on click', () => {
 **User Action**: Type "CFM calculation: 3000 cu ft × 6 ACH / 60 = 300 CFM"
 
 **Expected Result**:
+
 - Text appears in note box as typed
 - Text wraps automatically at box width
 - Box height expands if text exceeds height:
@@ -134,6 +141,7 @@ it('creates note entity on click', () => {
 - Selection highlighting works (drag to select text)
 
 **Validation Method**: Unit test
+
 ```typescript
 it('updates note text on input', () => {
   const note = createMockNote({ text: '' });
@@ -157,6 +165,7 @@ it('updates note text on input', () => {
 **User Action**: Click anywhere on canvas outside the note box
 
 **Expected Result**:
+
 - Note exits edit mode
 - Text input blurs (loses focus)
 - Note displays final text content
@@ -173,6 +182,7 @@ it('updates note text on input', () => {
 - Note is selectable (click to select, shows handles)
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('n');
 await page.mouse.click(400, 100);
@@ -190,6 +200,7 @@ await expect(page.locator('.note-entity')).not.toHaveClass('editing');
 **User Action**: Click on note to select it (after exiting edit mode)
 
 **Expected Result**:
+
 - Selection store updated: `selectedIds = ['note-abc123']`
 - Note rendered with selection highlight:
   - Blue outline (2px)
@@ -215,6 +226,7 @@ await expect(page.locator('.note-entity')).not.toHaveClass('editing');
 - Status bar shows: "1 entity selected"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.click('.note-entity');
 
@@ -233,6 +245,7 @@ await expect(page.locator('input[name="backgroundColor"]')).toHaveValue('#fef3c7
 **User Action**: Paste 6000 characters into note
 
 **Expected Behavior**:
+
 - Character limit enforced (5000 chars)
 - Text truncated at 5000 characters
 - Warning toast: "Note text exceeds maximum length (5000 characters)"
@@ -241,6 +254,7 @@ await expect(page.locator('input[name="backgroundColor"]')).toHaveValue('#fef3c7
 - Alternative: Allow longer notes with scrolling
 
 **Test**:
+
 ```typescript
 it('enforces character limit on note text', () => {
   const longText = 'A'.repeat(6000);
@@ -262,6 +276,7 @@ it('enforces character limit on note text', () => {
 **User Action**: Click to create note, then immediately click outside without typing
 
 **Expected Behavior**:
+
 - Empty note detected on blur
 - Warning prompt appears:
   - "This note is empty. Delete it?"
@@ -276,6 +291,7 @@ it('enforces character limit on note text', () => {
 ### 3. Multi-Line Note with Manual Breaks
 
 **User Action**: Type note with Enter key line breaks:
+
 ```
 Room 1: 300 CFM
 Room 2: 250 CFM
@@ -284,6 +300,7 @@ Total: 950 CFM
 ```
 
 **Expected Behavior**:
+
 - Each line break preserved
 - Lines stack vertically
 - Auto-resize height expands to fit all lines
@@ -298,6 +315,7 @@ Total: 950 CFM
 **User Action**: Type note with special chars: "Δ°F = 20°F, CFM ≥ 300, η = 95%"
 
 **Expected Behavior**:
+
 - All Unicode characters supported
 - Special symbols render correctly
 - Math symbols display properly
@@ -311,6 +329,7 @@ Total: 950 CFM
 **User Action**: Change note background to light blue (#bfdbfe) and text to dark blue (#1e3a8a)
 
 **Expected Behavior**:
+
 - Color updates immediately in real-time
 - Note re-renders with new colors
 - Color persists after saving
@@ -331,6 +350,7 @@ Total: 950 CFM
 **Scenario**: Canvas context fails to render note text
 
 **Expected Handling**:
+
 - Catch rendering error
 - Note entity persists in store
 - Placeholder box rendered instead
@@ -340,6 +360,7 @@ Total: 950 CFM
 - Log error to console
 
 **Test**:
+
 ```typescript
 it('handles note rendering errors gracefully', () => {
   const mockCtx = createMockCanvasContext();
@@ -363,6 +384,7 @@ it('handles note rendering errors gracefully', () => {
 **Scenario**: User clicks outside note while typing, accidentally
 
 **Expected Handling**:
+
 - Text auto-saves on blur
 - No data loss
 - Note exits edit mode gracefully
@@ -376,6 +398,7 @@ it('handles note rendering errors gracefully', () => {
 **Scenario**: User drags resize handle to make note 10px × 10px
 
 **Expected Handling**:
+
 - Minimum size enforced:
   - Min width: 100px
   - Min height: 50px
@@ -388,7 +411,7 @@ it('handles note rendering errors gracefully', () => {
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Note Tool | `N` |
 | Finish Editing (blur) | `Escape` |
 | New Line (in note) | `Enter` |
@@ -401,19 +424,37 @@ it('handles note rendering errors gracefully', () => {
 
 ## Related Elements
 
-- [NoteTool](../../elements/04-tools/NoteTool.md) - Note creation tool
-- [NoteRenderer](../../elements/05-renderers/NoteRenderer.md) - Canvas rendering
-- [NoteSchema](../../elements/03-schemas/NoteSchema.md) - Data validation
-- [NoteEditor](../../elements/01-components/canvas/NoteEditor.md) - Text editing component
-- [EntityCommands](../../elements/09-commands/EntityCommands.md) - Undo/redo support
-- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md) - Property editing
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity state management
+## Related Journeys
+
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+- [Select Entities](../04-selection-and-manipulation/tauri-offline/UJ-SM-001-SelectEntity.md)
+
+---
+
+## Related Elements
+
+### Components
+
+- [NoteTool](../../elements/04-tools/NoteTool.md)
+- [NoteRenderer](../../elements/05-renderers/NoteRenderer.md)
+- [NoteEditor](../../elements/01-components/canvas/NoteEditor.md)
+- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md)
+
+### Stores
+
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Core
+
+- [NoteSchema](../../elements/03-schemas/NoteSchema.md)
+- [EntityCommands](../../elements/09-commands/EntityCommands.md)
 
 ---
 
 ## Test Implementation
 
 ### Unit Tests
+
 - `src/__tests__/tools/NoteTool.test.ts`
   - Note creation
   - Click handling
@@ -421,6 +462,7 @@ it('handles note rendering errors gracefully', () => {
   - Auto-resize logic
 
 ### Integration Tests
+
 - `src/__tests__/integration/note-creation.test.ts`
   - Entity creation flow
   - Store updates
@@ -429,6 +471,7 @@ it('handles note rendering errors gracefully', () => {
   - Color customization
 
 ### E2E Tests
+
 - `e2e/entity-creation/add-note.spec.ts`
   - Complete note workflow
   - Multi-line notes
@@ -627,6 +670,7 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
 ### Visual Design
 
 **Note Appearance** (default):
+
 - Background: #fef3c7 (pale yellow - sticky note)
 - Border: 1px solid #f59e0b (orange)
 - Text: 14px sans-serif, black
@@ -634,6 +678,7 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
 - Corner: 4px border radius (optional)
 
 **Color Presets**:
+
 - Yellow (default): #fef3c7
 - Blue: #bfdbfe
 - Green: #bbf7d0

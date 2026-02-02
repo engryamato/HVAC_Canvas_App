@@ -390,17 +390,33 @@ This user journey covers creating rooftop unit (RTU) equipment entities on the c
 
 ---
 
+## Related Journeys
+
+- [Place Equipment](./UJ-EC-003-PlaceEquipment.md)
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+- [View BOM List](../10-bom-panel/UJ-BP-001-ViewBOMList.md)
+
+---
+
 ## Related Elements
 
-- [EquipmentTool](../../elements/04-tools/EquipmentTool.md) - Equipment placement tool
-- [RTUEntity](../../elements/05-entities/RTUEntity.md) - RTU entity definition
-- [CreateEquipmentCommand](../../elements/09-commands/CreateEquipmentCommand.md) - Undo support
-- [EquipmentConnectionSystem](../../elements/08-systems/EquipmentConnectionSystem.md) - Connection logic
-- [AirflowCalculator](../../elements/06-calculations/AirflowCalculator.md) - System calculations
-- [BOMPanel](../../elements/01-components/panels/BOMPanel.md) - Equipment list display
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity storage
-- [UJ-EC-003](./UJ-EC-003-DrawDuct.md) - Duct drawing (for connections)
-- [UJ-BP-001](../10-bom-panel/UJ-BP-001-ViewBOMList.md) - BOM viewing
+### Components
+- [EquipmentTool](../../elements/04-tools/EquipmentTool.md)
+- [BOMPanel](../../elements/01-components/panels/BOMPanel.md)
+
+### Entities
+- [RTUEntity](../../elements/05-entities/RTUEntity.md)
+
+### Stores
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Systems
+- [EquipmentConnectionSystem](../../elements/08-systems/EquipmentConnectionSystem.md)
+
+### Core
+- [CreateEquipmentCommand](../../elements/09-commands/CreateEquipmentCommand.md)
+- [AirflowCalculator](../../elements/06-calculations/AirflowCalculator.md)
 
 ---
 

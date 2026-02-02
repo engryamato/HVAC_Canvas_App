@@ -213,3 +213,14 @@ describe('AllProjectsSection', () => {
 2. **Project Count**: Badge shows accurate count
 3. **Grid Rendering**: ProjectGrid receives correct projects array
 4. **Search Context**: Empty state changes based on search presence
+
+## Platform Availability
+
+- **Universal**: Available on both Tauri (Desktop) and Web platforms.
+
+## Related User Journeys
+
+- [UJ-PM-007 (Hybrid)](../../../user-journeys/hybrid/01-project-management/UJ-PM-007-ListProjects.md)
+- [UJ-PM-005 (Hybrid)](../../../user-journeys/hybrid/01-project-management/UJ-PM-005-SearchProjects.md)
+- [UJ-PM-007 (Tauri)](../../../user-journeys/tauri-offline/01-project-management/UJ-PM-007-ListProjects.md)
+- [UJ-PM-005 (Tauri)](../../../user-journeys/tauri-offline/01-project-management/UJ-PM-005-SearchProjects.md)

@@ -18,6 +18,14 @@ src/features/dashboard/components/ProjectCard.tsx
 - Show visual feedback for hover and selection states
 - Navigate to the canvas editor when clicked
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
+## Related User Journeys
+- [Open Existing Project](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-002-OpenExistingProject.md)
+- [Archive Project](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-005-ArchiveProject.md)
+- [Duplicate Project](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-006-DuplicateProject.md)
+
 ## Dependencies
 
 - `@/features/dashboard/store/projectListStore` - Project list management

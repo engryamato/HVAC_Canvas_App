@@ -288,6 +288,20 @@ describe('projectStore', () => {
   });
 
   it('clears project state', () => {
+    expect(useProjectStore.getState().isDirty).toBe(false);
+  });
+
+  it('tracks dirty state', () => {
+    const { setDirty } = useProjectStore.getState();
+
+    setDirty(true);
+    expect(useProjectStore.getState().isDirty).toBe(true);
+
+    setDirty(false);
+    expect(useProjectStore.getState().isDirty).toBe(false);
+  });
+
+  it('clears project state', () => {
     const { setProject, clearProject } = useProjectStore.getState();
 
     setProject('proj-123', { projectId: 'proj-123', projectName: 'Test', createdAt: '', modifiedAt: '' });
@@ -297,4 +311,15 @@ describe('projectStore', () => {
     expect(useProjectStore.getState().projectDetails).toBeNull();
   });
 });
+
+## Platform Availability
+
+- **Universal**: Available on both Tauri (Desktop) and Web platforms.
+
+## Related User Journeys
+
+- [UJ-PM-002 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-002-CreateNewProject.md)
+- [UJ-PM-006 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-006-CloseProject.md)
+- [UJ-PM-002 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-002-CreateNewProject.md)
+- [UJ-PM-006 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-006-CloseProject.md)
 ```

@@ -403,15 +403,28 @@ This user journey covers duplicating selected entities to create identical copie
 
 ---
 
+## Related Journeys
+
+- [Copy/Paste Entity](./UJ-EC-009-CopyPasteEntity.md)
+- [Select Single Entity](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md)
+- [Select Multiple Entities](../04-selection-and-manipulation/UJ-SM-002-SelectMultipleEntities.md)
+
+---
+
 ## Related Elements
 
-- [SelectTool](../../elements/04-tools/SelectTool.md) - Entity selection
-- [DuplicateCommand](../../elements/09-commands/DuplicateCommand.md) - Duplicate undo/redo
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity storage
-- [NamingService](../../elements/11-services/NamingService.md) - Smart naming logic
-- [ClipboardService](../../elements/11-services/ClipboardService.md) - Copy/paste (related)
-- [UJ-EC-009](./UJ-EC-009-CopyPasteEntity.md) - Copy/paste (alternative)
-- [UJ-SM-001](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md) - Selection
+### Components
+- [SelectTool](../../elements/04-tools/SelectTool.md)
+
+### Services
+- [NamingService](../../elements/11-services/NamingService.md)
+- [ClipboardService](../../elements/11-services/ClipboardService.md)
+
+### Stores
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Core
+- [DuplicateCommand](../../elements/09-commands/DuplicateCommand.md)
 
 ---
 

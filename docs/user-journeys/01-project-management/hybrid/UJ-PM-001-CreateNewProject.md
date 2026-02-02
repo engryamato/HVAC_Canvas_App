@@ -95,8 +95,8 @@ This document describes the browser-based flow for creating a new HVAC project f
 - Clear affordance for required fields
 
 **Related Elements:**
-- `DashboardPage`
-- `NewProjectDialog`
+- [DashboardPage](../../../elements/01-components/dashboard/DashboardPage.md)
+- [NewProjectDialog](../../../elements/01-components/dashboard/NewProjectDialog.md)
 
 ---
 
@@ -206,16 +206,15 @@ This document describes the browser-based flow for creating a new HVAC project f
 ## 8. Related Elements
 
 ### Components
-- `NewProjectDialog`
-- `ProjectCreationScreen`
+- [NewProjectDialog](../../../elements/01-components/dashboard/NewProjectDialog.md)
+- [DashboardPage](../../../elements/01-components/dashboard/DashboardPage.md)
 
 ### Stores
-- `projectListStore`
-- `ProjectStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
+- [ProjectStore](../../../elements/02-stores/projectStore.md)
 
 ### Services
-- `ProjectService`
-- `IDBService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

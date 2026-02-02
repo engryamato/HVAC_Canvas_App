@@ -27,6 +27,7 @@ This user journey covers creating elbow fittings to connect ducts at 90° or 45�
 **User Action**: Press `F` key OR click "Fitting" button in toolbar
 
 **Expected Result**:
+
 - Fitting tool becomes active
 - Toolbar shows Fitting button selected
 - Fitting type selector appears:
@@ -39,6 +40,7 @@ This user journey covers creating elbow fittings to connect ducts at 90° or 45�
 - Status bar: "Fitting Tool: Select fitting type, then click to place"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('f');
 
@@ -54,6 +56,7 @@ await expect(page.locator('[data-fitting-type="elbow-90"]')).toHaveClass(/select
 **User Action**: Click "90° Long Radius" in fitting type selector
 
 **Expected Result**:
+
 - Selection updates to 90° Long Radius
 - Icon preview updates
 - Status bar updates: "90° Long Radius Elbow: Click on duct to place"
@@ -64,6 +67,7 @@ await expect(page.locator('[data-fitting-type="elbow-90"]')).toHaveClass(/select
   - Size: Auto-detected from duct
 
 **Validation Method**: Unit test
+
 ```typescript
 it('updates fitting type on selection', () => {
   const fittingTool = new FittingTool();
@@ -83,11 +87,13 @@ it('updates fitting type on selection', () => {
 **User Action**: Click on existing duct endpoint or midpoint
 
 **Expected Result**:
+
 - Click position detected: { x: 300, y: 150 }
 - Snap-to-duct logic activates:
   - If within 20px of duct endpoint → Snap to endpoint
   - If on duct path → Insert at click point (split duct)
 - Elbow fitting created:
+
 ```typescript
 const newElbow: Fitting = {
   id: crypto.randomUUID(),
@@ -116,11 +122,13 @@ const newElbow: Fitting = {
   }
 };
 ```
+
 - Command executed: `createEntity(newElbow)`
 - Fitting rendered at position
 - Connected ducts highlighted briefly
 
 **Validation Method**: Integration test
+
 ```typescript
 it('creates elbow fitting at duct connection', () => {
   const duct1 = createMockDuct({ startX: 100, startY: 100, endX: 300, endY: 100 });
@@ -151,6 +159,7 @@ it('creates elbow fitting at duct connection', () => {
 **User Action**: Fitting auto-selected after creation, press `R` key to rotate
 
 **Expected Result**:
+
 - Fitting rotates 90° clockwise
 - Connected ducts update connections
 - Visual representation updates
@@ -158,6 +167,7 @@ it('creates elbow fitting at duct connection', () => {
 - Rotation increments: 0°, 90°, 180°, 270°, back to 0°
 
 **Validation Method**: Unit test
+
 ```typescript
 it('rotates elbow fitting in 90° increments', () => {
   const elbow = createMockFitting({ rotation: 0 });
@@ -176,6 +186,7 @@ it('rotates elbow fitting in 90° increments', () => {
 **User Action**: Elbow auto-selected, inspect properties in right sidebar
 
 **Expected Result**:
+
 - Inspector panel populates:
   - **Section 1: Identity**
     - Name: "Elbow 1" (editable)
@@ -196,6 +207,7 @@ it('rotates elbow fitting in 90° increments', () => {
 - Status bar: "1 entity selected"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.click('.fitting-entity[data-fitting-type="elbow"]');
 
@@ -214,12 +226,14 @@ await expect(page.locator('.calculated-pressure-drop')).toContainText('0.15');
 **User Action**: Click in empty space (no nearby ducts)
 
 **Expected Behavior**:
+
 - Warning toast: "Elbow must connect to ducts. Place near duct endpoints."
 - No fitting created
 - Tool remains active
 - User can retry at correct location
 
 **Test**:
+
 ```typescript
 it('prevents elbow placement without duct connections', () => {
   const fittingTool = new FittingTool();
@@ -240,6 +254,7 @@ it('prevents elbow placement without duct connections', () => {
 **User Action**: Place elbow between 12" duct and 8" duct
 
 **Expected Behavior**:
+
 - Warning dialog:
   - "Duct size mismatch detected."
   - "Inlet: 12\", Outlet: 8\""
@@ -258,6 +273,7 @@ it('prevents elbow placement without duct connections', () => {
 **User Action**: Select "45° Elbow" type, place on duct
 
 **Expected Behavior**:
+
 - 45° elbow created
 - Visual shows 45° bend (not 90°)
 - Pressure drop lower than 90° elbow (~0.08 in. w.c. vs 0.15)
@@ -265,6 +281,7 @@ it('prevents elbow placement without duct connections', () => {
 - Connections work identically
 
 **Test**:
+
 ```typescript
 it('creates 45° elbow with correct pressure drop', () => {
   const elbow45 = createMockFitting({ angle: 45, radiusType: 'standard' });
@@ -282,6 +299,7 @@ it('creates 45° elbow with correct pressure drop', () => {
 **User Action**: Click within 20px of duct endpoint
 
 **Expected Behavior**:
+
 - Elbow snaps exactly to endpoint
 - Perfect alignment with duct
 - Connection automatic
@@ -295,6 +313,7 @@ it('creates 45° elbow with correct pressure drop', () => {
 **User Action**: Place 3 elbows in a row (90° + 90° + 90°)
 
 **Expected Behavior**:
+
 - Each elbow created independently
 - Ducts automatically created between elbows (if needed)
 - Total pressure drop = sum of all elbows (~0.45 in. w.c.)
@@ -310,6 +329,7 @@ it('creates 45° elbow with correct pressure drop', () => {
 **Scenario**: Invalid duct size or CFM causes calculation error
 
 **Expected Handling**:
+
 - Elbow created with basic properties
 - Pressure drop set to `null`
 - Warning in inspector: "⚠️ Cannot calculate pressure drop"
@@ -317,6 +337,7 @@ it('creates 45° elbow with correct pressure drop', () => {
 - Recalculation attempted when properties updated
 
 **Test**:
+
 ```typescript
 it('handles calculation errors gracefully', () => {
   const elbow = createMockFitting({ diameter: -10 }); // Invalid
@@ -335,6 +356,7 @@ it('handles calculation errors gracefully', () => {
 **Scenario**: Ducts too far apart, algorithm fails to detect connection
 
 **Expected Handling**:
+
 - Elbow created as standalone (no connections)
 - Warning: "No duct connections detected. Connect manually."
 - Inspector shows: "Inlet: None", "Outlet: None"
@@ -348,6 +370,7 @@ it('handles calculation errors gracefully', () => {
 **Scenario**: Place elbow at position where another fitting exists
 
 **Expected Handling**:
+
 - Overlap detection (if enabled)
 - Warning: "Fitting already exists at this location."
 - Options:
@@ -361,7 +384,7 @@ it('handles calculation errors gracefully', () => {
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Fitting Tool | `F` |
 | Cycle Fitting Types | `Tab` (while tool active) |
 | Rotate Fitting | `R` (when selected) |
@@ -369,20 +392,37 @@ it('handles calculation errors gracefully', () => {
 
 ---
 
+## Related Journeys
+
+- [Draw Fitting (Wye/Tee)](./UJ-EC-006-DrawFittingWye.md)
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+
+---
+
 ## Related Elements
 
-- [FittingTool](../../elements/04-tools/FittingTool.md) - Fitting placement tool
-- [FittingRenderer](../../elements/05-renderers/FittingRenderer.md) - Canvas rendering
-- [FittingSchema](../../elements/03-schemas/FittingSchema.md) - Data validation
-- [PressureDropCalculator](../../elements/06-calculators/PressureDropCalculator.md) - Pressure calculations
-- [DuctSchema](../../elements/03-schemas/DuctSchema.md) - Connected ducts
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity management
+### Components
+
+- [FittingTool](../../elements/04-tools/FittingTool.md)
+- [FittingRenderer](../../elements/05-renderers/FittingRenderer.md)
+
+### Stores
+
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Core
+
+- [FittingSchema](../../elements/03-schemas/FittingSchema.md)
+- [DuctSchema](../../elements/03-schemas/DuctSchema.md)
+- [PressureDropCalculator](../../elements/06-calculators/PressureDropCalculator.md)
 
 ---
 
 ## Test Implementation
 
 ### Unit Tests
+
 - `src/__tests__/tools/FittingTool.test.ts`
   - Type selection
   - Placement logic
@@ -390,6 +430,7 @@ it('handles calculation errors gracefully', () => {
   - Snap-to-duct
 
 ### Integration Tests
+
 - `src/__tests__/integration/fitting-creation.test.ts`
   - Complete fitting workflow
   - Duct connections
@@ -397,6 +438,7 @@ it('handles calculation errors gracefully', () => {
   - Store updates
 
 ### E2E Tests
+
 - `e2e/entity-creation/draw-fitting-elbow.spec.ts`
   - Fitting placement
   - Multiple types (90°, 45°)
@@ -548,18 +590,21 @@ export function renderElbow(fitting: Fitting, ctx: CanvasRenderingContext2D): vo
 ### Elbow Types and Specifications
 
 **90° Standard Elbow**:
+
 - Radius: R/D = 1.0 (tight bend)
 - Pressure Drop: ~0.15 in. w.c. @ 1000 FPM
 - Equivalent Length: ~15 ft
 - Use: General purpose, space-constrained
 
 **90° Long Radius Elbow**:
+
 - Radius: R/D = 1.5 (gentle bend)
 - Pressure Drop: ~0.08 in. w.c. @ 1000 FPM
 - Equivalent Length: ~8 ft
 - Use: High-flow, noise reduction
 
 **45° Elbow**:
+
 - Pressure Drop: ~0.05 in. w.c. @ 1000 FPM
 - Equivalent Length: ~5 ft
 - Use: Gradual direction changes
@@ -570,6 +615,7 @@ export function renderElbow(fitting: Fitting, ctx: CanvasRenderingContext2D): vo
 ΔP = C × (V² / 2g)
 
 Where:
+
 - ΔP = Pressure drop (in. w.c.)
 - C = Loss coefficient (elbow-specific)
 - V = Velocity (FPM)
@@ -577,6 +623,7 @@ Where:
 ```
 
 **Loss Coefficients (C)**:
+
 - 90° Standard: C = 0.60
 - 90° Long Radius: C = 0.30
 - 45° Standard: C = 0.20

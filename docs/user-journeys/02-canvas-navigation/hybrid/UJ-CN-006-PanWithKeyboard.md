@@ -30,5 +30,13 @@ This user journey covers panning the canvas using keyboard controls (Arrows/Spac
 **Handling**:
 - **Filter**: Key listener checks `e.target` is not `<input>` or `<textarea>` before panning.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [CanvasContainer](../../../../elements/01-components/canvas/CanvasContainer.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Pan Canvas](./UJ-CN-001-PanCanvas.md)

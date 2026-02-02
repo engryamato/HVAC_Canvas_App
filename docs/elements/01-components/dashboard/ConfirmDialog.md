@@ -421,4 +421,13 @@ describe('ConfirmDialog', () => {
   // a more complete JSDOM environment (focus management / portals). If this flakes,
   // consider asserting via `onOpenChange` behavior in an integration-style test.
 });
+
+## Platform Availability
+
+- **Universal**: Available on both Tauri (Desktop) and Web platforms.
+
+## Related User Journeys
+
+- [UJ-PM-004 (Hybrid)](../../../user-journeys/hybrid/01-project-management/UJ-PM-004-DeleteProject.md)
+- [UJ-PM-004 (Tauri)](../../../user-journeys/tauri-offline/01-project-management/UJ-PM-004-DeleteProject.md)
 ```

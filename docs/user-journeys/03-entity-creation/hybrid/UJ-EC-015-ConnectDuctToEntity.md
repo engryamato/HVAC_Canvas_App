@@ -29,6 +29,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Use Duct tool to draw supply duct ending near Room A
 
 **Expected Result**:
+
 - Duct drawing:
   - Duct tool active
   - Click start point: (50, 100)
@@ -62,6 +63,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Release mouse to complete duct drawing
 
 **Expected Result**:
+
 - Duct creation finalized:
   - Duct entity created:
     - **ID**: `duct-uuid-123`
@@ -111,6 +113,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Select duct to view connection properties
 
 **Expected Result**:
+
 - Duct selected
 - Inspector displays:
   - **Duct Properties**
@@ -144,6 +147,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Drag Room A from (100, 100) to (300, 200)
 
 **Expected Result**:
+
 - Room movement:
   - Room A selected
   - Drag to new position
@@ -184,6 +188,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Select duct, drag endpoint away from Room A
 
 **Expected Result**:
+
 - Duct endpoint drag:
   - Duct selected
   - Grab endpoint handle
@@ -227,6 +232,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Draw duct from Room A to Room B (both ends connected)
 
 **Expected Behavior**:
+
 - Duct drawing:
   - Start near Room A: Snap to (300, 150)
   - End near Room B: Snap to (500, 150)
@@ -265,6 +271,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Duct endpoint equidistant from two connection points
 
 **Expected Behavior**:
+
 - Scenario:
   - Duct endpoint at (100, 175)
   - Room A connection points:
@@ -293,6 +300,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Connect duct to wye fitting branch point
 
 **Expected Behavior**:
+
 - Fitting connection points:
   - Wye has 3 connection points:
     - Main inlet (left)
@@ -327,6 +335,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Drag duct endpoint from Room A to Room B
 
 **Expected Behavior**:
+
 - Initial state:
   - Duct connected to Room A
   - Connection: Room A, left-middle, 500 CFM
@@ -364,6 +373,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **User Action**: Attempt to connect supply duct to return duct
 
 **Expected Behavior**:
+
 - Connection validation:
   - Source: Supply duct (500 CFM supply)
   - Target: Return duct (not an entity endpoint)
@@ -398,6 +408,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **Scenario**: Connect duct to room with 0 CFM (not configured)
 
 **Expected Handling**:
+
 - Room A:
   - Supply CFM: 0 (default, not set)
   - Room exists but airflow not configured
@@ -426,6 +437,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **Scenario**: Connection point already occupied by another duct
 
 **Expected Handling**:
+
 - Room A left-middle connection point:
   - Already has duct-1 connected
   - User tries to connect duct-2 to same point
@@ -454,6 +466,7 @@ This user journey covers establishing connections between ducts and entities (ro
 **Scenario**: Connect ducts in circle (Room A → Duct 1 → Room B → Duct 2 → Room A)
 
 **Expected Handling**:
+
 - Circular path detection:
   - Graph traversal algorithm
   - Detect cycle: A → B → A
@@ -481,7 +494,7 @@ This user journey covers establishing connections between ducts and entities (ro
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Duct Tool | `D` |
 | Snap to Connection Point | `Shift` (hold while dragging) |
 | Disconnect Duct Endpoint | `Alt + Click` endpoint |
@@ -490,22 +503,36 @@ This user journey covers establishing connections between ducts and entities (ro
 
 ---
 
+## Related Journeys
+
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Calculate Duct Size](../../06-calculations/hybrid/UJ-CA-006-DuctSizingCalculations.md)
+
+---
+
 ## Related Elements
 
-- [DuctTool](../../elements/04-tools/DuctTool.md) - Duct drawing and connection
-- [DuctEntity](../../elements/03-entities/DuctEntity.md) - Duct data structure
-- [Connection](../../elements/03-entities/Connection.md) - Connection metadata
-- [connectionStore](../../elements/02-stores/connectionStore.md) - Connection state
-- [SnapService](../../elements/11-services/SnapService.md) - Snap detection logic
-- [DuctSizingService](../../elements/11-services/DuctSizingService.md) - Auto-sizing
-- [UJ-EC-004](./UJ-EC-004-DrawDuct.md) - Duct creation
-- [UJ-CA-002](../10-calculations/UJ-CA-002-CalculateDuctSize.md) - Duct sizing calculations
+### Components
+
+- [DuctTool](../../../elements/04-tools/DuctTool.md)
+
+### Schemas
+
+- [DuctSchema](../../../elements/03-schemas/DuctSchema.md)
+
+### Stores
+
+- `connectionStore` (Documentation pending)
+
+### Calculators
+
+- [DuctSizingCalculator](../../../elements/06-calculators/DuctSizingCalculator.md)
 
 ---
 
 ## Visual Diagram
 
-```
+```text
 Duct Connection Flow
 ┌────────────────────────────────────────────────────────┐
 │  1. Draw Duct Near Entity                              │

@@ -10,6 +10,9 @@ The GridSettings component provides UI controls for configuring the canvas grid,
 src/features/canvas/components/GridSettings.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
 ## Purpose
 
 - Toggle grid visibility on/off
@@ -262,6 +265,9 @@ function ProjectPropertiesAccordion() {
 |-----|--------|
 | `G` | Toggle grid visibility |
 | `S` | Toggle snap to grid |
+
+## Related User Journeys
+- [Zoom Canvas (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-002-ZoomCanvas.md) - Grid visibility and snapping affect view management mechanisms.
 
 ## Related Elements
 

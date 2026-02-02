@@ -27,5 +27,13 @@ This user journey describes how users reset the canvas viewport to fit all entit
 **Handling**:
 - **Fit**: Logic accounts for reduced vertical height (`visualViewport.height`) to ensures content is not hidden behind keyboard.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Fit to View](./UJ-CN-003-FitToView.md)

@@ -41,3 +41,12 @@ This user journey covers the workflow for manually saving an HVAC project in the
 ## Related Documentation
 - [Save As](./UJ-FM-003-SaveAs.md)
 - [Load Project](./UJ-FM-004-LoadProjectFromFile.md)
+
+## Related Elements
+
+### Stores
+- [ProjectStore](../../../../elements/02-stores/projectStore.md)
+
+### Services
+- [ProjectIO](../../../../elements/10-persistence/ProjectIO.md)
+- [FileSystem](../../../../elements/10-persistence/FileSystem.md)

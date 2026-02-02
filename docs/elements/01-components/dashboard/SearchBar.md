@@ -8,6 +8,12 @@ Search input with debouncing, sort dropdown, clear button, project count display
 hvac-design-app/src/features/dashboard/components/SearchBar.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
+## Related User Journeys
+- [Search & Filter Projects](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-007-SearchFilterProjects.md)
+
 ## Purpose
 - Provides debounced search input (300ms delay)
 - Displays sort options (name/date, asc/desc)

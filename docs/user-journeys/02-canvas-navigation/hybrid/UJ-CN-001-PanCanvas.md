@@ -45,7 +45,16 @@ This user journey covers panning (scrolling) the canvas viewport in the **Web En
 - **Compositing**: Uses CSS Transforms (`translate3d`) for smooth GPU layers if possible, but Canvas 2D API is primary.
 - **Garbage Collection**: Frequent object creation during Pan is avoided to prevent "Jank".
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [CanvasContainer](../../../../elements/01-components/canvas/CanvasContainer.md)
+- [StatusBar](../../../../elements/01-components/canvas/StatusBar.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Zoom Canvas](./UJ-CN-002-ZoomCanvas.md)
 Pan Direction Mapping:
 ┌────────────────────────────────────────────────────────┐

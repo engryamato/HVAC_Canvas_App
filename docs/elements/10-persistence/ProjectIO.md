@@ -100,3 +100,14 @@ Loads the source project, clones it with a new UUID and name, and saves it to a 
 - [FileSystem](./FileSystem.md) - File system abstraction layer
 - [ProjectFileSchema](../03-schemas/ProjectFileSchema.md) - Project validation schema
 - [useAutoSave](../07-hooks/useAutoSave.md) - Auto-save hook
+
+## Platform Availability
+
+- **Universal (Logic)**: Helper functions logic is universal, but underlying I/O operations depend on `FileSystem` implementation which varies by platform.
+
+## Related User Journeys
+
+- [UJ-PM-003 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-003-OpenProject.md)
+- [UJ-PM-004 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-004-DeleteProject.md)
+- [UJ-PM-003 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-003-OpenProject.md)
+- [UJ-PM-004 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-004-DeleteProject.md)

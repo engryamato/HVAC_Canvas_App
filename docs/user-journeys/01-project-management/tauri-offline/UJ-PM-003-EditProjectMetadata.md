@@ -167,16 +167,16 @@ This document describes editing project metadata in the offline desktop runtime,
 ## 8. Related Elements
 
 ### Components
-- `EditProjectDialog`
+- [EditProjectDialog](../../../elements/01-components/dashboard/EditProjectDialog.md)
 - `LeftSidebar`
 
 ### Stores
-- `ProjectStore`
-- `projectListStore`
+- [ProjectStore](../../../elements/02-stores/projectStore.md)
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectService` (Tauri)
-- `ProjectIO`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
+- [FileSystem](../../../elements/10-persistence/FileSystem.md)
 
 ## 9. Visual Diagrams
 

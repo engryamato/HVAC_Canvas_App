@@ -43,3 +43,11 @@ This user journey covers the workflow for manually saving an HVAC project in the
 ### 2. Incognito Mode
 **Scenario**: localStorage may be cleared on session close.
 **Handling**: Warn user on startup that data clears on close.
+
+## Related Elements
+
+### Stores
+- [ProjectStore](../../../../elements/02-stores/projectStore.md)
+
+### Services
+- [ProjectIO](../../../../elements/10-persistence/ProjectIO.md)

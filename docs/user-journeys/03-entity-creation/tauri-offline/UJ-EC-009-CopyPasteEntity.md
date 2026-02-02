@@ -414,15 +414,32 @@ This user journey covers copying selected entities to clipboard and pasting them
 
 ---
 
+## Related Journeys
+
+- [Duplicate Entity](./UJ-EC-011-DuplicateEntity.md)
+- [Select Single Entity](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md)
+- [Select Multiple Entities](../04-selection-and-manipulation/UJ-SM-002-SelectMultipleEntities.md)
+- [Delete Entity](./UJ-EC-010-DeleteEntity.md)
+
+---
+
 ## Related Elements
 
-- [SelectTool](../../elements/04-tools/SelectTool.md) - Entity selection for copy
-- [ClipboardService](../../elements/11-services/ClipboardService.md) - Clipboard operations
-- [CreateEntityCommand](../../elements/09-commands/CreateEntityCommand.md) - Paste creates entities
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity storage
-- [ConnectionSystem](../../elements/08-systems/ConnectionSystem.md) - Connection remapping
-- [HistoryStore](../../elements/09-commands/HistoryStore.md) - Undo support
-- [UJ-SM-001](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md) - Selection (prerequisite)
+### Components
+- [SelectTool](../../elements/04-tools/SelectTool.md)
+
+### Services
+- [ClipboardService](../../elements/11-services/ClipboardService.md)
+
+### Stores
+- [entityStore](../../elements/02-stores/entityStore.md)
+- [HistoryStore](../../elements/09-commands/HistoryStore.md)
+
+### Systems
+- [ConnectionSystem](../../elements/08-systems/ConnectionSystem.md)
+
+### Core
+- [CreateEntityCommand](../../elements/09-commands/CreateEntityCommand.md)
 
 ---
 

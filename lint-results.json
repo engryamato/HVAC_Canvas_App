@@ -1,0 +1,317 @@
+[
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 5,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 260",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      180
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 10,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 102",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      22
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 28,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 126",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      46
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 48,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 95",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      15
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 56,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 99",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      19
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 137,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 96",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      16
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 256,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Mouse up detected",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 287,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Tool normalizes rectangle:",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 321,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Tool continues tracking mous...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 337,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Start point snaps to nearest...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 354,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 84",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      4
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 373,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- New room is created regardle...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 388,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Catch error during entity cr...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 420,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Room entity created with bas...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 434,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Before creating entity, chec...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 632,
+    "ruleNames": [
+      "MD013",
+      "line-length"
+    ],
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md",
+    "errorDetail": "Expected: 80; Actual: 92",
+    "errorContext": null,
+    "errorRange": [
+      81,
+      12
+    ],
+    "fixInfo": null,
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 667,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Outline: 2px solid #3b82f6 (...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  },
+  {
+    "fileName": "docs/user-journeys/03-entity-creation/tauri-offline/UJ-EC-001-DrawRoom.md",
+    "lineNumber": 673,
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists"
+    ],
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md032.md",
+    "errorDetail": null,
+    "errorContext": "- Outline: 3px solid #2563eb (...",
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "\n"
+    },
+    "severity": "error"
+  }
+]
+

@@ -28,6 +28,7 @@ This user journey covers creating a duct entity on the canvas using the Duct Too
 **User Action**: Press `D` key OR click "Duct" button in toolbar
 
 **Expected Result**:
+
 - Duct tool becomes active
 - Toolbar shows Duct button as selected (highlighted state)
 - Cursor changes to crosshair (+) when over canvas
@@ -38,6 +39,7 @@ This user journey covers creating a duct entity on the canvas using the Duct Too
 - Default shape: Round (selected)
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('d');
 
@@ -53,6 +55,7 @@ await expect(page.locator('[data-shape-selector]')).toBeVisible();
 **User Action**: Click at desired duct start position (e.g., inside a room at x: 200, y: 150)
 
 **Expected Result**:
+
 - Tool captures click position
 - Starting point recorded: `startPoint = { x: 200, y: 150 }`
 - Drawing mode activated (`isDrawing = true`)
@@ -67,6 +70,7 @@ await expect(page.locator('[data-shape-selector]')).toBeVisible();
   - Store room connection: `connectedFrom = 'room-abc123'`
 
 **Validation Method**: Unit test
+
 ```typescript
 it('captures starting point and detects room connection', () => {
   const ductTool = new DuctTool();
@@ -93,6 +97,7 @@ it('captures starting point and detects room connection', () => {
 **User Action**: Drag mouse to endpoint (e.g., x: 450, y: 150)
 
 **Expected Result**:
+
 - Tool tracks current mouse position continuously
 - Live preview line drawn on canvas:
   - **Start**: (200, 150)
@@ -111,6 +116,7 @@ it('captures starting point and detects room connection', () => {
 - Connection detection at endpoint (checks for rooms/equipment)
 
 **Validation Method**: Integration test
+
 ```typescript
 it('shows live preview with dimensions while dragging', () => {
   const ductTool = new DuctTool();
@@ -137,6 +143,7 @@ it('shows live preview with dimensions while dragging', () => {
 **User Action**: Release mouse button at endpoint
 
 **Expected Result**:
+
 - Tool captures mouse up event
 - Final dimensions calculated:
   - Length: 250px → 20.8 ft
@@ -148,6 +155,7 @@ it('shows live preview with dimensions while dragging', () => {
   - If endpoint inside room/equipment → set `connectedTo = 'room-xyz789'`
   - Highlight connected entity briefly (green flash)
 - New duct entity created:
+
 ```typescript
 const newDuct: Duct = {
   id: crypto.randomUUID(),
@@ -181,6 +189,7 @@ const newDuct: Duct = {
   }
 };
 ```
+
 - Command executed: `createEntity(newDuct)`
 - Duct added to store and rendered
 - Preview cleared
@@ -188,6 +197,7 @@ const newDuct: Duct = {
 - Success toast: "Duct created"
 
 **Validation Method**: Integration test
+
 ```typescript
 it('creates duct entity with connections on mouse up', () => {
   const ductTool = new DuctTool();
@@ -224,6 +234,7 @@ it('creates duct entity with connections on mouse up', () => {
 **User Action**: Duct is automatically selected after creation
 
 **Expected Result**:
+
 - Selection store updated: `selectedIds = ['duct-abc123']`
 - Duct rendered with selection highlight:
   - Thicker blue outline (3px)
@@ -251,6 +262,7 @@ it('creates duct entity with connections on mouse up', () => {
 - Status bar: "1 entity selected"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('d');
 await page.mouse.click(200, 150);
@@ -273,6 +285,7 @@ await expect(page.locator('.calculated-area')).toHaveText('0.785 sq ft');
 **User Action**: Drag to create duct shorter than 1 ft (e.g., 8px)
 
 **Expected Behavior**:
+
 - Mouse up detected
 - Length validation fails: `length < 12px`
 - No entity created
@@ -282,6 +295,7 @@ await expect(page.locator('.calculated-area')).toHaveText('0.785 sq ft');
 - User can try again
 
 **Test**:
+
 ```typescript
 it('rejects ducts shorter than minimum length', () => {
   const ductTool = new DuctTool();
@@ -303,6 +317,7 @@ it('rejects ducts shorter than minimum length', () => {
 **User Action**: Click to start drawing round duct, then switch to rectangular via toolbar, then finish
 
 **Expected Behavior**:
+
 - Shape change updates `ductShape` state immediately
 - Preview updates to rectangular appearance
 - Dimension labels change to "12\" × 8\"" format
@@ -316,6 +331,7 @@ it('rejects ducts shorter than minimum length', () => {
 **User Action**: Drag vertically (x: 200→200, y: 150→350) or diagonally (x: 200→400, y: 150→350)
 
 **Expected Behavior**:
+
 - Rotation calculated from start→end angle:
   - Vertical: rotation = 90°
   - Diagonal: rotation = atan2(dy, dx) × 180/π
@@ -325,6 +341,7 @@ it('rejects ducts shorter than minimum length', () => {
 - All connections and calculations work identically
 
 **Test**:
+
 ```typescript
 it('calculates rotation for angled ducts', () => {
   const ductTool = new DuctTool();
@@ -346,6 +363,7 @@ it('calculates rotation for angled ducts', () => {
 **User Action**: Draw duct in empty canvas space (not inside any room)
 
 **Expected Behavior**:
+
 - Duct created successfully (standalone)
 - `connectedFrom` = `null`
 - `connectedTo` = `null`
@@ -360,6 +378,7 @@ it('calculates rotation for angled ducts', () => {
 **User Action**: Start duct inside room, end at furnace equipment entity
 
 **Expected Behavior**:
+
 - Start point detects room: `connectedFrom = 'room-abc'`
 - Endpoint detects furnace: `connectedTo = 'equipment-xyz'`
 - Both connections stored and displayed
@@ -376,6 +395,7 @@ it('calculates rotation for angled ducts', () => {
 **Scenario**: Algorithm fails to detect nearby room (rare edge case)
 
 **Expected Handling**:
+
 - Duct created without connection
 - Warning logged to console
 - No error shown to user (graceful degradation)
@@ -388,6 +408,7 @@ it('calculates rotation for angled ducts', () => {
 **Scenario**: Pressure drop calculation throws error (invalid CFM value)
 
 **Expected Handling**:
+
 - Duct entity created with basic properties
 - Calculated values set to `null`
 - Inspector shows: "Calculation error" with warning icon
@@ -401,6 +422,7 @@ it('calculates rotation for angled ducts', () => {
 **Scenario**: Project already has 5000 entities
 
 **Expected Handling**:
+
 - Before creating duct, check entity count
 - Error toast: "Cannot create duct. Maximum entity limit (5000) reached."
 - No entity created
@@ -412,7 +434,7 @@ it('calculates rotation for angled ducts', () => {
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Duct Tool | `D` |
 | Toggle Round/Rectangular | `T` (while tool active) |
 | Cancel Drawing | `Escape` (during drag) |
@@ -421,21 +443,40 @@ it('calculates rotation for angled ducts', () => {
 
 ---
 
+## Related Journeys
+
+- [Draw Room](./UJ-EC-001-DrawRoom.md)
+- [Place Equipment](./UJ-EC-003-PlaceEquipment.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+- [Select Entities](../04-selection-and-manipulation/tauri-offline/UJ-SM-001-SelectEntity.md)
+
+---
+
 ## Related Elements
 
-- [DuctTool](../../elements/04-tools/DuctTool.md) - Drawing tool implementation
-- [DuctRenderer](../../elements/05-renderers/DuctRenderer.md) - Canvas rendering
-- [DuctSchema](../../elements/03-schemas/DuctSchema.md) - Data validation
-- [DuctSizingCalculator](../../elements/06-calculators/DuctSizingCalculator.md) - Pressure drop calculations
-- [EntityCommands](../../elements/09-commands/EntityCommands.md) - Undo/redo support
-- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md) - Property editing
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity state management
+### Components
+
+- [DuctTool](../../elements/04-tools/DuctTool.md)
+- [DuctRenderer](../../elements/05-renderers/DuctRenderer.md)
+- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md)
+
+### Stores
+
+- [entityStore](../../elements/02-stores/entityStore.md)
+- [canvasStore](../../elements/02-stores/canvasStore.md)
+
+### Core
+
+- [DuctSchema](../../elements/03-schemas/DuctSchema.md)
+- [DuctSizingCalculator](../../elements/06-calculators/DuctSizingCalculator.md)
+- [EntityCommands](../../elements/09-commands/EntityCommands.md)
 
 ---
 
 ## Test Implementation
 
 ### Unit Tests
+
 - `src/__tests__/tools/DuctTool.test.ts`
   - Mouse event handling
   - Length/angle calculation
@@ -444,6 +485,7 @@ it('calculates rotation for angled ducts', () => {
   - Minimum length validation
 
 ### Integration Tests
+
 - `src/__tests__/integration/duct-creation.test.ts`
   - Entity creation flow
   - Store updates
@@ -452,6 +494,7 @@ it('calculates rotation for angled ducts', () => {
   - Calculator integration
 
 ### E2E Tests
+
 - `e2e/entity-creation/draw-duct.spec.ts`
   - Complete drawing workflow
   - Round and rectangular shapes
@@ -650,18 +693,21 @@ export class DuctTool extends BaseTool {
 ### Visual Design
 
 **Round Duct**:
+
 - Rounded rectangle (capsule shape)
 - Gray fill with blue outline
 - Diameter label perpendicular to duct
 - Airflow arrow at midpoint
 
 **Rectangular Duct**:
+
 - Solid rectangle
 - Gray fill with blue outline
 - Width × Height label
 - Airflow arrow at midpoint
 
 **Selection Handles**:
+
 - Circles at both endpoints (8px diameter)
 - Midpoint handle for splitting/branching (future)
 

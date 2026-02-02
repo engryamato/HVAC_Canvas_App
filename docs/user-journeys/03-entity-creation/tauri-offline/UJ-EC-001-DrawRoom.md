@@ -28,6 +28,7 @@ This user journey covers the complete workflow for creating a room entity on the
 **User Action**: Press `R` key OR click "Room" button in toolbar OR click "Room" in **FAB (Floating Action Button)** tool menu
 
 **Expected Result**:
+
 - Room tool becomes active
 - FAB menu closes (if was open)
 - Toolbar shows Room button as selected (highlighted state)
@@ -36,10 +37,11 @@ This user journey covers the complete workflow for creating a room entity on the
 - Status bar shows: "Room Tool: Click and drag to create room"
 - Inspector panel shows empty state with hint: "Draw a room to see properties"
 - **Room size** is changeable by:
-  * Dragging while drawing (interactive preview)
-  * Specifying exact dimensions in Inspector after creation (numeric inputs)
+  - Dragging while drawing (interactive preview)
+  - Specifying exact dimensions in Inspector after creation (numeric inputs)
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('r');
 
@@ -54,6 +56,7 @@ await expect(page.locator('.status-bar')).toContainText('Room Tool');
 **User Action**: Click and hold mouse button at desired room corner position (e.g., x: 100, y: 150)
 
 **Expected Result**:
+
 - Tool captures mouse down event
 - Starting point recorded in tool state:
   - `startPoint = { x: 100, y: 150 }` (canvas coordinates)
@@ -62,6 +65,7 @@ await expect(page.locator('.status-bar')).toContainText('Room Tool');
 - Snap to grid applied if enabled (e.g., snap to nearest 12" increment)
 
 **Validation Method**: Unit test
+
 ```typescript
 it('captures starting point on mouse down', () => {
   const roomTool = new RoomTool();
@@ -82,6 +86,7 @@ it('captures starting point on mouse down', () => {
 **User Action**: Drag mouse to opposite corner (e.g., x: 340, y: 330)
 
 **Expected Result**:
+
 - Tool tracks current mouse position continuously
 - Live preview rectangle drawn on canvas:
   - **Position**: Top-left at (100, 150)
@@ -98,6 +103,7 @@ it('captures starting point on mouse down', () => {
 - Snap to grid visual guides if enabled (dotted lines)
 
 **Validation Method**: Integration test
+
 ```typescript
 it('shows live preview while dragging', () => {
   const roomTool = new RoomTool();
@@ -122,6 +128,7 @@ it('shows live preview while dragging', () => {
 **User Action**: Release mouse button at final position
 
 **Expected Result**:
+
 - Tool captures mouse up event
 - Final dimensions calculated:
   - Width: 240px → 20 ft (@ 12px/ft scale)
@@ -130,6 +137,7 @@ it('shows live preview while dragging', () => {
   - If width < 12px or height < 12px → reject, show toast: "Room too small. Minimum 1 ft × 1 ft"
   - If valid → proceed with creation
 - New room entity created:
+
 ```typescript
 const newRoom: Room = {
   id: crypto.randomUUID(), // e.g., 'room-abc123'
@@ -158,6 +166,7 @@ const newRoom: Room = {
   }
 };
 ```
+
 - Command created and executed: `createEntity(newRoom)`
 - Room added to entity store
 - Room rendered on canvas
@@ -166,6 +175,7 @@ const newRoom: Room = {
 - Success toast: "Room created"
 
 **Validation Method**: Integration test
+
 ```typescript
 it('creates room entity on mouse up', () => {
   const roomTool = new RoomTool();
@@ -196,6 +206,7 @@ it('creates room entity on mouse up', () => {
 **User Action**: Room is automatically selected after creation
 
 **Expected Result**:
+
 - Selection store updated: `selectedIds = ['room-abc123']`
 - Room rendered with selection highlight:
   - Thicker blue outline (3px)
@@ -219,6 +230,7 @@ it('creates room entity on mouse up', () => {
 - Status bar shows: "1 entity selected"
 
 **Validation Method**: E2E test
+
 ```typescript
 await page.keyboard.press('r');
 await page.mouse.click(200, 200);
@@ -241,6 +253,7 @@ await expect(page.locator('.calculated-cfm')).toHaveText('300 CFM');
 **User Action**: Drag to create room smaller than 1 ft × 1 ft (e.g., 8px × 6px)
 
 **Expected Behavior**:
+
 - Mouse up detected
 - Size validation fails: `width < 12px || height < 12px`
 - No entity created
@@ -250,6 +263,7 @@ await expect(page.locator('.calculated-cfm')).toHaveText('300 CFM');
 - User can try again
 
 **Test**:
+
 ```typescript
 it('rejects rooms smaller than minimum size', () => {
   const roomTool = new RoomTool();
@@ -271,6 +285,7 @@ it('rejects rooms smaller than minimum size', () => {
 **User Action**: Drag from bottom-right to top-left (negative width/height)
 
 **Expected Behavior**:
+
 - Tool normalizes rectangle:
   - Calculates `topLeft = { x: min(startX, endX), y: min(startY, endY) }`
   - Calculates `width = abs(endX - startX)`
@@ -280,6 +295,7 @@ it('rejects rooms smaller than minimum size', () => {
 - Transform position is top-left corner
 
 **Test**:
+
 ```typescript
 it('handles reverse drag direction', () => {
   const roomTool = new RoomTool();
@@ -304,6 +320,7 @@ it('handles reverse drag direction', () => {
 **User Action**: Start drawing on canvas, drag mouse outside canvas bounds
 
 **Expected Behavior**:
+
 - Tool continues tracking mouse position
 - Preview clamps to canvas boundaries (doesn't render outside)
 - On mouse up outside canvas:
@@ -320,6 +337,7 @@ it('handles reverse drag direction', () => {
 **User Action**: Draw room with "Snap to Grid" enabled (12" grid)
 
 **Expected Behavior**:
+
 - Start point snaps to nearest grid intersection
 - Drag point snaps to nearest grid intersection
 - Resulting room dimensions are multiples of 12" (1 ft)
@@ -327,6 +345,7 @@ it('handles reverse drag direction', () => {
 - Room aligns perfectly with grid
 
 **Test**:
+
 ```typescript
 it('snaps room to grid when enabled', () => {
   const canvasStore = useCanvasStore.getState();
@@ -355,6 +374,7 @@ it('snaps room to grid when enabled', () => {
 **User Action**: Draw new room overlapping existing room
 
 **Expected Behavior**:
+
 - New room is created regardless of overlap
 - No collision detection (intentional - allows flexibility)
 - New room's zIndex determines rendering order
@@ -370,6 +390,7 @@ it('snaps room to grid when enabled', () => {
 **Scenario**: `createEntity` command throws error (store corruption)
 
 **Expected Handling**:
+
 - Catch error during entity creation
 - Error toast: "Failed to create room. Please try again."
 - Log error to console with stack trace
@@ -379,6 +400,7 @@ it('snaps room to grid when enabled', () => {
 - User can retry
 
 **Test**:
+
 ```typescript
 it('handles entity creation failure gracefully', () => {
   vi.spyOn(useEntityStore.getState(), 'addEntity').mockImplementation(() => {
@@ -401,6 +423,7 @@ it('handles entity creation failure gracefully', () => {
 **Scenario**: HVAC calculator throws error for room area/CFM
 
 **Expected Handling**:
+
 - Room entity created with basic properties
 - Calculated values set to `null` or error placeholders
 - Warning toast: "Room created, but calculations failed. Check properties."
@@ -415,6 +438,7 @@ it('handles entity creation failure gracefully', () => {
 **Scenario**: Project already has 5000 entities (hard limit)
 
 **Expected Handling**:
+
 - Before creating entity, check `allIds.length < 5000`
 - If limit exceeded:
   - Error toast: "Cannot create room. Maximum entity limit (5000) reached."
@@ -427,7 +451,7 @@ it('handles entity creation failure gracefully', () => {
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Activate Room Tool | `R` |
 | Cancel Drawing (during drag) | `Escape` |
 | Hold to Square | `Shift` (hold while dragging - forces width = height) |
@@ -435,22 +459,40 @@ it('handles entity creation failure gracefully', () => {
 
 ---
 
+## Related Journeys
+
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Place Equipment](./UJ-EC-003-PlaceEquipment.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+- [Select Entities](../04-selection-and-manipulation/tauri-offline/UJ-SM-001-SelectEntity.md)
+
+---
+
 ## Related Elements
 
-- [RoomTool](../../elements/04-tools/RoomTool.md) - Drawing tool implementation
-- [RoomRenderer](../../elements/05-renderers/RoomRenderer.md) - Canvas rendering
-- [RoomSchema](../../elements/03-schemas/RoomSchema.md) - Data validation
-- [VentilationCalculator](../../elements/06-calculators/VentilationCalculator.md) - CFM calculations
-- [EntityCommands](../../elements/09-commands/EntityCommands.md) - Undo/redo support
-- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md) - Property editing
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity state management
-- [canvasStore](../../elements/02-stores/canvasStore.md) - Grid and snap settings
+### Components
+
+- [RoomTool](../../elements/04-tools/RoomTool.md)
+- [RoomRenderer](../../elements/05-renderers/RoomRenderer.md)
+- [InspectorPanel](../../elements/01-components/inspector/InspectorPanel.md)
+
+### Stores
+
+- [entityStore](../../elements/02-stores/entityStore.md)
+- [canvasStore](../../elements/02-stores/canvasStore.md)
+
+### Core
+
+- [RoomSchema](../../elements/03-schemas/RoomSchema.md)
+- [VentilationCalculator](../../elements/06-calculators/VentilationCalculator.md)
+- [EntityCommands](../../elements/09-commands/EntityCommands.md)
 
 ---
 
 ## Test Implementation
 
 ### Unit Tests
+
 - `src/__tests__/tools/RoomTool.test.ts`
   - Mouse event handling
   - Dimension calculation
@@ -458,6 +500,7 @@ it('handles entity creation failure gracefully', () => {
   - Snap to grid logic
 
 ### Integration Tests
+
 - `src/__tests__/integration/room-creation.test.ts`
   - Entity creation flow
   - Store updates
@@ -466,6 +509,7 @@ it('handles entity creation failure gracefully', () => {
   - Selection after creation
 
 ### E2E Tests
+
 - `e2e/entity-creation/draw-room.spec.ts`
   - Complete drawing workflow
   - Keyboard activation
@@ -628,12 +672,14 @@ export class RoomTool extends BaseTool {
 ### Visual Design
 
 **Room Appearance**:
+
 - Outline: 2px solid #3b82f6 (blue)
 - Fill: rgba(59, 130, 246, 0.05) (very light blue)
 - Corner Radius: 4px
 - Text: Room name centered, 14px bold
 
 **Selected State**:
+
 - Outline: 3px solid #2563eb (darker blue)
 - Glow: 0 0 0 3px rgba(37, 99, 235, 0.3)
 - Handles: 8px white squares at corners

@@ -21,5 +21,10 @@ This user journey covers restricting the viewport navigation within specific lim
 **Handling**:
 - **Bounds**: Valid movement area expands immediately.
 
-## Related Documentation
+## Related Elements
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Pan Canvas](./UJ-CN-001-PanCanvas.md)

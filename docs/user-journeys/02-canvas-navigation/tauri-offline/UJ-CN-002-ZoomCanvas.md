@@ -40,7 +40,18 @@ This user journey covers zooming the canvas in the **Native Desktop Environment*
 - **Render Loop**: Decoupled from Event Loop.
 - **Latency**: Sub-frame latency for input-to-render.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [CanvasContainer](../../../../elements/01-components/canvas/CanvasContainer.md)
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+- [GridSettings](../../../../elements/01-components/canvas/GridSettings.md)
+- [StatusBar](../../../../elements/01-components/canvas/StatusBar.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Pan Canvas](./UJ-CN-001-PanCanvas.md)
 
 ---

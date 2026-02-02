@@ -115,15 +115,14 @@ This document describes duplicating projects in the browser, including quota che
 ## 8. Related Elements
 
 ### Components
-- `ProjectCard`
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 - `ProjectMenu`
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectService` (Web)
-- `IDBService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

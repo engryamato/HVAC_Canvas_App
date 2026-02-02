@@ -415,15 +415,29 @@ This user journey covers deleting selected entities from the canvas, including s
 
 ---
 
+## Related Journeys
+
+- [Select Single Entity](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md)
+- [Select Multiple Entities](../04-selection-and-manipulation/UJ-SM-002-SelectMultipleEntities.md)
+- [Disconnect Duct](./UJ-EC-016-DisconnectDuct.md)
+
+---
+
 ## Related Elements
 
-- [SelectTool](../../elements/04-tools/SelectTool.md) - Entity selection for deletion
-- [DeleteCommand](../../elements/09-commands/DeleteCommand.md) - Delete undo/redo support
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity removal
-- [ConnectionSystem](../../elements/08-systems/ConnectionSystem.md) - Connection cleanup
-- [ConfirmationDialog](../../elements/01-components/dialogs/ConfirmationDialog.md) - Bulk delete confirmation
-- [HistoryStore](../../elements/09-commands/HistoryStore.md) - Command history
-- [UJ-SM-001](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md) - Selection (prerequisite)
+### Components
+- [SelectTool](../../elements/04-tools/SelectTool.md)
+- [ConfirmationDialog](../../elements/01-components/dialogs/ConfirmationDialog.md)
+
+### Stores
+- [entityStore](../../elements/02-stores/entityStore.md)
+- [HistoryStore](../../elements/09-commands/HistoryStore.md)
+
+### Systems
+- [ConnectionSystem](../../elements/08-systems/ConnectionSystem.md)
+
+### Core
+- [DeleteCommand](../../elements/09-commands/DeleteCommand.md)
 
 ---
 

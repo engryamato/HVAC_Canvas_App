@@ -147,14 +147,14 @@ This document describes how users delete projects stored in browser storage, inc
 ## 8. Related Elements
 
 ### Components
-- `DeleteConfirmDialog`
-- `ProjectCard`
+- [DeleteConfirmDialog](../../../elements/01-components/dashboard/DeleteConfirmDialog.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `IDBService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

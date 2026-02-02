@@ -10,6 +10,9 @@ The ZoomControls component provides buttons for zooming in/out, resetting zoom t
 src/features/canvas/components/ZoomControls.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
 ## Purpose
 
 - Provide zoom in/out buttons
@@ -212,6 +215,12 @@ The ZoomControls are typically positioned in the bottom-right corner of the canv
   <ZoomControls />  {/* Right side */}
 </div>
 ```
+
+## Related User Journeys
+- [Zoom Canvas (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-002-ZoomCanvas.md)
+- [Fit To View (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-003-FitToView.md)
+- [Reset View (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-004-ResetViewFitToWindow.md)
+- [Zoom To Selection (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-005-ZoomToSelection.md)
 
 ## Related Elements
 

@@ -8,6 +8,12 @@ Comprehensive project metadata editing dialog with collapsible sections for proj
 hvac-design-app/src/components/dashboard/EditProjectDialog.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
+## Related User Journeys
+- [Edit Project Metadata (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-003-EditProjectMetadata.md)
+
 ## Purpose
 - Edits existing project metadata and settings
 - Pre-populates form with current project data

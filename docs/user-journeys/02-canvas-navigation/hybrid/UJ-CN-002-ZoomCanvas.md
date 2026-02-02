@@ -45,7 +45,18 @@ This user journey covers zooming the canvas viewport in the **Web Environment**.
 - **CSS Transforms**: Used for "preview" zoom during rapid gestures to stay responsive.
 - **Re-Rasterization**: High-quality re-draw happens debounced (100ms after gesture ends) to save battery.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [CanvasContainer](../../../../elements/01-components/canvas/CanvasContainer.md)
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+- [GridSettings](../../../../elements/01-components/canvas/GridSettings.md)
+- [StatusBar](../../../../elements/01-components/canvas/StatusBar.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Pan Canvas](./UJ-CN-001-PanCanvas.md)
 
 ---

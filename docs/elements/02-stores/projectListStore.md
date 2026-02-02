@@ -701,6 +701,163 @@ describe('projectListStore', () => {
 
     const duplicate = projects[0]; // Newest (prepended)
     expect(duplicate.projectName).toBe('Duplicate');
+
+### 1. Use Filtered Selectors
+
+**Good** (only subscribes to active projects):
+```typescript
+const activeProjects = useActiveProjects();
+```
+
+**Bad** (subscribes to all projects, filters in component):
+```typescript
+const projects = useProjects();
+const activeProjects = projects.filter(p => !p.isArchived);
+```
+
+### 2. Memoize Computed Values
+
+```typescript
+const sortedProjects = useMemo(() => {
+  return [...projects].sort((a, b) => a.projectName.localeCompare(b.projectName));
+}, [projects]);
+```
+
+### 3. Avoid Unnecessary Updates
+
+Only call `updateProject` when values actually change:
+```typescript
+const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+  const newValue = e.target.value;
+  if (newValue !== project.projectName) {
+    updateProject(project.projectId, { projectName: newValue });
+  }
+};
+```
+
+## Related Elements
+
+- [ProjectStore](./projectStore.md) - Manages current project's full data
+- [Dashboard](../01-components/dashboard/Dashboard.md) - Main project list view
+- [ProjectCard](../01-components/dashboard/ProjectCard.md) - Individual project display
+- [NewProjectDialog](../01-components/dashboard/NewProjectDialog.md) - Creates new projects
+- [ProjectIO](../10-persistence/ProjectIO.md) - Handles project file operations
+
+## Testing
+
+```typescript
+import { renderHook, act } from '@testing-library/react';
+import { useProjectListStore } from './projectListStore';
+
+describe('projectListStore', () => {
+  beforeEach(() => {
+    // Clear store and localStorage
+    useProjectListStore.setState({ projects: [], loading: false });
+    localStorage.clear();
+  });
+
+  const createMockProject = (overrides?: Partial<ProjectListItem>): ProjectListItem => ({
+    projectId: crypto.randomUUID(),
+    projectName: 'Test Project',
+    createdAt: new Date().toISOString(),
+    modifiedAt: new Date().toISOString(),
+    storagePath: `project-${crypto.randomUUID()}`,
+    isArchived: false,
+    ...overrides,
+  });
+
+  it('adds project to list', () => {
+    const project = createMockProject();
+
+    act(() => {
+      useProjectListStore.getState().addProject(project);
+    });
+
+    expect(useProjectListStore.getState().projects).toContainEqual(project);
+  });
+
+  it('prepends new project to list', () => {
+    const project1 = createMockProject({ projectName: 'Project 1' });
+    const project2 = createMockProject({ projectName: 'Project 2' });
+
+    act(() => {
+      useProjectListStore.getState().addProject(project1);
+      useProjectListStore.getState().addProject(project2);
+    });
+
+    const projects = useProjectListStore.getState().projects;
+    expect(projects[0].projectName).toBe('Project 2'); // Newest first
+    expect(projects[1].projectName).toBe('Project 1');
+  });
+
+  it('updates project metadata', () => {
+    const project = createMockProject();
+
+    act(() => {
+      useProjectListStore.getState().addProject(project);
+      useProjectListStore.getState().updateProject(project.projectId, {
+        projectName: 'Updated Name',
+        clientName: 'New Client',
+      });
+    });
+
+    const updated = useProjectListStore.getState().projects[0];
+    expect(updated.projectName).toBe('Updated Name');
+    expect(updated.clientName).toBe('New Client');
+    expect(updated.modifiedAt).not.toBe(project.modifiedAt); // Auto-updated
+  });
+
+  it('removes project from list', () => {
+    const project = createMockProject();
+
+    act(() => {
+      useProjectListStore.getState().addProject(project);
+      useProjectListStore.getState().removeProject(project.projectId);
+    });
+
+    expect(useProjectListStore.getState().projects).toHaveLength(0);
+  });
+
+  it('archives project', () => {
+    const project = createMockProject();
+
+    act(() => {
+      useProjectListStore.getState().addProject(project);
+      useProjectListStore.getState().archiveProject(project.projectId);
+    });
+
+    const archived = useProjectListStore.getState().projects[0];
+    expect(archived.isArchived).toBe(true);
+  });
+
+  it('restores archived project', () => {
+    const project = createMockProject({ isArchived: true });
+
+    act(() => {
+      useProjectListStore.getState().addProject(project);
+      useProjectListStore.getState().restoreProject(project.projectId);
+    });
+
+    const restored = useProjectListStore.getState().projects[0];
+    expect(restored.isArchived).toBe(false);
+  });
+
+  it('duplicates project', () => {
+    const original = createMockProject({
+      projectName: 'Original',
+      clientName: 'Client A'
+    });
+
+    act(() => {
+      useProjectListStore.getState().addProject(original);
+      useProjectListStore.getState().duplicateProject(original.projectId, 'Duplicate');
+    });
+
+    const projects = useProjectListStore.getState().projects;
+    expect(projects).toHaveLength(2);
+
+    const duplicate = projects[0]; // Newest (prepended)
+    expect(duplicate.projectName).toBe('Duplicate');
     expect(duplicate.clientName).toBe('Client A'); // Copied
     expect(duplicate.projectId).not.toBe(original.projectId); // New ID
     expect(duplicate.isArchived).toBe(false); // Always unarchived
@@ -717,4 +874,24 @@ describe('projectListStore', () => {
     expect(stored.state.projects).toContainEqual(project);
   });
 });
+
+## Platform Availability
+
+- **Universal**: Available on both Tauri (Desktop) and Web platforms.
+- **Note**: Persistence behavior differs. Uses `localStorage` index + `.sws` files (Tauri) vs `localStorage` index-only (Web).
+
+## Related User Journeys
+
+- [UJ-PM-002 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-002-CreateNewProject.md)
+- [UJ-PM-003 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-003-OpenProject.md)
+- [UJ-PM-004 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-004-DeleteProject.md)
+- [UJ-PM-005 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-005-SearchProjects.md)
+- [UJ-PM-006 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-006-CloseProject.md)
+- [UJ-PM-007 (Hybrid)](../../user-journeys/hybrid/01-project-management/UJ-PM-007-ListProjects.md)
+- [UJ-PM-002 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-002-CreateNewProject.md)
+- [UJ-PM-003 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-003-OpenProject.md)
+- [UJ-PM-004 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-004-DeleteProject.md)
+- [UJ-PM-005 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-005-SearchProjects.md)
+- [UJ-PM-006 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-006-CloseProject.md)
+- [UJ-PM-007 (Tauri)](../../user-journeys/tauri-offline/01-project-management/UJ-PM-007-ListProjects.md)
 ```

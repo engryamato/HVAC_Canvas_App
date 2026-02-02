@@ -136,15 +136,15 @@ This document describes how users search, sort, and filter projects in a browser
 ## 8. Related Elements
 
 ### Components
-- `SearchBar`
+- [SearchBar](../../../elements/01-components/dashboard/SearchBar.md)
 - `SortDropdown`
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
 - `SearchService`
-- `IDBService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

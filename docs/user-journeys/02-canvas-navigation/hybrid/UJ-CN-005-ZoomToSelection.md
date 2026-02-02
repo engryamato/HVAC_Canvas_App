@@ -20,5 +20,13 @@ This user journey covers fitting only the *selected* entities to the viewport in
 **Handling**:
 - **Focus**: Ensure Canvas keeps focus or re-acquires it after button click to capture shortcut.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Fit to View](./UJ-CN-003-FitToView.md)

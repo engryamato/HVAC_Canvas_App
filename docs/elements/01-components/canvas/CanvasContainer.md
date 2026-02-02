@@ -10,6 +10,9 @@ The CanvasContainer is the core rendering component of the HVAC Canvas applicati
 src/features/canvas/components/CanvasContainer.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
 ## Purpose
 
 - Render the main drawing canvas using pure Canvas 2D API
@@ -287,6 +290,10 @@ function CanvasPage() {
   );
 }
 ```
+
+## Related User Journeys
+- [Pan Canvas (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-001-PanCanvas.md)
+- [Zoom Canvas (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-002-ZoomCanvas.md)
 
 ## Related Elements
 

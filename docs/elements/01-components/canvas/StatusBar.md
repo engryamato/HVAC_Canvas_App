@@ -10,6 +10,9 @@ The StatusBar component displays real-time information about the canvas state in
 src/features/canvas/components/StatusBar.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
 ## Purpose
 
 - Display cursor position in canvas coordinates
@@ -185,6 +188,10 @@ No selection
 
 - Shows count of selected entities
 - Uses singular/plural correctly
+
+## Related User Journeys
+- [Pan Canvas (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-001-PanCanvas.md) - Status bar shows cursor position.
+- [Zoom Canvas (Tauri)](../../../user-journeys/02-canvas-navigation/tauri-offline/UJ-CN-002-ZoomCanvas.md) - Status bar shows zoom level.
 
 ## Related Elements
 

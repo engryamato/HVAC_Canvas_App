@@ -415,16 +415,32 @@ This user journey covers creating text note entities on the canvas for annotatio
 
 ---
 
+## Related Journeys
+
+- [Add Note](./UJ-EC-004-AddNote.md)
+- [Attach Note To Entity](./UJ-EC-013-AttachNoteToEntity.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+
+---
+
 ## Related Elements
 
-- [NoteTool](../../elements/04-tools/NoteTool.md) - Note creation tool
-- [NoteEntity](../../elements/05-entities/NoteEntity.md) - Note entity definition
-- [TextEditor](../../elements/01-components/canvas/TextEditor.md) - Inline text editing component
-- [CreateNoteCommand](../../elements/09-commands/CreateNoteCommand.md) - Undo support
-- [AttachmentSystem](../../elements/08-systems/AttachmentSystem.md) - Note-entity linking
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity storage
-- [ExportPDF](../../elements/10-persistence/ExportPDF.md) - PDF export with notes
-- [UJ-EC-001](./UJ-EC-001-DrawRoom.md) - Room creation (entities to annotate)
+### Components
+- [NoteTool](../../elements/04-tools/NoteTool.md)
+- [TextEditor](../../elements/01-components/canvas/TextEditor.md)
+
+### Entities
+- [NoteEntity](../../elements/05-entities/NoteEntity.md)
+
+### Stores
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Systems
+- [AttachmentSystem](../../elements/08-systems/AttachmentSystem.md)
+
+### Core
+- [CreateNoteCommand](../../elements/09-commands/CreateNoteCommand.md)
+- [ExportPDF](../../elements/10-persistence/ExportPDF.md)
 
 ---
 

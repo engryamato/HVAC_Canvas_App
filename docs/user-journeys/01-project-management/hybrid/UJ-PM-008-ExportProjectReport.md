@@ -143,12 +143,12 @@ This document describes exporting project reports in the browser, including PDF 
 ## 8. Related Elements
 
 ### Components
-- `ExportDialog`
+- [ExportDialog](../../../elements/01-components/export/ExportDialog.md)
 - `ReportPreview`
 
 ### Stores
-- `ProjectStore`
-- `EntityStore`
+- [projectStore](../../../elements/02-stores/projectStore.md)
+- [entityStore](../../../elements/02-stores/entityStore.md)
 
 ### Services
 - `ReportGenerator`

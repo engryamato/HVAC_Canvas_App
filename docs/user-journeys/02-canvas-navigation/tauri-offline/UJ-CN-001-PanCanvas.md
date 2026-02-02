@@ -44,7 +44,16 @@ This user journey covers panning (scrolling) the canvas viewport in the **Native
 - **Rendering**: WebGPU / WebGL context specifically tuned for Desktop.
 - **Throttling**: None. Runs at monitor refresh rate (144Hz supported).
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [CanvasContainer](../../../../elements/01-components/canvas/CanvasContainer.md)
+- [StatusBar](../../../../elements/01-components/canvas/StatusBar.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Zoom Canvas](./UJ-CN-002-ZoomCanvas.md)
 Pan Direction Mapping:
 ┌────────────────────────────────────────────────────────┐

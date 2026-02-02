@@ -39,5 +39,13 @@ This user journey covers automatically adjusting the viewport to fit entities in
 ## Performance
 - **Resize Loop**: Tightly coupled with Render Loop. No `requestAnimationFrame` lag.
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [ZoomControls](../../../../elements/01-components/canvas/ZoomControls.md)
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Zoom Canvas](./UJ-CN-002-ZoomCanvas.md)

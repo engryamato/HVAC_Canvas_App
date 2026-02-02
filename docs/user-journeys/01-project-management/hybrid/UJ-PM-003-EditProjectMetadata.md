@@ -162,16 +162,15 @@ This document describes editing project metadata in the browser, including valid
 ## 8. Related Elements
 
 ### Components
-- `EditProjectDialog`
+- [EditProjectDialog](../../../elements/01-components/dashboard/EditProjectDialog.md)
 - `LeftSidebar`
 
 ### Stores
-- `ProjectStore`
-- `projectListStore`
+- [ProjectStore](../../../elements/02-stores/projectStore.md)
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectService` (Web)
-- `IDBService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

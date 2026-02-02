@@ -37,5 +37,10 @@ This user journey covers the minimap navigation in the **Native Desktop Environm
 ## Performance
 - **Sync**: Minimap renders continuously in sync with Main Canvas (VSync).
 
-## Related Documentation
+## Related Elements
+
+### Components
+- [Minimap](../../../../elements/01-components/canvas/Minimap.md)
+
+## Related Journeys
 - [Zoom Canvas](./UJ-CN-002-ZoomCanvas.md)

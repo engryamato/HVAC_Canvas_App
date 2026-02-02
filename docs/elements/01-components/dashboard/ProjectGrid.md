@@ -8,6 +8,13 @@ Responsive grid layout component for project cards with staggered animation dela
 hvac-design-app/src/features/dashboard/components/ProjectGrid.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
+## Related User Journeys
+- [Search & Filter Projects](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-007-SearchFilterProjects.md)
+- [Open Existing Project](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-002-OpenExistingProject.md)
+
 ## Purpose
 - Renders responsive grid of project cards
 - Calculates staggered animation delays for cards

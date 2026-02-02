@@ -17,6 +17,9 @@ hvac-design-app/src/features/dashboard/components/DashboardPage.tsx
 - Supports Tauri file system integration
 - Displays recent projects section (active tab only)
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes. Features adapt (e.g., File System scan vs LocalStorage).
+
 ## Dependencies
 - **Store**: `useProjectListStore`, `useAppStateStore`
 - **Hooks**: `useProjectFilters`, `useAutoOpen`, `useRecentProjects`, `useSearchParams`
@@ -259,23 +262,11 @@ window.location.href = `/canvas/${projectId}`;
 - Project counts announced
 - Tab states communicated
 
-## User Journeys
-
-### UJ-PM-002: Opening Existing Projects
-1. User views dashboard with project list
-2. User clicks project card → navigates to canvas
-3. Tauri: User can also open from file via FileMenu
-
-### UJ-PM-007: Search & Filter Projects
-1. User types in search bar (debounced 300ms)
-2. Projects filtered in real-time
-3. Count shows: `{filtered} of {total}`
-4. User can sort by name or date
-
-### UJ-PM-005: Archive and Restore Projects
-1. User switches to "Archived" tab
-2. User views archived projects
-3. User can restore projects via ProjectCard actions
+## Related User Journeys
+- [Create New Project (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-001-CreateNewProject.md)
+- [Open Existing Project (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-002-OpenExistingProject.md)
+- [Search & Filter (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-007-SearchFilterProjects.md)
+- [Archive Project (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-005-ArchiveProject.md)
 
 ## Performance Considerations
 

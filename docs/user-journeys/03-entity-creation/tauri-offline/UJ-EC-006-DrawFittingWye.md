@@ -340,17 +340,32 @@ This user journey covers creating wye and tee fittings for branch duct connectio
 
 ---
 
+## Related Journeys
+
+- [Draw Fitting (Elbow)](./UJ-EC-005-DrawFittingElbow.md)
+- [Draw Duct](./UJ-EC-002-DrawDuct.md)
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+
+---
+
 ## Related Elements
 
-- [FittingTool](../../elements/04-tools/FittingTool.md) - Fitting creation tool
-- [WyeFitting](../../elements/05-entities/WyeFitting.md) - Wye fitting entity
-- [TeeFitting](../../elements/05-entities/TeeFitting.md) - Tee fitting entity
-- [CreateFittingCommand](../../elements/09-commands/CreateFittingCommand.md) - Undo support
-- [DuctConnectionSystem](../../elements/08-systems/DuctConnectionSystem.md) - Auto-connection logic
-- [PressureDropCalculator](../../elements/06-calculations/PressureDropCalculator.md) - Fitting losses
-- [entityStore](../../elements/02-stores/entityStore.md) - Entity storage
-- [UJ-EC-005](./UJ-EC-005-DrawFittingElbow.md) - Elbow fitting (related)
-- [UJ-EC-003](./UJ-EC-003-DrawDuct.md) - Duct drawing (prerequisite)
+### Components
+- [FittingTool](../../elements/04-tools/FittingTool.md)
+
+### Entities
+- [WyeFitting](../../elements/05-entities/WyeFitting.md)
+- [TeeFitting](../../elements/05-entities/TeeFitting.md)
+
+### Stores
+- [entityStore](../../elements/02-stores/entityStore.md)
+
+### Systems
+- [DuctConnectionSystem](../../elements/08-systems/DuctConnectionSystem.md)
+
+### Core
+- [CreateFittingCommand](../../elements/09-commands/CreateFittingCommand.md)
+- [PressureDropCalculator](../../elements/06-calculations/PressureDropCalculator.md)
 
 ---
 

@@ -27,5 +27,10 @@ This user journey covers restricting the viewport navigation within specific lim
 **Handling**:
 - **Dynamic Monitoring**: Logic uses `visualViewport` to update Bottom Clamp limit in real-time.
 
-## Related Documentation
+## Related Elements
+
+### Stores
+- [viewportStore](../../../../elements/02-stores/viewportStore.md)
+
+## Related Journeys
 - [Pan Canvas](./UJ-CN-001-PanCanvas.md)

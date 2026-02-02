@@ -8,6 +8,13 @@ Safety-focused confirmation dialog for project deletion with type-to-confirm val
 hvac-design-app/src/components/dashboard/DeleteConfirmDialog.tsx
 ```
 
+## Platform Availability
+- **Universal**: Available in both Tauri (Offline) and Hybrid (Web) modes.
+
+## Related User Journeys
+- [Delete Project (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-004-DeleteProject.md)
+- [Archive Project (Tauri)](../../../user-journeys/01-project-management/tauri-offline/UJ-PM-005-ArchiveProject.md)
+
 ## Purpose
 - Prevents accidental project deletion with type-to-confirm pattern
 - Displays project metadata and deletion impact preview

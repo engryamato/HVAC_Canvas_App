@@ -158,15 +158,15 @@ To return to the main view:
 ## 8. Related Elements
 
 ### Components
-- `ArchiveDialog`
-- `ProjectCard`
+- [ConfirmDialog](../../../elements/01-components/dashboard/ConfirmDialog.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 
 ### Stores
-- `projectListStore`
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectIO`
-- `FileSystemService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
+- [FileSystem](../../../elements/10-persistence/FileSystem.md)
 
 ## 9. Visual Diagrams
 

@@ -99,9 +99,9 @@ This document describes the offline desktop flow for accessing and opening exist
 - Empty state guides user to open from file
 
 **Related Elements:**
-- `DashboardPage`
-- `ProjectCard`
-- `ProjectGrid`
+- [DashboardPage](../../../elements/01-components/dashboard/DashboardPage.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
+- [ProjectGrid](../../../elements/01-components/dashboard/ProjectGrid.md)
 
 ---
 
@@ -209,18 +209,17 @@ This document describes the offline desktop flow for accessing and opening exist
 ## 8. Related Elements
 
 ### Components
-- `DashboardPage`
+- [DashboardPage](../../../elements/01-components/dashboard/DashboardPage.md)
+- [ProjectCard](../../../elements/01-components/dashboard/ProjectCard.md)
 - `NativeFileMenu`
-- `ProjectCard`
 
 ### Stores
-- `ProjectStore`
-- `projectListStore`
+- [projectStore](../../../elements/02-stores/projectStore.md)
+- [projectListStore](../../../elements/02-stores/projectListStore.md)
 
 ### Services
-- `ProjectService` (Tauri)
-- `ProjectIO`
-- `FileDialogService`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
+- [FileSystem](../../../elements/10-persistence/FileSystem.md)
 
 ## 9. Visual Diagrams
 

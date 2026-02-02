@@ -151,17 +151,17 @@ This document describes exporting project reports on desktop, including native s
 ## 8. Related Elements
 
 ### Components
-- `ExportDialog`
+- [ExportDialog](../../../elements/01-components/export/ExportDialog.md)
 - `ReportPreview`
 
 ### Stores
-- `ProjectStore`
-- `EntityStore`
+- [projectStore](../../../elements/02-stores/projectStore.md)
+- [entityStore](../../../elements/02-stores/entityStore.md)
 
 ### Services
 - `ReportGenerator`
 - `FileDialogService`
-- `ProjectIO`
+- [ProjectIO](../../../elements/10-persistence/ProjectIO.md)
 
 ## 9. Visual Diagrams
 

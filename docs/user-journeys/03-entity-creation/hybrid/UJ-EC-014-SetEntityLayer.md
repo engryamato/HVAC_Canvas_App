@@ -29,6 +29,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Click "Layers" tab in left sidebar
 
 **Expected Result**:
+
 - Layers panel opens:
   - Located in left sidebar
   - Replaces entity library view
@@ -68,6 +69,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Select Room A (currently on Supply layer)
 
 **Expected Result**:
+
 - Room A selected
 - Selection state:
   - `selectedIds`: ['room-a']
@@ -93,6 +95,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Change layer from "Supply" to "Equipment" via Inspector dropdown
 
 **Expected Result**:
+
 - Layer dropdown interaction:
   - Click dropdown
   - Options displayed
@@ -130,6 +133,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Uncheck "Equipment" layer in layers panel
 
 **Expected Result**:
+
 - Layer checkbox interaction:
   - Click checkbox next to Equipment
   - Checkbox: ☑️ → ☐
@@ -170,6 +174,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Check "Equipment" layer to make visible again
 
 **Expected Result**:
+
 - Layer checkbox interaction:
   - Click checkbox
   - Checkbox: ☐ → ☑️
@@ -209,6 +214,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Select 5 rooms, change all to Return layer
 
 **Expected Behavior**:
+
 - Multi-selection: 5 rooms selected
 - Rooms currently on different layers:
   - Room A: Supply
@@ -248,6 +254,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Click "+ New Layer" in layers panel
 
 **Expected Behavior**:
+
 - New layer dialog opens:
   - **Name**: "Untitled Layer" (editable)
   - **Color**: Default color picker
@@ -283,6 +290,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Delete "Equipment" layer which has 6 entities
 
 **Expected Behavior**:
+
 - Delete action:
   - Right-click Equipment layer
   - Select "Delete Layer"
@@ -322,6 +330,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Click lock icon on Background layer
 
 **Expected Behavior**:
+
 - Lock interaction:
   - Click lock icon (🔓)
   - Icon changes: 🔓 → 🔒
@@ -360,6 +369,7 @@ This user journey covers organizing entities into named layers for visibility co
 **User Action**: Hide Supply layer, ducts on Supply layer disappear
 
 **Expected Behavior**:
+
 - Supply layer hidden:
   - All supply ducts hidden
   - 12 duct entities not rendered
@@ -395,6 +405,7 @@ This user journey covers organizing entities into named layers for visibility co
 **Scenario**: User tries to delete "Supply" layer
 
 **Expected Handling**:
+
 - Delete action triggered
 - Layer type check: `layer.isDefault === true`
 - Default layers protected
@@ -423,6 +434,7 @@ This user journey covers organizing entities into named layers for visibility co
 **Scenario**: User creates custom layer named "Supply" (same as default)
 
 **Expected Handling**:
+
 - Layer creation dialog:
   - User enters name: "Supply"
   - Clicks Create
@@ -451,6 +463,7 @@ This user journey covers organizing entities into named layers for visibility co
 **Scenario**: Entity selected, then layer hidden via panel
 
 **Expected Handling**:
+
 - Initial state:
   - Room A selected
   - Room A on Equipment layer
@@ -484,7 +497,7 @@ This user journey covers organizing entities into named layers for visibility co
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| :--- | :--- |
 | Toggle Layers Panel | `L` |
 | Toggle Layer 1 (Supply) | `Alt + 1` |
 | Toggle Layer 2 (Return) | `Alt + 2` |
@@ -495,21 +508,33 @@ This user journey covers organizing entities into named layers for visibility co
 
 ---
 
+## Related Journeys
+
+- [Modify Entity Properties](./UJ-EC-012-ModifyEntityProperties.md)
+- [Select Single Entity](../04-selection-and-manipulation/UJ-SM-001-SelectSingleEntity.md)
+
+---
+
 ## Related Elements
 
-- [LayersPanel](../../elements/01-components/sidebar/LayersPanel.md) - Layer management UI
-- [layerStore](../../elements/02-stores/layerStore.md) - Layer state management
-- [Layer](../../elements/03-entities/Layer.md) - Layer data structure
-- [UpdatePropertyCommand](../../elements/09-commands/UpdatePropertyCommand.md) - Layer assignment undo
-- [RenderService](../../elements/05-renderers/RenderService.md) - Layer-aware rendering
-- [SelectionService](../../elements/11-services/SelectionService.md) - Layer-aware selection
+### Components
+
+- [LeftSidebar](../../../elements/01-components/layout/LeftSidebar.md)
+
+### Stores
+
+- [entityStore](../../../elements/02-stores/entityStore.md)
+
+### Core
+
+- [UpdatePropertyCommand](../../../elements/09-commands/UpdatePropertyCommand.md)
 - Detailed layer management documentation (pending canonical sidebar journey)
 
 ---
 
 ## Visual Diagram
 
-```
+```text
 Layers Panel UI
 ┌────────────────────────────────────────────────────────┐
 │  Left Sidebar - Layers Tab                             │

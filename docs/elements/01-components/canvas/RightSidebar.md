@@ -7,7 +7,7 @@ The Right Sidebar is a tabbed sidebar for canvas workflows. It includes entity/c
 ## Location
 
 ```
-hvac-design-app/src/features/canvas/components/RightSidebar.tsx
+src/features/canvas/components/RightSidebar.tsx
 ```
 
 ## Tabs
