@@ -375,7 +375,7 @@ const completeProject = {
           name: 'Conference Room',
           width: 240,
           length: 180,
-          ceilingHeight: 96,
+          height: 96,
           occupancyType: 'conference',
           airChangesPerHour: 6,
         },

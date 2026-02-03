@@ -82,13 +82,20 @@ function getMaterialGrade(materials: MaterialSelection[] | undefined, type: stri
   return (materials ?? []).find((m) => m.type === type)?.grade;
 }
 
-type LeftTabId = 'equipment' | 'layers' | 'recent' | 'project';
+type LeftTabId = 'product-catalog' | 'project-properties';
 
 function normalizeLeftTab(value: string): LeftTabId {
-  if (value === 'equipment' || value === 'layers' || value === 'recent' || value === 'project') {
+  if (value === 'product-catalog' || value === 'project-properties') {
     return value;
   }
-  return 'equipment';
+  // Map old values to new values for compatibility
+  if (value === 'equipment') {
+    return 'product-catalog';
+  }
+  if (value === 'project') {
+    return 'project-properties';
+  }
+  return 'product-catalog';
 }
 
 export function LeftSidebar({
@@ -236,62 +243,32 @@ export function LeftSidebar({
             <button
               type="button"
               role="tab"
-              aria-selected={activeLeftTab === 'equipment'}
-              aria-controls="equipment-panel"
-              onClick={() => setActiveLeftTab('equipment')}
+              aria-selected={activeLeftTab === 'product-catalog'}
+              aria-controls="product-catalog-panel"
+              onClick={() => setActiveLeftTab('product-catalog')}
               className={`rounded px-2 py-1 text-sm transition-colors ${
-                activeLeftTab === 'equipment'
+                activeLeftTab === 'product-catalog'
                   ? 'active bg-slate-200 text-slate-900'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
-              data-testid="tab-equipment"
+              data-testid="tab-product-catalog"
             >
-              Equipment
+              Product Catalog
             </button>
             <button
               type="button"
               role="tab"
-              aria-selected={activeLeftTab === 'layers'}
-              aria-controls="layers-panel"
-              onClick={() => setActiveLeftTab('layers')}
+              aria-selected={activeLeftTab === 'project-properties'}
+              aria-controls="project-properties-panel"
+              onClick={() => setActiveLeftTab('project-properties')}
               className={`rounded px-2 py-1 text-sm transition-colors ${
-                activeLeftTab === 'layers'
+                activeLeftTab === 'project-properties'
                   ? 'active bg-slate-200 text-slate-900'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
-              data-testid="tab-layers"
+              data-testid="tab-project-properties"
             >
-              Layers
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeLeftTab === 'recent'}
-              aria-controls="recent-panel"
-              onClick={() => setActiveLeftTab('recent')}
-              className={`rounded px-2 py-1 text-sm transition-colors ${
-                activeLeftTab === 'recent'
-                  ? 'active bg-slate-200 text-slate-900'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-              data-testid="tab-recent"
-            >
-              Recent
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeLeftTab === 'project'}
-              aria-controls="project-panel"
-              onClick={() => setActiveLeftTab('project')}
-              className={`rounded px-2 py-1 text-sm transition-colors ${
-                activeLeftTab === 'project'
-                  ? 'active bg-slate-200 text-slate-900'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-              data-testid="tab-project"
-            >
-              Project
+              Project Properties
             </button>
           </div>
         )}
@@ -320,189 +297,175 @@ export function LeftSidebar({
       </div>
       {!leftSidebarCollapsed && (
         <div className="sidebar-content overflow-y-auto">
-          {activeLeftTab === 'equipment' && (
-            <div className="p-3" data-testid="equipment-panel" id="equipment-panel" role="tabpanel">
+          {activeLeftTab === 'product-catalog' && (
+            <div className="p-3" data-testid="product-catalog-panel" id="product-catalog-panel" role="tabpanel">
               <ProductCatalogPanel />
             </div>
           )}
 
-        {activeLeftTab === 'layers' && (
-          <div className="p-3" data-testid="layers-panel" id="layers-panel" role="tabpanel">
-            <h3 className="text-sm font-semibold mb-2">Layers</h3>
-            <div className="text-xs text-slate-500">Layer management coming soon.</div>
-          </div>
-        )}
+          {activeLeftTab === 'project-properties' && (
+            <div className="space-y-4" id="project-properties-panel" role="tabpanel">
+              <ProjectSidebar className="w-full border-r-0" />
+              <CollapsibleSection
+                title="Project Details"
+                defaultExpanded={expandedSections.includes('project-details')}
+                onToggle={() => toggleSection('project-details')}
+              >
+                <ValidatedInput
+                  id="project-name"
+                  label="Name"
+                  type="text"
+                  value={details?.projectName ?? ''}
+                  onChange={(val) => updateProjectDetails({ projectName: String(val) })}
+                />
+                <ValidatedInput
+                  id="project-location"
+                  label="Location"
+                  type="text"
+                  value={details?.location ?? ''}
+                  onChange={(val) => updateProjectDetails({ location: String(val) })}
+                />
+                <ValidatedInput
+                  id="project-client"
+                  label="Client"
+                  type="text"
+                  value={details?.clientName ?? ''}
+                  onChange={(val) => updateProjectDetails({ clientName: String(val) })}
+                />
+              </CollapsibleSection>
 
-        {activeLeftTab === 'recent' && (
-          <div className="p-3" data-testid="recent-panel" id="recent-panel" role="tabpanel">
-            <h3 className="text-sm font-semibold mb-2">Recent Items</h3>
-            <div className="text-xs text-slate-500">Recently used items will appear here.</div>
-          </div>
-        )}
+              <CollapsibleSection
+                title="Project Scope"
+                defaultExpanded={expandedSections.includes('project-scope')}
+                onToggle={() => toggleSection('project-scope')}
+              >
+                <div className="scope-section">
+                  <div className="scope-title">Scope</div>
+                  {SCOPE_OPTIONS.map((option) => {
+                    const selected = projectScope.details.includes(option.value);
+                    return (
+                      <label key={option.value} className="scope-row">
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() =>
+                            updateScope({
+                              details: toggleArrayValue(projectScope.details, option.value),
+                            })
+                          }
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
 
-        {activeLeftTab === 'project' && (
-          <div className="space-y-4" id="project-panel" role="tabpanel">
-            <ProjectSidebar className="w-full border-r-0" />
-        <CollapsibleSection
-          title="Project Details"
-          defaultExpanded={expandedSections.includes('project-details')}
-          onToggle={() => toggleSection('project-details')}
-        >
-          <ValidatedInput
-            id="project-name"
-            label="Name"
-            type="text"
-            value={details?.projectName ?? ''}
-            onChange={(val) => updateProjectDetails({ projectName: String(val) })}
-          />
-          <ValidatedInput
-            id="project-location"
-            label="Location"
-            type="text"
-            value={details?.location ?? ''}
-            onChange={(val) => updateProjectDetails({ location: String(val) })}
-          />
-          <ValidatedInput
-            id="project-client"
-            label="Client"
-            type="text"
-            value={details?.clientName ?? ''}
-            onChange={(val) => updateProjectDetails({ clientName: String(val) })}
-          />
-        </CollapsibleSection>
+                <div className="scope-section">
+                  <div className="scope-title">Materials</div>
+                  {MATERIAL_OPTIONS.map((option) => {
+                    const selected = projectScope.materials.some((material) => material.type === option.value);
+                    return (
+                      <label key={option.value} className="scope-row">
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() =>
+                            updateScope({
+                              materials: toggleMaterial(projectScope.materials, option.value),
+                            })
+                          }
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    );
+                  })}
 
-        <CollapsibleSection
-          title="Project Scope"
-          defaultExpanded={expandedSections.includes('project-scope')}
-          onToggle={() => toggleSection('project-scope')}
-        >
-          <div className="scope-section">
-            <div className="scope-title">Scope</div>
-            {SCOPE_OPTIONS.map((option) => {
-              const selected = projectScope.details.includes(option.value);
-              return (
-                <label key={option.value} className="scope-row">
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() =>
-                      updateScope({
-                        details: toggleArrayValue(projectScope.details, option.value),
-                      })
-                    }
-                  />
-                  <span>{option.label}</span>
-                </label>
-              );
-            })}
-          </div>
+                  {projectScope.materials.some((material) => material.type === 'galvanized') && (
+                    <Dropdown
+                      label="Galvanized Grade"
+                      options={GALVANIZED_GRADES}
+                      value={getMaterialGrade(projectScope.materials, 'galvanized') ?? 'g-60'}
+                      onChange={(val) =>
+                        updateScope({
+                          materials: setMaterialGrade(projectScope.materials, 'galvanized', String(val)),
+                        })
+                      }
+                    />
+                  )}
 
-          <div className="scope-section">
-            <div className="scope-title">Materials</div>
-            {MATERIAL_OPTIONS.map((option) => {
-              const selected = projectScope.materials.some((material) => material.type === option.value);
-              return (
-                <label key={option.value} className="scope-row">
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() =>
-                      updateScope({
-                        materials: toggleMaterial(projectScope.materials, option.value),
-                      })
-                    }
-                  />
-                  <span>{option.label}</span>
-                </label>
-              );
-            })}
+                  {projectScope.materials.some((material) => material.type === 'stainless') && (
+                    <Dropdown
+                      label="Stainless Grade"
+                      options={STAINLESS_GRADES}
+                      value={getMaterialGrade(projectScope.materials, 'stainless') ?? '304'}
+                      onChange={(val) =>
+                        updateScope({
+                          materials: setMaterialGrade(projectScope.materials, 'stainless', String(val)),
+                        })
+                      }
+                    />
+                  )}
+                </div>
 
-            {projectScope.materials.some((material) => material.type === 'galvanized') && (
-              <Dropdown
-                label="Galvanized Grade"
-                options={GALVANIZED_GRADES}
-                value={getMaterialGrade(projectScope.materials, 'galvanized') ?? 'g-60'}
-                onChange={(val) =>
-                  updateScope({
-                    materials: setMaterialGrade(projectScope.materials, 'galvanized', String(val)),
-                  })
-                }
-              />
-            )}
+                <Dropdown
+                  label="Project Type"
+                  options={PROJECT_TYPE_OPTIONS}
+                  value={projectScope.projectType}
+                  onChange={(val) => updateScope({ projectType: String(val) })}
+                />
+              </CollapsibleSection>
 
-            {projectScope.materials.some((material) => material.type === 'stainless') && (
-              <Dropdown
-                label="Stainless Grade"
-                options={STAINLESS_GRADES}
-                value={getMaterialGrade(projectScope.materials, 'stainless') ?? '304'}
-                onChange={(val) =>
-                  updateScope({
-                    materials: setMaterialGrade(projectScope.materials, 'stainless', String(val)),
-                  })
-                }
-              />
-            )}
-          </div>
-
-          <Dropdown
-            label="Project Type"
-            options={PROJECT_TYPE_OPTIONS}
-            value={projectScope.projectType}
-            onChange={(val) => updateScope({ projectType: String(val) })}
-          />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title="Site Conditions"
-          defaultExpanded={expandedSections.includes('site-conditions')}
-          onToggle={() => toggleSection('site-conditions')}
-        >
-          <ValidatedInput
-            id="site-elevation"
-            label="Elevation (ft)"
-            type="number"
-            value={siteConditions.elevation ?? ''}
-            onChange={(val) => updateSiteConditions({ elevation: String(val) })}
-          />
-          <ValidatedInput
-            id="site-outdoor-temp"
-            label="Outdoor Temperature (°F)"
-            type="number"
-            value={siteConditions.outdoorTemp ?? ''}
-            onChange={(val) => updateSiteConditions({ outdoorTemp: String(val) })}
-          />
-          <ValidatedInput
-            id="site-indoor-temp"
-            label="Indoor Temperature (°F)"
-            type="number"
-            value={siteConditions.indoorTemp ?? ''}
-            onChange={(val) => updateSiteConditions({ indoorTemp: String(val) })}
-          />
-          <ValidatedInput
-            id="site-wind-speed"
-            label="Wind Speed (MPH)"
-            type="number"
-            value={siteConditions.windSpeed ?? ''}
-            onChange={(val) => updateSiteConditions({ windSpeed: String(val) })}
-          />
-          <ValidatedInput
-            id="site-humidity"
-            label="Humidity (%)"
-            type="number"
-            value={siteConditions.humidity ?? ''}
-            onChange={(val) => updateSiteConditions({ humidity: String(val) })}
-          />
-          <ValidatedInput
-            id="site-local-codes"
-            label="Local Codes"
-            type="text"
-            value={siteConditions.localCodes ?? ''}
-            onChange={(val) => updateSiteConditions({ localCodes: String(val) })}
-          />
-        </CollapsibleSection>
-          </div>
-        )}
-      </div>
+              <CollapsibleSection
+                title="Site Conditions"
+                defaultExpanded={expandedSections.includes('site-conditions')}
+                onToggle={() => toggleSection('site-conditions')}
+              >
+                <ValidatedInput
+                  id="site-elevation"
+                  label="Elevation (ft)"
+                  type="number"
+                  value={siteConditions.elevation ?? ''}
+                  onChange={(val) => updateSiteConditions({ elevation: String(val) })}
+                />
+                <ValidatedInput
+                  id="site-outdoor-temp"
+                  label="Outdoor Temperature (°F)"
+                  type="number"
+                  value={siteConditions.outdoorTemp ?? ''}
+                  onChange={(val) => updateSiteConditions({ outdoorTemp: String(val) })}
+                />
+                <ValidatedInput
+                  id="site-indoor-temp"
+                  label="Indoor Temperature (°F)"
+                  type="number"
+                  value={siteConditions.indoorTemp ?? ''}
+                  onChange={(val) => updateSiteConditions({ indoorTemp: String(val) })}
+                />
+                <ValidatedInput
+                  id="site-wind-speed"
+                  label="Wind Speed (MPH)"
+                  type="number"
+                  value={siteConditions.windSpeed ?? ''}
+                  onChange={(val) => updateSiteConditions({ windSpeed: String(val) })}
+                />
+                <ValidatedInput
+                  id="site-humidity"
+                  label="Humidity (%)"
+                  type="number"
+                  value={siteConditions.humidity ?? ''}
+                  onChange={(val) => updateSiteConditions({ humidity: String(val) })}
+                />
+                <ValidatedInput
+                  id="site-local-codes"
+                  label="Local Codes"
+                  type="text"
+                  value={siteConditions.localCodes ?? ''}
+                  onChange={(val) => updateSiteConditions({ localCodes: String(val) })}
+                />
+              </CollapsibleSection>
+            </div>
+          )}
+        </div>
       )}
 
       {onClose && (

@@ -33,8 +33,8 @@ function ToolButton({ tool, icon, label, shortcut, isActive, onClick }: ToolButt
         transition-colors duration-150 relative group
         ${
           isActive
-            ? 'active bg-blue-600 text-white shadow-md'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ? 'active bg-slate-100 text-slate-900 shadow-sm'
+            : 'text-slate-500 hover:text-slate-900'
         }
       `}
       title={`${label} (${shortcut})`}
@@ -64,9 +64,9 @@ const SelectIcon = () => (
   </svg>
 );
 
-const RoomIcon = () => (
+const PanIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
   </svg>
 );
 
@@ -78,6 +78,19 @@ const DuctIcon = () => (
   </svg>
 );
 
+const PipeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="8" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const WireIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 12 Q8 4 12 12 T20 12" strokeLinecap="round" />
+  </svg>
+);
+
 const EquipmentIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -85,10 +98,9 @@ const EquipmentIcon = () => (
   </svg>
 );
 
-const FittingIcon = () => (
+const RoomIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M4 12h8M20 12h-4M12 4v8M12 20v-4" />
-    <circle cx="12" cy="12" r="3" />
+    <rect x="3" y="3" width="18" height="18" rx="2" />
   </svg>
 );
 
@@ -102,33 +114,16 @@ const NoteIcon = () => (
   </svg>
 );
 
-const LineIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="4" y1="20" x2="20" y2="4" strokeLinecap="round" />
-  </svg>
-);
-
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
-  { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
-  { tool: 'line', icon: <LineIcon />, label: 'Line', shortcut: 'L' },
+  { tool: 'pan', icon: <PanIcon />, label: 'Pan', shortcut: 'Space' },
   { tool: 'duct', icon: <DuctIcon />, label: 'Duct', shortcut: 'D' },
+  { tool: 'pipe', icon: <PipeIcon />, label: 'Pipe', shortcut: 'P' },
+  { tool: 'wire', icon: <WireIcon />, label: 'Wire', shortcut: 'W' },
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
-  { tool: 'fitting', icon: <FittingIcon />, label: 'Fitting', shortcut: 'F' },
+  { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
   { tool: 'note', icon: <NoteIcon />, label: 'Note', shortcut: 'N' },
 ];
-
-const EQUIPMENT_TYPES: EquipmentType[] = ['hood', 'fan', 'diffuser', 'damper', 'air_handler'];
-
-const FITTING_TYPES: FittingType[] = ['elbow_90', 'elbow_45', 'tee', 'reducer', 'cap'];
-
-const FITTING_TYPE_LABELS: Record<FittingType, string> = {
-  elbow_90: '90° Elbow',
-  elbow_45: '45° Elbow',
-  tee: 'Tee',
-  reducer: 'Reducer',
-  cap: 'Cap',
-};
 
 /**
  * Undo/Redo button component
@@ -169,146 +164,6 @@ function UndoRedoButton({
   );
 }
 
-/**
- * Equipment type selector component with keyboard navigation
- */
-function EquipmentTypeSelector() {
-  const selectedType = useSelectedEquipmentType();
-  const { setEquipmentType } = useToolActions();
-
-  const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent, currentIndex: number) => {
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[(currentIndex + 1) % EQUIPMENT_TYPES.length]!);
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[(currentIndex - 1 + EQUIPMENT_TYPES.length) % EQUIPMENT_TYPES.length]!);
-          break;
-        case 'Home':
-          e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[0]!);
-          break;
-        case 'End':
-          e.preventDefault();
-          setEquipmentType(EQUIPMENT_TYPES[EQUIPMENT_TYPES.length - 1]!);
-          break;
-      }
-    },
-    [setEquipmentType]
-  );
-
-  return (
-    <div
-      className="flex flex-col gap-1 p-2 border-t border-gray-200"
-      role="radiogroup"
-      aria-label="Equipment type selection"
-    >
-      <div id="equipment-type-label" className="text-xs text-gray-500 font-medium mb-1">
-        Equipment Type
-      </div>
-      {EQUIPMENT_TYPES.map((type, index) => {
-        const isSelected = selectedType === type;
-        return (
-          <button
-            key={type}
-            type="button"
-            role="radio"
-            aria-checked={isSelected}
-            aria-labelledby="equipment-type-label"
-            onClick={() => setEquipmentType(type)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-            tabIndex={isSelected ? 0 : -1}
-            className={`
-              px-2 py-1.5 text-xs rounded transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${
-                isSelected
-                  ? 'bg-blue-100 text-blue-700 font-medium'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }
-            `}
-            title={EQUIPMENT_TYPE_LABELS[type]}
-          >
-            {EQUIPMENT_TYPE_LABELS[type]}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-/**
- * Fitting type selector component with keyboard navigation
- */
-function FittingTypeSelector() {
-  const selectedType = useSelectedFittingType();
-  const { setFittingType } = useToolActions();
-
-  const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent, currentIndex: number) => {
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setFittingType(FITTING_TYPES[(currentIndex + 1) % FITTING_TYPES.length]!);
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setFittingType(FITTING_TYPES[(currentIndex - 1 + FITTING_TYPES.length) % FITTING_TYPES.length]!);
-          break;
-        case 'Home':
-          e.preventDefault();
-          setFittingType(FITTING_TYPES[0]!);
-          break;
-        case 'End':
-          e.preventDefault();
-          setFittingType(FITTING_TYPES[FITTING_TYPES.length - 1]!);
-          break;
-      }
-    },
-    [setFittingType]
-  );
-
-  return (
-    <div
-      className="flex flex-col gap-1 p-2 border-t border-gray-200"
-      role="radiogroup"
-      aria-label="Fitting type selection"
-    >
-      <div id="fitting-type-label" className="text-xs text-gray-500 font-medium mb-1">
-        Fitting Type
-      </div>
-      {FITTING_TYPES.map((type, index) => {
-        const isSelected = selectedType === type;
-        return (
-          <button
-            key={type}
-            type="button"
-            role="radio"
-            aria-checked={isSelected}
-            aria-labelledby="fitting-type-label"
-            onClick={() => setFittingType(type)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-            tabIndex={isSelected ? 0 : -1}
-            className={`
-              px-2 py-1.5 text-xs rounded transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${
-                isSelected
-                  ? 'bg-blue-100 text-blue-700 font-medium'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }
-            `}
-            title={FITTING_TYPE_LABELS[type]}
-          >
-            {FITTING_TYPE_LABELS[type]}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 interface ToolbarProps {
   className?: string;
 }
@@ -335,20 +190,25 @@ export function Toolbar({ className = '' }: ToolbarProps) {
         case 'v':
           setTool('select');
           break;
-        case 'r':
-          setTool('room');
-          break;
-        case 'l':
-          setTool('line');
+        case ' ': // Space
+        case 'h':
+          e.preventDefault(); // Prevent page scroll on space
+          setTool('pan');
           break;
         case 'd':
           setTool('duct');
           break;
+        case 'p':
+          setTool('pipe');
+          break;
+        case 'w':
+          setTool('wire');
+          break;
         case 'e':
           setTool('equipment');
           break;
-        case 'f':
-          setTool('fitting');
+        case 'r':
+          setTool('room');
           break;
         case 'n':
           setTool('note');
@@ -424,12 +284,6 @@ export function Toolbar({ className = '' }: ToolbarProps) {
           testId="redo-button"
         />
       </div>
-
-      {/* Show equipment type selector when equipment tool is active */}
-      {currentTool === 'equipment' && <EquipmentTypeSelector />}
-
-      {/* Show fitting type selector when fitting tool is active */}
-      {currentTool === 'fitting' && <FittingTypeSelector />}
     </div>
   );
 }

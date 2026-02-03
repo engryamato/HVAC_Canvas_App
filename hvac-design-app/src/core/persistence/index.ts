@@ -34,3 +34,20 @@ export {
   type LoadResult,
 } from './projectIO';
 
+// Storage Adapter (Abstraction Layer)
+export { type StorageAdapter } from './StorageAdapter';
+export { createStorageAdapter } from './factory';
+export type {
+  SaveResult,
+  DeleteResult,
+  DuplicateResult,
+  AutoSaveResult,
+  SaveOptions,
+  AutoSaveConfig,
+  StorageConfig,
+  AutoSaveMetadata,
+  StorageInfo,
+  
+  // Explicitly export the new LoadResult as AdapterLoadResult to avoid conflict with projectIO.LoadResult
+  LoadResult as AdapterLoadResult
+} from './types';

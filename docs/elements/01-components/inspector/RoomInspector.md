@@ -105,9 +105,9 @@ const commit = useCallback(
 ### 2. Validation
 
 - Real-time validation using `useFieldValidation` hook
-- Width: 12-10000 inches
-- Length: 12-10000 inches
-- Height: 72-500 inches
+- Width: 1-10000 inches
+- Length: 1-10000 inches
+- Height: 1-500 inches
 - Air Changes/Hr: 1-100
 - Errors displayed inline under invalid fields
 
@@ -288,9 +288,9 @@ describe('RoomInspector', () => {
     render(<RoomInspector entity={mockRoom} />);
 
     const widthInput = screen.getByLabelText('Width (in)');
-    fireEvent.change(widthInput, { target: { value: '5' } }); // Below min of 12
+    fireEvent.change(widthInput, { target: { value: '0' } }); // Below min of 1
 
-    expect(screen.getByText(/must be at least 12/i)).toBeInTheDocument();
+    expect(screen.getByText(/must be at least 1/i)).toBeInTheDocument();
   });
 
   it('displays calculated values', () => {
@@ -307,7 +307,7 @@ describe('RoomInspector', () => {
     render(<RoomInspector entity={mockRoom} />);
 
     const heightInput = screen.getByLabelText('Height (in)');
-    fireEvent.change(heightInput, { target: { value: '50' } }); // Below min of 72
+    fireEvent.change(heightInput, { target: { value: '0' } }); // Below min of 1
 
     // Should not call updateEntityCommand
     expect(updateEntityCommand).not.toHaveBeenCalled();

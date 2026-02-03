@@ -21,7 +21,7 @@ interface LayoutStoreState {
 const defaultState = {
     leftSidebarCollapsed: false,
     rightSidebarCollapsed: false,
-    activeLeftTab: 'equipment',
+    activeLeftTab: 'product-catalog',
     activeRightTab: 'properties',
 };
 

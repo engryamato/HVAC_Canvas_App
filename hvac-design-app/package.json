@@ -10,7 +10,7 @@
     "pnpm": ">=8.0.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "node scripts/validate-env.js && next build",
     "build:prod": "NODE_ENV=production node scripts/validate-env.js && next build",
     "start": "next start",

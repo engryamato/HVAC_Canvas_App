@@ -151,16 +151,14 @@ const commit = useCallback(
 Available equipment types with their defaults:
 
 | Type | Label | Default CFM | Default Pressure | Dimensions (W×D×H) |
-|------|-------|-------------|------------------|--------------------|
-| `ahu` | Air Handling Unit | 5000 | 2.5 | 48×36×60 |
-| `rtu` | Rooftop Unit | 3000 | 1.5 | 60×48×42 |
-| `fcu` | Fan Coil Unit | 800 | 0.5 | 24×18×12 |
-| `exhaust_fan` | Exhaust Fan | 1000 | 0.75 | 24×24×24 |
-| `supply_fan` | Supply Fan | 2000 | 1.0 | 30×30×30 |
-| `vav` | VAV Box | 1200 | 0.8 | 36×24×18 |
-| `heat_pump` | Heat Pump | 2500 | 1.2 | 36×36×42 |
-| `chiller` | Chiller | 0 | 0 | 72×48×84 |
-| `boiler` | Boiler | 0 | 0 | 48×36×72 |
+|------|-------|-------------|------------------|---------------------|
+| `hood` | Exhaust Hood | 1000 | 0.5 | 48×36×24 |
+| `fan` | Fan | 2000 | 1.0 | 24×24×24 |
+| `diffuser` | Diffuser | 200 | 0.1 | 24×24×8 |
+| `damper` | Damper | 500 | 0.05 | 12×12×6 |
+| `air_handler` | Air Handling Unit | 5000 | 2.0 | 60×48×72 |
+| `furnace` | Furnace | 80000 | 0.5 | 24×36×48 |
+| `rtu` | Rooftop Unit | 12000 | 1.5 | 84×48×36 |
 
 ### 4. Validation
 
