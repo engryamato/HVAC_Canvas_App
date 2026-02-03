@@ -1,4 +1,5 @@
 /**
+import { isTauri } from "@/lib/platform";
  * Type declarations for Tauri modules that may not be available in web builds
  * These modules are only used when running in Tauri desktop environment
  */
