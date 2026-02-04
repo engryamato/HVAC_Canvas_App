@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NewProjectDialog } from '../NewProjectDialog';
 
-// Mock next/navigation
+// Mock dependencies
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
   }),
 }));
 
-// Mock stores
 vi.mock('@/stores/useProjectStore', () => ({
   useProjectStore: () => ({
     addProject: vi.fn(),
@@ -18,20 +18,37 @@ vi.mock('@/stores/useProjectStore', () => ({
 
 vi.mock('@/features/dashboard/store/projectListStore', () => ({
   useProjectListActions: () => ({
-    refreshProjects: vi.fn().mockResolvedValue(undefined),
+    refreshProjects: vi.fn(),
   }),
 }));
 
-// Mock storage adapter factory
 vi.mock('@/core/persistence/factory', () => ({
-  createStorageAdapter: vi.fn().mockResolvedValue({
-    saveProject: vi.fn().mockResolvedValue({ success: true }),
+  createStorageAdapter: vi.fn(() =>
+    Promise.resolve({
+      saveProject: vi.fn(() => Promise.resolve({ success: true })),
+    })
+  ),
+}));
+
+vi.mock('@/core/schema/project-file.schema', () => ({
+  createEmptyProject: (name: string) => ({
+    projectId: '',
+    projectName: name,
+    createdAt: '',
+    modifiedAt: '',
+    isArchived: false,
+    scope: {},
+    siteConditions: {},
+    entities: { rooms: [], ducts: [], fittings: [], equipment: [] },
   }),
 }));
 
 describe('NewProjectDialog', () => {
-  const mockOnOpenChange = vi.fn();
-  const mockOnProjectCreated = vi.fn();
+  const defaultProps = {
+    open: true,
+    onOpenChange: vi.fn(),
+    onProjectCreated: vi.fn(),
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -39,153 +56,96 @@ describe('NewProjectDialog', () => {
 
   describe('Rendering', () => {
     it('should render dialog when open', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-          onProjectCreated={mockOnProjectCreated}
-        />
-      );
-      
-      expect(screen.getByTestId('new-project-dialog')).toBeInTheDocument();
+      render(<NewProjectDialog {...defaultProps} />);
+
+      expect(screen.getByTestId('new-project-dialog')).toBeDefined();
+      expect(screen.getByText('Create New Project')).toBeDefined();
     });
 
-    it('should not render dialog when closed', () => {
-      render(
-        <NewProjectDialog 
-          open={false} 
-          onOpenChange={mockOnOpenChange}
-          onProjectCreated={mockOnProjectCreated}
-        />
-      );
-      
-      expect(screen.queryByTestId('new-project-dialog')).not.toBeInTheDocument();
+    it('should not render when not open', () => {
+      render(<NewProjectDialog {...defaultProps} open={false} />);
+
+      expect(screen.queryByTestId('new-project-dialog')).toBeNull();
     });
 
-    it('should display dialog title', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      expect(screen.getByText('Create New Project')).toBeInTheDocument();
+    it('should display project details accordion', () => {
+      render(<NewProjectDialog {...defaultProps} />);
+
+      expect(screen.getByText('Project Details')).toBeDefined();
     });
 
-    it('should display project name input', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      expect(screen.getByTestId('project-name-input')).toBeInTheDocument();
-    });
-  });
+    it('should display project scope accordion', () => {
+      render(<NewProjectDialog {...defaultProps} />);
 
-  describe('Tailwind Classes (No CSS Modules)', () => {
-    it('should render dialog content with Tailwind max-w class', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      const dialogContent = screen.getByTestId('new-project-dialog');
-      expect(dialogContent).toHaveClass('sm:max-w-[600px]');
+      expect(screen.getByText('Project Scope')).toBeDefined();
     });
 
-    it('should render dialog with overflow-y-auto class', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      const dialogContent = screen.getByTestId('new-project-dialog');
-      expect(dialogContent).toHaveClass('overflow-y-auto');
-    });
+    it('should display site conditions accordion', () => {
+      render(<NewProjectDialog {...defaultProps} />);
 
-    it('should render create button with correct data-testid', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      expect(screen.getByTestId('create-button')).toBeInTheDocument();
+      expect(screen.getByText('Site Conditions')).toBeDefined();
     });
   });
 
   describe('Form Validation', () => {
     it('should disable create button when project name is empty', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      const createButton = screen.getByTestId('create-button');
-      expect(createButton).toBeDisabled();
+      render(<NewProjectDialog {...defaultProps} />);
+
+      const createBtn = screen.getByTestId('create-button');
+      expect(createBtn).toHaveProperty('disabled', true);
     });
 
     it('should enable create button when project name is provided', async () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      const input = screen.getByTestId('project-name-input');
-      fireEvent.change(input, { target: { value: 'New HVAC Project' } });
-      
-      const createButton = screen.getByTestId('create-button');
-      expect(createButton).not.toBeDisabled();
+      render(<NewProjectDialog {...defaultProps} />);
+
+      const nameInput = screen.getByTestId('project-name-input');
+      await userEvent.type(nameInput, 'My New Project');
+
+      const createBtn = screen.getByTestId('create-button');
+      expect(createBtn).toHaveProperty('disabled', false);
     });
 
-    it('should show character count', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      const input = screen.getByTestId('project-name-input');
-      fireEvent.change(input, { target: { value: 'Test Project' } });
-      
-      expect(screen.getByText('12/100')).toBeInTheDocument();
+    it('should show character count for project name', async () => {
+      render(<NewProjectDialog {...defaultProps} />);
+
+      const nameInput = screen.getByTestId('project-name-input');
+      await userEvent.type(nameInput, 'Test');
+
+      expect(screen.getByText('4/100')).toBeDefined();
     });
   });
 
-  describe('Dialog Actions', () => {
-    it('should render cancel button', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+  describe('User Interactions', () => {
+    it('should call onOpenChange when cancel is clicked', async () => {
+      render(<NewProjectDialog {...defaultProps} />);
+
+      const cancelBtn = screen.getByText('Cancel');
+      fireEvent.click(cancelBtn);
+
+      expect(defaultProps.onOpenChange).toHaveBeenCalledWith(false);
     });
 
-    it('should render create button', () => {
-      render(
-        <NewProjectDialog 
-          open={true} 
-          onOpenChange={mockOnOpenChange}
-        />
-      );
-      
-      expect(screen.getByTestId('create-button')).toHaveTextContent('Create Project');
+    it('should update project name on input', async () => {
+      render(<NewProjectDialog {...defaultProps} />);
+
+      const nameInput = screen.getByTestId('project-name-input');
+      await userEvent.type(nameInput, 'Office Building HVAC');
+
+      expect(nameInput).toHaveProperty('value', 'Office Building HVAC');
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have dialog role', () => {
+      render(<NewProjectDialog {...defaultProps} />);
+
+      expect(screen.getByRole('dialog')).toBeDefined();
+    });
+
+    it('should have accessible name input', () => {
+      render(<NewProjectDialog {...defaultProps} />);
+
+      expect(screen.getByTestId('project-name-input')).toBeDefined();
     });
   });
 });

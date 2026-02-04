@@ -275,4 +275,44 @@ describe('Toolbar - Undo/Redo Integration', () => {
       expect(roomButton).toHaveAttribute('title', expect.stringContaining('R'));
     });
   });
+
+  describe('Visual States', () => {
+    it('should apply Technical Blue background to active tool', () => {
+      render(<Toolbar />);
+
+      // Click room button to activate it
+      const roomButton = screen.getByTestId('tool-room');
+      fireEvent.click(roomButton);
+
+      // Check for the active class with Technical Blue (bg-blue-500)
+      expect(roomButton.className).toContain('active');
+      expect(roomButton.className).toContain('bg-blue-500');
+      expect(roomButton.className).toContain('text-white');
+    });
+
+    it('should apply inactive styling to non-selected tools', () => {
+      render(<Toolbar />);
+
+      // Set room as active
+      const roomButton = screen.getByTestId('tool-room');
+      fireEvent.click(roomButton);
+
+      // Check that select button is inactive
+      const selectButton = screen.getByTestId('tool-select');
+      expect(selectButton.className).not.toContain('bg-blue-500');
+      expect(selectButton.className).toContain('text-slate-500');
+    });
+
+    it('should display tooltips with keyboard shortcuts on hover', () => {
+      render(<Toolbar />);
+
+      const selectButton = screen.getByTestId('tool-select');
+      // Tooltip should be in the DOM (hidden by default)
+      const tooltip = selectButton.querySelector('div');
+      expect(tooltip).toBeDefined();
+      expect(tooltip?.textContent).toContain('Select');
+      expect(tooltip?.textContent).toContain('V');
+    });
+  });
 });
+

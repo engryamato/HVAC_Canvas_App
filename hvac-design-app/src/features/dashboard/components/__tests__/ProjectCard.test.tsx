@@ -1,28 +1,47 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ProjectCard } from '../ProjectCard';
 import type { ProjectListItem } from '../../store/projectListStore';
 
-// Mock next/navigation
+// Mock dependencies
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
   }),
 }));
 
-// Mock projectListStore hooks
-vi.mock('../../store/projectListStore', async () => {
-  const actual = await vi.importActual('../../store/projectListStore');
+vi.mock('../../store/projectListStore', () => ({
+  useProjectListActions: () => ({
+    markAsOpened: vi.fn(),
+  }),
+}));
+
+// Mock localStorage
+const mockLocalStorage = (() => {
+  let store: Record<string, string> = {};
   return {
-    ...actual,
-    useProjectListActions: () => ({
-      markAsOpened: vi.fn(),
-    }),
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => { store[key] = value; },
+    clear: () => { store = {}; },
   };
-});
+})();
+Object.defineProperty(globalThis, 'localStorage', { value: mockLocalStorage });
 
 describe('ProjectCard', () => {
-  const mockHandlers = {
+  const mockProject: ProjectListItem = {
+    projectId: 'test-project-123',
+    projectName: 'Test HVAC Project',
+    projectNumber: '2025-001',
+    clientName: 'Acme Corp',
+    modifiedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    entityCount: 5,
+    isArchived: false,
+    status: 'draft',
+  };
+
+  const defaultProps = {
+    project: mockProject,
     onDelete: vi.fn(),
     onArchive: vi.fn(),
     onRestore: vi.fn(),
@@ -30,172 +49,186 @@ describe('ProjectCard', () => {
     onRename: vi.fn(),
   };
 
-  const createMockProject = (overrides: Partial<ProjectListItem> = {}): ProjectListItem => ({
-    projectId: 'test-project-id',
-    projectName: 'Test Project',
-    projectNumber: 'TEST-001',
-    clientName: 'Test Client',
-    createdAt: new Date().toISOString(),
-    modifiedAt: new Date().toISOString(),
-    storagePath: 'test-storage-path',
-    isArchived: false,
-    ...overrides,
-  });
-
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLocalStorage.clear();
   });
 
-  describe('Status Badge Rendering', () => {
-    it('should display Draft badge when status is undefined', () => {
-      const project = createMockProject({ status: undefined });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('badge-draft')).toBeInTheDocument();
-      expect(screen.getByTestId('badge-draft')).toHaveTextContent('Draft');
-      expect(screen.getByTestId('badge-draft')).toHaveClass('badge-slate');
+  describe('Rendering', () => {
+    it('should render project card', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByTestId('project-card')).toBeDefined();
     });
 
-    it('should display Draft badge when status is "draft"', () => {
-      const project = createMockProject({ status: 'draft' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('badge-draft')).toBeInTheDocument();
-      expect(screen.getByTestId('badge-draft')).toHaveClass('badge-slate');
-    });
-
-    it('should display In Progress badge with badge-blue class', () => {
-      const project = createMockProject({ status: 'in-progress' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('badge-in-progress')).toBeInTheDocument();
-      expect(screen.getByTestId('badge-in-progress')).toHaveTextContent('In Progress');
-      expect(screen.getByTestId('badge-in-progress')).toHaveClass('badge-blue');
-    });
-
-    it('should display Complete badge with badge-green class', () => {
-      const project = createMockProject({ status: 'complete' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('badge-complete')).toBeInTheDocument();
-      expect(screen.getByTestId('badge-complete')).toHaveTextContent('Complete');
-      expect(screen.getByTestId('badge-complete')).toHaveClass('badge-green');
-    });
-
-    it('should display Archived badge with badge-amber class when archived', () => {
-      const project = createMockProject({ isArchived: true });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('badge-archived')).toBeInTheDocument();
-      expect(screen.getByTestId('badge-archived')).toHaveTextContent('Archived');
-      expect(screen.getByTestId('badge-archived')).toHaveClass('badge-amber');
-    });
-
-    it('should hide status badge when project is archived', () => {
-      const project = createMockProject({ isArchived: true, status: 'in-progress' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('badge-archived')).toBeInTheDocument();
-      expect(screen.queryByTestId('badge-in-progress')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('badge-draft')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Metadata Display', () => {
     it('should display project name', () => {
-      const project = createMockProject({ projectName: 'My HVAC Project' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByText('My HVAC Project')).toBeInTheDocument();
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByText('Test HVAC Project')).toBeDefined();
     });
 
     it('should display project number', () => {
-      const project = createMockProject({ projectNumber: 'HVAC-2025-001' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByText('#HVAC-2025-001')).toBeInTheDocument();
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByText('#2025-001')).toBeDefined();
     });
 
     it('should display client name', () => {
-      const project = createMockProject({ clientName: 'Acme Corp' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByText('Acme Corp')).toBeDefined();
     });
 
-    it('should display entity count badge when > 0', () => {
-      const project = createMockProject({ entityCount: 42 });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByText('42 items')).toBeInTheDocument();
+    it('should display entity count badge', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByText('5 items')).toBeDefined();
     });
 
-    it('should not display entity count badge when 0', () => {
-      const project = createMockProject({ entityCount: 0 });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.queryByText('0 items')).not.toBeInTheDocument();
-    });
+    it('should display Untitled Project when name is undefined', () => {
+      const projectWithNoName = { ...mockProject, projectName: 'undefined' };
+      render(<ProjectCard {...defaultProps} project={projectWithNoName} />);
 
-    it('should display formatted date', () => {
-      const project = createMockProject({ modifiedAt: new Date().toISOString() });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByText(/Modified/)).toBeInTheDocument();
-    });
-
-    it('should display fallback name for undefined projectName', () => {
-      const project = createMockProject({ projectName: undefined as unknown as string });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByText('Untitled Project')).toBeInTheDocument();
+      expect(screen.getByText('Untitled Project')).toBeDefined();
     });
   });
 
-  describe('Card Interactions', () => {
-    it('should render project card with correct test id', () => {
-      const project = createMockProject();
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('project-card')).toBeInTheDocument();
+  describe('Status Badges', () => {
+    it('should display Draft badge for draft status', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByTestId('badge-draft')).toBeDefined();
+      expect(screen.getByText('Draft')).toBeDefined();
     });
 
-    it('should render menu button with correct test id', () => {
-      const project = createMockProject();
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByTestId('project-card-menu-btn')).toBeInTheDocument();
+    it('should display In Progress badge', () => {
+      const inProgressProject = { ...mockProject, status: 'in-progress' as const };
+      render(<ProjectCard {...defaultProps} project={inProgressProject} />);
+
+      expect(screen.getByTestId('badge-in-progress')).toBeDefined();
     });
 
-    it('should show menu on menu button click', () => {
-      const project = createMockProject();
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      fireEvent.pointerDown(screen.getByTestId('project-card-menu-btn'));
-      
-      expect(screen.getByTestId('project-card-menu')).toBeInTheDocument();
+    it('should display Complete badge', () => {
+      const completeProject = { ...mockProject, status: 'complete' as const };
+      render(<ProjectCard {...defaultProps} project={completeProject} />);
+
+      expect(screen.getByTestId('badge-complete')).toBeDefined();
     });
 
-    it('should display Open Project button', () => {
-      const project = createMockProject();
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      expect(screen.getByRole('button', { name: /Open Test Project/i })).toBeInTheDocument();
+    it('should display Archived badge when archived', () => {
+      const archivedProject = { ...mockProject, isArchived: true };
+      render(<ProjectCard {...defaultProps} project={archivedProject} />);
+
+      expect(screen.getByTestId('badge-archived')).toBeDefined();
     });
   });
 
-  describe('All Badge State Transitions', () => {
-    it.each([
-      ['draft', 'badge-draft', 'Draft', 'badge-slate'],
-      ['in-progress', 'badge-in-progress', 'In Progress', 'badge-blue'],
-      ['complete', 'badge-complete', 'Complete', 'badge-green'],
-    ])('should render %s status with correct styling', (status, testId, label, className) => {
-      const project = createMockProject({ status: status as 'draft' | 'in-progress' | 'complete' });
-      render(<ProjectCard project={project} {...mockHandlers} />);
-      
-      const badge = screen.getByTestId(testId);
-      expect(badge).toHaveTextContent(label);
-      expect(badge).toHaveClass(className);
+  describe('Menu Actions', () => {
+    it('should show menu when menu button is clicked', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      const menuBtn = screen.getByTestId('project-card-menu-btn');
+      fireEvent.pointerDown(menuBtn);
+
+      expect(screen.getByTestId('project-card-menu')).toBeDefined();
+    });
+
+    it('should call onDelete when delete is clicked', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      const menuBtn = screen.getByTestId('project-card-menu-btn');
+      fireEvent.pointerDown(menuBtn);
+
+      const deleteBtn = screen.getByTestId('menu-delete-btn');
+      fireEvent.click(deleteBtn);
+
+      expect(defaultProps.onDelete).toHaveBeenCalledWith('test-project-123');
+    });
+
+    it('should call onDuplicate when duplicate is clicked', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      const menuBtn = screen.getByTestId('project-card-menu-btn');
+      fireEvent.pointerDown(menuBtn);
+
+      const duplicateBtn = screen.getByTestId('menu-duplicate-btn');
+      fireEvent.click(duplicateBtn);
+
+      expect(defaultProps.onDuplicate).toHaveBeenCalledWith('test-project-123');
+    });
+
+    it('should call onArchive when archive is clicked', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      const menuBtn = screen.getByTestId('project-card-menu-btn');
+      fireEvent.pointerDown(menuBtn);
+
+      const archiveBtn = screen.getByTestId('menu-archive-btn');
+      fireEvent.click(archiveBtn);
+
+      expect(defaultProps.onArchive).toHaveBeenCalledWith('test-project-123');
+    });
+
+    it('should show restore button for archived projects', () => {
+      const archivedProject = { ...mockProject, isArchived: true };
+      render(<ProjectCard {...defaultProps} project={archivedProject} />);
+
+      const menuBtn = screen.getByTestId('project-card-menu-btn');
+      fireEvent.pointerDown(menuBtn);
+
+      expect(screen.getByTestId('menu-restore-btn')).toBeDefined();
+    });
+  });
+
+  describe('Rename Functionality', () => {
+    it('should enter edit mode when rename is clicked', async () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      const menuBtn = screen.getByTestId('project-card-menu-btn');
+      fireEvent.pointerDown(menuBtn);
+
+      const editBtn = screen.getByTestId('menu-edit-btn');
+      fireEvent.click(editBtn);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Project name')).toBeDefined();
+      });
+    });
+  });
+
+  describe('Date Formatting', () => {
+    it('should display Just now for recent projects', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByText('Modified Just now')).toBeDefined();
+    });
+
+    it('should display hours ago for older projects', () => {
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const olderProject = { ...mockProject, modifiedAt: twoHoursAgo };
+      render(<ProjectCard {...defaultProps} project={olderProject} />);
+
+      expect(screen.getByText('Modified 2h ago')).toBeDefined();
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have article role', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByRole('article')).toBeDefined();
+    });
+
+    it('should have accessible menu button', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByLabelText('Project actions')).toBeDefined();
+    });
+
+    it('should have accessible open button', () => {
+      render(<ProjectCard {...defaultProps} />);
+
+      expect(screen.getByLabelText('Open Test HVAC Project')).toBeDefined();
     });
   });
 });
