@@ -1,0 +1,61 @@
+name: Chromatic Visual Regression Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+
+jobs:
+  chromatic:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full git history required for Chromatic
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: hvac-design-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: hvac-design-app
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: hvac-design-app
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Chromatic
+        id: chromatic
+        working-directory: hvac-design-app
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: |
+          npx chromatic --playwright --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --exit-zero-on-changes | tee chromatic-output.txt
+          # Extract build URL from output
+          BUILD_URL=$(grep -oP 'View your Storybook at \K.+' chromatic-output.txt || echo '')
+          echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
+
+      - name: Post Chromatic results
+        if: always() && github.event_name == 'pull_request' && steps.chromatic.outputs.build_url != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildUrl = '${{ steps.chromatic.outputs.build_url }}';
+            if (buildUrl) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `🎨 Chromatic Build: ${buildUrl}\n\nReview visual changes and approve if they match design intent.`
+              });
+            }
