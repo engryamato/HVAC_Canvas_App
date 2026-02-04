@@ -7,6 +7,7 @@ import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import type { Entity } from '@/core/schema';
+import { ZOOM_TO_SELECTION_PADDING } from '@/core/constants/viewport';
 import {
   copySelectionToClipboard,
   cutSelectionToClipboard,
@@ -30,13 +31,13 @@ interface ShortcutOptions {
 }
 
 
-// Tool shortcut mappings
+// Tool shortcut mappings (removed 'f' since it's now zoom-to-selection)
 const TOOL_SHORTCUTS: Record<string, ToolType> = {
   v: 'select',
   r: 'room',
   d: 'duct',
   e: 'equipment',
-  f: 'fitting',
+  // 'f' removed - now used for zoom-to-selection
   n: 'note',
 };
 
@@ -114,6 +115,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         return;
       }
 
+      // Ctrl+1: Fit to screen
       if (ctrlOrMeta && key === '1') {
         event.preventDefault();
         const { fitToContent } = useViewportStore.getState();
@@ -146,6 +148,15 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         return;
       }
 
+      // Ctrl+0: Reset zoom to 100% (keep pan position)
+      if (ctrlOrMeta && key === '0') {
+        event.preventDefault();
+        useViewportStore.getState().zoomTo(1);
+        options.onZoomFit?.();
+        return;
+      }
+
+      // Ctrl+2: Zoom to selection (same as F key)
       if (ctrlOrMeta && key === '2') {
         event.preventDefault();
         const selectedIds = useSelectionStore.getState().selectedIds;
@@ -157,6 +168,11 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         const entities = selectedIds
           .map((id) => useEntityStore.getState().byId[id])
           .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
+
+        if (entities.length === 0) {
+          options.onZoomToSelection?.({ success: false, message: 'No valid entities' });
+          return;
+        }
 
         const bounds = entities.reduce(
           (acc, entity) => {
@@ -172,17 +188,37 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
           { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
         );
 
+        // Apply 10% padding to bounds before zoom
+        const boundsWidth = bounds.maxX - bounds.minX;
+        const boundsHeight = bounds.maxY - bounds.minY;
+        const paddingX = boundsWidth * ZOOM_TO_SELECTION_PADDING;
+        const paddingY = boundsHeight * ZOOM_TO_SELECTION_PADDING;
+
         useViewportStore.getState().zoomToSelection({
-          x: bounds.minX,
-          y: bounds.minY,
-          width: bounds.maxX - bounds.minX,
-          height: bounds.maxY - bounds.minY,
+          x: bounds.minX - paddingX / 2,
+          y: bounds.minY - paddingY / 2,
+          width: boundsWidth + paddingX,
+          height: boundsHeight + paddingY,
         });
 
         options.onZoomToSelection?.({ success: true });
         return;
       }
 
+      // Ctrl+Plus/Minus: Zoom in/out
+      if (ctrlOrMeta && (key === '+' || key === '=')) {
+        event.preventDefault();
+        useViewportStore.getState().zoomIn();
+        options.onZoomIn?.();
+        return;
+      }
+
+      if (ctrlOrMeta && key === '-') {
+        event.preventDefault();
+        useViewportStore.getState().zoomOut();
+        options.onZoomOut?.();
+        return;
+      }
 
       // Undo: Ctrl+Z
       if (ctrlOrMeta && key === 'z' && !event.shiftKey) {
@@ -282,13 +318,61 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
           return;
         }
 
+        // F key: Zoom to selection (with 10% padding)
+        if (key === 'f') {
+          const selectedIds = useSelectionStore.getState().selectedIds;
+          if (selectedIds.length === 0) {
+            options.onZoomToSelection?.({ success: false, message: 'No selection' });
+            return;
+          }
+
+          const entities = selectedIds
+            .map((id) => useEntityStore.getState().byId[id])
+            .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
+
+          if (entities.length === 0) {
+            options.onZoomToSelection?.({ success: false, message: 'No valid entities' });
+            return;
+          }
+
+          const bounds = entities.reduce(
+            (acc, entity) => {
+              const { x, y } = entity.transform;
+              const { width, height } = getEntityDimensions(entity);
+              return {
+                minX: Math.min(acc.minX, x),
+                minY: Math.min(acc.minY, y),
+                maxX: Math.max(acc.maxX, x + width),
+                maxY: Math.max(acc.maxY, y + height),
+              };
+            },
+            { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+          );
+
+          // Apply 10% padding to bounds before zoom
+          const boundsWidth = bounds.maxX - bounds.minX;
+          const boundsHeight = bounds.maxY - bounds.minY;
+          const paddingX = boundsWidth * ZOOM_TO_SELECTION_PADDING;
+          const paddingY = boundsHeight * ZOOM_TO_SELECTION_PADDING;
+
+          useViewportStore.getState().zoomToSelection({
+            x: bounds.minX - paddingX / 2,
+            y: bounds.minY - paddingY / 2,
+            width: boundsWidth + paddingX,
+            height: boundsHeight + paddingY,
+          });
+
+          options.onZoomToSelection?.({ success: true });
+          return;
+        }
+
         // Grid toggle: G
         if (key === 'g') {
           useViewportStore.getState().toggleGrid();
           return;
         }
 
-        // Zoom in: + or =
+        // Zoom in: + or = (without modifier for quick access)
         if (key === '+' || key === '=') {
           useViewportStore.getState().zoomIn();
           options.onZoomIn?.();
@@ -302,7 +386,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
           return;
         }
 
-        // Reset view: 0
+        // Reset view: 0 (without modifier resets both zoom and pan)
         if (key === '0') {
           useViewportStore.getState().resetView();
           options.onZoomFit?.();
@@ -317,7 +401,7 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         }
       }
     },
-    [options, clearSelection]
+    [options, clearSelection, isEnabled]
   );
 
   useEffect(() => {

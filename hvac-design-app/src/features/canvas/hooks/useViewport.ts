@@ -11,6 +11,7 @@ interface UseViewportOptions {
  * Hook to handle pan and zoom interactions on the canvas.
  * - Middle mouse drag or Space + left drag for panning
  * - Mouse wheel for zooming (centered on cursor)
+ * - Cursor states: grab when space pressed, grabbing during pan
  */
 export function useViewport({ canvasRef }: UseViewportOptions) {
   const { pan, zoomIn, zoomOut } = useViewportStore();
@@ -68,13 +69,21 @@ export function useViewport({ canvasRef }: UseViewportOptions) {
    * Handle mouse down for pan start
    */
   const handleMouseDown = useCallback((e: MouseEvent) => {
+    const canvas = canvasRef.current;
+    
     // Middle mouse button or Space + left click
     if (e.button === 1 || (e.button === 0 && isSpacePressed.current)) {
       isPanning.current = true;
       lastPanPosition.current = { x: e.clientX, y: e.clientY };
+      
+      // Change cursor to grabbing during pan
+      if (canvas) {
+        canvas.style.cursor = 'grabbing';
+      }
+      
       e.preventDefault();
     }
-  }, []);
+  }, [canvasRef]);
 
   /**
    * Handle mouse move for pan
@@ -99,17 +108,24 @@ export function useViewport({ canvasRef }: UseViewportOptions) {
    * Handle mouse up for pan end
    */
   const handleMouseUp = useCallback(() => {
+    const wasPanning = isPanning.current;
     isPanning.current = false;
-  }, []);
+    
+    const canvas = canvasRef.current;
+    if (canvas && wasPanning) {
+      // Restore cursor: grab if space still pressed, default otherwise
+      canvas.style.cursor = isSpacePressed.current ? 'grab' : 'default';
+    }
+  }, [canvasRef]);
 
   /**
-   * Handle key down for space key
+   * Handle key down for space key (pan mode)
    */
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.code === 'Space' && !e.repeat) {
         isSpacePressed.current = true;
-        // Change cursor to grab
+        // Change cursor to grab when space bar pressed
         if (canvasRef.current) {
           canvasRef.current.style.cursor = 'grab';
         }
@@ -125,8 +141,8 @@ export function useViewport({ canvasRef }: UseViewportOptions) {
     (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         isSpacePressed.current = false;
-        // Reset cursor
-        if (canvasRef.current) {
+        // Reset cursor to default when space released
+        if (canvasRef.current && !isPanning.current) {
           canvasRef.current.style.cursor = 'default';
         }
       }

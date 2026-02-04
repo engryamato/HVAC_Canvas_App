@@ -25,7 +25,7 @@ const createMockRoom = (id: string, name: string): Room => ({
     name,
     width: 120,
     length: 120,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'office',
     airChangesPerHour: 4,
   },
@@ -227,8 +227,7 @@ describe('Toolbar - Undo/Redo Integration', () => {
       fireEvent.keyDown(window, { key: 'e' });
       expect(useToolStore.getState().currentTool).toBe('equipment');
 
-      fireEvent.keyDown(window, { key: 'f' });
-      expect(useToolStore.getState().currentTool).toBe('fitting');
+      // Note: 'f' key is now used for zoom-to-selection, not fitting tool
 
       fireEvent.keyDown(window, { key: 'n' });
       expect(useToolStore.getState().currentTool).toBe('note');

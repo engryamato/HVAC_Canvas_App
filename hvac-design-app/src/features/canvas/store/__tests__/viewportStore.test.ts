@@ -1,10 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { useViewportStore } from '../viewportStore';
 import { MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '@/core/constants/viewport';
 
 describe('ViewportStore', () => {
   beforeEach(() => {
     useViewportStore.getState().resetView();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('pan', () => {
@@ -36,23 +41,23 @@ describe('ViewportStore', () => {
 
   describe('zoomTo', () => {
     it('should set zoom level', () => {
-      useViewportStore.getState().zoomTo(2);
+      useViewportStore.getState().zoomTo(2, undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBe(2);
     });
 
     it('should clamp zoom to minimum', () => {
-      useViewportStore.getState().zoomTo(0.01);
+      useViewportStore.getState().zoomTo(0.01, undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBe(MIN_ZOOM);
     });
 
     it('should clamp zoom to maximum', () => {
-      useViewportStore.getState().zoomTo(10);
+      useViewportStore.getState().zoomTo(10, undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBe(MAX_ZOOM);
     });
 
     it('should adjust pan when zooming toward center point', () => {
       useViewportStore.getState().setPan(0, 0);
-      useViewportStore.getState().zoomTo(2, 100, 100);
+      useViewportStore.getState().zoomTo(2, 100, 100, { animate: false });
       const state = useViewportStore.getState();
       // Pan should be adjusted to keep center point stable
       expect(state.panX).toBe(-100);
@@ -63,13 +68,13 @@ describe('ViewportStore', () => {
   describe('zoomIn', () => {
     it('should increase zoom by step', () => {
       const initialZoom = useViewportStore.getState().zoom;
-      useViewportStore.getState().zoomIn();
+      useViewportStore.getState().zoomIn(undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBeCloseTo(initialZoom + ZOOM_STEP);
     });
 
     it('should not exceed maximum zoom', () => {
-      useViewportStore.getState().zoomTo(MAX_ZOOM);
-      useViewportStore.getState().zoomIn();
+      useViewportStore.getState().zoomTo(MAX_ZOOM, undefined, undefined, { animate: false });
+      useViewportStore.getState().zoomIn(undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBe(MAX_ZOOM);
     });
   });
@@ -77,13 +82,13 @@ describe('ViewportStore', () => {
   describe('zoomOut', () => {
     it('should decrease zoom by step', () => {
       const initialZoom = useViewportStore.getState().zoom;
-      useViewportStore.getState().zoomOut();
+      useViewportStore.getState().zoomOut(undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBeCloseTo(initialZoom - ZOOM_STEP);
     });
 
     it('should not go below minimum zoom', () => {
-      useViewportStore.getState().zoomTo(MIN_ZOOM);
-      useViewportStore.getState().zoomOut();
+      useViewportStore.getState().zoomTo(MIN_ZOOM, undefined, undefined, { animate: false });
+      useViewportStore.getState().zoomOut(undefined, undefined, { animate: false });
       expect(useViewportStore.getState().zoom).toBe(MIN_ZOOM);
     });
   });
@@ -92,7 +97,7 @@ describe('ViewportStore', () => {
     it('should center on bounds and reset zoom', () => {
       const bounds = { x: 100, y: 100, width: 200, height: 200 };
       const canvasDimensions = { width: 400, height: 400 };
-      useViewportStore.getState().fitToContent(bounds, canvasDimensions);
+      useViewportStore.getState().fitToContent(bounds, canvasDimensions, { animate: false });
       const state = useViewportStore.getState();
       expect(state.panX).toBe(-100); // canvasWidth/2 - centerX * zoom
       expect(state.panY).toBe(-100); // canvasHeight/2 - centerY * zoom
@@ -103,12 +108,15 @@ describe('ViewportStore', () => {
   describe('resetView', () => {
     it('should reset to initial state', () => {
       useViewportStore.getState().pan(100, 100);
-      useViewportStore.getState().zoomTo(2);
+      useViewportStore.getState().zoomTo(2, undefined, undefined, { animate: false });
+      
       useViewportStore.getState().resetView();
+      
       const state = useViewportStore.getState();
       expect(state.panX).toBe(0);
       expect(state.panY).toBe(0);
       expect(state.zoom).toBe(1);
+      expect(state.isZooming).toBe(false);
     });
   });
 
