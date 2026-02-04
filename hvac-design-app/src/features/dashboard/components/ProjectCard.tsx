@@ -259,7 +259,16 @@ export function ProjectCard({
             {/* Status Badge Row */}
             <div className="flex flex-wrap items-center gap-2 mb-4">
                 {project.isArchived && (
-                    <span className="badge badge-amber">Archived</span>
+                    <span className="badge badge-amber" data-testid="badge-archived">Archived</span>
+                )}
+                {!project.isArchived && project.status === 'in-progress' && (
+                    <span className="badge badge-blue" data-testid="badge-in-progress">In Progress</span>
+                )}
+                {!project.isArchived && project.status === 'complete' && (
+                    <span className="badge badge-green" data-testid="badge-complete">Complete</span>
+                )}
+                {!project.isArchived && (!project.status || project.status === 'draft') && (
+                    <span className="badge badge-slate" data-testid="badge-draft">Draft</span>
                 )}
                 {project.entityCount !== undefined && project.entityCount > 0 && (
                     <span className="badge badge-slate">{project.entityCount} items</span>
