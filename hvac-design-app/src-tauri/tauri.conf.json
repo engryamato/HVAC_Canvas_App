@@ -1,54 +1,14 @@
 {
+  "productName": "SizeWise HVAC Canvas",
+  "version": "0.1.0",
+  "identifier": "com.sizewise.hvac-canvas",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:3000",
-    "distDir": "../out"
+    "devUrl": "http://localhost:3000",
+    "frontendDist": "../out"
   },
-  "package": {
-    "productName": "SizeWise HVAC Canvas",
-    "version": "0.1.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "fs": {
-        "all": true,
-        "scope": ["$DOCUMENT/*", "$HOME/Documents/HVAC Projects/*"]
-      },
-      "dialog": {
-        "all": true
-      },
-      "path": {
-        "all": true
-      },
-      "window": {
-        "all": false,
-        "close": true,
-        "hide": true,
-        "show": true,
-        "maximize": true,
-        "minimize": true,
-        "unmaximize": true,
-        "unminimize": true,
-        "startDragging": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.sizewise.hvac-canvas",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
-    },
-    "security": {
-      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; script-src 'self'"
-    },
+  "app": {
     "windows": [
       {
         "title": "SizeWise HVAC Canvas",
@@ -60,6 +20,20 @@
         "resizable": true,
         "fullscreen": false
       }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ]
   }
 }

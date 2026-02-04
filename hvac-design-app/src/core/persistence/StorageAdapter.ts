@@ -1,4 +1,4 @@
-import { ProjectFile, ProjectMetadata } from '../schema/ProjectFileSchema';
+import type { ProjectFile, ProjectMetadata } from '../schema/project-file.schema';
 import {
   SaveResult,
   LoadResult,

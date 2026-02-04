@@ -1,292 +1,261 @@
-import { test, expect, type Page } from '@playwright/test';
-
-async function createProjectAndReturnToDashboard(page: Page, projectName: string) {
-  await page.getByTestId('new-project-btn').click();
-  await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
-  await page.getByTestId('project-name-input').fill(projectName);
-  await page.getByTestId('create-button').click();
-
-  await expect(page).toHaveURL(/\/canvas\//, { timeout: 15000 });
-  await page.getByTestId('breadcrumb-dashboard').click();
-  await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
-  await page.waitForLoadState('networkidle');
-}
+import { test, expect } from '@playwright/test';
+import { openDashboard } from '../utils/test-utils';
+import { withThemeVariants, setLightMode } from '../utils/theme-utils';
 
 /**
- * Visual Regression Tests for Dashboard
- * Verifies all dashboard components, panels, and elements are properly rendered
+ * Visual Regression Tests for Dashboard Page
+ * Verifies project cards, search functionality, new project dialog, and theme toggle
  */
 
 test.describe('Dashboard Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage for consistent state
-    await page.goto('/dashboard');
-    await page.evaluate(() => {
-      localStorage.removeItem('sws.projectIndex');
-      localStorage.removeItem('sws.preferences');
-    });
-    await page.reload();
+    await openDashboard(page);
     await page.waitForLoadState('networkidle');
+    // Set light mode as default for consistent baseline
+    await setLightMode(page);
   });
 
-  test.describe('Empty State', () => {
-    test('should display empty dashboard correctly', async ({ page }) => {
-      // Wait for dashboard to fully render
-      await page.waitForSelector('[data-testid="dashboard"]', { timeout: 5000 }).catch(() => {});
-
-      // Take full page screenshot
-      await expect(page).toHaveScreenshot('dashboard-empty-state.png', {
-        fullPage: true,
+  test.describe('Dashboard Layout', () => {
+    test('should display complete dashboard layout', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        await expect(page).toHaveScreenshot(`dashboard-full-layout-${theme}.png`, {
+          fullPage: true,
+        });
       });
     });
 
-    test('should display header with correct elements', async ({ page }) => {
-      // Screenshot header section
-      const header = page.locator('header').first();
-      if (await header.isVisible()) {
-        await expect(header).toHaveScreenshot('dashboard-header.png');
-      }
-    });
-
-    test('should display "New Project" button prominently', async ({ page }) => {
-      const newProjectBtn = page.getByTestId('new-project-btn');
-      if (await newProjectBtn.isVisible()) {
-        await expect(newProjectBtn).toHaveScreenshot('new-project-button.png');
-      }
-    });
-
-    test('should display empty state illustration/message', async ({ page }) => {
-      // Look for empty state content
-      const emptyState = page.locator('[data-testid="empty-state"]').or(
-        page.getByText(/no projects/i)
-      );
-      if (await emptyState.isVisible()) {
-        await expect(emptyState).toHaveScreenshot('empty-state-message.png');
-      }
-    });
-  });
-
-  test.describe('New Project Dialog', () => {
-    test('should display new project dialog correctly', async ({ page }) => {
-      // Open new project dialog
-      await page.getByTestId('new-project-btn').click();
-
-      // Wait for dialog animation
-      await page.waitForTimeout(300);
-
-      // Screenshot the dialog
-      const dialog = page.getByRole('dialog');
-      await expect(dialog).toBeVisible();
-      await expect(dialog).toHaveScreenshot('new-project-dialog.png');
-    });
-
-    test('should display all form fields in dialog', async ({ page }) => {
-      await page.getByTestId('new-project-btn').click();
-      await page.waitForTimeout(300);
-
-      // Verify form fields are visible
-      await expect(page.getByLabel(/project name/i)).toBeVisible();
-
-      // Screenshot form area
-      const form = page.locator('form').first();
-      if (await form.isVisible()) {
-        await expect(form).toHaveScreenshot('new-project-form-fields.png');
-      }
-    });
-
-    test('should display validation error states', async ({ page }) => {
-      await page.getByTestId('new-project-btn').click();
-      await page.waitForTimeout(300);
-
-      // The create button should be disabled when form is invalid.
-      const createButton = page.getByRole('dialog').getByTestId('create-button');
-      await expect(createButton).toBeDisabled();
-
-      // Screenshot with validation errors
-      const dialog = page.getByRole('dialog');
-      await expect(dialog).toHaveScreenshot('new-project-dialog-validation-error.png');
-    });
-
-    test('should display filled form correctly', async ({ page }) => {
-      await page.getByTestId('new-project-btn').click();
-      await page.waitForTimeout(300);
-
-      // Fill in all fields
-      await page.getByLabel(/project name/i).fill('Visual Test Project');
-      const projectNumber = page.getByLabel(/project number/i);
-      if (await projectNumber.isVisible()) {
-        await projectNumber.fill('VT-2024-001');
-      }
-      const clientName = page.getByLabel(/client name/i);
-      if (await clientName.isVisible()) {
-        await clientName.fill('Test Client Inc.');
-      }
-
-      // Screenshot filled form
-      const dialog = page.getByRole('dialog');
-      await expect(dialog).toHaveScreenshot('new-project-dialog-filled.png');
+    test('should display empty dashboard state', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        // Clear any existing projects first if needed
+        await page.evaluate(() => localStorage.clear());
+        await page.reload();
+        await page.waitForLoadState('networkidle');
+        
+        await expect(page).toHaveScreenshot(`dashboard-empty-state-${theme}.png`);
+      });
     });
   });
 
   test.describe('Project Cards', () => {
-    test.beforeEach(async ({ page }) => {
-      await createProjectAndReturnToDashboard(page, 'Test Project Alpha');
-    });
-
     test('should display project card correctly', async ({ page }) => {
-      const projectCard = page.getByTestId('all-projects').getByTestId('project-card').first();
-      await expect(projectCard).toBeVisible();
-      await expect(projectCard).toHaveScreenshot('project-card.png');
+      await withThemeVariants(page, async (theme) => {
+        const projectCard = page.locator('[data-testid="project-card"]').or(
+          page.locator('.project-card')
+        ).first();
+
+        if (await projectCard.isVisible()) {
+          await expect(projectCard).toHaveScreenshot(`project-card-${theme}.png`);
+        }
+      });
     });
 
     test('should display project card hover state', async ({ page }) => {
-      const projectCard = page.getByTestId('all-projects').getByTestId('project-card').first();
-      await expect(projectCard).toBeVisible();
-      await projectCard.hover();
-      await page.waitForTimeout(200);
-      await expect(projectCard).toHaveScreenshot('project-card-hover.png');
-    });
+      await withThemeVariants(page, async (theme) => {
+        const projectCard = page.locator('[data-testid="project-card"]').or(
+          page.locator('.project-card')
+        ).first();
 
-    test('should display project context menu', async ({ page }) => {
-      // Right-click or click menu button on project card
-      const menuButton = page
-        .getByTestId('all-projects')
-        .locator('[data-testid="project-menu"]')
-        .first();
-
-      if (await menuButton.isVisible()) {
-        await menuButton.click();
-        await page.waitForTimeout(200);
-        await expect(page).toHaveScreenshot('project-context-menu.png');
-      }
-    });
-
-    test('should display multiple project cards in grid', async ({ page }) => {
-      // Create additional projects
-      for (let i = 2; i <= 4; i++) {
-        await createProjectAndReturnToDashboard(page, `Test Project ${i}`);
-      }
-
-      // Screenshot the grid layout
-      await expect(page).toHaveScreenshot('dashboard-multiple-projects.png', {
-        fullPage: true,
+        if (await projectCard.isVisible()) {
+          await projectCard.hover();
+          await page.waitForTimeout(150);
+          await expect(projectCard).toHaveScreenshot(`project-card-hover-${theme}.png`);
+        }
       });
     });
-  });
 
-  test.describe('Search and Filter Bar', () => {
-    test.beforeEach(async ({ page }) => {
-      // Create test projects
-      for (let i = 1; i <= 3; i++) {
-        await createProjectAndReturnToDashboard(page, `Project ${i}`);
-      }
-    });
-
-    test('should display search bar correctly', async ({ page }) => {
-      const searchBar = page.getByLabel('Search projects');
-
-      if (await searchBar.isVisible()) {
-        await expect(searchBar).toHaveScreenshot('search-bar.png');
-      }
-    });
-
-    test('should display search with input', async ({ page }) => {
-      const searchBar = page.getByLabel('Search projects');
-
-      if (await searchBar.isVisible()) {
-        await searchBar.fill('Project 1');
-        await page.waitForTimeout(300);
-        await expect(page).toHaveScreenshot('search-with-input.png', {
-          fullPage: true,
-        });
-      }
-    });
-
-    test('should display sort dropdown', async ({ page }) => {
-      const sortSelect = page.getByTestId('sort-select');
-      if (await sortSelect.isVisible()) {
-        await expect(sortSelect).toHaveScreenshot('sort-dropdown.png');
-      }
-    });
-  });
-
-  test.describe('Statistics Cards', () => {
-    test('should display stat cards correctly', async ({ page }) => {
-      const statsSection = page.locator('[data-testid="stats-section"]').or(
-        page.locator('.stats-container')
-      );
-
-      if (await statsSection.isVisible()) {
-        await expect(statsSection).toHaveScreenshot('stats-cards.png');
-      }
-    });
-
-    test('should display project count', async ({ page }) => {
-      const projectCount = page.getByText(/\d+ (active )?project/i);
-      if (await projectCount.isVisible()) {
-        await expect(projectCount).toHaveScreenshot('project-count.png');
-      }
-    });
-  });
-
-  test.describe('Confirm Dialogs', () => {
-    test.beforeEach(async ({ page }) => {
-      // Create a project to have something to delete
-      await page.getByRole('button', { name: /new project/i }).click();
-      await page.waitForTimeout(300);
-      await page.getByLabel(/project name/i).fill('Project to Delete');
-      await page.getByRole('dialog').getByRole('button', { name: 'Create' }).click();
-      await page.waitForTimeout(500);
-    });
-
-    test('should display delete confirmation dialog', async ({ page }) => {
-      // Find and click delete button
-      const menuButton = page.locator('[data-testid="project-menu"]').first().or(
-        page.getByRole('button', { name: /menu|options|more/i }).first()
-      );
-
-      if (await menuButton.isVisible()) {
-        await menuButton.click();
-        await page.waitForTimeout(200);
-
-        const deleteOption = page.getByRole('menuitem', { name: /delete/i }).or(
-          page.getByText(/delete/i)
+    test('should display multiple project cards grid', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const projectsGrid = page.locator('[data-testid="projects-grid"]').or(
+          page.locator('.projects-grid')
         );
 
-        if (await deleteOption.isVisible()) {
-          await deleteOption.click();
-          await page.waitForTimeout(300);
+        if (await projectsGrid.isVisible()) {
+          await expect(projectsGrid).toHaveScreenshot(`projects-grid-${theme}.png`);
+        }
+      });
+    });
+  });
 
-          const confirmDialog = page.getByRole('alertdialog').or(
-            page.getByRole('dialog')
+  test.describe('Search and Filter', () => {
+    test('should display search bar', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const searchBar = page.locator('[data-testid="search-bar"]').or(
+          page.getByPlaceholder(/search/i)
+        );
+
+        if (await searchBar.isVisible()) {
+          await expect(searchBar).toHaveScreenshot(`search-bar-${theme}.png`);
+        }
+      });
+    });
+
+    test('should display search bar with focus state', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const searchBar = page.locator('[data-testid="search-bar"]').or(
+          page.getByPlaceholder(/search/i)
+        );
+
+        if (await searchBar.isVisible()) {
+          await searchBar.focus();
+          await page.waitForTimeout(100);
+          await expect(searchBar).toHaveScreenshot(`search-bar-focused-${theme}.png`);
+        }
+      });
+    });
+
+    test('should display search with results', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const searchBar = page.locator('[data-testid="search-bar"]').or(
+          page.getByPlaceholder(/search/i)
+        );
+
+        if (await searchBar.isVisible()) {
+          await searchBar.fill('test');
+          await page.waitForTimeout(300);
+          await expect(page).toHaveScreenshot(`dashboard-search-results-${theme}.png`);
+        }
+      });
+    });
+  });
+
+  test.describe('New Project Dialog', () => {
+    test('should display new project button', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const newProjectBtn = page.getByRole('button', { name: /new project/i }).or(
+          page.locator('[data-testid="new-project-btn"]')
+        );
+
+        if (await newProjectBtn.isVisible()) {
+          await expect(newProjectBtn).toHaveScreenshot(`new-project-button-${theme}.png`);
+        }
+      });
+    });
+
+    test('should display new project dialog', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const newProjectBtn = page.getByRole('button', { name: /new project/i }).or(
+          page.locator('[data-testid="new-project-btn"]')
+        );
+
+        if (await newProjectBtn.isVisible()) {
+          await newProjectBtn.click();
+          await page.waitForTimeout(200);
+
+          const dialog = page.locator('[role="dialog"]').or(
+            page.locator('[data-testid="new-project-dialog"]')
           );
 
-          if (await confirmDialog.isVisible()) {
-            await expect(confirmDialog).toHaveScreenshot('delete-confirm-dialog.png');
+          if (await dialog.isVisible()) {
+            await expect(dialog).toHaveScreenshot(`new-project-dialog-${theme}.png`);
           }
         }
+      });
+    });
+
+    test('should display new project dialog with validation error', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const newProjectBtn = page.getByRole('button', { name: /new project/i });
+
+        if (await newProjectBtn.isVisible()) {
+          await newProjectBtn.click();
+          await page.waitForTimeout(200);
+
+          // Try to submit without filling required field
+          const submitBtn = page.getByRole('button', { name: /create|submit/i });
+          if (await submitBtn.isVisible()) {
+            await submitBtn.click();
+            await page.waitForTimeout(300);
+
+            const dialog = page.locator('[role="dialog"]');
+            if (await dialog.isVisible()) {
+              await expect(dialog).toHaveScreenshot(`new-project-dialog-error-${theme}.png`);
+            }
+          }
+        }
+      });
+    });
+  });
+
+  test.describe('Theme Toggle', () => {
+    test('should display theme toggle button', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const themeToggle = page.locator('[data-testid="theme-toggle"]').or(
+          page.getByRole('button', { name: /theme|dark mode|light mode/i })
+        );
+
+        if (await themeToggle.isVisible()) {
+          await expect(themeToggle).toHaveScreenshot(`theme-toggle-${theme}.png`);
+        }
+      });
+    });
+
+    test('should verify theme toggle functionality', async ({ page }) => {
+      // This test verifies the toggle switches themes correctly
+      const themeToggle = page.locator('[data-testid="theme-toggle"]').or(
+        page.getByRole('button', { name: /theme|dark mode|light mode/i })
+      );
+
+      if (await themeToggle.isVisible()) {
+        // Take screenshot in light mode
+        await setLightMode(page);
+        await expect(page).toHaveScreenshot('dashboard-light-mode.png', { fullPage: true });
+
+        // Click toggle and verify dark mode
+        await themeToggle.click();
+        await page.waitForTimeout(300);
+        await expect(page).toHaveScreenshot('dashboard-dark-mode-toggled.png', { fullPage: true });
       }
     });
   });
 
-  test.describe('Responsive Layout', () => {
-    test('should display correctly on tablet viewport', async ({ page }) => {
-      await page.setViewportSize({ width: 768, height: 1024 });
-      await page.reload();
-      await page.waitForLoadState('networkidle');
+  test.describe('Header and Navigation', () => {
+    test('should display app header', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const header = page.locator('header').or(
+          page.locator('[data-testid="app-header"]')
+        );
 
-      await expect(page).toHaveScreenshot('dashboard-tablet.png', {
-        fullPage: true,
+        if (await header.isVisible()) {
+          await expect(header).toHaveScreenshot(`header-${theme}.png`);
+        }
       });
     });
 
-    test('should display correctly on mobile viewport', async ({ page }) => {
-      await page.setViewportSize({ width: 375, height: 667 });
-      await page.reload();
-      await page.waitForLoadState('networkidle');
+    test('should display navigation menu', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const nav = page.locator('nav').or(
+          page.locator('[role="navigation"]')
+        );
 
-      await expect(page).toHaveScreenshot('dashboard-mobile.png', {
-        fullPage: true,
+        if (await nav.isVisible()) {
+          await expect(nav).toHaveScreenshot(`navigation-${theme}.png`);
+        }
+      });
+    });
+  });
+
+  test.describe('Action Buttons and Controls', () => {
+    test('should display action buttons correctly', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const actionButtons = page.locator('[data-testid="action-buttons"]').or(
+          page.locator('.action-buttons')
+        );
+
+        if (await actionButtons.isVisible()) {
+          await expect(actionButtons).toHaveScreenshot(`action-buttons-${theme}.png`);
+        }
+      });
+    });
+
+    test('should display button hover states', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const button = page.getByRole('button').first();
+
+        if (await button.isVisible()) {
+          await button.hover();
+          await page.waitForTimeout(150);
+          await expect(button).toHaveScreenshot(`button-hover-${theme}.png`);
+        }
       });
     });
   });

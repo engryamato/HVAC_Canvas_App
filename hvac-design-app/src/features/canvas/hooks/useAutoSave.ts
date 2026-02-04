@@ -125,8 +125,23 @@ export function buildProjectFileFromStores(): ProjectFile | null {
     projectName: projectStore.projectDetails.projectName,
     projectNumber: projectStore.projectDetails.projectNumber || undefined,
     clientName: projectStore.projectDetails.clientName || undefined,
+    location: projectStore.projectDetails.location || undefined,
+    scope: projectStore.projectDetails.scope ?? {
+      details: [],
+      materials: [],
+      projectType: 'Commercial',
+    },
+    siteConditions: projectStore.projectDetails.siteConditions ?? {
+      elevation: '0',
+      outdoorTemp: '70',
+      indoorTemp: '70',
+      windSpeed: '0',
+      humidity: '50',
+      localCodes: '',
+    },
     createdAt: projectStore.projectDetails.createdAt,
     modifiedAt: new Date().toISOString(),
+    isArchived: false,
     entities: {
       byId: entityStore.byId,
       allIds: entityStore.allIds,

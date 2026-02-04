@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -82,4 +82,4 @@ export function ConfirmDialog({
   );
 }
 
-export default ConfirmDialog;
+

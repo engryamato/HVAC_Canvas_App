@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,16 +9,18 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useProjectStore } from '@/stores/useProjectStore';
-import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
-import { useAppStateStore } from '@/stores/useAppStateStore';
+import { useProjectListActions } from '@/features/dashboard/store/projectListStore';
 import { useRouter } from 'next/navigation';
+import { createStorageAdapter } from '@/core/persistence/factory';
+import { createEmptyProject } from '@/core/schema/project-file.schema';
 
 interface NewProjectDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onProjectCreated?: () => void;
 }
 
-export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpenChange }) => {
+export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpenChange, onProjectCreated }) => {
     // Project Details
     const [projectName, setProjectName] = useState('');
     const [projectNumber, setProjectNumber] = useState('');
@@ -48,12 +50,11 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
     const [localCodes, setLocalCodes] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
-    const { addProject } = useProjectStore();
-    const addProjectToList = useProjectListStore((state) => state.addProject);
+    const { addProject } = useProjectStore(); // App state store
+    const { refreshProjects } = useProjectListActions(); // Dashboard list store
     const router = useRouter();
 
     const isValid = projectName.trim().length > 0 && projectName.length <= 100;
-    const isTauri = useAppStateStore((state) => state.isTauri);
 
     // Helper for non-secure contexts (Docker) where crypto.randomUUID might be missing
     const generateId = () => {
@@ -85,136 +86,80 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
             const newId = generateId();
             const now = new Date().toISOString();
 
-            const newProject = {
-                id: newId,
-                name: projectName.trim(),
-                projectNumber: projectNumber.trim() ||null,
-                clientName: clientName.trim() || null,
-                location: location.trim() || null,
-                scope: {
-                    details: scopeDetails,
-                    materials: materials,
-                    projectType: projectType
-                },
-                siteConditions: {
-                    elevation: elevation.trim(),
-                    outdoorTemp: outdoorTemp.trim(),
-                    indoorTemp: indoorTemp.trim(),
-                    windSpeed: windSpeed.trim(),
-                    humidity: humidity.trim(),
-                    localCodes: localCodes.trim()
-                },
-                createdAt: now,
-                modifiedAt: now,
-                entityCount: 0,
-                thumbnailUrl: null,
-                isArchived: false,
+            // Initialize ProjectFile using helper to ensure schema compliance
+            const newProject = createEmptyProject(projectName.trim());
+            newProject.projectId = newId;
+            newProject.createdAt = now;
+            newProject.modifiedAt = now;
+            newProject.isArchived = false;
+
+            // Populate optional fields
+            if (projectNumber.trim()) {newProject.projectNumber = projectNumber.trim();}
+            if (clientName.trim()) {newProject.clientName = clientName.trim();}
+            if (location.trim()) {newProject.location = location.trim();}
+
+            // Populate Scope
+            newProject.scope = {
+                details: scopeDetails,
+                materials: materials,
+                projectType: projectType
             };
 
-            // Environment-aware persistence
-            if (isTauri) {
-                // Tauri Mode: Use native file dialog and save to .sws file
-                const { TauriFileSystem } = await import('@/core/persistence/TauriFileSystem');
-                const { saveProject } = await import('@/core/persistence/projectIO');
-                const { createEmptyProject } = await import('@/core/schema/ProjectFileSchema');
+            // Populate Site Conditions
+            newProject.siteConditions = {
+                elevation: elevation.trim(),
+                outdoorTemp: outdoorTemp.trim(),
+                indoorTemp: indoorTemp.trim(),
+                windSpeed: windSpeed.trim(),
+                humidity: humidity.trim(),
+                localCodes: localCodes.trim()
+            };
 
-                // Show native save dialog
-                const filePath = await TauriFileSystem.saveFileDialog(projectName.trim());
-                
-                if (!filePath) {
-                    // User cancelled the dialog
-                    setIsLoading(false);
-                    return;
-                }
+            // Entity count is 0 for new project
+            
+            // Save using Unified Storage Adapter
+            // This handles filesystem (Tauri) or IndexedDB (Web) automatically
+            const adapter = await createStorageAdapter();
+            const saveResult = await adapter.saveProject(newProject);
 
-                // Create ProjectFile format
-                const projectFile = createEmptyProject(projectName.trim());
-                projectFile.projectId = newId;
-                projectFile.projectNumber = newProject.projectNumber ?? undefined;
-                projectFile.clientName = newProject.clientName ?? undefined;
-                projectFile.location = newProject.location ?? undefined;
-                projectFile.scope = newProject.scope;
-                projectFile.siteConditions = newProject.siteConditions;
-                projectFile.createdAt = now;
-                projectFile.modifiedAt = now;
-                projectFile.isArchived = false;
-
-                // Save to file
-                const saveResult = await saveProject(projectFile, filePath);
-                
-                if (!saveResult.success) {
-                    console.error('[NewProjectDialog] File save failed:', saveResult.error);
-                    alert(`Failed to save project: ${saveResult.error}`);
-                    setIsLoading(false);
-                    return;
-                }
-
-                // Add to project list with filePath
-                const projectListItem = {
-                    projectId: newProject.id,
-                    projectName: newProject.name,
-                    projectNumber: newProject.projectNumber ?? undefined,
-                    clientName: newProject.clientName ?? undefined,
-                    entityCount: newProject.entityCount,
-                    createdAt: newProject.createdAt,
-                    modifiedAt: newProject.modifiedAt,
-                    storagePath: filePath,
-                    isArchived: newProject.isArchived,
-                    filePath: filePath, // Track file path for Tauri
-                };
-
-                addProjectToList(projectListItem);
-
-                // Also save to canvas store
-                addProject(newProject);
-
-            } else {
-                // Web Mode: Use existing localStorage logic
-                addProject(newProject);
-
-                const projectListItem = {
-                    projectId: newProject.id,
-                    projectName: newProject.name,
-                    projectNumber: newProject.projectNumber ?? undefined,
-                    clientName: newProject.clientName ?? undefined,
-                    entityCount: newProject.entityCount,
-                    createdAt: newProject.createdAt,
-                    modifiedAt: newProject.modifiedAt,
-                    storagePath: `project-${newProject.id}`,
-                    isArchived: newProject.isArchived
-                };
-
-                // Manual persistence backup due to test env reliability issues
-                try {
-                    const existing = localStorage.getItem('sws.projectIndex');
-                    const state = existing
-                        ? JSON.parse(existing).state
-                        : { projects: [], recentProjectIds: [], loading: false };
-
-                    state.projects = [projectListItem, ...(state.projects || [])];
-
-                    localStorage.setItem('sws.projectIndex', JSON.stringify({
-                        state,
-                        version: 0
-                    }));
-                    console.log('[NewProjectDialog] Manual save success');
-                } catch (e) {
-                    console.error('[NewProjectDialog] Manual save failed', e);
-                }
-
-                addProjectToList(projectListItem);
+            if (!saveResult.success) {
+                console.error('[NewProjectDialog] Save failed:', saveResult.error);
+                alert(`Failed to save project: ${saveResult.error || 'Unknown error'}`);
+                setIsLoading(false);
+                return;
             }
 
+            // Refresh project list to reflect new project
+            await refreshProjects();
+
+            // Update app state
+            const appProject = {
+                id: newProject.projectId,
+                name: newProject.projectName,
+                projectNumber: newProject.projectNumber || null,
+                clientName: newProject.clientName || null,
+                location: newProject.location || null,
+                scope: newProject.scope,
+                siteConditions: newProject.siteConditions,
+                createdAt: newProject.createdAt,
+                modifiedAt: newProject.modifiedAt,
+                entityCount: 0,
+                thumbnailUrl: null,
+                isArchived: newProject.isArchived,
+            };
+            addProject(appProject);
+            
+            // Notify parent
+            onProjectCreated?.();
+
+            // Navigate to canvas
             onOpenChange(false);
             resetForm();
-            router.push(`/canvas/${newProject.id}`);
+            router.push(`/canvas/${newProject.projectId}`);
+
         } catch (error) {
-            // Log errors in development/test environments for debugging
-            if (process.env.NODE_ENV !== 'production') {
-                console.error('[NewProjectDialog] Failed to create project:', error);
-            }
-            // TODO: In production, implement proper error tracking (e.g., Sentry)
-            // TODO: Show user-friendly error toast notification
+            console.error('[NewProjectDialog] Failed to create project:', error);
+            // TODO: Toast notification
         } finally {
             setIsLoading(false);
         }
@@ -241,8 +186,6 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && isValid && !isLoading) {
-            // Prevent Enter from triggering if inside a specific field if needed, but usually OK for dialog
-            // UJ says "Submit via Enter key"
             handleCreate();
         }
     };

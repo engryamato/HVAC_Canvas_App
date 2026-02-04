@@ -3,24 +3,26 @@ import { useShallow } from 'zustand/react/shallow';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { logger } from '@/utils/logger';
-import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
+import { createStorageAdapter } from '@/core/persistence/factory';
+import { StorageAdapter } from '@/core/persistence/StorageAdapter';
+// type ProjectListItem as OriginalProjectListItem removed
 
 export interface ProjectListItem {
   projectId: string;
   projectName: string;
   projectNumber?: string;
   clientName?: string;
-  entityCount?: number; // Number of entities in project
+  entityCount?: number;
   createdAt: string;
   modifiedAt: string;
   storagePath: string;
   isArchived: boolean;
-  filePath?: string; // Absolute file path for Tauri (e.g., /path/to/project.sws)
+  filePath?: string; // Kept for compatibility, may be mapped from storage result
 }
 
 interface ProjectListState {
   projects: ProjectListItem[];
-  recentProjectIds: string[]; // Max 10 project IDs, ordered by access time (most recent first)
+  recentProjectIds: string[];
   loading: boolean;
   error?: string;
 }
@@ -32,11 +34,19 @@ interface ProjectListActions {
   archiveProject: (projectId: string) => Promise<void>;
   restoreProject: (projectId: string) => Promise<void>;
   duplicateProject: (projectId: string, newName: string) => Promise<void>;
-  markAsOpened: (projectId: string) => void; // Track project access for Recent Projects
+  markAsOpened: (projectId: string) => void;
   
-  // Tauri-specific actions
-  scanProjectsFromDisk: () => Promise<void>; // Scan default directory for .sws files
-  syncProjectFromDisk: (projectId: string) => Promise<void>; // Re-read metadata from file
+  /**
+   * Refreshes the project list from the underlying storage adapter.
+   * Works for both Tauri (filesystem) and Web (IndexedDB).
+   */
+  refreshProjects: () => Promise<void>;
+  
+  /**
+   * Re-syncs a single project's metadata from storage.
+   */
+  syncProject: (projectId: string) => Promise<void>;
+  
   setLoading: (loading: boolean) => void;
   setError: (error?: string) => void;
 }
@@ -45,6 +55,15 @@ type ProjectListStore = ProjectListState & ProjectListActions;
 
 const INDEX_KEY = 'sws.projectIndex';
 
+// Lazy adapter initialization
+let adapterPromise: Promise<StorageAdapter> | null = null;
+const getAdapter = () => {
+  if (!adapterPromise) {
+    adapterPromise = createStorageAdapter();
+  }
+  return adapterPromise;
+};
+
 export const useProjectListStore = create<ProjectListStore>()(
   persist(
     (set, get) => ({
@@ -52,8 +71,8 @@ export const useProjectListStore = create<ProjectListStore>()(
       recentProjectIds: [],
       loading: false,
 
+      // === Local State Helpers (Optimistic Updates) ===
       addProject: (project) => {
-        // Guard against undefined/empty project names
         const validatedProject = {
           ...project,
           projectName: project.projectName?.trim() || 'Untitled Project',
@@ -72,42 +91,35 @@ export const useProjectListStore = create<ProjectListStore>()(
         }));
       },
 
+      // === Storage Operations ===
+
       removeProject: async (projectId) => {
-        const project = get().projects.find((p) => p.projectId === projectId);
-        
-        // If in Tauri mode and project has a file path, delete the files
-        if (TauriFileSystem.isTauriEnvironment() && project?.filePath) {
-          try {
-            const { deleteProject } = await import('@/core/persistence/projectIO');
-            const result = await deleteProject(project.filePath);
-            
-            if (!result.success) {
-              logger.error('[ProjectListStore] File deletion failed:', result.error);
-              throw new Error(result.error || 'Failed to delete project files');
-            }
-            
-            logger.info('[ProjectListStore] Project files deleted:', project.filePath);
-          } catch (error) {
-            logger.error('[ProjectListStore] Error deleting project files:', error);
-            throw error; // Re-throw to let UI handle the error
+        try {
+          const adapter = await getAdapter();
+          const result = await adapter.deleteProject(projectId);
+
+          if (!result.success) {
+             throw new Error(result.error || 'Failed to delete project');
           }
+
+          // Update state
+          set((state) => ({
+            projects: state.projects.filter((p) => p.projectId !== projectId),
+            recentProjectIds: state.recentProjectIds.filter((id) => id !== projectId),
+          }));
+          
+          logger.info('[ProjectListStore] Project deleted:', projectId);
+        } catch (error) {
+          logger.error('[ProjectListStore] Error removing project:', error);
+          throw error;
         }
-        
-        // Remove from state (both Tauri and web mode)
-        set((state) => ({
-          projects: state.projects.filter((p) => p.projectId !== projectId),
-          recentProjectIds: state.recentProjectIds.filter((id) => id !== projectId),
-        }));
       },
 
       archiveProject: async (projectId) => {
         const project = get().projects.find((p) => p.projectId === projectId);
-        if (!project) {
-          logger.warn('[ProjectListStore] Project not found for archiving:', projectId);
-          return;
-        }
+        if (!project) {return;}
 
-        // Optimistically update local state
+        // Optimistic update
         set((state) => ({
           projects: state.projects.map((p) =>
             p.projectId === projectId
@@ -116,56 +128,27 @@ export const useProjectListStore = create<ProjectListStore>()(
           ),
         }));
 
-        // If in Tauri mode with file path, persist to disk
-        if (TauriFileSystem.isTauriEnvironment() && project.filePath) {
-          try {
-            const { loadProject, saveProject } = await import('@/core/persistence/projectIO');
-            
-            // Load full project
-            const loadResult = await loadProject(project.filePath);
-            if (!loadResult.success || !loadResult.project) {
-              throw new Error(loadResult.error || 'Failed to load project');
-            }
-
-            // Update isArchived flag
-            const updatedProject = {
-              ...loadResult.project,
-              isArchived: true,
-              modifiedAt: new Date().toISOString(),
-            };
-
-            // Save back to file
-            const saveResult = await saveProject(updatedProject, project.filePath);
-            if (!saveResult.success) {
-              throw new Error(saveResult.error || 'Failed to save project');
-            }
-
-            logger.info('[ProjectListStore] Project archived to file:', project.filePath);
-          } catch (error) {
-            logger.error('[ProjectListStore] Failed to archive project to file:', error);
-            
-            // Rollback local state on error
-            set((state) => ({
-              projects: state.projects.map((p) =>
-                p.projectId === projectId
-                  ? { ...p, isArchived: false }
-                  : p
-              ),
-            }));
-            
-            throw error; // Re-throw for UI to handle
-          }
+        try {
+          const adapter = await getAdapter();
+          await adapter.updateMetadata(projectId, { isArchived: true });
+          logger.info('[ProjectListStore] Project archived:', projectId);
+        } catch (error) {
+          logger.error('[ProjectListStore] Failed to archive project:', error);
+          // Rollback
+          set((state) => ({
+            projects: state.projects.map((p) =>
+              p.projectId === projectId ? { ...p, isArchived: false } : p
+            ),
+          }));
+          throw error;
         }
       },
 
       restoreProject: async (projectId) => {
         const project = get().projects.find((p) => p.projectId === projectId);
-        if (!project) {
-          logger.warn('[ProjectListStore] Project not found for restoring:', projectId);
-          return;
-        }
+        if (!project) {return;}
 
-        // Optimistically update local state
+        // Optimistic update
         set((state) => ({
           projects: state.projects.map((p) =>
             p.projectId === projectId
@@ -174,177 +157,94 @@ export const useProjectListStore = create<ProjectListStore>()(
           ),
         }));
 
-        // If in Tauri mode with file path, persist to disk
-        if (TauriFileSystem.isTauriEnvironment() && project.filePath) {
-          try {
-            const { loadProject, saveProject } = await import('@/core/persistence/projectIO');
-            
-            // Load full project
-            const loadResult = await loadProject(project.filePath);
-            if (!loadResult.success || !loadResult.project) {
-              throw new Error(loadResult.error || 'Failed to load project');
-            }
-
-            // Update isArchived flag
-            const updatedProject = {
-              ...loadResult.project,
-              isArchived: false,
-              modifiedAt: new Date().toISOString(),
-            };
-
-            // Save back to file
-            const saveResult = await saveProject(updatedProject, project.filePath);
-            if (!saveResult.success) {
-              throw new Error(saveResult.error || 'Failed to save project');
-            }
-
-            logger.info('[ProjectListStore] Project restored to file:', project.filePath);
-          } catch (error) {
-            logger.error('[ProjectListStore] Failed to restore project to file:', error);
-            
-            // Rollback local state on error
-            set((state) => ({
-              projects: state.projects.map((p) =>
-                p.projectId === projectId
-                  ? { ...p, isArchived: true }
-                  : p
-              ),
-            }));
-            
-            throw error; // Re-throw for UI to handle
-          }
+        try {
+          const adapter = await getAdapter();
+          await adapter.updateMetadata(projectId, { isArchived: false });
+          logger.info('[ProjectListStore] Project restored:', projectId);
+        } catch (error) {
+          logger.error('[ProjectListStore] Failed to restore project:', error);
+          // Rollback
+          set((state) => ({
+            projects: state.projects.map((p) =>
+              p.projectId === projectId ? { ...p, isArchived: true } : p
+            ),
+          }));
+          throw error;
         }
       },
 
       duplicateProject: async (projectId, newName) => {
-        const source = get().projects.find((p) => p.projectId === projectId);
-        if (!source) {
-          logger.warn('[ProjectListStore] Source project not found for duplication:', projectId);
-          return;
-        }
-
-        // If in Tauri mode with file path, duplicate the file
-        if (TauriFileSystem.isTauriEnvironment() && source.filePath) {
-          try {
-            const { duplicateProject: duplicateProjectFile } = await import('@/core/persistence/projectIO');
-            
-            // Generate destination path (same directory, new filename based on newName)
-            const sourceDir = source.filePath.substring(0, source.filePath.lastIndexOf('/'));
-            const destinationPath = `${sourceDir}/${newName}.sws`;
-            
-            // Call ProjectIO to duplicate the file
-            const result = await duplicateProjectFile(source.filePath, newName, destinationPath);
-            
-            if (!result.success || !result.project) {
-              throw new Error(result.error || 'Failed to duplicate project file');
-            }
-            
-            // Add the duplicated project to the store
-            const newProject: ProjectListItem = {
-              projectId: result.project.projectId,
-              projectName: result.project.projectName,
-              projectNumber: result.project.projectNumber,
-              clientName: result.project.clientName,
-              entityCount: source.entityCount,
-              createdAt: result.project.createdAt,
-              modifiedAt: result.project.modifiedAt,
-              storagePath: destinationPath,
-              isArchived: false,
-              filePath: destinationPath,
-            };
-            
-            set((state) => ({ projects: [newProject, ...state.projects] }));
-            logger.info('[ProjectListStore] Project duplicated to file:', destinationPath);
-          } catch (error) {
-            logger.error('[ProjectListStore] Failed to duplicate project file:', error);
-            throw error; // Re-throw for UI to handle
-          }
-        } else {
-          // Web mode: existing in-memory duplication logic
-          const now = new Date().toISOString();
-          const newProjectId = crypto.randomUUID();
-          const newProject: ProjectListItem = {
-            ...source,
-            projectId: newProjectId,
-            projectName: newName,
-            createdAt: now,
-            modifiedAt: now,
-            storagePath: `project-${newProjectId}`,
-            isArchived: false,
-          };
-          set((state) => ({ projects: [newProject, ...state.projects] }));
-        }
-      },
-
-      markAsOpened: (projectId) => {
-        set((state) => {
-          // Update modifiedAt timestamp
-          const updatedProjects = state.projects.map((p) =>
-            p.projectId === projectId
-              ? { ...p, modifiedAt: new Date().toISOString() }
-              : p
-          );
-
-          // Update recent list: add to front, remove duplicates, limit to 5
-          const newRecent = [
-            projectId,
-            ...state.recentProjectIds.filter((id) => id !== projectId),
-          ].slice(0, 5);
-
-          return {
-            projects: updatedProjects,
-            recentProjectIds: newRecent,
-          };
-        });
-      },
-      
-      // Tauri-specific actions
-      scanProjectsFromDisk: async () => {
-        if (!TauriFileSystem.isTauriEnvironment()) {
-          logger.debug('[ProjectListStore] Not in Tauri environment, skipping disk scan');
-          return;
-        }
-        
-        set({ loading: true, error: undefined });
-        
         try {
-          const defaultPath = await TauriFileSystem.getDefaultProjectsPath();
-          const scannedProjects = await TauriFileSystem.scanProjectDirectory(defaultPath);
+          const adapter = await getAdapter();
+          const result = await adapter.duplicateProject(projectId, newName);
+
+          if (!result.success || !result.project) {
+            throw new Error(result.error || 'Failed to duplicate project');
+          }
+
+          // Add new project to state
+          const newProject: ProjectListItem = {
+            projectId: result.project.projectId,
+            projectName: result.project.projectName,
+            projectNumber: result.project.projectNumber,
+            clientName: result.project.clientName,
+            // entityCount not readily available in partial result unless extra logic
+            // but adapter usually returns loaded project
+            entityCount: 0, 
+            createdAt: result.project.createdAt,
+            modifiedAt: result.project.modifiedAt,
+            // Use virtual path or file path
+            storagePath: result.source === 'file' ? (result as any).filePath || '' : `indexeddb://${result.project.projectId}`,
+            isArchived: false,
+            filePath: (result as any).filePath, // Only present if 'file' source
+          };
+
+          set((state) => ({ projects: [newProject, ...state.projects] }));
+          logger.info('[ProjectListStore] Project duplicated:', newName);
+        } catch (error) {
+          logger.error('[ProjectListStore] Duplicate failed:', error);
+          throw error;
+        }
+      },
+
+      refreshProjects: async () => {
+        set({ loading: true, error: undefined });
+        try {
+          const adapter = await getAdapter();
+          const projects = await adapter.listProjects();
+
+          // Map metadata to ProjectListItem
+          // Ideally we keep ProjectMetadata type consistent with ProjectListItem
+          // But ProjectListItem has extra fields like 'storagePath'.
           
-          // Convert scanned metadata to ProjectListItems
-          const projectItems: ProjectListItem[] = scannedProjects.map(p => ({
+          const projectItems: ProjectListItem[] = projects.map(p => ({
             projectId: p.projectId,
             projectName: p.projectName,
             projectNumber: p.projectNumber,
             clientName: p.clientName,
-            entityCount: 0, // Would need to count entities from full file
+            entityCount: 0, // Metadata doesn't usually carry entity count
             createdAt: p.createdAt,
             modifiedAt: p.modifiedAt,
-            storagePath: p.filePath,
-            isArchived: p.isArchived ?? false,
-            filePath: p.filePath,
+            isArchived: !!p.isArchived,
+            // In Tauri adapter, listProjects returns valid metadata. 
+            // StoragePath/FilePath might need to be inferred or is not critical for list
+            storagePath: '', 
+            filePath: undefined // Can update this if adapter returns it, but listProjects returns ProjectMetadata[] which usually doesn't have system path
           }));
-          
+
           set({ projects: projectItems, loading: false });
-          logger.info(`[ProjectListStore] Scanned ${projectItems.length} projects from disk`);
+          logger.info(`[ProjectListStore] Refreshed ${projectItems.length} projects`);
         } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : 'Failed to scan projects';
-          logger.error('[ProjectListStore] Scan failed:', error);
-          set({ error: errorMsg, loading: false });
+          const msg = error instanceof Error ? error.message : 'Failed to refresh projects';
+          logger.error('[ProjectListStore] Refresh failed:', error);
+          set({ error: msg, loading: false });
         }
       },
-      
-      syncProjectFromDisk: async (projectId) => {
-        const project = get().projects.find(p => p.projectId === projectId);
-        if (!project?.filePath) {
-          logger.warn('[ProjectListStore] No file path for project:', projectId);
-          return;
-        }
-        
+
+      syncProject: async (projectId) => {
         try {
-          // Re-scan just this project's metadata
-          const { loadProject } = await import('@/core/persistence/projectIO');
-          const result = await loadProject(project.filePath);
+          const adapter = await getAdapter();
+          const result = await adapter.loadProject(projectId);
           
           if (result.success && result.project) {
             get().updateProject(projectId, {
@@ -354,20 +254,34 @@ export const useProjectListStore = create<ProjectListStore>()(
               modifiedAt: result.project.modifiedAt,
               isArchived: !!result.project.isArchived,
             });
-            logger.debug('[ProjectListStore] Synced project from disk:', projectId);
+            logger.debug('[ProjectListStore] Synced project:', projectId);
           }
         } catch (error) {
           logger.error('[ProjectListStore] Sync failed:', error);
         }
       },
-      
+
+      markAsOpened: (projectId) => {
+        set((state) => {
+          const updatedProjects = state.projects.map((p) =>
+            p.projectId === projectId
+              ? { ...p, modifiedAt: new Date().toISOString() }
+              : p
+          );
+          const newRecent = [
+            projectId,
+            ...state.recentProjectIds.filter((id) => id !== projectId),
+          ].slice(0, 5);
+          return { projects: updatedProjects, recentProjectIds: newRecent };
+        });
+      },
+
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
     }),
     {
       name: INDEX_KEY,
       storage: createJSONStorage(() => {
-        // Handle SSR - return dummy storage if window is undefined
         if (typeof globalThis.window === 'undefined') {
           return {
             getItem: () => null,
@@ -377,56 +291,24 @@ export const useProjectListStore = create<ProjectListStore>()(
         }
         return localStorage;
       }),
-      // Merge function ensures corrupted/missing data defaults to valid state
+      // Simple merge logic
       merge: (persistedState: unknown, currentState: ProjectListStore): ProjectListStore => {
-        // Safe cast with unknown check
-        const persisted = (persistedState && typeof persistedState === 'object') 
+         const persisted = (persistedState && typeof persistedState === 'object') 
           ? persistedState as Partial<ProjectListState> 
           : null;
         
-        if (!persisted) {
-          logger.debug('[ProjectListStore] No persisted state, using defaults');
-          return currentState;
-        }
-        
-        // Validate and filter projects array
-        let validProjects: ProjectListItem[] = [];
-        if (Array.isArray(persisted.projects)) {
-          validProjects = persisted.projects.filter(
-            (p): p is ProjectListItem => 
-              typeof p === 'object' && 
-              p !== null && 
-              typeof p.projectId === 'string' && 
-              typeof p.projectName === 'string'
-          );
-          
-          if (validProjects.length !== persisted.projects.length) {
-            logger.warn('[ProjectListStore] Filtered out invalid project entries');
-          }
-        }
-        
-        // Validate recentProjectIds array
-        const validRecentIds = Array.isArray(persisted.recentProjectIds)
-          ? persisted.recentProjectIds.filter((id): id is string => typeof id === 'string')
-          : [];
-        
+        if (!persisted) {return currentState;}
+
+        const validProjects = Array.isArray(persisted.projects) ? persisted.projects : [];
+        const validRecentIds = Array.isArray(persisted.recentProjectIds) ? persisted.recentProjectIds : [];
+
         return {
           ...currentState,
           projects: validProjects,
           recentProjectIds: validRecentIds,
-          loading: false,
-          error: undefined,
         };
       },
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error('[ProjectListStore] Hydration failed:', error);
-          // State will already be the currentState from merge, which has valid defaults
-          return;
-        }
-        logger.debug('[ProjectListStore] Hydration finished, projects:', state?.projects?.length ?? 0);
-      },
-      skipHydration: true, // Prevent hydration mismatch on SSR
+      skipHydration: true,
     }
   )
 );
@@ -435,23 +317,19 @@ export const rehydrateProjectList = async () => {
   await useProjectListStore.persist.rehydrate();
 };
 
+// Selectors
 export const useProjects = () => useProjectListStore((state) => state.projects);
-
 export const useActiveProjects = () => {
   const projects = useProjects();
   return useMemo(() => projects.filter((p) => !p.isArchived), [projects]);
 };
-
 export const useArchivedProjects = () => {
   const projects = useProjects();
   return useMemo(() => projects.filter((p) => p.isArchived), [projects]);
 };
-
-// Selector for recent projects (max 10, ordered by access time)
 export const useRecentProjects = () => {
   const projects = useProjects();
   const recentProjectIds = useProjectListStore((state) => state.recentProjectIds);
-
   return useMemo(
     () =>
       recentProjectIds
@@ -471,7 +349,7 @@ export const useProjectListActions = () =>
       restoreProject: state.restoreProject,
       duplicateProject: state.duplicateProject,
       markAsOpened: state.markAsOpened,
-      scanProjectsFromDisk: state.scanProjectsFromDisk,
-      syncProjectFromDisk: state.syncProjectFromDisk,
+      refreshProjects: state.refreshProjects,
+      syncProject: state.syncProject,
     }))
   );

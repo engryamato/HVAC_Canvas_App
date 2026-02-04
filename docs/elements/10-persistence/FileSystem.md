@@ -262,18 +262,41 @@ if (result.success) {
 
 #### Tauri (Desktop)
 
-- **Adapter**: `TauriStorageAdapter` (planned)
+- **Adapter**: `TauriStorageAdapter` (implemented)
 - **Storage Mechanism**: Direct file system access via Tauri APIs
-- **Project Location**: `{baseDir}/{projectId}.json` (default baseDir: `Documents/HVAC_Projects`)
-- **Auto-Saves**: `{baseDir}/.autosaves/{projectId}/{timestamp}.json`
-- **Backups**: `{baseDir}/.backups/{projectId}/backup_{timestamp}.json`
+- **Project Location**: `Documents/SizeWise/Projects/{projectId}/{projectId}.hvac`
+- **Auto-Saves**: `Documents/SizeWise/Projects/{projectId}/.autosave/{timestamp}.hvac` (rolling window of 5)
+- **Backups**: `Documents/SizeWise/Projects/{projectId}/{projectId}.hvac.bak` (created before each save)
+- **Metadata**: `Documents/SizeWise/Projects/{projectId}/.metadata/` (thumbnails, preferences)
+- **Exports**: `Documents/SizeWise/Projects/{projectId}/exports/` (PDF, CSV outputs)
 - **Atomic Writes**: Write to `.tmp` file, then rename (prevents corruption on crash)
 - **Quota**: Limited by disk space only
 - **Performance**: Fast, direct I/O
 
+**Folder Structure**:
+
+```text
+Documents/SizeWise/Projects/
+└── {projectId}/
+    ├── {projectId}.hvac              # Main project file
+    ├── {projectId}.hvac.bak          # Backup (created on save)
+    ├── .autosave/                    # Auto-save folder
+    │   ├── 2024-01-15T10-30-00.hvac
+    │   ├── 2024-01-15T10-35-00.hvac
+    │   └── ... (last 5 copies)
+    ├── .metadata/                    # Metadata folder
+    │   ├── thumbnail.png
+    │   ├── recent.json
+    │   └── preferences.json
+    └── exports/                      # Export outputs
+        ├── {projectName}.pdf
+        └── {projectName}-BOM.csv
+```
+
+
 #### Web (Browser)
 
-- **Adapter**: `WebStorageAdapter` (planned)
+- **Adapter**: `WebStorageAdapter` (placeholder - not yet implemented)
 - **Storage Mechanism**: IndexedDB (preferred) with localStorage fallback
 - **Project Location**: IndexedDB object store `projects`, indexed by `projectId`
 - **Auto-Saves**: IndexedDB object store `autoSaves`, compound index on `(projectId, timestamp)`
@@ -311,14 +334,24 @@ The new abstraction layer extends and eventually replaces `projectIO` functions:
 
 ### Current Status
 
-**⚠️ Placeholder Implementation**: The factory currently returns placeholder adapters (`TauriPlaceholderAdapter`, `WebPlaceholderAdapter`) that throw "not implemented" errors when any method is called. This allows the abstraction to be integrated and tested without blocking other development.
+**✅ `TauriStorageAdapter` Implemented** (ticket:c357d1a4-8bad-4027-9d44-57d4788c9f4c/337504b1-ed25-473e-99c4-eedbc73e5a05):
+
+- Full implementation of `StorageAdapter` interface
+- Nested folder structure with `.hvac` extension
+- Atomic writes with temp-file-then-rename pattern
+- Auto-save with rolling window (5 copies)
+- Backup creation before overwriting
+- Comprehensive error handling with typed error codes
+- Unit tested (80%+ coverage)
+
+**⚠️ Placeholder Implementation for Web**: The factory returns a `WebPlaceholderAdapter` that throws "not implemented" errors when any method is called. This allows the abstraction to be integrated and tested without blocking other development.
 
 **Future Work**:
 
-- Implement `TauriStorageAdapter` (ticket TBD)
 - Implement `WebStorageAdapter` (ticket TBD)
 - Add migration logic from `projectIO` (ticket TBD)
 - Add comprehensive integration tests (ticket TBD)
+
 
 ## Platform Availability
 

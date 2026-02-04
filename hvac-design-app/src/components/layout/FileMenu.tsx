@@ -453,7 +453,7 @@ export function FileMenu() {
                                 storagePath: filePath,
                             });
                         }
-                        await useProjectListStore.getState().syncProjectFromDisk(projectId);
+                        await useProjectListStore.getState().syncProject(projectId);
                         router.push(`/canvas/${projectId}`);
                     })();
                 }}

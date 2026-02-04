@@ -42,7 +42,7 @@ const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
     name,
     width: 240,
     length: 180,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'office',
     airChangesPerHour: 4,
   },
@@ -256,6 +256,20 @@ function createProjectFile(
     modifiedAt: new Date().toISOString(),
     entities,
     viewportState,
+    scope: {
+      details: [],
+      materials: [],
+      projectType: 'Commercial',
+    },
+    siteConditions: {
+      elevation: '0',
+      outdoorTemp: '70',
+      indoorTemp: '70',
+      windSpeed: '0',
+      humidity: '50',
+      localCodes: '',
+    },
+    isArchived: false,
     settings: {
       unitSystem: 'imperial' as const,
       gridSize: 24,
@@ -660,7 +674,7 @@ describe('Export Workflow User Journey', () => {
       const room = createMockRoom('room-1', 'Conference Room');
       room.props.width = 480;
       room.props.length = 360;
-      room.props.height = 120;
+      room.props.ceilingHeight = 120;
       room.props.occupancyType = 'conference';
       room.props.airChangesPerHour = 8;
       room.calculated = { area: 1200, volume: 14400, requiredCFM: 2400 };

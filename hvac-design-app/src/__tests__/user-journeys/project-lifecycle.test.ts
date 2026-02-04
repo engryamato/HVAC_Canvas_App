@@ -33,7 +33,7 @@ const createMockRoom = (id: string, name: string, overrides?: Partial<Room>): Ro
     name,
     width: 240, // 20 feet
     length: 180, // 15 feet
-    height: 96, // 8 feet
+    ceilingHeight: 96, // 8 feet
     occupancyType: 'office',
     airChangesPerHour: 4,
   },
@@ -113,6 +113,20 @@ const createMockProjectFile = (
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   entities,
+  scope: {
+    details: [],
+    materials: [],
+    projectType: 'Commercial',
+  },
+  siteConditions: {
+    elevation: '0',
+    outdoorTemp: '70',
+    indoorTemp: '70',
+    windSpeed: '0',
+    humidity: '50',
+    localCodes: '',
+  },
+  isArchived: false,
   viewportState: {
     panX: 0,
     panY: 0,

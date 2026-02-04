@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { SortBy, SortOrder } from '../hooks/useProjectFilters';
-import { useAppStateStore } from '@/stores/useAppStateStore';
+// useAppStateStore import removed
 import { Search, ChevronDown, RefreshCw, X } from 'lucide-react';
 
 interface SearchBarProps {
@@ -31,7 +31,7 @@ export function SearchBar({
     filteredCount,
 }: SearchBarProps) {
     const [localValue, setLocalValue] = useState(value);
-    const isTauri = useAppStateStore((state) => state.isTauri);
+    // isTauri removed
 
     // Debounce the onChange callback
     useEffect(() => {
@@ -111,15 +111,15 @@ export function SearchBar({
                 )}
             </div>
 
-            {/* Rescan Button (Tauri only) */}
-            {isTauri && onRescan && (
+            {/* Refresh Button */}
+            {onRescan && (
                 <button
                     onClick={onRescan}
-                    className="btn-secondary"
-                    aria-label="Rescan project folder"
+                    className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                    title="Refresh project list"
+                    aria-label="Refresh project list"
                 >
-                    <RefreshCw className="w-4 h-4" />
-                    Rescan
+                    <RefreshCw className="w-5 h-5" />
                 </button>
             )}
         </div>
