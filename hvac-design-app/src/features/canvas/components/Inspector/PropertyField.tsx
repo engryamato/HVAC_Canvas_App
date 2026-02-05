@@ -1,5 +1,4 @@
 import React, { type ReactNode } from 'react';
-import styles from './InspectorPanel.module.css';
 
 interface PropertyFieldProps {
   label: string;
@@ -10,12 +9,12 @@ interface PropertyFieldProps {
 
 export function PropertyField({ label, htmlFor, helperText, children }: PropertyFieldProps) {
   return (
-    <div className={styles.field}>
-      <label className={styles.label} htmlFor={htmlFor}>
+    <div className="flex flex-col gap-1.5 mb-3.5">
+      <label className="text-sm font-medium text-slate-700" htmlFor={htmlFor}>
         {label}
       </label>
       {children}
-      {helperText ? <div className={styles.helper}>{helperText}</div> : null}
+      {helperText ? <div className="text-xs text-slate-500">{helperText}</div> : null}
     </div>
   );
 }
