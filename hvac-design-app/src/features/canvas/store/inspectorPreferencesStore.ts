@@ -24,6 +24,9 @@ export interface InspectorPreferencesState {
   };
   toggleSection: (entityType: 'room' | 'duct' | 'equipment', sectionName: string) => void;
   setSectionExpanded: (entityType: 'room' | 'duct' | 'equipment', sectionName: string, expanded: boolean) => void;
+  inspectorWidth: number;
+  setInspectorWidth: (width: number) => void;
+  resetInspectorWidth: () => void;
 }
 
 export type EntityType = 'room' | 'duct' | 'equipment';
@@ -51,6 +54,7 @@ export const useInspectorPreferencesStore = create<InspectorPreferencesState>()(
           dimensions: true,
         },
       },
+      inspectorWidth: 320,
       toggleSection: (entityType, sectionName) =>
         set((state) => {
           const key = sectionName as keyof InspectorPreferencesState['preferences'][typeof entityType];
@@ -77,6 +81,8 @@ export const useInspectorPreferencesStore = create<InspectorPreferencesState>()(
             },
           };
       }),
+      setInspectorWidth: (width) => set({ inspectorWidth: width }),
+      resetInspectorWidth: () => set({ inspectorWidth: 320 }),
     }),
     {
       name: 'sws.inspector-preferences',

@@ -57,7 +57,7 @@ export function InspectorPanel({ className, embedded = false }: InspectorPanelPr
   }
 
   // Combined classes based on logic
-  const panelClasses = `flex flex-col h-full bg-slate-50 border-l border-slate-200 w-80 min-w-[20rem] ${
+  const panelClasses = `flex flex-col h-full bg-slate-50 border-l border-slate-200 ${
     embedded ? 'w-auto min-w-0 border-l-0 bg-transparent' : ''
   } ${className ?? ''}`;
 
