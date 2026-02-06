@@ -84,7 +84,8 @@ This handles the edge cases mentioned in the spec: off-screen positioning and in
 
 ---
 
-### [ ] Step: Create Floating Inspector Component
+### [x] Step: Create Floating Inspector Component
+<!-- chat-id: 81980453-c7a4-418f-af09-a7a8ddccf8c2 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx` (new file)
 
