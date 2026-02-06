@@ -53,62 +53,352 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 
 ---
 
-### [ ] Step: Store + Position Validation
+### [ ] Step: Extend Inspector Preferences Store
 
-- Extend (or create) `inspectorPreferencesStore` persisted state:
-  - `isFloating`
-  - `floatingPosition`
-  - actions: `setFloating`, `setFloatingPosition`, `resetFloatingPosition`
-- Add `validateFloatingPosition` utility.
-- Add unit tests for store + validator.
+**File**: `hvac-design-app/src/features/canvas/store/inspectorPreferencesStore.ts`
 
-Verification:
-- `pnpm test`
+Add floating mode state to the existing Zustand store:
+- Add `isFloating: boolean` (default: `false`)
+- Add `floatingPosition: { x: number; y: number } | null` (default: `null`)
+- Add `setFloating(isFloating: boolean)` action
+- Add `setFloatingPosition(position: { x: number; y: number })` action
+- Add `resetFloatingPosition()` action to center the panel
 
----
-
-### [ ] Step: FloatingInspector Component
-
-- Add `FloatingInspector` portal-based component.
-- Implement drag behavior (native mouse events + rAF), dock button, and a11y attributes.
-- Add unit tests for render + drag + dock + resize revalidation behavior.
-
-Verification:
-- `pnpm test`
+The persist middleware will automatically save these values to local storage under the existing `'sws.inspector-preferences'` key.
 
 ---
 
-### [ ] Step: Dock/Float Integration
+### [ ] Step: Create Position Validation Utility
 
-- Update `InspectorPanel` to support `showHeader` + `onFloat` and render docked header/Float button.
-- Update `RightSidebar` to show Float button when docked, and placeholder when floating.
-- Render `FloatingInspector` conditionally from canvas root (e.g. `CanvasContainer`) and ensure initial positioning/validation.
-- Update unit tests for `RightSidebar` + `InspectorPanel` as needed.
+**File**: `hvac-design-app/src/features/canvas/utils/validateFloatingPosition.ts` (new file)
 
-Verification:
-- `pnpm test`
-- `pnpm type-check`
+Create a utility function to validate and correct floating panel positions:
+- Accept position `{ x, y }`, panel dimensions `{ width, height }`, and viewport dimensions
+- Check if position is within viewport bounds (with 50px margin)
+- If off-screen or invalid (negative coordinates, beyond bounds), return centered position
+- Return validated position object
 
----
-
-### [ ] Step: Visual Regression (Playwright)
-
-- Add Playwright visual regression coverage for:
-  - docked Float button
-  - floating window appearance (shadow/elevation)
-  - dragging (before/after screenshots)
-  - min/max widths
-  - different entity types
-
-Verification:
-- `pnpm e2e`
+This handles the edge cases mentioned in the spec: off-screen positioning and invalid coordinates.
 
 ---
 
-### [ ] Step: Documentation + Report
+### [ ] Step: Create Floating Inspector Component
 
-- Add `Inspector/README.md` describing docked vs floating, store shape, validation, and drag strategy.
-- After implementation completes, write `{@artifacts_path}/report.md` with summary + verification results.
+**File**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx` (new file)
 
-Verification:
-- `pnpm lint`
+Create a new component that renders the inspector as a floating window:
+- Use React Portal to render outside the normal DOM hierarchy (similar to `hvac-design-app/src/components/ui/dialog.tsx`)
+- Accept `onDock` callback prop to handle re-docking
+- Render with fixed positioning using `floatingPosition` from store
+- Apply shadow styling: `shadow-2xl` for elevation
+- Include draggable header with "Dock" button
+- Use `inspectorWidth` from store for width
+- Render `InspectorPanel` component with `embedded={false}` prop
+- Apply z-index to ensure it floats above canvas but below modals (z-50)
+
+Structure:
+- Outer container: fixed positioning, shadow, rounded corners
+- Header: draggable area with title "Properties" and "Dock" button
+- Content area: renders `InspectorPanel`
+
+---
+
+### [ ] Step: Implement Drag Functionality
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
+
+Add native mouse event handlers for dragging (pattern similar to `hvac-design-app/src/features/canvas/components/RightSidebar.tsx` resize logic):
+- Track `isDragging` state
+- Store initial mouse position and panel position on `mousedown`
+- On `mousemove`, calculate new position based on mouse delta
+- On `mouseup`, persist final position to store using `setFloatingPosition`
+- Add global event listeners to `window` during drag
+- Set cursor to `move` on header hover and `grabbing` during drag
+- Prevent text selection during drag with `user-select: none`
+
+Use `useEffect` to attach/detach window event listeners based on `isDragging` state.
+
+---
+
+### [ ] Step: Add Float/Dock Toggle Button
+
+**File**: `hvac-design-app/src/features/canvas/components/Inspector/InspectorPanel.tsx`
+
+Modify the component to accept optional header controls:
+- Add `showHeader?: boolean` prop (default: `false`)
+- Add `onFloat?: () => void` callback prop
+- When `showHeader` is true, render header section with:
+  - Title: "Properties"
+  - Float button with icon (use Lucide React `Maximize2` icon)
+  - Styling: border-b, padding, flex layout
+
+The header should only appear when inspector is docked (controlled by parent).
+
+---
+
+### [ ] Step: Update RightSidebar to Handle Floating Mode
+
+**File**: `hvac-design-app/src/features/canvas/components/RightSidebar.tsx`
+
+Integrate floating mode toggle:
+- Import `useInspectorPreferencesStore` selectors for `isFloating` and `setFloating`
+- When rendering Properties tab content, check `isFloating` state
+- If docked (`!isFloating`), render `InspectorPanel` with `showHeader={true}` and `onFloat` callback
+- The `onFloat` callback should call `setFloating(true)` and initialize position if null
+- If floating, render placeholder message: "Inspector is floating. Click Dock to return."
+
+---
+
+### [ ] Step: Render Floating Inspector Conditionally
+
+**File**: `hvac-design-app/src/features/canvas/components/CanvasContainer.tsx` or create new wrapper
+
+Add conditional rendering for `FloatingInspector`:
+- Import `useInspectorPreferencesStore` to check `isFloating`
+- When `isFloating` is true, render `FloatingInspector` component
+- Pass `onDock` callback that calls `setFloating(false)`
+- Validate position on mount using the validation utility
+- If position is invalid or null, center the panel and save to store
+
+Position initialization logic:
+- On first float, calculate center position: `{ x: (window.innerWidth - width) / 2, y: (window.innerHeight - height) / 2 }`
+- Save to store immediately
+
+---
+
+### [ ] Step: Add Position Validation on Window Resize
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
+
+Add window resize listener:
+- Use `useEffect` to listen for `resize` events
+- On resize, validate current position against new viewport dimensions
+- If position becomes invalid, reposition to center
+- Update store with corrected position
+
+This handles the edge case where user disconnects external monitor or changes screen resolution.
+
+---
+
+### [ ] Step: Maintain Width and Section States
+
+**Verification**: No changes needed
+
+The existing architecture already supports this:
+- `inspectorWidth` is stored in `inspectorPreferencesStore` and used by both docked and floating modes
+- Section collapse states are stored per entity type in the same store
+- Both `RightSidebar` and `FloatingInspector` will use the same `InspectorPanel` component, ensuring consistent state
+
+---
+
+### [ ] Step: Add Unit Tests
+
+**File**: `hvac-design-app/src/features/canvas/components/Inspector/__tests__/FloatingInspector.test.tsx` (new file)
+
+Create comprehensive unit tests:
+- Test rendering with valid position
+- Test drag start/move/end sequence
+- Test position persistence to store
+- Test "Dock" button calls `onDock` callback
+- Test position validation on mount
+- Test window resize triggers revalidation
+- Mock `useInspectorPreferencesStore` and verify store interactions
+- Mock `window.innerWidth/innerHeight` for viewport tests
+
+**File**: `hvac-design-app/src/features/canvas/store/__tests__/inspectorPreferencesStore.test.ts` (new file)
+
+Test store actions:
+- Test `setFloating` toggles state
+- Test `setFloatingPosition` updates position
+- Test `resetFloatingPosition` centers panel
+- Test persistence to local storage (verify Zustand persist middleware)
+
+**File**: `hvac-design-app/src/features/canvas/utils/__tests__/validateFloatingPosition.test.ts` (new file)
+
+Test validation logic:
+- Test valid position returns unchanged
+- Test off-screen position returns centered
+- Test negative coordinates return centered
+- Test position beyond viewport bounds returns centered
+- Test edge cases (exactly at boundary, partially visible)
+
+---
+
+### [ ] Step: Update Existing Tests
+
+**File**: `hvac-design-app/src/features/canvas/components/__tests__/RightSidebar.test.tsx`
+
+Add tests for floating mode integration:
+- Test "Float" button appears when docked
+- Test clicking "Float" button updates store
+- Test placeholder message appears when floating
+- Mock `useInspectorPreferencesStore` to simulate floating state
+
+**File**: `hvac-design-app/src/features/canvas/components/Inspector/__tests__/InspectorPanel.test.tsx`
+
+Add tests for header rendering:
+- Test header renders when `showHeader={true}`
+- Test header hidden when `showHeader={false}`
+- Test "Float" button calls `onFloat` callback
+
+---
+
+### [ ] Step: Add Visual Regression Tests
+
+**File**: `hvac-design-app/e2e/03-visual-regression/components/inspector-panel.spec.ts`
+
+Add new test cases:
+- Test floating inspector appearance with shadow
+- Test floating inspector at different positions
+- Test "Float" button in docked mode
+- Test "Dock" button in floating mode
+- Test dragging floating inspector (capture before/after)
+- Test floating inspector with different entity types selected
+- Test floating inspector at minimum and maximum widths
+
+Use Playwright's `page.mouse.down()`, `page.mouse.move()`, `page.mouse.up()` for drag simulation.
+
+---
+
+### [ ] Step: Add Accessibility Attributes
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
+
+Add ARIA attributes for accessibility:
+- `role="dialog"` on floating container
+- `aria-label="Floating Properties Panel"` on container
+- `aria-grabbed="true/false"` on header during drag
+- `tabIndex={0}` on header for keyboard focus
+- Add keyboard support: Escape key to dock, Arrow keys to move (optional enhancement)
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/InspectorPanel.tsx`
+
+Add ARIA attributes to Float button:
+- `aria-label="Float inspector panel"`
+- `title="Detach panel to float over canvas"`
+
+---
+
+### [ ] Step: Style Refinements
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
+
+Apply design system styles:
+- Background: `bg-slate-50` (matching docked inspector)
+- Border: `border border-slate-200`
+- Shadow: `shadow-2xl` for elevation
+- Rounded corners: `rounded-xl`
+- Header background: `bg-white`
+- Header border: `border-b border-slate-200`
+- Dock button: Technical Blue on hover (`hover:bg-blue-50 hover:text-blue-600`)
+- Cursor: `cursor-move` on header, `cursor-grabbing` during drag
+
+Ensure consistent styling with docked inspector from `hvac-design-app/src/features/canvas/components/RightSidebar.tsx`.
+
+---
+
+### [ ] Step: Handle Edge Case: Multiple Monitors
+
+**In**: Position validation utility
+
+Add logic to detect if stored position is beyond current viewport:
+- Compare stored position against `window.screen.availWidth/availHeight`
+- If position suggests external monitor that's no longer connected, reset to center
+- Log warning to console for debugging
+
+---
+
+### [ ] Step: Add Transition Animations
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
+
+Add smooth transitions when floating/docking:
+- Use Tailwind `transition-all duration-200` for position changes
+- Add fade-in animation on mount using Tailwind `animate-in fade-in`
+- Add slide-in animation from right: `slide-in-from-right-4`
+
+**In**: `hvac-design-app/src/features/canvas/components/RightSidebar.tsx`
+
+Add transition when switching to placeholder:
+- Use `transition-opacity duration-200` for smooth fade
+
+---
+
+### [ ] Step: Update Documentation
+
+**File**: `hvac-design-app/src/features/canvas/components/Inspector/README.md` (new file)
+
+Create component documentation:
+- Overview of inspector architecture
+- Explanation of docked vs floating modes
+- State management with `inspectorPreferencesStore`
+- Position validation logic
+- Drag implementation details
+- Testing approach
+
+---
+
+### [ ] Step: Performance Optimization
+
+**In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
+
+Optimize drag performance:
+- Use `requestAnimationFrame` for position updates during drag
+- Debounce store updates (only save on drag end, not during)
+- Use `React.memo` to prevent unnecessary re-renders
+- Use `useCallback` for event handlers
+
+---
+
+### [ ] Step: Integration Verification
+
+**Manual testing checklist**:
+- Float inspector from docked position
+- Drag floating inspector to different positions
+- Dock inspector back to sidebar
+- Verify width persists between modes
+- Verify section collapse states persist
+- Test with different entity types selected
+- Test with multi-selection
+- Test window resize while floating
+- Test browser refresh with floating position
+- Test invalid position recovery (manually edit local storage)
+
+## Visual Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant RightSidebar
+    participant InspectorPanel
+    participant FloatingInspector
+    participant Store as inspectorPreferencesStore
+    participant LocalStorage
+
+    User->>RightSidebar: Click "Float" button
+    RightSidebar->>Store: setFloating(true)
+    Store->>LocalStorage: Persist isFloating=true
+    RightSidebar->>RightSidebar: Render placeholder
+    
+    Note over FloatingInspector: Conditionally rendered
+    FloatingInspector->>Store: Get floatingPosition
+    alt Position is null or invalid
+        FloatingInspector->>FloatingInspector: Calculate center position
+        FloatingInspector->>Store: setFloatingPosition(centered)
+        Store->>LocalStorage: Persist position
+    end
+    
+    FloatingInspector->>InspectorPanel: Render with current state
+    
+    User->>FloatingInspector: Drag header
+    FloatingInspector->>FloatingInspector: Track mouse movement
+    FloatingInspector->>FloatingInspector: Update visual position
+    User->>FloatingInspector: Release mouse
+    FloatingInspector->>Store: setFloatingPosition(newPos)
+    Store->>LocalStorage: Persist new position
+    
+    User->>FloatingInspector: Click "Dock" button
+    FloatingInspector->>Store: setFloating(false)
+    Store->>LocalStorage: Persist isFloating=false
+    RightSidebar->>InspectorPanel: Render in sidebar
+```
