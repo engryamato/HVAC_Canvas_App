@@ -106,7 +106,8 @@ Structure:
 
 ---
 
-### [ ] Step: Implement Drag Functionality
+### [x] Step: Implement Drag Functionality
+<!-- chat-id: 7b31d1cc-bfdd-4a1b-8e0f-71fbccd3cbb1 -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
 
