@@ -53,7 +53,8 @@ Save to `{@artifacts_path}/plan.md`. If the feature is trivial and doesn't warra
 
 ---
 
-### [ ] Step: Extend Inspector Preferences Store
+### [x] Step: Extend Inspector Preferences Store
+<!-- chat-id: d3b92e34-e363-473e-acae-fcdd023983c3 -->
 
 **File**: `hvac-design-app/src/features/canvas/store/inspectorPreferencesStore.ts`
 
