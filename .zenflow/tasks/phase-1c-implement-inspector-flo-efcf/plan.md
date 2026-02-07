@@ -173,7 +173,7 @@ Position initialization logic:
 
 ---
 
-### [ ] Step: Add Position Validation on Window Resize
+### [x] Step: Add Position Validation on Window Resize
 <!-- chat-id: 0c659b54-53e4-495d-8e17-5d20c6615d0c -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`

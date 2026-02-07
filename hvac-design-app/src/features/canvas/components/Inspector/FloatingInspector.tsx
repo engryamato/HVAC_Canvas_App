@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { InspectorPanel } from './InspectorPanel';
 import { useInspectorPreferencesStore } from '../../store/inspectorPreferencesStore';
+import { validateFloatingPosition } from '../../utils/validateFloatingPosition';
 
 const DEFAULT_FLOATING_INSPECTOR_WIDTH_PX = 320;
 const PORTAL_ELEMENT_ID = 'floating-inspector-portal';
@@ -19,6 +20,8 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const dragStartMouseRef = useRef<{ x: number; y: number } | null>(null);
   const dragStartPanelRef = useRef<{ x: number; y: number } | null>(null);
@@ -88,6 +91,37 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
     };
   }, [isDragging, setFloatingPosition]);
 
+  useEffect(() => {
+    if (!floatingPosition || isDragging) {
+      return;
+    }
+
+    const handleResize = () => {
+      const rect = containerRef.current?.getBoundingClientRect();
+
+      const validatedPosition = validateFloatingPosition(
+        floatingPosition,
+        {
+          width: rect?.width ?? DEFAULT_FLOATING_INSPECTOR_WIDTH_PX,
+          height: rect?.height ?? 600,
+        },
+        { width: window.innerWidth, height: window.innerHeight }
+      );
+
+      if (
+        validatedPosition.x !== floatingPosition.x ||
+        validatedPosition.y !== floatingPosition.y
+      ) {
+        setFloatingPosition(validatedPosition);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [floatingPosition, isDragging, setFloatingPosition]);
+
   const floatingStyle = useMemo<React.CSSProperties>(() => {
     const position = dragPosition ?? floatingPosition;
     const left = position?.x ?? 0;
@@ -119,6 +153,7 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
 
   return createPortal(
     <div
+      ref={containerRef}
       className="fixed z-50 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-2xl"
       style={floatingStyle}
       data-testid="floating-inspector"
