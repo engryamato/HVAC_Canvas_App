@@ -200,7 +200,8 @@ The existing architecture already supports this:
 
 ---
 
-### [ ] Step: Add Unit Tests
+### [x] Step: Add Unit Tests
+<!-- chat-id: 6f3fde79-8571-4475-a63e-bd413786c092 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/Inspector/__tests__/FloatingInspector.test.tsx` (new file)
 
@@ -234,6 +235,7 @@ Test validation logic:
 ---
 
 ### [ ] Step: Update Existing Tests
+<!-- chat-id: d324e080-078b-454c-99a1-9a608ef66f57 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/__tests__/RightSidebar.test.tsx`
 
