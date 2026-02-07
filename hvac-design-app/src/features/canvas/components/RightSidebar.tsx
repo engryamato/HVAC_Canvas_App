@@ -3,6 +3,7 @@
 import React from 'react';
 import { BOMPanel } from './BOMPanel';
 import { InspectorPanel } from './Inspector/InspectorPanel';
+import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 
 interface RightSidebarProps {
@@ -25,6 +26,21 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
   const setActiveRightTab = useLayoutStore((state) => state.setActiveRightTab);
   const rightSidebarCollapsed = useLayoutStore((state) => state.rightSidebarCollapsed);
   const toggleRightSidebar = useLayoutStore((state) => state.toggleRightSidebar);
+
+  const isFloating = useInspectorPreferencesStore((state) => state.isFloating);
+  const floatingPosition = useInspectorPreferencesStore((state) => state.floatingPosition);
+  const setFloating = useInspectorPreferencesStore((state) => state.setFloating);
+  const setFloatingPosition = useInspectorPreferencesStore((state) => state.setFloatingPosition);
+
+  const handleFloat = React.useCallback(() => {
+    setFloating(true);
+
+    if (!floatingPosition) {
+      const panelWidthPx = 320;
+      const centerX = Math.max(50, Math.round((window.innerWidth - panelWidthPx) / 2));
+      setFloatingPosition({ x: centerX, y: 80 });
+    }
+  }, [floatingPosition, setFloating, setFloatingPosition]);
 
   if (!isOpen) {
     return null;
@@ -113,7 +129,11 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
         <div className="sidebar-content">
           {activeRightTab === 'properties' && (
             <section className="sidebar-section" data-testid="properties-panel" id="properties-panel" role="tabpanel">
-              <InspectorPanel embedded />
+              {isFloating ? (
+                <div className="p-3 text-sm text-slate-600">Inspector is floating. Click Dock to return.</div>
+              ) : (
+                <InspectorPanel embedded showHeader onFloat={handleFloat} />
+              )}
             </section>
           )}
 

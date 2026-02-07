@@ -141,7 +141,8 @@ The header should only appear when inspector is docked (controlled by parent).
 
 ---
 
-### [ ] Step: Update RightSidebar to Handle Floating Mode
+### [x] Step: Update RightSidebar to Handle Floating Mode
+<!-- chat-id: 24cbfb02-0f2d-4fac-82a8-1738f72bbeb5 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/RightSidebar.tsx`
 
