@@ -340,7 +340,8 @@ Add transition when switching to placeholder:
 
 ---
 
-### [ ] Step: Update Documentation
+### [x] Step: Update Documentation
+<!-- chat-id: 32043be5-3d5c-40f6-8a6e-758b63cea705 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/Inspector/README.md` (new file)
 
