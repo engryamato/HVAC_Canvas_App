@@ -181,7 +181,7 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
           type="button"
           onClick={onDock}
           onMouseDown={(event) => event.stopPropagation()}
-          className="rounded px-2 py-1 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          className="rounded px-2 py-1 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600"
         >
           Dock
         </button>

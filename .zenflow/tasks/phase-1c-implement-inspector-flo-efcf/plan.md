@@ -292,7 +292,8 @@ Add ARIA attributes to Float button:
 
 ---
 
-### [ ] Step: Style Refinements
+### [x] Step: Style Refinements
+<!-- chat-id: 161b93c2-6b42-4a5a-9988-6d41f009cea8 -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
 
