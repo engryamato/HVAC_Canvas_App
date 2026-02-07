@@ -155,7 +155,8 @@ Integrate floating mode toggle:
 
 ---
 
-### [ ] Step: Render Floating Inspector Conditionally
+### [x] Step: Render Floating Inspector Conditionally
+<!-- chat-id: 28f15f39-bb82-4070-bdfb-ccb5216353cc -->
 
 **File**: `hvac-design-app/src/features/canvas/components/CanvasContainer.tsx` or create new wrapper
 
@@ -173,6 +174,7 @@ Position initialization logic:
 ---
 
 ### [ ] Step: Add Position Validation on Window Resize
+<!-- chat-id: 0c659b54-53e4-495d-8e17-5d20c6615d0c -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
 
