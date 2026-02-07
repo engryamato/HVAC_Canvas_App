@@ -69,6 +69,8 @@ export function InspectorPanel({
           <button
             type="button"
             onClick={onFloat}
+            aria-label="Float inspector panel"
+            title="Detach panel to float over canvas"
             className="inline-flex items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
           >
             <Maximize2 className="h-4 w-4" />

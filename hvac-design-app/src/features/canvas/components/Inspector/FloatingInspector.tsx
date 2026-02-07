@@ -134,6 +134,13 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
     };
   }, [dragPosition, floatingPosition]);
 
+  const handleHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      onDock();
+    }
+  };
+
   const handleHeaderMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
 
@@ -156,6 +163,8 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
       ref={containerRef}
       className="fixed z-50 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-2xl"
       style={floatingStyle}
+      role="dialog"
+      aria-label="Floating Properties Panel"
       data-testid="floating-inspector"
     >
       <div
@@ -163,6 +172,9 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
           isDragging ? 'cursor-grabbing' : 'cursor-move'
         }`}
         onMouseDown={handleHeaderMouseDown}
+        onKeyDown={handleHeaderKeyDown}
+        tabIndex={0}
+        aria-grabbed={isDragging}
       >
         <div className="text-sm font-semibold text-slate-900">Properties</div>
         <button

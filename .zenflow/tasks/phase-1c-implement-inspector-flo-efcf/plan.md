@@ -272,7 +272,8 @@ Use Playwright's `page.mouse.down()`, `page.mouse.move()`, `page.mouse.up()` for
 
 ---
 
-### [ ] Step: Add Accessibility Attributes
+### [x] Step: Add Accessibility Attributes
+<!-- chat-id: 347324f1-ef6e-478a-bfc0-0866ddc7351d -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
 
