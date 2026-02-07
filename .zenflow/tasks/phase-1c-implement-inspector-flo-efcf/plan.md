@@ -254,7 +254,7 @@ Add tests for header rendering:
 
 ---
 
-### [ ] Step: Add Visual Regression Tests
+### [x] Step: Add Visual Regression Tests
 <!-- chat-id: 3f2caafb-a072-4b4a-b155-96bf117efc7d -->
 
 **File**: `hvac-design-app/e2e/03-visual-regression/components/inspector-panel.spec.ts`
