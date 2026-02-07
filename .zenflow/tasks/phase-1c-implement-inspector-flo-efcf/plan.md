@@ -234,7 +234,7 @@ Test validation logic:
 
 ---
 
-### [ ] Step: Update Existing Tests
+### [x] Step: Update Existing Tests
 <!-- chat-id: d324e080-078b-454c-99a1-9a608ef66f57 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/__tests__/RightSidebar.test.tsx`
@@ -255,6 +255,7 @@ Add tests for header rendering:
 ---
 
 ### [ ] Step: Add Visual Regression Tests
+<!-- chat-id: 3f2caafb-a072-4b4a-b155-96bf117efc7d -->
 
 **File**: `hvac-design-app/e2e/03-visual-regression/components/inspector-panel.spec.ts`
 
