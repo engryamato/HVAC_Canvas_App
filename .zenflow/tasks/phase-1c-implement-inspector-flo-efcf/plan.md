@@ -368,7 +368,7 @@ Optimize drag performance:
 
 ---
 
-### [ ] Step: Integration Verification
+### [x] Step: Integration Verification
 <!-- chat-id: 82905286-f685-4e20-8b5c-003c5f4e28fd -->
 
 **Manual testing checklist**:
