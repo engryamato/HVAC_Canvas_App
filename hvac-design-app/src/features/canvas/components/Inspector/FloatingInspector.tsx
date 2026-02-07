@@ -161,7 +161,7 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
   return createPortal(
     <div
       ref={containerRef}
-      className="fixed z-50 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-2xl"
+      className="fixed z-50 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-2xl transition-all duration-200 animate-in fade-in slide-in-from-right-4"
       style={floatingStyle}
       role="dialog"
       aria-label="Floating Properties Panel"

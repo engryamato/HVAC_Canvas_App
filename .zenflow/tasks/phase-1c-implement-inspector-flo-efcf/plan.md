@@ -323,7 +323,7 @@ Add logic to detect if stored position is beyond current viewport:
 
 ---
 
-### [ ] Step: Add Transition Animations
+### [x] Step: Add Transition Animations
 <!-- chat-id: 17a27773-8858-492b-9142-3109e412c96c -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`

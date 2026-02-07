@@ -130,7 +130,9 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
           {activeRightTab === 'properties' && (
             <section className="sidebar-section" data-testid="properties-panel" id="properties-panel" role="tabpanel">
               {isFloating ? (
-                <div className="p-3 text-sm text-slate-600">Inspector is floating. Click Dock to return.</div>
+                <div className="p-3 text-sm text-slate-600 transition-opacity duration-200">
+                  Inspector is floating. Click Dock to return.
+                </div>
               ) : (
                 <InspectorPanel embedded showHeader onFloat={handleFloat} />
               )}
