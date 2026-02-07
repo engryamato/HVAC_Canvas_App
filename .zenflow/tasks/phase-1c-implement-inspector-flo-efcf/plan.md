@@ -355,7 +355,8 @@ Create component documentation:
 
 ---
 
-### [ ] Step: Performance Optimization
+### [x] Step: Performance Optimization
+<!-- chat-id: 505eed5c-b56b-48fe-a99a-eadc55820968 -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
 

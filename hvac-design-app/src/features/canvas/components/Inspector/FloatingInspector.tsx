@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { InspectorPanel } from './InspectorPanel';
 import { useInspectorPreferencesStore } from '../../store/inspectorPreferencesStore';
@@ -13,7 +13,9 @@ export interface FloatingInspectorProps {
   onDock: () => void;
 }
 
-export function FloatingInspector({ onDock }: FloatingInspectorProps) {
+export const FloatingInspector = React.memo(function FloatingInspector({
+  onDock,
+}: FloatingInspectorProps) {
   const floatingPosition = useInspectorPreferencesStore((state) => state.floatingPosition);
   const setFloatingPosition = useInspectorPreferencesStore((state) => state.setFloatingPosition);
 
@@ -26,6 +28,8 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
   const dragStartMouseRef = useRef<{ x: number; y: number } | null>(null);
   const dragStartPanelRef = useRef<{ x: number; y: number } | null>(null);
   const lastDragPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const pendingDragPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const dragRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const existing = document.getElementById(PORTAL_ELEMENT_ID);
@@ -62,13 +66,34 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
         y: dragStartPanel.y + (event.clientY - dragStartMouse.y),
       };
 
-      lastDragPositionRef.current = nextPosition;
-      setDragPosition(nextPosition);
+      pendingDragPositionRef.current = nextPosition;
+
+      if (dragRafRef.current !== null) {
+        return;
+      }
+
+      dragRafRef.current = window.requestAnimationFrame(() => {
+        dragRafRef.current = null;
+        const pendingPosition = pendingDragPositionRef.current;
+
+        if (!pendingPosition) {
+          return;
+        }
+
+        lastDragPositionRef.current = pendingPosition;
+        setDragPosition(pendingPosition);
+      });
     };
 
     const handleMouseUp = () => {
-      const finalPosition = lastDragPositionRef.current;
+      const finalPosition = pendingDragPositionRef.current ?? lastDragPositionRef.current;
 
+      if (dragRafRef.current !== null) {
+        window.cancelAnimationFrame(dragRafRef.current);
+        dragRafRef.current = null;
+      }
+
+      pendingDragPositionRef.current = null;
       setIsDragging(false);
       dragStartMouseRef.current = null;
       dragStartPanelRef.current = null;
@@ -134,25 +159,32 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
     };
   }, [dragPosition, floatingPosition]);
 
-  const handleHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
+  const handleHeaderKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onDock();
+      }
+    },
+    [onDock]
+  );
+
+  const handleHeaderMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
-      onDock();
-    }
-  };
 
-  const handleHeaderMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
+      const initialPanelPosition = dragPosition ?? floatingPosition ?? { x: 0, y: 0 };
 
-    const initialPanelPosition = dragPosition ?? floatingPosition ?? { x: 0, y: 0 };
+      dragStartMouseRef.current = { x: event.clientX, y: event.clientY };
+      dragStartPanelRef.current = { x: initialPanelPosition.x, y: initialPanelPosition.y };
+      lastDragPositionRef.current = { x: initialPanelPosition.x, y: initialPanelPosition.y };
+      pendingDragPositionRef.current = { x: initialPanelPosition.x, y: initialPanelPosition.y };
 
-    dragStartMouseRef.current = { x: event.clientX, y: event.clientY };
-    dragStartPanelRef.current = { x: initialPanelPosition.x, y: initialPanelPosition.y };
-    lastDragPositionRef.current = { x: initialPanelPosition.x, y: initialPanelPosition.y };
-
-    document.body.style.userSelect = 'none';
-    setIsDragging(true);
-  };
+      document.body.style.userSelect = 'none';
+      setIsDragging(true);
+    },
+    [dragPosition, floatingPosition]
+  );
 
   if (!portalElement) {
     return null;
@@ -193,6 +225,6 @@ export function FloatingInspector({ onDock }: FloatingInspectorProps) {
     </div>,
     portalElement
   );
-}
+});
 
 export default FloatingInspector;
