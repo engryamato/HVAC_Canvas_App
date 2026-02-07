@@ -11,6 +11,9 @@ import type { Entity, Room, Duct, Equipment } from '@/core/schema';
 import { useViewport } from '../hooks/useViewport';
 import { useCursorStore } from '../store/cursorStore';
 import { RulersOverlay } from './RulersOverlay';
+import { FloatingInspector } from './Inspector/FloatingInspector';
+import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
+import { validateFloatingPosition } from '../utils/validateFloatingPosition';
 
 // Tools
 import {
@@ -59,6 +62,11 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
+
+  const isInspectorFloating = useInspectorPreferencesStore((state) => state.isFloating);
+  const floatingPosition = useInspectorPreferencesStore((state) => state.floatingPosition);
+  const setInspectorFloating = useInspectorPreferencesStore((state) => state.setFloating);
+  const setFloatingPosition = useInspectorPreferencesStore((state) => state.setFloatingPosition);
 
   // Store state
   const { panX, panY, zoom, gridVisible, gridSize } = useViewportStore();
@@ -474,6 +482,30 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   // Compute cursor based on active tool
   const cursor = activeTool.getCursor();
 
+  useEffect(() => {
+    if (!isInspectorFloating) {
+      return;
+    }
+
+    const viewport = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+
+    const panelWidthPx = 320;
+    const panelHeightPx = Math.max(240, Math.min(720, viewport.height - 120));
+
+    const validated = validateFloatingPosition(
+      floatingPosition,
+      { width: panelWidthPx, height: panelHeightPx },
+      viewport
+    );
+
+    if (!floatingPosition || validated.x !== floatingPosition.x || validated.y !== floatingPosition.y) {
+      setFloatingPosition(validated);
+    }
+  }, [floatingPosition, isInspectorFloating, setFloatingPosition]);
+
   return (
     <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
       {showRulers && (
@@ -485,6 +517,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
           unitSystem={unitSystem}
         />
       )}
+      {isInspectorFloating && <FloatingInspector onDock={() => setInspectorFloating(false)} />}
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
