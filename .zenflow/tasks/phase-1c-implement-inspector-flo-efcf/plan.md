@@ -124,7 +124,8 @@ Use `useEffect` to attach/detach window event listeners based on `isDragging` st
 
 ---
 
-### [ ] Step: Add Float/Dock Toggle Button
+### [x] Step: Add Float/Dock Toggle Button
+<!-- chat-id: df1dd9f7-f2ff-4fc4-82a8-ec038ac40bc6 -->
 
 **File**: `hvac-design-app/src/features/canvas/components/Inspector/InspectorPanel.tsx`
 
