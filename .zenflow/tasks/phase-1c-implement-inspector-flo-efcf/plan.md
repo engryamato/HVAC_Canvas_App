@@ -311,7 +311,8 @@ Ensure consistent styling with docked inspector from `hvac-design-app/src/featur
 
 ---
 
-### [ ] Step: Handle Edge Case: Multiple Monitors
+### [x] Step: Handle Edge Case: Multiple Monitors
+<!-- chat-id: 1d918525-9c0f-4384-9769-8d394af560ec -->
 
 **In**: Position validation utility
 
@@ -323,6 +324,7 @@ Add logic to detect if stored position is beyond current viewport:
 ---
 
 ### [ ] Step: Add Transition Animations
+<!-- chat-id: 17a27773-8858-492b-9142-3109e412c96c -->
 
 **In**: `hvac-design-app/src/features/canvas/components/Inspector/FloatingInspector.tsx`
 

@@ -14,6 +14,7 @@ export type ViewportDimensions = {
 };
 
 const DEFAULT_MARGIN_PX = 50;
+const EXTERNAL_MONITOR_THRESHOLD_PX = 100;
 
 export function validateFloatingPosition(
   position: FloatingPosition | null | undefined,
@@ -48,7 +49,44 @@ export function validateFloatingPosition(
     return getCenteredPosition(panel, viewport);
   }
 
+  const screenDimensions = getScreenAvailableDimensions();
+  if (screenDimensions) {
+    const isLikelyExternalMonitorPosition =
+      position.x > screenDimensions.width + EXTERNAL_MONITOR_THRESHOLD_PX ||
+      position.y > screenDimensions.height + EXTERNAL_MONITOR_THRESHOLD_PX ||
+      position.x < -(screenDimensions.width + EXTERNAL_MONITOR_THRESHOLD_PX) ||
+      position.y < -(screenDimensions.height + EXTERNAL_MONITOR_THRESHOLD_PX);
+
+    if (isLikelyExternalMonitorPosition) {
+      console.warn(
+        '[validateFloatingPosition] Floating inspector position appears off-screen (possibly disconnected monitor). Resetting to center.',
+        {
+          position,
+          viewport,
+          screen: screenDimensions,
+        }
+      );
+
+      return getCenteredPosition(panel, viewport);
+    }
+  }
+
   return { x: position.x, y: position.y };
+}
+
+function getScreenAvailableDimensions(): ViewportDimensions | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const width = window.screen?.availWidth;
+  const height = window.screen?.availHeight;
+
+  if (!isFiniteNumber(width) || !isFiniteNumber(height) || width <= 0 || height <= 0) {
+    return null;
+  }
+
+  return { width, height };
 }
 
 function getCenteredPosition(
@@ -69,4 +107,3 @@ function getCenteredPosition(
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
-
