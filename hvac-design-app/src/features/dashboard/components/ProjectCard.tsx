@@ -117,13 +117,13 @@ export function ProjectCard({
             return;
         }
         markAsOpened(project.projectId);
-        router.push(`/canvas/${project.projectId}`);
+        router.push(`/canvas?projectId=${project.projectId}`);
     };
 
     const handleOpenClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         markAsOpened(project.projectId);
-        router.push(`/canvas/${project.projectId}`);
+        router.push(`/canvas?projectId=${project.projectId}`);
     };
 
     const projectName = (project.projectName && project.projectName !== 'undefined') 

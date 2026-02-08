@@ -132,7 +132,7 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                 return;
             }
             if (e.key === 'Enter' && filteredProjects[focusedIndex]) {
-                window.location.href = `/canvas/${filteredProjects[focusedIndex].projectId}`;
+                window.location.href = `/canvas?projectId=${filteredProjects[focusedIndex].projectId}`;
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -144,23 +144,21 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
             showBreadcrumb={true}
             rightActions={
                 <div className="flex items-center gap-3">
-                    {/* Storage Mode Indicator (Web only) */}
-                    {!isTauriEnv && (
-                        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                            <HardDrive className="w-3.5 h-3.5" />
-                            {isFolderConnected ? 'Local Folder' : 'Browser Storage'}
-                        </div>
-                    )}
+                    {/* Storage Mode Indicator */}
+                    <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                        <HardDrive className="w-3.5 h-3.5" />
+                        {isTauriEnv ? 'Local Folder' : (isFolderConnected ? 'Local Folder' : 'Browser Storage')}
+                    </div>
 
-                    {/* Connect Folder Button (Web only) */}
-                    {!isTauriEnv && !isFolderConnected && (
+                    {/* Connect Folder Button */}
+                    {(isTauriEnv || (!isTauriEnv && !isFolderConnected)) && (
                         <button
                             onClick={() => setIsConnectFolderDialogOpen(true)}
                             className="btn-secondary py-1.5 text-xs"
                             data-testid="connect-folder-btn"
                         >
                             <HardDrive className="w-3.5 h-3.5" />
-                            Connect Folder
+                            {isTauriEnv ? 'Change Folder' : 'Connect Folder'}
                         </button>
                     )}
 

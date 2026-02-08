@@ -155,7 +155,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
             // Navigate to canvas
             onOpenChange(false);
             resetForm();
-            router.push(`/canvas/${newProject.projectId}`);
+            router.push(`/canvas?projectId=${newProject.projectId}`);
 
         } catch (error) {
             console.error('[NewProjectDialog] Failed to create project:', error);

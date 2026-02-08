@@ -60,7 +60,7 @@ export interface BomItem {
 
 /**
  * Generate bill of materials from entities
- * Returns BomItem array suitable for display in BOMTable
+ * Returns BomItem array suitable for display in BOM data grids
  */
 export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
   const entityList = entities.allIds

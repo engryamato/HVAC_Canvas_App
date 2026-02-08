@@ -13,8 +13,7 @@ import { useProjectListStore } from '@/features/dashboard/store/projectListStore
 import { useProjectStore as useLegacyProjectStore } from '@/stores/useProjectStore';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { useToolStore as useLegacyToolStore } from '@/stores/useToolStore';
-import { useViewportStore as useLegacyViewportStore } from '@/stores/useViewportStore';
+import { useToolStore } from '@/core/store/canvas.store';
 import { useTutorialStore } from '@/stores/useTutorialStore';
 import { ProjectFileSchema, type ProjectFile, CURRENT_SCHEMA_VERSION } from '@/core/schema/project-file.schema';
 import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } from '@/utils/storageKeys';
@@ -182,8 +181,8 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
 
   const appState = useAppStateStore.getState();
   const layoutState = useLayoutStore.getState();
-  const legacyTool = useLegacyToolStore.getState();
-  const legacyViewport = useLegacyViewportStore.getState();
+  const toolState = useToolStore.getState();
+  const viewportState = useViewportStore.getState();
   const tutorialState = useTutorialStore.getState();
 
   return {
@@ -241,13 +240,13 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
         activeRightTab: layoutState.activeRightTab,
       },
       tool: {
-        activeTool: legacyTool.activeTool,
+        activeTool: toolState.currentTool,
       },
       viewport: {
-        zoom: legacyViewport.zoom,
-        gridVisible: legacyViewport.gridVisible,
-        panOffset: legacyViewport.panOffset,
-        cursorPosition: legacyViewport.cursorPosition,
+        zoom: viewportState.zoom,
+        gridVisible: viewportState.gridVisible,
+        panOffset: { x: viewportState.panX, y: viewportState.panY },
+        cursorPosition: { x: 0, y: 0 },
       },
       tutorial: {
         isActive: tutorialState.isActive,
@@ -267,8 +266,8 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
   const legacyProjects = useLegacyProjectStore.getState();
   const appState = useAppStateStore.getState();
   const layoutState = useLayoutStore.getState();
-  const legacyTool = useLegacyToolStore.getState();
-  const legacyViewport = useLegacyViewportStore.getState();
+  const toolState = useToolStore.getState();
+  const viewportState = useViewportStore.getState();
   const tutorialState = useTutorialStore.getState();
 
   return {
@@ -326,13 +325,13 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
         activeRightTab: layoutState.activeRightTab,
       },
       tool: {
-        activeTool: legacyTool.activeTool,
+        activeTool: toolState.currentTool,
       },
       viewport: {
-        zoom: legacyViewport.zoom,
-        gridVisible: legacyViewport.gridVisible,
-        panOffset: legacyViewport.panOffset,
-        cursorPosition: legacyViewport.cursorPosition,
+        zoom: viewportState.zoom,
+        gridVisible: viewportState.gridVisible,
+        panOffset: { x: viewportState.panX, y: viewportState.panY },
+        cursorPosition: { x: 0, y: 0 },
       },
       tutorial: {
         isActive: tutorialState.isActive,

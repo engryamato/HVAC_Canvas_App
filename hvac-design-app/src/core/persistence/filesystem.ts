@@ -124,3 +124,20 @@ export async function renameFile(oldPath: string, newPath: string): Promise<void
   throw new Error('File rename requires Tauri runtime');
 }
 
+
+/**
+ * Open file/directory selection dialog
+ * @throws Error if not in Tauri environment
+ */
+export async function selectDirectory(): Promise<string | null> {
+  if (isTauri()) {
+    const { open } = await import('@tauri-apps/plugin-dialog');
+    const selected = await open({
+      directory: true,
+      multiple: false,
+      recursive: true,
+    });
+    return selected as string | null;
+  }
+  throw new Error('Directory selection requires Tauri runtime');
+}
