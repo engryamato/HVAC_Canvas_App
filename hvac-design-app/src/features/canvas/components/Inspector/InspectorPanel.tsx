@@ -1,6 +1,9 @@
 import React, { useCallback } from 'react';
+<<<<<<< HEAD
 import { Maximize2 } from 'lucide-react';
 import styles from './InspectorPanel.module.css';
+=======
+>>>>>>> feat/canvas-navigation
 import { useSelectionStore } from '../../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { Entity } from '@/core/schema';
@@ -29,7 +32,11 @@ function renderInspector(entity: Entity | null) {
     case 'equipment':
       return <EquipmentInspector entity={entity} />;
     default:
-      return <div className={styles.unsupported}>Inspector not available for this entity.</div>;
+      return (
+        <div className="p-4 border border-dashed border-slate-300 rounded-lg text-slate-500 bg-slate-50 text-center">
+          Inspector not available for this entity.
+        </div>
+      );
   }
 }
 
@@ -52,8 +59,8 @@ export function InspectorPanel({
     content = <CanvasPropertiesInspector />;
   } else if (selectedIds.length > 1) {
     content = (
-      <div className={styles.multiState}>
-        <div className={styles.multiCount}>{selectedIds.length}</div>
+      <div className="p-4 border border-dashed border-slate-300 rounded-lg text-slate-500 bg-slate-50 text-center">
+        <div className="font-semibold text-slate-900">{selectedIds.length}</div>
         <div>items selected</div>
       </div>
     );
@@ -61,7 +68,13 @@ export function InspectorPanel({
     content = renderInspector(selectedEntity);
   }
 
+  // Combined classes based on logic
+  const panelClasses = `flex flex-col h-full bg-slate-50 border-l border-slate-200 w-80 min-w-[20rem] ${
+    embedded ? 'w-auto min-w-0 border-l-0 bg-transparent' : ''
+  } ${className ?? ''}`;
+
   return (
+<<<<<<< HEAD
     <div className={`${styles.panel} ${embedded ? styles.embedded : ''} ${className ?? ''}`}>
       {showHeader ? (
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2">
@@ -78,6 +91,10 @@ export function InspectorPanel({
         </div>
       ) : null}
       <div className={styles.content}>{content}</div>
+=======
+    <div className={panelClasses}>
+      <div className="p-4 overflow-y-auto h-full">{content}</div>
+>>>>>>> feat/canvas-navigation
     </div>
   );
 }

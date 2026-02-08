@@ -24,14 +24,11 @@ export const DEFAULT_GRID_SIZE = 24;
 /** Grid size options for user preference */
 export const GRID_SIZE_OPTIONS = [12, 24, 48, 96] as const;
 
-/** Zoom level presets for quick access */
-export const ZOOM_PRESETS = {
-  FIT: 'fit',
-  '25%': 0.25,
-  '50%': 0.5,
-  '75%': 0.75,
-  '100%': 1.0,
-  '150%': 1.5,
-  '200%': 2.0,
-  '400%': 4.0,
-} as const;
+/** Zoom level presets for dropdown quick access */
+export const ZOOM_PRESETS = [0.25, 0.5, 1, 2, 4] as const;
+
+/** Zoom transition animation duration in milliseconds */
+export const ZOOM_TRANSITION_DURATION = 200;
+
+/** Padding multiplier for zoom-to-selection (10%) */
+export const ZOOM_TO_SELECTION_PADDING = 0.1;

@@ -40,7 +40,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
 
   return (
     <div
-      className={`flex items-center justify-between h-8 px-3 bg-slate-100 border-t border-gray-200 text-xs text-slate-600 select-none ${className}`}
+      className={`flex items-center justify-between h-8 px-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 select-none ${className}`}
       role="status"
       aria-live="polite"
       data-testid="status-bar"
@@ -53,7 +53,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
               X: {formatPosition(mousePosition.x)} Y: {formatPosition(mousePosition.y)}
             </span>
           ) : (
-            <span className="text-gray-400">—</span>
+            <span className="text-slate-400">—</span>
           )}
         </div>
       </div>
@@ -70,7 +70,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
 
         {/* Grid visibility indicator */}
         <div
-          className={`flex items-center gap-1 ${gridVisible ? 'text-blue-600' : 'text-gray-400'}`}
+          className={`flex items-center gap-1 ${gridVisible ? 'text-blue-500' : 'text-slate-400'}`}
           title={gridVisible ? 'Grid visible' : 'Grid hidden'}
         >
           <span>Grid: {gridVisible ? 'On' : 'Off'}</span>
@@ -80,7 +80,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
 
         {/* Grid snap indicator */}
         <div
-          className={`flex items-center gap-1 ${snapToGrid ? 'text-blue-600' : 'text-gray-400'}`}
+          className={`flex items-center gap-1 ${snapToGrid ? 'text-blue-500' : 'text-slate-400'}`}
           title={snapToGrid ? 'Snap to grid enabled' : 'Snap to grid disabled'}
         >
           <span>Snap: {snapToGrid ? 'On' : 'Off'}</span>

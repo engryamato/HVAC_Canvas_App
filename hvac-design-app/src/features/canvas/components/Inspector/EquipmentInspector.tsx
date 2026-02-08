@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import styles from './InspectorPanel.module.css';
 import PropertyField from './PropertyField';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
 import { useFieldValidation } from '../../hooks/useFieldValidation';
@@ -7,6 +6,7 @@ import type { Equipment } from '@/core/schema';
 import { EQUIPMENT_TYPE_DEFAULTS, EQUIPMENT_TYPE_LABELS } from '../../entities/equipmentDefaults';
 import { useEntityStore } from '@/core/store/entityStore';
 import { updateEntity as updateEntityCommand } from '@/core/commands/entityCommands';
+import { InspectorAccordion } from './InspectorAccordion';
 
 interface EquipmentInspectorProps {
   entity: Equipment;
@@ -86,39 +86,46 @@ export function EquipmentInspector({ entity }: EquipmentInspectorProps) {
     [entity.id, validateField]
   );
 
-  return (
-    <div>
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Identity</h3>
-        <PropertyField label="Name" htmlFor="equipment-name">
-          <ValidatedInput
-            id="equipment-name"
-            type="text"
-            value={entity.props.name}
-            error={errors['name']}
-            onChange={(val) => commit('name', val as string)}
-          />
-        </PropertyField>
-        <PropertyField label="Manufacturer" htmlFor="equipment-manufacturer" helperText="Optional">
-          <ValidatedInput
-            id="equipment-manufacturer"
-            type="text"
-            value={entity.props.manufacturer ?? ''}
-            onChange={(val) => commit('manufacturer', (val as string) || '')}
-          />
-        </PropertyField>
-        <PropertyField label="Model" htmlFor="equipment-model" helperText="Optional">
-          <ValidatedInput
-            id="equipment-model"
-            type="text"
-            value={entity.props.model ?? ''}
-            onChange={(val) => commit('model', (val as string) || '')}
-          />
-        </PropertyField>
-      </div>
-
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Type</h3>
+  const sections = [
+    {
+      id: 'identity',
+      title: 'Identity',
+      defaultExpanded: false,
+      content: (
+        <>
+          <PropertyField label="Name" htmlFor="equipment-name">
+            <ValidatedInput
+              id="equipment-name"
+              type="text"
+              value={entity.props.name}
+              error={errors['name']}
+              onChange={(val) => commit('name', val as string)}
+            />
+          </PropertyField>
+          <PropertyField label="Manufacturer" htmlFor="equipment-manufacturer" helperText="Optional">
+            <ValidatedInput
+              id="equipment-manufacturer"
+              type="text"
+              value={entity.props.manufacturer ?? ''}
+              onChange={(val) => commit('manufacturer', (val as string) || '')}
+            />
+          </PropertyField>
+          <PropertyField label="Model" htmlFor="equipment-model" helperText="Optional">
+            <ValidatedInput
+              id="equipment-model"
+              type="text"
+              value={entity.props.model ?? ''}
+              onChange={(val) => commit('model', (val as string) || '')}
+            />
+          </PropertyField>
+        </>
+      ),
+    },
+    {
+      id: 'type',
+      title: 'Type',
+      defaultExpanded: false,
+      content: (
         <PropertyField label="Equipment Type" htmlFor="equipment-type">
           <ValidatedInput
             id="equipment-type"
@@ -130,72 +137,88 @@ export function EquipmentInspector({ entity }: EquipmentInspectorProps) {
             ).map((key) => ({ value: key, label: EQUIPMENT_TYPE_LABELS[key] }))}
           />
         </PropertyField>
-      </div>
+      ),
+    },
+    {
+      id: 'performance',
+      title: 'Performance',
+      defaultExpanded: true,
+      content: (
+        <>
+          <PropertyField label="Capacity (CFM)" htmlFor="equipment-capacity">
+            <ValidatedInput
+              id="equipment-capacity"
+              type="number"
+              min={1}
+              max={100000}
+              step={10}
+              value={entity.props.capacity}
+              error={errors['capacity']}
+              onChange={(val) => commit('capacity', Number(val))}
+            />
+          </PropertyField>
+          <PropertyField label="Static Pressure (in.w.g.)" htmlFor="equipment-static-pressure">
+            <ValidatedInput
+              id="equipment-static-pressure"
+              type="number"
+              min={0}
+              max={20}
+              step={0.05}
+              value={entity.props.staticPressure}
+              error={errors['staticPressure']}
+              onChange={(val) => commit('staticPressure', Number(val))}
+            />
+          </PropertyField>
+        </>
+      ),
+    },
+    {
+      id: 'dimensions',
+      title: 'Dimensions',
+      defaultExpanded: true,
+      content: (
+        <>
+          <PropertyField label="Width (in)" htmlFor="equipment-width">
+            <ValidatedInput
+              id="equipment-width"
+              type="number"
+              min={1}
+              step={1}
+              value={entity.props.width}
+              error={errors['width']}
+              onChange={(val) => commit('width', Number(val))}
+            />
+          </PropertyField>
+          <PropertyField label="Depth (in)" htmlFor="equipment-depth">
+            <ValidatedInput
+              id="equipment-depth"
+              type="number"
+              min={1}
+              step={1}
+              value={entity.props.depth}
+              error={errors['depth']}
+              onChange={(val) => commit('depth', Number(val))}
+            />
+          </PropertyField>
+          <PropertyField label="Height (in)" htmlFor="equipment-height">
+            <ValidatedInput
+              id="equipment-height"
+              type="number"
+              min={1}
+              step={1}
+              value={entity.props.height}
+              error={errors['height']}
+              onChange={(val) => commit('height', Number(val))}
+            />
+          </PropertyField>
+        </>
+      ),
+    },
+  ];
 
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Performance</h3>
-        <PropertyField label="Capacity (CFM)" htmlFor="equipment-capacity">
-          <ValidatedInput
-            id="equipment-capacity"
-            type="number"
-            min={1}
-            max={100000}
-            step={10}
-            value={entity.props.capacity}
-            error={errors['capacity']}
-            onChange={(val) => commit('capacity', Number(val))}
-          />
-        </PropertyField>
-        <PropertyField label="Static Pressure (in.w.g.)" htmlFor="equipment-static-pressure">
-          <ValidatedInput
-            id="equipment-static-pressure"
-            type="number"
-            min={0}
-            max={20}
-            step={0.05}
-            value={entity.props.staticPressure}
-            error={errors['staticPressure']}
-            onChange={(val) => commit('staticPressure', Number(val))}
-          />
-        </PropertyField>
-      </div>
-
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Dimensions</h3>
-        <PropertyField label="Width (in)" htmlFor="equipment-width">
-          <ValidatedInput
-            id="equipment-width"
-            type="number"
-            min={1}
-            step={1}
-            value={entity.props.width}
-            error={errors['width']}
-            onChange={(val) => commit('width', Number(val))}
-          />
-        </PropertyField>
-        <PropertyField label="Depth (in)" htmlFor="equipment-depth">
-          <ValidatedInput
-            id="equipment-depth"
-            type="number"
-            min={1}
-            step={1}
-            value={entity.props.depth}
-            error={errors['depth']}
-            onChange={(val) => commit('depth', Number(val))}
-          />
-        </PropertyField>
-        <PropertyField label="Height (in)" htmlFor="equipment-height">
-          <ValidatedInput
-            id="equipment-height"
-            type="number"
-            min={1}
-            step={1}
-            value={entity.props.height}
-            error={errors['height']}
-            onChange={(val) => commit('height', Number(val))}
-          />
-        </PropertyField>
-      </div>
+  return (
+    <div>
+      <InspectorAccordion entityType="equipment" sections={sections} />
     </div>
   );
 }

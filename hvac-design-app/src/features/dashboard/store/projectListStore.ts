@@ -18,6 +18,7 @@ export interface ProjectListItem {
   storagePath: string;
   isArchived: boolean;
   filePath?: string; // Kept for compatibility, may be mapped from storage result
+  status?: 'draft' | 'in-progress' | 'complete';
 }
 
 interface ProjectListState {
@@ -76,6 +77,7 @@ export const useProjectListStore = create<ProjectListStore>()(
         const validatedProject = {
           ...project,
           projectName: project.projectName?.trim() || 'Untitled Project',
+          status: project.status || 'draft',
         };
         logger.debug('[ProjectListStore] Adding project:', validatedProject);
         set((state) => ({ projects: [validatedProject, ...state.projects] }));
@@ -182,7 +184,7 @@ export const useProjectListStore = create<ProjectListStore>()(
             throw new Error(result.error || 'Failed to duplicate project');
           }
 
-          // Add new project to state
+          // Add new project to state with status reset to 'draft' for duplicates
           const newProject: ProjectListItem = {
             projectId: result.project.projectId,
             projectName: result.project.projectName,
@@ -197,6 +199,7 @@ export const useProjectListStore = create<ProjectListStore>()(
             storagePath: result.source === 'file' ? (result as any).filePath || '' : `indexeddb://${result.project.projectId}`,
             isArchived: false,
             filePath: (result as any).filePath, // Only present if 'file' source
+            status: 'draft', // Reset status for duplicated projects
           };
 
           set((state) => ({ projects: [newProject, ...state.projects] }));
@@ -229,7 +232,8 @@ export const useProjectListStore = create<ProjectListStore>()(
             // In Tauri adapter, listProjects returns valid metadata. 
             // StoragePath/FilePath might need to be inferred or is not critical for list
             storagePath: '', 
-            filePath: undefined // Can update this if adapter returns it, but listProjects returns ProjectMetadata[] which usually doesn't have system path
+            filePath: undefined, // Can update this if adapter returns it, but listProjects returns ProjectMetadata[] which usually doesn't have system path
+            status: (p as any).status || 'draft', // Map status from adapter metadata if available
           }));
 
           set({ projects: projectItems, loading: false });
