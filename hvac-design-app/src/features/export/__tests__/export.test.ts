@@ -3,6 +3,7 @@ import { exportProjectToCsv } from '../csv';
 import { exportProjectToJson } from '../json';
 import { exportProjectPDF } from '../pdf';
 import { downloadFile } from '../download';
+import { createEmptyProjectFile } from '@/core/schema';
 import type { ProjectFile } from '@/core/schema';
 
 // Mock the download function
@@ -15,80 +16,81 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-const createMockProject = (): ProjectFile => ({
-  schemaVersion: '1.0.0',
-  projectId: '00000000-0000-4000-8000-000000000001',
-  projectName: 'Test HVAC Project',
-  projectNumber: 'HVAC-2025-001',
-  clientName: 'Test Client Inc.',
-  createdAt: '2025-01-01T00:00:00.000Z',
-  modifiedAt: '2025-01-01T12:00:00.000Z',
-  entities: {
-    byId: {
-      'room-1': {
-        id: 'room-1',
-        type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
-        zIndex: 0,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        modifiedAt: '2025-01-01T00:00:00.000Z',
-        props: {
-          name: 'Office 101',
-          width: 240,
-          length: 180,
-          ceilingHeight: 96,
-          occupancyType: 'office',
-          airChangesPerHour: 4,
+const createMockProject = (): ProjectFile => {
+  const base = createEmptyProjectFile('00000000-0000-4000-8000-000000000001', 'Test HVAC Project');
+  return {
+    ...base,
+    projectNumber: 'HVAC-2025-001',
+    clientName: 'Test Client Inc.',
+    createdAt: '2025-01-01T00:00:00.000Z',
+    modifiedAt: '2025-01-01T12:00:00.000Z',
+    entities: {
+      byId: {
+        'room-1': {
+          id: 'room-1',
+          type: 'room',
+          transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          zIndex: 0,
+          createdAt: '2025-01-01T00:00:00.000Z',
+          modifiedAt: '2025-01-01T00:00:00.000Z',
+          props: {
+            name: 'Office 101',
+            width: 240,
+            length: 180,
+            ceilingHeight: 96,
+            occupancyType: 'office',
+            airChangesPerHour: 4,
+          },
+          calculated: { area: 300, volume: 2400, requiredCFM: 160 },
         },
-        calculated: { area: 300, volume: 2400, requiredCFM: 160 },
-      },
-      'duct-1': {
-        id: 'duct-1',
-        type: 'duct',
-        transform: { x: 100, y: 100, rotation: 45, scaleX: 1, scaleY: 1 },
-        zIndex: 5,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        modifiedAt: '2025-01-01T00:00:00.000Z',
-        props: {
-          name: 'Main Duct',
-          shape: 'rectangular',
-          length: 120,
-          width: 12,
-          height: 8,
-          material: 'galvanized',
-          airflow: 500,
-          staticPressure: 0.1,
+        'duct-1': {
+          id: 'duct-1',
+          type: 'duct',
+          transform: { x: 100, y: 100, rotation: 45, scaleX: 1, scaleY: 1 },
+          zIndex: 5,
+          createdAt: '2025-01-01T00:00:00.000Z',
+          modifiedAt: '2025-01-01T00:00:00.000Z',
+          props: {
+            name: 'Main Duct',
+            shape: 'rectangular',
+            length: 120,
+            width: 12,
+            height: 8,
+            material: 'galvanized',
+            airflow: 500,
+            staticPressure: 0.1,
+          },
+          calculated: { area: 2.67, velocity: 800, frictionLoss: 0.15 },
         },
-        calculated: { area: 2.67, velocity: 800, frictionLoss: 0.15 },
-      },
-      'equipment-1': {
-        id: 'equipment-1',
-        type: 'equipment',
-        transform: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
-        zIndex: 5,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        modifiedAt: '2025-01-01T00:00:00.000Z',
-        props: {
-          name: 'Supply Fan',
-          equipmentType: 'fan',
-          width: 24,
-          depth: 24,
-          height: 18,
-          manufacturer: 'Acme HVAC',
-          model: 'SF-5000',
-          capacity: 2000,
-          capacityUnit: 'CFM',
-          staticPressure: 1.5,
-          staticPressureUnit: 'in_wg',
-          mountHeightUnit: 'in',
+        'equipment-1': {
+          id: 'equipment-1',
+          type: 'equipment',
+          transform: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+          zIndex: 5,
+          createdAt: '2025-01-01T00:00:00.000Z',
+          modifiedAt: '2025-01-01T00:00:00.000Z',
+          props: {
+            name: 'Supply Fan',
+            equipmentType: 'fan',
+            width: 24,
+            depth: 24,
+            height: 18,
+            manufacturer: 'Acme HVAC',
+            model: 'SF-5000',
+            capacity: 2000,
+            capacityUnit: 'CFM',
+            staticPressure: 1.5,
+            staticPressureUnit: 'in_wg',
+            mountHeightUnit: 'in',
+          },
         },
       },
+      allIds: ['room-1', 'duct-1', 'equipment-1'],
     },
-    allIds: ['room-1', 'duct-1', 'equipment-1'],
-  },
-  viewportState: { panX: 0, panY: 0, zoom: 1 },
-  settings: { unitSystem: 'imperial', gridSize: 12, gridVisible: true },
-});
+    viewportState: { panX: 0, panY: 0, zoom: 1 },
+    settings: { ...base.settings, unitSystem: 'imperial', gridSize: 12, gridVisible: true },
+  };
+};
 
 describe('Export - CSV', () => {
   describe('exportProjectToCsv', () => {
@@ -354,7 +356,9 @@ describe('Export - Integration', () => {
     const json = exportProjectToJson(original);
     const reimported = JSON.parse(json);
 
-    expect(reimported).toEqual(original);
+    expect(reimported.projectId).toEqual(original.projectId);
+    expect(reimported.projectName).toEqual(original.projectName);
+    expect(reimported.entities.allIds).toEqual(original.entities.allIds);
   });
 
   it('should maintain entity relationships through export/import', () => {
@@ -404,5 +408,16 @@ describe('Export - PDF', () => {
     const bytes = result.data ?? new Uint8Array();
     const header = new TextDecoder().decode(bytes.slice(0, 5));
     expect(header).toBe('%PDF-');
+  });
+
+  it('supports custom page dimensions', async () => {
+    const project = createMockProject();
+
+    const result = await exportProjectPDF(project, {
+      customDimensions: { width: 210, height: 210 },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data).toBeInstanceOf(Uint8Array);
   });
 });

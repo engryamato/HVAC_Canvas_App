@@ -1,17 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useProjectListStore, useRecentProjects } from '../store/projectListStore';
+import { useProjectListStore, useRecentProjects, useProjectListActions } from '../store/projectListStore';
 import { useProjectFilters } from '../hooks/useProjectFilters';
 import { SearchBar } from './SearchBar';
 import { RecentProjectsSection } from './RecentProjectsSection';
 import { AllProjectsSection } from './AllProjectsSection';
-import { Plus, Archive, FolderOpen } from 'lucide-react';
+import { Plus, Archive, HardDrive, FolderOpen } from 'lucide-react';
 import { NewProjectDialog } from './NewProjectDialog';
+import { ConnectFolderDialog } from './ConnectFolderDialog';
+import { FirstLaunchModal } from '@/features/onboarding/components/FirstLaunchModal';
+import { useFirstLaunch } from '@/features/onboarding/hooks/useFirstLaunch';
 import { AppShell } from '@/components/layout/AppShell';
 import { useAutoOpen } from '@/hooks/useAutoOpen';
-import { useAppStateStore } from '@/stores/useAppStateStore';
 import { useSearchParams } from 'next/navigation';
+import { isTauri } from '@/core/persistence/filesystem';
+import { getDirectoryHandle } from '@/core/persistence/directoryHandleManager';
 
 /**
  * Dashboard Page - Modern Engineering Project Management Interface
@@ -30,13 +34,28 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
     const activeProjects = allProjectsRaw.filter(p => !p.isArchived);
     const archivedProjects = allProjectsRaw.filter(p => p.isArchived);
     const recentProjects = useRecentProjects();
-    const scanProjectsFromDisk = useProjectListStore(state => state.scanProjectsFromDisk);
-    const [isDialogOpen, setIsDialogOpen] = useState(initialNewProjectOpen);
+    const { refreshProjects } = useProjectListActions();
+    const [isNewProjectDialogOpen, setIsNewProjectDialogOpen] = useState(initialNewProjectOpen);
     const searchParams = useSearchParams();
     const viewParam = searchParams.get('view') as 'active' | 'archived' | null;
     const [activeTab, setActiveTab] = useState<'active' | 'archived'>(viewParam === 'archived' ? 'archived' : 'active');
     const [focusedIndex, setFocusedIndex] = useState(0);
-    const isTauri = useAppStateStore((state) => state.isTauri);
+    const { isFirstLaunch, isLoading: isFirstLaunchLoading, markAsCompleted } = useFirstLaunch();
+    const [isConnectFolderDialogOpen, setIsConnectFolderDialogOpen] = useState(false);
+    const [isFolderConnected, setIsFolderConnected] = useState(false);
+    const [isTauriEnv, setIsTauriEnv] = useState(false);
+
+    // Check if folder is connected on mount
+    useEffect(() => {
+        void (async () => {
+            const dirHandle = await getDirectoryHandle();
+            setIsFolderConnected(dirHandle !== null);
+        })();
+    }, []);
+
+    useEffect(() => {
+        setIsTauriEnv(isTauri());
+    }, []);
 
     // Sync state with URL
     useEffect(() => {
@@ -55,25 +74,28 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
 
     useAutoOpen();
 
+    const fetchProjects = async () => {
+        await refreshProjects();
+    };
+
     useEffect(() => {
         void (async () => {
             await useProjectListStore.persist.rehydrate();
-            if (isTauri) {
-                await scanProjectsFromDisk();
-            }
+            await fetchProjects();
         })();
-    }, [isTauri, scanProjectsFromDisk]);
+    }, []); // Removed refreshProjects from dependency array as fetchProjects is defined within this scope or is a stable function.
 
     const handleRescan = async () => {
-        if (!isTauri) {
-            return;
-        }
-        await scanProjectsFromDisk();
+        await fetchProjects();
     };
 
     const handleSortChange = (sortBy: 'name' | 'date', sortOrder: 'asc' | 'desc') => {
         setSortBy(sortBy);
         setSortOrder(sortOrder);
+    };
+
+    const handleProjectCreated = () => {
+        fetchProjects();
     };
 
     // Keyboard shortcuts
@@ -110,7 +132,7 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                 return;
             }
             if (e.key === 'Enter' && filteredProjects[focusedIndex]) {
-                window.location.href = `/canvas/${filteredProjects[focusedIndex].projectId}`;
+                window.location.href = `/canvas?projectId=${filteredProjects[focusedIndex].projectId}`;
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -121,14 +143,35 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
         <AppShell 
             showBreadcrumb={true}
             rightActions={
-                <button
-                    onClick={() => setIsDialogOpen(true)}
-                    className="btn-primary py-1.5"
-                    data-testid="new-project-btn"
-                >
-                    <Plus className="w-4 h-4" />
-                    New Project
-                </button>
+                <div className="flex items-center gap-3">
+                    {/* Storage Mode Indicator */}
+                    <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                        <HardDrive className="w-3.5 h-3.5" />
+                        {isTauriEnv ? 'Local Folder' : (isFolderConnected ? 'Local Folder' : 'Browser Storage')}
+                    </div>
+
+                    {/* Connect Folder Button */}
+                    {(isTauriEnv || (!isTauriEnv && !isFolderConnected)) && (
+                        <button
+                            onClick={() => setIsConnectFolderDialogOpen(true)}
+                            className="btn-secondary py-1.5 text-xs"
+                            data-testid="connect-folder-btn"
+                        >
+                            <HardDrive className="w-3.5 h-3.5" />
+                            {isTauriEnv ? 'Change Folder' : 'Connect Folder'}
+                        </button>
+                    )}
+
+                    {/* New Project Button */}
+                    <button
+                        onClick={() => setIsNewProjectDialogOpen(true)}
+                        className="btn-primary py-1.5"
+                        data-testid="new-project-btn"
+                    >
+                        <Plus className="w-4 h-4" />
+                        New Project
+                    </button>
+                </div>
             }
         >
             <div className="flex-1 overflow-y-auto" data-testid="dashboard-page">
@@ -162,16 +205,16 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                         </div>
 
                         {/* Search Bar */}
-                        <SearchBar
-                            value={filters.searchQuery}
-                            onChange={setSearchQuery}
-                            sortBy={filters.sortBy}
-                            sortOrder={filters.sortOrder}
-                            onSortChange={handleSortChange}
-                            onRescan={isTauri ? handleRescan : undefined}
-                            totalCount={totalCount}
-                            filteredCount={filteredProjects.length}
-                        />
+                            <SearchBar
+                                value={filters.searchQuery}
+                                onChange={setSearchQuery}
+                                sortBy={filters.sortBy}
+                                sortOrder={filters.sortOrder}
+                                onSortChange={handleSortChange}
+                                onRescan={handleRescan}
+                                totalCount={totalCount}
+                                filteredCount={filteredProjects.length}
+                            />
                     </div>
 
                     {/* Content Area */}
@@ -186,7 +229,7 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                                 Create your first HVAC design project to get started with professional floor plans and equipment layouts.
                             </p>
                             <button
-                                onClick={() => setIsDialogOpen(true)}
+                                onClick={() => setIsNewProjectDialogOpen(true)}
                                 className="btn-primary text-base px-6 py-3"
                                 data-testid="empty-state-create-btn"
                             >
@@ -215,7 +258,33 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                     )}
                 </main>
 
-                <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+                {/* Dialogs */}
+                <NewProjectDialog 
+                    open={isNewProjectDialogOpen} 
+                    onOpenChange={setIsNewProjectDialogOpen}
+                    onProjectCreated={handleProjectCreated}
+                />
+                
+                <ConnectFolderDialog
+                    isOpen={isConnectFolderDialogOpen}
+                    onClose={() => setIsConnectFolderDialogOpen(false)}
+                    onConnected={() => {
+                        setIsFolderConnected(true);
+                        fetchProjects(); // Refresh list after connection
+                    }}
+                />
+
+                {!isTauriEnv && isFirstLaunch && !isFirstLaunchLoading && !isConnectFolderDialogOpen && (
+                    <FirstLaunchModal
+                        isOpen={true}
+                        onClose={(mode) => {
+                            markAsCompleted();
+                            if (mode === 'folder') {
+                                setIsConnectFolderDialogOpen(true); // Open connect folder dialog
+                            }
+                        }}
+                    />
+                )}
             </div>
         </AppShell>
     );

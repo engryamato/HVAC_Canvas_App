@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,26 @@ export function ConfirmDialog({
     return null;
   }
 
-  const confirmVariant = variant === 'danger' ? 'destructive' : 'default';
+  // Map variant to Button variant and custom classes
+  const getConfirmButtonProps = () => {
+    switch (variant) {
+      case 'danger':
+        return { variant: 'destructive' as const, className: '' };
+      case 'warning':
+        return { 
+          variant: 'default' as const, 
+          className: 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500' 
+        };
+      case 'info':
+      default:
+        return { 
+          variant: 'default' as const, 
+          className: 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
+        };
+    }
+  };
+
+  const confirmButtonProps = getConfirmButtonProps();
 
   const titleClassName =
     variant === 'danger'
@@ -73,7 +92,12 @@ export function ConfirmDialog({
           <Button ref={cancelButtonRef} variant="outline" onClick={onCancel}>
             {cancelLabel}
           </Button>
-          <Button variant={confirmVariant} onClick={onConfirm}>
+          <Button 
+            variant={confirmButtonProps.variant} 
+            className={confirmButtonProps.className}
+            onClick={onConfirm}
+            data-testid="confirm-button"
+          >
             {confirmLabel}
           </Button>
         </DialogFooter>
@@ -82,4 +106,4 @@ export function ConfirmDialog({
   );
 }
 
-export default ConfirmDialog;
+

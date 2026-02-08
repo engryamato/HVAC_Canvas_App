@@ -51,6 +51,23 @@ const config: Config = {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                
+                // HVAC Domain Colors
+                'supply-air': {
+                    DEFAULT: '#3b82f6', // Technical Blue - conditioned air supply
+                    light: '#60a5fa',
+                    dark: '#2563eb',
+                },
+                'return-air': {
+                    DEFAULT: '#10b981', // Emerald - return air
+                    light: '#34d399',
+                    dark: '#059669',
+                },
+                'exhaust-air': {
+                    DEFAULT: '#f59e0b', // Amber - exhaust air
+                    light: '#fbbf24',
+                    dark: '#d97706',
+                },
             },
             borderRadius: {
                 lg: "var(--radius)",

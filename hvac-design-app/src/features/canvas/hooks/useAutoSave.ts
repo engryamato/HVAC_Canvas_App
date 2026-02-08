@@ -13,8 +13,7 @@ import { useProjectListStore } from '@/features/dashboard/store/projectListStore
 import { useProjectStore as useLegacyProjectStore } from '@/stores/useProjectStore';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { useToolStore as useLegacyToolStore } from '@/stores/useToolStore';
-import { useViewportStore as useLegacyViewportStore } from '@/stores/useViewportStore';
+import { useToolStore } from '@/core/store/canvas.store';
 import { useTutorialStore } from '@/stores/useTutorialStore';
 import { ProjectFileSchema, type ProjectFile, CURRENT_SCHEMA_VERSION } from '@/core/schema/project-file.schema';
 import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } from '@/utils/storageKeys';
@@ -125,8 +124,23 @@ export function buildProjectFileFromStores(): ProjectFile | null {
     projectName: projectStore.projectDetails.projectName,
     projectNumber: projectStore.projectDetails.projectNumber || undefined,
     clientName: projectStore.projectDetails.clientName || undefined,
+    location: projectStore.projectDetails.location || undefined,
+    scope: projectStore.projectDetails.scope ?? {
+      details: [],
+      materials: [],
+      projectType: 'Commercial',
+    },
+    siteConditions: projectStore.projectDetails.siteConditions ?? {
+      elevation: '0',
+      outdoorTemp: '70',
+      indoorTemp: '70',
+      windSpeed: '0',
+      humidity: '50',
+      localCodes: '',
+    },
     createdAt: projectStore.projectDetails.createdAt,
     modifiedAt: new Date().toISOString(),
+    isArchived: false,
     entities: {
       byId: entityStore.byId,
       allIds: entityStore.allIds,
@@ -167,8 +181,8 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
 
   const appState = useAppStateStore.getState();
   const layoutState = useLayoutStore.getState();
-  const legacyTool = useLegacyToolStore.getState();
-  const legacyViewport = useLegacyViewportStore.getState();
+  const toolState = useToolStore.getState();
+  const viewportState = useViewportStore.getState();
   const tutorialState = useTutorialStore.getState();
 
   return {
@@ -226,13 +240,13 @@ export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile
         activeRightTab: layoutState.activeRightTab,
       },
       tool: {
-        activeTool: legacyTool.activeTool,
+        activeTool: toolState.currentTool,
       },
       viewport: {
-        zoom: legacyViewport.zoom,
-        gridVisible: legacyViewport.gridVisible,
-        panOffset: legacyViewport.panOffset,
-        cursorPosition: legacyViewport.cursorPosition,
+        zoom: viewportState.zoom,
+        gridVisible: viewportState.gridVisible,
+        panOffset: { x: viewportState.panX, y: viewportState.panY },
+        cursorPosition: { x: 0, y: 0 },
       },
       tutorial: {
         isActive: tutorialState.isActive,
@@ -252,8 +266,8 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
   const legacyProjects = useLegacyProjectStore.getState();
   const appState = useAppStateStore.getState();
   const layoutState = useLayoutStore.getState();
-  const legacyTool = useLegacyToolStore.getState();
-  const legacyViewport = useLegacyViewportStore.getState();
+  const toolState = useToolStore.getState();
+  const viewportState = useViewportStore.getState();
   const tutorialState = useTutorialStore.getState();
 
   return {
@@ -311,13 +325,13 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
         activeRightTab: layoutState.activeRightTab,
       },
       tool: {
-        activeTool: legacyTool.activeTool,
+        activeTool: toolState.currentTool,
       },
       viewport: {
-        zoom: legacyViewport.zoom,
-        gridVisible: legacyViewport.gridVisible,
-        panOffset: legacyViewport.panOffset,
-        cursorPosition: legacyViewport.cursorPosition,
+        zoom: viewportState.zoom,
+        gridVisible: viewportState.gridVisible,
+        panOffset: { x: viewportState.panX, y: viewportState.panY },
+        cursorPosition: { x: 0, y: 0 },
       },
       tutorial: {
         isActive: tutorialState.isActive,

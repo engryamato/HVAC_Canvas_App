@@ -1,0 +1,8 @@
+{
+  "projectToken": "${CHROMATIC_PROJECT_TOKEN}",
+  "buildScriptName": "build",
+  "playwright": true,
+  "exitZeroOnChanges": false,
+  "exitOnceUploaded": true,
+  "onlyChanged": true
+}

@@ -33,8 +33,8 @@ function ToolButton({ tool, icon, label, shortcut, isActive, onClick }: ToolButt
         transition-colors duration-150 relative group
         ${
           isActive
-            ? 'active bg-slate-100 text-slate-900 shadow-sm'
-            : 'text-slate-500 hover:text-slate-900'
+            ? 'active bg-blue-500 text-white shadow-sm'
+            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
         }
       `}
       title={`${label} (${shortcut})`}
@@ -46,12 +46,12 @@ function ToolButton({ tool, icon, label, shortcut, isActive, onClick }: ToolButt
       {/* Tooltip */}
       <div
         className="
-        absolute left-full ml-2 px-2 py-1 rounded bg-gray-800 text-white text-xs
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
         whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
         transition-opacity duration-150 z-50
       "
       >
-        {label} <span className="text-gray-400">({shortcut})</span>
+        {label} <span className="text-slate-400">({shortcut})</span>
       </div>
     </button>
   );
@@ -236,7 +236,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
     <div
       className={`
         flex flex-col gap-2 p-2
-        bg-white rounded-xl shadow-lg border border-gray-200
+        bg-slate-50 rounded-lg shadow-sm border border-slate-200
         ${className}
       `}
       role="toolbar"
@@ -256,7 +256,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       ))}
 
       {/* Undo/Redo buttons */}
-      <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
+      <div className="flex items-center gap-1 ml-2 pl-2 border-l border-slate-200">
         <UndoRedoButton
           onClick={undo}
           disabled={!canUndo}

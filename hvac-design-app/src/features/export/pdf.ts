@@ -5,6 +5,7 @@ export type PdfPageSize = 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'letter' | 'legal' 
 
 export interface ExportPdfOptions {
   pageSize?: PdfPageSize;
+  customDimensions?: { width: number; height: number };
   snapshot?: {
     dataUrl: string;
     widthPx: number;
@@ -30,7 +31,9 @@ export async function exportProjectPDF(project: ProjectFile, options?: ExportPdf
     const pageSize = options?.pageSize ?? 'letter';
     const doc = new jsPDF({
       unit: 'mm',
-      format: getPdfFormat(pageSize),
+      format: options?.customDimensions
+        ? [options.customDimensions.width, options.customDimensions.height]
+        : getPdfFormat(pageSize),
     });
 
     const entityList = project.entities.allIds

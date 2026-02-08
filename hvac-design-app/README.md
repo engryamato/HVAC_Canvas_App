@@ -90,6 +90,30 @@ npm run test:ui
 npm test -- --coverage
 ```
 
+### Visual Regression Testing
+
+This project uses [Chromatic](https://www.chromatic.com/) integrated with Playwright for automated visual regression testing. All UI components are tested in both light and dark modes.
+
+```bash
+# Run Playwright visual tests
+npm run e2e
+
+# Upload screenshots to Chromatic
+npm run chromatic
+
+# Capture new baseline (first time only)
+npm run chromatic:baseline
+```
+
+**See detailed documentation:** [Visual Testing Guide](./docs/VISUAL_TESTING.md)
+
+**Chromatic Features:**
+- Automated screenshot comparison on every PR
+- Light/dark mode theme variants for all components
+- Manual approval workflow for visual changes
+- CI/CD integration with GitHub Actions
+- 100+ baseline snapshots covering entire UI
+
 ## Building
 
 ```bash

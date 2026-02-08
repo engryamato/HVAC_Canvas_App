@@ -1,0 +1,300 @@
+{
+  "version": "1.0.0",
+  "library_name": "hvac-canvas-devops-workflow",
+  "phases": [
+    "Phase 0: Repo Recon",
+    "Phase 1: Install & Boot",
+    "Phase 2: API correctness",
+    "Phase 3: Tests",
+    "Phase 4: Orchestration",
+    "Phase 5: Documentation & Planning",
+    "Phase 6: CI readiness"
+  ],
+  "skills": [
+    {
+      "skill_id": "workflow-governance-and-logging",
+      "file": "skills/workflow-governance-and-logging.md",
+      "purpose": "Enforce execution format, checkpoint cadence, and usage logging.",
+      "triggers": [
+        "begin workflow",
+        "checkpoint update",
+        "status report",
+        "usage logging"
+      ],
+      "phase_mapping": [
+        "Phase 0: Repo Recon",
+        "Phase 1: Install & Boot",
+        "Phase 2: API correctness",
+        "Phase 3: Tests",
+        "Phase 4: Orchestration",
+        "Phase 5: Documentation & Planning",
+        "Phase 6: CI readiness"
+      ],
+      "required_inputs": [
+        "checkpoint name",
+        "skill_ids in use",
+        "commands run",
+        "files changed",
+        "result"
+      ],
+      "outputs": [
+        "formatted status update",
+        "usage_log.md append entry"
+      ]
+    },
+    {
+      "skill_id": "phase-0-repo-recon",
+      "file": "skills/phase-0-repo-recon.md",
+      "purpose": "Identify stack, scripts, services, current state, and gaps.",
+      "triggers": [
+        "start implementation",
+        "unknown stack",
+        "repo audit",
+        "baseline assessment"
+      ],
+      "phase_mapping": [
+        "Phase 0: Repo Recon"
+      ],
+      "required_inputs": [
+        "repo root path",
+        "operating system"
+      ],
+      "outputs": [
+        "current state report",
+        "gap list",
+        "checkpoint plan"
+      ]
+    },
+    {
+      "skill_id": "phase-1-install-and-boot",
+      "file": "skills/phase-1-install-and-boot.md",
+      "purpose": "Boot frontend, backend, and API with deterministic env wiring.",
+      "triggers": [
+        "dev environment setup",
+        "frontend fails to start",
+        "backend fails to start",
+        "env var setup"
+      ],
+      "phase_mapping": [
+        "Phase 1: Install & Boot"
+      ],
+      "required_inputs": [
+        "package manager",
+        "service ports",
+        "required services"
+      ],
+      "outputs": [
+        ".env.example updates",
+        "working dev scripts",
+        "verified frontend-to-api connectivity"
+      ]
+    },
+    {
+      "skill_id": "phase-2-api-correctness",
+      "file": "skills/phase-2-api-correctness.md",
+      "purpose": "Ensure health endpoint, validation, errors, CORS, and request-id logging.",
+      "triggers": [
+        "api validation",
+        "missing health endpoint",
+        "cors issue",
+        "inconsistent error response"
+      ],
+      "phase_mapping": [
+        "Phase 2: API correctness"
+      ],
+      "required_inputs": [
+        "api framework",
+        "current routes",
+        "allowed origins"
+      ],
+      "outputs": [
+        "GET /health endpoint",
+        "error response contract",
+        "validated CORS behavior",
+        "request-id logs"
+      ]
+    },
+    {
+      "skill_id": "phase-3-tests-and-quality-gates",
+      "file": "skills/phase-3-tests-and-quality-gates.md",
+      "purpose": "Make unit/integration/e2e tests deterministic and wire lint/format gates.",
+      "triggers": [
+        "test failures",
+        "missing integration tests",
+        "quality gate setup",
+        "nondeterministic tests"
+      ],
+      "phase_mapping": [
+        "Phase 3: Tests"
+      ],
+      "required_inputs": [
+        "test framework",
+        "db strategy for tests",
+        "existing scripts"
+      ],
+      "outputs": [
+        "reliable test scripts",
+        "unit and integration coverage",
+        "lint/format command parity"
+      ]
+    },
+    {
+      "skill_id": "phase-4-orchestration",
+      "file": "skills/phase-4-orchestration.md",
+      "purpose": "Provide compose/dev/reset orchestration with safe defaults.",
+      "triggers": [
+        "docker compose setup",
+        "multi-service local run",
+        "reset environment",
+        "service dependency setup"
+      ],
+      "phase_mapping": [
+        "Phase 4: Orchestration"
+      ],
+      "required_inputs": [
+        "required local services",
+        "existing compose files",
+        "port matrix"
+      ],
+      "outputs": [
+        "docker-compose.yml or equivalent",
+        "one-command dev orchestration",
+        "explicit reset flow"
+      ]
+    },
+    {
+      "skill_id": "phase-5-docs-and-planning",
+      "file": "skills/phase-5-docs-and-planning.md",
+      "purpose": "Create setup, architecture, runbook, and decisions docs tied to commands.",
+      "triggers": [
+        "missing setup docs",
+        "runbook needed",
+        "architecture update",
+        "record technical decision"
+      ],
+      "phase_mapping": [
+        "Phase 5: Documentation & Planning"
+      ],
+      "required_inputs": [
+        "actual run commands",
+        "service architecture",
+        "operational procedures"
+      ],
+      "outputs": [
+        "SETUP.md",
+        "ARCHITECTURE.md",
+        "RUNBOOK.md",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "skill_id": "phase-6-ci-readiness",
+      "file": "skills/phase-6-ci-readiness.md",
+      "purpose": "Integrate lint/test/build pipelines into existing CI safely.",
+      "triggers": [
+        "ci setup",
+        "pipeline breakage risk",
+        "cache optimization",
+        "pre-merge validation"
+      ],
+      "phase_mapping": [
+        "Phase 6: CI readiness"
+      ],
+      "required_inputs": [
+        "current ci provider",
+        "existing workflow files",
+        "script commands"
+      ],
+      "outputs": [
+        "ci workflow updates",
+        "passing lint/test/build jobs",
+        "non-breaking pipeline integration"
+      ]
+    },
+    {
+      "skill_id": "failure-triage-minimal-fix",
+      "file": "skills/failure-triage-minimal-fix.md",
+      "purpose": "Stop on failures, capture exact errors, and apply smallest safe fix.",
+      "triggers": [
+        "command failure",
+        "blocked checkpoint",
+        "unexpected stack behavior"
+      ],
+      "phase_mapping": [
+        "Phase 0: Repo Recon",
+        "Phase 1: Install & Boot",
+        "Phase 2: API correctness",
+        "Phase 3: Tests",
+        "Phase 4: Orchestration",
+        "Phase 5: Documentation & Planning",
+        "Phase 6: CI readiness"
+      ],
+      "required_inputs": [
+        "failing command",
+        "stderr output",
+        "target behavior"
+      ],
+      "outputs": [
+        "failure summary",
+        "smallest viable fix",
+        "verification rerun commands"
+      ]
+    }
+  ],
+  "default_workflow": [
+    {
+      "phase": "Phase 0: Repo Recon",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-0-repo-recon"
+      ]
+    },
+    {
+      "phase": "Phase 1: Install & Boot",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-1-install-and-boot",
+        "failure-triage-minimal-fix"
+      ]
+    },
+    {
+      "phase": "Phase 2: API correctness",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-2-api-correctness",
+        "failure-triage-minimal-fix"
+      ]
+    },
+    {
+      "phase": "Phase 3: Tests",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-3-tests-and-quality-gates",
+        "failure-triage-minimal-fix"
+      ]
+    },
+    {
+      "phase": "Phase 4: Orchestration",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-4-orchestration",
+        "failure-triage-minimal-fix"
+      ]
+    },
+    {
+      "phase": "Phase 5: Documentation & Planning",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-5-docs-and-planning"
+      ]
+    },
+    {
+      "phase": "Phase 6: CI readiness",
+      "skill_ids": [
+        "workflow-governance-and-logging",
+        "phase-6-ci-readiness",
+        "failure-triage-minimal-fix"
+      ]
+    }
+  ]
+}

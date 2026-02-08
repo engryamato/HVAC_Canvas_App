@@ -1,9 +1,8 @@
-'use client';
-
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { BOMPanel } from './BOMPanel';
 import { InspectorPanel } from './Inspector/InspectorPanel';
 import { useLayoutStore } from '@/stores/useLayoutStore';
+import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 
 interface RightSidebarProps {
   isOpen?: boolean;
@@ -25,6 +24,78 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
   const setActiveRightTab = useLayoutStore((state) => state.setActiveRightTab);
   const rightSidebarCollapsed = useLayoutStore((state) => state.rightSidebarCollapsed);
   const toggleRightSidebar = useLayoutStore((state) => state.toggleRightSidebar);
+  
+  const inspectorWidth = useInspectorPreferencesStore((state) => state.inspectorWidth);
+  const setInspectorWidth = useInspectorPreferencesStore((state) => state.setInspectorWidth);
+  const resetInspectorWidth = useInspectorPreferencesStore((state) => state.resetInspectorWidth);
+
+  const [isResizing, setIsResizing] = useState(false);
+  const [dragWidth, setDragWidth] = useState(inspectorWidth);
+  const widthRef = React.useRef(inspectorWidth);
+
+  // Sync dragWidth/ref with store when not resizing (e.g. on reset)
+  useEffect(() => {
+    if (!isResizing) {
+      setDragWidth(inspectorWidth);
+      widthRef.current = inspectorWidth;
+    }
+  }, [inspectorWidth, isResizing]);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    // Initialize ref with current store value to be safe
+    widthRef.current = inspectorWidth; 
+  }, [inspectorWidth]);
+
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) {return;}
+    
+    // Calculate new width (window width - mouse x position)
+    // Since it's right sidebar, moving left increases width
+    const newWidth = window.innerWidth - e.clientX;
+    
+    // Clamp between 280px and 480px
+    const clampedWidth = Math.min(Math.max(newWidth, 280), 480);
+    
+    // Update local state and ref only
+    setDragWidth(clampedWidth);
+    widthRef.current = clampedWidth;
+  }, [isResizing]);
+
+  const handleResizeEnd = useCallback(() => {
+    if (isResizing) {
+      setIsResizing(false);
+      // specific check for isResizing to avoid firing if not resizing
+      setInspectorWidth(widthRef.current);
+    }
+  }, [isResizing, setInspectorWidth]);
+
+  const handleDoubleClick = useCallback(() => {
+    resetInspectorWidth();
+  }, [resetInspectorWidth]);
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', handleResizeMove);
+      window.addEventListener('mouseup', handleResizeEnd);
+      // Add a global cursor style to body to prevent cursor flickering
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none'; // Prevent text selection while resizing
+    } else {
+      window.removeEventListener('mousemove', handleResizeMove);
+      window.removeEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleResizeMove);
+      window.removeEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
 
   if (!isOpen) {
     return null;
@@ -33,9 +104,17 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
   return (
     <aside
       className={`right-sidebar ${rightSidebarCollapsed ? 'collapsed' : ''} ${className}`}
-      style={{ width: rightSidebarCollapsed ? '48px' : '320px' }}
+      style={{ width: rightSidebarCollapsed ? '48px' : `${isResizing ? dragWidth : inspectorWidth}px` }}
       data-testid="right-sidebar"
     >
+      {!rightSidebarCollapsed && (
+        <div 
+          className="resize-handle-left"
+          onMouseDown={handleResizeStart}
+          onDoubleClick={handleDoubleClick}
+          title="Drag to resize, double-click to reset"
+        />
+      )}
       <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2">
         {!rightSidebarCollapsed && (
           <div className="flex gap-2" role="tablist">

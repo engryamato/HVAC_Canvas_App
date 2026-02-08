@@ -19,7 +19,7 @@ const createMockRoom = (id: string, name: string): Room => ({
     name,
     width: 120,
     length: 120,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'office',
     airChangesPerHour: 4,
   },

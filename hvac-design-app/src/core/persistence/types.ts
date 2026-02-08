@@ -1,4 +1,4 @@
-import { ProjectMetadata } from '../schema/ProjectFileSchema';
+export type { ProjectFile, ProjectMetadata } from '../schema/project-file.schema';
 import { IOResult, LoadResult as OriginalLoadResult, IOErrorCode as OriginalIOErrorCode } from './projectIO';
 
 /**
@@ -10,7 +10,11 @@ export type StorageErrorCode =
   | 'QUOTA_EXCEEDED'
   | 'MIGRATION_REQUIRED'
   | 'BACKUP_FAILED'
-  | 'ATOMIC_WRITE_FAILED';
+  | 'ATOMIC_WRITE_FAILED'
+  | 'WRITE_ERROR'
+  | 'READ_ERROR'
+  | 'DELETE_ERROR'
+  | 'CORRUPTED_FILE';
 
 /**
  * Base result type for storage operations
@@ -126,4 +130,4 @@ export interface StorageInfo {
 }
 
 // Re-export ProjectMetadata for convenience
-export type { ProjectMetadata };
+

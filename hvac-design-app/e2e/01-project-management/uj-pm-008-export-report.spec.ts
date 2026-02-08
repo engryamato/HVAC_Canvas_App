@@ -71,8 +71,7 @@ async function navigateToCanvas(page: Page) {
     return projectId;
 }
 
-// TODO: Enable when File menu and Export Report feature is implemented
-test.describe.skip('UJ-PM-008: Export Project Report', () => {
+test.describe('UJ-PM-008: Export Project Report', () => {
     test.beforeEach(async ({ page }) => {
         await page.evaluate(() => {
             localStorage.clear();
@@ -80,69 +79,55 @@ test.describe.skip('UJ-PM-008: Export Project Report', () => {
         });
     });
 
-    test('Export Report dialog opens from File menu', async ({ page }) => {
+    test('Export dialog opens from export menu', async ({ page }) => {
         await navigateToCanvas(page);
 
-        // Open File menu
-        await page.getByRole('button', { name: 'File' }).click();
-
-        // Click Export Report
-        await page.getByTestId('menu-export-report').click();
+        // Open Export dialog
+        await page.getByRole('button', { name: 'Export...' }).click();
 
         // Verify dialog opens
-        await expect(page.getByTestId('export-report-dialog')).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Export Project Report' })).toBeVisible();
+        await expect(page.getByTestId('enhanced-export-dialog')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Export' })).toBeVisible();
     });
 
     test('Export dialog has all required options', async ({ page }) => {
         await navigateToCanvas(page);
 
         // Open Export dialog
-        await page.getByRole('button', { name: 'File' }).click();
-        await page.getByTestId('menu-export-report').click();
+        await page.getByRole('button', { name: 'Export...' }).click();
 
         // Verify options are present
-        await expect(page.getByTestId('report-type-select')).toBeVisible();
-        await expect(page.getByTestId('include-details-checkbox')).toBeVisible();
-        await expect(page.getByTestId('include-bom-checkbox')).toBeVisible();
-        await expect(page.getByTestId('paper-size-select')).toBeVisible();
-        await expect(page.getByTestId('orientation-select')).toBeVisible();
-        await expect(page.getByTestId('export-btn')).toBeVisible();
-        await expect(page.getByTestId('export-cancel-btn')).toBeVisible();
+        await expect(page.getByText('Format')).toBeVisible();
+        await expect(page.getByText('Include')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Export' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
     });
 
     test('Cancel button closes dialog', async ({ page }) => {
         await navigateToCanvas(page);
 
         // Open Export dialog
-        await page.getByRole('button', { name: 'File' }).click();
-        await page.getByTestId('menu-export-report').click();
+        await page.getByRole('button', { name: 'Export...' }).click();
 
-        await expect(page.getByTestId('export-report-dialog')).toBeVisible();
+        await expect(page.getByTestId('enhanced-export-dialog')).toBeVisible();
 
         // Click Cancel
-        await page.getByTestId('export-cancel-btn').click();
+        await page.getByRole('button', { name: 'Cancel' }).click();
 
         // Dialog should close
-        await expect(page.getByTestId('export-report-dialog')).not.toBeVisible();
+        await expect(page.getByTestId('enhanced-export-dialog')).not.toBeVisible();
     });
 
-    test('Report type selection updates included sections', async ({ page }) => {
+    test('Format selection updates options', async ({ page }) => {
         await navigateToCanvas(page);
 
         // Open Export dialog
-        await page.getByRole('button', { name: 'File' }).click();
-        await page.getByTestId('menu-export-report').click();
+        await page.getByRole('button', { name: 'Export...' }).click();
 
-        // Default (Full Report) should have all checked
-        await expect(page.getByTestId('include-details-checkbox')).toBeChecked();
-        await expect(page.getByTestId('include-bom-checkbox')).toBeChecked();
+        // Change to PNG
+        await page.getByText('PNG').click();
 
-        // Change to BOM Only
-        await page.getByTestId('report-type-select').selectOption('bom');
-
-        // Only BOM should be checked
-        await expect(page.getByTestId('include-details-checkbox')).not.toBeChecked();
-        await expect(page.getByTestId('include-bom-checkbox')).toBeChecked();
+        // Quality selector should appear
+        await expect(page.getByText('Quality')).toBeVisible();
     });
 });

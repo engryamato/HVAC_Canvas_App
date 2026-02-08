@@ -2,33 +2,18 @@
 
 import { useMemo, useState } from 'react';
 import styles from './ExportMenu.module.css';
-import { exportProjectJSON, exportBOMtoCSV, exportProjectPDF, generateBOM } from './';
+import { exportProjectJSON, exportBOMtoCSV, generateBOM } from './';
 import { createEmptyProjectFile } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useCurrentProjectId, useProjectDetails } from '@/core/store/project.store';
 import { downloadFile } from './download';
-import { useAppStateStore } from '@/stores/useAppStateStore';
-import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
-import type { PdfPageSize } from './pdf';
-import { captureCanvasSnapshot } from './canvasSnapshot';
-
-const PDF_PAGE_SIZES: Array<{ label: string; value: PdfPageSize }> = [
-  { label: 'Letter', value: 'letter' },
-  { label: 'Legal', value: 'legal' },
-  { label: 'Tabloid', value: 'tabloid' },
-  { label: 'A0', value: 'a0' },
-  { label: 'A1', value: 'a1' },
-  { label: 'A2', value: 'a2' },
-  { label: 'A3', value: 'a3' },
-];
-
-function pushToast(message: string, type: 'success' | 'error' | 'warning' | 'info') {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  window.dispatchEvent(new CustomEvent('sws:toast', { detail: { message, type } }));
-}
+import { buildProjectFileFromStores } from '@/features/canvas/hooks/useAutoSave';
+import { EnhancedExportDialog } from '@/features/export/components/EnhancedExportDialog';
+import { PrintDialog } from '@/features/export/components/PrintDialog';
+import { EmptyCanvasDialog, ExportErrorDialog, LargeFileWarningDialog, UnsavedChangesDialog } from '@/features/export/components/ExportConfirmationDialogs';
+import { useExport } from '@/features/export/hooks/useExport';
+import { usePrint } from '@/features/export/hooks/usePrint';
+import type { ExportOptions } from '@/features/export/types';
 
 function sanitizeFileName(fileName: string): string {
   return fileName.replace(/[/\\?%*:|"<>\s]/g, '_');
@@ -39,8 +24,29 @@ export function ExportMenu() {
   const entityIds = useEntityStore((state) => state.allIds);
   const projectId = useCurrentProjectId();
   const projectDetails = useProjectDetails();
-  const isTauri = useAppStateStore((state) => state.isTauri);
-  const [pdfPageSize, setPdfPageSize] = useState<PdfPageSize>('letter');
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+
+  const {
+    exportProject,
+    isExporting,
+    showProgress,
+    emptyCanvasOpen,
+    largeFileOpen,
+    largeFileEstimate,
+    unsavedOpen,
+    exportErrorOpen,
+    exportErrorMessage,
+    handleConfirmEmptyCanvas,
+    handleConfirmLargeFile,
+    handleConfirmUnsaved,
+    handleRetryExport,
+    dismissEmptyCanvas,
+    dismissLargeFile,
+    dismissUnsaved,
+    dismissExportError,
+  } = useExport();
+  const { print, isPrinting } = usePrint();
 
   const project = useMemo(() => {
     if (!projectId) {
@@ -72,38 +78,25 @@ export function ExportMenu() {
     );
   };
 
-  const handleExportPdf = async () => {
-    if (!project) {
+  const handleExport = async (options: ExportOptions) => {
+    const projectFile = buildProjectFileFromStores();
+    if (!projectFile) {
+      return { success: false, error: 'No project loaded' };
+    }
+    return exportProject(projectFile, options);
+  };
+
+  const handleConfirmExport = async (handler: (project: NonNullable<ReturnType<typeof buildProjectFileFromStores>>) => Promise<unknown>) => {
+    const projectFile = buildProjectFileFromStores();
+    if (!projectFile) {
       return;
     }
+    await handler(projectFile);
+  };
 
-    const snapshot = await captureCanvasSnapshot();
-
-    const pdfResult = await exportProjectPDF(project, { pageSize: pdfPageSize, snapshot: snapshot ?? undefined });
-    if (!pdfResult.success || !pdfResult.data) {
-      pushToast(pdfResult.error ?? 'PDF export failed', 'error');
-      return;
-    }
-
-    const pdfFileName = `${sanitizeFileName(project.projectName)}.pdf`;
-
-    if (isTauri) {
-      const filePath = await TauriFileSystem.saveFileDialog({
-        defaultPath: pdfFileName,
-        title: 'Export Project PDF',
-        filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
-      });
-
-      if (!filePath) {
-        pushToast('Export cancelled', 'warning');
-        return;
-      }
-
-      await TauriFileSystem.writeBinaryFile(filePath, pdfResult.data);
-      return;
-    }
-
-    downloadFile(pdfResult.data, pdfFileName, 'application/pdf');
+  const handlePrint = async (options: Parameters<typeof print>[0]) => {
+    await print(options);
+    setPrintDialogOpen(false);
   };
 
   return (
@@ -112,20 +105,44 @@ export function ExportMenu() {
       <div className={styles.actions}>
         <button onClick={handleExportJson}>JSON</button>
         <button onClick={handleExportCsv}>CSV</button>
-        <select
-          className={styles.sizeSelect}
-          value={pdfPageSize}
-          onChange={(e) => setPdfPageSize(e.target.value as PdfPageSize)}
-          aria-label="PDF page size"
-        >
-          {PDF_PAGE_SIZES.map((size) => (
-            <option key={size.value} value={size.value}>
-              {size.label}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleExportPdf}>PDF</button>
+        <button onClick={() => setExportDialogOpen(true)} disabled={isExporting}>Export...</button>
+        <button onClick={() => setPrintDialogOpen(true)} disabled={isPrinting}>Print...</button>
       </div>
+
+      <EnhancedExportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        onExport={handleExport}
+      />
+
+      <PrintDialog
+        open={printDialogOpen}
+        onOpenChange={setPrintDialogOpen}
+        onPrint={handlePrint}
+      />
+
+      <EmptyCanvasDialog
+        open={emptyCanvasOpen}
+        onCancel={dismissEmptyCanvas}
+        onConfirm={() => handleConfirmExport(handleConfirmEmptyCanvas)}
+      />
+      <LargeFileWarningDialog
+        open={largeFileOpen}
+        onCancel={dismissLargeFile}
+        onConfirm={() => handleConfirmExport(handleConfirmLargeFile)}
+        estimatedSize={largeFileEstimate ?? '50 MB+'}
+      />
+      <UnsavedChangesDialog
+        open={unsavedOpen}
+        onCancel={dismissUnsaved}
+        onConfirm={() => handleConfirmExport(handleConfirmUnsaved)}
+      />
+      <ExportErrorDialog
+        open={exportErrorOpen}
+        message={exportErrorMessage}
+        onCancel={dismissExportError}
+        onConfirm={() => handleConfirmExport(handleRetryExport)}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { ProjectMetadata, ProjectMetadataSchema } from '@/core/schema/ProjectFileSchema';
+import type { ProjectMetadata } from '@/core/schema/project-file.schema';
+import { ProjectMetadataSchema } from '@/core/schema/project-file.schema';
 import { readTextFile, removeFile, readDir as readDirWrapper, exists } from './filesystem';
 
 /**

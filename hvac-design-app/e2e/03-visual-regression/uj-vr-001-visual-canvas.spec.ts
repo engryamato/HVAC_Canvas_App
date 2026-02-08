@@ -559,4 +559,64 @@ test.describe('Canvas Visual Tests', () => {
       });
     });
   });
+
+  test.describe('Balanced Visual Hierarchy', () => {
+    test('should display balanced visual hierarchy between chrome and canvas', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        // Ensure all chrome components are visible
+        const toolbar = page.locator('[data-testid="toolbar"]');
+        const statusBar = page.locator('[data-testid="status-bar"]');
+        const header = page.locator('[data-testid="header"]');
+        const canvas = page.locator('canvas').first();
+
+        // Wait for all chrome components to be present
+        await Promise.all([
+          toolbar.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+          statusBar.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+          header.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
+          canvas.waitFor({ state: 'visible', timeout: 5000 }),
+        ]);
+
+        // Capture full layout showing header, toolbar, canvas, inspector, status bar
+        await expect(page).toHaveScreenshot(`balanced-hierarchy-${theme}.png`, {
+          fullPage: true,
+        });
+      });
+    });
+
+    test('should display toolbar with Technical Blue active state', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        // Select a tool to show active state
+        await page.keyboard.press('d');
+        await page.waitForTimeout(100);
+
+        const toolbar = page.locator('[data-testid="toolbar"]');
+        if (await toolbar.isVisible()) {
+          const ductButton = page.getByTestId('tool-duct');
+          if (await ductButton.isVisible()) {
+            // Verify it has the active Technical Blue styling
+            await expect(toolbar).toHaveScreenshot(`toolbar-technical-blue-active-${theme}.png`);
+          }
+        }
+      });
+    });
+
+    test('should display status bar with consistent Slate-50 background', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const statusBar = page.locator('[data-testid="status-bar"]');
+        if (await statusBar.isVisible()) {
+          await expect(statusBar).toHaveScreenshot(`statusbar-slate-bg-${theme}.png`);
+        }
+      });
+    });
+
+    test('should display header with glassmorphism effect', async ({ page }) => {
+      await withThemeVariants(page, async (theme) => {
+        const header = page.locator('[data-testid="header"]');
+        if (await header.isVisible()) {
+          await expect(header).toHaveScreenshot(`header-glassmorphism-${theme}.png`);
+        }
+      });
+    });
+  });
 });

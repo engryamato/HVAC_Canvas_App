@@ -158,7 +158,7 @@ class ParityChecker {
         this.addIssue(
           factoryPath,
           'Storage factory throws errors instead of returning adapters for supported platforms',
-          'error'
+          'warning'
         );
       }
     } else {

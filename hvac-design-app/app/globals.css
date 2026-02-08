@@ -269,7 +269,22 @@
 }
 
 .resize-handle:hover {
-  background: #1976d2;
+  background: #3b82f6; /* Technical Blue */
+}
+
+.resize-handle-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 10;
+}
+
+.resize-handle-left:hover {
+  background: #3b82f6; /* Technical Blue */
 }
 
 .scope-section {
@@ -346,11 +361,11 @@
   height: 44px;
   border-radius: 999px;
   border: none;
-  background: #1976d2;
+  background: #3b82f6; /* Technical Blue */
   color: white;
   font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(25, 118, 210, 0.3);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
 }
 
 .fab-menu {
