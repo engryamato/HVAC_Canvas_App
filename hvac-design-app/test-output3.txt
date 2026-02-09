@@ -1,0 +1,191 @@
+
+> sizewise-hvac-canvas@0.1.0 test
+> vitest run src/core/services/__tests__/OperationQueue.test.ts
+
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+ Vitest  "deps.inline" is deprecated. If you rely on vite-node directly, use "server.deps.inline" instead. Otherwise, consider using "deps.optimizer.web.include"
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Users/User/Downloads/GitHub/HVAC_Canvas_App/hvac-design-app[39m
+
+ [33mΓ¥»[39m src/core/services/__tests__/OperationQueue.test.ts [2m ([22m[2m22 tests[22m [2m|[22m [31m5 failed[39m[2m)[22m[90m 12[2mms[22m[39m
+[31m   [33mΓ¥»[31m src/core/services/__tests__/OperationQueue.test.ts[2m > [22mOperationQueue[2m > [22mRetry Logic[2m > [22mshould fail immediately on permanent errors (EPERM)[39m
+[31m     ΓåÆ promise resolved "undefined" instead of rejecting[39m
+[31m   [33mΓ¥»[31m src/core/services/__tests__/OperationQueue.test.ts[2m > [22mOperationQueue[2m > [22mRetry Logic[2m > [22mshould fail immediately on permanent errors (ENOENT)[39m
+[31m     ΓåÆ promise resolved "undefined" instead of rejecting[39m
+[31m   [33mΓ¥»[31m src/core/services/__tests__/OperationQueue.test.ts[2m > [22mOperationQueue[2m > [22mRetry Logic[2m > [22mshould fail immediately on schema errors[39m
+[31m     ΓåÆ promise resolved "undefined" instead of rejecting[39m
+[31m   [33mΓ¥»[31m src/core/services/__tests__/OperationQueue.test.ts[2m > [22mOperationQueue[2m > [22mError Handling[2m > [22mshould remove failed operation from queue[39m
+[31m     ΓåÆ promise resolved "undefined" instead of rejecting[39m
+[31m   [33mΓ¥»[31m src/core/services/__tests__/OperationQueue.test.ts[2m > [22mOperationQueue[2m > [22mError Handling[2m > [22mshould propagate error to caller[39m
+[31m     ΓåÆ promise resolved "undefined" instead of rejecting[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 5 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/core/services/__tests__/OperationQueue.test.ts > OperationQueue > Retry Logic > should fail immediately on permanent errors (EPERM)
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected: 
+[Error: rejected promise]
+
++ Received: 
+undefined
+
+ Γ¥» src/core/services/__tests__/OperationQueue.test.ts:244:33
+    242|             await vi.runAllTimersAsync();
+    243|             
+    244|             await expect(promise).rejects.toMatchObject({ code: 'EPERMΓÇª
+       |                                 ^
+    245|             expect(operation).toHaveBeenCalledTimes(1); // No retries
+    246|         });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/5]ΓÄ»
+
+ FAIL  src/core/services/__tests__/OperationQueue.test.ts > OperationQueue > Retry Logic > should fail immediately on permanent errors (ENOENT)
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected: 
+[Error: rejected promise]
+
++ Received: 
+undefined
+
+ Γ¥» src/core/services/__tests__/OperationQueue.test.ts:255:33
+    253|             await vi.runAllTimersAsync();
+    254|             
+    255|             await expect(promise).rejects.toMatchObject({ code: 'ENOENΓÇª
+       |                                 ^
+    256|             expect(operation).toHaveBeenCalledTimes(1);
+    257|         });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/5]ΓÄ»
+
+ FAIL  src/core/services/__tests__/OperationQueue.test.ts > OperationQueue > Retry Logic > should fail immediately on schema errors
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected: 
+[Error: rejected promise]
+
++ Received: 
+undefined
+
+ Γ¥» src/core/services/__tests__/OperationQueue.test.ts:266:33
+    264|             await vi.runAllTimersAsync();
+    265|             
+    266|             await expect(promise).rejects.toMatchObject({ message: 'ScΓÇª
+       |                                 ^
+    267|             expect(operation).toHaveBeenCalledTimes(1);
+    268|         });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/5]ΓÄ»
+
+ FAIL  src/core/services/__tests__/OperationQueue.test.ts > OperationQueue > Error Handling > should remove failed operation from queue
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected: 
+[Error: rejected promise]
+
++ Received: 
+undefined
+
+ Γ¥» src/core/services/__tests__/OperationQueue.test.ts:374:33
+    372|             await vi.runAllTimersAsync();
+    373|             
+    374|             await expect(promise).rejects.toBeDefined();
+       |                                 ^
+    375| 
+    376|             // Queue should be empty after failed operation
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/5]ΓÄ»
+
+ FAIL  src/core/services/__tests__/OperationQueue.test.ts > OperationQueue > Error Handling > should propagate error to caller
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected: 
+[Error: rejected promise]
+
++ Received: 
+undefined
+
+ Γ¥» src/core/services/__tests__/OperationQueue.test.ts:411:33
+    409|             await vi.runAllTimersAsync();
+    410|             
+    411|             await expect(promise).rejects.toEqual(error);
+       |                                 ^
+    412|         });
+    413|     });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/5]ΓÄ»
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1m[7m Unhandled Errors [27m[22mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1m
+Vitest caught 6 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.[22m[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Unknown Error: Permission denied
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Serialized Error: { code: 'EPERM' }
+This error originated in "src/core/services/__tests__/OperationQueue.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "should fail immediately on permanent errors (EPERM)". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Unknown Error: File not found
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Serialized Error: { code: 'ENOENT' }
+This error originated in "src/core/services/__tests__/OperationQueue.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "should fail immediately on permanent errors (ENOENT)". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Unknown Error: Schema validation failed
+This error originated in "src/core/services/__tests__/OperationQueue.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "should fail immediately on schema errors". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Unknown Error: Permission denied
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Serialized Error: { code: 'EPERM' }
+This error originated in "src/core/services/__tests__/OperationQueue.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "should remove failed operation from queue". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+{
+  code: 'ENOENT',
+  expected: 'undefined',
+  actual: 'undefined',
+  VITEST_TEST_NAME: 'should continue processing queue after failure',
+  VITEST_TEST_PATH: 'src/core/services/__tests__/OperationQueue.test.ts',
+  VITEST_AFTER_ENV_TEARDOWN: undefined,
+  type: 'Unhandled Rejection',
+  stacks: []
+}
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Serialized Error: { code: 'ENOENT' }
+This error originated in "src/core/services/__tests__/OperationQueue.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "should continue processing queue after failure". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ» Unhandled Rejection ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Unknown Error: Permission denied
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+Serialized Error: { code: 'EPERM' }
+This error originated in "src/core/services/__tests__/OperationQueue.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "should propagate error to caller". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (22)[39m
+[2m     Errors [22m [1m[31m6 errors[39m[22m
+[2m   Start at [22m 23:41:00
+[2m   Duration [22m 819ms[2m (transform 33ms, setup 65ms, collect 18ms, tests 12ms, environment 366ms, prepare 55ms)[22m
+

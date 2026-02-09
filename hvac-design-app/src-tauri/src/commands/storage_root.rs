@@ -1,6 +1,6 @@
 use std::fs;
 use std::path::Path;
-use tauri::api::path::{app_data_dir, document_dir};
+use tauri::{AppHandle, Manager};
 use serde::{Serialize, Deserialize};
 use fs2::free_space;
 
@@ -27,9 +27,9 @@ pub struct DiskSpaceInfo {
 }
 
 #[tauri::command]
-pub fn resolve_storage_root(config: tauri::Config) -> StorageRootInfo {
-    let docs = document_dir();
-    let app_data = app_data_dir(&config);
+pub fn resolve_storage_root(app: AppHandle) -> StorageRootInfo {
+    let docs = app.path().document_dir().ok();
+    let app_data = app.path().app_data_dir().ok();
 
     StorageRootInfo {
         documents_path: docs.clone().map(|p| p.to_string_lossy().to_string()),

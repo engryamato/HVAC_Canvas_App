@@ -1,11 +1,31 @@
+/**
+ * Lightweight operation queue with global root lock and per-project FIFO queuing.
+ * Coordinates storage operations during migration, relocation, and normal project operations.
+ * 
+ * @example
+ * // Root lock for migration
+ * const release = await queue.acquireLock('root');
+ * try {
+ *   // ... migration operations
+ * } finally {
+ *   release();
+ * }
+ * 
+ * @example
+ * // Per-project queue
+ * await queue.enqueue('project:123', async () => {
+ *   await saveProject(project);
+ * });
+ */
+
 export interface QueuedOperation {
     id: string;
     key: string;
-    type: string;
     execute: () => Promise<void>;
     retryCount: number;
     maxRetries: number;
-    createdAt: number;
+    resolve: () => void;
+    reject: (error: unknown) => void;
 }
 
 export type ReleaseFn = () => void;
@@ -13,18 +33,45 @@ export type ReleaseFn = () => void;
 export class OperationQueue {
     private queues: Map<string, QueuedOperation[]> = new Map();
     private processing: Map<string, boolean> = new Map();
-    private history: Array<{ id: string; key: string; type: string; status: string; timestamp: number }> = [];
 
     constructor() { }
 
-    async enqueue(key: string, operation: QueuedOperation): Promise<void> {
-        if (!this.queues.has(key)) {
-            this.queues.set(key, []);
-        }
-        this.queues.get(key)!.push(operation);
-        this.processQueue(key);
+    /**
+     * Enqueues an operation for a specific key (project or root).
+     * Operations for the same key execute sequentially in FIFO order.
+     * Failed operations are retried up to 3 times for transient errors (EBUSY, EAGAIN, EINTR).
+     * 
+     * @param key - The queue key (e.g., 'root', 'project:uuid')
+     * @param operation - Async function to execute
+     */
+    async enqueue(key: string, operation: () => Promise<void>): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            // Generate operation ID internally
+            const op: QueuedOperation = {
+                id: `op-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                key,
+                execute: operation,
+                retryCount: 0,
+                maxRetries: 3,
+                resolve,
+                reject
+            };
+
+            if (!this.queues.has(key)) {
+                this.queues.set(key, []);
+            }
+            this.queues.get(key)!.push(op);
+            this.processQueue(key);
+        });
     }
 
+    /**
+     * Acquires an exclusive lock for the given key.
+     * All operations for this key will wait until the lock is released.
+     * 
+     * @param key - The lock key (typically 'root' for migrations)
+     * @returns A function that releases the lock when called
+     */
     async acquireLock(key: string): Promise<ReleaseFn> {
         let release: ReleaseFn = () => { };
         const releasedPromise = new Promise<void>((resolve) => {
@@ -32,94 +79,135 @@ export class OperationQueue {
         });
 
         // Enqueue an operation that waits for the release function to be called
-        await new Promise<void>((resolveEnqueued) => {
+        await new Promise<void>((resolveEnqueued, rejectEnqueued) => {
             const op: QueuedOperation = {
                 id: `lock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 key,
-                type: 'lock',
                 execute: async () => {
                     resolveEnqueued(); // Lock acquired
                     await releasedPromise; // Wait until released
                 },
                 retryCount: 0,
                 maxRetries: 0,
-                createdAt: Date.now()
+                resolve: () => {},  // Lock operations don't need to track completion
+                reject: rejectEnqueued
             };
-            this.enqueue(key, op);
+            
+            if (!this.queues.has(key)) {
+                this.queues.set(key, []);
+            }
+            this.queues.get(key)!.push(op);
+            this.processQueue(key);
         });
 
         return release;
     }
 
+    /**
+     * Checks if a key is currently locked/processing.
+     * 
+     * @param key - The key to check
+     * @returns true if the key is currently processing, false otherwise
+     */
+    isLocked(key: string): boolean {
+        return this.processing.get(key) ?? false;
+    }
+
     private async processQueue(key: string) {
-        if (this.processing.get(key)) return;
+        if (this.processing.get(key)) {return;}
 
         const queue = this.queues.get(key);
-        if (!queue || queue.length === 0) return;
+        if (!queue || queue.length === 0) {return;}
 
         this.processing.set(key, true);
-
-        // Process all items in queue sequentially
-        // Note: we re-check queue length inside loop because previous ops might satisfy it? 
-        // Actually best to process one by one and keep calling processQueue recursively or via loop
         
         try {
             while (queue && queue.length > 0) {
                 const op = queue[0];
                 try {
                     await this.executeOperation(op);
-                    this.addToHistory(op, 'completed');
                     queue.shift(); // Remove from queue only after successful execution
+                    op.resolve(); // Resolve the promise
                 } catch (error) {
                     console.error(`Operation ${op.id} failed`, error);
-                    this.addToHistory(op, 'failed');
                     queue.shift(); // Remove on failure to avoid blocking the queue forever
-                    // In a more robust system we might want to pause the queue or DLQ it
+                    op.reject(error); // Reject the promise
                 }
             }
         } finally {
             this.processing.set(key, false);
             // Check if more items were added while we were processing
-            if (this.queues.get(key)?.length ?? 0 > 0) {
-                 this.processQueue(key);
+            const remainingQueue = this.queues.get(key);
+            if (remainingQueue && remainingQueue.length > 0) {
+                this.processQueue(key);
+            } else {
+                // Cleanup: Remove empty queue and processing entry to prevent unbounded growth
+                this.queues.delete(key);
+                this.processing.delete(key);
             }
         }
     }
 
     private async executeOperation(op: QueuedOperation) {
-        let lastError: any;
+        const delays = [100, 200, 400]; // Simple fixed delays per ticket spec
+        let lastError: unknown;
+        
         for (let i = 0; i <= op.maxRetries; i++) {
             try {
                 await op.execute();
                 return;
-            } catch (err: any) {
+            } catch (err: unknown) {
                 lastError = err;
-                if (this.isTransientError(err)) {
-                    // Exponential backoff: 100ms, 200ms, 400ms...
-                    const delay = 100 * Math.pow(2, i);
+                if (this.isTransientError(err) && i < op.maxRetries) {
+                    // Use array-based delays: 100ms, 200ms, 400ms
+                    const delay = delays[i] ?? 400;
                     await new Promise(resolve => setTimeout(resolve, delay));
                     op.retryCount++;
                 } else {
-                    throw err; // Non-transient error, fail immediately
+                    throw err; // Non-transient error or max retries reached, fail immediately
                 }
             }
         }
         throw lastError; // Max retries reached
     }
 
-    private isTransientError(error: any): boolean {
-        const msg = (error.message || error.code || '').toString();
-        return msg.includes('EBUSY') || msg.includes('EAGAIN');
-    }
-
-    private addToHistory(op: QueuedOperation, status: string) {
-        this.history.unshift({
-            id: op.id,
-            key: op.key,
-            type: op.type,
-            status,
-            timestamp: Date.now()
-        });
-        if (this.history.length > 100) this.history.pop();
+    private isTransientError(error: unknown): boolean {
+        const msg = (error && typeof error === 'object' && 'message' in error 
+            ? String((error as { message?: unknown }).message || '') 
+            : '').toLowerCase();
+        const code = (error && typeof error === 'object' && 'code' in error 
+            ? String((error as { code?: unknown }).code || '') 
+            : '').toUpperCase();
+        
+        // Permanent errors - fail fast
+        if (code === 'EPERM' || code === 'ENOENT' || code === 'ENOSPC') {
+            return false;
+        }
+        if (msg.includes('permission denied')) {
+            return false;
+        }
+        if (msg.includes('not found')) {
+            return false;
+        }
+        if (msg.includes('disk full') || msg.includes('no space')) {
+            return false;
+        }
+        if (msg.includes('schema') || msg.includes('validation')) {
+            return false;
+        }
+        
+        // Transient errors - retry
+        if (code === 'EBUSY' || code === 'EAGAIN' || code === 'EINTR') {
+            return true;
+        }
+        if (msg.includes('locked') || msg.includes('busy')) {
+            return true;
+        }
+        if (msg.includes('temporarily unavailable')) {
+            return true;
+        }
+        
+        // Default: treat as permanent to avoid infinite retries
+        return false;
     }
 }
