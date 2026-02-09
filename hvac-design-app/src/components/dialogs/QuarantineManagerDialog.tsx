@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Trash2, FolderOpen, Info } from 'lucide-react';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
-import type { QuarantinedFile } from '@/core/services/migration/types';
+import type { QuarantinedFile } from '@/core/services/types';
 
 interface QuarantineManagerDialogProps {
     open: boolean;
@@ -42,10 +42,10 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
         }
     };
 
-    const handleDelete = async (fileName: string) => {
+    const handleDelete = async (filePath: string) => {
         try {
             const repository = await getProjectRepository();
-            await repository.deleteQuarantinedFile(fileName);
+            await repository.deleteQuarantinedFile(filePath);
             await loadQuarantinedFiles();
         } catch (error) {
             console.error('Failed to delete quarantined file:', error);
@@ -66,23 +66,13 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
             try {
                 const repository = await getProjectRepository();
                 for (const file of files) {
-                    await repository.deleteQuarantinedFile(file.fileName);
+                    await repository.deleteQuarantinedFile(file.path);
                 }
                 await loadQuarantinedFiles();
             } catch (error) {
                 console.error('Failed to clear quarantined files:', error);
             }
         }
-    };
-
-    const formatFileSize = (bytes: number): string => {
-        if (bytes < 1024) {
-            return `${bytes} B`;
-        }
-        if (bytes < 1024 * 1024) {
-            return `${(bytes / 1024).toFixed(1)} KB`;
-        }
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     };
 
     const formatDate = (isoDate: string): string => {
@@ -121,17 +111,15 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
                             <div className="space-y-2">
                                 {files.map((file) => (
                                     <div
-                                        key={file.fileName}
+                                        key={file.path}
                                         className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                                     >
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium truncate">
-                                                {file.fileName}
+                                                {file.path.split('/').pop() || file.path}
                                             </p>
                                             <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                                                <span>{formatDate(file.quarantinedAt)}</span>
-                                                <span>•</span>
-                                                <span>{formatFileSize(file.fileSize)}</span>
+                                                <span>{formatDate(new Date(file.timestamp).toISOString())}</span>
                                                 {file.reason && (
                                                     <>
                                                         <span>•</span>
@@ -145,7 +133,7 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() => handleDelete(file.fileName)}
+                                            onClick={() => handleDelete(file.path)}
                                             className="ml-2"
                                         >
                                             <Trash2 className="h-4 w-4" />

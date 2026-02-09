@@ -1,4 +1,4 @@
-import { writeTextFile, BaseDirectory, createDir } from '@tauri-apps/plugin-fs';
+import { createDir, readTextFile, writeTextFile } from '../persistence/filesystem';
 
 export type LogLevel = 'INFO' | 'WARN' | 'ERROR';
 
@@ -48,18 +48,17 @@ export class LoggerService {
     }
 
     async flush(): Promise<void> {
-        if (this.logBuffer.length === 0) return;
+        if (this.logBuffer.length === 0) {return;}
 
         const entries = [...this.logBuffer];
         this.logBuffer = [];
 
         try {
             // Ensure log directory exists
-            await createDir('SizeWise/logs', { 
-                baseDir: BaseDirectory.AppData,
-                recursive: true 
-            }).catch(() => {
-                // Directory might already exist
+            const logDir = 'SizeWise/logs';
+            const logFile = `${logDir}/storage-root.log`;
+            await createDir(logDir, true).catch(() => {
+                // Directory might already exist.
             });
 
             // Format log entries
@@ -67,11 +66,14 @@ export class LoggerService {
                 .map(e => `[${e.timestamp}] [${e.level}] [${e.component}] ${e.message}`)
                 .join('\n') + '\n';
 
-            // Append to log file
-            await writeTextFile('SizeWise/logs/storage-root.log', logText, {
-                baseDir: BaseDirectory.AppData,
-                append: true
-            });
+            // Append behavior implemented via read-then-write for wrapper compatibility.
+            let previous = '';
+            try {
+                previous = await readTextFile(logFile);
+            } catch {
+                previous = '';
+            }
+            await writeTextFile(logFile, `${previous}${logText}`);
         } catch (error) {
             console.error('Failed to write logs:', error);
         }

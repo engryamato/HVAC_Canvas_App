@@ -4,7 +4,7 @@ import { useStorageStore } from '../core/store/storageStore';
 
 export interface UseStorageRootReturn {
     storageRootPath: string | null;
-    storageRootType: 'default' | 'custom' | null;
+    storageRootType: 'documents' | 'appdata' | null;
     migrationState: 'pending' | 'in-progress' | 'completed' | 'error';
     migrationError: string | null;
     validationWarnings: string[];
@@ -21,12 +21,12 @@ export function useStorageRoot(): UseStorageRootReturn {
     useEffect(() => {
         let service: Awaited<ReturnType<typeof getStorageRootService>> | null = null;
 
-        const handleStorageRootChanged = (event: Event) => {
+        const handleStorageRootChanged = (_event: Event) => {
             // Event already dispatched by service, just trigger re-render
             // Zustand will handle the actual state updates
         };
 
-        const handleMigrationState = (event: Event) => {
+        const handleMigrationState = (_event: Event) => {
             // Migration state changes handled via Zustand store
         };
 

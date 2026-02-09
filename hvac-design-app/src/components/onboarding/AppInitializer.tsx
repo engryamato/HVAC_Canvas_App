@@ -19,6 +19,7 @@ export const AppInitializer: React.FC = () => {
     const skipSplash = searchParams.get('skipSplash') === 'true';
     const [showSplash, setShowSplash] = useState(!skipSplash);
     const [mounted, setMounted] = useState(false);
+    const [storageInitError, setStorageInitError] = useState<string | null>(null);
 
     console.log('[AppInfo Render]', { showSplash, isFirstLaunch, isLoading, isTutorialActive });
 
@@ -42,15 +43,20 @@ export const AppInitializer: React.FC = () => {
 
     useEffect(() => {
         setMounted(true);
-        
-        // UJ-GS-006: Environment Detection
-        performEnvironmentDetection();
-        
-        // Storage Initialization
-        performStorageInitialization();
-        
-        // UJ-GS-007: Integrity Checks
-        performIntegrityChecks();
+
+        (async () => {
+            // UJ-GS-006: Environment Detection
+            performEnvironmentDetection();
+
+            // Storage Initialization
+            const storageReady = await performStorageInitialization();
+            if (!storageReady) {
+                return;
+            }
+
+            // UJ-GS-007: Integrity Checks
+            performIntegrityChecks();
+        })();
     }, []);
 
     // Handle dynamic redirection when state changes (e.g. after rehydration)
@@ -121,7 +127,7 @@ export const AppInitializer: React.FC = () => {
     };
 
     // Storage Initialization
-    const performStorageInitialization = async () => {
+    const performStorageInitialization = async (): Promise<boolean> => {
         try {
             console.log('[AppInitializer] Initializing storage...');
             const service = await getStorageRootService();
@@ -132,12 +138,17 @@ export const AppInitializer: React.FC = () => {
                 if (result.migrationRan) {
                     console.log('[AppInitializer] ✓ Migration completed');
                 }
+                setStorageInitError(null);
+                return true;
             } else {
                 console.error('[AppInitializer] ✗ Storage initialization failed:', result.error);
-                // TODO: Show critical error dialog if no writable storage
+                setStorageInitError('Failed to initialize storage. Please check permissions and restart.');
+                return false;
             }
         } catch (error) {
             console.error('[AppInitializer] ✗ Storage initialization error:', error);
+            setStorageInitError('Failed to initialize storage. Please check permissions and restart.');
+            return false;
         }
     };
 
@@ -247,6 +258,14 @@ export const AppInitializer: React.FC = () => {
 
     if (showSplash) {
         return <SplashScreen onComplete={handleSplashComplete} />;
+    }
+
+    if (storageInitError) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-slate-50">
+                <p className="text-red-600">{storageInitError}</p>
+            </div>
+        );
     }
 
     if (isFirstLaunch) {

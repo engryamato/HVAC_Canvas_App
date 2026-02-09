@@ -124,6 +124,9 @@ export class OperationQueue {
         try {
             while (queue && queue.length > 0) {
                 const op = queue[0];
+                if (!op) {
+                    break;
+                }
                 try {
                     await this.executeOperation(op);
                     queue.shift(); // Remove from queue only after successful execution

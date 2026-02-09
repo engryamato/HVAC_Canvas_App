@@ -2,6 +2,13 @@
  * File system utilities for Tauri/web environments
  * Provides a unified API that works in both Tauri desktop and web contexts
  */
+import { invoke } from '@tauri-apps/api/core';
+
+export interface DiskSpaceInfo {
+  available_bytes: number;
+  total_bytes: number;
+  percent_available: number;
+}
 
 /**
  * Check if running in Tauri environment
@@ -83,6 +90,36 @@ export async function getDocumentsDir(): Promise<string> {
     return documentDir();
   }
   return '';
+}
+
+/**
+ * Get app data directory path via backend command.
+ * Returns empty string in web environment.
+ */
+export async function getAppDataDir(): Promise<string> {
+  if (isTauri()) {
+    return invoke<string>('get_app_data_dir');
+  }
+  return '';
+}
+
+/**
+ * Get disk space information for a path.
+ */
+export async function getDiskSpace(path: string): Promise<DiskSpaceInfo> {
+  if (isTauri()) {
+    const result = await invoke<{
+      free_bytes: number;
+      total_bytes: number;
+      available_percent: number;
+    }>('get_disk_space', { path });
+    return {
+      available_bytes: result.free_bytes,
+      total_bytes: result.total_bytes,
+      percent_available: result.available_percent,
+    };
+  }
+  throw new Error('Disk space checks require Tauri runtime');
 }
 
 /**

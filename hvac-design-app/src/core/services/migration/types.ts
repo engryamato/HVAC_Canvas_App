@@ -1,7 +1,7 @@
 export interface MigrationContext {
     storageRootPath: string;
     scanLocations: string[];
-    dryRun: boolean;
+    dryRun?: boolean;
     indexStorageKey?: string;
     existingProjectIds?: string[];
     onProgress?: (progress: MigrationProgress) => void;
@@ -27,13 +27,15 @@ export interface MigrationResult {
 export interface MigrationError {
     file: string;
     error: string;
-    stage: 'scan' | 'read' | 'copy' | 'index';
+    stage: 'scan' | 'read' | 'copy' | 'index' | 'disk';
 }
 
-export interface QuarantinedFile {
-    fileName: string;
-    originalPath: string;
-    quarantinedAt: string;
-    fileSize: number;
-    reason: string;
+export interface ProjectMetaJson {
+    projectId: string;
+    projectName: string;
+    slug: string;
+    createdAt: string;
+    modifiedAt: string;
+    version: string;
+    storageVersion: number;
 }

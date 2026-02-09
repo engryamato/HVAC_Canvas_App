@@ -2,7 +2,7 @@ import type { ProjectFile, ProjectMetadata, SaveResult, LoadResult, DeleteResult
 import type { OperationQueue } from '../services/OperationQueue';
 import type { StorageAdapter } from './StorageAdapter';
 import { getStorageRootService } from '../services/StorageRootService';
-import { QuarantinedFile } from '../services/migration/types';
+import type { QuarantinedFile } from '../services/types';
 import { loadProject as loadProjectFromPath, saveProject as saveProjectToPath } from './projectIO';
 import { createDir, copyFile, exists, readTextFile, renameFile, removeFile } from './filesystem';
 import { isTauri } from './filesystem';
@@ -250,8 +250,10 @@ export class ProjectRepository extends EventTarget {
         return await rootService.getQuarantinedFiles();
     }
 
-    async deleteQuarantinedFile(_fileName: string): Promise<void> {
-        // TODO: Implement quarantine file deletion
+    async deleteQuarantinedFile(filePath: string): Promise<void> {
+        if (await exists(filePath)) {
+            await removeFile(filePath);
+        }
     }
 
     private normalizePath(path: string): string {

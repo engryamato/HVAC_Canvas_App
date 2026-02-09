@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface StorageState {
     storageRootPath: string | null;
-    storageRootType: 'default' | 'custom' | null;
+    storageRootType: 'documents' | 'appdata' | null;
     migrationState: 'pending' | 'in-progress' | 'completed' | 'error';
     migrationCompletedAt: string | null;
     migrationError: string | null;
@@ -12,7 +12,7 @@ export interface StorageState {
     quarantinedFileCount: number;
     lastQuarantineAt: string | null;
 
-    setStorageRoot: (path: string, type: 'default' | 'custom') => void;
+    setStorageRoot: (path: string, type: 'documents' | 'appdata') => void;
     setMigrationState: (state: StorageState['migrationState'], error?: string) => void;
     updateValidation: (warnings: string[]) => void;
     incrementQuarantine: () => void;
