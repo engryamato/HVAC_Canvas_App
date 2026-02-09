@@ -8,6 +8,7 @@ import { useAutoOpen } from '@/hooks/useAutoOpen';
 import { SplashScreen } from './SplashScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 import { isTauri } from '@/core/persistence/filesystem';
+import { getStorageRootService } from '@/core/services/StorageRootService';
 
 
 export const AppInitializer: React.FC = () => {
@@ -44,6 +45,9 @@ export const AppInitializer: React.FC = () => {
         
         // UJ-GS-006: Environment Detection
         performEnvironmentDetection();
+        
+        // Storage Initialization
+        performStorageInitialization();
         
         // UJ-GS-007: Integrity Checks
         performIntegrityChecks();
@@ -114,6 +118,27 @@ export const AppInitializer: React.FC = () => {
         const tauriDetected = isTauri();
         console.log('[AppInitializer] Environment detected:', tauriDetected ? 'Tauri Desktop' : 'Web Browser');
         setEnvironment(tauriDetected);
+    };
+
+    // Storage Initialization
+    const performStorageInitialization = async () => {
+        try {
+            console.log('[AppInitializer] Initializing storage...');
+            const service = await getStorageRootService();
+            const result = await service.initialize();
+            
+            if (result.success) {
+                console.log('[AppInitializer] ✓ Storage initialized:', result.path);
+                if (result.migrationRan) {
+                    console.log('[AppInitializer] ✓ Migration completed');
+                }
+            } else {
+                console.error('[AppInitializer] ✗ Storage initialization failed:', result.error);
+                // TODO: Show critical error dialog if no writable storage
+            }
+        } catch (error) {
+            console.error('[AppInitializer] ✗ Storage initialization error:', error);
+        }
     };
 
     // UJ-GS-007: Integrity Checks

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useViewportStore } from '../store/viewportStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 
@@ -67,3 +66,4 @@ export function GridSettings({ className }: GridSettingsProps) {
 }
 
 export default GridSettings;
+

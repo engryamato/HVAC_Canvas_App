@@ -268,6 +268,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       location: persistedProject?.location || undefined,
       scope: persistedProject?.scope,
       siteConditions: persistedProject?.siteConditions,
+      isArchived: storedProject?.isArchived ?? persistedProject?.isArchived ?? false,
       createdAt: storedProject?.createdAt ?? persistedProject?.createdAt ?? new Date().toISOString(),
       modifiedAt: storedProject?.modifiedAt ?? persistedProject?.modifiedAt ?? new Date().toISOString(),
     });

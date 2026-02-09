@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
@@ -63,3 +62,4 @@ export function ErrorPage({
         </div>
     );
 }
+

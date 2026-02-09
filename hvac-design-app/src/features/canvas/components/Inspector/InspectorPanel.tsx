@@ -1,9 +1,6 @@
 import React, { useCallback } from 'react';
-<<<<<<< HEAD
 import { Maximize2 } from 'lucide-react';
-import styles from './InspectorPanel.module.css';
-=======
->>>>>>> feat/canvas-navigation
+
 import { useSelectionStore } from '../../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { Entity } from '@/core/schema';
@@ -74,10 +71,9 @@ export function InspectorPanel({
   } ${className ?? ''}`;
 
   return (
-<<<<<<< HEAD
-    <div className={`${styles.panel} ${embedded ? styles.embedded : ''} ${className ?? ''}`}>
+    <div className={panelClasses}>
       {showHeader ? (
-        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2 shrink-0">
           <div className="text-sm font-medium text-slate-800">Properties</div>
           <button
             type="button"
@@ -90,11 +86,7 @@ export function InspectorPanel({
           </button>
         </div>
       ) : null}
-      <div className={styles.content}>{content}</div>
-=======
-    <div className={panelClasses}>
       <div className="p-4 overflow-y-auto h-full">{content}</div>
->>>>>>> feat/canvas-navigation
     </div>
   );
 }

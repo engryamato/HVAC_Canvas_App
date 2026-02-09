@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import PropertyField from './PropertyField';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
 import { useFieldValidation } from '../../hooks/useFieldValidation';
@@ -224,3 +224,4 @@ export function EquipmentInspector({ entity }: EquipmentInspectorProps) {
 }
 
 export default EquipmentInspector;
+

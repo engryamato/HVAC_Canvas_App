@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 
@@ -167,3 +167,4 @@ export function ProductCatalogPanel() {
 }
 
 export default ProductCatalogPanel;
+

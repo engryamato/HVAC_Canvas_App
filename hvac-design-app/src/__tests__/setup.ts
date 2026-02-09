@@ -1,6 +1,5 @@
 import { vi } from 'vitest'
 import '@testing-library/jest-dom'
-import { isTauri } from "@/lib/platform";
 
 // Mock Tauri API modules for testing
 vi.mock('@tauri-apps/api/tauri', () => ({

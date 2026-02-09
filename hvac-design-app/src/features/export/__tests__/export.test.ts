@@ -21,6 +21,20 @@ const createMockProject = (): ProjectFile => ({
   projectName: 'Test HVAC Project',
   projectNumber: 'HVAC-2025-001',
   clientName: 'Test Client Inc.',
+  scope: {
+    details: [],
+    materials: [],
+    projectType: 'commercial',
+  },
+  siteConditions: {
+    elevation: '',
+    outdoorTemp: '',
+    indoorTemp: '',
+    windSpeed: '',
+    humidity: '',
+    localCodes: '',
+  },
+  isArchived: false,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T12:00:00.000Z',
   entities: {

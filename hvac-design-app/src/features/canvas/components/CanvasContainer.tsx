@@ -21,7 +21,6 @@ import {
   RoomTool,
   DuctTool,
   EquipmentTool,
-  FittingTool,
   NoteTool,
   type ITool,
   type ToolMouseEvent,
@@ -45,11 +44,12 @@ interface CanvasContainerProps {
 function createToolInstances(): Record<CanvasTool, ITool> {
   return {
     select: new SelectTool(),
+    pan: new SelectTool(),
     room: new RoomTool(),
-    line: new DuctTool(),
     duct: new DuctTool(),
+    pipe: new DuctTool(),
+    wire: new DuctTool(),
     equipment: new EquipmentTool(),
-    fitting: new FittingTool(),
     note: new NoteTool(),
   };
 }

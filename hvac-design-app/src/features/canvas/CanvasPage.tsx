@@ -13,7 +13,6 @@ import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectDetails, useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
 import { AppShell } from '@/components/layout/AppShell';
-import { Toolbar } from './components/Toolbar';
 import { StatusBar } from './components/StatusBar';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
@@ -23,7 +22,7 @@ import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
  *
  * Layout:
  * - Header with navigation
- * - Toolbar on left
+ * - Tools integrated into left sidebar
  * - Canvas in center (fills remaining space)
  * - Inspector panel on right (Phase 4)
  * - Status bar at bottom
@@ -153,8 +152,6 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
   return (
     <AppShell projectName={projectName}>
-      <Toolbar />
-
       <div className={`flex-1 flex overflow-hidden relative ${className}`}>
         <LeftSidebar />
 

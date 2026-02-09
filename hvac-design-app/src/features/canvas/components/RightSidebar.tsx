@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { BOMPanel } from './BOMPanel';
+import { CalculationsPanel } from './CalculationsPanel';
 import { InspectorPanel } from './Inspector/InspectorPanel';
 import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
@@ -149,7 +150,7 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
           {activeRightTab === 'calculations' && (
             <section className="sidebar-section" data-testid="calculations-panel" id="calculations-panel" role="tabpanel">
               <h3 className="sidebar-title">Calculations</h3>
-              <div className="sidebar-empty">Calculation details will appear here.</div>
+              <CalculationsPanel />
             </section>
           )}
         </div>

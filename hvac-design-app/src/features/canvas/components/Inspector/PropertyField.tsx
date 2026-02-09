@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 interface PropertyFieldProps {
   label: string;
@@ -20,3 +20,4 @@ export function PropertyField({ label, htmlFor, helperText, children }: Property
 }
 
 export default PropertyField;
+

@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
@@ -97,7 +96,7 @@ describe('FloatingInspector', () => {
       expect(setFloatingPositionMock).toHaveBeenCalledWith({ x: 50, y: 60 });
     });
 
-    const lastArgs = validateSpy.mock.calls.at(-1);
+    const lastArgs = validateSpy.mock.calls[validateSpy.mock.calls.length - 1];
     expect(lastArgs?.[2]).toEqual({ width: 1000, height: 800 });
   });
 });

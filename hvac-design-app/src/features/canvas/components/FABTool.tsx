@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToolActions } from '@/core/store/canvas.store';
 
 interface FABToolProps {
@@ -58,3 +58,4 @@ export function FABTool({ className = '' }: FABToolProps) {
 }
 
 export default FABTool;
+

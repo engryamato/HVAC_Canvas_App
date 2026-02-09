@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import { isTauri } from '@/utils/platform';
 
@@ -71,3 +71,4 @@ export const DeviceWarning = () => {
         </div>
     );
 };
+

@@ -65,10 +65,10 @@ export function ToolsMenu() {
                         Equipment Tool <span className="text-xs opacity-50">E</span>
                     </button>
                     <button
-                        onClick={() => selectTool('fitting')}
+                        onClick={() => selectTool('pipe')}
                         className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between"
                     >
-                        Fitting Tool <span className="text-xs opacity-50">F</span>
+                        Pipe Tool <span className="text-xs opacity-50">P</span>
                     </button>
                     <button
                         onClick={() => selectTool('note')}

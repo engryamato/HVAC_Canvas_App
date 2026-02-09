@@ -56,6 +56,17 @@ function createMockProject(overrides?: Partial<ProjectFile>): ProjectFile {
       byId: {},
       allIds: [],
     },
+    viewportState: {
+      panX: 0,
+      panY: 0,
+      zoom: 1,
+    },
+    settings: {
+      unitSystem: 'imperial',
+      gridSize: 12,
+      gridVisible: true,
+      snapToGrid: true,
+    },
     scope: {
       projectType: 'residential',
       details: [],
@@ -63,10 +74,10 @@ function createMockProject(overrides?: Partial<ProjectFile>): ProjectFile {
     },
     siteConditions: {
       elevation: '100',
-      climate: 'temperate',
-      seismicZone: 'low',
+      outdoorTemp: '70',
+      indoorTemp: '70',
       windSpeed: '90',
-      snowLoad: '20',
+      humidity: '50',
       localCodes: 'IBC 2021',
     },
     isArchived: false,
@@ -422,7 +433,7 @@ describe('TauriStorageAdapter', () => {
       const projects = await adapter.listProjects();
 
       expect(projects).toHaveLength(1);
-      expect(projects[0].projectId).toBe('test-project-id');
+      expect(projects[0]!.projectId).toBe('test-project-id');
     });
 
     it('should skip corrupted files', async () => {
@@ -435,7 +446,7 @@ describe('TauriStorageAdapter', () => {
       const projects = await adapter.listProjects();
 
       expect(projects).toHaveLength(1);
-      expect(projects[0].projectId).toBe('project-1');
+      expect(projects[0]!.projectId).toBe('project-1');
     });
 
     it('should sort by modifiedAt descending', async () => {
@@ -450,8 +461,8 @@ describe('TauriStorageAdapter', () => {
 
       const projects = await adapter.listProjects();
 
-      expect(projects[0].projectId).toBe('p2'); // Most recent first
-      expect(projects[1].projectId).toBe('p1');
+      expect(projects[0]!.projectId).toBe('p2'); // Most recent first
+      expect(projects[1]!.projectId).toBe('p1');
     });
   });
 
@@ -479,21 +490,21 @@ describe('TauriStorageAdapter', () => {
       const results = await adapter.searchProjects('hvac');
 
       expect(results).toHaveLength(1);
-      expect(results[0].projectId).toBe('p1');
+      expect(results[0]!.projectId).toBe('p1');
     });
 
     it('should filter by project number', async () => {
       const results = await adapter.searchProjects('PRJ-001');
 
       expect(results).toHaveLength(1);
-      expect(results[0].projectId).toBe('p1');
+      expect(results[0]!.projectId).toBe('p1');
     });
 
     it('should filter by client name', async () => {
       const results = await adapter.searchProjects('acme');
 
       expect(results).toHaveLength(1);
-      expect(results[0].projectId).toBe('p2');
+      expect(results[0]!.projectId).toBe('p2');
     });
 
     it('should return empty array for no matches', async () => {
@@ -586,8 +597,8 @@ describe('TauriStorageAdapter', () => {
       const autoSaves = await adapter.listAutoSaves('test-project-id');
 
       expect(autoSaves).toHaveLength(2);
-      expect(autoSaves[0].timestamp).toBe('2024-01-02T00:00:00.000Z'); // Newest first
-      expect(autoSaves[1].timestamp).toBe('2024-01-01T00:00:00.000Z');
+      expect(autoSaves[0]!.timestamp).toBe('2024-01-02T00:00:00.000Z'); // Newest first
+      expect(autoSaves[1]!.timestamp).toBe('2024-01-01T00:00:00.000Z');
     });
 
     it('should include file sizes', async () => {
@@ -596,7 +607,7 @@ describe('TauriStorageAdapter', () => {
 
       const autoSaves = await adapter.listAutoSaves('test-project-id');
 
-      expect(autoSaves[0].sizeBytes).toBeDefined();
+      expect(autoSaves[0]!.sizeBytes).toBeDefined();
     });
   });
 

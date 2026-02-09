@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -9,8 +9,11 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useShallow } from 'zustand/react/shallow';
+import { useStorageRoot } from '@/hooks/useStorageRoot';
+import { QuarantineManagerDialog } from './QuarantineManagerDialog';
 
 interface SettingsDialogProps {
     open: boolean;
@@ -38,6 +41,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             setAutoSaveEnabled: state.setAutoSaveEnabled,
         }))
     );
+
+    const { storageRootPath } = useStorageRoot();
+    const [showQuarantine, setShowQuarantine] = useState(false);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,12 +116,43 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Storage */}
+                    <div>
+                        <h3 className="font-semibold text-sm mb-3">Storage</h3>
+                        <div className="space-y-3">
+                            <div>
+                                <Label className="text-xs text-slate-500">Storage Location</Label>
+                                <p className="text-sm mt-1 font-mono truncate">
+                                    {storageRootPath || 'Not configured'}
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="flex-1">
+                                    Change Location
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="flex-1"
+                                    onClick={() => setShowQuarantine(true)}
+                                >
+                                    View Quarantine
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="mt-6 pt-4 border-t text-xs text-slate-500">
                     Settings are automatically saved.
                 </div>
             </DialogContent>
+            <QuarantineManagerDialog 
+                open={showQuarantine} 
+                onOpenChange={setShowQuarantine}
+            />
         </Dialog>
     );
 }
+

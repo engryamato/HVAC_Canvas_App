@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import styles from './LoadingIndicator.module.css';
 
 interface LoadingIndicatorProps {
@@ -78,3 +77,4 @@ export function ButtonLoader({ className = '' }: { className?: string }) {
 }
 
 export default LoadingIndicator;
+

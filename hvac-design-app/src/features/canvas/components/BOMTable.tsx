@@ -1,4 +1,3 @@
-import React from 'react';
 import type { BomItem } from '@/features/export/csv';
 import styles from './BOMTable.module.css';
 

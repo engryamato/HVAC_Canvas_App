@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
     Accordion,
     AccordionContent,
@@ -121,3 +121,4 @@ export function ProjectSidebar({ className }: ProjectSidebarProps) {
         </div>
     );
 }
+

@@ -10,9 +10,11 @@ import {
 import { createEmptyProjectFile, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
 
 describe('serialization', () => {
+  const makeProject = () => createEmptyProjectFile('550e8400-e29b-41d4-a716-446655440000');
+
   describe('serializeProject', () => {
     it('should serialize valid project to JSON', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const result = serializeProject(project);
 
       expect(result.success).toBe(true);
@@ -21,14 +23,14 @@ describe('serialization', () => {
     });
 
     it('should produce valid JSON', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const result = serializeProject(project);
 
       expect(() => JSON.parse(result.data!)).not.toThrow();
     });
 
     it('should format with indentation', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const result = serializeProject(project);
 
       expect(result.data).toContain('\n');
@@ -46,7 +48,7 @@ describe('serialization', () => {
 
   describe('deserializeProject', () => {
     it('should deserialize valid JSON', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const json = JSON.stringify(project);
       const result = deserializeProject(json);
 
@@ -63,7 +65,7 @@ describe('serialization', () => {
     });
 
     it('should detect version mismatch', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const modified = { ...project, schemaVersion: '0.9.0' };
       const json = JSON.stringify(modified);
       const result = deserializeProject(json);
@@ -87,7 +89,7 @@ describe('serialization', () => {
 
   describe('deserializeProjectLenient', () => {
     it('should deserialize regardless of schemaVersion mismatch', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const modified = { ...project, schemaVersion: '9.9.9' };
       const json = JSON.stringify(modified);
       const result = deserializeProjectLenient(json);
@@ -99,7 +101,7 @@ describe('serialization', () => {
 
   describe('migrateProject', () => {
     it('should handle current version', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const result = migrateProject(project, '1.0.0');
 
       expect(result.success).toBe(true);
@@ -107,7 +109,7 @@ describe('serialization', () => {
     });
 
     it('should return error for unknown version', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const result = migrateProject(project, '0.1.0');
 
       expect(result.success).toBe(false);
@@ -117,7 +119,7 @@ describe('serialization', () => {
 
   describe('isValidProjectFile', () => {
     it('should return true for valid project structure', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const json = JSON.stringify(project);
 
       expect(isValidProjectFile(json)).toBe(true);
@@ -135,7 +137,7 @@ describe('serialization', () => {
 
   describe('getSchemaVersion', () => {
     it('should extract version from valid JSON', () => {
-      const project = createEmptyProjectFile();
+      const project = makeProject();
       const json = JSON.stringify(project);
 
       expect(getSchemaVersion(json)).toBe(CURRENT_SCHEMA_VERSION);

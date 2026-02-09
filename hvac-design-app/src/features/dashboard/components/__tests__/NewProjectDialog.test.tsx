@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { NewProjectDialog } from '../NewProjectDialog';
 
 // Mock dependencies
@@ -22,8 +21,8 @@ vi.mock('@/features/dashboard/store/projectListStore', () => ({
   }),
 }));
 
-vi.mock('@/core/persistence/factory', () => ({
-  createStorageAdapter: vi.fn(() =>
+vi.mock('@/core/persistence/ProjectRepository', () => ({
+  getProjectRepository: vi.fn(() =>
     Promise.resolve({
       saveProject: vi.fn(() => Promise.resolve({ success: true })),
     })
@@ -98,8 +97,8 @@ describe('NewProjectDialog', () => {
     it('should enable create button when project name is provided', async () => {
       render(<NewProjectDialog {...defaultProps} />);
 
-      const nameInput = screen.getByTestId('project-name-input');
-      await userEvent.type(nameInput, 'My New Project');
+      const nameInput = screen.getByTestId('project-name-input') as HTMLInputElement;
+      fireEvent.change(nameInput, { target: { value: 'My New Project' } });
 
       const createBtn = screen.getByTestId('create-button');
       expect(createBtn).toHaveProperty('disabled', false);
@@ -108,8 +107,8 @@ describe('NewProjectDialog', () => {
     it('should show character count for project name', async () => {
       render(<NewProjectDialog {...defaultProps} />);
 
-      const nameInput = screen.getByTestId('project-name-input');
-      await userEvent.type(nameInput, 'Test');
+      const nameInput = screen.getByTestId('project-name-input') as HTMLInputElement;
+      fireEvent.change(nameInput, { target: { value: 'Test' } });
 
       expect(screen.getByText('4/100')).toBeDefined();
     });
@@ -128,8 +127,8 @@ describe('NewProjectDialog', () => {
     it('should update project name on input', async () => {
       render(<NewProjectDialog {...defaultProps} />);
 
-      const nameInput = screen.getByTestId('project-name-input');
-      await userEvent.type(nameInput, 'Office Building HVAC');
+      const nameInput = screen.getByTestId('project-name-input') as HTMLInputElement;
+      fireEvent.change(nameInput, { target: { value: 'Office Building HVAC' } });
 
       expect(nameInput).toHaveProperty('value', 'Office Building HVAC');
     });

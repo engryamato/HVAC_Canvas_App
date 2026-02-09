@@ -36,6 +36,7 @@ describe('ProjectCard', () => {
     modifiedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     entityCount: 5,
+    storagePath: 'project-test-project-123',
     isArchived: false,
     status: 'draft',
   };

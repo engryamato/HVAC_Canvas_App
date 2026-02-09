@@ -240,6 +240,6 @@ describe('ProjectSettingsSchema extended fields', () => {
       planScale: { pixelsPerUnit: 96, unit: 'ft' as const },
     };
     const result = ProjectSettingsSchema.parse(settings);
-    expect(result.planScale?.pixelsPerUnit).toBe(96);
+    expect(result.planScale).toMatchObject({ pixelsPerUnit: 96, unit: 'ft' });
   });
 });

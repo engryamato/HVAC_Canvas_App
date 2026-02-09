@@ -4,15 +4,10 @@ import React from 'react';
 import {
   useToolStore,
   useToolActions,
-  useSelectedEquipmentType,
-  useSelectedFittingType,
   type CanvasTool,
 } from '@/core/store/canvas.store';
 import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
-import type { EquipmentType } from '@/core/schema/equipment.schema';
-import type { FittingType } from '@/core/schema/fitting.schema';
-import { EQUIPMENT_TYPE_LABELS } from '../entities/equipmentDefaults';
 
 interface ToolButtonProps {
   tool: CanvasTool;
@@ -164,19 +159,20 @@ function UndoRedoButton({
   );
 }
 
-interface ToolbarProps {
+interface ToolButtonsProps {
   className?: string;
+  orientation?: 'vertical' | 'horizontal';
 }
 
 /**
- * Toolbar component for tool selection.
- * Displays vertically on the left side of the canvas.
+ * Reusable tool buttons list used by both the standalone toolbar and sidebar.
  */
-export function Toolbar({ className = '' }: ToolbarProps) {
+export function ToolButtons({ className = '', orientation = 'vertical' }: ToolButtonsProps) {
   const currentTool = useToolStore((state) => state.currentTool);
   const { setTool } = useToolActions();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
+  const isVertical = orientation === 'vertical';
 
   // Handle keyboard shortcuts
   React.useEffect(() => {
@@ -235,8 +231,8 @@ export function Toolbar({ className = '' }: ToolbarProps) {
   return (
     <div
       className={`
-        flex flex-col gap-2 p-2
-        bg-slate-50 rounded-lg shadow-sm border border-slate-200
+        flex gap-2 p-2 bg-slate-50 rounded-lg shadow-sm border border-slate-200
+        ${isVertical ? 'flex-col items-start' : 'flex-row flex-wrap items-center'}
         ${className}
       `}
       role="toolbar"
@@ -256,7 +252,7 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       ))}
 
       {/* Undo/Redo buttons */}
-      <div className="flex items-center gap-1 ml-2 pl-2 border-l border-slate-200">
+      <div className={`flex items-center gap-1 ${isVertical ? 'ml-2 pl-2 border-l' : 'ml-1 pl-2 border-l'} border-slate-200`}>
         <UndoRedoButton
           onClick={undo}
           disabled={!canUndo}
@@ -286,6 +282,17 @@ export function Toolbar({ className = '' }: ToolbarProps) {
       </div>
     </div>
   );
+}
+
+interface ToolbarProps {
+  className?: string;
+}
+
+/**
+ * Backward-compatible standalone toolbar wrapper.
+ */
+export function Toolbar({ className = '' }: ToolbarProps) {
+  return <ToolButtons className={className} orientation="vertical" />;
 }
 
 export default Toolbar;

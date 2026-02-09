@@ -21,6 +21,11 @@ import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } f
 import { trackTelemetry } from '@/utils/telemetry';
 import { sendCloudBackup } from '@/services/cloudBackupService';
 import { saveProjectToExistingHandleOrDownload } from '@/core/persistence/webProjectFileIO';
+import { calculateSystemMetrics } from './useSystemCalculations';
+import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
+
+
+
 
 const STORAGE_SCHEMA_VERSION = CURRENT_SCHEMA_VERSION;
 
@@ -161,8 +166,25 @@ export function buildProjectFileFromStores(): ProjectFile | null {
       commands: historyStore.past,
       currentIndex: Math.max(historyStore.past.length - 1, 0),
     },
-    calculations: undefined,
-    billOfMaterials: undefined,
+    calculations: calculateSystemMetrics(entityStore.byId),
+    billOfMaterials: (() => {
+        const bom = generateBillOfMaterials(entityStore);
+        const mapItem = <T extends 'Duct' | 'Fitting' | 'Equipment'>(type: T) => (item: BomItem) => ({
+            id: String(item.itemNumber),
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            cost: 0,
+            type: type,
+            details: item.specifications || item.description,
+        });
+
+        return {
+            ducts: bom.filter(i => i.type === 'Duct').map(mapItem('Duct')),
+            fittings: bom.filter(i => i.type === 'Fitting').map(mapItem('Fitting')),
+            equipment: bom.filter(i => i.type === 'Equipment').map(mapItem('Equipment')),
+        };
+    })(),
   };
 }
 
@@ -493,7 +515,6 @@ export function loadProjectFromStorage(projectId: string): LoadedProject | null 
     if (envelope && isEnvelopeValid(envelope)) {
       try {
         localStorage.setItem('hvac-backup-recovered', 'true');
-        console.log('[useAutoSave] Set backup recovery flag - backup data will be used');
       } catch {
         // ignore storage errors
       }

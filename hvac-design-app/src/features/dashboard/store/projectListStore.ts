@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { logger } from '@/utils/logger';
 import { createStorageAdapter } from '@/core/persistence/factory';
 import { StorageAdapter } from '@/core/persistence/StorageAdapter';
+import { getProjectRepository } from '@/core/persistence/ProjectRepository';
 // type ProjectListItem as OriginalProjectListItem removed
 
 export interface ProjectListItem {
@@ -80,6 +81,10 @@ export const useProjectListStore = create<ProjectListStore>()(
           status: project.status || 'draft',
         };
         logger.debug('[ProjectListStore] Adding project:', validatedProject);
+        if (get().projects.some((p) => p.projectId === validatedProject.projectId)) {
+          logger.warn('[ProjectListStore] Duplicate project ID detected, skipping add:', validatedProject.projectId);
+          return;
+        }
         set((state) => ({ projects: [validatedProject, ...state.projects] }));
       },
 
@@ -236,7 +241,14 @@ export const useProjectListStore = create<ProjectListStore>()(
             status: (p as any).status || 'draft', // Map status from adapter metadata if available
           }));
 
-          set({ projects: projectItems, loading: false });
+          // Dedup projects by ID, preferring the one from adapter (latest)
+          const uniqueProjects = Array.from(new Map(projectItems.map(p => [p.projectId, p])).values());
+          
+          if (uniqueProjects.length !== projectItems.length) {
+              logger.warn(`[ProjectListStore] Found ${projectItems.length - uniqueProjects.length} duplicate projects in refresh, removing them.`);
+          }
+
+          set({ projects: uniqueProjects, loading: false });
           logger.info(`[ProjectListStore] Refreshed ${projectItems.length} projects`);
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Failed to refresh projects';
@@ -306,9 +318,14 @@ export const useProjectListStore = create<ProjectListStore>()(
         const validProjects = Array.isArray(persisted.projects) ? persisted.projects : [];
         const validRecentIds = Array.isArray(persisted.recentProjectIds) ? persisted.recentProjectIds : [];
 
+        // Dedup validProjects
+        // Create a Map with projectId as key to ensure uniqueness.
+        // We use validProjects (from persisted state) as the source.
+        const uniqueValidProjects = Array.from(new Map(validProjects.map((p: ProjectListItem) => [p.projectId, p])).values());
+
         return {
           ...currentState,
-          projects: validProjects,
+          projects: uniqueValidProjects,
           recentProjectIds: validRecentIds,
         };
       },
@@ -320,6 +337,31 @@ export const useProjectListStore = create<ProjectListStore>()(
 export const rehydrateProjectList = async () => {
   await useProjectListStore.persist.rehydrate();
 };
+
+// Subscribe to ProjectRepository events for automatic refresh
+if (typeof window !== 'undefined') {
+  (async () => {
+    try {
+      const repository = await getProjectRepository();
+      
+      // Listen for project changes
+      repository.addEventListener('project:changed', () => {
+        logger.debug('[ProjectListStore] Project changed, refreshing list');
+        useProjectListStore.getState().refreshProjects();
+      });
+      
+      // Listen for bulk project changes
+      repository.addEventListener('projects:changed', () => {
+        logger.debug('[ProjectListStore] Projects changed, refreshing list');
+        useProjectListStore.getState().refreshProjects();
+      });
+      
+      logger.debug('[ProjectListStore] Event subscriptions initialized');
+    } catch (error) {
+      logger.warn('[ProjectListStore] Could not subscribe to repository events:', error);
+    }
+  })();
+}
 
 // Selectors
 export const useProjects = () => useProjectListStore((state) => state.projects);

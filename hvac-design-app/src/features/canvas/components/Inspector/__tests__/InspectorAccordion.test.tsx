@@ -1,11 +1,10 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { InspectorAccordion } from '../InspectorAccordion';
-import { useInspectorPreferencesStore } from '../../store/inspectorPreferencesStore';
+import { useInspectorPreferencesStore } from '../../../store/inspectorPreferencesStore';
 
 // Mock the store
-vi.mock('../../store/inspectorPreferencesStore');
+vi.mock('../../../store/inspectorPreferencesStore');
 
 describe('InspectorAccordion', () => {
   const mockSetSectionExpanded = vi.fn();

@@ -19,6 +19,11 @@ const DB_VERSION = 1;
 const STORE_NAME = 'directory-handles';
 const PROJECTS_DIR_KEY = 'projects-directory';
 
+interface PermissionCapableHandle {
+  queryPermission: (descriptor?: { mode?: 'read' | 'readwrite' }) => Promise<PermissionState>;
+  requestPermission: (descriptor?: { mode?: 'read' | 'readwrite' }) => Promise<PermissionState>;
+}
+
 /**
  * Directory Handle Manager
  * Manages FileSystemDirectoryHandle persistence and permission verification
@@ -104,14 +109,15 @@ export class DirectoryHandleManager {
     requestIfNeeded = true
   ): Promise<boolean> {
     const opts = { mode: 'readwrite' } as const;
+    const permissionHandle = dirHandle as unknown as PermissionCapableHandle;
 
     // Check current permission
-    if ((await dirHandle.queryPermission(opts)) === 'granted') {
+    if ((await permissionHandle.queryPermission(opts)) === 'granted') {
       return true;
     }
 
     // Request permission if needed
-    if (requestIfNeeded && (await dirHandle.requestPermission(opts)) === 'granted') {
+    if (requestIfNeeded && (await permissionHandle.requestPermission(opts)) === 'granted') {
       return true;
     }
 

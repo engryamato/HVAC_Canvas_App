@@ -17,7 +17,7 @@ const createRoom = (
     name: 'Test Room',
     width: 120,
     length: 120,
-    height: 96,
+    ceilingHeight: 96,
     occupancyType: 'office',
     airChangesPerHour: 4,
     ...overrides,

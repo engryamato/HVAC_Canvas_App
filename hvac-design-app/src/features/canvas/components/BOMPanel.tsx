@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { BOMTable } from './BOMTable';
 import { useBOM } from '../hooks/useBOM';
@@ -99,3 +99,4 @@ export function BOMPanel() {
     </div>
   );
 }
+

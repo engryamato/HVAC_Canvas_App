@@ -6,6 +6,7 @@ describe('ProjectStore', () => {
   const mockDetails: ProjectDetails = {
     projectId: '550e8400-e29b-41d4-a716-446655440000',
     projectName: 'Test Project',
+    isArchived: false,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',
   };

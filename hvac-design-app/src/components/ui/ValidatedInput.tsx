@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './ValidatedInput.module.css';
 
 type Option = {
@@ -122,3 +121,4 @@ export function ValidatedInput(props: ValidatedInputProps) {
 }
 
 export default ValidatedInput;
+

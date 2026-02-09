@@ -12,6 +12,7 @@ describe('Canvas RightSidebar Tabs', () => {
       projectDetails: {
         projectId: '11111111-1111-4111-8111-111111111111',
         projectName: 'Test Project',
+        isArchived: false,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
       },

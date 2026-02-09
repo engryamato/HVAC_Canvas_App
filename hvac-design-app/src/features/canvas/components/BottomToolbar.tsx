@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { GridSettings } from './GridSettings';
 
 interface BottomToolbarProps {
@@ -19,3 +18,4 @@ export function BottomToolbar({ className = '' }: BottomToolbarProps) {
 }
 
 export default BottomToolbar;
+

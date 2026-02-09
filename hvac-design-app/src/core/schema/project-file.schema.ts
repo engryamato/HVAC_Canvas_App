@@ -153,9 +153,45 @@ export const ProjectFileSchema = z.object({
     currentIndex: z.number().int().nonnegative(),
   }).optional(),
 
-  // Future calculation support
-  calculations: z.unknown().optional(),
-  billOfMaterials: z.unknown().optional(),
+  // System calculations
+  calculations: z.object({
+    totalCFM: z.number().nonnegative().default(0),
+    maxStaticPressure: z.number().nonnegative().default(0),
+    totalDuctLength: z.number().nonnegative().default(0),
+    totalDuctWeight: z.number().nonnegative().default(0),
+    criticalPathId: z.string().optional(),
+  }).optional(),
+
+  // Bill of Materials
+  billOfMaterials: z.object({
+    ducts: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      quantity: z.number(),
+      unit: z.string(),
+      cost: z.number().optional(),
+      type: z.literal('Duct'),
+      details: z.string().optional(),
+    })).default([]),
+    fittings: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      quantity: z.number(),
+      unit: z.string(),
+      cost: z.number().optional(),
+      type: z.literal('Fitting'),
+      details: z.string().optional(),
+    })).default([]),
+    equipment: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      quantity: z.number(),
+      unit: z.string(),
+      cost: z.number().optional(),
+      type: z.literal('Equipment'),
+      details: z.string().optional(),
+    })).default([]),
+  }).optional(),
 }).passthrough();
 
 export type ProjectFile = z.infer<typeof ProjectFileSchema>;

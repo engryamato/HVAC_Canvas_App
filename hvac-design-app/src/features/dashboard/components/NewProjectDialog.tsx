@@ -11,8 +11,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useProjectListActions } from '@/features/dashboard/store/projectListStore';
 import { useRouter } from 'next/navigation';
-import { createStorageAdapter } from '@/core/persistence/factory';
 import { createEmptyProject } from '@/core/schema/project-file.schema';
+import { getProjectRepository } from '@/core/persistence/ProjectRepository';
 
 interface NewProjectDialogProps {
     open: boolean;
@@ -51,7 +51,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
 
     const [isLoading, setIsLoading] = useState(false);
     const { addProject } = useProjectStore(); // App state store
-    const { refreshProjects } = useProjectListActions(); // Dashboard list store
+    const { addProject: addProjectToList, refreshProjects } = useProjectListActions(); // Dashboard list store
     const router = useRouter();
 
     const isValid = projectName.trim().length > 0 && projectName.length <= 100;
@@ -117,10 +117,8 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
 
             // Entity count is 0 for new project
             
-            // Save using Unified Storage Adapter
-            // This handles filesystem (Tauri) or IndexedDB (Web) automatically
-            const adapter = await createStorageAdapter();
-            const saveResult = await adapter.saveProject(newProject);
+            const repository = await getProjectRepository();
+            const saveResult = await repository.saveProject(newProject);
 
             if (!saveResult.success) {
                 console.error('[NewProjectDialog] Save failed:', saveResult.error);
@@ -128,6 +126,20 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
                 setIsLoading(false);
                 return;
             }
+
+            addProjectToList({
+                projectId: newProject.projectId,
+                projectName: newProject.projectName,
+                projectNumber: newProject.projectNumber,
+                clientName: newProject.clientName,
+                entityCount: 0,
+                createdAt: newProject.createdAt,
+                modifiedAt: newProject.modifiedAt,
+                storagePath: saveResult.filePath || `project-${newProject.projectId}`,
+                filePath: saveResult.filePath,
+                isArchived: newProject.isArchived,
+                status: 'draft',
+            });
 
             // Refresh project list to reflect new project
             await refreshProjects();

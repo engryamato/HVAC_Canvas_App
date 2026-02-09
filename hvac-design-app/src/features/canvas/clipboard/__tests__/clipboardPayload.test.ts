@@ -22,7 +22,7 @@ function makeRoom(id: string, x: number, y: number): Entity {
       name: 'Room',
       width: 100,
       length: 200,
-      height: 96,
+      ceilingHeight: 96,
       occupancyType: 'office',
       airChangesPerHour: 4,
     },

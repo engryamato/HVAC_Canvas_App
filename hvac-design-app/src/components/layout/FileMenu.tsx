@@ -21,6 +21,7 @@ import { setWebProjectFileHandle } from '@/core/persistence/webFileHandles';
 import { openProjectFromPicker, saveProjectAsAndRememberHandle } from '@/core/persistence/webProjectFileIO';
 import { deserializeProjectLenient } from '@/core/persistence/serialization';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
+import { getProjectRepository } from '@/core/persistence/ProjectRepository';
 
 export function FileMenu() {
     const router = useRouter();
@@ -116,14 +117,15 @@ export function FileMenu() {
                     return;
                 }
                 const { loadProject } = await import('@/core/persistence/projectIO');
-                const result = await loadProject(filePath);
-                if (!result.success || !result.project) {
-                    throw new Error(result.error || 'Failed to load project');
+                const loadResult = await loadProject(filePath);
+                if (!loadResult.success || !loadResult.project) {
+                    throw new Error(loadResult.error || 'Failed to load project');
                 }
+                const importedProject = loadResult.project;
 
                 const projectListStore = useProjectListStore.getState();
                 const existing = projectListStore.projects.find(
-                    p => p.filePath === filePath || p.projectId === result.project!.projectId
+                    p => p.filePath === filePath || p.projectId === importedProject.projectId
                 );
                 if (existing) {
                     setExistingProjectId(existing.projectId);
@@ -132,29 +134,21 @@ export function FileMenu() {
                     return;
                 }
 
-                const existingById = projectListStore.projects.find(
-                    p => p.projectId === result.project!.projectId
-                );
-                const projectListItem = {
-                    projectId: result.project.projectId,
-                    projectName: result.project.projectName,
-                    projectNumber: result.project.projectNumber,
-                    clientName: result.project.clientName,
-                    entityCount: result.project.entities.allIds.length,
-                    createdAt: result.project.createdAt,
-                    modifiedAt: result.project.modifiedAt,
-                    storagePath: filePath,
-                    isArchived: Boolean((result.project as any).isArchived),
-                    filePath,
-                };
-
-                if (existingById) {
-                    projectListStore.updateProject(result.project.projectId, projectListItem);
-                } else {
-                    projectListStore.addProject(projectListItem);
+                const repository = await getProjectRepository();
+                const importResult = await repository.importProject(filePath);
+                if (!importResult.success) {
+                    throw new Error(importResult.error || 'Failed to import project');
                 }
 
-                router.push(`/canvas/${result.project.projectId}`);
+                if (importResult.filePath) {
+                    projectListStore.updateProject(importResult.projectId, {
+                        filePath: importResult.filePath,
+                        storagePath: importResult.filePath,
+                    });
+                }
+
+                await projectListStore.refreshProjects();
+                router.push(`/canvas/${importResult.projectId}`);
                 return;
             }
 

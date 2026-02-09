@@ -8,6 +8,7 @@ import { useProjectActions, useProjectDetails } from '@/core/store/project.store
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { ProjectSidebar } from './ProjectSidebar';
 import { ProductCatalogPanel } from './ProductCatalogPanel';
+import { ToolButtons } from './Toolbar';
 
 interface LeftSidebarProps {
   isOpen?: boolean;
@@ -295,6 +296,13 @@ export function LeftSidebar({
           </svg>
         </button>
       </div>
+
+      {!leftSidebarCollapsed && (
+        <div className="border-b border-slate-200 bg-white px-3 py-2">
+          <ToolButtons orientation="horizontal" className="w-full" />
+        </div>
+      )}
+
       {!leftSidebarCollapsed && (
         <div className="sidebar-content overflow-y-auto">
           {activeLeftTab === 'product-catalog' && (

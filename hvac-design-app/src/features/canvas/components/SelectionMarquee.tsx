@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import type { Bounds } from '@/core/geometry/bounds';
 
 interface SelectionMarqueeProps {
@@ -31,3 +30,4 @@ export function SelectionMarquee({ bounds, isActive }: SelectionMarqueeProps) {
 }
 
 export default SelectionMarquee;
+

@@ -266,6 +266,21 @@ export async function runStorageTests() {
     log('4. Check .autosave/ and .metadata/ folders');
     log('\nOptional: Run cleanup test to delete all test projects');
     
+    // Verify Hydration of Calculations and BOM (New Check)
+    if (loadResult.success && loadResult.project) {
+        log('\n🔍 VERIFICATION: Hydration Check');
+        if (!loadResult.project.calculations) {
+            log('⚠️  Calculations field is missing in loaded project');
+        } else {
+            log('✅ Calculations field present:', loadResult.project.calculations);
+        }
+        if (!loadResult.project.billOfMaterials) {
+            log('⚠️  BillOfMaterials field is missing in loaded project');
+        } else {
+            log('✅ BillOfMaterials field present:', loadResult.project.billOfMaterials);
+        }
+    }
+    
   } catch (error) {
     log('❌ CRITICAL ERROR:', error);
     console.error(error);

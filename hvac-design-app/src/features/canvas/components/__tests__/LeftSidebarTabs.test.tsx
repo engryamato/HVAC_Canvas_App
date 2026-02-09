@@ -12,6 +12,7 @@ describe('Canvas LeftSidebar Tabs', () => {
       projectDetails: {
         projectId: '11111111-1111-4111-8111-111111111111',
         projectName: 'Test Project',
+        isArchived: false,
         projectNumber: 'P-001',
         clientName: 'Client',
         location: 'Location',
@@ -40,14 +41,15 @@ describe('Canvas LeftSidebar Tabs', () => {
     render(<LeftSidebar />);
 
     expect(screen.getAllByText('Project Details').length).toBeGreaterThan(0);
-    expect(screen.getByTestId('tab-project')).toBeDefined();
-    expect(screen.getByTestId('tab-equipment')).toBeDefined();
+    expect(screen.getByTestId('tab-project-properties')).toBeDefined();
+    expect(screen.getByTestId('tab-product-catalog')).toBeDefined();
+    expect(screen.getByTestId('toolbar')).toBeDefined();
   });
 
   it('switches to Product Catalog tab', () => {
     render(<LeftSidebar />);
 
-    fireEvent.click(screen.getByTestId('tab-equipment'));
+    fireEvent.click(screen.getByTestId('tab-product-catalog'));
     expect(screen.getByTestId('equipment-search')).toBeDefined();
   });
 });
