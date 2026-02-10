@@ -3,6 +3,7 @@ import './globals.css'
 import { DeviceWarning } from '@components/common/DeviceWarning'
 import { VibeKanbanWebCompanionClient } from '@components/common/VibeKanbanWebCompanionClient'
 import { ToastHost } from '@components/ui/ToastHost'
+import { ToastProvider } from '@/components/ui/ToastContext'
 
 export const metadata: Metadata = {
   title: 'SizeWise HVAC Canvas',
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <DeviceWarning />
-        <VibeKanbanWebCompanionClient />
-        <ToastHost />
-        {children}
+        <ToastProvider>
+          <DeviceWarning />
+          <VibeKanbanWebCompanionClient />
+          <ToastHost />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   )

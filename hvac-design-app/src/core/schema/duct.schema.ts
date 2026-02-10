@@ -52,6 +52,10 @@ export const DuctPropsSchema = z
     // Connection references
     connectedFrom: z.string().uuid().optional().describe('Source entity ID'),
     connectedTo: z.string().uuid().optional().describe('Destination entity ID'),
+    
+    // Service & Catalog references
+    serviceId: z.string().uuid().optional().describe('Active Service ID'),
+    catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
   })
   .refine(
     (data) => {
@@ -86,6 +90,7 @@ export type DuctCalculated = z.infer<typeof DuctCalculatedSchema>;
 export const DuctWarningsSchema = z
   .object({
     velocity: z.string().optional(),
+    constraintViolations: z.array(z.string()).optional().describe('Service constraint violations'),
   })
   .optional();
 

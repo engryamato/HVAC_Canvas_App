@@ -4,6 +4,9 @@ import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+import { useValidationStore } from '@/core/store/validationStore';
+import { useServiceStore } from '@/core/store/serviceStore';
+import { ConstraintValidationService } from '@/core/services/constraintValidation';
 
 interface CommandOptions {
   selectionBefore?: string[];
@@ -45,6 +48,51 @@ function executeAndRecord(command: ReversibleCommand): void {
   useHistoryStore.getState().push(command);
 }
 
+function syncEntityValidation(entity: Entity): void {
+  const validationStore = useValidationStore.getState();
+
+  if (entity.type !== 'duct') {
+    validationStore.clearValidation(entity.id);
+    return;
+  }
+
+  const serviceId = entity.props.serviceId;
+  if (!serviceId) {
+    validationStore.clearValidation(entity.id);
+    return;
+  }
+
+  const serviceStore = useServiceStore.getState();
+  const service = serviceStore.services[serviceId] ?? serviceStore.baselineTemplates.find((template) => template.id === serviceId);
+  if (!service) {
+    validationStore.clearValidation(entity.id);
+    return;
+  }
+
+  const violations = ConstraintValidationService.validateDuct(entity.props, service);
+  if (violations.length === 0) {
+    validationStore.clearValidation(entity.id);
+    return;
+  }
+
+  validationStore.setValidationResult(entity.id, {
+    entityId: entity.id,
+    serviceId,
+    violations,
+    catalogStatus: 'resolved',
+    lastValidated: new Date(),
+  });
+}
+
+function syncEntityValidationById(entityId: string): void {
+  const entity = useEntityStore.getState().byId[entityId];
+  if (!entity) {
+    useValidationStore.getState().clearValidation(entityId);
+    return;
+  }
+  syncEntityValidation(entity);
+}
+
 /**
  * Create a new entity on the canvas
  * Pushes a reversible command to history for undo support
@@ -70,6 +118,7 @@ export function createEntity(entity: Entity, options?: CommandOptions): void {
 
   // Execute command
   useEntityStore.getState().addEntity(entity);
+  syncEntityValidation(entity);
   useSelectionStore.getState().select(entity.id);
 
   // Push to history
@@ -101,6 +150,7 @@ export function createEntities(entities: Entity[]): void {
   };
 
   useEntityStore.getState().addEntities(entities);
+  entities.forEach((entity) => syncEntityValidation(entity));
   useSelectionStore.getState().selectMultiple(selectionAfter);
   useHistoryStore.getState().push(command);
 }
@@ -200,6 +250,7 @@ export function deleteEntity(entityOrId: Entity | string, options?: CommandOptio
   };
 
   useEntityStore.getState().removeEntity(entityId);
+  useValidationStore.getState().clearValidation(entityId);
   applySelection(nextSelection);
   useHistoryStore.getState().push(command);
 }
@@ -229,6 +280,7 @@ export function deleteEntities(entities: Entity[], options?: CommandOptions): vo
   };
 
   useEntityStore.getState().removeEntities(entityIds);
+  entityIds.forEach((id) => useValidationStore.getState().clearValidation(id));
   applySelection(remainingSelection);
   useHistoryStore.getState().push(command);
 }
@@ -315,11 +367,13 @@ function executeCommand(command: Command): void {
   switch (command.type) {
     case CommandType.CREATE_ENTITY:
       entityStore.addEntity((command.payload as { entity: Entity }).entity);
+      syncEntityValidation((command.payload as { entity: Entity }).entity);
       applySelection((command.payload as { selection?: string[] }).selection);
       break;
 
     case CommandType.DELETE_ENTITY:
       entityStore.removeEntity((command.payload as { entityId: string }).entityId);
+      useValidationStore.getState().clearValidation((command.payload as { entityId: string }).entityId);
       applySelection((command.payload as { selection?: string[] }).selection);
       break;
 
@@ -330,6 +384,7 @@ function executeCommand(command: Command): void {
         selection?: string[];
       };
       entityStore.updateEntity(id, updates);
+      syncEntityValidationById(id);
       applySelection(selection);
       break;
     }
@@ -337,6 +392,7 @@ function executeCommand(command: Command): void {
     case CommandType.CREATE_ENTITIES: {
       const { entities, selection } = command.payload as { entities: Entity[]; selection?: string[] };
       entityStore.addEntities(entities);
+      entities.forEach((entity) => syncEntityValidation(entity));
       applySelection(selection);
       break;
     }
@@ -344,6 +400,7 @@ function executeCommand(command: Command): void {
     case CommandType.DELETE_ENTITIES: {
       const { entityIds, selection } = command.payload as { entityIds: string[]; selection?: string[] };
       entityStore.removeEntities(entityIds);
+      entityIds.forEach((id) => useValidationStore.getState().clearValidation(id));
       applySelection(selection);
       break;
     }

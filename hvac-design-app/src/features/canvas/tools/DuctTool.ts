@@ -7,6 +7,14 @@ import {
 import { createDuct } from '../entities/ductDefaults';
 import { createEntity } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
+import { useServiceStore } from '@/core/store/serviceStore';
+import { ConstraintValidationService } from '@/core/services/constraintValidation';
+import {
+  DuctMaterialSchema as DuctEntityMaterialSchema,
+  DuctShapeSchema as DuctEntityShapeSchema,
+} from '@/core/schema/duct.schema';
+import { ConnectionDetectionService } from '@/core/services/connectionDetection';
+import { FittingGenerationService } from '@/core/services/fittingGeneration';
 
 /**
  * Minimum duct length in pixels (for 0.1 feet minimum)
@@ -86,17 +94,30 @@ export class DuctTool extends BaseTool {
 
     const { ctx, zoom } = context;
     const { startPoint, currentPoint } = this.state;
+    const activeServiceId = useServiceStore.getState().activeServiceId;
+    const services = useServiceStore.getState().services;
+    const templates = useServiceStore.getState().baselineTemplates;
+    const activeService = services[activeServiceId!] || templates.find(t => t.id === activeServiceId);
 
     // Calculate duct length
     const dx = currentPoint.x - startPoint.x;
     const dy = currentPoint.y - startPoint.y;
     const length = Math.sqrt(dx * dx + dy * dy);
+    
+    // Minimum length check
     const isValid = length >= MIN_DUCT_LENGTH;
+    const warningMessage = length < MIN_DUCT_LENGTH ? 'Too Short' : '';
+
+    // Service Constraints Check - visualize service color
+    if (isValid && activeService) {
+        ctx.strokeStyle = activeService.color || '#424242';
+    } else {
+        ctx.strokeStyle = isValid ? '#424242' : '#D32F2F';
+    }
 
     ctx.save();
 
     // Draw preview line
-    ctx.strokeStyle = isValid ? '#424242' : '#D32F2F';
     ctx.lineWidth = 12 / zoom; // Approximate duct visual width
     ctx.lineCap = 'round';
     ctx.setLineDash([8 / zoom, 4 / zoom]);
@@ -111,13 +132,13 @@ export class DuctTool extends BaseTool {
     const midX = (startPoint.x + currentPoint.x) / 2;
     const midY = (startPoint.y + currentPoint.y) / 2;
     ctx.font = `${12 / zoom}px sans-serif`;
-    ctx.fillStyle = isValid ? '#424242' : '#D32F2F';
+    ctx.fillStyle = isValid ? (activeService?.color || '#424242') : '#D32F2F';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(`${lengthFt}'`, midX, midY - 8 / zoom);
+    ctx.fillText(`${lengthFt}' ${warningMessage}`, midX, midY - 8 / zoom);
 
     // Draw endpoints
-    ctx.fillStyle = isValid ? '#424242' : '#D32F2F';
+    ctx.fillStyle = isValid ? (activeService?.color || '#424242') : '#D32F2F';
     ctx.beginPath();
     ctx.arc(startPoint.x, startPoint.y, 4 / zoom, 0, Math.PI * 2);
     ctx.fill();
@@ -157,14 +178,54 @@ export class DuctTool extends BaseTool {
       return;
     }
 
-    // Calculate length in feet and rotation
     const lengthFt = lengthPixels / 12;
     const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
 
-    const duct = createDuct({ x: start.x, y: start.y, length: lengthFt });
-    // Update the transform rotation
+    // Get Active Service
+    const activeServiceId = useServiceStore.getState().activeServiceId;
+    const services = useServiceStore.getState().services;
+    const templates = useServiceStore.getState().baselineTemplates;
+    const activeService = services[activeServiceId!] || templates.find(t => t.id === activeServiceId);
+
+    // Create duct Props with defaults + Service info
+    const ductProps: Parameters<typeof createDuct>[0] = {
+        x: start.x, 
+        y: start.y, 
+        length: lengthFt,
+        serviceId: activeServiceId || undefined
+    };
+
+    if (activeService) {
+        const serviceMaterial = DuctEntityMaterialSchema.safeParse(activeService.material);
+        const requestedShape = activeService.dimensionalConstraints.allowedShapes[0] ?? 'round';
+        const serviceShape = DuctEntityShapeSchema.safeParse(requestedShape);
+
+        // Apply service defaults only when compatible with duct schema
+        if (serviceMaterial.success) {
+          ductProps.material = serviceMaterial.data;
+        }
+        if (serviceShape.success) {
+          ductProps.shape = serviceShape.data;
+        }
+    }
+
+    const duct = createDuct(ductProps);
     duct.transform.rotation = rotation;
+
+    // Validate
+    if (activeService) {
+        const violations = ConstraintValidationService.validateDuct(duct.props, activeService);
+        if (violations.length > 0) {
+            if (!duct.warnings) {
+                duct.warnings = {};
+            }
+            duct.warnings.constraintViolations = violations.map(v => v.message);
+        }
+    }
+
     createEntity(duct);
+    ConnectionDetectionService.detectConnections(duct.id);
+    FittingGenerationService.autoGenerateFittings(duct.id);
   }
 }
 

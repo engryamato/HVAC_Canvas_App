@@ -42,6 +42,8 @@ export function createDuct(
     material: Duct['props']['material'];
     airflow: number;
     staticPressure: number;
+    serviceId: string;
+    catalogItemId: string;
   }>
 ): Duct {
   const ductNumber = getNextDuctNumber();
@@ -57,6 +59,8 @@ export function createDuct(
     material: overrides?.material ?? DEFAULT_ROUND_DUCT_PROPS.material,
     airflow: overrides?.airflow ?? DEFAULT_ROUND_DUCT_PROPS.airflow,
     staticPressure: overrides?.staticPressure ?? DEFAULT_ROUND_DUCT_PROPS.staticPressure,
+    serviceId: overrides?.serviceId,
+    catalogItemId: overrides?.catalogItemId,
   };
 
   const props =

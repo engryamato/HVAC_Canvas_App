@@ -2,7 +2,9 @@ import {
   copyFile,
   createDir,
   exists,
+  getDesktopDir,
   getDiskSpace,
+  getDownloadsDir,
   readDir,
   removeFile,
   renameFile,
@@ -132,13 +134,25 @@ async function scanForProjectFiles(scanLocations: string[]): Promise<string[]> {
   const discovered = new Set<string>();
 
   for (const location of scanLocations) {
-    if (!(await exists(location))) {
+    const normalizedLocation = normalizePath(location);
+    if (!normalizedLocation || !(await exists(normalizedLocation))) {
       continue;
     }
 
-    const entries = await readDir(location);
+    if (normalizedLocation.endsWith('.hvac') || normalizedLocation.endsWith('.sws')) {
+      discovered.add(normalizedLocation);
+      continue;
+    }
+
+    let entries: string[] = [];
+    try {
+      entries = await readDir(normalizedLocation);
+    } catch {
+      continue;
+    }
+
     for (const entry of entries) {
-      const entryPath = normalizePath(joinPath(location, entry));
+      const entryPath = normalizePath(joinPath(normalizedLocation, entry));
       if (entry.endsWith('.hvac') || entry.endsWith('.sws')) {
         discovered.add(entryPath);
         continue;
@@ -169,6 +183,68 @@ async function scanForProjectFiles(scanLocations: string[]): Promise<string[]> {
   return Array.from(discovered);
 }
 
+function getProjectIndexPaths(indexStorageKey: string): string[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  const raw = window.localStorage.getItem(indexStorageKey);
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    const projects = Array.isArray(parsed?.state?.projects) ? parsed.state.projects : [];
+    const extracted: string[] = [];
+    for (const project of projects) {
+      const storagePath =
+        typeof project?.storagePath === 'string'
+          ? project.storagePath
+          : typeof project?.filePath === 'string'
+            ? project.filePath
+            : '';
+      if (!storagePath) {
+        continue;
+      }
+      extracted.push(storagePath);
+      if (storagePath.endsWith('.sws') || storagePath.endsWith('.hvac')) {
+        extracted.push(getDirectoryName(storagePath));
+      }
+    }
+    return extracted;
+  } catch {
+    return [];
+  }
+}
+
+async function resolveScanLocations(
+  baseLocations: string[],
+  indexStorageKey: string
+): Promise<string[]> {
+  const downloadsDir = await getDownloadsDir().catch(() => '');
+  const desktopDir = await getDesktopDir().catch(() => '');
+  const fromIndex = getProjectIndexPaths(indexStorageKey);
+
+  const candidates = [
+    ...baseLocations,
+    downloadsDir,
+    downloadsDir ? joinPath(downloadsDir, 'HVAC_Projects') : '',
+    desktopDir,
+    desktopDir ? joinPath(desktopDir, 'HVAC_Projects') : '',
+    ...fromIndex,
+  ];
+
+  const unique = new Set<string>();
+  for (const candidate of candidates) {
+    if (!candidate) {
+      continue;
+    }
+    unique.add(normalizePath(candidate));
+  }
+  return Array.from(unique);
+}
+
 export async function runMigration(context: MigrationContext): Promise<MigrationResult> {
   const startTime = Date.now();
   const errors: MigrationError[] = [];
@@ -184,7 +260,9 @@ export async function runMigration(context: MigrationContext): Promise<Migration
       percentComplete: 0,
     });
 
-    const allFiles = await scanForProjectFiles(context.scanLocations);
+    const indexStorageKey = context.indexStorageKey || DEFAULT_PROJECT_INDEX_KEY;
+    const scanLocations = await resolveScanLocations(context.scanLocations, indexStorageKey);
+    const allFiles = await scanForProjectFiles(scanLocations);
     const totalFiles = allFiles.length;
 
     const requiredBytes =
@@ -311,7 +389,7 @@ export async function runMigration(context: MigrationContext): Promise<Migration
             isArchived: project.isArchived,
           },
           canonicalProjectPath,
-          context.indexStorageKey || DEFAULT_PROJECT_INDEX_KEY
+          indexStorageKey
         );
 
         migratedCount++;

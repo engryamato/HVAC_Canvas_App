@@ -1,10 +1,11 @@
 import type { ProjectFile, ProjectMetadata, SaveResult, LoadResult, DeleteResult, SaveOptions } from './types';
 import type { OperationQueue } from '../services/OperationQueue';
+import { getSharedOperationQueue } from '../services/OperationQueue';
 import type { StorageAdapter } from './StorageAdapter';
 import { getStorageRootService } from '../services/StorageRootService';
 import type { QuarantinedFile } from '../services/types';
 import { loadProject as loadProjectFromPath, saveProject as saveProjectToPath } from './projectIO';
-import { createDir, copyFile, exists, readTextFile, renameFile, removeFile } from './filesystem';
+import { createDir, copyFile, exists, readTextFile, renameFile, removeFile, removePath } from './filesystem';
 import { isTauri } from './filesystem';
 
 export interface ImportResult extends SaveResult {
@@ -92,6 +93,46 @@ export class ProjectRepository extends EventTarget {
 
         if (isTauri()) {
             const canonical = this.getCanonicalProjectPaths(rootPath, projectId);
+            
+            // PSR-07: Corruption detection before loading
+            const { detectCorruption } = await import('../services/validation/detectCorruption');
+            const corruptionReport = await detectCorruption(canonical.projectFilePath);
+            
+            if (!corruptionReport.isValid) {
+                console.error('[ProjectRepository] Corrupted file detected:', corruptionReport.error);
+                
+                // Quarantine the corrupted file
+                const { quarantineFile } = await import('../services/validation/quarantineFile');
+                const quarantineResult = await quarantineFile(
+                    canonical.projectFilePath,
+                    rootPath,
+                    projectId
+                );
+                
+                if (quarantineResult.success) {
+                    console.log('[ProjectRepository] File quarantined:', quarantineResult.quarantinedPath);
+                    
+                    // Emit quarantine event
+                    this.dispatchEvent(new CustomEvent('project:quarantined', {
+                        detail: { 
+                            projectId, 
+                            originalPath: canonical.projectFilePath,
+                            quarantinedPath: quarantineResult.quarantinedPath,
+                            reason: corruptionReport.error
+                        }
+                    }));
+                } else {
+                    console.error('[ProjectRepository] Failed to quarantine file:', quarantineResult.error);
+                }
+                
+                return {
+                    success: false,
+                    errorCode: 'CORRUPTED_FILE',
+                    error: `Project file is corrupted and has been quarantined: ${corruptionReport.error}`,
+                };
+            }
+            
+            // Load project normally if not corrupted
             const loadResult = await loadProjectFromPath(canonical.projectFilePath);
 
             if (loadResult.success && loadResult.project) {
@@ -113,13 +154,60 @@ export class ProjectRepository extends EventTarget {
         return await this.adapter.loadProject(projectId);
     }
 
+
     async deleteProject(projectId: string): Promise<DeleteResult> {
         const release = await this.queue.acquireLock(`project:${projectId}`);
         
         try {
-            const result = await this.adapter.deleteProject(projectId);
+            let result: DeleteResult;
+            if (isTauri()) {
+                const rootService = await getStorageRootService();
+                const rootPath = rootService.getStorageRoot();
+                if (!rootPath) {
+                    return {
+                        success: false,
+                        errorCode: 'DELETE_ERROR',
+                        error: 'No storage root configured',
+                    };
+                }
+
+                const canonical = this.getCanonicalProjectPaths(rootPath, projectId);
+                try {
+                    const projectFile = canonical.projectFilePath;
+                    const backupFile = `${canonical.projectFilePath}.bak`;
+                    const thumbnailFile = this.joinPath(canonical.projectDir, 'thumbnail.png');
+                    const metadataFile = this.joinPath(canonical.projectDir, 'meta.json');
+                    const autosaveDir = this.joinPath(canonical.projectDir, '.autosave');
+
+                    const filesToDelete = [projectFile, backupFile, thumbnailFile, metadataFile];
+                    for (const filePath of filesToDelete) {
+                        if (await exists(filePath)) {
+                            await removeFile(filePath);
+                        }
+                    }
+
+                    if (await exists(autosaveDir)) {
+                        await removePath(autosaveDir, true);
+                    }
+
+                    if (await exists(canonical.projectDir)) {
+                        await removePath(canonical.projectDir, true);
+                    }
+
+                    result = { success: true };
+                } catch (error) {
+                    result = {
+                        success: false,
+                        errorCode: 'DELETE_ERROR',
+                        error: error instanceof Error ? error.message : 'Failed to delete project',
+                    };
+                }
+            } else {
+                result = await this.adapter.deleteProject(projectId);
+            }
 
             if (result.success) {
+                this.removeProjectIndexEntry(projectId);
                 this.dispatchEvent(new CustomEvent('project:changed', { 
                     detail: { projectId, action: 'delete' } 
                 }));
@@ -220,15 +308,71 @@ export class ProjectRepository extends EventTarget {
         }
     }
 
-    async exportProject(_projectId: string, destPath: string): Promise<ExportResult> {
-        // TODO: Implement exporting project
+    async exportProject(projectId: string, destPath: string): Promise<ExportResult> {
+        const release = await this.queue.acquireLock(`export:${projectId}`);
         
-        return {
-            success: false,
-            sourcePath: '',
-            destPath,
-            error: 'Not implemented'
-        };
+        try {
+            const rootService = await getStorageRootService();
+            const rootPath = rootService.getStorageRoot();
+            
+            if (!rootPath) {
+                return {
+                    success: false,
+                    sourcePath: '',
+                    destPath,
+                    error: 'No storage root configured',
+                };
+            }
+
+            const canonical = this.getCanonicalProjectPaths(rootPath, projectId);
+            const sourcePath = canonical.projectFilePath;
+
+            // Verify source project exists
+            if (!(await exists(sourcePath))) {
+                return {
+                    success: false,
+                    sourcePath,
+                    destPath,
+                    error: 'Source project file does not exist',
+                };
+            }
+
+            // Copy main project file
+            await copyFile(sourcePath, destPath);
+
+            // Copy backup file if exists
+            const sourceBackup = `${sourcePath}.bak`;
+            const destBackup = `${destPath}.bak`;
+            if (await exists(sourceBackup)) {
+                await copyFile(sourceBackup, destBackup);
+            }
+
+            // Copy thumbnail if exists
+            const sourceThumbnail = this.joinPath(canonical.projectDir, 'thumbnail.png');
+            if (await exists(sourceThumbnail)) {
+                // Extract destination directory and create thumbnail path
+                const destDir = destPath.substring(0, destPath.lastIndexOf('/'));
+                const destFileName = destPath.substring(destPath.lastIndexOf('/') + 1);
+                const destBaseName = destFileName.replace(/\.[^.]+$/, '');
+                const destThumbnail = this.joinPath(destDir, `${destBaseName}.png`);
+                await copyFile(sourceThumbnail, destThumbnail);
+            }
+
+            return {
+                success: true,
+                sourcePath,
+                destPath,
+            };
+        } catch (error) {
+            return {
+                success: false,
+                sourcePath: '',
+                destPath,
+                error: `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            };
+        } finally {
+            release();
+        }
     }
 
     async getProjectPath(projectId: string): Promise<string> {
@@ -424,6 +568,41 @@ export class ProjectRepository extends EventTarget {
             })
         );
     }
+
+    private removeProjectIndexEntry(projectId: string): void {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const indexKey = 'sws.projectIndex';
+        const raw = window.localStorage.getItem(indexKey);
+        const parsed = raw ? JSON.parse(raw) : {};
+        const state = (parsed?.state ?? {}) as {
+            projects?: Array<Record<string, unknown>>;
+            recentProjectIds?: string[];
+            loading?: boolean;
+            error?: string;
+        };
+
+        const projects = Array.isArray(state.projects)
+            ? state.projects.filter((entry) => entry.projectId !== projectId)
+            : [];
+        const recentProjectIds = Array.isArray(state.recentProjectIds)
+            ? state.recentProjectIds.filter((id) => id !== projectId)
+            : [];
+
+        window.localStorage.setItem(
+            indexKey,
+            JSON.stringify({
+                ...parsed,
+                state: {
+                    ...state,
+                    projects,
+                    recentProjectIds,
+                },
+            })
+        );
+    }
 }
 
 // Factory and global cache
@@ -439,13 +618,11 @@ export function createProjectRepository(
 
 export async function getProjectRepository(): Promise<ProjectRepository> {
     if (!repositoryInstance) {
-        // TODO: Properly integrate with actual adapter and stores
-        const { OperationQueue } = await import('../services/OperationQueue');
         const { useStorageStore } = await import('../store/storageStore');
         const { getAdapter } = await import('./factory');
         
         const adapter = await getAdapter();
-        const queue = new OperationQueue();
+        const queue = getSharedOperationQueue();
         const store = useStorageStore.getState();
         
         repositoryInstance = createProjectRepository(adapter, queue, store);

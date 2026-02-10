@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import { getStorageRootService } from '../core/services/StorageRootService';
 import { useStorageStore } from '../core/store/storageStore';
+import type { StorageMigrationState, StorageRootType } from '../core/store/storageStore';
+import { isTauri } from '../core/persistence/filesystem';
 
 export interface UseStorageRootReturn {
     storageRootPath: string | null;
-    storageRootType: 'documents' | 'appdata' | null;
-    migrationState: 'pending' | 'in-progress' | 'completed' | 'error';
+    storageRootType: StorageRootType;
+    migrationState: StorageMigrationState;
     migrationError: string | null;
     validationWarnings: string[];
     isValidating: boolean;
     initialize: () => Promise<void>;
     validate: () => Promise<void>;
     relocate: (newPath: string) => Promise<void>;
+    changeStorageLocation: () => Promise<void>;
 }
 
 export function useStorageRoot(): UseStorageRootReturn {
@@ -50,6 +53,68 @@ export function useStorageRoot(): UseStorageRootReturn {
             }
         };
     }, []);
+    
+    // Periodic validation to update disk space info
+    useEffect(() => {
+        if (!store.storageRootPath) {
+            return;
+        }
+
+        let cancelled = false;
+        
+        const runValidation = async () => {
+            try {
+                const service = await getStorageRootService();
+                if (!cancelled) {
+                    await service.validate();
+                }
+            } catch (error) {
+                console.warn('Periodic storage validation failed:', error);
+            }
+        };
+
+        // Initial run
+        runValidation();
+
+        // Poll every 60 seconds
+        const interval = setInterval(() => {
+            runValidation();
+        }, 60_000);
+
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, [store.storageRootPath]);
+
+    useEffect(() => {
+        if (!store.storageRootPath) {
+            return;
+        }
+
+        let cancelled = false;
+
+        const runValidation = async () => {
+            try {
+                const service = await getStorageRootService();
+                if (!cancelled) {
+                    await service.validate();
+                }
+            } catch (error) {
+                console.warn('Periodic storage validation failed:', error);
+            }
+        };
+
+        void runValidation();
+        const interval = setInterval(() => {
+            void runValidation();
+        }, 60_000);
+
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, [store.storageRootPath]);
 
     const initialize = async () => {
         const service = await getStorageRootService();
@@ -70,6 +135,33 @@ export function useStorageRoot(): UseStorageRootReturn {
         const service = await getStorageRootService();
         await service.relocate(newPath);
     };
+    
+    const changeStorageLocation = async () => {
+        if (!isTauri()) {
+            // Web Fallback: Allow manual path entry for Virtual FS
+            // This preserves the feature logic (changing location) without needing native dialogs
+            const current = store.storageRootPath || 'indexeddb://documents';
+            // eslint-disable-next-line no-alert
+            const newPath = window.prompt('Enter new storage path (Virtual FS):', current);
+            
+            if (newPath && newPath.trim() !== '' && newPath !== current) {
+                await relocate(newPath.trim());
+            }
+            return;
+        }
+
+        // Import dialog dynamically to avoid SSR issues
+        const { open } = await import('@tauri-apps/plugin-dialog');
+        const selected = await open({
+            directory: true,
+            multiple: false,
+            title: 'Select New Storage Location',
+        });
+        
+        if (selected && typeof selected === 'string') {
+            await relocate(selected);
+        }
+    };
 
     return {
         storageRootPath: store.storageRootPath,
@@ -80,6 +172,7 @@ export function useStorageRoot(): UseStorageRootReturn {
         isValidating,
         initialize,
         validate,
-        relocate
+        relocate,
+        changeStorageLocation,
     };
 }

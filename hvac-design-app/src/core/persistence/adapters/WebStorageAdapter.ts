@@ -333,7 +333,10 @@ export class WebStorageAdapter implements StorageAdapter {
       const records = await db.getAll('projects');
       
       // Extract metadata
-      const projects = records.map(r => r.metadata);
+      // Extract metadata only for valid projects (must have content)
+      const projects = records
+        .filter(r => r.content && r.metadata)
+        .map(r => r.metadata);
 
       // Sort by modifiedAt descending
       projects.sort((a, b) => 

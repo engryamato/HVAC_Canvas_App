@@ -82,7 +82,7 @@ export const useInspectorPreferencesStore = create<InspectorPreferencesStore>()(
           const key = sectionName as keyof InspectorPreferencesState['preferences'][typeof entityType];
           // Guard against invalid keys if schema changes
           if (!state.preferences[entityType] || state.preferences[entityType][key] === undefined) {
-             return state;
+            return state;
           }
           return {
             preferences: {
@@ -93,12 +93,12 @@ export const useInspectorPreferencesStore = create<InspectorPreferencesStore>()(
               },
             },
           };
-      }),
+        }),
       setSectionExpanded: (entityType, sectionName, expanded) =>
         set((state) => {
           const key = sectionName as keyof InspectorPreferencesState['preferences'][typeof entityType];
           if (!state.preferences[entityType] || state.preferences[entityType][key] === undefined) {
-             return state;
+            return state;
           }
           return {
             preferences: {
@@ -109,7 +109,7 @@ export const useInspectorPreferencesStore = create<InspectorPreferencesStore>()(
               },
             },
           };
-      }),
+        }),
     }),
     {
       name: 'sws.inspector-preferences',
@@ -125,7 +125,9 @@ export const useInspectorPreferencesStore = create<InspectorPreferencesStore>()(
 export const useSectionExpanded = (entityType: EntityType, sectionName: string) => {
   return useInspectorPreferencesStore((state) => {
       const entityPrefs = state.preferences[entityType];
-      if (!entityPrefs) return false;
+      if (!entityPrefs) {
+        return false;
+      }
       return entityPrefs[sectionName as keyof typeof entityPrefs];
   });
 };

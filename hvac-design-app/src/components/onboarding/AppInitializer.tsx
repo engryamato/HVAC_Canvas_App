@@ -9,6 +9,8 @@ import { SplashScreen } from './SplashScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 import { isTauri } from '@/core/persistence/filesystem';
 import { getStorageRootService } from '@/core/services/StorageRootService';
+import { useStorageEvents } from '@/hooks/useStorageEvents';
+
 
 
 export const AppInitializer: React.FC = () => {
@@ -40,6 +42,10 @@ export const AppInitializer: React.FC = () => {
 
     // Auto-open last project if enabled
     useAutoOpen();
+
+    // Subscribe to storage events for toast notifications (PSR-11)
+    useStorageEvents();
+
 
     useEffect(() => {
         setMounted(true);
@@ -137,6 +143,12 @@ export const AppInitializer: React.FC = () => {
                 console.log('[AppInitializer] ✓ Storage initialized:', result.path);
                 if (result.migrationRan) {
                     console.log('[AppInitializer] ✓ Migration completed');
+                }
+                try {
+                    await service.validate();
+                    console.log('[AppInitializer] ✓ Storage validation completed');
+                } catch (validationError) {
+                    console.warn('[AppInitializer] ⚠ Storage validation failed after initialization:', validationError);
                 }
                 setStorageInitError(null);
                 return true;

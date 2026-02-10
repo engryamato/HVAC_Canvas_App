@@ -322,7 +322,7 @@ export default function StorageAdapterTestPage() {
       <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#fff3cd', borderRadius: '5px' }}>
         <h3>Instructions:</h3>
         <ol>
-          <li>Click "Run All Tests" to execute the full test suite</li>
+          <li>Click &quot;Run All Tests&quot; to execute the full test suite</li>
           <li>Or click individual test buttons to test specific functionality</li>
           <li>Check the console output below for results</li>
           <li>After running tests, check your file system at: <code>Documents/SizeWise/Projects/</code></li>

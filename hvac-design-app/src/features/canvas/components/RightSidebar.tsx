@@ -4,6 +4,7 @@ import React from 'react';
 import { BOMPanel } from './BOMPanel';
 import { CalculationsPanel } from './CalculationsPanel';
 import { InspectorPanel } from './Inspector/InspectorPanel';
+import { ValidationDashboard } from './ValidationDashboard';
 import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 
@@ -13,10 +14,10 @@ interface RightSidebarProps {
   className?: string;
 }
 
-type RightTabId = 'properties' | 'bom' | 'calculations';
+type RightTabId = 'properties' | 'bom' | 'calculations' | 'validation';
 
 function normalizeRightTab(value: string): RightTabId {
-  if (value === 'bom' || value === 'calculations' || value === 'properties') {
+  if (value === 'bom' || value === 'calculations' || value === 'properties' || value === 'validation') {
     return value;
   }
   return 'properties';
@@ -101,6 +102,21 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
             >
               Calculations
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeRightTab === 'validation'}
+              aria-controls="validation-panel"
+              onClick={() => setActiveRightTab('validation')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeRightTab === 'validation'
+                  ? 'bg-slate-200 text-slate-900 active'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-validation"
+            >
+              Validation
+            </button>
           </div>
         )}
         <button
@@ -151,6 +167,12 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
             <section className="sidebar-section" data-testid="calculations-panel" id="calculations-panel" role="tabpanel">
               <h3 className="sidebar-title">Calculations</h3>
               <CalculationsPanel />
+            </section>
+          )}
+
+          {activeRightTab === 'validation' && (
+            <section className="sidebar-section" data-testid="validation-panel" id="validation-panel" role="tabpanel">
+              <ValidationDashboard />
             </section>
           )}
         </div>

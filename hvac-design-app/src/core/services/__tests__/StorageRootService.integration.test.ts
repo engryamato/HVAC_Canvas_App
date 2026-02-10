@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { StorageRootService, createStorageRootService } from '../StorageRootService';
 import { OperationQueue } from '../OperationQueue';
-import type { StorageState } from '../../store/storageStore';
+import type { DiskSpaceInfo, StorageState } from '../../store/storageStore';
+import * as filesystem from '../../persistence/filesystem';
 
 /**
  * Integration tests for StorageRootService
@@ -22,7 +23,7 @@ describe('StorageRootService Integration Tests', () => {
         // Create mock store with realistic state
         mockStoreState = {
             storageRootPath: null,
-            storageRootType: null,
+            storageRootType: 'documents',
             migrationState: 'pending',
             migrationCompletedAt: null,
             migrationError: null,
@@ -30,6 +31,11 @@ describe('StorageRootService Integration Tests', () => {
             validationWarnings: [],
             quarantinedFileCount: 0,
             lastQuarantineAt: null,
+            diskSpace: {
+                availableBytes: 0,
+                totalBytes: 0,
+                percentAvailable: 100,
+            },
             setStorageRoot: (path: string, type: 'documents' | 'appdata') => {
                 mockStoreState.storageRootPath = path;
                 mockStoreState.storageRootType = type;
@@ -37,11 +43,14 @@ describe('StorageRootService Integration Tests', () => {
             setMigrationState: (state: string, _error?: string) => {
                 mockStoreState.migrationState = state as any;
             },
-            updateValidation: (errors: string[]) => {
+            updateValidation: (_timestamp: number, errors: string[]) => {
                 mockStoreState.validationWarnings = errors;
             },
             incrementQuarantine: () => {
                 mockStoreState.quarantinedFileCount += 1;
+            },
+            setDiskSpace: (diskSpace: DiskSpaceInfo) => {
+                mockStoreState.diskSpace = diskSpace;
             },
         } as unknown as StorageState;
 
@@ -142,9 +151,31 @@ describe('StorageRootService Integration Tests', () => {
 
         it('should update validation errors in store', () => {
             const errors = ['Error 1', 'Error 2'];
-            mockStoreState.updateValidation(errors);
+            mockStoreState.updateValidation(Date.now(), errors);
 
             expect(mockStoreState.validationWarnings).toEqual(errors);
+        });
+
+        it('should update disk space in store during validate', async () => {
+            mockStoreState.storageRootPath = 'indexeddb://documents/SizeWise';
+            const validateSpy = vi
+                .spyOn(filesystem, 'validateStorageRoot')
+                .mockResolvedValue({
+                    exists: true,
+                    writable: true,
+                    available_bytes: 5 * 1024 ** 3,
+                    total_bytes: 10 * 1024 ** 3,
+                    percent_available: 50,
+                });
+
+            await service.validate();
+
+            expect(validateSpy).toHaveBeenCalled();
+            expect(mockStoreState.diskSpace).toEqual({
+                availableBytes: 5 * 1024 ** 3,
+                totalBytes: 10 * 1024 ** 3,
+                percentAvailable: 50,
+            });
         });
     });
 
@@ -252,16 +283,16 @@ describe('StorageRootService Integration Tests', () => {
         it('should transition migration state correctly', () => {
             expect(mockStoreState.migrationState).toBe('pending');
 
-            mockStoreState.setMigrationState('in-progress');
-            expect(mockStoreState.migrationState).toBe('in-progress');
+            mockStoreState.setMigrationState('running');
+            expect(mockStoreState.migrationState).toBe('running');
 
             mockStoreState.setMigrationState('completed');
             expect(mockStoreState.migrationState).toBe('completed');
         });
 
         it('should handle migration errors', () => {
-            mockStoreState.setMigrationState('error', 'Test error');
-            expect(mockStoreState.migrationState).toBe('error');
+            mockStoreState.setMigrationState('failed', 'Test error');
+            expect(mockStoreState.migrationState).toBe('failed');
         });
     });
 

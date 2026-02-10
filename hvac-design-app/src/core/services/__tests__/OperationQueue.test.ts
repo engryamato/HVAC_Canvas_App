@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { OperationQueue } from '../OperationQueue';
+import { OperationQueue, getSharedOperationQueue } from '../OperationQueue';
 
 describe('OperationQueue', () => {
     let queue: OperationQueue;
@@ -91,6 +91,25 @@ describe('OperationQueue', () => {
 
             // Now operations should execute
             expect(operations).toEqual(['op1', 'op2']);
+        });
+
+        it('should block project queue execution while root lock is active', async () => {
+            const operations: string[] = [];
+            const releaseLock = await queue.acquireLock('root');
+
+            const projectPromise = queue.enqueue('project:123', async () => {
+                operations.push('project-op');
+            });
+
+            await vi.runAllTimersAsync();
+            expect(operations).toEqual([]);
+            expect(queue.getQueueSize('project:123')).toBe(1);
+
+            releaseLock();
+            await vi.runAllTimersAsync();
+            await projectPromise;
+
+            expect(operations).toEqual(['project-op']);
         });
 
         it('should release root lock and process queued operations', async () => {
@@ -193,8 +212,9 @@ describe('OperationQueue', () => {
                 .mockRejectedValueOnce({ code: 'EBUSY', message: 'Resource busy' })
                 .mockResolvedValueOnce(undefined);
 
-            await queue.enqueue('test-key', operation);
+            const promise = queue.enqueue('test-key', operation);
             await vi.runAllTimersAsync();
+            await promise;
 
             // Should be called 4 times (initial + 3 retries)
             expect(operation).toHaveBeenCalledTimes(4);
@@ -239,9 +259,9 @@ describe('OperationQueue', () => {
                 .mockRejectedValueOnce({ code: 'EPERM', message: 'Permission denied' });
 
             const promise = queue.enqueue('test-key', operation);
+            const assertion = expect(promise).rejects.toMatchObject({ code: 'EPERM' });
             await vi.runAllTimersAsync();
-            
-            await expect(promise).rejects.toMatchObject({ code: 'EPERM' });
+            await assertion;
             expect(operation).toHaveBeenCalledTimes(1); // No retries
         });
 
@@ -250,9 +270,9 @@ describe('OperationQueue', () => {
                 .mockRejectedValueOnce({ code: 'ENOENT', message: 'File not found' });
 
             const promise = queue.enqueue('test-key', operation);
+            const assertion = expect(promise).rejects.toMatchObject({ code: 'ENOENT' });
             await vi.runAllTimersAsync();
-            
-            await expect(promise).rejects.toMatchObject({ code: 'ENOENT' });
+            await assertion;
             expect(operation).toHaveBeenCalledTimes(1);
         });
 
@@ -261,9 +281,9 @@ describe('OperationQueue', () => {
                 .mockRejectedValueOnce({ message: 'Schema validation failed' });
 
             const promise = queue.enqueue('test-key', operation);
+            const assertion = expect(promise).rejects.toMatchObject({ message: 'Schema validation failed' });
             await vi.runAllTimersAsync();
-            
-            await expect(promise).rejects.toMatchObject({ message: 'Schema validation failed' });
+            await assertion;
             expect(operation).toHaveBeenCalledTimes(1);
         });
 
@@ -272,8 +292,9 @@ describe('OperationQueue', () => {
                 .mockRejectedValueOnce({ code: 'EBUSY' })
                 .mockResolvedValueOnce(undefined);
 
-            await queue.enqueue('test-key', operation);
+            const promise = queue.enqueue('test-key', operation);
             await vi.runAllTimersAsync();
+            await promise;
 
             expect(operation).toHaveBeenCalledTimes(2);
         });
@@ -283,8 +304,9 @@ describe('OperationQueue', () => {
                 .mockRejectedValueOnce({ code: 'EAGAIN' })
                 .mockResolvedValueOnce(undefined);
 
-            await queue.enqueue('test-key', operation);
+            const promise = queue.enqueue('test-key', operation);
             await vi.runAllTimersAsync();
+            await promise;
 
             expect(operation).toHaveBeenCalledTimes(2);
         });
@@ -298,8 +320,9 @@ describe('OperationQueue', () => {
                 }
             });
 
-            await queue.enqueue('test-key', operation);
+            const promise = queue.enqueue('test-key', operation);
             await vi.runAllTimersAsync();
+            await promise;
 
             expect(operation).toHaveBeenCalledTimes(3);
             expect(retryCount).toBe(2);
@@ -369,9 +392,9 @@ describe('OperationQueue', () => {
             const promise = queue.enqueue('test-key', async () => {
                 throw { code: 'EPERM', message: 'Permission denied' };
             });
+            const assertion = expect(promise).rejects.toBeDefined();
             await vi.runAllTimersAsync();
-            
-            await expect(promise).rejects.toBeDefined();
+            await assertion;
 
             // Queue should be empty after failed operation
             await queue.enqueue('test-key', async () => {
@@ -406,9 +429,56 @@ describe('OperationQueue', () => {
             const promise = queue.enqueue('test-key', async () => {
                 throw error;
             });
+            const assertion = expect(promise).rejects.toEqual(error);
             await vi.runAllTimersAsync();
-            
-            await expect(promise).rejects.toEqual(error);
+            await assertion;
+        });
+    });
+
+    describe('Shared Queue', () => {
+        it('should return singleton shared queue instance', () => {
+            const first = getSharedOperationQueue();
+            const second = getSharedOperationQueue();
+            expect(first).toBe(second);
+        });
+    });
+
+    describe('Queue Introspection', () => {
+        it('should report queue size for a key', async () => {
+            const releaseLock = await queue.acquireLock('test-key');
+            const promise = queue.enqueue('test-key', async () => {});
+
+            expect(queue.getQueueSize('test-key')).toBeGreaterThanOrEqual(1);
+
+            releaseLock();
+            await vi.runAllTimersAsync();
+            await promise;
+            expect(queue.getQueueSize('test-key')).toBe(0);
+        });
+
+        it('should clear pending operations for a key', async () => {
+            const releaseLock = await queue.acquireLock('test-key');
+            const first = queue.enqueue('test-key', async () => {});
+            const second = queue.enqueue('test-key', async () => {});
+            const firstAssertion = expect(first).rejects.toThrow('Queue cleared for key: test-key');
+            const secondAssertion = expect(second).rejects.toThrow('Queue cleared for key: test-key');
+
+            queue.clearQueue('test-key');
+            releaseLock();
+            await vi.runAllTimersAsync();
+
+            await firstAssertion;
+            await secondAssertion;
+        });
+
+        it('should cap operation history to 100 entries', async () => {
+            for (let i = 0; i < 110; i++) {
+                await queue.enqueue(`key-${i}`, async () => {});
+            }
+            await vi.runAllTimersAsync();
+            const history = queue.getOperationHistory();
+            expect(history.length).toBe(100);
+            expect(history[history.length - 1]?.status).toBe('success');
         });
     });
 });

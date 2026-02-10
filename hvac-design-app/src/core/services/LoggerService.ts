@@ -1,6 +1,6 @@
-import { createDir, readTextFile, writeTextFile } from '../persistence/filesystem';
+import { createDir, readTextFile, writeTextFile, exists, removeFile } from '../persistence/filesystem';
 
-export type LogLevel = 'INFO' | 'WARN' | 'ERROR';
+export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
 interface LogEntry {
     timestamp: string;
@@ -25,6 +25,16 @@ export class LoggerService {
             LoggerService.instance = new LoggerService();
         }
         return LoggerService.instance;
+    }
+
+    /**
+     * Reset the singleton instance (for testing purposes only)
+     */
+    static resetInstance(): void {
+        if (LoggerService.instance?.flushInterval) {
+            clearInterval(LoggerService.instance.flushInterval);
+        }
+        LoggerService.instance = null;
     }
 
     async log(level: LogLevel, component: string, message: string): Promise<void> {
@@ -61,6 +71,21 @@ export class LoggerService {
                 // Directory might already exist.
             });
 
+            // Check if rotation is needed (10MB threshold)
+            const maxLogSize = 10 * 1024 * 1024; // 10MB
+            let currentSize = 0;
+            try {
+                const current = await readTextFile(logFile);
+                currentSize = new Blob([current]).size;
+            } catch {
+                currentSize = 0;
+            }
+
+            // Rotate if needed
+            if (currentSize > maxLogSize) {
+                await this.rotateLog(logDir);
+            }
+
             // Format log entries
             const logText = entries
                 .map(e => `[${e.timestamp}] [${e.level}] [${e.component}] ${e.message}`)
@@ -75,8 +100,57 @@ export class LoggerService {
             }
             await writeTextFile(logFile, `${previous}${logText}`);
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Failed to write logs:', error);
         }
+    }
+
+    /**
+     * Rotate logs: storage-root.log -> storage-root.1.log ... storage-root.4.log
+     * Keep 5 files total including current log file.
+     */
+    private async rotateLog(logDir: string): Promise<void> {
+        try {
+            const baseLog = `${logDir}/storage-root.log`;
+            const log1 = `${logDir}/storage-root.1.log`;
+            const log2 = `${logDir}/storage-root.2.log`;
+            const log3 = `${logDir}/storage-root.3.log`;
+            const log4 = `${logDir}/storage-root.4.log`;
+
+            // Delete oldest log
+            if (await exists(log4)) {
+                await removeFile(log4);
+            }
+
+            // Shift logs
+            if (await exists(log3)) {
+                const content = await readTextFile(log3);
+                await writeTextFile(log4, content);
+            }
+
+            if (await exists(log2)) {
+                const content = await readTextFile(log2);
+                await writeTextFile(log3, content);
+            }
+
+            if (await exists(log1)) {
+                const content = await readTextFile(log1);
+                await writeTextFile(log2, content);
+            }
+
+            if (await exists(baseLog)) {
+                const content = await readTextFile(baseLog);
+                await writeTextFile(log1, content);
+                await writeTextFile(baseLog, ''); // Clear current log
+            }
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to rotate logs:', error);
+        }
+    }
+
+    async debug(component: string, message: string): Promise<void> {
+        await this.log('DEBUG', component, message);
     }
 
     async info(component: string, message: string): Promise<void> {
@@ -97,6 +171,19 @@ export class LoggerService {
             this.flushInterval = null;
         }
         this.flush();
+    }
+
+    /**
+     * Log performance metrics for an operation
+     */
+    async logPerformance(
+        component: string,
+        operation: string,
+        durationMs: number,
+        metadata?: Record<string, unknown>
+    ): Promise<void> {
+        const metaStr = metadata ? ` | ${JSON.stringify(metadata)}` : '';
+        await this.info(component, `${operation} completed in ${durationMs}ms${metaStr}`);
     }
 }
 

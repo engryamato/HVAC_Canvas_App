@@ -8,6 +8,7 @@ import { useProjectActions, useProjectDetails } from '@/core/store/project.store
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { ProjectSidebar } from './ProjectSidebar';
 import { ProductCatalogPanel } from './ProductCatalogPanel';
+import { ServicesPanel } from './ServicesPanel';
 import { ToolButtons } from './Toolbar';
 
 interface LeftSidebarProps {
@@ -83,10 +84,10 @@ function getMaterialGrade(materials: MaterialSelection[] | undefined, type: stri
   return (materials ?? []).find((m) => m.type === type)?.grade;
 }
 
-type LeftTabId = 'product-catalog' | 'project-properties';
+type LeftTabId = 'product-catalog' | 'project-properties' | 'services';
 
 function normalizeLeftTab(value: string): LeftTabId {
-  if (value === 'product-catalog' || value === 'project-properties') {
+  if (value === 'product-catalog' || value === 'project-properties' || value === 'services') {
     return value;
   }
   // Map old values to new values for compatibility
@@ -259,6 +260,21 @@ export function LeftSidebar({
             <button
               type="button"
               role="tab"
+              aria-selected={activeLeftTab === 'services'}
+              aria-controls="services-panel"
+              onClick={() => setActiveLeftTab('services')}
+              className={`rounded px-2 py-1 text-sm transition-colors ${
+                activeLeftTab === 'services'
+                  ? 'active bg-slate-200 text-slate-900'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              data-testid="tab-services"
+            >
+              Services
+            </button>
+            <button
+              type="button"
+              role="tab"
               aria-selected={activeLeftTab === 'project-properties'}
               aria-controls="project-properties-panel"
               onClick={() => setActiveLeftTab('project-properties')}
@@ -308,6 +324,12 @@ export function LeftSidebar({
           {activeLeftTab === 'product-catalog' && (
             <div className="p-3" data-testid="product-catalog-panel" id="product-catalog-panel" role="tabpanel">
               <ProductCatalogPanel />
+            </div>
+          )}
+
+          {activeLeftTab === 'services' && (
+            <div className="p-3" data-testid="services-panel" id="services-panel" role="tabpanel">
+              <ServicesPanel />
             </div>
           )}
 

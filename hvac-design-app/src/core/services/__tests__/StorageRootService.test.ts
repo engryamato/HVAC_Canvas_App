@@ -3,6 +3,7 @@ import { StorageRootService } from '../StorageRootService';
 import type { OperationQueue } from '../OperationQueue';
 import type { StorageState } from '../../store/storageStore';
 import { runMigration } from '../migration/runMigration';
+import { listQuarantinedFiles } from '../validation/quarantineFile';
 import {
   createDir,
   exists,
@@ -11,10 +12,15 @@ import {
   getDocumentsDir,
   readDir,
   removeFile,
+  resolveStorageRoot,
+  validateStorageRoot,
   writeTextFile,
 } from '../../persistence/filesystem';
 
 vi.mock('../migration/runMigration');
+vi.mock('../validation/quarantineFile', () => ({
+  listQuarantinedFiles: vi.fn(async () => []),
+}));
 vi.mock('../../persistence/filesystem');
 vi.mock('../../../features/dashboard/store/projectListStore', () => ({
   useProjectListStore: {
@@ -25,7 +31,7 @@ vi.mock('../../../features/dashboard/store/projectListStore', () => ({
 function createMockState(overrides: Partial<StorageState> = {}): StorageState {
   return {
     storageRootPath: null,
-    storageRootType: null,
+    storageRootType: 'documents',
     migrationState: 'pending',
     migrationCompletedAt: null,
     migrationError: null,
@@ -33,10 +39,16 @@ function createMockState(overrides: Partial<StorageState> = {}): StorageState {
     validationWarnings: [],
     quarantinedFileCount: 0,
     lastQuarantineAt: null,
+    diskSpace: {
+      availableBytes: 0,
+      totalBytes: 0,
+      percentAvailable: 100,
+    },
     setStorageRoot: vi.fn(),
     setMigrationState: vi.fn(),
     updateValidation: vi.fn(),
     incrementQuarantine: vi.fn(),
+    setDiskSpace: vi.fn(),
     ...overrides,
   };
 }
@@ -62,6 +74,18 @@ describe('StorageRootService', () => {
 
     vi.mocked(getDocumentsDir).mockResolvedValue('/users/test/documents');
     vi.mocked(getAppDataDir).mockResolvedValue('/users/test/appdata');
+    vi.mocked(resolveStorageRoot).mockResolvedValue({
+      documents_path: '/users/test/documents',
+      appdata_path: '/users/test/appdata',
+      recommended_path: '/users/test/documents',
+    });
+    vi.mocked(validateStorageRoot).mockResolvedValue({
+      exists: true,
+      writable: true,
+      available_bytes: 1024 ** 3,
+      total_bytes: 10 * 1024 ** 3,
+      percent_available: 10,
+    });
     vi.mocked(createDir).mockResolvedValue(undefined);
     vi.mocked(writeTextFile).mockResolvedValue(undefined);
     vi.mocked(removeFile).mockResolvedValue(undefined);
@@ -83,7 +107,7 @@ describe('StorageRootService', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('initializes using Documents/SizeWise when writable', async () => {
@@ -108,9 +132,25 @@ describe('StorageRootService', () => {
     expect(state.setStorageRoot).toHaveBeenCalledWith('/users/test/appdata/SizeWise', 'appdata');
   });
 
+  it('emits operation:error when initialize fails', async () => {
+    vi.mocked(resolveStorageRoot).mockRejectedValueOnce(new Error('resolve failed'));
+    const errorSpy = vi.fn();
+    service.addEventListener('operation:error', errorSpy);
+
+    const result = await service.initialize();
+
+    expect(result.success).toBe(false);
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
   it('returns failure when no writable location exists', async () => {
     vi.mocked(getDocumentsDir).mockResolvedValue('');
     vi.mocked(getAppDataDir).mockResolvedValue('');
+    vi.mocked(resolveStorageRoot).mockResolvedValue({
+      documents_path: '',
+      appdata_path: '',
+      recommended_path: '',
+    });
 
     const result = await service.initialize();
 
@@ -133,6 +173,13 @@ describe('StorageRootService', () => {
       storageRootType: 'documents',
     });
     vi.mocked(exists).mockResolvedValueOnce(false).mockResolvedValue(true);
+    vi.mocked(validateStorageRoot).mockResolvedValueOnce({
+      exists: false,
+      writable: true,
+      available_bytes: 1024 ** 3,
+      total_bytes: 10 * 1024 ** 3,
+      percent_available: 10,
+    });
 
     const result = await service.validate();
 
@@ -150,6 +197,13 @@ describe('StorageRootService', () => {
       total_bytes: 1000,
       percent_available: 2,
     });
+    vi.mocked(validateStorageRoot).mockResolvedValueOnce({
+      exists: true,
+      writable: true,
+      available_bytes: 100,
+      total_bytes: 1000,
+      percent_available: 2,
+    });
     const warningSpy = vi.fn();
     service.addEventListener('validation:warning', warningSpy);
 
@@ -157,7 +211,34 @@ describe('StorageRootService', () => {
 
     expect(result.is_valid).toBe(true);
     expect(warningSpy).toHaveBeenCalled();
+    expect(state.setDiskSpace).toHaveBeenCalledWith({
+      availableBytes: 100,
+      totalBytes: 1000,
+      percentAvailable: 2,
+    });
     expect(state.updateValidation).toHaveBeenCalled();
+  });
+
+  it('emits operation:error when validate has unrecoverable errors', async () => {
+    state = createMockState({
+      storageRootPath: '/users/test/documents/SizeWise',
+      storageRootType: 'appdata',
+    });
+    vi.mocked(validateStorageRoot).mockResolvedValueOnce({
+      exists: true,
+      writable: false,
+      available_bytes: 10,
+      total_bytes: 100,
+      percent_available: 10,
+    });
+    vi.mocked(writeTextFile).mockRejectedValueOnce(new Error('EPERM'));
+    const errorSpy = vi.fn();
+    service.addEventListener('operation:error', errorSpy);
+
+    const result = await service.validate();
+
+    expect(result.is_valid).toBe(false);
+    expect(errorSpy).toHaveBeenCalled();
   });
 
   it('updates path consistency when documents path changes', async () => {
@@ -167,9 +248,12 @@ describe('StorageRootService', () => {
     });
     vi.mocked(getDocumentsDir).mockResolvedValue('/users/new/Documents');
 
+    const changedSpy = vi.fn();
+    service.addEventListener('storageRoot:changed', changedSpy);
     await service.validate();
 
     expect(state.setStorageRoot).toHaveBeenCalledWith('/users/new/Documents/SizeWise', 'documents');
+    expect(changedSpy).toHaveBeenCalled();
   });
 
   it('relocate fails for empty path', async () => {
@@ -191,10 +275,22 @@ describe('StorageRootService', () => {
     expect(result.newPath).toBe('/same/path');
   });
 
+  it('relocate infers documents type when target is Documents/SizeWise', async () => {
+    state = createMockState({ storageRootPath: '/old/path', storageRootType: 'appdata' });
+    vi.mocked(getDocumentsDir).mockResolvedValue('/users/test/documents');
+
+    const result = await service.relocate('/users/test/documents/SizeWise');
+
+    expect(result.success).toBe(true);
+    expect(state.setStorageRoot).toHaveBeenCalledWith('/users/test/documents/SizeWise', 'documents');
+  });
+
   it('returns quarantined files from .quarantine directory', async () => {
     state = createMockState({ storageRootPath: '/users/test/documents/SizeWise' });
-    vi.mocked(exists).mockResolvedValue(true);
-    vi.mocked(readDir).mockResolvedValue(['file1', 'file2']);
+    vi.mocked(listQuarantinedFiles).mockResolvedValueOnce([
+      '/users/test/documents/SizeWise/.quarantine/file1',
+      '/users/test/documents/SizeWise/.quarantine/file2',
+    ]);
 
     const files = await service.getQuarantinedFiles();
 

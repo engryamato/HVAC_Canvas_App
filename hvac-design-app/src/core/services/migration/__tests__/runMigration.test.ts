@@ -42,6 +42,8 @@ describe('runMigration', () => {
       total_bytes: 1024 * 1024 * 1024,
       percent_available: 50,
     });
+    vi.mocked(filesystem.getDownloadsDir).mockResolvedValue('');
+    vi.mocked(filesystem.getDesktopDir).mockResolvedValue('');
     vi.mocked(filesystem.createDir).mockResolvedValue(undefined);
     vi.mocked(filesystem.copyFile).mockResolvedValue(undefined);
     vi.mocked(filesystem.renameFile).mockResolvedValue(undefined);
@@ -114,6 +116,25 @@ describe('runMigration', () => {
 
     expect(result.failedCount).toBe(1);
     expect(result.errors[0]?.stage).toBe('copy');
+  });
+
+  it('discovers migration candidates from persisted project index', async () => {
+    localStorage.setItem(
+      'sws.projectIndex',
+      JSON.stringify({
+        state: {
+          projects: [{ projectId: 'proj-1', storagePath: '/legacy/proj-1/proj-1.hvac' }],
+        },
+      })
+    );
+
+    const result = await runMigration({
+      storageRootPath: '/root',
+      scanLocations: [],
+      indexStorageKey: 'sws.projectIndex',
+    });
+
+    expect(result.migratedCount).toBe(1);
   });
 });
 

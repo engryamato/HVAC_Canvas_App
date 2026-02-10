@@ -1,4 +1,5 @@
 import type { OperationQueue } from './OperationQueue';
+import { getSharedOperationQueue } from './OperationQueue';
 import type { StorageState } from '../store/storageStore';
 import type { InitResult, ValidationResult, RelocationResult, QuarantinedFile } from './types';
 import { runMigration } from './migration/runMigration';
@@ -12,6 +13,8 @@ import {
   readDir,
   removeFile,
   renameFile,
+  resolveStorageRoot,
+  validateStorageRoot,
   writeTextFile,
 } from '../persistence/filesystem';
 import { useProjectListStore } from '../../features/dashboard/store/projectListStore';
@@ -40,8 +43,10 @@ export class StorageRootService extends EventTarget {
         return { success: true, path: existingPath, migrationRan };
       }
 
-      const docsDir = await getDocumentsDir();
-      const docsRoot = docsDir ? this.toNormalizedPath(docsDir, 'SizeWise') : '';
+      const rootInfo = await resolveStorageRoot();
+      const docsRoot = rootInfo.documents_path
+        ? this.toNormalizedPath(rootInfo.documents_path, 'SizeWise')
+        : '';
 
       if (docsRoot) {
         try {
@@ -58,6 +63,7 @@ export class StorageRootService extends EventTarget {
 
       return this.initializeAppDataFallback();
     } catch (error) {
+      this.dispatchOperationError('initialize', error);
       return {
         success: false,
         path: '',
@@ -88,7 +94,9 @@ export class StorageRootService extends EventTarget {
 
     storageRootPath = this.normalizePath(storageRootPath);
 
-    if (!(await exists(storageRootPath))) {
+    const backendValidation = await validateStorageRoot(storageRootPath).catch(() => null);
+
+    if (!(backendValidation?.exists ?? (await exists(storageRootPath)))) {
       try {
         await this.ensureCanonicalDirectories(storageRootPath);
         warnings.push(`Storage root recreated: ${storageRootPath}`);
@@ -103,9 +111,11 @@ export class StorageRootService extends EventTarget {
         const expectedPath = this.toNormalizedPath(docsDir, 'SizeWise');
         if (this.normalizePath(storageRootPath) !== this.normalizePath(expectedPath)) {
           try {
+            const previousPath = storageRootPath;
             await this.ensureCanonicalDirectories(expectedPath);
             state.setStorageRoot(expectedPath, 'documents');
             storageRootPath = expectedPath;
+            this.dispatchStorageRootChanged(expectedPath, previousPath);
             warnings.push('Storage path updated to current Documents directory');
           } catch (error) {
             errors.push(`Failed to update storage path consistency: ${this.toErrorMessage(error)}`);
@@ -114,8 +124,14 @@ export class StorageRootService extends EventTarget {
       }
     }
 
+    if (backendValidation && !backendValidation.writable) {
+      writable = false;
+    }
+
     try {
-      await this.assertWritable(storageRootPath);
+      if (!backendValidation?.writable) {
+        await this.assertWritable(storageRootPath);
+      }
     } catch (error) {
       writable = false;
       if (state.storageRootType === 'documents') {
@@ -133,8 +149,19 @@ export class StorageRootService extends EventTarget {
     }
 
     try {
-      const disk = await getDiskSpace(storageRootPath);
+      const disk = backendValidation
+        ? {
+            available_bytes: backendValidation.available_bytes,
+            total_bytes: backendValidation.total_bytes,
+            percent_available: backendValidation.percent_available,
+          }
+        : await getDiskSpace(storageRootPath);
       freeSpaceBytes = disk.available_bytes;
+      state.setDiskSpace({
+        availableBytes: disk.available_bytes,
+        totalBytes: disk.total_bytes,
+        percentAvailable: disk.percent_available,
+      });
       if (disk.percent_available < LOW_DISK_THRESHOLD_PERCENT) {
         const warning = `Low disk space: ${disk.percent_available.toFixed(1)}% available`;
         warnings.push(warning);
@@ -152,9 +179,10 @@ export class StorageRootService extends EventTarget {
       warnings.push(`Disk space check unavailable: ${this.toErrorMessage(error)}`);
     }
 
-    state.updateValidation(warnings);
+    state.updateValidation(Date.now(), warnings);
 
     if (errors.length > 0) {
+      this.dispatchOperationError('validate', errors.join('; '));
       this.dispatchEvent(
         new CustomEvent('validation:error', {
           detail: { errors, path: storageRootPath },
@@ -172,7 +200,8 @@ export class StorageRootService extends EventTarget {
 
   async relocate(newPath: string): Promise<RelocationResult> {
     const release = await this.queue.acquireLock('root');
-    const oldPath = this.getStoreState().storageRootPath;
+    const currentState = this.getStoreState();
+    const oldPath = currentState.storageRootPath;
 
     try {
       if (!newPath || !newPath.trim()) {
@@ -195,7 +224,11 @@ export class StorageRootService extends EventTarget {
         await this.copyRootContents(oldPath, normalizedNewPath);
       }
 
-      this.getStoreState().setStorageRoot(normalizedNewPath, 'appdata');
+      const docsDir = await getDocumentsDir();
+      const documentsRoot = docsDir ? this.toNormalizedPath(docsDir, 'SizeWise') : '';
+      const nextType =
+        documentsRoot && this.normalizePath(documentsRoot) === normalizedNewPath ? 'documents' : 'appdata';
+      this.getStoreState().setStorageRoot(normalizedNewPath, nextType);
       this.dispatchStorageRootChanged(normalizedNewPath, oldPath || undefined);
 
       return {
@@ -204,6 +237,7 @@ export class StorageRootService extends EventTarget {
         newPath: normalizedNewPath,
       };
     } catch (error) {
+      this.dispatchOperationError('relocate', error);
       return {
         success: false,
         oldPath: oldPath || '',
@@ -225,14 +259,13 @@ export class StorageRootService extends EventTarget {
       return [];
     }
 
-    const quarantineDir = this.toNormalizedPath(storageRoot, '.quarantine');
-    if (!(await exists(quarantineDir))) {
-      return [];
-    }
+    // Use the quarantineFile module to list files
+    const { listQuarantinedFiles } = await import('./validation/quarantineFile');
+    const quarantinedPaths = await listQuarantinedFiles(storageRoot);
 
-    const folders = await readDir(quarantineDir);
-    return folders.map((folder) => ({
-      path: this.toNormalizedPath(quarantineDir, folder),
+    // Convert paths to QuarantinedFile format
+    return quarantinedPaths.map((path) => ({
+      path,
       reason: 'corrupted_or_unmigrated',
       timestamp: Date.now(),
     }));
@@ -250,13 +283,24 @@ export class StorageRootService extends EventTarget {
     );
   }
 
+  private dispatchOperationError(operation: string, error: unknown): void {
+    this.dispatchEvent(
+      new CustomEvent('operation:error', {
+        detail: {
+          operation,
+          error: this.toErrorMessage(error),
+        },
+      })
+    );
+  }
+
   private async runStartupMigration(storageRootPath: string): Promise<boolean> {
     const state = this.getStoreState();
     if (state.migrationState !== 'pending') {
       return false;
     }
 
-    state.setMigrationState('in-progress');
+    state.setMigrationState('running');
     try {
       const scanLocations = await this.resolveMigrationScanLocations(storageRootPath);
       const existingProjectIds = useProjectListStore
@@ -282,12 +326,13 @@ export class StorageRootService extends EventTarget {
       if (migrationResult.success || migrationResult.migratedCount > 0) {
         state.setMigrationState('completed');
       } else {
-        state.setMigrationState('error', migrationResult.errors[0]?.error || 'Migration failed');
+        state.setMigrationState('failed', migrationResult.errors[0]?.error || 'Migration failed');
       }
 
       return migrationResult.migratedCount > 0;
     } catch (error) {
-      state.setMigrationState('error', this.toErrorMessage(error));
+      state.setMigrationState('failed', this.toErrorMessage(error));
+      this.dispatchOperationError('migration', error);
       return false;
     }
   }
@@ -472,9 +517,8 @@ export function createStorageRootService(
 
 export async function getStorageRootService(): Promise<StorageRootService> {
   if (!serviceInstance) {
-    const { OperationQueue } = await import('./OperationQueue');
     const { useStorageStore } = await import('../store/storageStore');
-    const queue = new OperationQueue();
+    const queue = getSharedOperationQueue();
     serviceInstance = createStorageRootService(queue, useStorageStore);
   }
   return serviceInstance;

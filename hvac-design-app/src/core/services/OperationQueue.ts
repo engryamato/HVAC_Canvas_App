@@ -21,18 +21,35 @@
 export interface QueuedOperation {
     id: string;
     key: string;
+    type: OperationType;
     execute: () => Promise<void>;
     retryCount: number;
     maxRetries: number;
+    createdAt: number;
     resolve: () => void;
     reject: (error: unknown) => void;
 }
 
+export interface OperationHistoryEntry {
+    id: string;
+    key: string;
+    type: OperationType;
+    createdAt: number;
+    completedAt: number;
+    retryCount: number;
+    status: 'success' | 'failed' | 'cleared';
+    error?: string;
+}
+
+export type OperationType = 'migration' | 'import' | 'save' | 'relocate' | 'delete' | 'generic';
+
 export type ReleaseFn = () => void;
 
 export class OperationQueue {
+    private static readonly HISTORY_LIMIT = 100;
     private queues: Map<string, QueuedOperation[]> = new Map();
-    private processing: Map<string, boolean> = new Map();
+    private activeOperations: Set<string> = new Set();
+    private operationHistory: OperationHistoryEntry[] = [];
 
     constructor() { }
 
@@ -44,15 +61,21 @@ export class OperationQueue {
      * @param key - The queue key (e.g., 'root', 'project:uuid')
      * @param operation - Async function to execute
      */
-    async enqueue(key: string, operation: () => Promise<void>): Promise<void> {
+    async enqueue(
+        key: string,
+        operation: () => Promise<void>,
+        options?: { type?: OperationType; maxRetries?: number }
+    ): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             // Generate operation ID internally
             const op: QueuedOperation = {
                 id: `op-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 key,
+                type: options?.type ?? 'generic',
                 execute: operation,
                 retryCount: 0,
-                maxRetries: 3,
+                maxRetries: options?.maxRetries ?? 3,
+                createdAt: Date.now(),
                 resolve,
                 reject
             };
@@ -83,12 +106,14 @@ export class OperationQueue {
             const op: QueuedOperation = {
                 id: `lock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 key,
+                type: 'generic',
                 execute: async () => {
                     resolveEnqueued(); // Lock acquired
                     await releasedPromise; // Wait until released
                 },
                 retryCount: 0,
                 maxRetries: 0,
+                createdAt: Date.now(),
                 resolve: () => {},  // Lock operations don't need to track completion
                 reject: rejectEnqueued
             };
@@ -110,16 +135,64 @@ export class OperationQueue {
      * @returns true if the key is currently processing, false otherwise
      */
     isLocked(key: string): boolean {
-        return this.processing.get(key) ?? false;
+        return this.activeOperations.has(key);
+    }
+
+    getQueueSize(key: string): number {
+        return this.queues.get(key)?.length ?? 0;
+    }
+
+    clearQueue(key: string): void {
+        const queue = this.queues.get(key);
+        if (!queue || queue.length === 0) {
+            return;
+        }
+
+        const currentActive = this.activeOperations.has(key);
+        const retained: QueuedOperation[] = [];
+        const startIdx = currentActive ? 1 : 0;
+
+        if (currentActive && queue[0]) {
+            retained.push(queue[0]);
+        }
+
+        for (let i = startIdx; i < queue.length; i++) {
+            const op = queue[i];
+            if (!op) {
+                continue;
+            }
+            this.recordHistory(op, 'cleared');
+            op.reject(new Error(`Queue cleared for key: ${key}`));
+        }
+
+        this.queues.set(key, retained);
+    }
+
+    getOperationHistory(): OperationHistoryEntry[] {
+        return [...this.operationHistory];
+    }
+
+    private isRootBarrierActive(): boolean {
+        if (this.activeOperations.has('root')) {
+            return true;
+        }
+        return (this.queues.get('root')?.length ?? 0) > 0;
     }
 
     private async processQueue(key: string) {
-        if (this.processing.get(key)) {return;}
+        if (key !== 'root' && this.isRootBarrierActive()) {
+            return;
+        }
+        if (this.activeOperations.has(key)) {
+            return;
+        }
 
         const queue = this.queues.get(key);
-        if (!queue || queue.length === 0) {return;}
+        if (!queue || queue.length === 0) {
+            return;
+        }
 
-        this.processing.set(key, true);
+        this.activeOperations.add(key);
         
         try {
             while (queue && queue.length > 0) {
@@ -130,15 +203,17 @@ export class OperationQueue {
                 try {
                     await this.executeOperation(op);
                     queue.shift(); // Remove from queue only after successful execution
+                    this.recordHistory(op, 'success');
                     op.resolve(); // Resolve the promise
                 } catch (error) {
                     console.error(`Operation ${op.id} failed`, error);
                     queue.shift(); // Remove on failure to avoid blocking the queue forever
+                    this.recordHistory(op, 'failed', error);
                     op.reject(error); // Reject the promise
                 }
             }
         } finally {
-            this.processing.set(key, false);
+            this.activeOperations.delete(key);
             // Check if more items were added while we were processing
             const remainingQueue = this.queues.get(key);
             if (remainingQueue && remainingQueue.length > 0) {
@@ -146,8 +221,20 @@ export class OperationQueue {
             } else {
                 // Cleanup: Remove empty queue and processing entry to prevent unbounded growth
                 this.queues.delete(key);
-                this.processing.delete(key);
             }
+
+            if (key === 'root') {
+                this.processNonRootQueues();
+            }
+        }
+    }
+
+    private processNonRootQueues(): void {
+        for (const [key, queue] of this.queues.entries()) {
+            if (key === 'root' || queue.length === 0) {
+                continue;
+            }
+            this.processQueue(key);
         }
     }
 
@@ -172,6 +259,23 @@ export class OperationQueue {
             }
         }
         throw lastError; // Max retries reached
+    }
+
+    private recordHistory(op: QueuedOperation, status: OperationHistoryEntry['status'], error?: unknown): void {
+        this.operationHistory.push({
+            id: op.id,
+            key: op.key,
+            type: op.type,
+            createdAt: op.createdAt,
+            completedAt: Date.now(),
+            retryCount: op.retryCount,
+            status,
+            error: error instanceof Error ? error.message : error ? String(error) : undefined,
+        });
+
+        if (this.operationHistory.length > OperationQueue.HISTORY_LIMIT) {
+            this.operationHistory.splice(0, this.operationHistory.length - OperationQueue.HISTORY_LIMIT);
+        }
     }
 
     private isTransientError(error: unknown): boolean {
@@ -213,4 +317,13 @@ export class OperationQueue {
         // Default: treat as permanent to avoid infinite retries
         return false;
     }
+}
+
+let sharedOperationQueue: OperationQueue | null = null;
+
+export function getSharedOperationQueue(): OperationQueue {
+    if (!sharedOperationQueue) {
+        sharedOperationQueue = new OperationQueue();
+    }
+    return sharedOperationQueue;
 }

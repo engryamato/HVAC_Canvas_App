@@ -5,6 +5,8 @@ import { CanvasContainer } from './components/CanvasContainer';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
 import { LeftSidebar } from './components/LeftSidebar';
+import { ServiceContextStrip } from './components/ServiceContextStrip';
+import { CanvasOverlayWarning } from './components/CanvasOverlayWarning';
 import { RightSidebar } from './components/RightSidebar';
 import { useViewportStore } from './store/viewportStore';
 
@@ -155,15 +157,20 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
       <div className={`flex-1 flex overflow-hidden relative ${className}`}>
         <LeftSidebar />
 
-        <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern">
-          <CanvasContainer className="w-full h-full" />
+        <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern flex flex-col">
+          <ServiceContextStrip />
+          <div className="flex-1 relative">
+            <CanvasContainer className="w-full h-full" />
+            
+            <CanvasOverlayWarning />
 
-          <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
-            <Minimap />
-            <ZoomControls />
+            <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
+              <Minimap />
+              <ZoomControls />
+            </div>
+
+            <TutorialOverlay />
           </div>
-
-          <TutorialOverlay />
         </main>
 
         <RightSidebar />

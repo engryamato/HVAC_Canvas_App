@@ -34,3 +34,12 @@ export {
 
 // Preferences Store
 export { usePreferencesStore, usePreferences, usePreferencesActions } from './preferencesStore';
+
+// Storage Store
+export {
+  useStorageStore,
+  STORAGE_INITIAL_STATE,
+  type StorageState,
+  type StorageMigrationState,
+  type StorageRootType,
+} from './storageStore';

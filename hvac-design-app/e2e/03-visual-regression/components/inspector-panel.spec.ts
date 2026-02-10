@@ -78,7 +78,9 @@ async function createDuct(page: Page) {
   await page.keyboard.press('d');
   const canvas = await getCanvasLocator(page);
   const box = await canvas.boundingBox();
-  if (!box) return;
+  if (!box) {
+    return;
+  }
 
   await page.mouse.move(box.x + 260, box.y + 360);
   await page.mouse.down();
@@ -91,7 +93,9 @@ async function createEquipment(page: Page) {
   await page.keyboard.press('e');
   const canvas = await getCanvasLocator(page);
   const box = await canvas.boundingBox();
-  if (!box) return;
+  if (!box) {
+    return;
+  }
 
   await page.mouse.click(box.x + 520, box.y + 220);
   await page.waitForTimeout(250);
@@ -226,7 +230,9 @@ test.describe('Inspector Panel Visual Tests', () => {
     await withThemeVariants(page, async (theme) => {
       const canvas = await getCanvasLocator(page);
       const box = await canvas.boundingBox();
-      if (!box) return;
+      if (!box) {
+        return;
+      }
 
       // Create Room 1
       await page.keyboard.press('r');

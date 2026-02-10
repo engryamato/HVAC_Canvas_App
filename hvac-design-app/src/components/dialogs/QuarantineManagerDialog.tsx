@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Trash2, FolderOpen, Info } from 'lucide-react';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
+import { isTauri } from '@/core/persistence/filesystem';
+import { getStorageRootService } from '@/core/services/StorageRootService';
 import type { QuarantinedFile } from '@/core/services/types';
 
 interface QuarantineManagerDialogProps {
@@ -53,8 +55,33 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
     };
 
     const handleOpenFolder = async () => {
-        // TODO: Use Tauri shell plugin to open quarantine folder
-        console.log('Open quarantine folder');
+        try {
+            const service = await getStorageRootService();
+            const rootPath = service.getStorageRoot();
+            if (!rootPath) {
+                console.error('No storage root configured');
+                return;
+            }
+
+            const quarantineDir = `${rootPath}/.quarantine`;
+
+            if (!isTauri()) {
+                console.warn(`Open folder is only supported in desktop mode: ${quarantineDir}`);
+                return;
+            }
+
+            const shellModuleName = '@tauri-apps/plugin-shell';
+            const shellModule = await import(/* @vite-ignore */ shellModuleName);
+            const openPath = (shellModule as { open?: (path: string) => Promise<void> }).open;
+            if (typeof openPath !== 'function') {
+                console.error('Tauri shell open API is unavailable');
+                return;
+            }
+
+            await openPath(quarantineDir);
+        } catch (error) {
+            console.error('Failed to open quarantine folder:', error);
+        }
     };
 
     const handleClearAll = async () => {
@@ -75,8 +102,8 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
         }
     };
 
-    const formatDate = (isoDate: string): string => {
-        return new Date(isoDate).toLocaleString();
+    const formatDate = (timestamp: number): string => {
+        return new Date(timestamp).toLocaleString();
     };
 
     return (
@@ -119,7 +146,7 @@ export function QuarantineManagerDialog({ open, onOpenChange }: QuarantineManage
                                                 {file.path.split('/').pop() || file.path}
                                             </p>
                                             <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                                                <span>{formatDate(new Date(file.timestamp).toISOString())}</span>
+                                                <span>{formatDate(file.timestamp)}</span>
                                                 {file.reason && (
                                                     <>
                                                         <span>•</span>
