@@ -1,11 +1,13 @@
 /**
  * ServiceEditor
- * 
+ *
  * Component for creating and editing service specifications
+ * Uses unified component library store (componentLibraryStoreV2)
  */
-import { useState } from 'react';
-import { Service, SystemType, PressureClass } from '@/core/schema/service.schema';
-import { useServiceStore } from '@/core/store/serviceStore';
+import { useState, useEffect } from 'react';
+import { SystemType, PressureClass } from '@/core/schema/service.schema';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,39 +17,161 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface ServiceEditorProps {
   open: boolean;
   onClose: () => void;
-  serviceId?: string; // If provided, edit mode; otherwise create mode
+  serviceId?: string;
+}
+
+type MaterialType = 'galvanized' | 'stainless' | 'aluminum' | 'flex';
+type ComponentSystemType = 'supply' | 'return' | 'exhaust';
+type ComponentPressureClass = 'low' | 'medium' | 'high';
+
+interface ServiceFormData {
+  name: string;
+  systemType: SystemType;
+  pressureClass: PressureClass;
+  material: MaterialType;
+  color: string;
+  allowedShapes: Array<'round' | 'rectangular'>;
+}
+
+const DEFAULT_FITTING_RULES = [
+  { angle: 90, fittingType: 'elbow_90', preference: 1 },
+  { angle: 45, fittingType: 'elbow_45', preference: 1 },
+  { angle: 90, fittingType: 'tee', preference: 1 },
+];
+
+function toComponentMaterialType(material: MaterialType): 'galvanized_steel' | 'stainless_steel' | 'aluminum' | 'flexible' {
+  switch (material) {
+    case 'stainless':
+      return 'stainless_steel';
+    case 'aluminum':
+      return 'aluminum';
+    case 'flex':
+      return 'flexible';
+    case 'galvanized':
+    default:
+      return 'galvanized_steel';
+  }
+}
+
+function toServiceMaterial(materialType?: string): MaterialType {
+  switch (materialType) {
+    case 'stainless_steel':
+      return 'stainless';
+    case 'aluminum':
+      return 'aluminum';
+    case 'flexible':
+      return 'flex';
+    case 'galvanized_steel':
+    default:
+      return 'galvanized';
+  }
+}
+
+function getServiceColor(systemType?: string): string {
+  switch (systemType) {
+    case 'supply':
+      return '#007bff';
+    case 'return':
+      return '#dc3545';
+    case 'exhaust':
+      return '#28a745';
+    default:
+      return '#424242';
+  }
+}
+
+function componentToFormData(component: UnifiedComponentDefinition | undefined): ServiceFormData {
+  if (!component) {
+    return {
+      name: '',
+      systemType: 'supply',
+      pressureClass: 'low',
+      material: 'galvanized',
+      color: '#4A90E2',
+      allowedShapes: ['round', 'rectangular'],
+    };
+  }
+
+  const dimensionalConstraints = component.customFields?.dimensionalConstraints as
+    | { allowedShapes?: Array<'round' | 'rectangular'> }
+    | undefined;
+
+  return {
+    name: component.name || '',
+    systemType: (component.systemType as SystemType) || 'supply',
+    pressureClass: (component.pressureClass as PressureClass) || 'low',
+    material: toServiceMaterial(component.materials?.[0]?.type),
+    color: getServiceColor(component.systemType),
+    allowedShapes: dimensionalConstraints?.allowedShapes || ['round', 'rectangular'],
+  };
 }
 
 export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) {
-  const services = useServiceStore((state) => state.services);
-  const templates = useServiceStore((state) => state.baselineTemplates);
-  const addService = useServiceStore((state) => state.addService);
-  const updateService = useServiceStore((state) => state.updateService);
+  const addComponent = useComponentLibraryStoreV2((state) => state.addComponent);
+  const updateComponent = useComponentLibraryStoreV2((state) => state.updateComponent);
+  const getComponent = useComponentLibraryStoreV2((state) => state.getComponent);
 
-  const existingService = serviceId ? (services[serviceId] || templates.find(t => t.id === serviceId)) : null;
+  const existingComponent = serviceId ? getComponent(serviceId) : undefined;
 
-  const [formData, setFormData] = useState<Partial<Service>>({
-    name: existingService?.name || '',
-    systemType: existingService?.systemType || 'supply',
-    pressureClass: existingService?.pressureClass || 'low',
-    material: existingService?.material || 'galvanized',
-    color: existingService?.color || '#4A90E2',
-    dimensionalConstraints: existingService?.dimensionalConstraints || {
-      allowedShapes: ['round', 'rectangular'],
-    },
-    fittingRules: existingService?.fittingRules || [],
-  });
+  const [formData, setFormData] = useState<ServiceFormData>(componentToFormData(existingComponent));
+
+  useEffect(() => {
+    if (open) {
+      setFormData(componentToFormData(existingComponent));
+    }
+  }, [open, existingComponent]);
 
   const handleSave = () => {
-    const serviceData: Service = {
+    const now = new Date();
+    const primaryShape = formData.allowedShapes[0] ?? 'round';
+
+    const componentData: UnifiedComponentDefinition = {
       id: serviceId || crypto.randomUUID(),
-      ...formData as Omit<Service, 'id'>,
+      name: formData.name,
+      category: 'duct',
+      type: 'duct',
+      subtype: primaryShape,
+      description: `${formData.name} - ${formData.systemType} air service`,
+      systemType: formData.systemType as ComponentSystemType,
+      pressureClass: formData.pressureClass as ComponentPressureClass,
+      engineeringProperties: {
+        frictionFactor: 0.02,
+        maxVelocity: 2500,
+        minVelocity: 500,
+        maxPressureDrop: 0.1,
+      },
+      pricing: {
+        materialCost: 0,
+        laborUnits: 0,
+        wasteFactor: 0,
+      },
+      materials: [
+        {
+          id: `${formData.name}-material`,
+          name: formData.material,
+          type: toComponentMaterialType(formData.material),
+          cost: 0,
+          costUnit: 'linear_foot',
+        },
+      ],
+      tags: ['service', formData.systemType, 'legacy-migrated'],
+      customFields: {
+        serviceEditor: true,
+        dimensionalConstraints: {
+          allowedShapes: formData.allowedShapes,
+        },
+        fittingRules: DEFAULT_FITTING_RULES,
+        color: formData.color,
+      },
+      isCustom: true,
+      createdAt: existingComponent?.createdAt ?? now,
+      updatedAt: now,
     };
 
-    if (serviceId && services[serviceId]) {
-      updateService(serviceId, serviceData);
+    if (serviceId && existingComponent) {
+      updateComponent(serviceId, componentData);
     } else {
-      addService(serviceData);
+      addComponent(componentData);
     }
 
     onClose();
@@ -112,7 +236,7 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
             <Label htmlFor="material">Material</Label>
             <Select
               value={formData.material}
-              onValueChange={(value) => setFormData({ ...formData, material: value as Service['material'] })}
+              onValueChange={(value) => setFormData({ ...formData, material: value as MaterialType })}
             >
               <SelectTrigger id="material">
                 <SelectValue />

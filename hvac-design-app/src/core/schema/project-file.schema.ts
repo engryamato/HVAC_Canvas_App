@@ -225,7 +225,7 @@ export const ProjectMetadataSchema = ProjectFileSchema.omit({
 
 export type ProjectMetadata = z.infer<typeof ProjectMetadataSchema>;
 
-export const CURRENT_SCHEMA_VERSION = '1.0.0';
+export const CURRENT_SCHEMA_VERSION = '2.0.0';
 
 /**
  * Plan scale metadata

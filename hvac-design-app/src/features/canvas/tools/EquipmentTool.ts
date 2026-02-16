@@ -5,10 +5,11 @@ import {
   type ToolRenderContext,
 } from './BaseTool';
 import { createEquipment, EQUIPMENT_TYPE_DEFAULTS } from '../entities/equipmentDefaults';
-import { createEntity } from '@/core/commands/entityCommands';
+import { createEntity, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
-import { useToolStore } from '@/core/store/canvas.store';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
+import { adaptComponentToService } from '@/core/services/componentServiceInterop';
 
 interface EquipmentToolState {
   currentPoint: { x: number; y: number } | null;
@@ -31,10 +32,10 @@ export class EquipmentTool extends BaseTool {
   }
 
   /**
-   * Get the currently selected equipment type from store
+   * Get the currently active component from the library store
    */
-  getSelectedType(): EquipmentType {
-    return useToolStore.getState().selectedEquipmentType;
+  getActiveComponent() {
+    return useComponentLibraryStoreV2.getState().getActiveComponent();
   }
 
   onActivate(): void {
@@ -46,13 +47,11 @@ export class EquipmentTool extends BaseTool {
   }
 
   onMouseDown(event: ToolMouseEvent): void {
-    console.log('EquipmentTool.onMouseDown', event.x, event.y, event.button);
     if (event.button !== 0) {
       return;
     }
 
     const snappedPoint = this.snapToGrid(event.x, event.y);
-    console.log('EquipmentTool.snapped', snappedPoint);
     this.createEquipmentEntity(snappedPoint.x, snappedPoint.y);
   }
 
@@ -76,31 +75,42 @@ export class EquipmentTool extends BaseTool {
       return;
     }
 
+    const activeComponent = this.getActiveComponent();
+    if (!activeComponent || activeComponent.category !== 'equipment') {
+      return;
+    }
+
     const { ctx, zoom } = context;
     const currentPoint = this.state.currentPoint;
-    const selectedType = this.getSelectedType();
-    const defaults = EQUIPMENT_TYPE_DEFAULTS[selectedType]!; // Non-null assertion: defaults always exist for all equipment types
+    
+    // Determine equipment type from subtype or fallback
+    const type = (activeComponent.subtype as EquipmentType) || 'fan';
+    const defaults = EQUIPMENT_TYPE_DEFAULTS[type] || EQUIPMENT_TYPE_DEFAULTS['fan'];
+    
+    // Use component dimensions if available, otherwise defaults
+    const width = activeComponent.defaultDimensions?.width ?? defaults.width;
+    const depth = activeComponent.defaultDimensions?.depth ?? defaults.depth;
 
     ctx.save();
 
     // Draw preview rectangle at cursor
-    const x = currentPoint.x - defaults.width / 2;
-    const y = currentPoint.y - defaults.depth / 2;
+    const x = currentPoint.x - width / 2;
+    const y = currentPoint.y - depth / 2;
 
     ctx.fillStyle = 'rgba(255, 243, 224, 0.7)';
     ctx.strokeStyle = '#E65100';
     ctx.lineWidth = 2 / zoom;
     ctx.setLineDash([6 / zoom, 4 / zoom]);
 
-    ctx.fillRect(x, y, defaults.width, defaults.depth);
-    ctx.strokeRect(x, y, defaults.width, defaults.depth);
+    ctx.fillRect(x, y, width, depth);
+    ctx.strokeRect(x, y, width, depth);
 
     // Draw type label
     ctx.font = `${10 / zoom}px sans-serif`;
     ctx.fillStyle = '#E65100';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(selectedType.toUpperCase(), currentPoint.x, currentPoint.y);
+    ctx.fillText(activeComponent.name || type.toUpperCase(), currentPoint.x, currentPoint.y);
 
     ctx.restore();
   }
@@ -121,16 +131,36 @@ export class EquipmentTool extends BaseTool {
   }
 
   private createEquipmentEntity(x: number, y: number): void {
-    const selectedType = this.getSelectedType();
+    const activeComponent = this.getActiveComponent();
+    if (!activeComponent || activeComponent.category !== 'equipment') {
+      console.warn('No active equipment component selected');
+      return;
+    }
+
+    const type = (activeComponent.subtype as EquipmentType) || 'fan';
+    const defaults = EQUIPMENT_TYPE_DEFAULTS[type] || EQUIPMENT_TYPE_DEFAULTS['fan'];
+    const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
+
+    // Use component dimensions and metadata
+    const overrides = {
+      x,
+      y,
+      width: activeComponent.defaultDimensions?.width ?? defaults.width,
+      depth: activeComponent.defaultDimensions?.depth ?? defaults.depth,
+      height: activeComponent.defaultDimensions?.height ?? defaults.height,
+      manufacturer: activeComponent.manufacturer,
+      model: activeComponent.model,
+      name: activeComponent.name,
+      serviceId: activeService?.id || activeComponent.id,
+      catalogItemId: activeComponent.id,
+    };
 
     // Place equipment at the snapped position (corner, not centered)
     // This ensures the transform position is grid-aligned
-    const equipment = createEquipment(selectedType, {
-      x,
-      y,
-    });
+    const equipment = createEquipment(type, overrides);
 
     createEntity(equipment);
+    validateAndRecord(equipment.id);
   }
 }
 

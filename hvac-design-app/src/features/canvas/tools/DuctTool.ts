@@ -4,17 +4,24 @@ import {
   type ToolKeyEvent,
   type ToolRenderContext,
 } from './BaseTool';
+
+// ... existing imports ...
+
+// ... inside class ...
 import { createDuct } from '../entities/ductDefaults';
-import { createEntity } from '@/core/commands/entityCommands';
+import { createEntities, createEntity, deleteEntities, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
-import { useServiceStore } from '@/core/store/serviceStore';
-import { ConstraintValidationService } from '@/core/services/constraintValidation';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import {
   DuctMaterialSchema as DuctEntityMaterialSchema,
   DuctShapeSchema as DuctEntityShapeSchema,
 } from '@/core/schema/duct.schema';
 import { ConnectionDetectionService } from '@/core/services/connectionDetection';
-import { FittingGenerationService } from '@/core/services/fittingGeneration';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
+import type { Entity, Fitting } from '@/core/schema';
+import { useEntityStore } from '@/core/store/entityStore';
+import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
+import { adaptComponentToService, getServiceColor } from '@/core/services/componentServiceInterop';
 
 /**
  * Minimum duct length in pixels (for 0.1 feet minimum)
@@ -33,6 +40,23 @@ interface DuctToolState {
  */
 export class DuctTool extends BaseTool {
   readonly name = 'duct';
+  private static autoFittingEnabled = true;
+
+  static setAutoFittingEnabled(enabled: boolean): void {
+    this.autoFittingEnabled = enabled;
+  }
+
+  static isAutoFittingEnabled(): boolean {
+    return this.autoFittingEnabled;
+  }
+
+  setAutoFittingEnabled(enabled: boolean): void {
+    DuctTool.setAutoFittingEnabled(enabled);
+  }
+
+  isAutoFittingEnabled(): boolean {
+    return DuctTool.isAutoFittingEnabled();
+  }
 
   private state: DuctToolState = {
     mode: 'idle',
@@ -87,6 +111,10 @@ export class DuctTool extends BaseTool {
     }
   }
 
+  private getActiveComponent(): UnifiedComponentDefinition | null {
+    return useComponentLibraryStoreV2.getState().getActiveComponent() ?? null;
+  }
+
   render(context: ToolRenderContext): void {
     if (this.state.mode !== 'drawing' || !this.state.startPoint || !this.state.currentPoint) {
       return;
@@ -94,15 +122,14 @@ export class DuctTool extends BaseTool {
 
     const { ctx, zoom } = context;
     const { startPoint, currentPoint } = this.state;
-    const activeServiceId = useServiceStore.getState().activeServiceId;
-    const services = useServiceStore.getState().services;
-    const templates = useServiceStore.getState().baselineTemplates;
-    const activeService = services[activeServiceId!] || templates.find(t => t.id === activeServiceId);
+    
+    const activeComponent = this.getActiveComponent();
+    const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
 
     // Calculate duct length
     const dx = currentPoint.x - startPoint.x;
     const dy = currentPoint.y - startPoint.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
+    const length = Math.hypot(dx, dy);
     
     // Minimum length check
     const isValid = length >= MIN_DUCT_LENGTH;
@@ -110,7 +137,7 @@ export class DuctTool extends BaseTool {
 
     // Service Constraints Check - visualize service color
     if (isValid && activeService) {
-        ctx.strokeStyle = activeService.color || '#424242';
+        ctx.strokeStyle = activeService.color || getServiceColor(activeService.systemType);
     } else {
         ctx.strokeStyle = isValid ? '#424242' : '#D32F2F';
     }
@@ -171,7 +198,7 @@ export class DuctTool extends BaseTool {
   private createDuctEntity(start: { x: number; y: number }, end: { x: number; y: number }): void {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
-    const lengthPixels = Math.sqrt(dx * dx + dy * dy);
+    const lengthPixels = Math.hypot(dx, dy);
 
     // Enforce minimum length
     if (lengthPixels < MIN_DUCT_LENGTH) {
@@ -181,23 +208,23 @@ export class DuctTool extends BaseTool {
     const lengthFt = lengthPixels / 12;
     const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
 
-    // Get Active Service
-    const activeServiceId = useServiceStore.getState().activeServiceId;
-    const services = useServiceStore.getState().services;
-    const templates = useServiceStore.getState().baselineTemplates;
-    const activeService = services[activeServiceId!] || templates.find(t => t.id === activeServiceId);
+    // Get Active Component and adapt to Service
+    const activeComponent = this.getActiveComponent();
+    const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
 
     // Create duct Props with defaults + Service info
     const ductProps: Parameters<typeof createDuct>[0] = {
-        x: start.x, 
-        y: start.y, 
+        x: start.x,
+        y: start.y,
         length: lengthFt,
-        serviceId: activeServiceId || undefined
+        serviceId: activeService?.id ?? activeComponent?.id,
+        catalogItemId: activeComponent?.id,
     };
 
     if (activeService) {
         const serviceMaterial = DuctEntityMaterialSchema.safeParse(activeService.material);
-        const requestedShape = activeService.dimensionalConstraints.allowedShapes[0] ?? 'round';
+        // Map subtype to shape, default to round if not present
+        const requestedShape = activeComponent?.subtype || activeService.dimensionalConstraints.allowedShapes[0] || 'round';
         const serviceShape = DuctEntityShapeSchema.safeParse(requestedShape);
 
         // Apply service defaults only when compatible with duct schema
@@ -212,20 +239,33 @@ export class DuctTool extends BaseTool {
     const duct = createDuct(ductProps);
     duct.transform.rotation = rotation;
 
-    // Validate
-    if (activeService) {
-        const violations = ConstraintValidationService.validateDuct(duct.props, activeService);
-        if (violations.length > 0) {
-            if (!duct.warnings) {
-                duct.warnings = {};
-            }
-            duct.warnings.constraintViolations = violations.map(v => v.message);
-        }
+    createEntity(duct);
+    validateAndRecord(duct.id);
+
+    // Keep existing connection analysis call for side-effect compatibility in current flow.
+    ConnectionDetectionService.detectConnections(duct.id);
+
+    if (!DuctTool.autoFittingEnabled) {
+      return;
     }
 
-    createEntity(duct);
-    ConnectionDetectionService.detectConnections(duct.id);
-    FittingGenerationService.autoGenerateFittings(duct.id);
+    const entities = useEntityStore.getState().byId as Record<string, Entity>;
+    const autoInsertPlan = fittingInsertionService.planAutoInsertForDuct(duct.id, entities);
+
+    if (autoInsertPlan.insertions.length > 0) {
+      createEntities(autoInsertPlan.insertions);
+    }
+
+    if (autoInsertPlan.orphanFittingIds.length > 0) {
+      const currentEntities = useEntityStore.getState().byId as Record<string, Entity>;
+      const orphanEntities = autoInsertPlan.orphanFittingIds
+        .map((id) => currentEntities[id])
+        .filter((entity): entity is Fitting => entity?.type === 'fitting');
+
+      if (orphanEntities.length > 0) {
+        deleteEntities(orphanEntities);
+      }
+    }
   }
 }
 

@@ -6,12 +6,20 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAllServices, useServiceStore } from '@/core/store/serviceStore';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { adaptComponentToService } from '@/core/services/componentServiceInterop';
 
 export function ServicesPanel() {
-  const services = useAllServices();
-  const { activeServiceId, setActiveService, cloneService, removeService } = useServiceStore();
+  const components = useComponentLibraryStoreV2((state) => state.components);
+  const activeComponentId = useComponentLibraryStoreV2((state) => state.activeComponentId);
+  const activateComponent = useComponentLibraryStoreV2((state) => state.activateComponent);
+  const duplicateComponent = useComponentLibraryStoreV2((state) => state.duplicateComponent);
+  const deleteComponent = useComponentLibraryStoreV2((state) => state.deleteComponent);
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'return' | 'exhaust'>('all');
+
+  const services = components
+    .filter((component) => Boolean(component.systemType))
+    .map((component) => adaptComponentToService(component));
 
   const filteredServices = services.filter((service) => {
     if (filterType === 'all') {
@@ -20,8 +28,8 @@ export function ServicesPanel() {
     return service.systemType === filterType;
   });
 
-  const handleClone = (id: string, name: string) => {
-    cloneService(id, `${name} (Copy)`);
+  const handleClone = (id: string) => {
+    duplicateComponent(id);
   };
 
   return (
@@ -49,17 +57,17 @@ export function ServicesPanel() {
         ) : null}
         {filteredServices.map((service) => (
           <div
-            key={service.id}
-            className={cn(
-              'rounded border p-3 space-y-2',
-              activeServiceId === service.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white'
-            )}
-            data-testid={`service-card-${service.id}`}
-          >
+              key={service.id}
+              className={cn(
+                'rounded border p-3 space-y-2',
+                activeComponentId === service.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white'
+              )}
+              data-testid={`service-card-${service.id}`}
+            >
             <button
               type="button"
               className="w-full text-left"
-              onClick={() => setActiveService(service.id)}
+              onClick={() => activateComponent(service.id)}
               data-testid={`service-select-${service.id}`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -67,18 +75,18 @@ export function ServicesPanel() {
                   <span className="h-3 w-3 rounded-full" style={{ backgroundColor: service.color ?? '#94a3b8' }} />
                   <span className="font-medium text-sm">{service.name}</span>
                 </div>
-                {activeServiceId === service.id ? <span className="text-[11px] font-medium text-blue-700">Active</span> : null}
+                {activeComponentId === service.id ? <span className="text-[11px] font-medium text-blue-700">Active</span> : null}
               </div>
               <p className="mt-1 text-xs text-slate-600">
                 {service.systemType} • {service.pressureClass} • {service.material}
               </p>
             </button>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleClone(service.id, service.name)}>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleClone(service.id)}>
                 Clone
               </Button>
               {service.source === 'custom' ? (
-                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => removeService(service.id)}>
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => deleteComponent(service.id)}>
                   Delete
                 </Button>
               ) : null}
@@ -89,4 +97,3 @@ export function ServicesPanel() {
     </div>
   );
 }
-

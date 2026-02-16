@@ -1,10 +1,16 @@
 import type { Project } from '@/types/project';
 
 export interface ReportOptions {
+    format?: 'pdf' | 'csv' | 'excel';
+    groupBy?: 'category' | 'systemType' | 'zone' | 'flat';
     includeMetadata: boolean;
     includeCalculations: boolean;
     includeEntities: boolean;
     includeBOM: boolean;
+    includePricing?: boolean;
+    includeEngineeringNotes?: boolean;
+    includeCanvasSnapshot?: boolean;
+    templateId?: string;
     orientation: 'portrait' | 'landscape';
 }
 

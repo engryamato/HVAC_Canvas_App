@@ -57,12 +57,11 @@ export function createDuct(
     shape,
     length: overrides?.length ?? DEFAULT_ROUND_DUCT_PROPS.length,
     material: overrides?.material ?? DEFAULT_ROUND_DUCT_PROPS.material,
-    airflow: overrides?.airflow ?? DEFAULT_ROUND_DUCT_PROPS.airflow,
+    airflow: overrides?.airflow ?? 0, // Flow calculated from topology
     staticPressure: overrides?.staticPressure ?? DEFAULT_ROUND_DUCT_PROPS.staticPressure,
     serviceId: overrides?.serviceId,
     catalogItemId: overrides?.catalogItemId,
   };
-
   const props =
     shape === 'round'
       ? {

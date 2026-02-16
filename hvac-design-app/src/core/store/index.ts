@@ -43,3 +43,10 @@ export {
   type StorageMigrationState,
   type StorageRootType,
 } from './storageStore';
+
+// Component Library Store V2 (Phase 1.1)
+export {
+  useComponentLibraryStoreV2,
+  type ImportPreview,
+  type ImportRow,
+} from './componentLibraryStoreV2';

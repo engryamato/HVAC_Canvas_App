@@ -1,17 +1,17 @@
 import type { Duct } from '@/core/schema';
 import type { RenderContext } from './RoomRenderer';
+import { ProfessionalRenderingHelper } from '../utils';
+import { canvasPerformanceService } from '../services';
 
 /**
  * Duct colors
  */
 const DUCT_COLORS = {
   round: {
-    fill: '#E0E0E0',
     stroke: '#424242',
     selectedStroke: '#1976D2',
   },
   rectangular: {
-    fill: '#EEEEEE',
     stroke: '#616161',
     selectedStroke: '#1976D2',
   },
@@ -24,73 +24,105 @@ const DUCT_COLORS = {
  */
 export function renderDuct(duct: Duct, context: RenderContext): void {
   const { ctx, zoom, isSelected } = context;
-  const { shape, length, airflow, name } = duct.props;
-
+  const { shape, length, airflow, name, insulated, insulationThickness } = duct.props;
+  
   // Convert length from feet to pixels (12 inches per foot)
   const lengthPixels = length * 12;
 
+  const helper = new ProfessionalRenderingHelper(ctx, zoom);
+  const perfHints = canvasPerformanceService.getPerformanceHints();
+
   ctx.save();
 
+  // Determine standard properties based on shape
+  let width: number;
   if (shape === 'round') {
-    renderRoundDuct(ctx, duct, lengthPixels, zoom, isSelected);
+    width = 'diameter' in duct.props ? (duct.props.diameter ?? 12) : 12;
   } else {
-    renderRectangularDuct(ctx, duct, lengthPixels, zoom, isSelected);
+    width = 'width' in duct.props ? (duct.props.width ?? 12) : 12;
   }
 
-  // Draw airflow direction arrow
-  renderAirflowArrow(ctx, lengthPixels, zoom, airflow);
+  const color = isSelected 
+    ? (shape === 'round' ? DUCT_COLORS.round.selectedStroke : DUCT_COLORS.rectangular.selectedStroke)
+    : (shape === 'round' ? DUCT_COLORS.round.stroke : DUCT_COLORS.rectangular.stroke);
 
-  // Draw duct label
-  renderDuctLabel(ctx, name, duct.props, lengthPixels, zoom);
+  const weight = isSelected ? 3 : 2;
+
+  // 1. Draw Insulation Hatching (if enabled and efficient)
+  if (insulated && perfHints.enableHatching) {
+    const hatchThickness = insulationThickness ? Math.max(insulationThickness, 1) : 1;
+    // For rectangular ducts, we hatch the top surface if viewed from top
+    // For now, simpler approximation: Fill the duct area with hatching
+    // Offset y by -width/2 because standard drawing is centered on line
+    
+    helper.drawHatching(
+      { x: 0, y: -width / 2, width: lengthPixels, height: width },
+      hatchThickness, // hatch line thickness
+      45 // angle
+    );
+  }
+
+  // 2. Draw Double Lines (Main Body)
+  // Top line
+  // Start point is (0, -width/2) effectively for the top wall relative to centerline?
+  // helper.drawDoubleLine draws *around* the centerline defined by start->end.
+  // So we pass the centerline (0,0) to (length,0) and the full width.
+  
+  // NOTE: isSelected highlights BOTH lines.
+  const lineOptions = {
+    color,
+    weight,
+    style: 'solid' as const,
+  };
+
+  helper.drawDoubleLine(
+    { x: 0, y: 0 },
+    { x: lengthPixels, y: 0 },
+    width,
+    lineOptions
+  );
+
+  // 3. Draw Centerline (Round Ducts only)
+  if (shape === 'round') {
+    // Only draw centerline if detail level permits or always? Standards say yes.
+    // Use lighter weight for centerline
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1 / zoom;
+    helper.setLineStyle('centerline');
+    ctx.moveTo(0, 0);
+    ctx.lineTo(lengthPixels, 0);
+    ctx.stroke();
+    helper.setLineStyle('solid'); // Reset
+  }
+
+  // 4. Draw Flanges at ends
+  // Flange is a line perpendicular to duct at start and end
+  // Length usually extends slightly beyond width, or matches width. SMACNA often shows them matching or slightly sticking out.
+  // Let's make them match width for cleanliness + 2px extra (1px each side)
+  const flangeHalfHeight = (width / 2) + (2 / zoom);
+  
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2 / zoom;
+  
+  // Start Flange
+  ctx.moveTo(0, -flangeHalfHeight);
+  ctx.lineTo(0, flangeHalfHeight);
+  
+  // End Flange
+  ctx.moveTo(lengthPixels, -flangeHalfHeight);
+  ctx.lineTo(lengthPixels, flangeHalfHeight);
+  
+  ctx.stroke();
+
+  // 5. Draw airflow direction arrow
+  renderAirflowArrow(ctx, lengthPixels, zoom, airflow, DUCT_COLORS.arrow, DUCT_COLORS.text);
+
+  // 6. Draw duct label
+  renderDuctLabel(ctx, name, duct.props, lengthPixels, zoom, DUCT_COLORS.text);
 
   ctx.restore();
-}
-
-/**
- * Render a round duct
- */
-function renderRoundDuct(
-  ctx: CanvasRenderingContext2D,
-  duct: Duct,
-  lengthPixels: number,
-  zoom: number,
-  isSelected: boolean
-): void {
-  const diameter = 'diameter' in duct.props ? (duct.props.diameter ?? 12) : 12;
-  const halfDiameter = diameter / 2;
-
-  ctx.fillStyle = DUCT_COLORS.round.fill;
-  ctx.strokeStyle = isSelected ? DUCT_COLORS.round.selectedStroke : DUCT_COLORS.round.stroke;
-  ctx.lineWidth = isSelected ? 3 / zoom : 2 / zoom;
-
-  // Draw duct as a rounded rectangle (simulating round duct in 2D)
-  ctx.beginPath();
-  ctx.roundRect(-halfDiameter, -halfDiameter, lengthPixels + diameter, diameter, halfDiameter);
-  ctx.fill();
-  ctx.stroke();
-}
-
-/**
- * Render a rectangular duct
- */
-function renderRectangularDuct(
-  ctx: CanvasRenderingContext2D,
-  duct: Duct,
-  lengthPixels: number,
-  zoom: number,
-  isSelected: boolean
-): void {
-  const width = 'width' in duct.props ? (duct.props.width ?? 12) : 12;
-  const halfWidth = width / 2;
-
-  ctx.fillStyle = DUCT_COLORS.rectangular.fill;
-  ctx.strokeStyle = isSelected
-    ? DUCT_COLORS.rectangular.selectedStroke
-    : DUCT_COLORS.rectangular.stroke;
-  ctx.lineWidth = isSelected ? 3 / zoom : 2 / zoom;
-
-  ctx.fillRect(0, -halfWidth, lengthPixels, width);
-  ctx.strokeRect(0, -halfWidth, lengthPixels, width);
 }
 
 /**
@@ -100,12 +132,14 @@ function renderAirflowArrow(
   ctx: CanvasRenderingContext2D,
   lengthPixels: number,
   zoom: number,
-  airflow: number
+  airflow: number,
+  arrowColor: string,
+  textColor: string
 ): void {
   const arrowX = lengthPixels * 0.7;
   const arrowSize = Math.min(12 / zoom, 10);
 
-  ctx.fillStyle = DUCT_COLORS.arrow;
+  ctx.fillStyle = arrowColor;
   ctx.beginPath();
   ctx.moveTo(arrowX, 0);
   ctx.lineTo(arrowX - arrowSize, -arrowSize / 2);
@@ -116,7 +150,7 @@ function renderAirflowArrow(
   // Draw CFM label near arrow
   const fontSize = Math.max(9 / zoom, 7);
   ctx.font = `${fontSize}px sans-serif`;
-  ctx.fillStyle = DUCT_COLORS.text;
+  ctx.fillStyle = textColor;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(`${airflow} CFM`, arrowX + 4 / zoom, 0);
@@ -130,11 +164,12 @@ function renderDuctLabel(
   name: string,
   props: Duct['props'],
   lengthPixels: number,
-  zoom: number
+  zoom: number,
+  textColor: string
 ): void {
   const fontSize = Math.max(10 / zoom, 8);
   ctx.font = `bold ${fontSize}px sans-serif`;
-  ctx.fillStyle = DUCT_COLORS.text;
+  ctx.fillStyle = textColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
 
@@ -150,5 +185,3 @@ function renderDuctLabel(
 
   ctx.fillText(`${name} (${sizeLabel})`, lengthPixels / 2, -8 / zoom);
 }
-
-export default renderDuct;

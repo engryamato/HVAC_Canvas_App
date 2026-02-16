@@ -12,7 +12,9 @@ import { CatalogResolutionStatus } from '../schema/catalog.schema';
 
 export interface ConstraintViolation {
   ruleId: string;
+  type?: string;
   message: string;
+  suggestedFix?: string;
   severity: 'warning' | 'blocker';
 }
 
@@ -32,6 +34,7 @@ interface ValidationState {
   exportBlockers: string[];
   // Set of entity IDs with unresolved catalog items
   unresolvedCatalogItems: string[];
+  ignoredWarnings: string[];
 }
 
 interface ValidationActions {
@@ -45,13 +48,18 @@ interface ValidationActions {
   clearAll: () => void;
   // Update catalog status specifically
   updateCatalogStatus: (entityId: string, status: CatalogResolutionStatus, message?: string) => void;
+  ignoreWarning: (entityId: string, ruleId: string) => void;
+  unignoreWarning: (entityId: string, ruleId: string) => void;
+  getViolationsBySeverity: (severity: ConstraintViolation['severity']) => ConstraintViolation[];
+  getAutoFixSuggestions: (entityId: string) => string[];
 }
 
 export const useValidationStore = create<ValidationState & ValidationActions>()(
-  immer((set) => ({
+  immer((set, get) => ({
     validationResults: {},
     exportBlockers: [],
     unresolvedCatalogItems: [],
+    ignoredWarnings: [],
 
     setValidationResult: (entityId, result) =>
       set((state) => {
@@ -114,6 +122,7 @@ export const useValidationStore = create<ValidationState & ValidationActions>()(
         state.validationResults = {};
         state.exportBlockers = [];
         state.unresolvedCatalogItems = [];
+        state.ignoredWarnings = [];
       }),
 
     updateCatalogStatus: (entityId, status, message) =>
@@ -132,6 +141,40 @@ export const useValidationStore = create<ValidationState & ValidationActions>()(
           }
         }
       }),
+
+    ignoreWarning: (entityId, ruleId) =>
+      set((state) => {
+        const key = `${entityId}:${ruleId}`;
+        if (!state.ignoredWarnings.includes(key)) {
+          state.ignoredWarnings.push(key);
+        }
+      }),
+
+    unignoreWarning: (entityId, ruleId) =>
+      set((state) => {
+        const key = `${entityId}:${ruleId}`;
+        const idx = state.ignoredWarnings.indexOf(key);
+        if (idx !== -1) {
+          state.ignoredWarnings.splice(idx, 1);
+        }
+      }),
+
+    getViolationsBySeverity: (severity) => {
+      return Object.values(get().validationResults)
+        .flatMap((result) => result.violations)
+        .filter((violation) => violation.severity === severity);
+    },
+
+    getAutoFixSuggestions: (entityId) => {
+      const result = get().validationResults[entityId];
+      if (!result) {
+        return [];
+      }
+
+      return result.violations
+        .map((v) => v.suggestedFix)
+        .filter((fix): fix is string => Boolean(fix));
+    },
   }))
 );
 

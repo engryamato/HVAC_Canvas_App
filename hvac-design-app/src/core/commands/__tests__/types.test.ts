@@ -6,6 +6,7 @@ describe('CommandType', () => {
   it('should have all entity command types', () => {
     expect(CommandType.CREATE_ENTITY).toBe('CREATE_ENTITY');
     expect(CommandType.UPDATE_ENTITY).toBe('UPDATE_ENTITY');
+    expect(CommandType.UPDATE_ENTITIES).toBe('UPDATE_ENTITIES');
     expect(CommandType.DELETE_ENTITY).toBe('DELETE_ENTITY');
     expect(CommandType.MOVE_ENTITY).toBe('MOVE_ENTITY');
   });

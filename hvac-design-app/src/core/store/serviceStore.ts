@@ -82,7 +82,7 @@ const EXHAUST_AIR: ServiceTemplate = {
   color: '#10b981' // Green
 };
 
-const INITIAL_TEMPLATES = [
+export const INITIAL_TEMPLATES = [
   LOW_PRESSURE_SUPPLY,
   MEDIUM_PRESSURE_SUPPLY,
   LOW_PRESSURE_RETURN,

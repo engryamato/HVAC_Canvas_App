@@ -15,7 +15,9 @@ import { useProjectStore } from '@/core/store/project.store';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
+import { useValidationStore } from '@/core/store/validationStore';
 import { type Project } from '@/types/project';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface ExportReportDialogProps {
     open: boolean;
@@ -27,12 +29,17 @@ export type PaperSize = 'letter' | 'a4';
 export type Orientation = 'portrait' | 'landscape';
 
 export interface ExportOptions {
+    format: 'pdf' | 'csv' | 'excel';
+    groupBy: 'category' | 'systemType' | 'zone' | 'flat';
+    includePricing: boolean;
+    includeEngineeringNotes: boolean;
+    includeCanvasSnapshot: boolean;
+    templateId?: string;
     reportType: ReportType;
     includeDetails: boolean;
     includeEntities: boolean;
     includeCalculations: boolean;
     includeBOM: boolean;
-    includeScreenshot: boolean;
     paperSize: PaperSize;
     orientation: Orientation;
 }
@@ -41,17 +48,29 @@ export interface ExportOptions {
 
 export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogProps) {
     const [options, setOptions] = useState<ExportOptions>({
+        format: 'pdf',
+        groupBy: 'category',
+        includePricing: true,
+        includeEngineeringNotes: true,
+        includeCanvasSnapshot: true,
+        templateId: undefined,
         reportType: 'full',
         includeDetails: true,
         includeEntities: true,
         includeCalculations: true,
         includeBOM: true,
-        includeScreenshot: true,
         paperSize: 'letter',
         orientation: 'portrait',
     });
 
     const { exportProject, isExporting, error } = useExport();
+    const warningViolations = useValidationStore(
+        useShallow((state) =>
+            Object.values(state.validationResults).flatMap((result) =>
+                result.violations.filter((violation) => violation.severity === 'warning')
+            )
+        )
+    );
     
     // Store selectors for data aggregation
     const currentProjectId = useProjectStore((state) => state.currentProjectId);
@@ -67,28 +86,28 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                 newOptions.includeEntities = true;
                 newOptions.includeCalculations = true;
                 newOptions.includeBOM = true;
-                newOptions.includeScreenshot = true;
+                newOptions.includeCanvasSnapshot = true;
                 break;
             case 'summary':
                 newOptions.includeDetails = true;
                 newOptions.includeEntities = false;
                 newOptions.includeCalculations = false;
                 newOptions.includeBOM = false;
-                newOptions.includeScreenshot = false;
+                newOptions.includeCanvasSnapshot = false;
                 break;
             case 'bom':
                 newOptions.includeDetails = false;
                 newOptions.includeEntities = false;
                 newOptions.includeCalculations = false;
                 newOptions.includeBOM = true;
-                newOptions.includeScreenshot = false;
+                newOptions.includeCanvasSnapshot = false;
                 break;
             case 'calculations':
                 newOptions.includeDetails = false;
                 newOptions.includeEntities = false;
                 newOptions.includeCalculations = true;
                 newOptions.includeBOM = false;
-                newOptions.includeScreenshot = false;
+                newOptions.includeCanvasSnapshot = false;
                 break;
         }
 
@@ -98,6 +117,14 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
     const handleExport = async () => {
         if (!currentProjectId || !projectDetails) {
             return;
+        }
+        if (warningViolations.length > 0 && options.includeEngineeringNotes) {
+            const shouldContinue = window.confirm(
+                `Design has ${warningViolations.length} warning(s). Include them in engineering notes and continue export?`
+            );
+            if (!shouldContinue) {
+                return;
+            }
         }
 
         // Aggregate project data from stores
@@ -142,6 +169,12 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
         };
 
         const result = await exportProject(project, {
+            format: options.format,
+            groupBy: options.groupBy,
+            includePricing: options.includePricing,
+            includeEngineeringNotes: options.includeEngineeringNotes,
+            includeCanvasSnapshot: options.includeCanvasSnapshot,
+            templateId: options.templateId,
             includeMetadata: options.includeDetails,
             includeCalculations: options.includeCalculations,
             includeEntities: options.includeEntities,
@@ -189,6 +222,21 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                             </div>
                         )}
                         {/* Report Type */}
+                        <div>
+                            <label className="block text-sm font-medium mb-2">
+                                Format
+                            </label>
+                            <select
+                                value={options.format}
+                                onChange={(e) => setOptions({ ...options, format: e.target.value as ExportOptions['format'] })}
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="pdf">PDF</option>
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium mb-2">
                                 Report Type
@@ -259,19 +307,54 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                                 <label className="flex items-center gap-2">
                                     <input
                                         type="checkbox"
-                                        checked={options.includeScreenshot}
+                                        checked={options.includeCanvasSnapshot}
                                         onChange={(e) =>
-                                            setOptions({ ...options, includeScreenshot: e.target.checked })
+                                            setOptions({ ...options, includeCanvasSnapshot: e.target.checked })
                                         }
                                         data-testid="include-screenshot-checkbox"
                                     />
                                     Canvas Screenshot
                                 </label>
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={options.includePricing}
+                                        onChange={(e) =>
+                                            setOptions({ ...options, includePricing: e.target.checked })
+                                        }
+                                    />
+                                    Include Pricing
+                                </label>
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={options.includeEngineeringNotes}
+                                        onChange={(e) =>
+                                            setOptions({ ...options, includeEngineeringNotes: e.target.checked })
+                                        }
+                                    />
+                                    Engineering Notes
+                                </label>
                             </div>
                         </div>
 
                         {/* Paper Size & Orientation */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-2">
+                                    Group By
+                                </label>
+                                <select
+                                    value={options.groupBy}
+                                    onChange={(e) => setOptions({ ...options, groupBy: e.target.value as ExportOptions['groupBy'] })}
+                                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="category">Category</option>
+                                    <option value="systemType">System Type</option>
+                                    <option value="zone">Zone</option>
+                                    <option value="flat">Flat List</option>
+                                </select>
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium mb-2">
                                     Paper Size

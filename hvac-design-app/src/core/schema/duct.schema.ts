@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { BaseEntitySchema } from './base.schema';
+import { MaterialSpecSchema } from './component-library.schema';
 
 /**
  * Duct material types with associated roughness factors
@@ -7,6 +8,50 @@ import { BaseEntitySchema } from './base.schema';
 export const DuctMaterialSchema = z.enum(['galvanized', 'stainless', 'aluminum', 'flex']);
 
 export type DuctMaterial = z.infer<typeof DuctMaterialSchema>;
+
+/**
+ * System type for ductwork
+ */
+export const SystemTypeSchema = z.enum(['supply', 'return', 'exhaust', 'outside_air']);
+
+export type SystemType = z.infer<typeof SystemTypeSchema>;
+
+/**
+ * Validation result severity
+ */
+export const ValidationSeveritySchema = z.enum(['error', 'warning', 'info']);
+
+export type ValidationSeverity = z.infer<typeof ValidationSeveritySchema>;
+
+/**
+ * Constraint validation status
+ */
+export const ConstraintStatusSchema = z.object({
+  isValid: z.boolean(),
+  violations: z.array(z.object({
+    type: z.string(),
+    severity: ValidationSeveritySchema,
+    message: z.string(),
+    suggestedFix: z.string().optional(),
+  })).default([]),
+  lastValidated: z.date().optional(),
+});
+
+export type ConstraintStatus = z.infer<typeof ConstraintStatusSchema>;
+
+/**
+ * Engineering data for calculations
+ */
+export const DuctEngineeringDataSchema = z.object({
+  airflow: z.number().min(0), // CFM
+  velocity: z.number().min(0), // FPM (calculated)
+  pressureDrop: z.number().min(0), // in.w.g./100ft (calculated)
+  friction: z.number().min(0), // friction factor
+  equivalentDiameter: z.number().min(0).optional(), // for rectangular ducts
+  reynoldsNumber: z.number().optional(),
+});
+
+export type DuctEngineeringData = z.infer<typeof DuctEngineeringDataSchema>;
 
 /**
  * Duct shape determines which dimension fields are required
@@ -56,6 +101,22 @@ export const DuctPropsSchema = z
     // Service & Catalog references
     serviceId: z.string().uuid().optional().describe('Active Service ID'),
     catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
+    
+    // Parametric design fields
+    systemType: SystemTypeSchema.optional(),
+    materialSpec: MaterialSpecSchema.optional(),
+    gauge: z.number().optional().describe('Metal gauge thickness'),
+    insulated: z.boolean().optional(),
+    insulationThickness: z.number().optional().describe('Insulation thickness in inches'),
+    
+    // Engineering data
+    engineeringData: DuctEngineeringDataSchema.optional(),
+    
+    // Constraint status
+    constraintStatus: ConstraintStatusSchema.optional(),
+    
+    // Auto-sizing flag
+    autoSized: z.boolean().optional().describe('Indicates if duct was auto-sized'),
   })
   .refine(
     (data) => {
@@ -104,24 +165,20 @@ export const DuctSchema = BaseEntitySchema.extend({
   warnings: DuctWarningsSchema,
 });
 
+
+
 export type Duct = z.infer<typeof DuctSchema>;
 
-/**
- * Default values for round duct
- */
 export const DEFAULT_ROUND_DUCT_PROPS = {
   name: 'New Duct',
   shape: 'round' as const,
   diameter: 12,
   length: 10,
   material: 'galvanized' as const,
-  airflow: 500,
+  airflow: 0, // Flow is calculated from connected terminals
   staticPressure: 0.1,
 };
 
-/**
- * Default values for rectangular duct
- */
 export const DEFAULT_RECTANGULAR_DUCT_PROPS = {
   name: 'New Duct',
   shape: 'rectangular' as const,
@@ -129,6 +186,6 @@ export const DEFAULT_RECTANGULAR_DUCT_PROPS = {
   height: 8,
   length: 10,
   material: 'galvanized' as const,
-  airflow: 500,
+  airflow: 0, // Flow is calculated from connected terminals
   staticPressure: 0.1,
 };

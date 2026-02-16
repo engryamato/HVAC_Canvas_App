@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { BaseEntitySchema } from './base.schema';
+import { ConstraintStatusSchema } from './duct.schema';
 
 /**
  * Equipment types for HVAC components
@@ -53,6 +54,19 @@ export const EquipmentPropsSchema = z.object({
   connectedDuctId: z.string().uuid().optional().describe('Reference to connected Duct.id'),
   // Location tag for identification
   locationTag: z.string().max(50).optional().describe('Location tag e.g. "ROOF-1", "MECH-101"'),
+  
+  //Service & Catalog references
+  serviceId: z.string().uuid().optional().describe('Active Service ID'),
+  catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
+  
+  // Engineering data for validation
+  engineeringData: z.object({
+    airflow: z.number().min(0), // CFM
+    pressureDrop: z.number().min(0).optional(),
+    efficiency: z.number().min(0).max(100).optional(), // Percentage
+    powerConsumption: z.number().min(0).optional(), // Watts
+  }).optional(),
+  constraintStatus: ConstraintStatusSchema.optional(),
 });
 
 export type EquipmentProps = z.infer<typeof EquipmentPropsSchema>;
@@ -63,6 +77,9 @@ export type EquipmentProps = z.infer<typeof EquipmentPropsSchema>;
 export const EquipmentSchema = BaseEntitySchema.extend({
   type: z.literal('equipment'),
   props: EquipmentPropsSchema,
+  warnings: z.object({
+    constraintViolations: z.array(z.string()).optional(),
+  }).optional(),
 });
 
 export type Equipment = z.infer<typeof EquipmentSchema>;

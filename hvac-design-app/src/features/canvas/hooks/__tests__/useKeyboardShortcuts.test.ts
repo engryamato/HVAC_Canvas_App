@@ -76,6 +76,17 @@ describe('useKeyboardShortcuts', () => {
       expect(onToolChange).toHaveBeenCalledWith('equipment');
     });
 
+    it('should trigger onToolChange when F is pressed', () => {
+      const onToolChange = vi.fn();
+      renderHook(() => useKeyboardShortcuts({ onToolChange }));
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f' }));
+      });
+
+      expect(onToolChange).toHaveBeenCalledWith('fitting');
+    });
+
     it('should be case insensitive', () => {
       const onToolChange = vi.fn();
       renderHook(() => useKeyboardShortcuts({ onToolChange }));

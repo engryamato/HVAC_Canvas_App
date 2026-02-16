@@ -31,13 +31,13 @@ interface ShortcutOptions {
 }
 
 
-// Tool shortcut mappings (removed 'f' since it's now zoom-to-selection)
+// Tool shortcut mappings
 const TOOL_SHORTCUTS: Record<string, ToolType> = {
   v: 'select',
   r: 'room',
   d: 'duct',
   e: 'equipment',
-  // 'f' removed - now used for zoom-to-selection
+  f: 'fitting',
   n: 'note',
 };
 
@@ -315,54 +315,6 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
         if (event.key === 'Escape') {
           clearSelection();
           options.onEscape?.();
-          return;
-        }
-
-        // F key: Zoom to selection (with 10% padding)
-        if (key === 'f') {
-          const selectedIds = useSelectionStore.getState().selectedIds;
-          if (selectedIds.length === 0) {
-            options.onZoomToSelection?.({ success: false, message: 'No selection' });
-            return;
-          }
-
-          const entities = selectedIds
-            .map((id) => useEntityStore.getState().byId[id])
-            .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
-
-          if (entities.length === 0) {
-            options.onZoomToSelection?.({ success: false, message: 'No valid entities' });
-            return;
-          }
-
-          const bounds = entities.reduce(
-            (acc, entity) => {
-              const { x, y } = entity.transform;
-              const { width, height } = getEntityDimensions(entity);
-              return {
-                minX: Math.min(acc.minX, x),
-                minY: Math.min(acc.minY, y),
-                maxX: Math.max(acc.maxX, x + width),
-                maxY: Math.max(acc.maxY, y + height),
-              };
-            },
-            { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
-          );
-
-          // Apply 10% padding to bounds before zoom
-          const boundsWidth = bounds.maxX - bounds.minX;
-          const boundsHeight = bounds.maxY - bounds.minY;
-          const paddingX = boundsWidth * ZOOM_TO_SELECTION_PADDING;
-          const paddingY = boundsHeight * ZOOM_TO_SELECTION_PADDING;
-
-          useViewportStore.getState().zoomToSelection({
-            x: bounds.minX - paddingX / 2,
-            y: bounds.minY - paddingY / 2,
-            width: boundsWidth + paddingX,
-            height: boundsHeight + paddingY,
-          });
-
-          options.onZoomToSelection?.({ success: true });
           return;
         }
 

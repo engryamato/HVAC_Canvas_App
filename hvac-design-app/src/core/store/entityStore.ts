@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type { Entity, EntityType } from '@/core/schema';
+import { ConnectionGraphBuilder } from '@/core/services/graph/ConnectionGraphBuilder';
+import { FlowPropagationService } from '@/core/services/graph/FlowPropagationService';
 
 /**
  * Normalized entity state structure
@@ -32,16 +34,37 @@ const initialState: EntityState = {
   allIds: [],
 };
 
+/**
+ * Helper to recalculate flows based on current state
+ */
+const recalculateFlows = (state: EntityState) => {
+  try {
+    const entities = Object.values(state.byId);
+    const graph = ConnectionGraphBuilder.fromEntities(entities);
+    const flows = FlowPropagationService.calculateFlows(graph, state.byId);
+
+    for (const [id, flow] of flows) {
+      const entity = state.byId[id];
+      if (entity && entity.type === 'duct' && entity.props.airflow !== flow) {
+        entity.props.airflow = flow;
+      }
+    }
+  } catch (error) {
+    console.error('[EntityStore] Failed to recalculate flows:', error);
+  }
+};
+
 export const useEntityStore = create<EntityStore>()(
   immer((set) => ({
     ...initialState,
 
     addEntity: (entity) =>
       set((state) => {
-        console.log('[EntityStore] addEntity', entity.id, entity.type);
+
         if (!state.byId[entity.id]) {
           state.byId[entity.id] = entity;
           state.allIds.push(entity.id);
+          recalculateFlows(state);
         } else {
             console.warn('[EntityStore] addEntity: Entity already exists', entity.id);
         }
@@ -51,44 +74,49 @@ export const useEntityStore = create<EntityStore>()(
       set((state) => {
         if (state.byId[id]) {
           state.byId[id] = { ...state.byId[id], ...updates } as Entity;
+          recalculateFlows(state);
         }
       }),
 
     removeEntity: (id) =>
       set((state) => {
-        console.log('[EntityStore] removeEntity', id);
+
         delete state.byId[id];
         state.allIds = state.allIds.filter((entityId) => entityId !== id);
+        recalculateFlows(state);
       }),
 
     addEntities: (entities) =>
       set((state) => {
-        console.log('[EntityStore] addEntities', entities.length);
+
         entities.forEach((entity) => {
           if (!state.byId[entity.id]) {
             state.byId[entity.id] = entity;
             state.allIds.push(entity.id);
           }
         });
+        recalculateFlows(state);
       }),
 
     removeEntities: (ids) =>
       set((state) => {
-        console.log('[EntityStore] removeEntities', ids.length);
+
         ids.forEach((id) => delete state.byId[id]);
         state.allIds = state.allIds.filter((id) => !ids.includes(id));
+        recalculateFlows(state);
       }),
 
     clearAllEntities: () => set((state) => {
-        console.log('[EntityStore] clearAllEntities');
+
         Object.assign(state, initialState);
     }),
 
     hydrate: (newState) =>
       set((state) => {
-        console.log('[EntityStore] hydrate from newState', newState.allIds.length);
+
         state.byId = newState.byId;
         state.allIds = newState.allIds;
+        recalculateFlows(state);
       }),
   }))
 );

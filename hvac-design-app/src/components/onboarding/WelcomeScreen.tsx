@@ -8,12 +8,20 @@ import { FeatureHighlightCard } from './FeatureHighlightCard';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import { useTutorialStore } from '@/stores/useTutorialStore';
 
-export const WelcomeScreen: React.FC = () => {
+interface WelcomeScreenProps {
+    onStart?: () => void;
+}
+
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
     const router = useRouter();
     const { setHasLaunched } = useAppStateStore();
     const { startTutorial } = useTutorialStore();
 
     const handleStartTutorial = () => {
+        if (onStart) {
+            onStart();
+            return;
+        }
         setHasLaunched(true);
         startTutorial();
         router.push('/canvas');

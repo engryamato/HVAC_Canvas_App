@@ -14,12 +14,14 @@ import { RulersOverlay } from './RulersOverlay';
 import { FloatingInspector } from './Inspector/FloatingInspector';
 import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 import { validateFloatingPosition } from '../utils/validateFloatingPosition';
+import { canvasPerformanceService } from '../services/CanvasPerformanceService';
 
 // Tools
 import {
   SelectTool,
   RoomTool,
   DuctTool,
+  FittingTool,
   EquipmentTool,
   NoteTool,
   type ITool,
@@ -47,8 +49,7 @@ function createToolInstances(): Record<CanvasTool, ITool> {
     pan: new SelectTool(),
     room: new RoomTool(),
     duct: new DuctTool(),
-    pipe: new DuctTool(),
-    wire: new DuctTool(),
+    fitting: new FittingTool(),
     equipment: new EquipmentTool(),
     note: new NoteTool(),
   };
@@ -136,7 +137,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     }
 
     // Get device pixel ratio for sharp rendering (SSR-safe)
-    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    const dpr = typeof globalThis.window !== 'undefined' ? globalThis.window.devicePixelRatio || 1 : 1;
 
     // Set canvas size to container size
     const rect = container.getBoundingClientRect();
@@ -244,13 +245,13 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         // Render based on entity type using Phase 3 renderers
         switch (entity.type) {
           case 'room':
-            renderRoom(entity as Room, renderContext);
+            renderRoom(entity, renderContext);
             break;
           case 'duct':
-            renderDuct(entity as Duct, renderContext);
+            renderDuct(entity, renderContext);
             break;
           case 'equipment':
-            renderEquipment(entity as Equipment, renderContext);
+            renderEquipment(entity, renderContext);
             break;
           case 'fitting':
             renderFittingInline(ctx, entity);
@@ -273,13 +274,17 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
    * Main render loop
    */
   const render = useCallback(() => {
+    // Start performance monitoring
+    canvasPerformanceService.startFrame();
+
     const ctx = getContext();
     const canvas = canvasRef.current;
     if (!ctx || !canvas) {
+      canvasPerformanceService.endFrame();
       return;
     }
 
-    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    const dpr = typeof globalThis.window !== 'undefined' ? globalThis.window.devicePixelRatio || 1 : 1;
     const width = canvas.width / dpr;
     const height = canvas.height / dpr;
 
@@ -298,6 +303,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       renderGrid(ctx, width, height);
     }
 
+    // Update performance service with current entity count
+    canvasPerformanceService.setEntityCount(entities.length);
+
     // Render entities
     renderEntities(ctx);
 
@@ -313,9 +321,12 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     // Restore context state
     ctx.restore();
 
+    // End performance monitoring
+    canvasPerformanceService.endFrame();
+
     // Schedule next frame
     animationFrameRef.current = requestAnimationFrame(render);
-  }, [getContext, panX, panY, zoom, gridVisible, renderGrid, renderEntities, activeTool]);
+  }, [getContext, panX, panY, zoom, gridVisible, renderGrid, renderEntities, activeTool, entities.length]);
 
   // Set up resize observer
   useEffect(() => {

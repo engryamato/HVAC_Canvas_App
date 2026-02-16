@@ -114,6 +114,8 @@ export function createEquipment(
     height: number;
     manufacturer: string;
     model: string;
+    serviceId: string;
+    catalogItemId: string;
   }>
 ): Equipment {
   const equipmentNumber = getNextEquipmentNumber();
@@ -147,6 +149,8 @@ export function createEquipment(
       mountHeightUnit: 'in',
       manufacturer: overrides?.manufacturer,
       model: overrides?.model,
+      serviceId: overrides?.serviceId,
+      catalogItemId: overrides?.catalogItemId,
     },
   };
 }

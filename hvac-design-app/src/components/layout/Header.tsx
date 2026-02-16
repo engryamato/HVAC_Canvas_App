@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { FileMenu } from './FileMenu';
 import { EditMenu } from './EditMenu';
 import { ViewMenu } from './ViewMenu';
-import { ToolsMenu } from './ToolsMenu';
 import { HelpMenu } from './HelpMenu';
 import { KeyboardShortcutsDialog } from '@/components/dialogs/KeyboardShortcutsDialog';
 import { SettingsDialog } from '@/components/dialogs/SettingsDialog';
@@ -83,7 +82,6 @@ export const Header: React.FC<HeaderProps> = ({
                             <FileMenu />
                             <EditMenu />
                             <ViewMenu onResetLayout={() => { /* TODO */ }} />
-                            <ToolsMenu />
                             <HelpMenu onShowShortcuts={() => setShortcutsOpen(true)} />
                         </nav>
                     )}

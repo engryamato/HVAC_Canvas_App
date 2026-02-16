@@ -8,17 +8,20 @@ export interface CanvasPoint {
 
 interface CursorState {
   lastCanvasPoint: CanvasPoint | null;
+  cursorMode: 'default' | 'select' | 'pan' | 'duct' | 'fitting' | 'equipment' | 'room' | 'note' | 'crosshair';
 }
 
 interface CursorActions {
   setLastCanvasPoint: (point: CanvasPoint) => void;
   clearLastCanvasPoint: () => void;
+  setCursorMode: (mode: CursorState['cursorMode']) => void;
 }
 
 type CursorStore = CursorState & CursorActions;
 
 const initialState: CursorState = {
   lastCanvasPoint: null,
+  cursorMode: 'default',
 };
 
 export const useCursorStore = create<CursorStore>()(
@@ -30,9 +33,15 @@ export const useCursorStore = create<CursorStore>()(
         state.lastCanvasPoint = point;
       }),
 
+    setCursorMode: (mode) =>
+      set((state) => {
+        state.cursorMode = mode;
+      }),
+
     clearLastCanvasPoint: () => set(initialState),
   }))
 );
 
 export const selectLastCanvasPoint = () => useCursorStore.getState().lastCanvasPoint;
+export const selectCursorMode = () => useCursorStore.getState().cursorMode;
 

@@ -19,6 +19,42 @@ export function useExport() {
         setError(null);
 
         try {
+            const format = options.format ?? 'pdf';
+            const entities = project.entities;
+            if (!entities) {
+                throw new Error('Project has no entities to export');
+            }
+
+            if (format !== 'pdf') {
+                const rows = entities.allIds
+                    .map((id) => entities.byId[id])
+                    .filter(Boolean)
+                    .map((entity, index) => [
+                        String(index + 1),
+                        entity.type,
+                        entity.id,
+                        (entity.properties?.model as string | undefined) ?? 'N/A',
+                        '1',
+                    ]);
+                const header = ['#', 'Type', 'ID', 'Model', 'Qty'];
+                const separator = format === 'csv' ? ',' : '\t';
+                const body = [header, ...rows].map((row) => row.join(separator)).join('\n');
+                const mime = format === 'csv' ? 'text/csv;charset=utf-8' : 'application/vnd.ms-excel;charset=utf-8';
+                const extension = format === 'csv' ? 'csv' : 'xls';
+
+                const blob = new Blob([body], { type: mime });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${project.projectName.replace(/[^a-z0-9]/gi, '_')}_Report.${extension}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setIsExporting(false);
+                return { success: true };
+            }
+
             // Generate PDF
             const { reportGenerator } = await import('../services/ReportGenerator');
             const pdfBytes = await reportGenerator.generatePDF(project, options);

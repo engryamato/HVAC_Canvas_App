@@ -70,7 +70,7 @@ export const ServiceSchema = z.object({
   fittingRules: z.array(FittingRuleSchema),
   
   // Catalog Preferences
-  manufacturerPreferences: z.array(z.string()), // Ranked list of preferred manufacturers
+  manufacturerPreferences: z.array(z.string()).default([]), // Ranked list of preferred manufacturers
   
   // Metadata
   source: z.enum(['baseline', 'custom']).default('custom'),
@@ -79,7 +79,7 @@ export const ServiceSchema = z.object({
   updatedAt: z.date().optional(),
 });
 
-export type Service = z.infer<typeof ServiceSchema>;
+export type Service = z.input<typeof ServiceSchema>;
 
 export const ServiceTemplateSchema = ServiceSchema.omit({ 
   id: true, 

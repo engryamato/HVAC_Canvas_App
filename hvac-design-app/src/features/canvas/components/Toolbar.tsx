@@ -8,6 +8,7 @@ import {
 } from '@/core/store/canvas.store';
 import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
+import { useCursorStore } from '@/features/canvas/store/cursorStore';
 
 interface ToolButtonProps {
   tool: CanvasTool;
@@ -73,16 +74,9 @@ const DuctIcon = () => (
   </svg>
 );
 
-const PipeIcon = () => (
+const FittingIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="8" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
-
-const WireIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M4 12 Q8 4 12 12 T20 12" strokeLinecap="round" />
+    <path d="M5 7h8v4h4v8H9v-4H5z" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -113,8 +107,7 @@ const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut:
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'pan', icon: <PanIcon />, label: 'Pan', shortcut: 'Space' },
   { tool: 'duct', icon: <DuctIcon />, label: 'Duct', shortcut: 'D' },
-  { tool: 'pipe', icon: <PipeIcon />, label: 'Pipe', shortcut: 'P' },
-  { tool: 'wire', icon: <WireIcon />, label: 'Wire', shortcut: 'W' },
+  { tool: 'fitting', icon: <FittingIcon />, label: 'Fitting', shortcut: 'F' },
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
   { tool: 'note', icon: <NoteIcon />, label: 'Note', shortcut: 'N' },
@@ -169,10 +162,11 @@ interface ToolButtonsProps {
  */
 export function ToolButtons({ className = '', orientation = 'vertical' }: ToolButtonsProps) {
   const currentTool = useToolStore((state) => state.currentTool);
-  const { setTool } = useToolActions();
+  const { setTool, dispatchKeyboardShortcut } = useToolActions();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
   const isVertical = orientation === 'vertical';
+  const setCursorMode = useCursorStore((state) => state.setCursorMode);
 
   // Handle keyboard shortcuts
   React.useEffect(() => {
@@ -184,24 +178,20 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
 
       switch (e.key.toLowerCase()) {
         case 'v':
-          setTool('select');
+        case 'd':
+        case 'f':
+        case 'e':
+        case 'escape': {
+          const activated = dispatchKeyboardShortcut(e.key.toLowerCase());
+          if (!activated && e.key.toLowerCase() === 'f') {
+            setTool('fitting');
+          }
           break;
+        }
         case ' ': // Space
         case 'h':
           e.preventDefault(); // Prevent page scroll on space
           setTool('pan');
-          break;
-        case 'd':
-          setTool('duct');
-          break;
-        case 'p':
-          setTool('pipe');
-          break;
-        case 'w':
-          setTool('wire');
-          break;
-        case 'e':
-          setTool('equipment');
           break;
         case 'r':
           setTool('room');
@@ -226,7 +216,27 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setTool]);
+  }, [dispatchKeyboardShortcut, setTool]);
+
+  React.useEffect(() => {
+    if (currentTool === 'select' || currentTool === 'pan') {
+      setCursorMode('select');
+      return;
+    }
+    if (currentTool === 'duct') {
+      setCursorMode('duct');
+      return;
+    }
+    if (currentTool === 'fitting') {
+      setCursorMode('fitting');
+      return;
+    }
+    if (currentTool === 'equipment') {
+      setCursorMode('equipment');
+      return;
+    }
+    setCursorMode('default');
+  }, [currentTool, setCursorMode]);
 
   return (
     <div

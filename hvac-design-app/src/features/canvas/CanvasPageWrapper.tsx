@@ -13,16 +13,25 @@ import { type ReversibleCommand } from '@/core/commands/types';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
+import { MigrationWizard } from '@/components/dialogs/MigrationWizard';
+import { VersionDetector } from '@/core/services/migration/VersionDetector';
+import { type ProjectFile } from '@/core/schema/project-file.schema';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
-import { loadProjectFromStorage, type LocalStoragePayload } from './hooks/useAutoSave';
+import {
+  createLocalStoragePayloadFromProjectFileWithDefaults,
+  loadProjectFromStorage,
+  saveProjectToStorage,
+  type LocalStoragePayload,
+} from './hooks/useAutoSave';
 import { useAppStateStore } from '@/stores/useAppStateStore';
+import initializeComponentLibraryV2 from '@/core/store/componentLibraryInitializer';
 
 interface CanvasPageWrapperProps {
   projectId: string;
 }
 
-const APP_VERSION = '1.0.0'; // Application version
+const APP_VERSION = '2.0.0'; // Application version
 
 /**
  * Compare two semver version strings
@@ -53,6 +62,8 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const [versionWarning, setVersionWarning] = useState(false);
   const [projectVersion, setProjectVersion] = useState<string>('');
   const [shouldLoadProject, setShouldLoadProject] = useState(false);
+  const [needsMigration, setNeedsMigration] = useState(false);
+  const [migrationData, setMigrationData] = useState<ProjectFile | null>(null);
 
   const hydrateFromPayload = (payload: LocalStoragePayload) => {
     try {
@@ -97,6 +108,14 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
     }
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    initializeComponentLibraryV2();
+  }, []);
+
   // Set project ID in store when route loads
   useEffect(() => {
     try {
@@ -132,6 +151,13 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
             
             if (!result.success || !result.project) {
               setProjectError(`Failed to load project file: ${result.error || 'Unknown error'}`);
+              return;
+            }
+
+            const detectedVersion = VersionDetector.detectVersion(result.project);
+            if (VersionDetector.needsMigration(detectedVersion)) {
+              setNeedsMigration(true);
+              setMigrationData(result.project as ProjectFile);
               return;
             }
 
@@ -207,6 +233,16 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       if (!projectName) {
         setProjectError('Project data is corrupted or invalid. Required fields are missing.');
         return;
+      }
+
+      const loadedProjectData = storedPayload?.project;
+      if (loadedProjectData) {
+        const detectedVersion = VersionDetector.detectVersion(loadedProjectData);
+        if (VersionDetector.needsMigration(detectedVersion)) {
+          setNeedsMigration(true);
+          setMigrationData(loadedProjectData as ProjectFile);
+          return;
+        }
       }
 
       if (storedPayload) {
@@ -296,6 +332,51 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       <ErrorPage
         title="Project Not Found"
         message={projectError}
+      />
+    );
+  }
+
+  if (needsMigration && migrationData) {
+    return (
+      <MigrationWizard
+        isOpen={true}
+        onClose={() => {
+          setNeedsMigration(false);
+          router.push('/dashboard');
+        }}
+        data={migrationData}
+        onMigrationComplete={(migratedData: any) => {
+          if (migratedData) {
+            const payload = createLocalStoragePayloadFromProjectFileWithDefaults(migratedData);
+            saveProjectToStorage(migratedData.projectId, payload);
+            hydrateFromPayload(payload);
+
+            setProject(migratedData.projectId, {
+              projectId: migratedData.projectId,
+              projectName: payload.project.projectName,
+              projectNumber: payload.project.projectNumber,
+              clientName: payload.project.clientName,
+              isArchived: payload.project.isArchived,
+              createdAt: payload.project.createdAt,
+              modifiedAt: payload.project.modifiedAt,
+            });
+
+            localStorage.setItem('lastActiveProjectId', migratedData.projectId);
+
+            useProjectListStore.getState().addProject({
+              projectId: migratedData.projectId,
+              projectName: payload.project.projectName,
+              projectNumber: payload.project.projectNumber,
+              clientName: payload.project.clientName,
+              createdAt: payload.project.createdAt,
+              modifiedAt: payload.project.modifiedAt,
+              storagePath: `project-${migratedData.projectId}`,
+              isArchived: false,
+            });
+          }
+
+          setNeedsMigration(false);
+        }}
       />
     );
   }

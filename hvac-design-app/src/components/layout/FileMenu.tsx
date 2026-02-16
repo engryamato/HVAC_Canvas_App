@@ -1,9 +1,8 @@
-'use client';
-
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useSettingsStore } from '@/core/store/settingsStore';
+import { useDialogStore } from '@/core/store/dialogStore';
 import { FileText } from 'lucide-react';
 import { ExportReportDialog } from '@/features/export/ExportReportDialog';
 import { useAppStateStore } from '@/stores/useAppStateStore';
@@ -11,10 +10,13 @@ import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
 import { ProjectAlreadyExistsDialog } from '@/components/dialogs/ProjectAlreadyExistsDialog';
 import { UnsavedChangesDialog } from '@/components/dialogs/UnsavedChangesDialog';
 import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
-import { useCurrentProjectId, useIsDirty, useProjectActions } from '@/core/store/project.store';
+import { useCurrentProjectId, useIsDirty, useProjectActions, useProjectStore } from '@/core/store/project.store';
+import { useEntityStore } from '@/core/store/entityStore';
+import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import {
   buildProjectFileFromStores,
   createLocalStoragePayloadFromProjectFileWithDefaults,
+  loadProjectFromStorage,
   saveProjectToStorage,
 } from '@/features/canvas/hooks/useAutoSave';
 import { setWebProjectFileHandle } from '@/core/persistence/webFileHandles';
@@ -22,6 +24,15 @@ import { openProjectFromPicker, saveProjectAsAndRememberHandle } from '@/core/pe
 import { deserializeProjectLenient } from '@/core/persistence/serialization';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
+import { createEmptyProject, type ProjectFile } from '@/core/schema/project-file.schema';
+import { ProjectSetupWizard, type ProjectSetupData } from '@/features/project/components/ProjectSetupWizard';
+import { MigrationWizard } from '@/components/dialogs/MigrationWizard';
+import { useToast } from '@/components/ui/ToastContext';
+import {
+    ENABLE_MIGRATION_WIZARD,
+    ENABLE_PROJECT_SETUP_WIZARD,
+    ENABLE_SYSTEM_TEMPLATE_DIALOG,
+} from '@/core/config/featureFlags';
 
 export function FileMenu() {
     const router = useRouter();
@@ -35,13 +46,39 @@ export function FileMenu() {
     const [existingProjectFilePath, setExistingProjectFilePath] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<null | 'open' | 'new' | 'dashboard'>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [projectSetupOpen, setProjectSetupOpen] = useState(false);
+    const [migrationWizardOpen, setMigrationWizardOpen] = useState(false);
+    const [migrationWizardData, setMigrationWizardData] = useState<ProjectFile | Record<string, never>>({});
     const menuRef = useRef<HTMLDivElement>(null);
 
     const isTauri = useAppStateStore((state) => state.isTauri);
     const isDirty = useIsDirty();
     const currentProjectId = useCurrentProjectId();
-    const { setDirty } = useProjectActions();
+    const { setDirty, setProject } = useProjectActions();
+    const isCanvasRoute = pathname.startsWith('/canvas/');
     const canSave = Boolean(currentProjectId && pathname.startsWith('/canvas/'));
+    const canOpenSystemTemplate = isCanvasRoute && ENABLE_SYSTEM_TEMPLATE_DIALOG;
+    const { addToast } = useToast();
+
+    const loadProjectDataForMigration = async (): Promise<ProjectFile | null> => {
+        if (isCanvasRoute) {
+            return buildProjectFileFromStores();
+        }
+
+        const lastProjectId = localStorage.getItem('lastActiveProjectId');
+        if (!lastProjectId) {
+            console.warn('No recent project found for migration');
+            return null;
+        }
+
+        try {
+            const loaded = loadProjectFromStorage(lastProjectId);
+            return loaded?.payload?.project || null;
+        } catch (error) {
+            console.error('Failed to load project for migration:', error);
+            return null;
+        }
+    };
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -60,53 +97,14 @@ export function FileMenu() {
         };
     }, [isOpen]);
 
-    const requestCanvasSave = () => {
+    const requestCanvasSave = useCallback(() => {
         if (typeof window === 'undefined') {
             return;
         }
         window.dispatchEvent(new Event('sws:canvas-save'));
-    };
+    }, []);
 
-    const proceedAfterSaveOrDiscard = async (action: 'open' | 'new' | 'dashboard') => {
-        if (action === 'new') {
-            router.push('/dashboard/new');
-            return;
-        }
-
-        if (action === 'dashboard') {
-            setDirty(false);
-            router.push('/dashboard');
-            return;
-        }
-        await handleOpenFromFileInternal();
-    };
-
-    const handleNavigateDashboard = useCallback(() => {
-        setIsOpen(false);
-        if (!pathname.startsWith('/canvas/')) {
-            router.push('/dashboard');
-            return;
-        }
-
-        if (isDirty) {
-            setPendingAction('dashboard');
-            setUnsavedDialogOpen(true);
-            return;
-        }
-
-        router.push('/dashboard');
-    }, [isDirty, pathname, router]);
-
-    useEffect(() => {
-        const handleNavigateEvent = () => {
-            handleNavigateDashboard();
-        };
-
-        window.addEventListener('sws:navigate-dashboard', handleNavigateEvent);
-        return () => window.removeEventListener('sws:navigate-dashboard', handleNavigateEvent);
-    }, [handleNavigateDashboard]);
-
-    const handleOpenFromFileInternal = async () => {
+    const handleOpenFromFileInternal = useCallback(async () => {
         setIsOpen(false);
         setIsLoading(true);
 
@@ -195,9 +193,48 @@ export function FileMenu() {
         } finally {
             setIsLoading(false);
         }
+    }, [isTauri, router]);
+
+    const proceedAfterSaveOrDiscard = async (action: 'open' | 'new' | 'dashboard') => {
+        if (action === 'new') {
+            router.push('/dashboard/new');
+            return;
+        }
+
+        if (action === 'dashboard') {
+            setDirty(false);
+            router.push('/dashboard');
+            return;
+        }
+        await handleOpenFromFileInternal();
     };
 
-    const handleOpenFromFile = async () => {
+    const handleNavigateDashboard = useCallback(() => {
+        setIsOpen(false);
+        if (!pathname.startsWith('/canvas/')) {
+            router.push('/dashboard');
+            return;
+        }
+
+        if (isDirty) {
+            setPendingAction('dashboard');
+            setUnsavedDialogOpen(true);
+            return;
+        }
+
+        router.push('/dashboard');
+    }, [isDirty, pathname, router]);
+
+    useEffect(() => {
+        const handleNavigateEvent = () => {
+            handleNavigateDashboard();
+        };
+
+        window.addEventListener('sws:navigate-dashboard', handleNavigateEvent);
+        return () => window.removeEventListener('sws:navigate-dashboard', handleNavigateEvent);
+    }, [handleNavigateDashboard]);
+
+    const handleOpenFromFile = useCallback(async () => {
         if (isDirty) {
             setPendingAction('open');
             setUnsavedDialogOpen(true);
@@ -215,9 +252,9 @@ export function FileMenu() {
                     : 'Failed to open project file. Please ensure it is a valid .sws file.'
             );
         }
-    };
+    }, [isDirty, handleOpenFromFileInternal]);
 
-    const handleNewProject = () => {
+    const handleNewProject = useCallback(() => {
         if (isDirty) {
             setPendingAction('new');
             setUnsavedDialogOpen(true);
@@ -225,10 +262,107 @@ export function FileMenu() {
             return;
         }
         setIsOpen(false);
-        router.push('/dashboard/new');
+        if (!ENABLE_PROJECT_SETUP_WIZARD) {
+            router.push('/dashboard/new');
+            return;
+        }
+        setProjectSetupOpen(true);
+    }, [isDirty, router]);
+
+    const handleProjectSetupComplete = async (projectData: ProjectSetupData) => {
+        const projectId = crypto.randomUUID();
+        const now = new Date().toISOString();
+
+        try {
+            const projectFile = createEmptyProject(projectData.projectName, {
+                projectId,
+                createdAt: now,
+                modifiedAt: now,
+                isArchived: false,
+                location: projectData.location || undefined,
+                settings: projectData.settings ? {
+                    unitSystem: projectData.settings.unitSystem || 'imperial',
+                    gridSize: projectData.settings.gridSize || 12,
+                    gridVisible: projectData.settings.gridVisible ?? true,
+                    snapToGrid: projectData.settings.snapToGrid ?? true,
+                    // Include any other calculation settings from the wizard
+                    ...projectData.settings
+                } : undefined,
+            });
+
+            const repository = await getProjectRepository();
+            const saveResult = await repository.saveProject(projectFile);
+            if (!saveResult.success) {
+                throw new Error(saveResult.error || 'Failed to create project');
+            }
+
+            const projectListStore = useProjectListStore.getState();
+            projectListStore.addProject({
+                projectId,
+                projectName: projectData.projectName,
+                entityCount: 0,
+                createdAt: now,
+                modifiedAt: now,
+                storagePath: saveResult.filePath || `project-${projectId}`,
+                filePath: saveResult.filePath,
+                isArchived: false,
+                status: 'draft',
+            });
+            await projectListStore.refreshProjects();
+
+            // 1. Initialize Project Store
+            setProject(projectId, {
+                projectId: projectId,
+                projectName: projectData.projectName,
+                isArchived: false,
+                location: projectData.location,
+                createdAt: now,
+                modifiedAt: now,
+            });
+
+            // 2. Apply Settings
+            if (projectData.settings) {
+                useSettingsStore.getState().setCalculationSettings(projectData.settings);
+            }
+
+            setDirty(false);
+            setProjectSetupOpen(false);
+            router.push(`/canvas/${projectId}`);
+            
+            addToast({
+                title: 'Project Created',
+                message: `Started project: ${projectData.projectName}`,
+                type: 'success',
+            });
+        } catch (error) {
+            console.error('[FileMenu] Failed to create project:', error);
+            setErrorMessage(error instanceof Error ? error.message : 'Failed to create project');
+        }
     };
 
-    const handleSaveAs = async () => {
+    const handleMigration = async () => {
+        setIsOpen(false);
+        if (!ENABLE_MIGRATION_WIZARD) {
+            return;
+        }
+
+        const projectData = await loadProjectDataForMigration();
+        if (!projectData) {
+            addToast({
+                title: 'Migration Unavailable',
+                message: isCanvasRoute
+                    ? 'Unable to load current project data for migration.'
+                    : 'No project found to migrate. Please open a project first.',
+                type: 'error',
+            });
+            return;
+        }
+
+        setMigrationWizardData(projectData);
+        setMigrationWizardOpen(true);
+    };
+
+    const handleSaveAs = useCallback(async () => {
         setIsOpen(false);
         if (!canSave) {
             return;
@@ -266,7 +400,7 @@ export function FileMenu() {
 
         await saveProjectAsAndRememberHandle(projectFile);
         requestCanvasSave();
-    };
+    }, [canSave, isTauri, currentProjectId, requestCanvasSave, setDirty]);
 
     useEffect(() => {
         const isEditableTarget = (target: EventTarget | null) => {
@@ -326,11 +460,12 @@ export function FileMenu() {
                 </Button>
 
                 {isOpen && (
-                    <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50 flex flex-col items-start">
+                    <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg py-1 min-w-[200px] z-50 flex flex-col items-start" role="menu">
                         <button
                             onClick={() => {
                                 handleNavigateDashboard();
                             }}
+                            role="menuitem"
                             className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
                             data-testid="menu-dashboard"
                         >
@@ -341,16 +476,18 @@ export function FileMenu() {
                                 setIsOpen(false);
                                 router.push('/dashboard?view=archived');
                             }}
+                            role="menuitem"
                             className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm"
                             data-testid="menu-archived"
                         >
                             Archived Projects
                         </button>
 
-                        <div className="h-px bg-slate-200 w-full my-1" />
+                        <div className="h-px bg-slate-200 w-full my-1" role="separator" />
 
                         <button
                             onClick={handleNewProject}
+                            role="menuitem"
                             className="w-full text-left px-4 py-2 hover:bg-slate-100 transition-colors text-sm flex justify-between items-center"
                         >
                             New Project... <span className="text-xs opacity-50 ml-2">Ctrl+N</span>
@@ -364,7 +501,34 @@ export function FileMenu() {
                             {isLoading ? 'Opening...' : 'Open from File...'} <span className="text-xs opacity-50 ml-2">Ctrl+O</span>
                         </button>
 
-                        <div className="h-px bg-slate-200 w-full my-1" />
+                        <div className="h-px bg-slate-200 w-full my-1" role="separator" />
+
+                        <button
+                            onClick={handleMigration}
+                            disabled={!ENABLE_MIGRATION_WIZARD}
+                            role="menuitem"
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                        >
+                            Migrate Data
+                        </button>
+                        
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                if (!canOpenSystemTemplate) {
+                                    useDialogStore.getState().setOpenSystemTemplate(false);
+                                    return;
+                                }
+                                useDialogStore.getState().setOpenSystemTemplate(true);
+                            }}
+                            disabled={!canOpenSystemTemplate}
+                            role="menuitem"
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                        >
+                            Apply System Template...
+                        </button>
+
+                        <div className="h-px bg-slate-200 w-full my-1" role="separator" />
 
                         <button
                             onClick={() => {
@@ -372,6 +536,7 @@ export function FileMenu() {
                                 requestCanvasSave();
                             }}
                             disabled={!canSave}
+                            role="menuitem"
                             className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm flex justify-between items-center"
                         >
                             Save Project <span className="text-xs opacity-50 ml-2">Ctrl+S</span>
@@ -379,6 +544,7 @@ export function FileMenu() {
                         <button
                             onClick={() => void handleSaveAs()}
                             disabled={!canSave}
+                            role="menuitem"
                             className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm flex justify-between items-center"
                         >
                             Save Project As... <span className="text-xs opacity-50 ml-2">Ctrl+Shift+S</span>
@@ -457,6 +623,81 @@ export function FileMenu() {
                     setExistingProjectFilePath(null);
                 }}
             />
+
+            {ENABLE_PROJECT_SETUP_WIZARD && (
+                <ProjectSetupWizard 
+                    isOpen={projectSetupOpen}
+                    onClose={() => setProjectSetupOpen(false)}
+                    onComplete={handleProjectSetupComplete}
+                />
+            )}
+
+            {ENABLE_MIGRATION_WIZARD && (
+                <MigrationWizard
+                    isOpen={migrationWizardOpen}
+                    onClose={() => setMigrationWizardOpen(false)}
+                    data={migrationWizardData}
+                    onMigrationComplete={(migratedData: any) => {
+                        if (!migratedData || !migratedData.projectId) {
+                            setErrorMessage('Migration produced invalid data');
+                            return;
+                        }
+
+                        const payload = createLocalStoragePayloadFromProjectFileWithDefaults(migratedData);
+                        const storageResult = saveProjectToStorage(migratedData.projectId, payload);
+                        if (!storageResult.success) {
+                            setErrorMessage(storageResult.error || 'Failed to save migrated project');
+                            return;
+                        }
+
+                        if (migratedData.entities) {
+                            useEntityStore.getState().hydrate(migratedData.entities);
+                        }
+
+                        if (migratedData.viewportState) {
+                            useViewportStore.setState({
+                                panX: migratedData.viewportState.panX,
+                                panY: migratedData.viewportState.panY,
+                                zoom: migratedData.viewportState.zoom,
+                            });
+                        }
+
+                        if (migratedData.settings) {
+                            useSettingsStore.getState().setCalculationSettings(migratedData.settings);
+                        }
+
+                        const migratedProject = payload.project;
+                        useProjectStore.getState().setProject(migratedData.projectId, {
+                            projectId: migratedData.projectId,
+                            projectName: migratedProject.projectName,
+                            projectNumber: migratedProject.projectNumber,
+                            clientName: migratedProject.clientName,
+                            isArchived: migratedProject.isArchived,
+                            createdAt: migratedProject.createdAt,
+                            modifiedAt: migratedProject.modifiedAt,
+                        });
+
+                        const projectListStore = useProjectListStore.getState();
+                        projectListStore.updateProject(migratedData.projectId, {
+                            projectName: migratedProject.projectName,
+                            projectNumber: migratedProject.projectNumber,
+                            clientName: migratedProject.clientName,
+                            modifiedAt: new Date().toISOString()
+                        });
+
+                        setMigrationWizardOpen(false);
+                        if (!isCanvasRoute) {
+                            router.push(`/canvas/${migratedData.projectId}`);
+                        }
+
+                        addToast({
+                            title: 'Migration Complete',
+                            message: 'Data migration finished successfully.',
+                            type: 'success',
+                        });
+                    }}
+                />
+            )}
 
             {errorMessage && (
                 <ErrorDialog

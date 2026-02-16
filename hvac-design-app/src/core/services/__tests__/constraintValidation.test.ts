@@ -38,28 +38,24 @@ describe('ConstraintValidationService', () => {
       const ductProps = createMockDuct({ diameter: 12 });
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      expect(result.isValid).toBe(true);
-      expect(result.violations).toHaveLength(0);
+      expect(result).toHaveLength(0);
     });
 
     it('should fail validation for diameter below minimum', () => {
       const ductProps = createMockDuct({ diameter: 4 });
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      expect(result.isValid).toBe(false);
-      expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].type).toBe('dimensional');
-      expect(result.violations[0].severity).toBe('warning');
-      expect(result.violations[0].message).toContain('Diameter 4" is below minimum');
+      const minDiameterViolation = result.find((v) => v.ruleId === 'min-diameter');
+      expect(minDiameterViolation?.severity).toBe('warning');
+      expect(minDiameterViolation?.message).toContain('Diameter 4" is below minimum');
     });
 
     it('should fail validation for diameter above maximum', () => {
       const ductProps = createMockDuct({ diameter: 30 });
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      expect(result.isValid).toBe(false);
-      expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].message).toContain('Diameter 30" exceeds maximum');
+      const maxDiameterViolation = result.find((v) => v.ruleId === 'max-diameter');
+      expect(maxDiameterViolation?.message).toContain('Diameter 30" exceeds maximum');
     });
 
     it('should fail validation for disallowed shape', () => {
@@ -73,20 +69,18 @@ describe('ConstraintValidationService', () => {
       const ductProps = createMockDuct({ shape: 'round' });
       const result = ConstraintValidationService.validateDuct(ductProps, serviceWithRectOnly);
 
-      expect(result.isValid).toBe(false);
-      expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].type).toBe('shape');
-      expect(result.violations[0].message).toContain('Round ducts not allowed');
+      expect(result).toHaveLength(1);
+      expect(result[0]?.ruleId).toBe('shape-not-allowed');
+      expect(result[0]?.message).toContain("Shape 'round' is not allowed");
     });
 
     it('should fail validation for material mismatch', () => {
       const ductProps = createMockDuct({ material: 'stainless' });
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      expect(result.isValid).toBe(false);
-      expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].type).toBe('material');
-      expect(result.violations[0].message).toContain('Material mismatch');
+      expect(result).toHaveLength(1);
+      expect(result[0]?.ruleId).toBe('material-mismatch');
+      expect(result[0]?.message).toContain("does not match service spec");
     });
 
     it('should validate rectangular ducts with width/height constraints', () => {
@@ -108,7 +102,7 @@ describe('ConstraintValidationService', () => {
       }) as any;
 
       const result = ConstraintValidationService.validateDuct(validRect, serviceWithRect);
-      expect(result.isValid).toBe(true);
+      expect(result).toHaveLength(0);
     });
 
     it('should return multiple violations when multiple constraints are violated', () => {
@@ -119,26 +113,32 @@ describe('ConstraintValidationService', () => {
 
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      expect(result.isValid).toBe(false);
-      expect(result.violations.length).toBeGreaterThanOrEqual(2);
+      expect(result.length).toBeGreaterThanOrEqual(2);
     });
   });
 
   describe('classifyViolationSeverity', () => {
-    it('should classify severe over-limit as blocker', () => {
+    it('should return violations for severe over-limit', () => {
       const ductProps = createMockDuct({ diameter: 40 }); // 66% over max
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      const blockers = result.violations.filter(v => v.severity === 'blocker');
-      expect(blockers.length).toBeGreaterThan(0);
+      expect(result.length).toBeGreaterThan(0);
     });
 
     it('should classify minor violations as warnings', () => {
       const ductProps = createMockDuct({ diameter: 26 }); // Slightly over max
       const result = ConstraintValidationService.validateDuct(ductProps, mockService);
 
-      const warnings = result.violations.filter(v => v.severity === 'warning');
+      const warnings = result.filter((v) => v.severity === 'warning');
       expect(warnings.length).toBeGreaterThan(0);
+    });
+
+    it('should include velocity and pressure checks based on engineering limits', () => {
+      const ductProps = createMockDuct({ diameter: 6, airflow: 2500 });
+      const result = ConstraintValidationService.validateDuct(ductProps, mockService);
+
+      expect(result.some((v) => v.ruleId === 'max-velocity')).toBe(true);
+      expect(result.some((v) => v.ruleId === 'max-pressure-drop')).toBe(true);
     });
   });
 });

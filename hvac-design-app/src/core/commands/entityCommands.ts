@@ -5,8 +5,11 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useValidationStore } from '@/core/store/validationStore';
-import { useServiceStore } from '@/core/store/serviceStore';
+import { useSettingsStore } from '@/core/store/settingsStore';
 import { ConstraintValidationService } from '@/core/services/constraintValidation';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { adaptComponentToService } from '@/core/services/componentServiceInterop';
+import type { Duct, ValidationSeverity } from '@/core/schema/duct.schema';
 
 interface CommandOptions {
   selectionBefore?: string[];
@@ -48,11 +51,42 @@ function executeAndRecord(command: ReversibleCommand): void {
   useHistoryStore.getState().push(command);
 }
 
-function syncEntityValidation(entity: Entity): void {
+let isApplyingValidationMutation = false;
+
+function toConstraintSeverity(severity: 'warning' | 'blocker'): ValidationSeverity {
+  return severity === 'blocker' ? 'error' : 'warning';
+}
+
+function resolveServiceById(serviceId: string) {
+  const component = useComponentLibraryStoreV2.getState().getComponent(serviceId);
+  if (!component) {
+    return null;
+  }
+
+  return adaptComponentToService(component);
+}
+
+export function validateAndRecord(entityId: string): void {
+  const entity = useEntityStore.getState().byId[entityId];
   const validationStore = useValidationStore.getState();
+  if (!entity) {
+    validationStore.clearValidation(entityId);
+    return;
+  }
 
   if (entity.type !== 'duct') {
-    validationStore.clearValidation(entity.id);
+    const serviceId = ('serviceId' in entity.props ? entity.props.serviceId : undefined) as string | undefined;
+    if (!serviceId) {
+      validationStore.clearValidation(entity.id);
+      return;
+    }
+    validationStore.setValidationResult(entity.id, {
+      entityId: entity.id,
+      serviceId,
+      violations: [],
+      catalogStatus: 'resolved',
+      lastValidated: new Date(),
+    });
     return;
   }
 
@@ -62,26 +96,75 @@ function syncEntityValidation(entity: Entity): void {
     return;
   }
 
-  const serviceStore = useServiceStore.getState();
-  const service = serviceStore.services[serviceId] ?? serviceStore.baselineTemplates.find((template) => template.id === serviceId);
+  const service = resolveServiceById(serviceId);
   if (!service) {
     validationStore.clearValidation(entity.id);
     return;
   }
 
-  const violations = ConstraintValidationService.validateDuct(entity.props, service);
-  if (violations.length === 0) {
+  const engineeringLimits = useSettingsStore.getState().calculationSettings.engineeringLimits;
+  const violations = ConstraintValidationService.validateDuct(entity.props, service, { engineeringLimits });
+
+  const normalizedViolations = violations.map((violation) => ({
+    ...violation,
+    severity: violation.severity ?? 'warning',
+  }));
+
+  if (normalizedViolations.length === 0) {
+    validationStore.clearValidation(entity.id);
+  } else {
+    validationStore.setValidationResult(entity.id, {
+      entityId: entity.id,
+      serviceId,
+      violations: normalizedViolations,
+      catalogStatus: 'resolved',
+      lastValidated: new Date(),
+    });
+  }
+
+  const currentWarnings = ((entity as Duct).warnings ?? {}) as { constraintViolations?: string[] };
+  const warningMessages = normalizedViolations.map((violation) => violation.message);
+  const nextWarnings = { ...currentWarnings };
+  if (warningMessages.length > 0) {
+    nextWarnings.constraintViolations = warningMessages;
+  } else {
+    delete nextWarnings.constraintViolations;
+  }
+
+  const constraintStatus = {
+    isValid: normalizedViolations.length === 0,
+    violations: normalizedViolations.map((violation) => ({
+      type: violation.type ?? violation.ruleId,
+      severity: toConstraintSeverity(violation.severity),
+      message: violation.message,
+      suggestedFix: violation.suggestedFix,
+    })),
+    lastValidated: new Date(),
+  };
+
+  isApplyingValidationMutation = true;
+  try {
+    useEntityStore.getState().updateEntity(entity.id, {
+      props: {
+        ...(entity as Duct).props,
+        constraintStatus,
+      },
+      warnings: Object.keys(nextWarnings).length > 0 ? nextWarnings : undefined,
+      modifiedAt: new Date().toISOString(),
+    } as Partial<Entity>);
+  } finally {
+    isApplyingValidationMutation = false;
+  }
+}
+
+function syncEntityValidation(entity: Entity): void {
+  const validationStore = useValidationStore.getState();
+
+  if (entity.type !== 'duct') {
     validationStore.clearValidation(entity.id);
     return;
   }
-
-  validationStore.setValidationResult(entity.id, {
-    entityId: entity.id,
-    serviceId,
-    violations,
-    catalogStatus: 'resolved',
-    lastValidated: new Date(),
-  });
+  validateAndRecord(entity.id);
 }
 
 function syncEntityValidationById(entityId: string): void {
@@ -198,6 +281,47 @@ export function updateEntity(
       id: generateCommandId(),
       type: CommandType.UPDATE_ENTITY,
       payload: { id, updates: actualPreviousState, selection: selection.before },
+      timestamp: Date.now(),
+    },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
+  };
+
+  executeAndRecord(command);
+}
+
+/**
+ * Update multiple entities in a single atomic command.
+ */
+export function updateEntities(
+  updates: Array<{ id: string; updates: Partial<Entity>; previous: Entity }>,
+  options?: CommandOptions
+): void {
+  if (updates.length === 0) {
+    return;
+  }
+
+  const selection = captureSelection(options);
+
+  const payload = {
+    updates: updates.map((item) => ({ id: item.id, updates: item.updates })),
+    selection: selection.before,
+  };
+
+  const inversePayload = {
+    updates: updates.map((item) => ({ id: item.id, updates: item.previous })),
+    selection: selection.before,
+  };
+
+  const command: ReversibleCommand = {
+    id: generateCommandId(),
+    type: CommandType.UPDATE_ENTITIES,
+    payload,
+    timestamp: Date.now(),
+    inverse: {
+      id: generateCommandId(),
+      type: CommandType.UPDATE_ENTITIES,
+      payload: inversePayload,
       timestamp: Date.now(),
     },
     selectionBefore: selection.before,
@@ -389,6 +513,21 @@ function executeCommand(command: Command): void {
       break;
     }
 
+    case CommandType.UPDATE_ENTITIES: {
+      const { updates, selection } = command.payload as {
+        updates: Array<{ id: string; updates: Partial<Entity> }>;
+        selection?: string[];
+      };
+
+      updates.forEach(({ id, updates: entityUpdates }) => {
+        entityStore.updateEntity(id, entityUpdates);
+        syncEntityValidationById(id);
+      });
+
+      applySelection(selection);
+      break;
+    }
+
     case CommandType.CREATE_ENTITIES: {
       const { entities, selection } = command.payload as { entities: Entity[]; selection?: string[] };
       entityStore.addEntities(entities);
@@ -417,4 +556,32 @@ function executeCommand(command: Command): void {
       break;
     }
   }
+}
+
+if (typeof window !== 'undefined') {
+  let previousById = useEntityStore.getState().byId;
+  useEntityStore.subscribe((state) => {
+    if (isApplyingValidationMutation) {
+      previousById = state.byId;
+      return;
+    }
+
+    const changedEntityIds: string[] = [];
+    const seen = new Set<string>([
+      ...Object.keys(previousById),
+      ...Object.keys(state.byId),
+    ]);
+
+    seen.forEach((entityId) => {
+      if (previousById[entityId] !== state.byId[entityId]) {
+        changedEntityIds.push(entityId);
+      }
+    });
+
+    changedEntityIds.forEach((entityId) => {
+      validateAndRecord(entityId);
+    });
+
+    previousById = state.byId;
+  });
 }

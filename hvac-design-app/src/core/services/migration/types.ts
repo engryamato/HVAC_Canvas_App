@@ -30,6 +30,28 @@ export interface MigrationError {
     stage: 'scan' | 'read' | 'copy' | 'index' | 'disk';
 }
 
+// Component Library Migration Types
+
+export interface ComponentMigrationResult {
+  success: boolean;
+  migratedComponents: import('../../schema/unified-component.schema').UnifiedComponentDefinition[];
+  errors: ComponentMigrationError[];
+  stats: {
+    totalProcessed: number;
+    successful: number;
+    failed: number;
+    fromComponents: number;
+    fromCatalog: number;
+    fromServices: number;
+  };
+}
+
+export interface ComponentMigrationError {
+  sourceId: string;
+  sourceType: 'component' | 'catalog' | 'service';
+  error: string;
+}
+
 export interface ProjectMetaJson {
     projectId: string;
     projectName: string;

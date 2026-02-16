@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: './src/__tests__/setup.ts',
+    setupFiles: ['./src/__tests__/setup.ts', 'vitest-canvas-mock'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules/', 'e2e/', 'src-tauri/'],
     deps: {
@@ -71,4 +71,3 @@ export default defineConfig({
     },
   },
 });
-

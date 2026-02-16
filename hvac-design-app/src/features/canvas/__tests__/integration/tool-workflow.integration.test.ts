@@ -8,7 +8,7 @@ import { SelectTool } from '../../tools/SelectTool';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../../store/selectionStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
-import { undo, redo } from '@/core/commands/entityCommands';
+import { deleteEntity, undo, redo } from '@/core/commands/entityCommands';
 import type { Room, Duct, Equipment, Fitting, Note } from '@/core/schema';
 
 /**
@@ -24,6 +24,7 @@ describe('Tool Workflow Integration Tests', () => {
   let selectTool: SelectTool;
 
   beforeEach(() => {
+    DuctTool.setAutoFittingEnabled(true);
     useEntityStore.getState().clearAllEntities();
     useSelectionStore.getState().clearSelection();
     useHistoryStore.getState().clear();
@@ -268,6 +269,37 @@ describe('Tool Workflow Integration Tests', () => {
   });
 
   describe('Undo/Redo Integration', () => {
+    it('undo removes full auto-insert fitting batch atomically', () => {
+      // Existing duct 1 (vertical ending at 220,100)
+      ductTool.onActivate();
+      ductTool.onMouseDown({ x: 220, y: -20, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 220, y: 100, button: 0 });
+
+      // Existing duct 2 (vertical starting at 340,100)
+      ductTool.onMouseDown({ x: 340, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 340, y: 220, button: 0 });
+
+      // New duct connects both endpoints and should trigger two elbows in one batch
+      ductTool.onMouseDown({ x: 220, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 340, y: 100, button: 0 });
+      ductTool.onDeactivate();
+
+      const entitiesAfterInsert = getEntityStore().allIds.map((id) => getEntityStore().byId[id]);
+      const fittingsAfterInsert = entitiesAfterInsert.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      const ductsAfterInsert = entitiesAfterInsert.filter((entity): entity is Duct => entity?.type === 'duct');
+      expect(ductsAfterInsert.length).toBe(3);
+      expect(fittingsAfterInsert.length).toBe(2);
+
+      // Last command should be CREATE_ENTITIES and remove both fittings at once
+      undo();
+
+      const entitiesAfterUndo = getEntityStore().allIds.map((id) => getEntityStore().byId[id]);
+      const fittingsAfterUndo = entitiesAfterUndo.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      const ductsAfterUndo = entitiesAfterUndo.filter((entity): entity is Duct => entity?.type === 'duct');
+      expect(ductsAfterUndo.length).toBe(3);
+      expect(fittingsAfterUndo.length).toBe(0);
+    });
+
     it('should support undo/redo across multiple tool operations', () => {
       // Operation 1: Create room
       roomTool.onActivate();
@@ -353,6 +385,53 @@ describe('Tool Workflow Integration Tests', () => {
       expect(getEntityStore().allIds.length).toBe(3);
       expect(getHistoryStore().past.length).toBe(3);
       expect(getHistoryStore().future.length).toBe(0);
+    });
+
+    it('respects manual override toggle for auto-fitting enable/disable', () => {
+      // Base duct
+      ductTool.onActivate();
+      ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 220, y: 100, button: 0 });
+
+      DuctTool.setAutoFittingEnabled(false);
+      // Connection that would normally insert elbow
+      ductTool.onMouseDown({ x: 220, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 220, y: 220, button: 0 });
+      ductTool.onDeactivate();
+
+      const entities = getEntityStore().allIds.map((id) => getEntityStore().byId[id]);
+      const fittings = entities.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      expect(fittings.length).toBe(0);
+    });
+
+    it('cleans orphan auto-inserted fittings after connected duct removal on next insertion pass', () => {
+      // Build elbow scenario
+      ductTool.onActivate();
+      ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 220, y: 100, button: 0 });
+      ductTool.onMouseDown({ x: 220, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 220, y: 220, button: 0 });
+
+      let entities = getEntityStore().allIds.map((id) => getEntityStore().byId[id]);
+      let fittings = entities.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      const ducts = entities.filter((entity): entity is Duct => entity?.type === 'duct');
+      expect(fittings.length).toBe(1);
+
+      const ductToRemove = ducts.find((duct) => duct.transform.x === 220 && duct.transform.y === 100);
+      expect(ductToRemove).toBeDefined();
+      if (!ductToRemove) {
+        throw new Error('Expected connected duct to remove');
+      }
+      deleteEntity(ductToRemove);
+
+      // Trigger insertion pass again with disconnected duct
+      ductTool.onMouseDown({ x: 400, y: 400, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseUp({ x: 520, y: 400, button: 0 });
+      ductTool.onDeactivate();
+
+      entities = getEntityStore().allIds.map((id) => getEntityStore().byId[id]);
+      fittings = entities.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      expect(fittings.length).toBe(0);
     });
   });
 

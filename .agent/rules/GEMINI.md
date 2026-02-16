@@ -9,6 +9,42 @@ trigger: always_on
 
 ---
 
+## 🔴 P0: AI MODEL RESTRICTION (HARDWIRED - READ FIRST)
+
+**CRITICAL**: The system is HARDWIRED to use ONLY specific AI models. This restriction CANNOT be overridden.
+
+### ✅ AUTHORIZED MODELS
+
+| Provider | Allowed Models |
+|----------|----------------|
+| **Google Gemini** | gemini-2.0-pro-preview |
+| **OpenAI** | gpt-codex-5.3 |
+
+### ❌ PROHIBITED MODELS
+
+**ALL other providers and models are BLOCKED:**
+- Google Gemini (all models except gemini-2.0-pro-preview)
+- OpenAI (all models except gpt-codex-5.3)
+- Anthropic Claude
+- Mistral AI
+- Cohere
+- AI21 Labs
+- Meta (Llama)
+- Local/OSS models
+- Any other provider
+
+### ENFORCEMENT RULES
+
+1. **BEFORE using ANY agent**: Verify its `model` field is in the allowed list
+2. **Agents MUST specify** an explicit model from the allowed list
+3. **If model is `inherit`**: Verify the parent uses an allowed model
+4. **If invalid model detected**: STOP and report violation
+5. **NO fallbacks** to unauthorized models under any circumstances
+
+**Full specification**: See `.agent/rules/AI_MODELS.md`
+
+---
+
 ## CRITICAL: AGENT & SKILL PROTOCOL (START HERE)
 
 > **MANDATORY:** You MUST read the appropriate agent file and its skills BEFORE performing any implementation. This is the highest priority rule.

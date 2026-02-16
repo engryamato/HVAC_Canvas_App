@@ -385,6 +385,36 @@ describe('Store Integration Tests', () => {
       // This tests current state
       expect(['room', 'select']).toContain(useToolStore.getState().currentTool);
     });
+
+    it('should dispatch Milestone 1 keyboard shortcut contract (V/D/F/E/Escape)', () => {
+      const store = useToolStore.getState();
+
+      expect(store.dispatchKeyboardShortcut('d')).toBe(true);
+      expect(useToolStore.getState().currentTool).toBe('duct');
+
+      expect(useToolStore.getState().dispatchKeyboardShortcut('f')).toBe(true);
+      expect(useToolStore.getState().currentTool).toBe('fitting');
+
+      expect(useToolStore.getState().dispatchKeyboardShortcut('e')).toBe(true);
+      expect(useToolStore.getState().currentTool).toBe('equipment');
+
+      expect(useToolStore.getState().dispatchKeyboardShortcut('v')).toBe(true);
+      expect(useToolStore.getState().currentTool).toBe('select');
+
+      useToolStore.getState().setTool('duct');
+      expect(useToolStore.getState().dispatchKeyboardShortcut('escape')).toBe(true);
+      expect(useToolStore.getState().currentTool).toBe('select');
+    });
+
+    it('should keep multi-placement mode enabled across tool shortcut activations', () => {
+      useToolStore.getState().setMultiPlacementMode(true);
+
+      useToolStore.getState().dispatchKeyboardShortcut('d');
+      useToolStore.getState().dispatchKeyboardShortcut('f');
+      useToolStore.getState().dispatchKeyboardShortcut('escape');
+
+      expect(useToolStore.getState().multiPlacementMode).toBe(true);
+    });
   });
 
   describe('Complex Multi-Store Scenarios', () => {

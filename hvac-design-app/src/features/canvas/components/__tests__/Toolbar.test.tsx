@@ -227,7 +227,8 @@ describe('Toolbar - Undo/Redo Integration', () => {
       fireEvent.keyDown(window, { key: 'e' });
       expect(useToolStore.getState().currentTool).toBe('equipment');
 
-      // Note: 'f' key is now used for zoom-to-selection, not fitting tool
+      fireEvent.keyDown(window, { key: 'f' });
+      expect(useToolStore.getState().currentTool).toBe('fitting');
 
       fireEvent.keyDown(window, { key: 'n' });
       expect(useToolStore.getState().currentTool).toBe('note');

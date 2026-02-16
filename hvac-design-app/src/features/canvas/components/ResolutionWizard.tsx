@@ -5,7 +5,7 @@
  */
 import { useState } from 'react';
 import { useValidationStore } from '@/core/store/validationStore';
-import { useCatalogStore } from '@/core/store/catalogStore';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,15 +21,16 @@ export function ResolutionWizard({ open, onClose, entityId }: ResolutionWizardPr
   const [mode, setMode] = useState<'find' | 'create' | 'modify'>('find');
   const [searchQuery, setSearchQuery] = useState('');
   const validationResult = useValidationStore((state) => state.validationResults[entityId]);
-  const searchCatalog = useCatalogStore((state) => state.searchCatalog);
-  const searchResults = useCatalogStore((state) => state.searchResults);
-  const catalogItems = useCatalogStore((state) => state.items);
+  const searchComponents = useComponentLibraryStoreV2((state) => state.search);
+  const activateComponent = useComponentLibraryStoreV2((state) => state.activateComponent);
+  const [searchResults, setSearchResults] = useState<Array<ReturnType<typeof searchComponents>[number]>>([]);
 
   const handleSearch = () => {
-    searchCatalog(searchQuery);
+    setSearchResults(searchComponents(searchQuery));
   };
 
-  const handleSelectCatalogItem = () => {
+  const handleSelectCatalogItem = (componentId: string) => {
+    activateComponent(componentId);
     // Update entity with selected catalog item
     useValidationStore.getState().updateCatalogStatus(entityId, 'resolved', 'Manual resolution');
     onClose();
@@ -90,23 +91,17 @@ export function ResolutionWizard({ open, onClose, entityId }: ResolutionWizardPr
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {searchResults.map((catalogId) => {
-                    const item = catalogItems[catalogId];
-                    if (!item) {
-                      return null;
-                    }
-                    return (
-                      <div
-                        key={catalogId}
+                  {searchResults.map((item) => (
+                    <div
+                        key={item.id}
                         className="border rounded p-3 hover:bg-accent cursor-pointer"
-                        onClick={handleSelectCatalogItem}
+                        onClick={() => handleSelectCatalogItem(item.id)}
                       >
-                        <div className="font-medium">{item.partNumber}</div>
-                        <div className="text-sm text-muted-foreground">{item.manufacturer}</div>
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-sm text-muted-foreground">{item.manufacturer ?? 'N/A'}</div>
                         <div className="text-xs text-muted-foreground">{item.description}</div>
                       </div>
-                    );
-                  })}
+                  ))}
                 </div>
               )}
             </div>

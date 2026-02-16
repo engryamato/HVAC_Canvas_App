@@ -10,19 +10,29 @@ interface LayoutStoreState {
     activeLeftTab: string;
     activeRightTab: string;
 
+    // Dock state
+    activeDockPanel: 'none' | 'library' | 'services';
+
     // Actions
     toggleLeftSidebar: () => void;
     toggleRightSidebar: () => void;
     setActiveLeftTab: (tab: string) => void;
     setActiveRightTab: (tab: string) => void;
+    
+    // Dock actions
+    setActiveDockPanel: (panel: 'none' | 'library' | 'services') => void;
+    toggleDockPanel: (panel: 'library' | 'services') => void;
+    closeDockPanel: () => void;
+
     resetLayout: () => void;
 }
 
 const defaultState = {
     leftSidebarCollapsed: false,
     rightSidebarCollapsed: false,
-    activeLeftTab: 'product-catalog',
+    activeLeftTab: 'library',
     activeRightTab: 'properties',
+    activeDockPanel: 'none' as const,
 };
 
 export const useLayoutStore = create<LayoutStoreState>()(
@@ -42,6 +52,17 @@ export const useLayoutStore = create<LayoutStoreState>()(
             setActiveRightTab: (tab) =>
                 set({ activeRightTab: tab }),
 
+            setActiveDockPanel: (panel) => 
+                set({ activeDockPanel: panel }),
+
+            toggleDockPanel: (panel) =>
+                set((state) => ({
+                    activeDockPanel: state.activeDockPanel === panel ? 'none' : panel
+                })),
+
+            closeDockPanel: () =>
+                set({ activeDockPanel: 'none' }),
+
             resetLayout: () =>
                 set(defaultState),
         }),
@@ -52,6 +73,7 @@ export const useLayoutStore = create<LayoutStoreState>()(
                 rightSidebarCollapsed: state.rightSidebarCollapsed,
                 activeLeftTab: state.activeLeftTab,
                 activeRightTab: state.activeRightTab,
+                activeDockPanel: state.activeDockPanel,
             }),
         }
     )

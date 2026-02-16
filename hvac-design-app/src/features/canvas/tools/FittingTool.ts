@@ -5,10 +5,11 @@ import {
   type ToolRenderContext,
 } from './BaseTool';
 import { createFitting, FITTING_TYPE_LABELS } from '../entities/fittingDefaults';
-import { createEntity } from '@/core/commands/entityCommands';
+import { createEntity, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
-import { useToolStore } from '@/core/store/canvas.store';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import type { FittingType } from '@/core/schema/fitting.schema';
+import { adaptComponentToService } from '@/core/services/componentServiceInterop';
 
 interface FittingToolState {
   currentPoint: { x: number; y: number } | null;
@@ -31,10 +32,10 @@ export class FittingTool extends BaseTool {
   }
 
   /**
-   * Get the currently selected fitting type from store
+   * Get the currently active component from the library
    */
-  getSelectedType(): FittingType {
-    return useToolStore.getState().selectedFittingType;
+  getActiveComponent() {
+    return useComponentLibraryStoreV2.getState().getActiveComponent();
   }
 
   onActivate(): void {
@@ -76,8 +77,15 @@ export class FittingTool extends BaseTool {
 
     const { ctx, zoom } = context;
     const currentPoint = this.state.currentPoint;
-    const selectedType = this.getSelectedType();
-    const label = FITTING_TYPE_LABELS[selectedType];
+    const activeComponent = this.getActiveComponent();
+    
+    // Only render if a fitting is selected
+    if (!activeComponent || activeComponent.category !== 'fitting') {
+        return;
+    }
+
+    const type = (activeComponent.subtype as FittingType) || 'elbow_90';
+    const label = FITTING_TYPE_LABELS[type] || activeComponent.name;
 
     ctx.save();
 
@@ -127,14 +135,24 @@ export class FittingTool extends BaseTool {
   }
 
   private createFittingEntity(x: number, y: number): void {
-    const selectedType = this.getSelectedType();
+    const activeComponent = this.getActiveComponent();
+    if (!activeComponent || activeComponent.category !== 'fitting') {
+        console.warn('No active fitting selected');
+        return;
+    }
 
-    const fitting = createFitting(selectedType, {
+    const type = (activeComponent.subtype as FittingType) || 'elbow_90';
+    const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
+
+    const fitting = createFitting(type, {
       x,
       y,
+      serviceId: activeService?.id || activeComponent.id,
+      catalogItemId: activeComponent.id,
     });
 
     createEntity(fitting);
+    validateAndRecord(fitting.id);
   }
 }
 

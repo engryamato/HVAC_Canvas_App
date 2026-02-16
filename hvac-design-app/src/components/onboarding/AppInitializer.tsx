@@ -10,20 +10,92 @@ import { WelcomeScreen } from './WelcomeScreen';
 import { isTauri } from '@/core/persistence/filesystem';
 import { getStorageRootService } from '@/core/services/StorageRootService';
 import { useStorageEvents } from '@/hooks/useStorageEvents';
-
-
+import { ProjectSetupWizard, type ProjectSetupData } from '@/features/project/components/ProjectSetupWizard';
+import { useProjectActions } from '@/core/store/project.store';
+import { useSettingsStore } from '@/core/store/settingsStore';
+import { createEmptyProject } from '@/core/schema/project-file.schema';
+import { getProjectRepository } from '@/core/persistence/ProjectRepository';
+import { ENABLE_PROJECT_SETUP_WIZARD } from '@/core/config/featureFlags';
 
 export const AppInitializer: React.FC = () => {
     const router = useRouter();
-    const { isFirstLaunch, isLoading, setEnvironment } = useAppStateStore();
-    const { isActive: isTutorialActive } = useTutorialStore();
+    const { isFirstLaunch, isLoading, setEnvironment, setHasLaunched } = useAppStateStore();
+    const { isActive: isTutorialActive, startTutorial } = useTutorialStore();
     const searchParams = useSearchParams();
     const skipSplash = searchParams.get('skipSplash') === 'true';
     const [showSplash, setShowSplash] = useState(!skipSplash);
+    const [showWizard, setShowWizard] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [storageInitError, setStorageInitError] = useState<string | null>(null);
 
-    console.log('[AppInfo Render]', { showSplash, isFirstLaunch, isLoading, isTutorialActive });
+    // Project Logic
+    const { setProject, setDirty } = useProjectActions();
+
+    const handleWizardComplete = async (projectData: ProjectSetupData) => {
+        const projectId = crypto.randomUUID();
+        const now = new Date().toISOString();
+
+        try {
+            const projectFile = createEmptyProject(projectData.projectName, {
+                projectId,
+                createdAt: now,
+                modifiedAt: now,
+                isArchived: false,
+                location: projectData.location || undefined,
+                settings: projectData.settings ? {
+                    unitSystem: projectData.settings.unitSystem || 'imperial',
+                    gridSize: projectData.settings.gridSize || 12,
+                    gridVisible: projectData.settings.gridVisible ?? true,
+                    snapToGrid: projectData.settings.snapToGrid ?? true,
+                    // Include any other calculation settings from the wizard
+                    ...projectData.settings
+                } : undefined,
+            });
+
+            const repository = await getProjectRepository();
+            const saveResult = await repository.saveProject(projectFile);
+            if (!saveResult.success) {
+                throw new Error(saveResult.error || 'Failed to create project');
+            }
+
+            const projectListStore = useProjectListStore.getState();
+            projectListStore.addProject({
+                projectId,
+                projectName: projectData.projectName,
+                entityCount: 0,
+                createdAt: now,
+                modifiedAt: now,
+                storagePath: saveResult.filePath || `project-${projectId}`,
+                filePath: saveResult.filePath,
+                isArchived: false,
+                status: 'draft',
+            });
+            await projectListStore.refreshProjects();
+
+            // 1. Initialize Project Store
+            setProject(projectId, {
+                projectId: projectId,
+                projectName: projectData.projectName,
+                isArchived: false,
+                createdAt: now,
+                modifiedAt: now,
+                location: projectData.location,
+            });
+
+            // 2. Apply Settings
+            if (projectData.settings) {
+                useSettingsStore.getState().setCalculationSettings(projectData.settings);
+            }
+
+            setDirty(false);
+            setHasLaunched(true);
+            setShowWizard(false);
+            startTutorial();
+            router.push(`/canvas/${projectId}`);
+        } catch (error) {
+            console.error('[AppInitializer] Failed to create project from wizard:', error);
+        }
+    };
 
     // Force preferences hydration on startup
     usePreferencesStore();
@@ -67,19 +139,14 @@ export const AppInitializer: React.FC = () => {
 
     // Handle dynamic redirection when state changes (e.g. after rehydration)
     useEffect(() => {
-        // Debug logging for troubleshooting
-        console.log('[AppInfo] State:', { showSplash, isFirstLaunch, isLoading, isTutorialActive });
-
         // Don't redirect if tutorial is active - user is navigating to canvas
         if (isTutorialActive) {
-            console.log('[AppInfo] Tutorial active, skipping dashboard redirect');
             return;
         }
 
-        if (!showSplash && !isFirstLaunch && !isLoading) {
+        if (!showSplash && !isFirstLaunch && !isLoading && !showWizard) {
             // Small delay to ensure Zustand stores fully hydrate (prevents test race conditions)
             const redirectTimer = setTimeout(() => {
-                console.log('[AppInfo] Redirecting to dashboard...');
                 router.replace('/dashboard');
             }, 100);
             
@@ -87,7 +154,7 @@ export const AppInitializer: React.FC = () => {
         }
 
         return;
-    }, [showSplash, isFirstLaunch, isLoading, isTutorialActive, router]);
+    }, [showSplash, isFirstLaunch, isLoading, isTutorialActive, router, showWizard]);
 
 
 
@@ -128,27 +195,20 @@ export const AppInitializer: React.FC = () => {
     // UJ-GS-006: Environment Detection
     const performEnvironmentDetection = () => {
         const tauriDetected = isTauri();
-        console.log('[AppInitializer] Environment detected:', tauriDetected ? 'Tauri Desktop' : 'Web Browser');
         setEnvironment(tauriDetected);
     };
 
     // Storage Initialization
     const performStorageInitialization = async (): Promise<boolean> => {
         try {
-            console.log('[AppInitializer] Initializing storage...');
             const service = await getStorageRootService();
             const result = await service.initialize();
             
             if (result.success) {
-                console.log('[AppInitializer] ✓ Storage initialized:', result.path);
-                if (result.migrationRan) {
-                    console.log('[AppInitializer] ✓ Migration completed');
-                }
                 try {
                     await service.validate();
-                    console.log('[AppInitializer] ✓ Storage validation completed');
                 } catch (validationError) {
-                    console.warn('[AppInitializer] ⚠ Storage validation failed after initialization:', validationError);
+                    // Validation failed
                 }
                 setStorageInitError(null);
                 return true;
@@ -281,7 +341,27 @@ export const AppInitializer: React.FC = () => {
     }
 
     if (isFirstLaunch) {
-        return <WelcomeScreen />;
+        if (showWizard && ENABLE_PROJECT_SETUP_WIZARD) {
+            return (
+                <ProjectSetupWizard
+                    isOpen={true}
+                    onClose={() => setShowWizard(false)}
+                    onComplete={handleWizardComplete}
+                />
+            );
+        }
+        return (
+            <WelcomeScreen
+                onStart={() => {
+                    if (!ENABLE_PROJECT_SETUP_WIZARD) {
+                        setHasLaunched(true);
+                        router.push('/dashboard/new');
+                        return;
+                    }
+                    setShowWizard(true);
+                }}
+            />
+        );
     }
 
     // While redirecting or loading
@@ -291,4 +371,3 @@ export const AppInitializer: React.FC = () => {
         </div>
     );
 };
-

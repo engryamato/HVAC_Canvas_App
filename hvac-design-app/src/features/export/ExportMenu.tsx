@@ -11,6 +11,7 @@ import { useAppStateStore } from '@/stores/useAppStateStore';
 import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
 import type { PdfPageSize } from './pdf';
 import { captureCanvasSnapshot } from './canvasSnapshot';
+import { ExportDialog, ExportDialogOptions } from './ExportDialog';
 
 const PDF_PAGE_SIZES: Array<{ label: string; value: PdfPageSize }> = [
   { label: 'Letter', value: 'letter' },
@@ -41,6 +42,8 @@ export function ExportMenu() {
   const projectDetails = useProjectDetails();
   const isTauri = useAppStateStore((state) => state.isTauri);
   const [pdfPageSize, setPdfPageSize] = useState<PdfPageSize>('letter');
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const project = useMemo(() => {
     if (!projectId) {
@@ -125,7 +128,35 @@ export function ExportMenu() {
           ))}
         </select>
         <button onClick={handleExportPdf}>PDF</button>
+        <button onClick={() => setExportDialogOpen(true)}>Export...</button>
       </div>
+
+      <ExportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        onExport={async (options: ExportDialogOptions) => {
+          setIsExporting(true);
+          try {
+            if (options.format === 'csv' && project) {
+              const bom = generateBOM(
+                entityIds
+                  .map((id) => entitiesById[id])
+                  .filter((e): e is NonNullable<typeof e> => e !== undefined)
+              );
+              const csv = exportBOMtoCSV(bom);
+              downloadFile(
+                csv,
+                `${sanitizeFileName(projectDetails?.projectName ?? 'project')}-bom.csv`,
+                'text/csv;charset=utf-8'
+              );
+            }
+          } finally {
+            setIsExporting(false);
+            setExportDialogOpen(false);
+          }
+        }}
+        isExporting={isExporting}
+      />
     </div>
   );
 }

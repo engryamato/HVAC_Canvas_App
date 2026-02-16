@@ -22,8 +22,19 @@ Antigravity Kit is a modular system consisting of:
 ├── skills/                  # 40 Skills
 ├── workflows/               # 11 Slash Commands
 ├── rules/                   # Global Rules
+│   ├── GEMINI.md           # Main orchestrator rules
+│   └── AI_MODELS.md        # 🔴 AI Model Restrictions (HARDWIRED)
 └── .shared/                 # Shared Resources
 ```
+
+### 🔴 Critical Configuration Files
+
+| File | Purpose | Priority |
+|------|---------|----------|
+| `rules/GEMINI.md` | Main orchestration rules | P0 |
+| `rules/AI_MODELS.md` | **AI Model Restrictions** | P0 - HARDWIRED |
+
+**Note**: `AI_MODELS.md` defines the ONLY authorized AI models (Gemini & OpenAI). This is a hardwired restriction that requires user approval to modify.
 
 ---
 

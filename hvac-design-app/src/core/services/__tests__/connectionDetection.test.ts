@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ConnectionDetectionService } from '../connectionDetection';
 import { Duct } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
+import type { DetectedConnection } from '../connectionDetection';
 
 // Mock the entity store
 vi.mock('@/core/store/entityStore', () => ({
@@ -138,6 +139,42 @@ describe('ConnectionDetectionService', () => {
       const connections = ConnectionDetectionService.detectConnections('duct3');
 
       expect(connections.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('classifies tee when a new duct endpoint connects to two existing ducts', () => {
+      const trunk = createMockDuct('trunk', 100, 100, 0, 10);
+      const branch = createMockDuct('branch', 220, -20, 90, 10);
+      const newDuct = createMockDuct('new', 220, 100, 90, 10);
+
+      (useEntityStore.getState as any).mockReturnValue({
+        byId: {
+          trunk,
+          branch,
+          new: newDuct,
+        },
+      });
+
+      const connections = ConnectionDetectionService.detectConnections('new');
+      expect(connections.length).toBe(2);
+      expect(connections.every((connection: DetectedConnection) => connection.fittingType === 'tee')).toBe(true);
+    });
+
+    it('classifies transition for straight connection with size change', () => {
+      const large = createMockDuct('large', 100, 100, 0, 10);
+      large.props.diameter = 24;
+      const small = createMockDuct('small', 220, 100, 0, 10);
+      small.props.diameter = 12;
+
+      (useEntityStore.getState as any).mockReturnValue({
+        byId: {
+          large,
+          small,
+        },
+      });
+
+      const connections = ConnectionDetectionService.detectConnections('small');
+      expect(connections).toHaveLength(1);
+      expect(connections[0]?.fittingType).toBe('transition');
     });
 
     it('should return empty array for non-existent duct', () => {

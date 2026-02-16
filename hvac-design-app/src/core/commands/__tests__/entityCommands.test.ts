@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createEntity, updateEntity, deleteEntity, undo, redo } from '../entityCommands';
+import { createEntity, updateEntity, updateEntities, deleteEntity, undo, redo } from '../entityCommands';
 import { useEntityStore, selectEntity, selectEntityCount } from '@/core/store/entityStore';
 import { useHistoryStore } from '../historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
-import type { Room } from '@/core/schema';
+import type { Duct, Fitting, Room } from '@/core/schema';
 
 const createMockRoom = (id: string, name: string): Room => ({
   id,
@@ -68,6 +68,83 @@ describe('Entity Commands', () => {
       updateEntity('room-1', { zIndex: 5 }, room);
 
       expect(useHistoryStore.getState().past).toHaveLength(1);
+    });
+  });
+
+  describe('updateEntities', () => {
+    it('should apply and undo multiple updates atomically', () => {
+      const duct: Duct = {
+        id: 'duct-1',
+        type: 'duct',
+        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        zIndex: 1,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        modifiedAt: '2025-01-01T00:00:00.000Z',
+        props: {
+          name: 'Duct 1',
+          shape: 'round',
+          diameter: 12,
+          length: 20,
+          material: 'galvanized',
+          airflow: 1000,
+          staticPressure: 0.1,
+        },
+        calculated: { area: 113.1, velocity: 1273, frictionLoss: 0.03 },
+      };
+
+      const fitting: Fitting = {
+        id: 'fit-1',
+        type: 'fitting',
+        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        zIndex: 2,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        modifiedAt: '2025-01-01T00:00:00.000Z',
+        props: {
+          fittingType: 'elbow_90',
+          inletDuctId: duct.id,
+          autoInserted: true,
+        },
+        calculated: { equivalentLength: 30, pressureLoss: 0.01 },
+      };
+
+      createEntity(duct);
+      createEntity(fitting);
+      useHistoryStore.getState().clear();
+
+      updateEntities([
+        {
+          id: duct.id,
+          previous: duct,
+          updates: {
+            props: {
+              ...duct.props,
+              diameter: 14,
+            },
+          },
+        },
+        {
+          id: fitting.id,
+          previous: fitting,
+          updates: {
+            calculated: {
+              ...fitting.calculated,
+              equivalentLength: 35,
+            },
+          },
+        },
+      ]);
+
+      expect(useHistoryStore.getState().past).toHaveLength(1);
+      const updatedDuct = selectEntity(duct.id) as Duct;
+      const updatedFitting = selectEntity(fitting.id) as Fitting;
+      expect(updatedDuct.props.diameter).toBe(14);
+      expect(updatedFitting.calculated.equivalentLength).toBe(35);
+
+      undo();
+      const revertedDuct = selectEntity(duct.id) as Duct;
+      const revertedFitting = selectEntity(fitting.id) as Fitting;
+      expect(revertedDuct.props.diameter).toBe(12);
+      expect(revertedFitting.calculated.equivalentLength).toBe(30);
     });
   });
 
