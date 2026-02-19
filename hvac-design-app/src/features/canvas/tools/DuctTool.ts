@@ -18,7 +18,7 @@ import {
 } from '@/core/schema/duct.schema';
 import { ConnectionDetectionService } from '@/core/services/connectionDetection';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
-import type { Entity, Fitting } from '@/core/schema';
+import type { Entity, Fitting, Duct } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import { adaptComponentToService, getServiceColor } from '@/core/services/componentServiceInterop';
@@ -28,10 +28,24 @@ import { adaptComponentToService, getServiceColor } from '@/core/services/compon
  */
 const MIN_DUCT_LENGTH = 12; // 1 foot minimum for usability
 
+/**
+ * Snap tolerance for magnetic endpoints (pixels)
+ */
+const SNAP_TOLERANCE = 12;
+
+interface SnapTarget {
+  ductId: string;
+  endPoint: 'start' | 'end';
+  x: number;
+  y: number;
+  angle: number;
+}
+
 interface DuctToolState {
-  mode: 'idle' | 'drawing';
+  mode: 'idle' | 'placing_end';
   startPoint: { x: number; y: number } | null;
   currentPoint: { x: number; y: number } | null;
+  snapTarget: SnapTarget | null;
 }
 
 /**
@@ -62,6 +76,7 @@ export class DuctTool extends BaseTool {
     mode: 'idle',
     startPoint: null,
     currentPoint: null,
+    snapTarget: null,
   };
 
   getCursor(): string {
@@ -81,28 +96,44 @@ export class DuctTool extends BaseTool {
       return;
     }
 
-    const snappedPoint = this.snapToGrid(event.x, event.y);
-
-    this.state = {
-      mode: 'drawing',
-      startPoint: snappedPoint,
-      currentPoint: snappedPoint,
-    };
+    if (this.state.mode === 'idle') {
+      // First click: set start point
+      const snappedPoint = this.snapToGrid(event.x, event.y);
+      this.state = {
+        mode: 'placing_end',
+        startPoint: snappedPoint,
+        currentPoint: snappedPoint,
+        snapTarget: null,
+      };
+    } else if (this.state.mode === 'placing_end') {
+      // Second click: finalize (handled in onMouseUp)
+    }
   }
 
   onMouseMove(event: ToolMouseEvent): void {
-    if (this.state.mode === 'drawing') {
-      const snappedPoint = this.snapToGrid(event.x, event.y);
-      this.state.currentPoint = snappedPoint;
+    if (this.state.mode === 'placing_end') {
+      // Check for magnetic snapping first
+      const snapResult = this.findSnapPoint(event.x, event.y);
+      
+      if (snapResult) {
+        // Snap to endpoint
+        this.state.currentPoint = { x: snapResult.x, y: snapResult.y };
+        this.state.snapTarget = snapResult;
+      } else {
+        // Normal grid snap
+        const snappedPoint = this.snapToGrid(event.x, event.y);
+        this.state.currentPoint = snappedPoint;
+        this.state.snapTarget = null;
+      }
     }
   }
 
-  onMouseUp(event: ToolMouseEvent): void {
-    if (this.state.mode === 'drawing' && this.state.startPoint) {
-      const snappedPoint = this.snapToGrid(event.x, event.y);
-      this.createDuctEntity(this.state.startPoint, snappedPoint);
+  onMouseUp(_event: ToolMouseEvent): void {
+    if (this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
+      // Second click: finalize the duct
+      this.createDuctEntity(this.state.startPoint, this.state.currentPoint);
+      this.reset();
     }
-    this.reset();
   }
 
   onKeyDown(event: ToolKeyEvent): void {
@@ -116,12 +147,12 @@ export class DuctTool extends BaseTool {
   }
 
   render(context: ToolRenderContext): void {
-    if (this.state.mode !== 'drawing' || !this.state.startPoint || !this.state.currentPoint) {
+    if (this.state.mode !== 'placing_end' || !this.state.startPoint || !this.state.currentPoint) {
       return;
     }
 
     const { ctx, zoom } = context;
-    const { startPoint, currentPoint } = this.state;
+    const { startPoint, currentPoint, snapTarget } = this.state;
     
     const activeComponent = this.getActiveComponent();
     const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
@@ -134,12 +165,13 @@ export class DuctTool extends BaseTool {
     // Minimum length check
     const isValid = length >= MIN_DUCT_LENGTH;
     const warningMessage = length < MIN_DUCT_LENGTH ? 'Too Short' : '';
+    const isSnapped = snapTarget !== null;
 
     // Service Constraints Check - visualize service color
     if (isValid && activeService) {
         ctx.strokeStyle = activeService.color || getServiceColor(activeService.systemType);
     } else {
-        ctx.strokeStyle = isValid ? '#424242' : '#D32F2F';
+        ctx.strokeStyle = isValid ? (isSnapped ? '#2196F3' : '#424242') : '#D32F2F';
     }
 
     ctx.save();
@@ -159,19 +191,83 @@ export class DuctTool extends BaseTool {
     const midX = (startPoint.x + currentPoint.x) / 2;
     const midY = (startPoint.y + currentPoint.y) / 2;
     ctx.font = `${12 / zoom}px sans-serif`;
-    ctx.fillStyle = isValid ? (activeService?.color || '#424242') : '#D32F2F';
+    ctx.fillStyle = isValid ? (activeService?.color || (isSnapped ? '#2196F3' : '#424242')) : '#D32F2F';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(`${lengthFt}' ${warningMessage}`, midX, midY - 8 / zoom);
+    const snapHint = isSnapped ? ' [SNAP]' : '';
+    ctx.fillText(`${lengthFt}' ${warningMessage}${snapHint}`, midX, midY - 8 / zoom);
 
     // Draw endpoints
-    ctx.fillStyle = isValid ? (activeService?.color || '#424242') : '#D32F2F';
+    ctx.fillStyle = isValid ? (activeService?.color || (isSnapped ? '#2196F3' : '#424242')) : '#D32F2F';
     ctx.beginPath();
     ctx.arc(startPoint.x, startPoint.y, 4 / zoom, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
     ctx.arc(currentPoint.x, currentPoint.y, 4 / zoom, 0, Math.PI * 2);
     ctx.fill();
+
+    // Draw Ghost Fitting Preview when snapped
+    if (isSnapped && snapTarget && isValid) {
+      this.renderGhostFitting(ctx, zoom, snapTarget, currentPoint, startPoint);
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * Render ghost fitting preview at snap point
+   */
+  private renderGhostFitting(
+    ctx: CanvasRenderingContext2D,
+    zoom: number,
+    snapTarget: SnapTarget,
+    connectionPoint: { x: number; y: number },
+    newDuctStart: { x: number; y: number }
+  ): void {
+    // Calculate angle between new duct and existing duct
+    const newDuctAngle = Math.atan2(
+      connectionPoint.y - newDuctStart.y,
+      connectionPoint.x - newDuctStart.x
+    ) * (180 / Math.PI);
+    
+    const angleDiff = Math.abs(newDuctAngle - snapTarget.angle) % 360;
+    const normalizedAngle = angleDiff > 180 ? 360 - angleDiff : angleDiff;
+
+    // Determine fitting type based on angle
+    const isStraight = normalizedAngle <= 15 || normalizedAngle >= 165;
+    const isElbow = !isStraight && (Math.abs(normalizedAngle - 90) <= 20 || Math.abs(normalizedAngle - 45) <= 20);
+
+    if (isStraight) {
+      return; // No fitting needed for straight connections
+    }
+
+    // Draw ghost fitting (semi-transparent elbow arc)
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = '#2196F3';
+    ctx.lineWidth = 8 / zoom;
+    ctx.setLineDash([]);
+
+    if (isElbow) {
+      // Draw elbow arc
+      const radius = 24 / zoom;
+      const startAngle = (snapTarget.angle * Math.PI) / 180;
+      const endAngle = (newDuctAngle * Math.PI) / 180;
+
+      ctx.beginPath();
+      ctx.arc(connectionPoint.x, connectionPoint.y, radius, startAngle, endAngle);
+      ctx.stroke();
+
+      // Draw fitting indicator
+      ctx.font = `${10 / zoom}px sans-serif`;
+      ctx.fillStyle = '#2196F3';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const labelAngle = (startAngle + endAngle) / 2;
+      const labelX = connectionPoint.x + (radius + 12 / zoom) * Math.cos(labelAngle);
+      const labelY = connectionPoint.y + (radius + 12 / zoom) * Math.sin(labelAngle);
+      ctx.fillText(Math.abs(normalizedAngle - 45) <= 20 ? '45°' : '90°', labelX, labelY);
+    }
 
     ctx.restore();
   }
@@ -181,6 +277,7 @@ export class DuctTool extends BaseTool {
       mode: 'idle',
       startPoint: null,
       currentPoint: null,
+      snapTarget: null,
     };
   }
 
@@ -193,6 +290,64 @@ export class DuctTool extends BaseTool {
       x: Math.round(x / gridSize) * gridSize,
       y: Math.round(y / gridSize) * gridSize,
     };
+  }
+
+  /**
+   * Find nearby duct endpoint within snap tolerance
+   */
+  private findSnapPoint(x: number, y: number): SnapTarget | null {
+    const entities = useEntityStore.getState().byId as Record<string, Entity>;
+    const ducts = Object.values(entities).filter(
+      (entity): entity is Duct => entity.type === 'duct'
+    );
+
+    let closestSnap: SnapTarget | null = null;
+    let closestDistance = SNAP_TOLERANCE;
+
+    for (const duct of ducts) {
+      const endpoints = this.getDuctEndpointsForSnap(duct);
+      
+      for (const endpoint of endpoints) {
+        const dx = endpoint.x - x;
+        const dy = endpoint.y - y;
+        const distance = Math.hypot(dx, dy);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestSnap = endpoint;
+        }
+      }
+    }
+
+    return closestSnap;
+  }
+
+  /**
+   * Get duct endpoints for snapping calculations
+   */
+  private getDuctEndpointsForSnap(duct: Duct): SnapTarget[] {
+    const { x, y, rotation } = duct.transform;
+    const lengthPixels = duct.props.length * 12;
+    const radians = (rotation * Math.PI) / 180;
+    const endX = x + lengthPixels * Math.cos(radians);
+    const endY = y + lengthPixels * Math.sin(radians);
+
+    return [
+      {
+        ductId: duct.id,
+        endPoint: 'start',
+        x,
+        y,
+        angle: rotation,
+      },
+      {
+        ductId: duct.id,
+        endPoint: 'end',
+        x: endX,
+        y: endY,
+        angle: rotation,
+      },
+    ];
   }
 
   private createDuctEntity(start: { x: number; y: number }, end: { x: number; y: number }): void {

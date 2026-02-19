@@ -5,6 +5,7 @@
  * specifications for engineering rules.
  */
 import { z } from 'zod';
+import { FittingTypeSchema } from './fitting.schema';
 
 export const SystemTypeSchema = z.enum([
   'supply',
@@ -34,6 +35,15 @@ export type DuctShape = z.infer<typeof DuctShapeSchema>;
 
 export const DuctMaterialSchema = z.enum(['galvanized', 'stainless', 'aluminum', 'flex']);
 export type DuctMaterial = z.infer<typeof DuctMaterialSchema>;
+
+export const IndustrialMaterialSchema = z.enum([
+  'black_iron_16ga',
+  'black_iron_18ga',
+  'stainless_304',
+  'stainless_316',
+  'aluminized_steel',
+]);
+export type IndustrialMaterial = z.infer<typeof IndustrialMaterialSchema>;
 
 // Rules for dimensional constraints
 export const DimensionalConstraintsSchema = z.object({
@@ -68,6 +78,18 @@ export const ServiceSchema = z.object({
   
   // Automation Rules
   fittingRules: z.array(FittingRuleSchema),
+
+  // Industrial Constraints (optional)
+  industrialConstraints: z.object({
+    industrialType: z.enum(['kitchen_exhaust', 'generator_exhaust', 'commercial_supply', 'fume_hood']),
+    forbiddenFittings: z.array(FittingTypeSchema),
+    requiredMaterial: IndustrialMaterialSchema,
+    minTransitionSlopeInchesPerFoot: z.number(),
+    maxVelocityFPM: z.number(),
+    allowFlexConnectors: z.boolean(),
+    maxFlexLengthInches: z.number(),
+    preferredElbowType: FittingTypeSchema,
+  }).partial().optional(),
   
   // Catalog Preferences
   manufacturerPreferences: z.array(z.string()).default([]), // Ranked list of preferred manufacturers
@@ -80,6 +102,9 @@ export const ServiceSchema = z.object({
 });
 
 export type Service = z.input<typeof ServiceSchema>;
+
+// Inferred type for the industrialConstraints field
+export type IndustrialConstraints = NonNullable<z.infer<typeof ServiceSchema>['industrialConstraints']>;
 
 export const ServiceTemplateSchema = ServiceSchema.omit({ 
   id: true, 

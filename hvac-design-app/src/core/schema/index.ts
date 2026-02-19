@@ -15,11 +15,7 @@ export * from './project-file.schema';
 // Unified component schema (Phase 1.1)
 export * from './unified-component.schema';
 
-// Service schema
-// Note: service.schema.ts re-defines DuctMaterial, DuctMaterialSchema, DuctShape,
-// DuctShapeSchema, SystemType, and SystemTypeSchema which also exist in duct.schema.ts.
-// The canonical definitions live in duct.schema.ts; we export service-specific types
-// explicitly to avoid ambiguous re-export conflicts.
+// Service schema (auto-fitting epic) — explicit exports to avoid conflicts with duct.schema
 export {
     PressureClassSchema,
     type PressureClass,
@@ -31,12 +27,28 @@ export {
     type Service,
     ServiceTemplateSchema,
     type ServiceTemplate,
+    IndustrialMaterialSchema,
+    type IndustrialMaterial,
+    type IndustrialConstraints,
     DEFAULT_DIMENSIONAL_CONSTRAINTS,
 } from './service.schema';
 
-// Explicit re-exports to resolve ambiguous barrel conflicts between
+// Export service-specific type aliases and schemas for those that conflict with duct.schema
+export {
+    SystemTypeSchema as ServiceSystemTypeSchema,
+    DuctShapeSchema as ServiceDuctShapeSchema,
+    DuctMaterialSchema as ServiceDuctMaterialSchema,
+} from './service.schema';
+
+export type {
+    SystemType as ServiceSystemType,
+    DuctShape as ServiceDuctShape,
+    DuctMaterial as ServiceDuctMaterial,
+} from './service.schema';
+
+// Explicit re-exports to resolve ambiguous barrel conflicts between 
 // duct.schema.ts and service.schema.ts for identically-named exports.
-// These ensure `DuctMaterial`, `DuctMaterialSchema`, `DuctShape`, `DuctShapeSchema`,
+// These ensure `DuctMaterial`, `DuctMaterialSchema`, `DuctShape`, `DuctShapeSchema`, 
 // `SystemType`, and `SystemTypeSchema` are unambiguously importable from '@/core/schema'.
 export {
     DuctMaterialSchema,

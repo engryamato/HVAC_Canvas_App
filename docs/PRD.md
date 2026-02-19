@@ -1,10 +1,8 @@
-# PRD
-
 # SizeWise HVAC Canvas - Product Requirements Document (PRD)
 
-**Version:** 1.0.0
-**Date:** 2025-12-06
-**Status:** Phase 1 MVP
+**Version:** 1.1.0
+**Date:** 2026-02-16
+**Status:** Phase 1 MVP + Enhancement
 **Document Owner:** Architecture Team
 
 ---
@@ -41,10 +39,13 @@
 The Phase 1 MVP focuses on **air-side HVAC design** with these primary objectives:
 
 1. **Canvas-based design workspace** for drawing rooms, ducts, and equipment
-2. **Real-time HVAC calculations** for airflow, velocity, and pressure drop
-3. **Local-first architecture** with .sws file format for project persistence
-4. **Bill of Materials generation** with CSV export capability
-5. **PDF export** for professional documentation
+2. **Component Library System** for managing catalog items and templates
+3. **Service System** for context-based engineering and visual organization
+4. **Automation Features** including auto-sizing, smart fittings, and bulk operations
+5. **Real-time HVAC calculations** for airflow, velocity, and pressure drop
+6. **Local-first architecture** with .sws file format for project persistence
+7. **Bill of Materials generation** with CSV export capability
+8. **PDF export** for professional documentation
 
 ### 1.4 Success Metrics
 
@@ -100,27 +101,35 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
 ### 2.2 Canvas Interface
 
 ### FR-UI-001: Layout Structure
+
 - **Left Sidebar**: Sizable Drawer Layer containing Project Details, Scope, and Site Conditions.
 - **Right Sidebar**: Sizable Drawer Layer containing Bill of Quantities and Calculations.
 - **Bottom Toolbar**: Dynamic Sizing Bar containing file operations, process, settings, and notifications.
 - **FAB Tool**: Floating Action Button triggered by 'D' key for quick entity creation.
 
 ### FR-UI-002: Left Sidebar (Project Context)
+
 **Project Details (Accordion):**
+
 - Name
 - Location
 - Client
 
 **Project Scope (Accordion):**
+
 - **Scope** (Multi-select): HVAC, For future updates
 - **Material** (Multi-select with Dropdowns):
   - Galvanized Steel (G-60, G-90)
   - Stainless Steel (304S.S., 316S.S., 409S.S., 430S.S., 444S.S.)
   - Aluminum
   - PVS
+  - Black Iron / Carbon Steel (16ga, 18ga)
+  - Aluminized Steel
+  - Double-Wall Insulated
 - **Project Type** (Dropdown): Residential, Commercial, Industrial
 
 **Site Conditions (Accordion):**
+
 - Elevation (Text/Number)
 - Outdoor Temperature (Text/Number)
 - Indoor Temperature (Text/Number)
@@ -129,11 +138,14 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
 - Local Codes (Text/Number)
 
 ### FR-UI-003: Right Sidebar (Engineering)
+
 **Bill of Quantities (Accordion):**
+
 - Table with columns: Quantity, Name (Separated by Size, Description, Weight), Description, Weight.
 - Categories: Ducts, Fittings, Equipment, Accessories.
 
 **Calculation (Accordion):**
+
 - Color coding for issues: Inappropriate (Red?), Warning (Yellow), Normal (Green/None).
 - **Equipment Hierarchy**: Organized by Air System -> Duct Section.
 - **Air Volume** (Unit Dropdown):
@@ -150,7 +162,9 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
   - Metric: °C, °K
 
 ### FR-UI-004: Bottom Toolbar
+
 **Buttons (Icon + Tooltip):**
+
 - **File Upload**: Upload external files.
 - **Export**: Opens Export Modal.
 - **Process**: Triggers calculation engine.
@@ -164,13 +178,16 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
 - **Notification**: Opens notification drawer (close button top-left).
 
 ### FR-UI-005: FAB Tool (Quick Create)
-- Trigger: Press button ‘D’.
+
+- Trigger: Press **Spacebar** or **'F'**.
+- **Note:** The **'D'** key is reserved for the Duct drawing tool to prevent conflicts.
 - **Umbrella Menu**:
   - **Rooms**: Select room templates.
   - **Ducts**: Select duct types.
   - **Equipments**: Select equipment types.
 
 ### FR-UI-006: Feedback & Notifications
+
 - **Loaders**: Three pulsating dots for async operations.
 - **Toast Notifications**:
   - Status: "File uploaded", "Progress saved".
@@ -180,18 +197,76 @@ The Phase 1 MVP focuses on **air-side HVAC design** with these primary objective
     - **Rooms**: Size Issue (Too small/large).
 
 ### FR-UI-007: Device Compatibility
+
 - **Detection**: Automatically detect device type (PC, Laptop, Tablet vs. Mobile).
-- **Warning**: Display full-screen blocking error on mobile devices (phones).
-- **Behavior**: **Terminate** execution or block access. No option to proceed.
-- **Criteria**: Screen width < 640px.
+- **Warning**: Display "Switch to desktop to edit" message on mobile devices (phones).
+- **Behavior**: Enter **"View Only" mode**. User can open projects and View BOM/Canvas, but editing tools are disabled.
+- **Criteria**: Screen width < 768px.
 
 ### FR-UI-008: Responsive Elements
+
 - **Requirement**: Elements (Sidebars, Toolbars) must adjust to screen availability.
 - **Documentation**: See `docs/guides/RESPONSIVE_DESIGN.md` for specific behavior.
 
 ---
 
-### 2.4 Calculations Engine
+### 2.3 Component Library Management
+
+### FR-LIB-001: Unified Component Browser
+- **Hierarchical Navigation**: Browse components by Category -> Subcategory -> Type.
+- **Search & Filter**: Search by name, description, tags, or manufacturer.
+- **Visual Preview**: Display thumbnails for components.
+- **Drag & Drop**: (Future) Drag components onto canvas (currently click-to-activate).
+
+### FR-LIB-002: Component Management
+- **Create Custom**: Create new components from templates.
+- **Edit/Delete**: Modify or remove user-created components.
+- **Import/Export**: detailed in FR-LIB-003.
+
+### FR-LIB-003: Import/Export Components
+- **CSV Import**: Bulk import components from CSV with mapping.
+- **JSON Import/Export**: Full fidelity transfer of component data.
+- **Validation**: Validate imported data against schema.
+
+### 2.4 Service System
+
+### FR-SERV-001: Service Management
+- **Service Definition**: Define services (Supply, Return, Exhaust, etc.) with color coding.
+- **Templates**: Standard templates (Ashrae colors/standards).
+- **CRUD Operations**: Create, Read, Update, Delete services.
+
+### FR-SERV-002: Service Assignment
+- **Contextual Assignment**: Active service determines properties of new objects.
+- **Inheritance**: Ducts inherit service from connected equipment.
+- **Visual Indication**: Color-coding of entities on canvas based on service.
+
+### 2.5 Automation Features
+
+### FR-AUTO-001: Auto-Sizing
+- **Reactive Calculation**: Triggers on airflow/connection changes.
+- **Velocity Constraints**: Sizes based on max/min velocity rules.
+- **User Confirmation**: Non-destructive suggestions.
+
+### FR-AUTO-002: Fitting Insertion
+- **Architecture**: Implements an **Adapter-Wrapped Resolver** pattern with **Strategy Dispatch**.
+- **Execution Modes**:
+  - **Preview Mode**: Triggered on SNAP detection (`onMouseMove`). Returns a non-destructive `FittingPreview` (green/red ghost) without mutating state. Validates geometry and service constraints in real-time.
+  - **Commit Mode**: Triggered on mouse release. Returns an ordered chain of `FittingRequest` objects (e.g., [Transition, Elbow]). Creates entities via `createEntities()`.
+- **Strategies**:
+  - **TurnStrategy**: Handles direction changes (90°, 45°, mitered).
+  - **TransitionStrategy**: Handles shape/size mismatches (concentric, eccentric, flat-top/bottom).
+  - **JunctionStrategy**: Handles 3-way/4-way splits (Tee, Wye, Cross).
+  - **TerminationStrategy**: Handles end-caps and grilles.
+- **Validation Classes**:
+  - **Geometry Impossible**: Hard-block (gap < 6", impossible angle). Prevents entity creation.
+  - **Service Violation**: Warning (e.g., spin-in on grease duct). Allows creation but flags with `constraintStatus='violation'`.
+- **Performance**: Resolver only runs when a valid snap target is detected.
+
+### FR-AUTO-003: Bulk Operations
+- **Batch Edit**: Modify properties of multiple selected entities.
+- **Match Properties**: Copy properties from one entity to others.
+
+### 2.6 Calculations Engine
 
 ### FR-CALC-001: Room Ventilation (ASHRAE 62.1)
 
@@ -231,11 +306,41 @@ Where:
 Velocity (FPM) = CFM × 144 / Area (sq in)
 ```
 
-**Velocity Limits (warnings):**
-- Residential: 600-900 FPM
-- Commercial: 1000-1500 FPM
-- Industrial: 1500-2500 FPM
-- Kitchen exhaust: up to 4000 FPM
+**Velocity Limits & Validation:**
+- **Primary Source:** `Service.industrialConstraints` (if defined).
+- **Secondary Source:** Room Type defaults (ASHRAE 62.1 noise criteria) via **Appendix B**.
+
+**Validation Logic:**
+1.  **Service Constraint Check (Industrial):**
+    *   If `Service.industrialConstraints.maxVelocityFPM` exists: Warning if $V > maxVelocityFPM$.
+    *   If `Service.industrialConstraints.minVelocityFPM` exists (future): Critical if $V < minVelocityFPM$.
+2.  **Room Constraint Check (Commercial/Residential):**
+    *   **Strict Max Velocity:** Warning if $V > V_{max}$ (Noise risk).
+    *   **Pressure Bias:** Warning if room pressure direction opposes design.
+
+**JSON Schema for Validation Rules (Room Defaults):**
+```json
+{
+  "room_definitions": {
+    "residential_bedroom": {
+      "category": "residential",
+      "max_supply_velocity": 600,
+      "target_nc": 25,
+      "pressure_bias": "neutral"
+    },
+    // ...
+  }
+}
+```
+
+**Validation Scenarios:**
+1.  **Kitchen Exhaust (Industrial Service):**
+    *   *Service Rule:* Max 4000 FPM.
+    *   *Check:* Velocity = 3500 FPM?
+    *   *Result:* **OK** (Passes Service rule, ignores Room noise limit).
+2.  **Conference Room (Commercial Room):**
+    *   *Check:* Supply Velocity > 600 FPM?
+    *   *Result:* **Warning**: "Exceeds room noise criteria."
 
 ### FR-CALC-004: Velocity Pressure
 
@@ -266,35 +371,49 @@ Where:
   a, b = Rectangular dimensions
 ```
 
-### FR-CALC-007: Friction Loss (Darcy-Weisbach)
+### FR-CALC-007: Friction Loss (Colebrook-White / Swamee-Jain)
 
 **Formula:**
 
-```
-ΔP = f × (L/D) × (V/4005)²
-Where:
-  f = Friction factor (material-dependent)
-  L = Duct length (ft)
-  D = Duct diameter (ft)
-  V = Velocity (FPM)
-```
+1. **Calculate Reynolds Number ($Re$):**
+   ```
+   Re = (D × V) / (12 × ν)
+   (Where ν = Kinematic Viscosity of air ≈ 1.6 × 10^-4 ft²/s)
+   ```
 
-**Friction Factors by Material:**
+2. **Calculate Friction Factor ($f$) using Swamee-Jain:**
+   ```
+   f = 0.25 / [log10( (ε / (3.7 × D)) + (5.74 / Re^0.9) )]²
+   ```
+
+3. **Calculate Pressure Drop ($\Delta P$):**
+   ```
+   ΔP = f × (L/D) × (V/4005)²
+   ```
+
+**Material Roughness ($\epsilon$):**
 | Material | Absolute Roughness (ft) |
-|———-|————————|
+|---|---|
 | Galvanized steel | 0.0005 |
 | Stainless steel | 0.0002 |
 | Aluminum | 0.0002 |
 | Flex duct | 0.003 |
+| Black Iron / Carbon Steel | 0.00015 |
 
 ### FR-CALC-008: Fitting Pressure Loss
 
-**Method:** Equivalent Length
+**Method:** Dual-Mode Calculation
 
+**1. Standard Mode (Commercial/Residential):**
 ```
 ΔP_fitting = ΔP_per_100ft × (Le / 100)
-Where:
-  Le = Equivalent length of fitting (ft)
+Where: Le = Equivalent length (ft)
+```
+
+**2. Industrial Mode (Exhaust/Grease):**
+```
+ΔP_fitting = C × (V / 4005)²
+Where: C = Loss Coefficient (lookup based on fitting geometry)
 ```
 
 **Common Fitting Equivalent Lengths:**
@@ -314,7 +433,7 @@ Where:
 
 ---
 
-### 2.5 Bill of Materials (BOM)
+### 2.7 Bill of Materials (BOM)
 
 ### FR-BOM-001: Auto-Generation
 
@@ -339,7 +458,7 @@ interface BOMLineItem {
 
 ---
 
-### 2.6 File Management
+### 2.8 File Management
 
 ### FR-FILE-001: Project File Format (.sws)
 
@@ -375,7 +494,7 @@ interface BOMLineItem {
 
 ---
 
-### 2.7 Export System
+### 2.9 Export System
 
 ### FR-EXPORT-001: JSON Export (Full Fidelity)
 
@@ -387,7 +506,8 @@ interface BOMLineItem {
 ### FR-EXPORT-002: CSV Export (BOM)
 
 - Export Bill of Materials as CSV
-- Columns: Category, Subcategory, Description, Quantity, Unit, Size, Material
+- Columns: Category, Subcategory, Description, Quantity, Unit, Size, Material, Unit Price, Total Price
+- **Note:** "Unit Price" is drawn from the static `basePrice` field in the component definition. Full quoting engine logic is deferred to Phase 2.
 - UTF-8 with BOM for Excel compatibility
 - Filename: `{projectName}_BOM_{date}.csv`
 
@@ -404,7 +524,7 @@ interface BOMLineItem {
 
 ---
 
-### 2.8 Settings
+### 2.10 Settings
 
 ### FR-SETT-001: User Preferences
 
@@ -426,18 +546,45 @@ interface BOMLineItem {
 
 ---
 
+### 2.11 Migration & Backward Compatibility
+
+### FR-MIG-001: Auto-Migration for Legacy Projects
+- **Automatic Upgrades**: Detect and upgrade older `.sws` schema versions upon load.
+- **Versioning**: Store schema version in project file metadata.
+- **Backup**: Create a non-destructive backup (`.sws.bak`) before any migration.
+- **Validation**: Run full project validation post-migration to flag unresolved items.
+
+### FR-MIG-002: Service Mapping
+- **Default Assignment**: Assign default "General Supply" service to legacy entities lacking service context execution.
+- **Entity Mapping**: Map legacy entity properties to new baseline component definitions where possible.
+- **Fallback**: Mark unmappable items as "Custom" with preserved raw properties.
+
+### FR-MIG-003: User Resolution Wizard
+- **Trigger**: Launch wizard if validation errors occur during migration.
+- **Flow**:
+  1. Display summary of migrated items vs. items requiring attention.
+  2. Allow user to map unknown materials to new Component Library definitions.
+  3. Allow user to assign Services to bulk groups of entities.
+  4. Confirm and finalize migration.
+
+### FR-MIG-004: Graceful Degradation
+- **Legacy Rendering**: Fall back to basic geometric rendering if component assets are missing.
+- **Calculation Defaults**: Use conservative defaults (e.g., standard friction factors) if specific engineering data is missing from legacy files.
+
+---
+
 ## 3. Technical Requirements
 
 ### 3.1 Technology Stack
 
 | Component | Technology | Version | Purpose |
 | --- | --- | --- | --- |
-| **Desktop Runtime** | Tauri | 1.x | Native desktop wrapper, filesystem access |
-| **Frontend Framework** | Next.js | 14.x | React framework with routing |
-| **UI Library** | React | 18.x | Component-based UI |
-| **State Management** | Zustand | 4.x | Lightweight, performant state |
-| **Schema Validation** | Zod | 3.x | Runtime type validation |
-| **Canvas Rendering** | Pure Canvas 2D | - | No wrapper libraries; Fabric.js explicitly rejected per DEC-001 |
+| **Desktop Runtime** | Tauri | 2.x | Native desktop wrapper, filesystem access |
+| **Frontend Framework** | Next.js | 16.x | React framework with routing |
+| **UI Library** | React | 18.3.x | Component-based UI |
+| **State Management** | Zustand | 5.x | Lightweight, performant state |
+| **Schema Validation** | Zod | 4.x | Runtime type validation |
+| **Canvas Rendering** | Pure Canvas 2D | - | No wrapper libraries; Fabric.js explicitly rejected per DEC-001. **Must implement Spatial Indexing (Hash Grid/Quadtree).** |
 | **Local Cache** | localStorage | - | Browser-based persistence for web; .sws file remains authoritative on Desktop |
 | **Language** | TypeScript | 5.x | Type-safe development |
 | **Package Manager** | pnpm | 8.x | Fast, disk-efficient |
@@ -517,7 +664,12 @@ interface Room extends BaseEntity {
   type: 'room';  props: {
     name: string;                    // 1-100 chars    width: number;                   // inches, 1-10,000    length: number;                  // inches, 1-10,000    height: number;                  // inches, 1-500    occupancyType: OccupancyType;    airChangesPerHour: number;       // 1-100    notes?: string;  };  calculated: {
     area: number;                    // sq ft    volume: number;                  // cu ft    requiredCFM: number;  };}
-type OccupancyType =  | 'office'  | 'retail'  | 'restaurant'  | 'kitchen_commercial'  | 'warehouse'  | 'classroom'  | 'conference'  | 'lobby';
+type OccupancyType = 
+  | 'residential_bedroom' | 'residential_living' | 'residential_kitchen' | 'residential_garage'
+  | 'office_private' | 'office_open' | 'conference' | 'lobby' | 'classroom' | 'restaurant_dining'
+  | 'kitchen_commercial' | 'gymnasium' | 'retail'
+  | 'patient_room' | 'operating_room' | 'isolation_room' | 'mri_room'
+  | 'warehouse' | 'welding_shop' | 'paint_booth' | 'chemical_storage' | 'boiler_room' | 'generator_room' | 'server_room';
 ```
 
 ### 3.3.3 Duct Entity
@@ -527,7 +679,7 @@ interface Duct extends BaseEntity {
   type: 'duct';  props: {
     name: string;    shape: 'round' | 'rectangular';    diameter?: number;               // round only, inches    width?: number;                  // rectangular only, inches    height?: number;                 // rectangular only, inches    length: number;                  // feet    material: DuctMaterial;    airflow: number;                 // CFM (canonical field name)    staticPressure: number;          // in.w.g.    connectedFrom?: string;          // Entity ID    connectedTo?: string;            // Entity ID  };  calculated: {
     area: number;                    // sq in    velocity: number;                // FPM    frictionLoss: number;            // in.w.g./100ft  };}
-type DuctMaterial = 'galvanized' | 'stainless' | 'aluminum' | 'flex';
+type DuctMaterial = 'galvanized' | 'stainless' | 'aluminum' | 'flex' | 'carbon_steel' | 'black_iron' | 'double_wall_insulated' | 'aluminized_steel';
 ```
 
 ### 3.3.4 Equipment Entity
@@ -543,13 +695,451 @@ type EquipmentType = 'hood' | 'fan' | 'diffuser' | 'damper';
 
 ```tsx
 interface Fitting extends BaseEntity {
-  type: 'fitting';  props: {
-    fittingType: FittingType;    angle?: number;                  // degrees (for elbows)    inletDuctId?: string;    outletDuctId?: string;  };  calculated: {
-    equivalentLength: number;        // feet    pressureLoss: number;            // in.w.g.  };}
-type FittingType = 'elbow_90' | 'elbow_45' | 'tee' | 'reducer' | 'cap';
+  type: 'fitting';
+  props: {
+    fittingType: FittingType;
+    angle?: number;                  // degrees (for elbows)
+    inletDuctId?: string;
+    outletDuctId?: string;
+    transitionData?: {
+      fromShape: 'round' | 'rectangular';
+      toShape: 'round' | 'rectangular';
+      fromDiameter?: number;
+      toDiameter?: number;
+      fromWidth?: number;
+      fromHeight?: number;
+      toWidth?: number;
+      toHeight?: number;
+      alignment: 'center_line' | 'flat_top' | 'flat_bottom';  // NEW: Offset geometry support
+    };
+  };
+  calculated: {
+    equivalentLength: number;        // feet
+    pressureLoss: number;            // in.w.g.
+  };
+}
+
+type FittingType = 
+  | 'elbow_90' | 'elbow_45' | 'tee' | 'reducer' | 'cap'
+  // NEW: Auto-Fitting additions
+  | 'transition_square_to_round'   // Rect -> Round (spin-in or welded)
+  | 'reducer_tapered'              // Aerodynamic 15deg convergence
+  | 'reducer_eccentric'            // Offset, flat-top or flat-bottom
+  | 'wye'                          // Y-branch, 45deg split
+  | 'elbow_mitered'                // No-vane, industrial only
+  | 'end_boot';                    // Round -> Rectangular terminal
 ```
 
-### 3.4 Project File Schema
+### 3.3.6 Unified Component Definition
+
+```typescript
+// Unified Component Definition
+interface UnifiedComponentDefinition {
+  // Identity
+  id: string;
+  name: string;
+  category: 'duct' | 'fitting' | 'equipment' | 'accessory';
+  type: string;
+  subtype?: string;                    // e.g., "rectangular", "round", "elbow", "tee"
+  
+  // Catalog Information
+  manufacturer?: string;
+  model?: string;
+  partNumber?: string;
+  sku?: string;
+  description?: string;
+  thumbnail?: string;
+  
+  // Service Integration
+  systemType?: 'supply' | 'return' | 'exhaust';
+  pressureClass?: 'low' | 'medium' | 'high';
+  
+  // Engineering Properties
+  engineeringProperties: {
+    frictionFactor: number;            // Darcy friction factor
+    maxVelocity: number;               // Max recommended air velocity (fpm)
+    minVelocity?: number;              // Min recommended air velocity (fpm)
+    pressureCoefficient?: number;      // Pressure loss coefficient
+    maxPressureDrop?: number;          // in. w.g./100 ft
+    roughness?: number;                // Absolute roughness (ft)
+  };
+  
+  // Pricing
+  pricing: {
+    materialCost: number;
+    laborUnits: number;                // Labor hours per unit
+    laborRate?: number;                // $/hour (can override project rate)
+    wasteFactor: number;               // 0.0 to 1.0 (10% waste = 0.10)
+    markup?: number;                   // Markup percentage override
+    notes?: string;
+  };
+  
+  // Materials
+  materials: MaterialSpec[];
+  defaultDimensions?: Record<string, number>;
+  
+  // Metadata
+  tags?: string[];
+  customFields?: Record<string, unknown>;
+  isCustom: boolean;                   // User-created vs. system component
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// Material Specification
+interface MaterialSpec {
+  id: string;
+  name: string;
+  grade?: string;                      // e.g., "24-gauge", "26-gauge"
+  type: 'galvanized_steel' | 'stainless_steel' | 'aluminum' | 'fiberglass' | 'flexible';
+  cost: number;                        // Cost per unit
+  costUnit: 'linear_foot' | 'square_foot' | 'piece';
+  properties?: {
+    weight?: number;                   // lb/ft² or lb/ft
+    thermalConductivity?: number;
+    maxTemperature?: number;           // °F
+  };
+}
+
+// Hierarchical Categories
+interface ComponentCategory {
+  id: string;
+  name: string;
+  parentId: string | null;
+  description?: string;
+  icon?: string;
+  subcategories?: ComponentCategory[];
+}
+
+// Component Templates
+interface ComponentTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  componentId: string;                 // Base component this template is for
+  dimensions?: Record<string, number>;
+  materialId?: string;                 // Preset material selection
+  engineeringOverrides?: {
+    airflow?: number;
+    velocity?: number;
+    pressureClass?: string;
+  };
+  createdBy?: string;
+  isShared: boolean;
+  createdAt?: Date;
+}
+```
+
+### 3.3.7 Service Definition
+
+```typescript
+// Service Definition
+interface Service {
+  id: string;                    // UUID v4
+  name: string;                  // 1+ characters
+  description?: string;          // Optional description
+  // Broader enum set (fresh_air, relief_air, other) is a conscious deviation from original plan for completeness
+  systemType: 'supply' | 'return' | 'exhaust' | 'fresh_air' | 'relief_air' | 'other';
+  material: 'galvanized' | 'stainless' | 'aluminum' | 'fiberglass' | 'flexible' | 'carbon_steel' | 'black_iron' | 'double_wall_insulated' | 'aluminized_steel';
+  pressureClass: 'low' | 'medium' | 'high' | 'low-pressure' | 'medium-pressure' | 'high-pressure';
+  
+  // Dimensional Constraints - Required
+  dimensionalConstraints: {
+    minDiameter: number;
+    maxDiameter: number;
+    minWidth: number;
+    maxWidth: number;
+    minHeight: number;
+    maxHeight: number;
+    allowedShapes: ('round' | 'rectangular')[];
+  };
+  
+  // Fitting Rules
+  fittingRules: Array<{
+    angle: number;              // e.g. 90, 45
+    fittingType: string;        // e.g. "elbow_90_stamped", "elbow_90_gore"
+    preference: string;         // "Preferred", "Standard", "Avoid"
+  }>;
+  
+  // Preferences
+  manufacturerPreferences: string[];  // Ranked list of preferred manufacturers
+  
+  // Metadata
+  source: 'baseline' | 'custom';      // 'baseline' = system template, 'custom' = user-created
+  color: string;                      // Visual override color (hex), required
+  
+  // NEW: Industrial & Code-Grade Constraints
+  industrialConstraints?: {
+    industrialType: 'kitchen_exhaust' | 'generator_exhaust' | 'commercial_supply' | 'fume_hood';
+    forbiddenFittings?: string[];       // e.g. ['transition_square_to_round']
+    requiredMaterial?: IndustrialMaterial;
+    minTransitionSlopeInchesPerFoot?: number;
+    maxVelocityFPM?: number;
+    allowFlexConnectors?: boolean;
+    maxFlexLengthInches?: number;
+    preferredElbowType?: string;        // e.g. 'elbow_mitered'
+  };
+
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// NEW: Industrial Material Enum (Code-Grade)
+type IndustrialMaterial = 
+  | 'black_iron_16ga'   // NFPA 96 grease duct standard
+  | 'black_iron_18ga'   // Lighter gauge industrial
+  | 'stainless_304'     // Fume hood / corrosive exhaust
+  | 'stainless_316'     // High-corrosion environments
+  | 'aluminized_steel'; // Generator exhaust / high-temp
+
+// Service Template (baseline)
+interface ServiceTemplate extends Omit<Service, 'id' | 'createdAt' | 'updatedAt'> {
+  id: string;                         // Static string IDs like 'tmpl_low_pressure_supply'
+  isTemplate: true;
+}
+```
+
+### 3.3.8 Note Entity
+
+```typescript
+interface Note extends BaseEntity {
+  type: 'note';
+  props: {
+    content: string;
+    fontSize: number;
+    color: string;
+  };
+}
+```
+
+### 3.3.9 Group Entity
+
+```typescript
+interface Group extends BaseEntity {
+  type: 'group';
+  props: {
+    name: string;
+    childIds: string[];
+  };
+}
+```
+
+### 3.3.10 Automation Data Structures
+
+```typescript
+// Validation Result
+interface ValidationResult {
+  entityId: string;
+  serviceId: string;
+  catalogStatus: 'valid' | 'invalid' | 'unknown';
+  catalogMessage?: string;
+  violations: Array<{
+    ruleId: string;
+    severity: 'error' | 'warning' | 'info';
+    message: string;
+  }>;
+}
+
+// Auto-Sizing Result
+interface SizeOption {
+  size: {
+    diameter?: number;
+    width?: number;
+    height?: number;
+  };
+  velocity: number;                    // FPM
+  pressureDrop: number;                // in.w.g./100ft
+  recommendation: string;              // "Optimal", "Low velocity", etc.
+}
+
+// Parametric Update Result
+interface ParametricUpdateResult {
+  updatedEntities: string[];           // IDs of entities that were updated
+  violations: Array<{
+    entityId: string;
+    message: string;
+  }>;
+  requiresUserAction: boolean;
+  entityUpdates?: Array<{
+    id: string;
+    updates: Partial<Entity>;
+    previous: Entity;
+  }>;
+  engineeringData?: DuctEngineeringData;
+}
+
+// Validation Dashboard Data (from ValidationAggregationService)
+interface ValidationDashboardData {
+  summary: {
+    totalEntities: number;
+    validEntities: number;
+    entitiesWithErrors: number;
+    entitiesWithWarnings: number;
+    validationPercentage: number;
+  };
+  byCategory: {
+    ducts: CategoryValidation;
+    fittings: CategoryValidation;
+    equipment: CategoryValidation;
+  };
+  topIssues: ValidationIssue[];
+  recentlyValidated: Date;
+}
+
+interface CategoryValidation {
+  total: number;
+  valid: number;
+  errors: number;
+  warnings: number;
+}
+
+// Validation Issue (from ValidationAggregationService)
+interface ValidationIssue {
+  entityId: string;
+  entityType: 'duct' | 'fitting' | 'equipment';
+  severity: 'error' | 'warning' | 'info';
+  type: string;
+  message: string;
+  count: number;                       // How many entities have this issue
+}
+
+// Constraint Status (used within entities)
+interface ConstraintStatus {
+  isValid: boolean;
+  violations: Array<{
+    type: string;
+    severity: 'error' | 'warning' | 'info';
+    message: string;
+    field?: string;
+  }>;
+}
+
+// Bulk Edit Changes
+interface BulkEditChanges {
+  material?: string;
+  insulation?: string;
+  costMarkup?: number;
+  systemAssignment?: string;
+  category?: string;
+}
+
+// Update Dependency (for parametric updates)
+interface UpdateDependency {
+  entityId: string;
+  entityType: 'duct' | 'fitting' | 'equipment';
+  updateType: 'recalculate' | 'validate' | 'propagate';
+}
+
+// NEW: Auto-Fitting Resolver Types
+
+// Input context for all strategies
+interface TopologyContext {
+  connections: ConnectionPoint[];         // 2 for turn/transition; 3+ for junctions
+  topologyType: 'turn' | 'transition' | 'junction' | 'termination' | 'straight';
+  constraints: {
+    service: Service | null;
+    industrial: IndustrialConstraints | null;
+  };
+  // Optional metadata
+  angleDeg?: number;
+  primaryRunIndex?: number;
+  branchIndices?: number[];
+  shapeSignature?: string;               // e.g. 'rect->round'
+}
+
+// Output of Resolver in Preview Mode
+interface FittingPreview {
+  fittings: Array<{ fittingType: FittingType; sequenceIndex: number }>;
+  isValid: boolean;
+  validationFailureType?: 'geometry_impossible' | 'service_violation';
+  invalidReason?: string;
+  tooltipText: string;
+  ghostColor: 'green' | 'red';
+}
+
+// Output of Strategy Engines (Commit Mode)
+interface FittingRequest {
+  fittingType: FittingType;
+  material: DuctMaterial | IndustrialMaterial;
+  length?: number;
+  alignment?: 'center_line' | 'flat_top' | 'flat_bottom';
+  angle?: number;
+  serviceId?: string;
+  sequenceIndex: number;       // 0 = first in chain
+  autoInserted: true;
+}
+```
+
+### 3.4 State Management Architecture
+
+### 3.4.1 Component Library Store
+- **Store**: `componentLibraryStoreV2`
+- **Persistence**: `localStorage` (key: `sws.componentLibrary.v2`)
+- **Structure**: Normalized components by ID, hierarchical category tree
+- **Middleware**: Zustand persist middleware with Immer for immutability
+- **Key Actions**:
+  - `addComponent`: Add new component definition
+  - `updateComponent`: Modify existing component
+  - `deleteComponent`: Remove custom component
+  - `duplicateComponent`: Create copy of existing component
+  - `getComponent`: Retrieve component by ID
+  - `activateComponent`: Set active component for tool system
+  - `deactivateComponent`: Clear active component
+  - `getActiveComponent`: Get currently active component
+  - `search`: Fuzzy search by name, description, tags
+  - `setSearchQuery`: Update search query
+  - `setFilterTags`: Filter by tags
+  - `setSelectedCategory`: Filter components by category/subcategory
+  - `getByCategoryTree`: Get components within category hierarchy
+  - `getFilteredComponents`: Get components matching all active filters
+  - `addCategory`/`updateCategory`/`deleteCategory`: Manage category tree
+  - `addTemplate`/`updateTemplate`/`deleteTemplate`: Manage component templates
+  - `setEnabled`/`setLoading`/`setError`: UI state management
+  - `reset`: Reset store to initial state
+
+**Note**: Import/export functionality is handled by separate services, not directly by the store. See `ComponentImportService` for CSV/JSON import operations.
+
+### 3.4.2 Service Store
+- **Store**: `serviceStore`
+- **Persistence**: Project file (.sws)
+- **Structure**: Record of custom services keyed by ID, baseline templates (read-only), active service context
+- **Middleware**: Zustand with Immer middleware
+- **Key Actions**:
+  - `addService`: Create new service definition
+  - `updateService`: Modify custom service properties (baseline services are read-only)
+  - `removeService`: Remove custom service (baseline services cannot be removed)
+  - `setActiveService`: Set current working service context (can be custom service or template ID)
+  - `cloneService`: Create new custom service from template or existing service
+  - `loadBaselineTemplates`: Load system service templates
+  - `hydrate`: Restore store state from project file
+
+**Note**: Service assignment to entities is handled through the entity's `serviceId` property in the entity store, not through a store action. Use `entityStore.updateEntity(entityId, { serviceId: '...' })` to assign services.
+
+### 3.4.3 Validation Store
+- **Store**: `validationStore`
+- **Persistence**: In-memory (derived from entity state)
+- **Structure**: Aggregated validation results grouped by severity and category
+- **Key Features**:
+  - Real-time validation aggregation from entity.warnings
+  - Dashboard counts by severity (error, warning, info)
+  - Filter by severity, category, or service
+  - Issue navigation (click to select entity)
+  - Resolution tracking
+
+### 3.4.4 Calculation Settings Store
+- **Store**: `calculationSettingsStore`
+- **Persistence**: Project file (.sws)
+- **Structure**: Calculation templates and active settings
+- **Templates**:
+  - Commercial Standard ($65/hr labor, 15% markup)
+  - Residential Budget ($45/hr labor, 10% markup)
+  - Industrial Heavy ($85/hr labor, 20% markup)
+- **Key Actions**:
+  - `applyTemplate`: Apply predefined template
+  - `updateSettings`: Modify custom settings
+  - `createCustomTemplate`: Save current settings as template
+
+### 3.5 Project File Schema
 
 ```tsx
 interface ProjectFile {
@@ -560,7 +1150,7 @@ interface ProjectFile {
     commands: Command[];    currentIndex: number;  };}
 ```
 
-### 3.5 Folder Structure
+### 3.6 Folder Structure
 
 ```
 hvac-design-app/
@@ -609,6 +1199,17 @@ hvac-design-app/
 │   │   │   │   ├── ventilation.ts
 │   │   │   │   ├── ductSizing.ts
 │   │   │   │   └── pressureDrop.ts
+│   │   │   ├── auto-fitting/           # NEW: Auto-Fitting Module
+│   │   │   │   ├── FittingResolver.ts  # Public API / Adapter
+│   │   │   │   ├── strategies/         # Strategy Implementations
+│   │   │   │   │   ├── TurnStrategy.ts
+│   │   │   │   │   ├── TransitionStrategy.ts
+│   │   │   │   │   ├── JunctionStrategy.ts
+│   │   │   │   │   └── TerminationStrategy.ts
+│   │   │   │   ├── rules/              # Validation Rules
+│   │   │   │   │   ├── ServiceRules.ts
+│   │   │   │   │   └── GeometryRules.ts
+│   │   │   │   └── types.ts            # Local types
 │   │   │   └── index.ts
 │   │   │
 │   │   └── export/
@@ -815,7 +1416,115 @@ hvac-design-app/
 4. PDF generated with drawing and tables
 5. PDF opened in default viewer
 
-### 4.5 File Management
+### 4.5 Component Library
+
+### US-LIB-001: Browse Components
+
+**As an** HVAC designer
+**I want to** browse and filter the component library
+**So that** I can find specific parts for my design
+
+**Flow:**
+1. User opens "Library" panel
+2. User selects category (e.g. "Ducts > Round")
+3. User types "Spiral" in search
+4. List updates to visually show matching components
+
+### US-LIB-002: Import Catalog
+
+**As an** HVAC estimator
+**I want to** import my company's part catalog from CSV
+**So that** I can use accurate part numbers and pricing
+
+**Flow:**
+1. User clicks "Import" in Library
+2. Selects CSV file
+3. Maps columns (SKU, Cost, etc.)
+4. Validates preview
+5. Components added to "Custom" library
+
+### 4.6 Services
+
+### US-SERV-001: Define Service
+
+**As an** HVAC lead
+**I want to** define a "High Pressure Supply" service
+**So that** my team uses consistent specifications
+
+**Flow:**
+1. User opens "Services" panel
+2. Clicks "Create New"
+3. Sets Name="Supply HP", Color=Blue, System=Supply
+4. Sets standard constraints (e.g. Min Velocity=1500)
+5. Saves service
+
+### US-SERV-002: Visual Verification
+
+**As an** HVAC designer
+**I want to** see services color-coded on the canvas
+**So that** I can visually verify system separation
+
+**Flow:**
+1. User enables "Service Coloring" toggle
+2. Supply ducts turn Blue, Return ducts turn Pink
+3. User identifies a Return duct connected to Supply system (mismatch)
+
+### 4.7 Automation
+
+### US-AUTO-001: Auto-Size Duct Run
+
+**As an** HVAC designer
+**I want** the system to suggest duct sizes based on airflow
+**So that** I can ensure proper velocity without manual calculation
+
+**Flow:**
+1. User sets airflow at terminal (e.g. 500 CFM)
+2. System calculates required size for upstream ducts
+3. Non-intrusive notification: "Sizing update available"
+4. User clicks "Apply" to resize ducts to recommended dimensions
+
+### US-AUTO-002: Auto-Insert Fittings
+
+**As an** HVAC designer
+**I want** elbows to appear automatically when I turn corners
+**So that** I can draw quickly without interruption
+
+**Flow:**
+1. User draws duct segment A
+2. User continues drawing segment B at 90 degrees
+3. System automatically inserts 90-degree elbow at vertex
+4. Connections established A -> Elbow -> B
+
+### US-AUTO-003: Parametric Updates
+
+**As an** HVAC designer
+**I want** connected fittings to resize when I change duct dimensions
+**So that** I don't have to manually update every connected component
+
+**Flow:**
+1. User selects duct and changes diameter from 12" to 14"
+2. System detects connected fittings (elbows, tees)
+3. Parametric update service resizes fittings to match new diameter
+4. Connected ducts inherit size changes if part of same system
+5. Brief visual highlight (0.5s) indicates affected entities
+6. Single undo operation reverses all changes
+
+### US-AUTO-004: Bulk Operations
+
+**As an** HVAC estimator
+**I want** to update properties on multiple selected entities at once
+**So that** I can efficiently make project-wide changes
+
+**Flow:**
+1. User multi-selects 20 duct segments (Ctrl+click or drag selection)
+2. User opens context menu and selects "Bulk Edit"
+3. Bulk Edit dialog shows common properties that can be changed
+4. User changes material from "Galvanized" to "Stainless"
+5. Preview shows affected entities highlighted
+6. User clicks "Apply" to update all selected entities
+7. Single undo operation reverses all changes
+
+### 4.8 File Management
 
 ### US-FM-001: Auto-Save Project
 
@@ -891,7 +1600,37 @@ hvac-design-app/
 | AC-CALC-004 | Calculations trigger within 300ms of input change | Performance test |
 | AC-CALC-005 | Velocity warnings appear when outside limits | Unit test |
 
-### 5.5 File Management
+### 5.5 Component Library
+
+| ID | Criterion | Validation Method |
+| --- | --- | --- |
+| AC-LIB-001 | Browser handles 1000+ items with < 500ms delay | Performance test |
+| AC-LIB-002 | Search filters results in real-time (< 100ms) | Unit test |
+| AC-LIB-003 | CSV import validates schema and rejects bad rows | Integration test |
+| AC-LIB-004 | Custom components persist across app restarts | E2E test |
+
+### 5.6 Services
+
+| ID | Criterion | Validation Method |
+| --- | --- | --- |
+| AC-SERV-001 | New entities inherit service from connection | Unit test |
+| AC-SERV-002 | Service colors render correctly on canvas | Visual test |
+| AC-SERV-003 | Changing service triggers re-validation | Integration test |
+
+### 5.7 Automation
+
+| ID | Criterion | Validation Method |
+| --- | --- | --- |
+| AC-AUTO-001 | Fittings insert automatically on 90/45 degree turns | E2E test |
+| AC-AUTO-002 | Auto-sizing suggests sizes within velocity limits | Unit test |
+| AC-AUTO-003 | Bulk edit updates 50+ entities in < 1s | Performance test |
+| AC-AUTO-004 | Parametric updates propagate flow correctly | Unit test |
+| AC-AUTO-005 | Parametric changes create single undo group | Unit test |
+| AC-AUTO-006 | Visual highlight appears for 0.5s on affected entities | Visual test |
+| AC-AUTO-007 | Bulk operations show preview before apply | E2E test |
+| AC-AUTO-008 | Auto-sizing triggers within 300ms of airflow change | Performance test |
+
+### 5.8 File Management
 
 | ID | Criterion | Validation Method |
 | --- | --- | --- |
@@ -901,7 +1640,7 @@ hvac-design-app/
 | AC-FILE-004 | Schema validation rejects invalid files with message | Unit test |
 | AC-FILE-005 | Auto-save triggers at configured interval | Integration test |
 
-### 5.6 Export
+### 5.9 Export
 
 | ID | Criterion | Validation Method |
 | --- | --- | --- |
@@ -1128,7 +1867,59 @@ For planning purposes, anticipated Phase 2 features include:
 
 ---
 
-## Appendix B: Validation Ranges Summary
+## Appendix B: Velocity & Design Reference Table
+
+### 1. Residential (ACCA Manual D)
+| Room Type | Rec. Main (FPM) | Rec. Branch (FPM) | Target NC | Pressure |
+|---|---|---|---|---|
+| Master Bedroom | 700 | 500 | 25 | Neutral |
+| Bedroom (Std) | 800 | 600 | 30 | Neutral |
+| Living / Family | 900 | 700 | 30 | Neutral |
+| Kitchen | 900 | 700 | 35 | Negative |
+| Dining Room | 900 | 700 | 30 | Neutral |
+| Bathroom | 1,000 | 700 | 35 | Negative |
+| Laundry / Utility | 1,100 | 800 | 40 | Negative |
+| Home Theater | 600 | 400 | 20 | Neutral |
+| Garage | 1,200 | 900 | 45 | Negative |
+
+### 2. Commercial (ASHRAE)
+| Room Type | Rec. Main (FPM) | Rec. Branch (FPM) | Target NC | Pressure |
+|---|---|---|---|---|
+| Private Office | 1,200 | 800 | 30 | Pos/Neu |
+| Open Plan Office | 1,500 | 1,000 | 35-40 | Pos/Neu |
+| Conference Room | 1,100 | 600 | 25-30 | Positive |
+| Lobby / Corridor | 1,600 | 1,200 | 40 | Positive |
+| Library / Museum | 1,000 | 500 | 20-25 | Positive |
+| Auditorium | 900 | 500 | 20 | Positive |
+| Classroom | 1,100 | 700 | 25-30 | Positive |
+| Restaurant Dining | 1,600 | 1,100 | 40 | Positive |
+| Commercial Kitchen | 1,800 | 1,200 | 45 | **Negative** |
+| Retail Store | 1,800 | 1,400 | 45 | Positive |
+| Gymnasium | 2,000 | 1,500 | 45-50 | Positive |
+
+### 3. Healthcare (FGI/ASHRAE 170)
+| Room Type | Rec. Main (FPM) | Rec. Branch (FPM) | Target NC | Pressure |
+|---|---|---|---|---|
+| Patient Room | 1,100 | 700 | 30 | Neutral |
+| Operating Room (OR) | 1,500 | 1,000 | 35-40 | **Positive** |
+| ICU | 1,200 | 800 | 30 | Positive |
+| Isolation (Airborne) | 1,200 | 800 | 30 | **Negative** |
+| MRI / X-Ray | 1,200 | 800 | 35 | Neutral |
+
+### 4. Industrial (ACGIH)
+| Room Type | Supply Max (FPM) | Exhaust Min (FPM) | Pressure | Notes |
+|---|---|---|---|---|
+| Warehouse | 2,500 | N/A | Neutral | |
+| Welding Shop | 2,000 | 2,000 - 2,500 | Negative | Capture velocity critical |
+| Paint Booth | 1,000 | 2,000 | Negative | Laminar flow |
+| Chemical Storage | 1,500 | 1,500 | Negative | Low floor exhaust |
+| Boiler Room | 2,000 | 2,500 (Flue) | Negative | Combustion air |
+| Generator Room | 3,000 | 4,000 - 8,000 | Negative | Heat rejection |
+| Server Room | 1,500 | 1,500 | Positive | Hot/Cold aisle |
+
+---
+
+## Appendix C: Validation Ranges Summary
 
 | Entity | Field | Min | Max | Unit |
 | --- | --- | --- | --- | --- |
@@ -1143,14 +1934,10 @@ For planning purposes, anticipated Phase 2 features include:
 | Duct | airflow | 1 | 100,000 | CFM |
 | Duct | staticPressure | 0 | 20 | in.w.g. |
 | Equipment | capacity | 1 | 100,000 | CFM |
-| Velocity | residential | 600 | 900 | FPM |
-| Velocity | commercial | 1,000 | 1,500 | FPM |
-| Velocity | industrial | 1,500 | 2,500 | FPM |
-| Velocity | kitchen exhaust | 1,500 | 4,000 | FPM |
 
 ---
 
-## Appendix C: Glossary
+## Appendix D: Glossary
 
 | Term | Definition |
 | --- | --- |
@@ -1160,7 +1947,9 @@ For planning purposes, anticipated Phase 2 features include:
 | **in.w.g.** | Inches of Water Gauge - pressure measurement |
 | **BOM** | Bill of Materials - list of all materials and quantities |
 | **ASHRAE** | American Society of Heating, Refrigerating and Air-Conditioning Engineers |
+| **ACCA** | Air Conditioning Contractors of America |
 | **SMACNA** | Sheet Metal and Air Conditioning Contractors’ National Association |
+| **ACGIH** | American Conference of Governmental Industrial Hygienists |
 | **Rp** | People outdoor air rate (CFM/person) |
 | **Ra** | Area outdoor air rate (CFM/sq ft) |
 | **Vbz** | Breathing zone outdoor airflow |
