@@ -183,7 +183,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download Web Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: web-build
           path: web-build
