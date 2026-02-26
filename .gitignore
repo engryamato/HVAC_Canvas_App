@@ -37,5 +37,9 @@ pw-*.json
 typecheck-*.txt
 typecheck-*.count.txt
 
+# Python
+__pycache__/
+*.pyc
+
 # Windows junk
 nul

@@ -1,0 +1,965 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "m7a76",
+      "x": -337.2612197928654,
+      "y": -150,
+      "name": "Canvas (Editor)",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#E2E8F0",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "00vRU",
+          "x": 0,
+          "y": 0,
+          "name": "Header Bar",
+          "fill": "#FFFFFFD9",
+          "width": 1440,
+          "height": 48,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "HmY6f",
+          "x": 0.2612197928654041,
+          "y": 48,
+          "name": "Dock Rail",
+          "fill": "#FFFFFF",
+          "width": 56,
+          "height": 852,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "E9vLT",
+          "x": 8,
+          "y": 64,
+          "name": "Estimating Library",
+          "fill": "#EFF6FF",
+          "width": 40,
+          "height": 40,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#BFDBFE"
+          }
+        },
+        {
+          "type": "text",
+          "id": "XVGSU",
+          "x": 20,
+          "y": 74,
+          "name": "Assets Icon",
+          "fill": "#3B82F6",
+          "content": "📦",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "jM9Zz",
+          "x": 16,
+          "y": 10,
+          "name": "Logo Icon",
+          "fill": "#3B82F6",
+          "width": 28,
+          "height": 28
+        },
+        {
+          "type": "text",
+          "id": "LK1yl",
+          "x": 52,
+          "y": 16,
+          "name": "Logo Text",
+          "fill": "#1E293B",
+          "content": "HVAC Pro",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "rectangle",
+          "id": "kH25g",
+          "x": 140,
+          "y": 14,
+          "name": "Divider 1",
+          "fill": "#E2E8F0",
+          "width": 1,
+          "height": 20
+        },
+        {
+          "type": "text",
+          "id": "rLcTB",
+          "x": 152,
+          "y": 16,
+          "name": "Menu: File",
+          "fill": "#1E293B",
+          "content": "File",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "OHl4V",
+          "x": 194,
+          "y": 16,
+          "name": "Menu: Edit",
+          "fill": "#1E293B",
+          "content": "Edit",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "MMAfS",
+          "x": 236,
+          "y": 16,
+          "name": "Menu: View",
+          "fill": "#1E293B",
+          "content": "View",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "HDtxf",
+          "x": 282,
+          "y": 16,
+          "name": "Menu: Help",
+          "fill": "#1E293B",
+          "content": "Help",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "WqIob",
+          "x": 330,
+          "y": 14,
+          "name": "Divider 2",
+          "fill": "#E2E8F0",
+          "width": 1,
+          "height": 20
+        },
+        {
+          "type": "text",
+          "id": "JpjYE",
+          "x": 342,
+          "y": 16,
+          "name": "Breadcrumb",
+          "fill": "#64748B",
+          "content": "⌂ Dashboard  ›  Office Block A - Level 1",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 5,
+          "id": "i4gOs",
+          "x": 1400,
+          "y": 10,
+          "name": "Settings Button Area",
+          "width": 28,
+          "height": 28
+        },
+        {
+          "type": "text",
+          "id": "TMt52",
+          "x": 17.261219792865404,
+          "y": 867,
+          "name": "Settings Icon",
+          "fill": "#64748B",
+          "content": "⚙",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "I9e1A",
+          "x": 56.261219792865404,
+          "y": 48,
+          "name": "Service Context Strip",
+          "fill": "#F8FAFC",
+          "width": 1064,
+          "height": 31,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#60A5FA"
+          }
+        },
+        {
+          "type": "text",
+          "id": "sO7Xa",
+          "x": 72.2612197928654,
+          "y": 58,
+          "name": "Service Context Text",
+          "fill": "#3B82F6",
+          "content": "Service: Supply Air  ·  System: AHU-01  ·  Zone: Level 1 Office",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "DGUN5",
+          "x": 1120,
+          "y": 48,
+          "name": "Right Sidebar",
+          "fill": "#FFFFFF",
+          "width": 320,
+          "height": 848,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "bw7Mm",
+          "x": 1120,
+          "y": 48,
+          "name": "Right Tab Bar",
+          "fill": "#FFFFFF",
+          "width": 320,
+          "height": 40,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 5,
+          "id": "PNgpX",
+          "x": 1124,
+          "y": 54,
+          "name": "Tab: Properties (active)",
+          "fill": "#E2E8F0",
+          "width": 82,
+          "height": 26
+        },
+        {
+          "type": "text",
+          "id": "JySvs",
+          "x": 1138,
+          "y": 63,
+          "name": "Tab: Properties Text",
+          "fill": "#1E293B",
+          "content": "Properties",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "GCQ15",
+          "x": 1214,
+          "y": 63,
+          "name": "Tab: BOM Text",
+          "fill": "#64748B",
+          "content": "BOM",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "AJz6f",
+          "x": 1254,
+          "y": 63,
+          "name": "Tab: Calculations Text",
+          "fill": "#64748B",
+          "content": "Calculations",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "G5vLw",
+          "x": 1340,
+          "y": 63,
+          "name": "Tab: Validation Text",
+          "fill": "#64748B",
+          "content": "Validation",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 4,
+          "id": "3LH7v",
+          "x": 1412,
+          "y": 54,
+          "name": "Collapse Btn",
+          "width": 24,
+          "height": 24
+        },
+        {
+          "type": "text",
+          "id": "NxcqA",
+          "x": 1415,
+          "y": 60,
+          "name": "Collapse Icon",
+          "fill": "#64748B",
+          "content": "›",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "HGi3D",
+          "x": 1014,
+          "y": 780.0582524271845,
+          "name": "Minimap",
+          "fill": "#FFFFFF",
+          "width": 100,
+          "height": 83,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 5,
+          "id": "u1pQa",
+          "x": 1016,
+          "y": 782.126213592233,
+          "name": "Minimap Content",
+          "fill": "#F8FAFC",
+          "width": 96,
+          "height": 79
+        },
+        {
+          "type": "rectangle",
+          "id": "L2Zck",
+          "x": 1026,
+          "y": 794.5339805825242,
+          "name": "Minimap Viewport Indicator",
+          "width": 66,
+          "height": 45,
+          "stroke": {
+            "thickness": 1.5,
+            "fill": "#3B82F6"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "nFn1O",
+          "x": 1014,
+          "y": 871.0485436893204,
+          "name": "Zoom Controls",
+          "fill": "#FFFFFF",
+          "width": 100,
+          "height": 29,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "text",
+          "id": "9i6nT",
+          "x": 1022,
+          "y": 878.2864077669902,
+          "name": "Zoom Out",
+          "fill": "#64748B",
+          "textGrowth": "fixed-width-height",
+          "width": 11,
+          "height": 20,
+          "content": "−",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "PM0gd",
+          "x": 1045,
+          "y": 880.3543689320388,
+          "name": "Zoom %",
+          "fill": "#1E293B",
+          "textGrowth": "fixed-width-height",
+          "width": 32,
+          "height": 16,
+          "content": "100%",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "yIpiN",
+          "x": 1098,
+          "y": 878.2864077669902,
+          "name": "Zoom In",
+          "fill": "#64748B",
+          "textGrowth": "fixed-width-height",
+          "width": 11,
+          "height": 20,
+          "content": "+",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "MZWrH",
+          "x": 72,
+          "y": 880,
+          "name": "Cursor Position",
+          "fill": "#1E293B",
+          "content": "X: 412  Y: 298",
+          "fontFamily": "monospace",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "uqvVB",
+          "x": 640,
+          "y": 880,
+          "name": "Zoom Level",
+          "fill": "#1E293B",
+          "content": "Zoom: 100%",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "skzAg",
+          "x": 728,
+          "y": 880,
+          "name": "Divider",
+          "fill": "#CBD5E1",
+          "content": "|",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "v9do8",
+          "x": 744,
+          "y": 880,
+          "name": "Grid Status",
+          "fill": "#3B82F6",
+          "content": "Grid: On",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "7xddA",
+          "x": 820,
+          "y": 880,
+          "name": "Divider 2",
+          "fill": "#CBD5E1",
+          "content": "|",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "Sb6FH",
+          "x": 836,
+          "y": 880,
+          "name": "Snap Status",
+          "fill": "#3B82F6",
+          "content": "Snap: On",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "IPpSl",
+          "x": 927.2612197928654,
+          "y": 879,
+          "name": "Selection Count",
+          "fill": "#64748B",
+          "content": "No selection",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "YdFgE",
+          "x": 56,
+          "y": 48,
+          "name": "Canvas_Estimating_Library",
+          "width": 320,
+          "height": 852,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "0qzJ4",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_Properties",
+          "width": 320,
+          "height": 808,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "pthpm",
+              "x": 12,
+              "y": 16,
+              "name": "Inspector Title",
+              "fill": "#1E293B",
+              "content": "Element Properties",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "xKGEG",
+              "x": 12,
+              "y": 36,
+              "name": "No Selection Hint",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 80,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "d4bw8",
+              "x": 80,
+              "y": 70,
+              "name": "No Selection Hint Text",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": 160,
+              "content": "Select an element\nto view properties",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "eGOxx",
+              "x": 12,
+              "y": 132,
+              "name": "Duct Props Heading",
+              "fill": "#1E293B",
+              "content": "Duct Properties",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "IgDjU",
+              "x": 12,
+              "y": 154,
+              "name": "Field: Width",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "UUl8H",
+              "x": 20,
+              "y": 164,
+              "name": "Field Label: Width",
+              "fill": "#64748B",
+              "content": "Width (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "tqbPG",
+              "x": 216,
+              "y": 164,
+              "name": "Field Value: Width",
+              "fill": "#1E293B",
+              "content": "300",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "Sgqvm",
+              "x": 12,
+              "y": 194,
+              "name": "Field: Height",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "3RGJx",
+              "x": 20,
+              "y": 204,
+              "name": "Field Label: Height",
+              "fill": "#64748B",
+              "content": "Height (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "X79lf",
+              "x": 216,
+              "y": 204,
+              "name": "Field Value: Height",
+              "fill": "#1E293B",
+              "content": "200",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "QJKLa",
+              "x": 12,
+              "y": 234,
+              "name": "Field: Material",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "6hyub",
+              "x": 20,
+              "y": 244,
+              "name": "Field Label: Material",
+              "fill": "#64748B",
+              "content": "Material",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "dPJHm",
+              "x": 160,
+              "y": 244,
+              "name": "Field Value: Material",
+              "fill": "#1E293B",
+              "content": "Galvanised Steel",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RmSby",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_BOM",
+          "width": 320,
+          "height": 808,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "9CIv2",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_Calculations",
+          "width": 320,
+          "height": 808,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "86k34",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_Validation",
+          "width": 320,
+          "height": 808,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "lhhL1",
+          "x": -332,
+          "y": 88,
+          "name": "Canvas_Properties_Copy",
+          "width": 320,
+          "height": 808,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "TeiJa",
+              "x": 12,
+              "y": 16,
+              "name": "Inspector Title",
+              "fill": "#1E293B",
+              "content": "Element Properties",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "X0pCt",
+              "x": 12,
+              "y": 36,
+              "name": "No Selection Hint",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 80,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "ZAT9O",
+              "x": 80,
+              "y": 70,
+              "name": "No Selection Hint Text",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": 160,
+              "content": "Select an element\nto view properties",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "FCbef",
+              "x": 12,
+              "y": 132,
+              "name": "Duct Props Heading",
+              "fill": "#1E293B",
+              "content": "Duct Properties",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "oVlXR",
+              "x": 12,
+              "y": 154,
+              "name": "Field: Width",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "nUTqb",
+              "x": 20,
+              "y": 164,
+              "name": "Field Label: Width",
+              "fill": "#64748B",
+              "content": "Width (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "rA9Cc",
+              "x": 216,
+              "y": 164,
+              "name": "Field Value: Width",
+              "fill": "#1E293B",
+              "content": "300",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "wuncg",
+              "x": 12,
+              "y": 194,
+              "name": "Field: Height",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "f3dCo",
+              "x": 20,
+              "y": 204,
+              "name": "Field Label: Height",
+              "fill": "#64748B",
+              "content": "Height (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "oYI2v",
+              "x": 216,
+              "y": 204,
+              "name": "Field Value: Height",
+              "fill": "#1E293B",
+              "content": "200",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "felRC",
+              "x": 12,
+              "y": 234,
+              "name": "Field: Material",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "ekSDb",
+              "x": 20,
+              "y": 244,
+              "name": "Field Label: Material",
+              "fill": "#64748B",
+              "content": "Material",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "r8kEn",
+              "x": 160,
+              "y": 244,
+              "name": "Field Value: Material",
+              "fill": "#1E293B",
+              "content": "Galvanised Steel",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "Theme": [
+      "Default",
+      "Variant-1"
+    ]
+  },
+  "variables": {
+    "new1": {
+      "type": "string",
+      "value": [
+        {
+          "value": "1",
+          "theme": {
+            "Theme": "Default"
+          }
+        },
+        {
+          "value": "111",
+          "theme": {
+            "Theme": "Variant-1"
+          }
+        }
+      ]
+    },
+    "new2": {
+      "type": "string",
+      "value": [
+        {
+          "value": "2",
+          "theme": {
+            "Theme": "Default"
+          }
+        },
+        {
+          "value": "222",
+          "theme": {
+            "Theme": "Variant-1"
+          }
+        }
+      ]
+    }
+  }
+}
