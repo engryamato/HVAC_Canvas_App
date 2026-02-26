@@ -19,6 +19,7 @@
           "x": 0,
           "y": 0,
           "name": "Header Bar",
+          "context": "Main application navigation, containing File/Edit menus and breadcrumbs.",
           "fill": "#FFFFFFD9",
           "width": 1440,
           "height": 48,
@@ -33,6 +34,7 @@
           "x": 0.2612197928654041,
           "y": 48,
           "name": "Dock Rail",
+          "context": "Left sidebar dock giving access to primary application functions like the estimating library.",
           "fill": "#FFFFFF",
           "width": 56,
           "height": 852,
@@ -199,6 +201,7 @@
           "x": 56.261219792865404,
           "y": 48,
           "name": "Service Context Strip",
+          "context": "Indicates the specific engineering system context (Service, System, Zone) currently filtering the calculations.",
           "fill": "#F8FAFC",
           "width": 1064,
           "height": 31,
@@ -239,6 +242,7 @@
           "x": 1120,
           "y": 48,
           "name": "Right Tab Bar",
+          "context": "Right tab bar navigation between Properties, BOM, Calculations, and Validation modes.",
           "fill": "#FFFFFF",
           "width": 320,
           "height": 40,
@@ -335,6 +339,7 @@
           "x": 1014,
           "y": 780.0582524271845,
           "name": "Minimap",
+          "context": "Minimap: Provides a miniaturized view of the entire canvas.",
           "fill": "#FFFFFF",
           "width": 100,
           "height": 83,
@@ -374,6 +379,7 @@
           "x": 1014,
           "y": 871.0485436893204,
           "name": "Zoom Controls",
+          "context": "Zoom Controls: Controls the magnification level of the canvas.",
           "fill": "#FFFFFF",
           "width": 100,
           "height": 29,
@@ -722,7 +728,990 @@
           "name": "Canvas_Calculations",
           "width": 320,
           "height": 808,
-          "layout": "none"
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "2gwKs",
+              "x": 12,
+              "y": 16,
+              "name": "headTitle",
+              "fill": "#0F172A",
+              "content": "Calculations",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "mmPGr",
+              "x": 12,
+              "y": 36,
+              "name": "headSub",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": 288,
+              "content": "Real-time airflow, velocity, pressure and validation feedback organized by air system.",
+              "lineHeight": 1.25,
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "alDEc",
+              "x": 12,
+              "y": 76,
+              "name": "statusCard",
+              "context": "Summarizes system engineering health with an error/warning counter and recalculation timestamp.",
+              "width": 288,
+              "height": 96,
+              "fill": "#F8FAFC",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Z8Wan",
+                  "x": 12,
+                  "y": 12,
+                  "fill": "#334155",
+                  "content": "Calculation Status",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "eV4Ys",
+                  "x": 12,
+                  "y": 32,
+                  "fill": "#0F172A",
+                  "content": "1 Warning · 0 Errors",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "ESShJ",
+                  "x": 12,
+                  "y": 58,
+                  "fill": "#64748B",
+                  "textGrowth": "fixed-width",
+                  "width": 188,
+                  "content": "Last recalculation: 0.3s ago",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 6,
+                  "id": "sp2mR",
+                  "x": 188,
+                  "y": 12,
+                  "fill": "#1D4ED8",
+                  "width": 88,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "1XwuY",
+                  "x": 205,
+                  "y": 20,
+                  "fill": "#FFFFFF",
+                  "content": "Process",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "SsilS",
+                  "x": 12,
+                  "y": 74,
+                  "fill": "#E2E8F0",
+                  "width": 264,
+                  "height": 1
+                },
+                {
+                  "type": "text",
+                  "id": "jRNuy",
+                  "x": 12,
+                  "y": 81,
+                  "fill": "#64748B",
+                  "textGrowth": "fixed-width",
+                  "width": 264,
+                  "content": "Velocity checks run against office limits.",
+                  "lineHeight": 1.2,
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "XVCLA",
+              "x": 12,
+              "y": 186,
+              "name": "hierLabel",
+              "fill": "#334155",
+              "content": "Equipment Hierarchy",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "XUZIP",
+              "x": 12,
+              "y": 204,
+              "name": "hierCard",
+              "context": "Equipment Hierarchy Visualizer: A tree-view indicating the air path from the root equipment to terminal units with visual status dots.",
+              "width": 288,
+              "height": 152,
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "02Ys9",
+                  "x": 12,
+                  "y": 10,
+                  "name": "title",
+                  "fill": "#0F172A",
+                  "textGrowth": "fixed-width-height",
+                  "width": 180,
+                  "height": 18,
+                  "content": "Equipment Hierarchy",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "QrMRE",
+                  "x": 182,
+                  "y": 8,
+                  "name": "warnBg",
+                  "width": 94,
+                  "height": 22,
+                  "fill": "#FEF3C7",
+                  "cornerRadius": 11,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FDE68A"
+                  },
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "2yubn",
+                      "x": 8,
+                      "y": 7,
+                      "name": "warnDot",
+                      "fill": "#F59E0B",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "wKdQ1",
+                      "x": 22,
+                      "y": 4,
+                      "name": "warnText",
+                      "fill": "#92400E",
+                      "textGrowth": "fixed-width-height",
+                      "width": 64,
+                      "height": 14,
+                      "content": "1 warning",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "FOBvK",
+                  "x": 12,
+                  "y": 34,
+                  "name": "sub",
+                  "fill": "#64748B",
+                  "textGrowth": "fixed-width-height",
+                  "width": 264,
+                  "height": 14,
+                  "content": "Supply air path status and active alerts",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "line",
+                  "id": "MKdtn",
+                  "x": 21,
+                  "y": 58,
+                  "name": "trunk",
+                  "width": 1,
+                  "height": 70,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#CBD5E1"
+                  }
+                },
+                {
+                  "type": "line",
+                  "id": "qosWH",
+                  "x": 22,
+                  "y": 69,
+                  "name": "branch1",
+                  "width": 14,
+                  "height": 1,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#CBD5E1"
+                  }
+                },
+                {
+                  "type": "line",
+                  "id": "9YCD9",
+                  "x": 22,
+                  "y": 95,
+                  "name": "branch2",
+                  "width": 26,
+                  "height": 1,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#CBD5E1"
+                  }
+                },
+                {
+                  "type": "line",
+                  "id": "ZtwDu",
+                  "x": 22,
+                  "y": 121,
+                  "name": "branch3",
+                  "width": 26,
+                  "height": 1,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#CBD5E1"
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "N6Syx",
+                  "x": 16,
+                  "y": 64,
+                  "name": "dotRoot",
+                  "fill": "#10B981",
+                  "width": 10,
+                  "height": 10,
+                  "stroke": {
+                    "thickness": 2,
+                    "fill": "#ECFDF5"
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "iK1yG",
+                  "x": 40,
+                  "y": 61,
+                  "name": "rootName",
+                  "fill": "#0F172A",
+                  "textGrowth": "fixed-width-height",
+                  "width": 165,
+                  "height": 14,
+                  "content": "AHU-1 Supply Air",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "b9X6i",
+                  "x": 206,
+                  "y": 61,
+                  "name": "rootMeta",
+                  "fill": "#059669",
+                  "textGrowth": "fixed-width-height",
+                  "width": 70,
+                  "height": 14,
+                  "content": "Online",
+                  "textAlign": "right",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "ellipse",
+                  "id": "P7UuR",
+                  "x": 43,
+                  "y": 90,
+                  "name": "dotChild1",
+                  "fill": "#F59E0B",
+                  "width": 10,
+                  "height": 10,
+                  "stroke": {
+                    "thickness": 2,
+                    "fill": "#FFFBEB"
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "2fykL",
+                  "x": 60,
+                  "y": 87,
+                  "name": "child1Name",
+                  "fill": "#1E293B",
+                  "textGrowth": "fixed-width-height",
+                  "width": 146,
+                  "height": 14,
+                  "content": "SF-1 Fan Section",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "JwA6y",
+                  "x": 170,
+                  "y": 87,
+                  "name": "child1Meta",
+                  "fill": "#B45309",
+                  "textGrowth": "fixed-width-height",
+                  "width": 106,
+                  "height": 14,
+                  "content": "Belt slip risk",
+                  "textAlign": "right",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "ellipse",
+                  "id": "bzlYc",
+                  "x": 43,
+                  "y": 116,
+                  "name": "dotChild2",
+                  "fill": "#10B981",
+                  "width": 10,
+                  "height": 10,
+                  "stroke": {
+                    "thickness": 2,
+                    "fill": "#ECFDF5"
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "5TZvm",
+                  "x": 60,
+                  "y": 113,
+                  "name": "child2Name",
+                  "fill": "#1E293B",
+                  "textGrowth": "fixed-width-height",
+                  "width": 140,
+                  "height": 14,
+                  "content": "CLG-1 Cooling Coil",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "0xY1b",
+                  "x": 188,
+                  "y": 113,
+                  "name": "child2Meta",
+                  "fill": "#64748B",
+                  "textGrowth": "fixed-width-height",
+                  "width": 88,
+                  "height": 14,
+                  "content": "Stable",
+                  "textAlign": "right",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "PM6uF",
+                  "x": 12,
+                  "y": 130,
+                  "name": "footer",
+                  "width": 264,
+                  "height": 16,
+                  "fill": "#F8FAFC",
+                  "cornerRadius": 4,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "VOvOc",
+                      "x": 6,
+                      "y": 6,
+                      "name": "footerDot",
+                      "fill": "#F59E0B",
+                      "width": 4,
+                      "height": 4
+                    },
+                    {
+                      "type": "text",
+                      "id": "tMZeS",
+                      "x": 14,
+                      "y": 0,
+                      "name": "footerText",
+                      "fill": "#475569",
+                      "textGrowth": "fixed-width-height",
+                      "width": 244,
+                      "height": 16,
+                      "content": "Check SF-1 belt tension before airflow recalculation.",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "92sxl",
+              "x": 12,
+              "y": 368,
+              "name": "unitsLabel",
+              "fill": "#334155",
+              "content": "Calculation Units",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "vm7lg",
+              "x": 12,
+              "y": 386,
+              "name": "unitsCard",
+              "context": "Calculation Units: Displays groups of related calculations, organizing the metrics logically.",
+              "width": 288,
+              "height": 148,
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "XEO1Y",
+                  "name": "header",
+                  "width": "fill_container",
+                  "height": 22,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WEHve",
+                      "name": "headerTitle",
+                      "fill": "#334155",
+                      "content": "Calculation Units",
+                      "fontFamily": "Arial",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tE4lE",
+                      "name": "unitPill",
+                      "width": 96,
+                      "height": 22,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      },
+                      "gap": 2,
+                      "padding": 2,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "tSGlI",
+                          "name": "siTab",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#FFFFFF",
+                          "cornerRadius": 4,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "#CBD5E1"
+                          },
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "GQkMT",
+                              "name": "siText",
+                              "fill": "#0F172A",
+                              "content": "SI",
+                              "fontFamily": "Arial",
+                              "fontSize": 10,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "KCUx8",
+                          "name": "ipTab",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#F8FAFC",
+                          "cornerRadius": 4,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "3LLXH",
+                              "name": "ipText",
+                              "fill": "#64748B",
+                              "content": "IP",
+                              "fontFamily": "Arial",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lxpUv",
+                  "name": "rows",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Ba0FK",
+                      "name": "row1",
+                      "width": "fill_container",
+                      "height": 22,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      },
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "EfWOH",
+                          "name": "row1Label",
+                          "fill": "#475569",
+                          "content": "Air Volume",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "l8B1E",
+                          "name": "row1Value",
+                          "fill": "#0F172A",
+                          "content": "CFM  v",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Sqn9o",
+                      "name": "row2",
+                      "width": "fill_container",
+                      "height": 22,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      },
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "uiiTb",
+                          "name": "row2Label",
+                          "fill": "#475569",
+                          "content": "Air Velocity",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "3YRDh",
+                          "name": "row2Value",
+                          "fill": "#0F172A",
+                          "content": "FPM  v",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KZTcA",
+                      "name": "row3",
+                      "width": "fill_container",
+                      "height": 22,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      },
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bFVAl",
+                          "name": "row3Label",
+                          "fill": "#475569",
+                          "content": "Air Pressure",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "MobfE",
+                          "name": "row3Value",
+                          "fill": "#0F172A",
+                          "content": "in.wg  v",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8Tmwe",
+                      "name": "row4",
+                      "width": "fill_container",
+                      "height": 22,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      },
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "le2Gy",
+                          "name": "row4Label",
+                          "fill": "#475569",
+                          "content": "Temperature",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "AShUw",
+                          "name": "row4Value",
+                          "fill": "#0F172A",
+                          "content": "degF  v",
+                          "fontFamily": "Arial",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "xgf7P",
+              "x": 12,
+              "y": 546,
+              "name": "selLabel",
+              "fill": "#334155",
+              "content": "Selected Duct Metrics",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "3XSHH",
+              "x": 12,
+              "y": 564,
+              "name": "selCard",
+              "context": "Selected Duct Metrics: Real-time selection properties detailing Air Volume, Velocity, Static/Dynamic Pressures, and calculated warnings.",
+              "width": 288,
+              "height": 172,
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZKrVH",
+                  "x": 12,
+                  "y": 12,
+                  "fill": "#0F172A",
+                  "content": "Supply Duct • Section B",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "SORTY",
+                  "x": 12,
+                  "y": 28,
+                  "fill": "#64748B",
+                  "content": "Rectangular 300×200 mm • Galvanized steel",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 10,
+                  "id": "kMT8T",
+                  "x": 196,
+                  "y": 10,
+                  "fill": "#FEF3C7",
+                  "width": 80,
+                  "height": 20
+                },
+                {
+                  "type": "text",
+                  "id": "zOH1v",
+                  "x": 216,
+                  "y": 16,
+                  "fill": "#92400E",
+                  "content": "Warning",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "Olxfz",
+                  "x": 10,
+                  "y": 50,
+                  "fill": "#F8FAFC",
+                  "width": 268,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "AB1pB",
+                  "x": 20,
+                  "y": 59,
+                  "fill": "#64748B",
+                  "content": "Air Volume",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "DL5NZ",
+                  "x": 212,
+                  "y": 59,
+                  "fill": "#0F172A",
+                  "content": "620 CFM",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "a9k3l",
+                  "x": 10,
+                  "y": 82,
+                  "fill": "#FFF7ED",
+                  "width": 268,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "r6LSl",
+                  "x": 20,
+                  "y": 91,
+                  "fill": "#9A3412",
+                  "content": "Air Velocity",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "sOtJQ",
+                  "x": 202,
+                  "y": 91,
+                  "fill": "#C2410C",
+                  "content": "1,180 FPM",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "6ICH4",
+                  "x": 10,
+                  "y": 114,
+                  "fill": "#F8FAFC",
+                  "width": 128,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "G2nj8",
+                  "x": 20,
+                  "y": 123,
+                  "fill": "#64748B",
+                  "content": "Static P",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Es5zf",
+                  "x": 82,
+                  "y": 123,
+                  "fill": "#0F172A",
+                  "content": "0.42 in.w.g.",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "Dwtv9",
+                  "x": 150,
+                  "y": 114,
+                  "fill": "#F8FAFC",
+                  "width": 128,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "eM0Yb",
+                  "x": 160,
+                  "y": 123,
+                  "fill": "#64748B",
+                  "content": "Dynamic P",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "WLkt3",
+                  "x": 234,
+                  "y": 123,
+                  "fill": "#0F172A",
+                  "content": "0.09",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "G9fU1",
+                  "x": 12,
+                  "y": 152,
+                  "fill": "#64748B",
+                  "content": "Friction loss: 0.18 in.w.g./100ft  •  VP = (V/4005)^2",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "25DOb",
+              "x": 12,
+              "y": 746,
+              "name": "footerHint",
+              "context": "Provides guidance on status color-coding (green=normal, amber=warning, red=out-of-range).",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": 288,
+              "content": "Status colors: green = normal, amber = warning, red = inappropriate/out-of-range.",
+              "lineHeight": 1.2,
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal"
+            }
+          ]
         },
         {
           "type": "frame",
