@@ -1,0 +1,1507 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": 0,
+      "y": -57.000000000000114,
+      "name": "Frame",
+      "clip": true,
+      "width": 885,
+      "height": 960,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "AW7Vt",
+          "x": 470,
+          "y": 24,
+          "name": "Ductwork Inspector Panel",
+          "context": "Shared Element Transition Panel. The inspector panel that appears when a duct is selected on the canvas. Contains: (1) Hero Header - entity identity and connection context, (2) Properties Stack - all engineering properties for the duct, (3) Transition Details - animation timeline metadata.",
+          "width": 306,
+          "height": 748,
+          "fill": "#F8FAFC",
+          "cornerRadius": 12,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CBD5E1"
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 10,
+          "children": [
+            {
+              "type": "frame",
+              "id": "Pajbh",
+              "name": "Connection Context Header",
+              "context": "Hero Header card. Shows entity identity, transition context, and spatial metadata for the selected duct. White background, light border. Visually anchors the panel context before the dark properties stack.",
+              "width": "fill_container",
+              "height": 182,
+              "fill": "#FFFFFF",
+              "cornerRadius": 10,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "yDMCS",
+                  "x": 14,
+                  "y": 14,
+                  "name": "label",
+                  "context": "Section label: 'SHARED TRANSITION'. All-caps grey Inter 12px with letter-spacing. Identifies this card as the shared element transition context area.",
+                  "fill": "#A1A1AA",
+                  "textGrowth": "fixed-width-height",
+                  "width": 150,
+                  "height": 12,
+                  "content": "SHARED TRANSITION",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "700",
+                  "letterSpacing": 1.5
+                },
+                {
+                  "type": "text",
+                  "id": "A2txp",
+                  "x": 14,
+                  "y": 30,
+                  "name": "title",
+                  "context": "Primary heading: 'Selected Ductwork'. Confirms the entity type currently inspected. Changes to 'Selected Equipment', 'Selected Room' etc. depending on selection.",
+                  "fill": "#18181B",
+                  "textGrowth": "fixed-width-height",
+                  "width": 170,
+                  "height": 19,
+                  "content": "Selected Ductwork",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "OyDU3",
+                  "x": 198,
+                  "y": 14,
+                  "name": "chip",
+                  "context": "ID chip. Blue-bordered pill showing 'ID D-142' — the unique display ID of the selected entity. Background #EFF6FF (blue-50), border #2563EB (blue-600).",
+                  "width": 74,
+                  "height": 24,
+                  "fill": "#EFF6FF",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1.5,
+                    "fill": "#2563EB"
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YMYBG",
+                      "name": "chipText",
+                      "context": "ID chip text. Displays entity's human-readable short ID (format: D-###). Maps to Duct.id formatted for display.",
+                      "fill": "#2563EB",
+                      "textGrowth": "fixed-width-height",
+                      "width": 50,
+                      "height": 14,
+                      "content": "ID D-142",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "SeSqG",
+                  "x": 14,
+                  "y": 58,
+                  "name": "track",
+                  "context": "Transition track. Shows source→target connection: which entity this duct comes from and connects to. Visualizes Duct.props.connectedFrom and Duct.props.connectedTo.",
+                  "width": 258,
+                  "height": 62,
+                  "fill": "#F8FAFC",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "DxAC7",
+                      "x": 8,
+                      "y": 9,
+                      "name": "sourceCard",
+                      "context": "Source card. Shows the upstream entity label and name. White background with subtle border = neutral/source state.",
+                      "width": 80,
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E4E4E7"
+                      },
+                      "layout": "vertical",
+                      "gap": 2,
+                      "padding": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "gzHUS",
+                          "name": "sourceTop",
+                          "context": "Source label: 'SOURCE'. All-caps grey to indicate the upstream entity this duct originates from (Duct.props.connectedFrom).",
+                          "fill": "#A1A1AA",
+                          "textGrowth": "fixed-width-height",
+                          "width": 68,
+                          "height": 12,
+                          "content": "SOURCE",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 1
+                        },
+                        {
+                          "type": "text",
+                          "id": "h5gw3",
+                          "name": "sourceName",
+                          "context": "Source entity name (e.g. 'Duct A1'). Shows the name of the parent entity connected upstream.",
+                          "fill": "#18181B",
+                          "textGrowth": "fixed-width-height",
+                          "width": 68,
+                          "height": 16,
+                          "content": "Duct A1",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "SKoIV",
+                      "x": 118,
+                      "y": 21,
+                      "name": "centerDot",
+                      "context": "Central connector dot. Solid blue ellipse at midpoint of the transition line. Visual node indicating the connection point between source and target.",
+                      "fill": "#2563EB",
+                      "width": 20,
+                      "height": 20
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "HqfNL",
+                      "x": 122,
+                      "y": 25,
+                      "name": "icon",
+                      "context": "Arrow icon between source and target. Lucide 'move-right' icon white on blue dot. Indicates flow direction: source → target.",
+                      "width": 12,
+                      "height": 12,
+                      "iconFontName": "move-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Z8S4L",
+                      "x": 170,
+                      "y": 9,
+                      "name": "targetCard",
+                      "context": "Target card. Shows the downstream entity. Blue border/fill = active target, indicating this is the connection endpoint being evaluated.",
+                      "width": 80,
+                      "height": 44,
+                      "fill": "#EFF6FF",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "thickness": 1.5,
+                        "fill": "#2563EB"
+                      },
+                      "layout": "vertical",
+                      "gap": 2,
+                      "padding": 6,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bbuKL",
+                          "name": "targetTop",
+                          "context": "Target label: 'TARGET'. Blue color indicating active endpoint. Maps to Duct.props.connectedTo entity.",
+                          "fill": "#2563EB",
+                          "textGrowth": "fixed-width-height",
+                          "width": 68,
+                          "height": 12,
+                          "content": "TARGET",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 1
+                        },
+                        {
+                          "type": "text",
+                          "id": "87ze6",
+                          "name": "targetName",
+                          "context": "Target entity name (e.g. 'Plenum B4'). Bold to differentiate from source — this is the active connection endpoint.",
+                          "fill": "#18181B",
+                          "textGrowth": "fixed-width-height",
+                          "width": 68,
+                          "height": 16,
+                          "content": "Plenum B4",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "line",
+                      "id": "BfHqY",
+                      "x": 88,
+                      "y": 31,
+                      "name": "lineL",
+                      "context": "Left connector line. Blue stroke connecting the source card to the central dot. Part of the source → target visual flow path.",
+                      "width": 30,
+                      "height": 0,
+                      "stroke": {
+                        "thickness": 1.5,
+                        "fill": "#2563EB"
+                      }
+                    },
+                    {
+                      "type": "line",
+                      "id": "hgAqm",
+                      "x": 138,
+                      "y": 31,
+                      "name": "lineR",
+                      "context": "Right connector line. Blue stroke connecting the central dot to the target card. Part of the source → target visual flow path.",
+                      "width": 32,
+                      "height": 0,
+                      "stroke": {
+                        "thickness": 1.5,
+                        "fill": "#2563EB"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ForRp",
+                  "x": 14,
+                  "y": 134,
+                  "name": "ctx",
+                  "context": "Spatial context bar. Shows zone, floor level, and HVAC system type in compact key-value format. Provides quick orientation for the selected duct's location in the building model.",
+                  "width": 258,
+                  "height": 24,
+                  "gap": 8,
+                  "padding": [
+                    8,
+                    0,
+                    0,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "rIT5L",
+                      "name": "ctx1",
+                      "context": "Zone label: 'ZONE: NORTH'. Identifies which building zone this duct serves. Maps to service assignment / zone grouping in the project.",
+                      "fill": "#71717A",
+                      "textGrowth": "fixed-width-height",
+                      "width": 86,
+                      "height": 14,
+                      "content": "ZONE: NORTH",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 0.8
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "GWzEL",
+                      "name": "div1",
+                      "context": "Vertical divider between zone and level labels. 1px grey rectangle used as a visual separator in the context bar.",
+                      "fill": "#E4E4E7",
+                      "width": 1,
+                      "height": 12
+                    },
+                    {
+                      "type": "text",
+                      "id": "fhR5K",
+                      "name": "ctx2",
+                      "context": "Level label: 'LEVEL: L2'. Identifies the floor/level of this duct section. Helps disambiguate ducts with similar IDs across multiple floors.",
+                      "fill": "#71717A",
+                      "textGrowth": "fixed-width-height",
+                      "width": 68,
+                      "height": 14,
+                      "content": "LEVEL: L2",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 0.8
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "VOVg5",
+                      "name": "div2",
+                      "context": "Vertical divider between level and system labels. 1px grey separator.",
+                      "fill": "#E4E4E7",
+                      "width": 1,
+                      "height": 12
+                    },
+                    {
+                      "type": "text",
+                      "id": "01Y2D",
+                      "name": "ctx3",
+                      "context": "System label: 'SYSTEM: SUP'. Shows the active HVAC service type: SUP=Supply, RET=Return, EXH=Exhaust. Maps to FR-SERV-002 Service Assignment.",
+                      "fill": "#71717A",
+                      "textGrowth": "fixed-width-height",
+                      "width": 64,
+                      "height": 14,
+                      "content": "SYS: SUP",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 0.8
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "m3NI9",
+              "name": "Duct Properties Stack",
+              "context": "Dark terminal-style properties panel. Shows all engineering fields for the currently selected duct entity. Background #212121, vertical layout with 10px padding and 6px gap between rows.",
+              "clip": true,
+              "width": "fill_container",
+              "height": 540,
+              "fill": "#FFFFFF",
+              "cornerRadius": 12,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZidwB",
+                  "name": "Properties Header",
+                  "context": "Panel header row. Shows 'DUCT_PROPERTIES' title (Oswald bold) on the left and '// selected' tag (JetBrains Mono) on the right. Indicates the panel is in selection/read mode.",
+                  "width": "fill_container",
+                  "height": 24,
+                  "padding": [
+                    0,
+                    0,
+                    8,
+                    0
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZTfWz",
+                      "name": "labelTitle",
+                      "context": "Panel title label. Uses Oswald 600 white text. Always reads 'DUCT_PROPERTIES' to identify this as the duct inspector panel.",
+                      "fill": "#0F172A",
+                      "content": "DUCT_PROPERTIES",
+                      "lineHeight": 1,
+                      "fontFamily": "Oswald",
+                      "fontSize": 13,
+                      "fontWeight": "800",
+                      "letterSpacing": 0.4
+                    },
+                    {
+                      "type": "text",
+                      "id": "bwcbU",
+                      "name": "labelTag",
+                      "context": "State tag. JetBrains Mono 9px grey. Reads '// selected' to indicate a duct entity is currently selected on canvas.",
+                      "fill": "#94A3B8",
+                      "content": "// selected",
+                      "lineHeight": 1,
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 9,
+                      "fontWeight": "normal",
+                      "letterSpacing": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 1,
+                  "id": "6gEoF",
+                  "name": "divider",
+                  "context": "Horizontal divider line (#3D3D3D). Separates the header from the property rows below.",
+                  "fill": "#F1F5F9",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "wr35C",
+                  "name": "Properties Rows",
+                  "context": "Vertical stack of all property rows. vertical layout, fill_container, gap 4px. Contains 11 data rows plus the warning banner.",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "tdxuR",
+                      "name": "hdr_system",
+                      "width": "fill_container",
+                      "height": 20,
+                      "gap": 4,
+                      "padding": [
+                        8,
+                        6,
+                        2,
+                        6
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "7fLgT",
+                          "name": "hdr_system_label",
+                          "fill": "#64748B",
+                          "content": "SYSTEM DATA",
+                          "fontFamily": "Inter",
+                          "fontSize": 8,
+                          "fontWeight": "700",
+                          "letterSpacing": 1.2
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "r1V6h",
+                          "name": "hdr_system_line",
+                          "fill": "#E2E8F0",
+                          "width": "fill_container",
+                          "height": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fY9Kt",
+                      "name": "row_cfm_origin",
+                      "context": "Property row: cfm_origin. The room or zone that is the source of the airflow demand. Maps to Duct.props.connectedFrom entity via the Room.calculated.requiredCFM field. This is where the 1,240 CFM demand originates.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "iDUhP",
+                          "name": "label_cfm_origin",
+                          "context": "Row label: 'cfm_origin'. Identifies the room or zone entity supplying the airflow demand to this duct.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Origin Room",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "HRgxw",
+                          "name": "val_cfm_origin",
+                          "context": "Value chip: cfm_origin. Contains the name of the source room or zone entity.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "K2hZO",
+                              "name": "text_cfm_origin",
+                              "context": "Value text: source room name (e.g. 'Room 101'). This room's requiredCFM drives the airflow_cfm value for this duct section.",
+                              "fill": "#0F172A",
+                              "content": "Room 101",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "7oKbM",
+                          "name": "status_cfm_origin",
+                          "context": "Status dot for cfm_origin. Green = a valid connected room entity exists. Red = duct has no room origin assigned.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "eolXj",
+                      "name": "row_source_equip",
+                      "context": "Property row: source_equip. The air handling unit or fan driving airflow through this duct. Maps to Duct.props.connectedFrom equipment entity. Determines system pressure class and service type.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "iQAem",
+                          "name": "label_source_equip",
+                          "context": "Row label: 'source_equip'. Identifies the equipment entity (AHU, fan, etc.) that this duct section belongs to. Used to group ducts by Air System hierarchy per FR-UI-003.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Source System",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pjpHk",
+                          "name": "val_source_equip",
+                          "context": "Value chip: source_equip. Contains the equipment name.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "PfSA1",
+                              "name": "text_source_equip",
+                              "context": "Value text: equipment name (e.g. 'AHU-2'). The AHU or fan entity. Its CFM capacity and static pressure rating constrain this duct's design parameters.",
+                              "fill": "#0F172A",
+                              "content": "AHU-2",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "9XGPo",
+                          "name": "status_source_equip",
+                          "context": "Status dot for source_equip. Green = a valid connected equipment entity exists. Red = duct is an orphan with no parent equipment assigned.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LclTg",
+                      "name": "row8",
+                      "context": "Property row 6: material. Duct sheet metal material type. Maps to Duct.props.material (DuctMaterial enum) in PRD schema.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "0xiRN",
+                          "name": "r8l",
+                          "context": "Row label: 'material'. Maps to Duct.props.material. Determines roughness factor ε used in Colebrook-White friction calculation.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Material",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "3W73R",
+                          "name": "r8v",
+                          "context": "Value chip frame for material.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "PwtXn",
+                              "name": "r8t",
+                              "context": "Value text: material type (e.g. 'galvanized'). Valid values per PRD DuctMaterial: galvanized, stainless, aluminum, flex, carbon_steel, black_iron, double_wall_insulated, aluminized_steel.",
+                              "fill": "#0F172A",
+                              "content": "galvanized",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "bCkZU",
+                          "name": "r8s",
+                          "context": "Status dot for material. Green = recognized material with known roughness factor on file.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iTQap",
+                      "name": "hdr_geometry",
+                      "width": "fill_container",
+                      "height": 20,
+                      "gap": 4,
+                      "padding": [
+                        10,
+                        6,
+                        2,
+                        6
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "AiB1u",
+                          "name": "hdr_geo_label",
+                          "fill": "#64748B",
+                          "content": "GEOMETRY",
+                          "fontFamily": "Inter",
+                          "fontSize": 8,
+                          "fontWeight": "700",
+                          "letterSpacing": 1.2
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "4YlJy",
+                          "name": "hdr_geo_line",
+                          "fill": "#E2E8F0",
+                          "width": "fill_container",
+                          "height": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rae7A",
+                      "name": "row2",
+                      "context": "Property row 2: shape. Shows duct cross-section shape: 'round' or 'rectangular'. Matches Duct.props.shape in PRD schema.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "KLqn5",
+                          "name": "r2l",
+                          "context": "Row label: 'shape'. Maps to Duct.props.shape ('round' | 'rectangular'). Fixed-width 86px.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Shape",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "3ALAL",
+                          "name": "r2v",
+                          "context": "Value chip frame for shape. Contains shape type text.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "lgaZj",
+                              "name": "r2t",
+                              "context": "Value text: shape value ('round' or 'rectangular'). White JetBrains Mono 12px.",
+                              "fill": "#0F172A",
+                              "content": "rectangular",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "TD7cL",
+                          "name": "r2s",
+                          "context": "Status dot for shape. Green = valid shape set. Would turn red if shape is undefined.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "M3JK6",
+                      "name": "row3",
+                      "context": "Property row 3: width_in. Duct width in inches. Only applicable when shape='rectangular'. Matches Duct.props.width in PRD.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "BF5L3",
+                          "name": "r3l",
+                          "context": "Row label: 'width_in'. Maps to Duct.props.width (inches). Displayed only when shape is rectangular.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Width (in)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "l2yqo",
+                          "name": "r3v",
+                          "context": "Value chip frame for width_in. Contains the duct width value in inches.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "7R3CG",
+                              "name": "r3t",
+                              "context": "Value text: duct width in inches (e.g. '18'). Realistic HVAC range: 4–96 inches.",
+                              "fill": "#0F172A",
+                              "content": "18",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "ZTXsp",
+                          "name": "r3s",
+                          "context": "Status dot for width_in. Green = value within ASHRAE recommended range.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ni7nu",
+                      "name": "row4",
+                      "context": "Property row 4: height_in. Duct height in inches. Only applicable when shape='rectangular'. Maps to Duct.props.height in PRD.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "stvKO",
+                          "name": "r4l",
+                          "context": "Row label: 'height_in'. Maps to Duct.props.height (inches). For round ducts, this row is hidden and diameter_in is shown instead.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Height (in)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ahlvw",
+                          "name": "r4v",
+                          "context": "Value chip frame for height_in.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "99JS8",
+                              "name": "r4t",
+                              "context": "Value text: duct height in inches (e.g. '12'). Realistic HVAC range: 4–48 inches. Multiply width×height to get area.",
+                              "fill": "#0F172A",
+                              "content": "12",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "K4eKE",
+                          "name": "r4s",
+                          "context": "Status dot for height_in. Green = value within recommended range.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bjMAt",
+                      "name": "row7",
+                      "context": "Property row 5: length_ft. Duct section length in feet. Maps to Duct.props.length in PRD. Used for friction loss calculation.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "po1KH",
+                          "name": "r7l",
+                          "context": "Row label: 'length_ft'. Maps to Duct.props.length (feet). Used in FR-CALC-007 (Friction Loss = f × L/D × VP).",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Length (ft)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "P7piB",
+                          "name": "r7v",
+                          "context": "Value chip frame for length_ft.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "HYumb",
+                              "name": "r7t",
+                              "context": "Value text: duct section length in feet (e.g. '14.5'). Feeds directly into pressure drop calculation ΔP = f × (L/D) × (V/4005)².",
+                              "fill": "#0F172A",
+                              "content": "14.5",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "0Hg0e",
+                          "name": "r7s",
+                          "context": "Status dot for length_ft. Green = valid length specified.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "V6Xbk",
+                      "name": "row11",
+                      "context": "Property row 11: area_sq_in. Cross-sectional duct area in square inches. Maps to Duct.calculated.area. Derived from width_in × height_in for rectangular ducts.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "L0jE8",
+                          "name": "r11l",
+                          "context": "Row label: 'area_sq_in'. Maps to Duct.calculated.area (sq in). Formula: area = width × height (rectangular) or π×(d/2)² (round).",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Area (in²)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "TGCb2",
+                          "name": "r11v",
+                          "context": "Value chip frame for area_sq_in.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "kBie5",
+                              "name": "r11t",
+                              "context": "Value text: cross-sectional area in sq in (e.g. '216.0'). 18in × 12in = 216 sq in. Used in velocity formula: V = CFM × 144 / area per FR-CALC-003.",
+                              "fill": "#0F172A",
+                              "content": "216.0",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "G0lDq",
+                          "name": "r11s",
+                          "context": "Status dot for area_sq_in. Green = calculated area is valid and within physically reasonable range.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Xd06o",
+                      "name": "hdr_engineering",
+                      "width": "fill_container",
+                      "height": 20,
+                      "gap": 4,
+                      "padding": [
+                        10,
+                        6,
+                        2,
+                        6
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "g09mS",
+                          "name": "hdr_eng_label",
+                          "fill": "#64748B",
+                          "content": "ENGINEERING",
+                          "fontFamily": "Inter",
+                          "fontSize": 8,
+                          "fontWeight": "700",
+                          "letterSpacing": 1.2
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "95giW",
+                          "name": "hdr_eng_line",
+                          "fill": "#E2E8F0",
+                          "width": "fill_container",
+                          "height": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ABeel",
+                      "name": "row5",
+                      "context": "Property row 7: airflow_cfm. Air volume flow rate in CFM. Maps to Duct.props.airflow (canonical PRD field name). The primary design input driving all downstream calculations.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "JBSm5",
+                          "name": "r5l",
+                          "context": "Row label: 'airflow_cfm'. Maps to Duct.props.airflow (CFM). Per FR-UI-003 unit dropdown: English default is CFM.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Airflow (CFM)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "h6WLe",
+                          "name": "r5v",
+                          "context": "Value chip frame for airflow_cfm.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DWipP",
+                              "name": "r5t",
+                              "context": "Value text: airflow in CFM (e.g. '1,240'). This drives velocity calculation: V = CFM × 144 / area_sq_in per FR-CALC-003.",
+                              "fill": "#0F172A",
+                              "content": "1,240",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "vgXHT",
+                          "name": "r5s",
+                          "context": "Status dot for airflow_cfm. Green = airflow within design range. Would turn red if airflow would cause velocity to exceed max service velocity constraint.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "o0jx0",
+                      "name": "row6",
+                      "context": "Property row 8: velocity_fpm. Calculated air velocity in FPM. Maps to Duct.calculated.velocity. Formula: V = CFM × 144 / area. Shows warning if exceeds service or room noise limit.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#FFFBEB",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "3jNkL",
+                          "name": "r6l",
+                          "context": "Row label: 'velocity_fpm'. Maps to Duct.calculated.velocity (FPM). Per FR-UI-003 unit dropdown: English default is FPM.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Velocity (FPM)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "s2xlx",
+                          "name": "r6v",
+                          "context": "Value chip frame for velocity_fpm.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#FEF3C7",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "2vby7",
+                              "name": "r6t",
+                              "context": "Value text: velocity in FPM (e.g. '827'). Calculated from CFM × 144 / area_sq_in per FR-CALC-003. Value above 800 FPM triggers WARNING per this duct's room noise constraint.",
+                              "fill": "#92400E",
+                              "content": "827",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "s8109",
+                          "name": "r6s",
+                          "context": "Status dot for velocity_fpm. Yellow (#EAB308) = Warning — velocity exceeds room design target but is not a hard error. Per PRD FR-UI-003: Yellow = Warning, Red = Inappropriate.",
+                          "fill": "#EAB308",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Xbf6H",
+                      "name": "row9",
+                      "context": "Property row 9: static_press. Static pressure in in.w.g. Maps to Duct.props.staticPressure. Used in system pressure drop calculations and fan selection.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "x933l",
+                          "name": "r9l",
+                          "context": "Row label: 'static_press'. Maps to Duct.props.staticPressure (in.w.g.). Per FR-UI-003, Air Pressure units: English = in. W.C. | Metric = Pa.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Static (in.w.g.)",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "qZqq8",
+                          "name": "r9v",
+                          "context": "Value chip frame for static_press.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ay3jm",
+                              "name": "r9t",
+                              "context": "Value text: static pressure in in.w.g. (e.g. '0.42'). Represents accumulated pressure loss to this duct section from the fan outlet.",
+                              "fill": "#0F172A",
+                              "content": "0.42",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "CWwze",
+                          "name": "r9s",
+                          "context": "Status dot for static_press. Green = within design static pressure budget.",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "U0IqJ",
+                      "name": "row10",
+                      "context": "Property row 10: fric_loss_100. Friction loss per 100 feet in in.w.g. Maps to Duct.calculated.frictionLoss. Calculated via FR-CALC-007 (Colebrook-White / Swamee-Jain).",
+                      "width": "fill_container",
+                      "height": 24,
+                      "fill": "#F8FAFC",
+                      "cornerRadius": 6,
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "pEOdB",
+                          "name": "r10l",
+                          "context": "Row label: 'fric_loss_100'. Maps to Duct.calculated.frictionLoss (in.w.g./100ft). Formula: ΔP = f × (L/D) × (V/4005)². Depends on material roughness ε.",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 100,
+                          "content": "Frict. Loss (/100')",
+                          "lineHeight": 1,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "9GiYG",
+                          "name": "r10v",
+                          "context": "Value chip frame for fric_loss_100.",
+                          "width": "fill_container",
+                          "height": 16,
+                          "fill": "#F1F5F9",
+                          "cornerRadius": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "vJpqT",
+                              "name": "r10t",
+                              "context": "Value text: friction loss per 100ft (e.g. '0.08' in.w.g./100ft). Typical design target for HVAC systems is 0.08–0.10 in.w.g./100ft.",
+                              "fill": "#0F172A",
+                              "content": "0.08",
+                              "lineHeight": 1,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "HrzYq",
+                          "name": "r10s",
+                          "context": "Status dot for fric_loss_100. Green = friction rate within standard ASHRAE design range (0.05–0.15 in.w.g./100ft).",
+                          "fill": "#22C55E",
+                          "width": 6,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "O5bCE",
+                      "name": "Velocity Warning Banner",
+                      "context": "Warning banner. Appears when any calculated property exceeds a design limit. Yellow color (#EAB308) per PRD FR-UI-003 (Warning). Tappable in production to highlight the issue source on canvas.",
+                      "width": "fill_container",
+                      "height": 20,
+                      "fill": "#FEFCE8",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FDE68A"
+                      },
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 1,
+                          "id": "rr4vB",
+                          "name": "warnDot",
+                          "context": "Warning dot icon — small yellow square matching the row's status dot color. Reinforces the warning color coding at-a-glance.",
+                          "fill": "#A16207",
+                          "width": 6,
+                          "height": 6
+                        },
+                        {
+                          "type": "text",
+                          "id": "vpRzR",
+                          "name": "warnText",
+                          "context": "Warning message text. Identifies the specific constraint violation. Format: '[WARNING] {metric} > {limit} {unit} design target'. Maps to FR-UI-006 interactive toast warning pattern.",
+                          "fill": "#A16207",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "[WARNING] velocity > 800 fpm design target",
+                          "lineHeight": 1,
+                          "fontFamily": "JetBrains Mono",
+                          "fontSize": 9,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "dXA6m",
+          "x": 88,
+          "y": 206,
+          "name": "Selected Duct Element",
+          "context": "Selected Duct Element chip. Shows a compact summary of the selected duct on the canvas surface itself: entity name, size pill, and key calculated values (CFM and velocity). Blue (#EFF6FF) background indicates Supply service per FR-SERV-002 color coding.",
+          "width": 220,
+          "height": 96,
+          "fill": "#EFF6FF",
+          "cornerRadius": 12,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#93C5FD"
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "ZDFOh",
+              "x": 14,
+              "y": 12,
+              "context": "Selected duct name label. Shows 'Selected: {duct name}' on the canvas chip. Dark blue text (#1E3A8A) matching the Supply service color scheme.",
+              "fill": "#1E3A8A",
+              "textGrowth": "fixed-width",
+              "width": 190,
+              "content": "Selected: Supply Duct SD-14A",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 999,
+              "id": "DZ4XA",
+              "x": 14,
+              "y": 38,
+              "context": "Size pill background. Rounded rectangle in Supply blue (#3B82F6). Contains the duct dimensions text showing width × height in inches.",
+              "fill": "#3B82F6",
+              "width": 148,
+              "height": 20
+            },
+            {
+              "type": "text",
+              "id": "hIECw",
+              "x": 52,
+              "y": 42,
+              "context": "Size pill text. Shows duct cross-section as 'width\" × height\"' in inches. Matches width_in and height_in properties in the Properties Stack.",
+              "fill": "#FFFFFF",
+              "textGrowth": "fixed-width",
+              "width": 80,
+              "content": "18\" × 12\"",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "cPCUc",
+              "x": 14,
+              "y": 66,
+              "context": "Key metrics row. Shows the two most critical calculated values in compact format: CFM (airflow) and FPM (velocity). Maps to Duct.props.airflow and Duct.calculated.velocity. Consistent with values shown in Properties Stack.",
+              "fill": "#475569",
+              "textGrowth": "fixed-width",
+              "width": 190,
+              "content": "CFM 1,240 · Velocity 827 FPM",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "line",
+          "id": "r7w5H",
+          "x": 308,
+          "y": 254,
+          "width": 150,
+          "height": 0,
+          "stroke": {
+            "thickness": 2,
+            "fill": "#60A5FA"
+          }
+        },
+        {
+          "type": "icon_font",
+          "id": "3HiYr",
+          "x": 452,
+          "y": 247,
+          "width": 18,
+          "height": 18,
+          "iconFontName": "arrow-right",
+          "iconFontFamily": "lucide",
+          "fill": "#2563EB"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4452 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "m7a76",
+      "x": -337.2612197928654,
+      "y": -150,
+      "name": "Canvas (Editor)",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "#E2E8F0",
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "00vRU",
+          "x": 0,
+          "y": 0,
+          "name": "Header Bar",
+          "fill": "#FFFFFFD9",
+          "width": 1440,
+          "height": 48,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "HmY6f",
+          "x": 0.2612197928654041,
+          "y": 48,
+          "name": "Dock Rail",
+          "fill": "#FFFFFF",
+          "width": 56,
+          "height": 852,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 8,
+          "id": "E9vLT",
+          "x": 8,
+          "y": 64,
+          "name": "Estimating Library",
+          "fill": "#EFF6FF",
+          "width": 40,
+          "height": 40,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#BFDBFE"
+          }
+        },
+        {
+          "type": "text",
+          "id": "XVGSU",
+          "x": 20,
+          "y": 74,
+          "name": "Assets Icon",
+          "fill": "#3B82F6",
+          "content": "📦",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "jM9Zz",
+          "x": 16,
+          "y": 10,
+          "name": "Logo Icon",
+          "fill": "#3B82F6",
+          "width": 28,
+          "height": 28
+        },
+        {
+          "type": "text",
+          "id": "LK1yl",
+          "x": 52,
+          "y": 16,
+          "name": "Logo Text",
+          "fill": "#1E293B",
+          "content": "HVAC Pro",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "rectangle",
+          "id": "kH25g",
+          "x": 140,
+          "y": 14,
+          "name": "Divider 1",
+          "fill": "#E2E8F0",
+          "width": 1,
+          "height": 20
+        },
+        {
+          "type": "text",
+          "id": "rLcTB",
+          "x": 152,
+          "y": 16,
+          "name": "Menu: File",
+          "fill": "#1E293B",
+          "content": "File",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "OHl4V",
+          "x": 194,
+          "y": 16,
+          "name": "Menu: Edit",
+          "fill": "#1E293B",
+          "content": "Edit",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "MMAfS",
+          "x": 236,
+          "y": 16,
+          "name": "Menu: View",
+          "fill": "#1E293B",
+          "content": "View",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "HDtxf",
+          "x": 282,
+          "y": 16,
+          "name": "Menu: Help",
+          "fill": "#1E293B",
+          "content": "Help",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "WqIob",
+          "x": 330,
+          "y": 14,
+          "name": "Divider 2",
+          "fill": "#E2E8F0",
+          "width": 1,
+          "height": 20
+        },
+        {
+          "type": "text",
+          "id": "JpjYE",
+          "x": 342,
+          "y": 16,
+          "name": "Breadcrumb",
+          "fill": "#64748B",
+          "content": "⌂ Dashboard  ›  Office Block A - Level 1",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 5,
+          "id": "i4gOs",
+          "x": 1400,
+          "y": 10,
+          "name": "Settings Button Area",
+          "width": 28,
+          "height": 28
+        },
+        {
+          "type": "text",
+          "id": "TMt52",
+          "x": 17.261219792865404,
+          "y": 867,
+          "name": "Settings Icon",
+          "fill": "#64748B",
+          "content": "⚙",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "I9e1A",
+          "x": 56.261219792865404,
+          "y": 48,
+          "name": "Service Context Strip",
+          "fill": "#F8FAFC",
+          "width": 1064,
+          "height": 31,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#60A5FA"
+          }
+        },
+        {
+          "type": "text",
+          "id": "sO7Xa",
+          "x": 72.2612197928654,
+          "y": 58,
+          "name": "Service Context Text",
+          "fill": "#3B82F6",
+          "content": "Service: Supply Air  ·  System: AHU-01  ·  Zone: Level 1 Office",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "id": "DGUN5",
+          "x": 1120,
+          "y": 48,
+          "name": "Right Sidebar",
+          "fill": "#FFFFFF",
+          "width": 320,
+          "height": 848,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "id": "bw7Mm",
+          "x": 1120,
+          "y": 48,
+          "name": "Right Tab Bar",
+          "fill": "#FFFFFF",
+          "width": 320,
+          "height": 40,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 5,
+          "id": "PNgpX",
+          "x": 1335.2612197928654,
+          "y": 58,
+          "name": "Tab: Calculations (active)",
+          "fill": "#DBEAFE",
+          "width": 65,
+          "height": 26
+        },
+        {
+          "type": "text",
+          "id": "JySvs",
+          "x": 1138,
+          "y": 63,
+          "name": "Tab: Properties Text",
+          "fill": "#94A3B8",
+          "content": "Properties",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "GCQ15",
+          "x": 1214,
+          "y": 63,
+          "name": "Tab: BOM Text",
+          "fill": "#64748B",
+          "content": "BOM",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "AJz6f",
+          "x": 1254,
+          "y": 63,
+          "name": "Tab: Calculations Text",
+          "fill": "#64748b",
+          "content": "Calculations",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "G5vLw",
+          "x": 1340,
+          "y": 63,
+          "name": "Tab: Validation Text",
+          "fill": "#1d4ed8",
+          "content": "Validation",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 4,
+          "id": "3LH7v",
+          "x": 1412,
+          "y": 54,
+          "name": "Collapse Btn",
+          "width": 24,
+          "height": 24
+        },
+        {
+          "type": "text",
+          "id": "NxcqA",
+          "x": 1415,
+          "y": 60,
+          "name": "Collapse Icon",
+          "fill": "#64748B",
+          "content": "›",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "HGi3D",
+          "x": 1014,
+          "y": 780.0582524271845,
+          "name": "Minimap",
+          "fill": "#FFFFFF",
+          "width": 100,
+          "height": 83,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 5,
+          "id": "u1pQa",
+          "x": 1016,
+          "y": 782.126213592233,
+          "name": "Minimap Content",
+          "fill": "#F8FAFC",
+          "width": 96,
+          "height": 79
+        },
+        {
+          "type": "rectangle",
+          "id": "L2Zck",
+          "x": 1026,
+          "y": 794.5339805825242,
+          "name": "Minimap Viewport Indicator",
+          "width": 66,
+          "height": 45,
+          "stroke": {
+            "thickness": 1.5,
+            "fill": "#3B82F6"
+          }
+        },
+        {
+          "type": "rectangle",
+          "cornerRadius": 6,
+          "id": "nFn1O",
+          "x": 1014,
+          "y": 871.0485436893204,
+          "name": "Zoom Controls",
+          "fill": "#FFFFFF",
+          "width": 100,
+          "height": 29,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          }
+        },
+        {
+          "type": "text",
+          "id": "9i6nT",
+          "x": 1022,
+          "y": 878.2864077669902,
+          "name": "Zoom Out",
+          "fill": "#64748B",
+          "textGrowth": "fixed-width-height",
+          "width": 11,
+          "height": 20,
+          "content": "−",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "PM0gd",
+          "x": 1045,
+          "y": 880.3543689320388,
+          "name": "Zoom %",
+          "fill": "#1E293B",
+          "textGrowth": "fixed-width-height",
+          "width": 32,
+          "height": 16,
+          "content": "100%",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "yIpiN",
+          "x": 1098,
+          "y": 878.2864077669902,
+          "name": "Zoom In",
+          "fill": "#64748B",
+          "textGrowth": "fixed-width-height",
+          "width": 11,
+          "height": 20,
+          "content": "+",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "MZWrH",
+          "x": 72,
+          "y": 880,
+          "name": "Cursor Position",
+          "fill": "#1E293B",
+          "content": "X: 412  Y: 298",
+          "fontFamily": "monospace",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "uqvVB",
+          "x": 640,
+          "y": 880,
+          "name": "Zoom Level",
+          "fill": "#1E293B",
+          "content": "Zoom: 100%",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "skzAg",
+          "x": 728,
+          "y": 880,
+          "name": "Divider",
+          "fill": "#CBD5E1",
+          "content": "|",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "v9do8",
+          "x": 744,
+          "y": 880,
+          "name": "Grid Status",
+          "fill": "#3B82F6",
+          "content": "Grid: On",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "7xddA",
+          "x": 820,
+          "y": 880,
+          "name": "Divider 2",
+          "fill": "#CBD5E1",
+          "content": "|",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "Sb6FH",
+          "x": 836,
+          "y": 880,
+          "name": "Snap Status",
+          "fill": "#3B82F6",
+          "content": "Snap: On",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "text",
+          "id": "IPpSl",
+          "x": 927.2612197928654,
+          "y": 879,
+          "name": "Selection Count",
+          "fill": "#64748B",
+          "content": "No selection",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "YdFgE",
+          "x": 56,
+          "y": 48,
+          "name": "Canvas_Estimating_Library",
+          "width": 320,
+          "height": 852,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "0qzJ4",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_Properties",
+          "width": 320,
+          "height": 808,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "pthpm",
+              "x": 12,
+              "y": 16,
+              "name": "Inspector Title",
+              "fill": "#1E293B",
+              "content": "Element Properties",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "xKGEG",
+              "x": 12,
+              "y": 36,
+              "name": "No Selection Hint",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 80,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "d4bw8",
+              "x": 80,
+              "y": 70,
+              "name": "No Selection Hint Text",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": 160,
+              "content": "Select an element\nto view properties",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "eGOxx",
+              "x": 12,
+              "y": 132,
+              "name": "Duct Props Heading",
+              "fill": "#1E293B",
+              "content": "Duct Properties",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "IgDjU",
+              "x": 12,
+              "y": 154,
+              "name": "Field: Width",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "UUl8H",
+              "x": 20,
+              "y": 164,
+              "name": "Field Label: Width",
+              "fill": "#64748B",
+              "content": "Width (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "tqbPG",
+              "x": 216,
+              "y": 164,
+              "name": "Field Value: Width",
+              "fill": "#1E293B",
+              "content": "300",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "Sgqvm",
+              "x": 12,
+              "y": 194,
+              "name": "Field: Height",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "3RGJx",
+              "x": 20,
+              "y": 204,
+              "name": "Field Label: Height",
+              "fill": "#64748B",
+              "content": "Height (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "X79lf",
+              "x": 216,
+              "y": 204,
+              "name": "Field Value: Height",
+              "fill": "#1E293B",
+              "content": "200",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "QJKLa",
+              "x": 12,
+              "y": 234,
+              "name": "Field: Material",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "6hyub",
+              "x": 20,
+              "y": 244,
+              "name": "Field Label: Material",
+              "fill": "#64748B",
+              "content": "Material",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "dPJHm",
+              "x": 160,
+              "y": 244,
+              "name": "Field Value: Material",
+              "fill": "#1E293B",
+              "content": "Galvanised Steel",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RmSby",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_BOM",
+          "width": 320,
+          "height": 808,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "9CIv2",
+          "x": 1120,
+          "y": 88,
+          "name": "Canvas_Calculations",
+          "width": 320,
+          "height": 808,
+          "fill": "#F8FAFC",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "j4SZI",
+              "name": "panelHeader",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "vskNq",
+                  "fill": "#0F172A",
+                  "content": "Calculations",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "dj7ye",
+                  "fill": "#94A3B8",
+                  "content": "System health, capacity, and ductwork analysis.",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "f4VFk",
+              "name": "divider0",
+              "fill": "#E2E8F0",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "9Hfy7",
+              "name": "sec1Header",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "9CtnA",
+                  "fill": "#94A3B8",
+                  "content": "SYSTEM STATUS",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "AiLO7",
+                  "fill": "#D97706",
+                  "content": "2 Warnings",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FOolq",
+              "name": "sec1Card",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "yCG4U",
+                  "name": "row1a",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    8,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "tatZI",
+                      "fill": "#D97706",
+                      "content": "⚠",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iN4eU",
+                      "name": "col1a",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "kn4nz",
+                          "fill": "#1E293B",
+                          "content": "Return Air Path Missing",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "h7kVo",
+                          "fill": "#64748B",
+                          "content": "Connect AHU-01 return duct to close the airflow loop.",
+                          "lineHeight": 1.35,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "ySoEn",
+                  "name": "div1a",
+                  "enabled": false,
+                  "fill": "#F1F5F9",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "MXIMT",
+                  "name": "row1b",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    8,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "6HBun",
+                      "fill": "#D97706",
+                      "content": "⚠",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "nb1pw",
+                      "name": "col1b",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NF5Cx",
+                          "fill": "#1E293B",
+                          "content": "Exhaust Fan Missing",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "AAWTK",
+                          "fill": "#64748B",
+                          "content": "Add an exhaust fan for toilet and pantry zones.",
+                          "lineHeight": 1.35,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "VE97d",
+                  "name": "div1b",
+                  "enabled": false,
+                  "fill": "#F1F5F9",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "gCmOY",
+                  "name": "row1c",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    8,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "t90Rl",
+                      "fill": "#16A34A",
+                      "content": "✓",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bZ735",
+                      "name": "col1c",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "te7te",
+                          "fill": "#1E293B",
+                          "content": "RTU-01 Air Paths Complete",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "IGkev",
+                          "fill": "#64748B",
+                          "content": "Supply, return, and outside-air paths verified.",
+                          "lineHeight": 1.35,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "hWqOf",
+              "name": "divider1",
+              "fill": "#E2E8F0",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "p21bH",
+              "name": "sec2Header",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "fkp1i",
+                  "fill": "#94A3B8",
+                  "content": "EQUIPMENT CAPACITY",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "qp8TR",
+              "name": "equip1",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "GAPWV",
+                  "name": "equip1Row",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "MXcAz",
+                      "fill": "#0F172A",
+                      "content": "AHU-01",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "4APTQ",
+                      "fill": "#B91C1C",
+                      "content": "105%",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "7cvKA",
+                  "name": "equip1Bar",
+                  "width": "fill_container",
+                  "height": 8,
+                  "fill": "#FEE2E2",
+                  "cornerRadius": 4,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "7R6Ei",
+                      "fill": "#EF4444",
+                      "width": "fill_container",
+                      "height": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "SQK48",
+                  "fill": "#B91C1C",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "18,000 BTU rated · Oversized by 5% — Upsize now to prevent unmet load.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XwP7Y",
+              "name": "sec2Gap",
+              "width": "fill_container",
+              "height": 6
+            },
+            {
+              "type": "frame",
+              "id": "Iiv7g",
+              "name": "equip2",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "LaH3N",
+                  "name": "equip2Row",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GwwB9",
+                      "fill": "#0F172A",
+                      "content": "VAV-02",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "IbCLe",
+                      "fill": "#15803D",
+                      "content": "85%",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "51Kcn",
+                  "name": "equip2Bar",
+                  "width": "fill_container",
+                  "height": 8,
+                  "fill": "#DCFCE7",
+                  "cornerRadius": 4,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "reqgm",
+                      "fill": "#22C55E",
+                      "width": 224,
+                      "height": "fill_container"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "GS9Aq",
+                  "fill": "#15803D",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "12,000 BTU rated · Right-sized at 85% load — no change needed.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "m99XP",
+              "name": "divider2",
+              "fill": "#E2E8F0",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "OcrUs",
+              "name": "sec3Header",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "nqakj",
+                  "fill": "#94A3B8",
+                  "content": "CRITICAL PATH",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "zj1GJ",
+                  "fill": "#DC2626",
+                  "content": "1 Bottleneck",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "26xDl",
+              "name": "botCard",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FCA5A5"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "oEsCT",
+                  "name": "botHeader",
+                  "width": "fill_container",
+                  "fill": "#FEF2F2",
+                  "gap": 8,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "skExy",
+                      "fill": "#DC2626",
+                      "content": "✕",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "9RRXl",
+                      "name": "botHeaderText",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cohG1",
+                          "fill": "#991B1B",
+                          "content": "Governing Constraint (Critical Path)",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "yjEim",
+                          "fill": "#B91C1C",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Dominant resistance bottleneck — resolve this first to unlock system performance",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "O6jCu",
+                  "name": "botDivider",
+                  "fill": "#FCA5A5",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "byLQv",
+                  "name": "botBody",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "IYmeH",
+                      "name": "botPathSection",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "kTRJ5",
+                          "fill": "#94A3B8",
+                          "content": "Critical Path Segment",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "XsyfA",
+                          "fill": "#1E293B",
+                          "content": "Return Trunk B -> Section 4 -> Fitting F-12",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "n0Sqx",
+                      "name": "botBodyDivider",
+                      "fill": "#E2E8F0",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "QD4ha",
+                      "fill": "#94A3B8",
+                      "content": "Primary Bottleneck",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "FrAwj",
+                      "name": "botIssueRow",
+                      "width": "fill_container",
+                      "fill": "#FFF7F7",
+                      "cornerRadius": 6,
+                      "gap": 12,
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "o1jEl",
+                          "fill": "#1E293B",
+                          "content": "Pressure drop at Fitting F-12",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "bhIeh",
+                          "fill": "#DC2626",
+                          "content": "4.5x limit",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "a4RZz",
+                      "name": "botActionNote",
+                      "width": "fill_container",
+                      "fill": "#FEF2F2",
+                      "cornerRadius": 6,
+                      "gap": 8,
+                      "padding": [
+                        8,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "6cErb",
+                          "fill": "#B91C1C",
+                          "content": "Action:",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "UPHcl",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Upsize this segment and reduce bend count before tuning downstream branches.",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "RpnSC",
+              "name": "divider3",
+              "fill": "#E2E8F0",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "cltL1",
+              "name": "sec4Header",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "F68OF",
+                  "fill": "#94A3B8",
+                  "content": "HIERARCHICAL AIRFLOW STACK",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "UcoMF",
+                  "fill": "#3B82F6",
+                  "content": "AHU-01 → Supply → Trunks / Branches",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "t1xqQ",
+              "name": "hierCard",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 8,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "gap": 6,
+              "padding": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "cbJRC",
+                  "name": "thRow",
+                  "width": "fill_container",
+                  "fill": "#F8FAFC",
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cuoNM",
+                      "fill": "#94A3B8",
+                      "content": "Node",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "6MzW4",
+                      "fill": "#94A3B8",
+                      "content": "Dimensions",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dNFv0",
+                      "fill": "#94A3B8",
+                      "content": "CFM",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hHXPx",
+                      "fill": "#94A3B8",
+                      "content": "FPM",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "MLJqt",
+                  "name": "thDivider",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "f9hb0",
+                  "name": "trTrunk",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "xx3wh",
+                      "fill": "#1E293B",
+                      "content": "▾ Main Trunk A",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "lNCyu",
+                      "fill": "#475569",
+                      "textGrowth": "fixed-width",
+                      "width": 52,
+                      "content": "24×20",
+                      "textAlign": "center",
+                      "fontFamily": "Courier New",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WtMKq",
+                      "fill": "#1E293B",
+                      "content": "2,000",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "585va",
+                      "fill": "#15803D",
+                      "content": "600",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "7my4y",
+                  "name": "trDiv1",
+                  "fill": "#F1F5F9",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "UpBIB",
+                  "name": "trBr1",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ikKOX",
+                      "fill": "#475569",
+                      "content": "   ├─ Branch A1",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "6xTV7",
+                      "fill": "#475569",
+                      "textGrowth": "fixed-width",
+                      "width": 52,
+                      "content": "12×10",
+                      "textAlign": "center",
+                      "fontFamily": "Courier New",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rJeNw",
+                      "fill": "#334155",
+                      "content": "500",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tW8Cg",
+                      "fill": "#15803D",
+                      "content": "600",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "NSW9U",
+                  "name": "trDiv2",
+                  "fill": "#F1F5F9",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "eHJj1",
+                  "name": "trBr2",
+                  "width": "fill_container",
+                  "fill": "#FFF7ED",
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SO5VW",
+                      "fill": "#B45309",
+                      "content": "   └─ Branch A2  ⚠",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "KIXKR",
+                      "fill": "#B45309",
+                      "textGrowth": "fixed-width",
+                      "width": 52,
+                      "content": "10×8",
+                      "textAlign": "center",
+                      "fontFamily": "Courier New",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "6B0ly",
+                      "fill": "#B45309",
+                      "content": "350",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cwwgB",
+                      "fill": "#DC2626",
+                      "content": "900 ↑",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "l9u2p",
+                  "name": "trDiv3",
+                  "fill": "#FED7AA",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "fniUS",
+                  "name": "trBr2Detail",
+                  "width": "fill_container",
+                  "fill": "#FFFBEB",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Zr57h",
+                      "fill": "#92400E",
+                      "content": "   Friction Loss: 0.12 in. wg  |  Friction Rate: 0.15 / 100 ft",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "v0ioO",
+                      "fill": "#92400E",
+                      "content": "   Fitting: Elbow x1 (Eq. Length: 15 ft)  |  Peak FPM: 900 (Limit: 800)",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "8sDPx",
+                  "name": "trDiv4",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "mJiZw",
+                  "name": "trBr3",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "4ff2l",
+                      "fill": "#64748B",
+                      "content": "      └─ Runout A2-1",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "2AOAW",
+                      "fill": "#64748B",
+                      "textGrowth": "fixed-width",
+                      "width": 52,
+                      "content": "8×6",
+                      "textAlign": "center",
+                      "fontFamily": "Courier New",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "pYnet",
+                      "fill": "#64748B",
+                      "content": "175",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hhbdO",
+                      "fill": "#15803D",
+                      "content": "520",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "MN2aD",
+                  "name": "trDiv5",
+                  "fill": "#F1F5F9",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "63iTy",
+                  "name": "trTrunk2",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "padding": [
+                    6,
+                    8
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RfCrw",
+                      "fill": "#1E293B",
+                      "content": "▸ Main Trunk B",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "94skM",
+                      "fill": "#475569",
+                      "textGrowth": "fixed-width",
+                      "width": 52,
+                      "content": "20×16",
+                      "textAlign": "center",
+                      "fontFamily": "Courier New",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "HEkYy",
+                      "fill": "#1E293B",
+                      "content": "1,150",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zvZLA",
+                      "fill": "#15803D",
+                      "content": "518",
+                      "textAlign": "right",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hEhuv",
+                  "name": "moreBtn",
+                  "width": "fill_container",
+                  "fill": "#F8FAFC",
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "1l9iR",
+                      "fill": "#3B82F6",
+                      "content": "Expand 4 downstream sections",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "b3Epk",
+                  "name": "accRet",
+                  "width": "fill_container",
+                  "fill": "#FFFDF0",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FDE68A"
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "i3ooM",
+                      "name": "retHead",
+                      "width": "fill_container",
+                      "fill": "#FFFBEB",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "9gUIQ",
+                          "name": "retTitle",
+                          "fill": "#334155",
+                          "content": "⊞  Return Network",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ToqdF",
+                          "name": "retChevron",
+                          "fill": "#D97706",
+                          "content": "6 nodes  ·  1 ⚠",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "ddgfS",
+                      "name": "retSummary",
+                      "fill": "#64748B",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Summary: 6 sections, 1 warning (high velocity at Return Branch B2). Expand to inspect per-node dimensions, CFM, FPM, and friction rate.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rkA7R",
+                  "name": "accFit",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "xe2hd",
+                      "name": "fitHead",
+                      "width": "fill_container",
+                      "fill": "#F8FAFC",
+                      "padding": [
+                        8,
+                        10
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "L6Jk9",
+                          "name": "fitTitle",
+                          "fill": "#334155",
+                          "content": "⊟  Fittings & Pressure Loss",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "mrIFm",
+                          "name": "fitChevron",
+                          "fill": "#94A3B8",
+                          "content": "Collapsed",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "OS0iw",
+                      "name": "fitSummary",
+                      "fill": "#64748B",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Summary: 14 fittings, peak loss at F-12 (0.45 in. wg). Expand to compare equivalent length and friction contribution per fitting.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "YJrqT",
+              "name": "divider4",
+              "fill": "#E2E8F0",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "sCOgp",
+              "name": "legendRow",
+              "width": "fill_container",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "tqxWU",
+                  "name": "lgOk",
+                  "gap": 5,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "Z5NbF",
+                      "fill": "#22C55E",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "yZsig",
+                      "fill": "#64748B",
+                      "content": "Normal",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "L4DEx",
+                  "name": "lgWarn",
+                  "gap": 5,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "PdOfB",
+                      "fill": "#F59E0B",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "owjCu",
+                      "fill": "#64748B",
+                      "content": "Warning",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "0lyxF",
+                  "name": "lgErr",
+                  "gap": 5,
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "2ZaCi",
+                      "fill": "#EF4444",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ugh8f",
+                      "fill": "#64748B",
+                      "content": "Critical",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "lhhL1",
+          "x": -332,
+          "y": 88,
+          "name": "Canvas_Properties_Copy",
+          "width": 320,
+          "height": 808,
+          "layout": "none",
+          "children": [
+            {
+              "type": "text",
+              "id": "TeiJa",
+              "x": 12,
+              "y": 16,
+              "name": "Inspector Title",
+              "fill": "#1E293B",
+              "content": "Element Properties",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "X0pCt",
+              "x": 12,
+              "y": 36,
+              "name": "No Selection Hint",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 80,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "ZAT9O",
+              "x": 80,
+              "y": 70,
+              "name": "No Selection Hint Text",
+              "fill": "#64748B",
+              "textGrowth": "fixed-width",
+              "width": 160,
+              "content": "Select an element\nto view properties",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "FCbef",
+              "x": 12,
+              "y": 132,
+              "name": "Duct Props Heading",
+              "fill": "#1E293B",
+              "content": "Duct Properties",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "oVlXR",
+              "x": 12,
+              "y": 154,
+              "name": "Field: Width",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "nUTqb",
+              "x": 20,
+              "y": 164,
+              "name": "Field Label: Width",
+              "fill": "#64748B",
+              "content": "Width (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "rA9Cc",
+              "x": 216,
+              "y": 164,
+              "name": "Field Value: Width",
+              "fill": "#1E293B",
+              "content": "300",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "wuncg",
+              "x": 12,
+              "y": 194,
+              "name": "Field: Height",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "f3dCo",
+              "x": 20,
+              "y": 204,
+              "name": "Field Label: Height",
+              "fill": "#64748B",
+              "content": "Height (mm)",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "oYI2v",
+              "x": 216,
+              "y": 204,
+              "name": "Field Value: Height",
+              "fill": "#1E293B",
+              "content": "200",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 5,
+              "id": "felRC",
+              "x": 12,
+              "y": 234,
+              "name": "Field: Material",
+              "fill": "#F8FAFC",
+              "width": 288,
+              "height": 32,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "ekSDb",
+              "x": 20,
+              "y": 244,
+              "name": "Field Label: Material",
+              "fill": "#64748B",
+              "content": "Material",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "r8kEn",
+              "x": 160,
+              "y": 244,
+              "name": "Field Value: Material",
+              "fill": "#1E293B",
+              "content": "Galvanised Steel",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "XXbf1",
+          "x": 1500,
+          "y": 88,
+          "name": "Layer Frame - Supply Open",
+          "width": 360,
+          "fill": "#FFFFFF",
+          "cornerRadius": 10,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#CBD5E1"
+          },
+          "layout": "vertical",
+          "gap": 6,
+          "padding": 12,
+          "children": [
+            {
+              "type": "text",
+              "id": "L9XGU",
+              "name": "labelSupply",
+              "fill": "#0F172A",
+              "content": "Accordion Layer: Supply Open",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "gAv6D",
+              "name": "subSupply",
+              "fill": "#64748B",
+              "content": "Frame wrapper added for visibility",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "LJGDP",
+              "name": "Validation Accordion Layer - Supply Open",
+              "width": "fill_container",
+              "fill": "#F8FAFC",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "PbjZY",
+                  "name": "panelHeader",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "vnYX9",
+                      "fill": "#0F172A",
+                      "content": "Calculations — Supply Open",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "YXJvC",
+                      "fill": "#94A3B8",
+                      "content": "Layer 1 of 3 · Supply stack expanded",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "jMpm5",
+                  "name": "divider0",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "4DJPp",
+                  "name": "sec1Header",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "w1GsY",
+                      "fill": "#94A3B8",
+                      "content": "SYSTEM STATUS",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "UTuCb",
+                      "fill": "#D97706",
+                      "content": "2 Warnings",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NCqpE",
+                  "name": "sec1Card",
+                  "clip": true,
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "vertical",
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wy9QT",
+                      "name": "row1a",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "X8VVd",
+                          "fill": "#D97706",
+                          "content": "⚠",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JZOAm",
+                          "name": "col1a",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "KvnxG",
+                              "fill": "#1E293B",
+                              "content": "Return Air Path Missing",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "IwKcA",
+                              "fill": "#64748B",
+                              "content": "Connect AHU-01 return duct to close the airflow loop.",
+                              "lineHeight": 1.35,
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "EDAp2",
+                      "name": "div1a",
+                      "enabled": false,
+                      "fill": "#F1F5F9",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8hG3Q",
+                      "name": "row1b",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "0Jyq6",
+                          "fill": "#D97706",
+                          "content": "⚠",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "4IqME",
+                          "name": "col1b",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "LibEO",
+                              "fill": "#1E293B",
+                              "content": "Exhaust Fan Missing",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "rY58U",
+                              "fill": "#64748B",
+                              "content": "Add an exhaust fan for toilet and pantry zones.",
+                              "lineHeight": 1.35,
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "1jkTW",
+                      "name": "div1b",
+                      "enabled": false,
+                      "fill": "#F1F5F9",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kuckc",
+                      "name": "row1c",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "sMxSE",
+                          "fill": "#16A34A",
+                          "content": "✓",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "a5GIl",
+                          "name": "col1c",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "dRITX",
+                              "fill": "#1E293B",
+                              "content": "RTU-01 Air Paths Complete",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "MfiNB",
+                              "fill": "#64748B",
+                              "content": "Supply, return, and outside-air paths verified.",
+                              "lineHeight": 1.35,
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "JJquT",
+                  "name": "divider1",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "7QEV9",
+                  "name": "sec2Header",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "p0wQE",
+                      "fill": "#94A3B8",
+                      "content": "EQUIPMENT CAPACITY",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "EOZV3",
+                  "name": "equip1",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "9fffG",
+                      "name": "equip1Row",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "CBxt4",
+                          "fill": "#0F172A",
+                          "content": "AHU-01",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ZNIx9",
+                          "fill": "#B91C1C",
+                          "content": "105%",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZDYTd",
+                      "name": "equip1Bar",
+                      "width": "fill_container",
+                      "height": 8,
+                      "fill": "#FEE2E2",
+                      "cornerRadius": 4,
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 4,
+                          "id": "dXqbu",
+                          "fill": "#EF4444",
+                          "width": "fill_container",
+                          "height": "fill_container"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "6fWTu",
+                      "fill": "#B91C1C",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "18,000 BTU rated · Oversized by 5% — Upsize now to prevent unmet load.",
+                      "lineHeight": 1.35,
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wJy8b",
+                  "name": "sec2Gap",
+                  "width": "fill_container",
+                  "height": 6
+                },
+                {
+                  "type": "frame",
+                  "id": "I7CWh",
+                  "name": "equip2",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "3DKKB",
+                      "name": "equip2Row",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cFEhw",
+                          "fill": "#0F172A",
+                          "content": "VAV-02",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "p2Irs",
+                          "fill": "#15803D",
+                          "content": "85%",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GQJyx",
+                      "name": "equip2Bar",
+                      "width": "fill_container",
+                      "height": 8,
+                      "fill": "#DCFCE7",
+                      "cornerRadius": 4,
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 4,
+                          "id": "OFj2v",
+                          "fill": "#22C55E",
+                          "width": 224,
+                          "height": "fill_container"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "LAgse",
+                      "fill": "#15803D",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "12,000 BTU rated · Right-sized at 85% load — no change needed.",
+                      "lineHeight": 1.35,
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "xIU7v",
+                  "name": "divider2",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "POsDL",
+                  "name": "sec3Header",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "owITF",
+                      "fill": "#94A3B8",
+                      "content": "CRITICAL PATH",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rfsEF",
+                      "fill": "#DC2626",
+                      "content": "1 Bottleneck",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Hpl5Y",
+                  "name": "botCard",
+                  "clip": true,
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FCA5A5"
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Dnp8r",
+                      "name": "botHeader",
+                      "width": "fill_container",
+                      "fill": "#FEF2F2",
+                      "gap": 10,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "11nf0",
+                          "fill": "#DC2626",
+                          "content": "✕",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "YT7zD",
+                          "name": "botHeaderText",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "i0NTl",
+                              "fill": "#991B1B",
+                              "content": "Governing Constraint (Critical Path)",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Bz0vo",
+                              "fill": "#B91C1C",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Dominant resistance bottleneck — resolve this first to unlock system performance",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "63zdl",
+                      "name": "botDivider",
+                      "fill": "#FCA5A5",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4bUQh",
+                      "name": "botBody",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "tuZWk",
+                          "name": "botPathSection",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "KRoBB",
+                              "fill": "#94A3B8",
+                              "content": "Critical Path Segment",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "fnWDe",
+                              "fill": "#1E293B",
+                              "content": "Return Trunk B -> Section 4 -> Fitting F-12",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "0Ibj6",
+                          "name": "botBodyDivider",
+                          "fill": "#E2E8F0",
+                          "width": "fill_container",
+                          "height": 1
+                        },
+                        {
+                          "type": "text",
+                          "id": "UeVUk",
+                          "fill": "#94A3B8",
+                          "content": "Primary Bottleneck",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "vrk9T",
+                          "name": "botIssueRow",
+                          "width": "fill_container",
+                          "fill": "#FFF7F7",
+                          "cornerRadius": 6,
+                          "gap": 12,
+                          "padding": [
+                            6,
+                            8
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "sbhoN",
+                              "fill": "#1E293B",
+                              "content": "Pressure drop at Fitting F-12",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Zp1PF",
+                              "fill": "#DC2626",
+                              "content": "4.5x limit",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "vIiYd",
+                          "name": "botActionNote",
+                          "width": "fill_container",
+                          "fill": "#FEF2F2",
+                          "cornerRadius": 6,
+                          "gap": 8,
+                          "padding": [
+                            8,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "fd71Y",
+                              "fill": "#B91C1C",
+                              "content": "Action:",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ySkL8",
+                              "fill": "#64748B",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Upsize this segment and reduce bend count before tuning downstream branches.",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "ie3bd",
+                  "name": "divider3",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "czEH1",
+                  "name": "sec4Header",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wd2qJ",
+                      "fill": "#94A3B8",
+                      "content": "HIERARCHICAL AIRFLOW STACK",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "X69hJ",
+                      "fill": "#3B82F6",
+                      "content": "Layer 1/3 · Return and Fittings collapsed",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mIAL4",
+                  "name": "hierCard",
+                  "clip": true,
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "vertical",
+                  "gap": 6,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "0dKhQ",
+                      "name": "thRow",
+                      "width": "fill_container",
+                      "fill": "#F8FAFC",
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "rsH3L",
+                          "fill": "#94A3B8",
+                          "content": "Node",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "gI3QA",
+                          "fill": "#94A3B8",
+                          "content": "Dimensions",
+                          "textAlign": "center",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "uBDjv",
+                          "fill": "#94A3B8",
+                          "content": "CFM",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "EkYU8",
+                          "fill": "#94A3B8",
+                          "content": "FPM",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "K5Sbj",
+                      "name": "thDivider",
+                      "fill": "#E2E8F0",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DRuGA",
+                      "name": "trTrunk",
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "uVlr7",
+                          "fill": "#1E293B",
+                          "content": "▾ Main Trunk A",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "nGXKp",
+                          "fill": "#475569",
+                          "textGrowth": "fixed-width",
+                          "width": 52,
+                          "content": "24×20",
+                          "textAlign": "center",
+                          "fontFamily": "Courier New",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "uWu0C",
+                          "fill": "#1E293B",
+                          "content": "2,000",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "w2uI9",
+                          "fill": "#15803D",
+                          "content": "600",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "1KtA1",
+                      "name": "trDiv1",
+                      "fill": "#F1F5F9",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "K1Rul",
+                      "name": "trBr1",
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "2KL2d",
+                          "fill": "#475569",
+                          "content": "   ├─ Branch A1",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "iOIUQ",
+                          "fill": "#475569",
+                          "textGrowth": "fixed-width",
+                          "width": 52,
+                          "content": "12×10",
+                          "textAlign": "center",
+                          "fontFamily": "Courier New",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "tblCS",
+                          "fill": "#334155",
+                          "content": "500",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "2qJrl",
+                          "fill": "#15803D",
+                          "content": "600",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "X7Zd8",
+                      "name": "trDiv2",
+                      "fill": "#F1F5F9",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "2KSRg",
+                      "name": "trBr2",
+                      "width": "fill_container",
+                      "fill": "#FFF7ED",
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "nETWs",
+                          "fill": "#B45309",
+                          "content": "   └─ Branch A2  ⚠",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ryC0M",
+                          "fill": "#B45309",
+                          "textGrowth": "fixed-width",
+                          "width": 52,
+                          "content": "10×8",
+                          "textAlign": "center",
+                          "fontFamily": "Courier New",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "e2Iqb",
+                          "fill": "#B45309",
+                          "content": "350",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Yx5jp",
+                          "fill": "#DC2626",
+                          "content": "900 ↑",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "lRB8p",
+                      "name": "trDiv3",
+                      "fill": "#FED7AA",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Ea1CQ",
+                      "name": "trBr2Detail",
+                      "width": "fill_container",
+                      "fill": "#FFFBEB",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "S99p4",
+                          "fill": "#92400E",
+                          "content": "   Friction Loss: 0.12 in. wg  |  Friction Rate: 0.15 / 100 ft",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "h4wti",
+                          "fill": "#92400E",
+                          "content": "   Fitting: Elbow x1 (Eq. Length: 15 ft)  |  Peak FPM: 900 (Limit: 800)",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "SYtCK",
+                      "name": "trDiv4",
+                      "fill": "#E2E8F0",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "w9bUC",
+                      "name": "trBr3",
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "eI6me",
+                          "fill": "#64748B",
+                          "content": "      └─ Runout A2-1",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "SEAjf",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": 52,
+                          "content": "8×6",
+                          "textAlign": "center",
+                          "fontFamily": "Courier New",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ftOsJ",
+                          "fill": "#64748B",
+                          "content": "175",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "oLLC5",
+                          "fill": "#15803D",
+                          "content": "520",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "hIeKX",
+                      "name": "trDiv5",
+                      "fill": "#F1F5F9",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "XAwgI",
+                      "name": "trTrunk2",
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "VxnfN",
+                          "fill": "#1E293B",
+                          "content": "▸ Main Trunk B",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "0Fkki",
+                          "fill": "#475569",
+                          "textGrowth": "fixed-width",
+                          "width": 52,
+                          "content": "20×16",
+                          "textAlign": "center",
+                          "fontFamily": "Courier New",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "qSCow",
+                          "fill": "#1E293B",
+                          "content": "1,150",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "FeAwJ",
+                          "fill": "#15803D",
+                          "content": "518",
+                          "textAlign": "right",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jltNf",
+                      "name": "moreBtn",
+                      "width": "fill_container",
+                      "fill": "#F8FAFC",
+                      "padding": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "v5GtO",
+                          "fill": "#3B82F6",
+                          "content": "Expand 4 downstream sections",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "3nfVV",
+                      "name": "accRet",
+                      "width": "fill_container",
+                      "fill": "#FFFDF0",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FDE68A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "UOjdg",
+                          "name": "retHead",
+                          "width": "fill_container",
+                          "fill": "#FFFBEB",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "C0Ypu",
+                              "name": "retTitle",
+                              "fill": "#334155",
+                              "content": "▸ Return Network",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "wIFtT",
+                              "name": "retChevron",
+                              "fill": "#94A3B8",
+                              "content": "Open in Layer 2",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "vr6e8",
+                          "name": "retSummary",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Summary: 6 sections, 1 warning (high velocity at Return Branch B2). Expand to inspect per-node dimensions, CFM, FPM, and friction rate.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "AJDyB",
+                      "name": "accFit",
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "PIwtP",
+                          "name": "fitHead",
+                          "width": "fill_container",
+                          "fill": "#F8FAFC",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "vv5Yq",
+                              "name": "fitTitle",
+                              "fill": "#334155",
+                              "content": "▸ Fittings & Pressure Loss",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "yiGqu",
+                              "name": "fitChevron",
+                              "fill": "#94A3B8",
+                              "content": "Open in Layer 3",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "CGYKV",
+                          "name": "fitSummary",
+                          "fill": "#64748B",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Summary: 14 fittings, peak loss at F-12 (0.45 in. wg). Expand to compare equivalent length and friction contribution per fitting.",
+                          "lineHeight": 1.4,
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "L4PRq",
+                  "name": "divider4",
+                  "fill": "#E2E8F0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "q5mOh",
+                  "name": "legendRow",
+                  "width": "fill_container",
+                  "gap": 14,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pxZ9c",
+                      "name": "lgOk",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 2,
+                          "id": "tDOLo",
+                          "fill": "#22C55E",
+                          "width": 8,
+                          "height": 8
+                        },
+                        {
+                          "type": "text",
+                          "id": "Y3k8X",
+                          "fill": "#64748B",
+                          "content": "Normal",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EfvUJ",
+                      "name": "lgWarn",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 2,
+                          "id": "gvX14",
+                          "fill": "#F59E0B",
+                          "width": 8,
+                          "height": 8
+                        },
+                        {
+                          "type": "text",
+                          "id": "6mj96",
+                          "fill": "#64748B",
+                          "content": "Warning",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "knz5a",
+                      "name": "lgErr",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 2,
+                          "id": "5uyOC",
+                          "fill": "#EF4444",
+                          "width": 8,
+                          "height": 8
+                        },
+                        {
+                          "type": "text",
+                          "id": "GsXB7",
+                          "fill": "#64748B",
+                          "content": "Critical",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "rEaY3",
+      "x": 1148,
+      "y": -150,
+      "name": "Validation Panel v2",
+      "width": 344,
+      "fill": "#FFFFFF",
+      "cornerRadius": 12,
+      "stroke": {
+        "thickness": 1,
+        "fill": "#CBD5E1"
+      },
+      "layout": "vertical",
+      "gap": 10,
+      "padding": 12,
+      "children": [
+        {
+          "type": "text",
+          "id": "9i4DQ",
+          "name": "panelLabel",
+          "fill": "#64748B",
+          "content": "Validation",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "srF0v",
+          "name": "summaryShell",
+          "width": "fill_container",
+          "fill": "#F8FAFC",
+          "cornerRadius": 12,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#E2E8F0"
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 12,
+          "children": [
+            {
+              "type": "text",
+              "id": "GXBbo",
+              "name": "summaryHeadline",
+              "fill": "#0F172A",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "1 critical bottleneck blocking system validation",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "NBH7G",
+              "name": "summaryMetricsRow",
+              "width": "fill_container",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BLXc8",
+                  "name": "metricBlockers",
+                  "width": "fill_container",
+                  "fill": "#FEF2F2",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FECACA"
+                  },
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    8,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SRyQb",
+                      "name": "blockersNumA",
+                      "fill": "#B91C1C",
+                      "content": "1",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZjUhi",
+                      "name": "blockersLabelA",
+                      "fill": "#7F1D1D",
+                      "content": "Blocker",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DsAtq",
+                  "name": "metricWarnings",
+                  "width": "fill_container",
+                  "fill": "#FFFBEB",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FDE68A"
+                  },
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    8,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kaiGz",
+                      "name": "warningsNumA",
+                      "fill": "#B45309",
+                      "content": "2",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "iVkEe",
+                      "name": "warningsLabelA",
+                      "fill": "#92400E",
+                      "content": "Warnings",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pYSOM",
+                  "name": "metricPassed",
+                  "width": "fill_container",
+                  "fill": "#F0FDF4",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#BBF7D0"
+                  },
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    8,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "5icKA",
+                      "name": "passedNumA",
+                      "fill": "#15803D",
+                      "content": "6",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "iVCxt",
+                      "name": "passedLabelA",
+                      "fill": "#166534",
+                      "content": "Passed",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "twPVh",
+              "name": "summaryRecommendation",
+              "fill": "#475569",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Inspect Return Trunk B first to relieve the dominant restriction before tuning downstream branches.",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "HWWEa",
+          "name": "primaryActionRow",
+          "width": "fill_container",
+          "gap": 8,
+          "children": [
+            {
+              "type": "frame",
+              "id": "mWGXs",
+              "name": "inspectCriticalBtn",
+              "width": "fill_container",
+              "fill": "#1D4ED8",
+              "cornerRadius": 999,
+              "gap": 6,
+              "padding": [
+                8,
+                10
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "e4CcF",
+                  "name": "inspectBtnTextA",
+                  "fill": "#FFFFFF",
+                  "content": "Inspect Critical Path",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "g5TUf",
+              "name": "viewWarningsBtn",
+              "width": "fill_container",
+              "fill": "#E2E8F0",
+              "cornerRadius": 999,
+              "gap": 6,
+              "padding": [
+                8,
+                10
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "PUNjh",
+                  "name": "viewBtnTextA",
+                  "fill": "#334155",
+                  "content": "View All Warnings",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Mi58k",
+          "name": "accordionStack",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 10,
+          "children": [
+            {
+              "type": "frame",
+              "id": "t8NRN",
+              "name": "Critical Path Section",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 14,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FCA5A5"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "tmNxR",
+                  "name": "criticalHeader",
+                  "width": "fill_container",
+                  "fill": "#FFF1F2",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "N1eWG",
+                      "name": "criticalTitleGroup",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "4azR6",
+                          "name": "criticalTitleB",
+                          "fill": "#991B1B",
+                          "content": "Critical Path",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "kuV1L",
+                          "name": "criticalSubB",
+                          "fill": "#B91C1C",
+                          "content": "1 blocker affecting fan sizing",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "SGe3D",
+                      "name": "criticalChevronB",
+                      "fill": "#B91C1C",
+                      "content": "⌄",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "R8ETv",
+                  "name": "criticalBody",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 12,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SNOAx",
+                      "name": "criticalLabelB",
+                      "fill": "#94A3B8",
+                      "content": "Governing constraint",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OagnS",
+                      "name": "criticalMetricCard",
+                      "width": "fill_container",
+                      "fill": "#7F1D1D",
+                      "cornerRadius": 12,
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": [
+                        10,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "UPzSu",
+                          "name": "criticalMetricTitleB",
+                          "fill": "#FEE2E2",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Return Trunk B → Section 4 → Fitting F-12",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "JH0A4",
+                          "name": "criticalMetricB",
+                          "fill": "#FFFFFF",
+                          "content": "4.5× limit",
+                          "fontFamily": "Inter",
+                          "fontSize": 26,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "Tl9kN",
+                      "name": "criticalNoteB",
+                      "fill": "#334155",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Pressure drop at F-12 dominates the system. Resolve this segment before tuning downstream branches.",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4uniQ",
+                      "name": "criticalAction",
+                      "width": "fill_container",
+                      "fill": "#FEF2F2",
+                      "cornerRadius": 10,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FECACA"
+                      },
+                      "padding": [
+                        9,
+                        10
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "4fZKl",
+                          "name": "criticalActionLabelB",
+                          "fill": "#991B1B",
+                          "content": "Inspect on canvas",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "2xiy4",
+                          "name": "criticalActionHintB",
+                          "fill": "#B91C1C",
+                          "content": "Focus segment ↗",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "y9yEb",
+              "name": "System Status Section",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 12,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ncUFR",
+                  "name": "systemHeader",
+                  "width": "fill_container",
+                  "fill": "#F8FAFC",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "2KZrS",
+                      "name": "systemTitleGroup",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "8GaU3",
+                          "name": "systemTitleB",
+                          "fill": "#0F172A",
+                          "content": "System Status",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xHnAl",
+                          "name": "systemSubB",
+                          "fill": "#B45309",
+                          "content": "2 warnings still need routing fixes",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "U8ueN",
+                      "name": "systemMeta",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "K9Whj",
+                          "name": "systemCountB",
+                          "fill": "#B45309",
+                          "content": "2",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "oxctz",
+                          "name": "systemMetaLabelB",
+                          "fill": "#94A3B8",
+                          "content": "warnings",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "m4X0w",
+                          "name": "systemChevronB",
+                          "fill": "#94A3B8",
+                          "content": "›",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "4FMxh",
+              "name": "Equipment Capacity Section",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 12,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#E2E8F0"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QZZH4",
+                  "name": "equipHeader",
+                  "width": "fill_container",
+                  "fill": "#F8FAFC",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "P74Mn",
+                      "name": "equipTitleGroup",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "B9Snz",
+                          "name": "equipTitleC",
+                          "fill": "#0F172A",
+                          "content": "Equipment Capacity",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "83BsS",
+                          "name": "equipSubC",
+                          "fill": "#475569",
+                          "content": "AHU-01 overloaded, VAV-02 healthy",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "5fqQs",
+                      "name": "equipMeta",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "e7WIL",
+                          "name": "equipBadgeC",
+                          "fill": "#B91C1C",
+                          "content": "1 hot",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "sqrEd",
+                          "name": "equipChevronC",
+                          "fill": "#94A3B8",
+                          "content": "›",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tSsnw",
+              "name": "Hierarchical Airflow Section",
+              "width": "fill_container",
+              "fill": "#FFFFFF",
+              "cornerRadius": 12,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#BFDBFE"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "kTSOC",
+                  "name": "airflowHeader",
+                  "width": "fill_container",
+                  "fill": "#EFF6FF",
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "EuM39",
+                      "name": "airflowTitleGroup",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "JZOO3",
+                          "name": "airflowTitleC",
+                          "fill": "#1D4ED8",
+                          "content": "Hierarchical Airflow",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "vCEbI",
+                          "name": "airflowSubC",
+                          "fill": "#2563EB",
+                          "content": "Tree view for AHU-01 supply branches",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tKuja",
+                      "name": "airflowMeta",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Q2l7q",
+                          "name": "airflowBadgeC",
+                          "fill": "#B45309",
+                          "content": "Branch A2 high FPM",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "vF5X7",
+                          "name": "airflowChevronC",
+                          "fill": "#60A5FA",
+                          "content": "›",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "Theme": [
+      "Default",
+      "Variant-1"
+    ]
+  },
+  "variables": {
+    "new1": {
+      "type": "string",
+      "value": [
+        {
+          "value": "1",
+          "theme": {
+            "Theme": "Default"
+          }
+        },
+        {
+          "value": "111",
+          "theme": {
+            "Theme": "Variant-1"
+          }
+        }
+      ]
+    },
+    "new2": {
+      "type": "string",
+      "value": [
+        {
+          "value": "2",
+          "theme": {
+            "Theme": "Default"
+          }
+        },
+        {
+          "value": "222",
+          "theme": {
+            "Theme": "Variant-1"
+          }
+        }
+      ]
+    }
+  }
+}

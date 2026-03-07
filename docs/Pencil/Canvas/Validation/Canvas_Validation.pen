@@ -251,11 +251,11 @@
           "type": "rectangle",
           "cornerRadius": 5,
           "id": "PNgpX",
-          "x": 1124,
+          "x": 1328,
           "y": 54,
-          "name": "Tab: Properties (active)",
+          "name": "Tab: Validation (active)",
           "fill": "#E2E8F0",
-          "width": 82,
+          "width": 86,
           "height": 26
         },
         {
@@ -264,11 +264,11 @@
           "x": 1138,
           "y": 63,
           "name": "Tab: Properties Text",
-          "fill": "#1E293B",
+          "fill": "#64748B",
           "content": "Properties",
           "fontFamily": "Inter",
           "fontSize": 12,
-          "fontWeight": "600"
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -300,11 +300,11 @@
           "x": 1340,
           "y": 63,
           "name": "Tab: Validation Text",
-          "fill": "#64748B",
+          "fill": "#1E293B",
           "content": "Validation",
           "fontFamily": "Inter",
           "fontSize": 12,
-          "fontWeight": "normal"
+          "fontWeight": "600"
         },
         {
           "type": "rectangle",
@@ -730,9 +730,1321 @@
           "x": 1120,
           "y": 88,
           "name": "Canvas_Validation",
+          "context": "Main Validation panel container for surfacing engineering design warnings and errors.",
           "width": 320,
           "height": 808,
-          "layout": "none"
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "NdIEI",
+              "x": 0,
+              "y": 0,
+              "name": "Validation Content Wrapper",
+              "context": "Layout wrapper for organizing the summary, issues, and actions in the Validation panel.",
+              "width": 320,
+              "height": 808,
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "nmqLh",
+                  "name": "Validation Summary Section",
+                  "context": "Top summary section showing aggregate counts of active errors, warnings, and overall system health.",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 180,
+                  "fill": "#F8FAFC",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#E2E8F0"
+                  },
+                  "layout": "vertical",
+                  "gap": 8,
+                  "padding": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "aSflV",
+                      "name": "header",
+                      "context": "Header indicating Validation Summary is actively live.",
+                      "width": "fill_container",
+                      "height": 24,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "4HUAJ",
+                          "name": "headerTitle",
+                          "fill": "#0F172A",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Validation Summary",
+                          "lineHeight": 1.2,
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jZSzA",
+                          "name": "headerBadge",
+                          "width": 70,
+                          "height": 20,
+                          "fill": "#EEF2FF",
+                          "cornerRadius": 999,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "5JR3w",
+                              "name": "headerBadgeText",
+                              "fill": "#4338CA",
+                              "textGrowth": "fixed-width",
+                              "width": 36,
+                              "content": "Live",
+                              "lineHeight": 1.1,
+                              "textAlign": "center",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Kr2sL",
+                      "name": "rowTop",
+                      "width": "fill_container",
+                      "height": 62,
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "JKEqM",
+                          "name": "cardTotal",
+                          "context": "Displays the total count of scanned and checked items across the canvas.",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#FFFFFF",
+                          "cornerRadius": 8,
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "#E2E8F0"
+                          },
+                          "layout": "vertical",
+                          "gap": 3,
+                          "padding": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "u1EBd",
+                              "name": "ctLabel",
+                              "fill": "#64748B",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Checked",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "46cEe",
+                              "name": "ctValue",
+                              "context": "The exact numeric value representing the total checked elements.",
+                              "fill": "#0F172A",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "248",
+                              "lineHeight": 1,
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "rgrIW",
+                              "name": "ctHelper",
+                              "fill": "#94A3B8",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Scopes validation coverage",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 9,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "SuWNe",
+                          "name": "cardPass",
+                          "context": "Represents the percentage of elements that passed validation rules without errors.",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#F0FDF4",
+                          "cornerRadius": 8,
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "#BBF7D0"
+                          },
+                          "layout": "vertical",
+                          "gap": 3,
+                          "padding": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "7fiAH",
+                              "name": "cpLabel",
+                              "fill": "#15803D",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Pass Rate",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "fRijD",
+                              "name": "cpValue",
+                              "fill": "#166534",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "96%",
+                              "lineHeight": 1,
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "YW0z4",
+                              "name": "cpHelper",
+                              "fill": "#16A34A",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Higher means cleaner output",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 9,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "03BM2",
+                          "name": "cardErrors",
+                          "context": "Card tallying the number of critical errors blocking the release.",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#FEF2F2",
+                          "cornerRadius": 8,
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "#FECACA"
+                          },
+                          "layout": "vertical",
+                          "gap": 3,
+                          "padding": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "5mnrv",
+                              "name": "ceLabel",
+                              "fill": "#B91C1C",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Errors",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "3M0S9",
+                              "name": "ceValue",
+                              "fill": "#991B1B",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "9",
+                              "lineHeight": 1,
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "BZDFk",
+                              "name": "ceHelper",
+                              "fill": "#DC2626",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Blocks release readiness",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 9,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "NhZ3A",
+                      "name": "rowBottom",
+                      "width": "fill_container",
+                      "height": 62,
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "iBq8O",
+                          "name": "cardWarn",
+                          "context": "Card tallying the warnings that represent risks requiring review.",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#FFFBEB",
+                          "cornerRadius": 8,
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "#FDE68A"
+                          },
+                          "layout": "vertical",
+                          "gap": 3,
+                          "padding": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "9JQVy",
+                              "name": "cwLabel",
+                              "fill": "#B45309",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Warnings",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "eRac0",
+                              "name": "cwValue",
+                              "fill": "#92400E",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "18",
+                              "lineHeight": 1,
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "vHaeK",
+                              "name": "cwHelper",
+                              "fill": "#D97706",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Signals risk to review",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 9,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "fnBoZ",
+                          "name": "cardInfo",
+                          "context": "Card tallying non-blocking informational advisory notices.",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "#EFF6FF",
+                          "cornerRadius": 8,
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "#BFDBFE"
+                          },
+                          "layout": "vertical",
+                          "gap": 3,
+                          "padding": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "f2Emt",
+                              "name": "ciLabel",
+                              "fill": "#1D4ED8",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Info",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ydU8J",
+                              "name": "ciValue",
+                              "fill": "#1E40AF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "21",
+                              "lineHeight": 1,
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "LSpgT",
+                              "name": "ciHelper",
+                              "fill": "#2563EB",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Adds non-blocking context",
+                              "lineHeight": 1.1,
+                              "fontFamily": "Inter",
+                              "fontSize": 9,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lbiSV",
+                  "name": "Validation Issues Section",
+                  "context": "Primary scrolling list of individual validation issues with details, severity indicators, and element links.",
+                  "clip": true,
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#E4E8EF"
+                  },
+                  "layout": "vertical",
+                  "gap": 8,
+                  "padding": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "MX72P",
+                      "name": "header",
+                      "context": "Header indicating the total count of unresolved issues waiting to be addressed.",
+                      "width": "fill_container",
+                      "height": 48,
+                      "layout": "vertical",
+                      "gap": 2,
+                      "padding": [
+                        0,
+                        2
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "iisC0",
+                          "name": "headerLeft",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "kPbai",
+                              "name": "warnIcon",
+                              "width": 16,
+                              "height": 16,
+                              "iconFontName": "warning",
+                              "iconFontFamily": "Material Symbols Rounded",
+                              "weight": 500,
+                              "fill": "#D97706"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Mn6jW",
+                              "name": "headerTitle",
+                              "fill": "#111827",
+                              "content": "Validation Issues",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "R8wO2",
+                          "name": "headerCount",
+                          "fill": "#6B7280",
+                          "content": "7 open · unresolved only",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "EPHk9",
+                          "name": "openCountHint",
+                          "fill": "#6B7280",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Open count excludes resolved and dismissed checks.",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "mqGwz",
+                      "name": "overview",
+                      "context": "Overview legend explaining color coding for Critical, Warning, and Info badges.",
+                      "width": "fill_container",
+                      "height": 44,
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "YOHhJ",
+                          "name": "badgeCritical",
+                          "fill": "#FEE2E2",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "9epFG",
+                              "name": "criticalText",
+                              "fill": "#B91C1C",
+                              "content": "2 Critical · block",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "gNN68",
+                          "name": "badgeWarning",
+                          "fill": "#FEF3C7",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "SYUWA",
+                              "name": "warningText",
+                              "fill": "#92400E",
+                              "content": "3 Warning · review",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JidRn",
+                          "name": "badgeInfo",
+                          "fill": "#E0F2FE",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "OwOqZ",
+                              "name": "infoText",
+                              "fill": "#0C4A6E",
+                              "content": "2 Info · advisory",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "pA7xm",
+                          "name": "badgeMeaning",
+                          "fill": "#6B7280",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Critical blocks sign-off · Warning needs review · Info is advisory",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JAyjz",
+                      "name": "groupCritical",
+                      "context": "Group containing detailed messages for critical, release-blocking errors.",
+                      "width": "fill_container",
+                      "fill": "#FFF7F7",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#FECACA"
+                      },
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "cigEw",
+                          "name": "critHead",
+                          "width": "fill_container",
+                          "height": 20,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "gUcbz",
+                              "name": "critHeadLeft",
+                              "gap": 6,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "EfIcU",
+                                  "name": "critDot",
+                                  "fill": "#DC2626",
+                                  "width": 8,
+                                  "height": 8
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "GY7if",
+                                  "name": "critLabel",
+                                  "fill": "#991B1B",
+                                  "content": "Critical",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "nIRVj",
+                              "name": "critCount",
+                              "fill": "#7F1D1D",
+                              "content": "2 open issues",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "GuO78",
+                          "name": "critIssue1",
+                          "width": "fill_container",
+                          "height": 28,
+                          "padding": [
+                            0,
+                            2
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "K12xm",
+                              "name": "critMsg1",
+                              "fill": "#111827",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Input · AHU-02 · Missing supply airflow input",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "daRp9",
+                              "name": "critJump1",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "arrow-up-right",
+                              "iconFontFamily": "lucide",
+                              "fill": "#6B7280"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "yaqXk",
+                          "name": "critIssue2",
+                          "width": "fill_container",
+                          "height": 28,
+                          "padding": [
+                            0,
+                            2
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "xcLWX",
+                              "name": "critMsg2",
+                              "fill": "#111827",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Limit · Duct S-17 · Static pressure exceeds limit",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "KD5La",
+                              "name": "critJump2",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "arrow-up-right",
+                              "iconFontFamily": "lucide",
+                              "fill": "#6B7280"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8rD6X",
+                      "name": "groupWarning",
+                      "context": "Group containing detailed messages for warnings that should be reviewed.",
+                      "width": "fill_container",
+                      "fill": "#FFFBEB",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#FDE68A"
+                      },
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "x5hA9",
+                          "name": "warnHead",
+                          "width": "fill_container",
+                          "height": 20,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "BPXuG",
+                              "name": "warnHeadLeft",
+                              "gap": 6,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "XBbxF",
+                                  "name": "warnDot",
+                                  "fill": "#D97706",
+                                  "width": 8,
+                                  "height": 8
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "ii5NP",
+                                  "name": "warnLabel",
+                                  "fill": "#92400E",
+                                  "content": "Warning",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "nCLmC",
+                              "name": "warnCount",
+                              "fill": "#78350F",
+                              "content": "3 open issues",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "DOtMK",
+                          "name": "warnIssue1",
+                          "width": "fill_container",
+                          "height": 26,
+                          "padding": [
+                            0,
+                            2
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "83zxn",
+                              "name": "warnMsg1",
+                              "fill": "#1F2937",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Check · Diffuser D-22 · Throw distance not validated",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "GUCXT",
+                              "name": "warnJump1",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "arrow-up-right",
+                              "iconFontFamily": "lucide",
+                              "fill": "#6B7280"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Qza5J",
+                          "name": "warnIssue2",
+                          "width": "fill_container",
+                          "height": 26,
+                          "padding": [
+                            0,
+                            2
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "B1dNZ",
+                              "name": "warnMsg2",
+                              "fill": "#1F2937",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Stale · Room 2B · Cooling load is out of date",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "Cplop",
+                              "name": "warnJump2",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "arrow-up-right",
+                              "iconFontFamily": "lucide",
+                              "fill": "#6B7280"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "qlI7Y",
+                      "name": "groupInfo",
+                      "context": "Group containing detailed informational validation details.",
+                      "width": "fill_container",
+                      "fill": "#F0F9FF",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#BAE6FD"
+                      },
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "keL2q",
+                          "name": "infoHead",
+                          "width": "fill_container",
+                          "height": 20,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "qI3dP",
+                              "name": "infoHeadLeft",
+                              "gap": 6,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "5HSC8",
+                                  "name": "infoDot",
+                                  "fill": "#0284C7",
+                                  "width": 8,
+                                  "height": 8
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "LfFXb",
+                                  "name": "infoLabel",
+                                  "fill": "#075985",
+                                  "content": "Info",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "aCKDF",
+                              "name": "infoCount",
+                              "fill": "#0C4A6E",
+                              "content": "2 open issues",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "w4a5F",
+                          "name": "infoIssue1",
+                          "width": "fill_container",
+                          "height": 26,
+                          "padding": [
+                            0,
+                            2
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ijAqR",
+                              "name": "infoMsg1",
+                              "fill": "#1F2937",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Auto-size · Branch B-14 · Auto-sized from template",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "pA5oy",
+                              "name": "infoJump1",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "arrow-up-right",
+                              "iconFontFamily": "lucide",
+                              "fill": "#6B7280"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Uffb5",
+                          "name": "infoIssue2",
+                          "width": "fill_container",
+                          "height": 26,
+                          "padding": [
+                            0,
+                            2
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "J7LzL",
+                              "name": "infoMsg2",
+                              "fill": "#1F2937",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Schema · Fan EF-03 · Rule updated in latest schema",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "shKqd",
+                              "name": "infoJump2",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "arrow-up-right",
+                              "iconFontFamily": "lucide",
+                              "fill": "#6B7280"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MwFIT",
+                      "name": "footer",
+                      "context": "Navigation controls to jump between individual issue elements on the canvas.",
+                      "width": "fill_container",
+                      "height": 30,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": {
+                          "top": 1
+                        },
+                        "fill": "#E5E7EB"
+                      },
+                      "padding": 2,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "jcfG5",
+                          "name": "jumpHint",
+                          "fill": "#6B7280",
+                          "content": "Issue rows: click ↗ to locate",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "5Zg7e",
+                          "name": "jumpControls",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "7HJmx",
+                              "name": "prevBtn",
+                              "width": 26,
+                              "height": 22,
+                              "fill": "#F9FAFB",
+                              "cornerRadius": 6,
+                              "stroke": {
+                                "align": "inside",
+                                "thickness": 1,
+                                "fill": "#D1D5DB"
+                              },
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "YSlrl",
+                                  "name": "prevIcon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "iconFontName": "chevron-up",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#374151"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "uUu9o",
+                              "name": "nextBtn",
+                              "width": 26,
+                              "height": 22,
+                              "fill": "#F9FAFB",
+                              "cornerRadius": 6,
+                              "stroke": {
+                                "align": "inside",
+                                "thickness": 1,
+                                "fill": "#D1D5DB"
+                              },
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "FFP0i",
+                                  "name": "nextIcon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "iconFontName": "chevron-down",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#374151"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "OmzoU",
+                  "name": "Validation Actions Section",
+                  "context": "Bottom action area containing global commands like override warnings, generate report, or recalculate.",
+                  "width": "fill_container",
+                  "height": 150,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "k4gp6",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Actions Title",
+                      "fill": "#1E293B",
+                      "content": "Validation Actions & Guidance",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 6,
+                      "id": "frwad",
+                      "x": 0,
+                      "y": 24,
+                      "name": "Run Validation Btn",
+                      "context": "Button triggering a full canvas system check for the current view.",
+                      "fill": "#10B981",
+                      "width": 140,
+                      "height": 30
+                    },
+                    {
+                      "type": "text",
+                      "id": "7eHKA",
+                      "x": 33,
+                      "y": 33,
+                      "name": "Run Validation Text",
+                      "fill": "#FFFFFF",
+                      "content": "Run full check",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 6,
+                      "id": "ESu77",
+                      "x": 148,
+                      "y": 24,
+                      "name": "Auto Fix Btn",
+                      "context": "Action button that auto-suggests engineering fixes for detected warnings.",
+                      "fill": "#3B82F6",
+                      "width": 140,
+                      "height": 30
+                    },
+                    {
+                      "type": "text",
+                      "id": "SYp7U",
+                      "x": 184,
+                      "y": 33,
+                      "name": "Auto Fix Text",
+                      "fill": "#FFFFFF",
+                      "content": "Suggest fixes",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 6,
+                      "id": "tX0vD",
+                      "x": 0,
+                      "y": 60,
+                      "name": "Mute Warnings Btn",
+                      "context": "Temporarily mute background/room constraint warnings for an hour.",
+                      "fill": "#F8FAFC",
+                      "width": 288,
+                      "height": 28,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#E2E8F0"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZCMlB",
+                      "x": 63,
+                      "y": 68,
+                      "name": "Mute Warnings Text",
+                      "fill": "#475569",
+                      "content": "Mute noise warnings for 1h (room checks)",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cdBdK",
+                      "x": 0,
+                      "y": 99,
+                      "name": "Legend Title",
+                      "fill": "#334155",
+                      "content": "Severity legend (impact on design readiness)",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 999,
+                      "id": "Cs8xw",
+                      "x": 0,
+                      "y": 117,
+                      "name": "Error Chip",
+                      "fill": "#FEE2E2",
+                      "width": 88,
+                      "height": 24,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FCA5A5"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "85MG1",
+                      "x": 31,
+                      "y": 124,
+                      "name": "Error Chip Text",
+                      "fill": "#B91C1C",
+                      "content": "Error",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 999,
+                      "id": "I2gTS",
+                      "x": 96,
+                      "y": 117,
+                      "name": "Warning Chip",
+                      "fill": "#FEF3C7",
+                      "width": 92,
+                      "height": 24,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FCD34D"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "aI35a",
+                      "x": 124,
+                      "y": 124,
+                      "name": "Warning Chip Text",
+                      "fill": "#92400E",
+                      "content": "Warning",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 999,
+                      "id": "nP9P3",
+                      "x": 196,
+                      "y": 117,
+                      "name": "Info Chip",
+                      "fill": "#DBEAFE",
+                      "width": 92,
+                      "height": 24,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#93C5FD"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "Rb1z8",
+                      "x": 230,
+                      "y": 124,
+                      "name": "Info Chip Text",
+                      "fill": "#1D4ED8",
+                      "content": "Info",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zDASl",
+                      "x": 0,
+                      "y": 146,
+                      "name": "Last Run Meta",
+                      "fill": "#64748B",
+                      "textGrowth": "fixed-width",
+                      "width": 288,
+                      "content": "Run validation after airflow/size edits. Last run: 2m ago, project-wide scope.",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "frame",
