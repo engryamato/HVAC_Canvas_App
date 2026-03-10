@@ -77,9 +77,29 @@ export const ProjectSettingsSchema = z.object({
   gridSize: z.number().positive().default(12),
   gridVisible: z.boolean().default(true),
   snapToGrid: z.boolean().default(true).optional(),
+  activeViewMode: z.enum(['plan', '3d']).default('plan').optional(),
 }).passthrough();
 
 export type ProjectSettings = z.infer<typeof ProjectSettingsSchema>;
+
+export const Vector3Schema = z.object({
+  x: z.number(),
+  y: z.number(),
+  z: z.number(),
+});
+
+export const ThreeDViewStateSchema = z.object({
+  cameraTarget: Vector3Schema.default({ x: 0, y: 0, z: 0 }),
+  cameraPosition: Vector3Schema.default({ x: 560, y: 320, z: 560 }),
+  orbitRadius: z.number().positive().default(860),
+  polarAngle: z.number().min(0).max(Math.PI).default(1.12),
+  azimuthAngle: z.number().default(0.78),
+  showGrid: z.boolean().default(true),
+  showAxes: z.boolean().default(true),
+  showPlanOverlay: z.boolean().default(false),
+});
+
+export type ThreeDViewState = z.infer<typeof ThreeDViewStateSchema>;
 
 /**
  * Schema for .sws project files
@@ -87,22 +107,22 @@ export type ProjectSettings = z.infer<typeof ProjectSettingsSchema>;
  */
 export const ProjectFileSchema = z.object({
   // Schema version for migration support
-  schemaVersion: z.string().default('1.0.0'),
-  
+  schemaVersion: z.string().regex(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+)?$/, 'Valid semver required').default('1.0.0'),
+
   // Project identification
   projectId: z.string().uuid(),
   projectName: z.string().min(1).max(100),
   projectNumber: z.string().optional(),
   clientName: z.string().optional(),
   location: z.string().optional(),
-  
+
   // Project scope
   scope: ProjectScopeSchema.default({
     details: [],
     materials: [],
     projectType: 'Commercial'
   }),
-  
+
   // Site conditions
   siteConditions: SiteConditionsSchema.default({
     elevation: '0',
@@ -112,38 +132,40 @@ export const ProjectFileSchema = z.object({
     humidity: '50',
     localCodes: ''
   }),
-  
+
   // Timestamps
   createdAt: z.string().datetime(),
   modifiedAt: z.string().datetime(),
-  
+
   // Archive status
   isArchived: z.boolean().default(false),
-  
+
   // Canvas entities
   entities: NormalizedEntitiesSchema.default({
     byId: {},
     allIds: []
   }),
-  
+
   // Viewport state
   viewportState: ViewportStateSchema.default({
     panX: 0,
     panY: 0,
     zoom: 1
   }),
-  
+
   // Application settings
   settings: ProjectSettingsSchema.default({
     unitSystem: 'imperial',
     gridSize: 12,
     gridVisible: true,
-    snapToGrid: true
+    snapToGrid: true,
+    activeViewMode: 'plan',
   }),
-  
+  threeDViewState: ThreeDViewStateSchema.optional(),
+
   // Optional thumbnail data URL
   thumbnailUrl: z.string().optional().nullable(),
-  
+
   // App version when created/modified
   version: z.string().optional(),
 
@@ -270,7 +292,7 @@ export function createEmptyProject(
   options?: Partial<ProjectFile>
 ): ProjectFile {
   const now = new Date().toISOString();
-  
+
   return {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     projectId: crypto.randomUUID(),
@@ -307,7 +329,18 @@ export function createEmptyProject(
       unitSystem: 'imperial',
       gridSize: 12,
       gridVisible: true,
-      snapToGrid: true
+      snapToGrid: true,
+      activeViewMode: 'plan',
+    },
+    threeDViewState: {
+      cameraTarget: { x: 0, y: 0, z: 0 },
+      cameraPosition: { x: 560, y: 320, z: 560 },
+      orbitRadius: 860,
+      polarAngle: 1.12,
+      azimuthAngle: 0.78,
+      showGrid: true,
+      showAxes: true,
+      showPlanOverlay: false,
     },
     thumbnailUrl: null,
     version: process.env.npm_package_version,

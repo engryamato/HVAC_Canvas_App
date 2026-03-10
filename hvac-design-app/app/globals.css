@@ -258,6 +258,10 @@
   flex: 1;
 }
 
+.sidebar-content-bom {
+  padding: 0;
+}
+
 .resize-handle {
   position: absolute;
   right: 0;
@@ -294,6 +298,11 @@
 
 .sidebar-section {
   margin-bottom: 16px;
+}
+
+.sidebar-section-bom {
+  height: 100%;
+  margin-bottom: 0;
 }
 
 .sidebar-title {

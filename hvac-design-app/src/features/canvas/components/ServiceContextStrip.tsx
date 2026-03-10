@@ -6,11 +6,13 @@
 import { useValidationSummary } from '@/core/store/validationStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
+import { useBOM } from '../hooks/useBOM';
 
 export function ServiceContextStrip() {
   const validationSummary = useValidationSummary();
   const activeComponent = useComponentLibraryStoreV2((state) => state.getActiveComponent());
   const resolvedService = activeComponent ? adaptComponentToService(activeComponent) : null;
+  const { totals } = useBOM();
 
   if (!resolvedService) {
     return (
@@ -33,9 +35,19 @@ export function ServiceContextStrip() {
         </span>
       </div>
 
-      <div className={validationSummary.totalIssues > 0 ? 'text-amber-700' : 'text-emerald-700'}>
-        {validationSummary.totalIssues > 0 ? `${validationSummary.totalIssues} Issues` : 'Validated'}
+      <div className="flex items-center gap-3">
+        <span
+          className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-medium"
+          style={{ background: '#ECFDF5', borderColor: '#A7F3D0', color: '#065F46' }}
+        >
+          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#10B981' }} />
+          BOM Live · {totals.totalItems} {totals.totalItems === 1 ? 'item' : 'items'}
+        </span>
+        <span className={validationSummary.totalIssues > 0 ? 'text-amber-700' : 'text-emerald-700'}>
+          {validationSummary.totalIssues > 0 ? `${validationSummary.totalIssues} Issues` : 'Validated'}
+        </span>
       </div>
     </div>
   );
 }
+

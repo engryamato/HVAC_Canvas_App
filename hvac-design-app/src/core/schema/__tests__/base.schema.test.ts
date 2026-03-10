@@ -9,7 +9,7 @@ import {
 
 describe('TransformSchema', () => {
   it('should validate a valid transform', () => {
-    const transform = { x: 100, y: 200, rotation: 45, scaleX: 1, scaleY: 1 };
+    const transform = { x: 100, y: 200, rotation: 45, scaleX: 1, scaleY: 1, elevation: 0 };
     expect(TransformSchema.parse(transform)).toEqual(transform);
   });
 
@@ -18,6 +18,7 @@ describe('TransformSchema', () => {
     expect(result.rotation).toBe(0);
     expect(result.scaleX).toBe(1);
     expect(result.scaleY).toBe(1);
+    expect(result.elevation).toBe(0);
   });
 
   it('should reject rotation outside 0-360', () => {
@@ -49,7 +50,7 @@ describe('BaseEntitySchema', () => {
   const validEntity = {
     id: '550e8400-e29b-41d4-a716-446655440000',
     type: 'room' as const,
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1, elevation: 0 },
     zIndex: 0,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -71,7 +72,7 @@ describe('BaseEntitySchema', () => {
 describe('createDefaultTransform', () => {
   it('should create transform with default values', () => {
     const transform = createDefaultTransform();
-    expect(transform).toEqual({ x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
+    expect(transform).toEqual({ x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1, elevation: 0 });
   });
 
   it('should apply overrides', () => {
@@ -79,6 +80,7 @@ describe('createDefaultTransform', () => {
     expect(transform.x).toBe(100);
     expect(transform.y).toBe(200);
     expect(transform.rotation).toBe(0);
+    expect(transform.elevation).toBe(0);
   });
 });
 

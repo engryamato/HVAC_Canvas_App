@@ -52,6 +52,7 @@
     "@tauri-apps/plugin-clipboard-manager": "^2.3.2",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2.4.5",
+    "@types/three": "^0.183.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "idb": "^8.0.3",
@@ -65,6 +66,7 @@
     "react-dom": "18.3.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.183.2",
     "vibe-kanban-web-companion": "^0.0.5",
     "zod": "4.3.6",
     "zustand": "5.0.11"
@@ -88,6 +90,7 @@
     "chromatic": "^11.0.0",
     "eslint": "^8.56.0",
     "eslint-config-next": "^15.0.0",
+    "fake-indexeddb": "^6.2.5",
     "husky": "^9.1.7",
     "jsdom": "27.4.0",
     "lint-staged": "^16.2.7",

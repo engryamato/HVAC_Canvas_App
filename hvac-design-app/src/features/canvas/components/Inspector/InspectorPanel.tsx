@@ -3,6 +3,7 @@ import { Maximize2 } from 'lucide-react';
 
 import { useSelectionStore } from '../../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useActiveViewMode } from '../../store/viewModeStore';
 import type { Entity } from '@/core/schema';
 import RoomInspector from './RoomInspector';
 import DuctInspector from './DuctInspector';
@@ -45,6 +46,7 @@ export function InspectorPanel({
 }: InspectorPanelProps) {
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const selectedId = selectedIds.length === 1 ? selectedIds[0] : null;
+  const activeViewMode = useActiveViewMode();
 
   const selectedEntity = useEntityStore(
     useCallback((state) => (selectedId ? (state.byId[selectedId] ?? null) : null), [selectedId])
@@ -66,9 +68,10 @@ export function InspectorPanel({
   }
 
   // Combined classes based on logic
-  const panelClasses = `flex flex-col h-full bg-slate-50 border-l border-slate-200 w-80 min-w-[20rem] ${
-    embedded ? 'w-auto min-w-0 border-l-0 bg-transparent' : ''
-  } ${className ?? ''}`;
+  const panelClasses = `flex flex-col h-full bg-slate-50 border-l border-slate-200 w-80 min-w-[20rem] ${embedded ? 'w-auto min-w-0 border-l-0 bg-transparent' : ''
+    } ${className ?? ''}`;
+
+  const show3DStrip = activeViewMode === '3d' && selectedIds.length > 0;
 
   return (
     <div className={panelClasses}>
@@ -86,6 +89,15 @@ export function InspectorPanel({
           </button>
         </div>
       ) : null}
+      {show3DStrip && (
+        <div
+          className="flex items-center gap-2 border-b border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 shrink-0"
+          data-testid="three-d-mode-strip"
+        >
+          <span aria-hidden="true">⬛</span>
+          Editing in 3D View
+        </div>
+      )}
       <div className="p-4 overflow-y-auto h-full">{content}</div>
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { CanvasContainer } from './components/CanvasContainer';
+import { CanvasViewportHost } from './components/CanvasViewportHost';
 import { ZoomControls } from './components/ZoomControls';
 import { Minimap } from './components/Minimap';
 import { UnifiedDock } from './components/UnifiedDock';
@@ -10,6 +10,7 @@ import { ServiceContextStrip } from './components/ServiceContextStrip';
 import { CanvasOverlayWarning } from './components/CanvasOverlayWarning';
 import { RightSidebar } from './components/RightSidebar';
 import { useViewportStore } from './store/viewportStore';
+import { useActiveViewMode } from './store/viewModeStore';
 
 import { useAutoSave } from './hooks';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
@@ -165,6 +166,7 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
 
   const setOpenBulkEdit = useDialogStore((state) => state.setOpenBulkEdit);
   const selectedCount = useSelectionCount();
+  const activeViewMode = useActiveViewMode();
 
   return (
     <AppShell projectName={projectName}>
@@ -174,16 +176,18 @@ export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElem
         <main className="flex-1 relative overflow-hidden bg-slate-100 grid-pattern flex flex-col">
           <ServiceContextStrip />
           <div className="flex-1 relative">
-            <CanvasContainer className="w-full h-full" />
+            <CanvasViewportHost className="w-full h-full" />
             
             <TopToolBar />
 
             <CanvasOverlayWarning />
 
-            <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
-              <Minimap />
-              <ZoomControls />
-            </div>
+            {activeViewMode === 'plan' ? (
+              <div className="absolute bottom-8 right-4 z-10 flex flex-col gap-3 items-end">
+                <Minimap />
+                <ZoomControls />
+              </div>
+            ) : null}
 
             <TutorialOverlay />
 

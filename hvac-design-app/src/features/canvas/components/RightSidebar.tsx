@@ -143,7 +143,7 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
       </div>
 
       {!rightSidebarCollapsed && (
-        <div className="sidebar-content">
+        <div className={`sidebar-content ${activeRightTab === 'bom' ? 'sidebar-content-bom' : ''}`}>
           {activeRightTab === 'properties' && (
             <section className="sidebar-section" data-testid="properties-panel" id="properties-panel" role="tabpanel">
               {isFloating ? (
@@ -157,8 +157,12 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
           )}
 
           {activeRightTab === 'bom' && (
-            <section className="sidebar-section" data-testid="bom-panel" id="bom-panel" role="tabpanel">
-              <h3 className="sidebar-title">Bill of Quantities</h3>
+            <section
+              className="sidebar-section sidebar-section-bom"
+              data-testid="bom-panel"
+              id="bom-panel"
+              role="tabpanel"
+            >
               <BOMPanel />
             </section>
           )}

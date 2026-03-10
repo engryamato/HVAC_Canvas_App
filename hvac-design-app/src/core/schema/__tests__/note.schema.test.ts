@@ -46,7 +46,7 @@ describe('NoteSchema', () => {
   const validNote = {
     id: '550e8400-e29b-41d4-a716-446655440000',
     type: 'note' as const,
-    transform: { x: 50, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 50, y: 100, rotation: 0, scaleX: 1, scaleY: 1, elevation: 0 },
     zIndex: 10,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',

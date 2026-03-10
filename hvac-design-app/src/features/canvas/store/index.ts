@@ -20,6 +20,18 @@ export {
   useViewportActions,
 } from './viewportStore';
 
+export {
+  useViewModeStore,
+  useActiveViewMode,
+  type CanvasViewMode,
+} from './viewModeStore';
+
+export {
+  useThreeDViewStore,
+  type ThreeDViewState,
+  type Vector3State,
+} from './threeDViewStore';
+
 // Re-export viewport constants from centralized location
 export {
   MIN_ZOOM,

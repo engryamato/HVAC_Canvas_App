@@ -7,6 +7,7 @@ import { z } from 'zod';
 export const TransformSchema = z.object({
   x: z.number().describe('X position in pixels from origin'),
   y: z.number().describe('Y position in pixels from origin'),
+  elevation: z.number().default(0).describe('Vertical world position in 3D space (inches from floor)'),
   rotation: z.number().min(0).max(360).default(0).describe('Rotation in degrees'),
   scaleX: z.number().positive().default(1).describe('Horizontal scale factor'),
   scaleY: z.number().positive().default(1).describe('Vertical scale factor'),
@@ -51,6 +52,7 @@ export function createDefaultTransform(overrides?: Partial<Transform>): Transfor
   return {
     x: 0,
     y: 0,
+    elevation: 0,
     rotation: 0,
     scaleX: 1,
     scaleY: 1,

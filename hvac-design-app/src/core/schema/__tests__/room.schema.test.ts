@@ -64,9 +64,9 @@ describe('RoomPropsSchema', () => {
     expect(() => RoomPropsSchema.parse({ ...DEFAULT_ROOM_PROPS, length: 10001 })).toThrow();
   });
 
-  it('should enforce height validation range', () => {
-    expect(() => RoomPropsSchema.parse({ ...DEFAULT_ROOM_PROPS, height: 0 })).toThrow();
-    expect(() => RoomPropsSchema.parse({ ...DEFAULT_ROOM_PROPS, height: 501 })).toThrow();
+  it('should enforce ceilingHeight validation range', () => {
+    expect(() => RoomPropsSchema.parse({ ...DEFAULT_ROOM_PROPS, ceilingHeight: 0 })).toThrow();
+    expect(() => RoomPropsSchema.parse({ ...DEFAULT_ROOM_PROPS, ceilingHeight: 501 })).toThrow();
   });
 
   it('should enforce ACH validation range', () => {
@@ -89,7 +89,7 @@ describe('RoomSchema', () => {
   const validRoom = {
     id: '550e8400-e29b-41d4-a716-446655440000',
     type: 'room' as const,
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1, elevation: 0 },
     zIndex: 0,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',

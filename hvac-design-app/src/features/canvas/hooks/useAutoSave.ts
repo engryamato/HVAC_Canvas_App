@@ -6,6 +6,8 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore, useProjectActions } from '@/core/store/project.store';
 import { useViewportStore } from '../store/viewportStore';
 import { useSelectionStore } from '../store/selectionStore';
+import { useThreeDViewStore } from '../store/threeDViewStore';
+import { useViewModeStore } from '../store/viewModeStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useSettingsStore } from '@/core/store/settingsStore';
@@ -119,6 +121,8 @@ export function buildProjectFileFromStores(): ProjectFile | null {
 
   const entityStore = useEntityStore.getState();
   const viewportStore = useViewportStore.getState();
+  const threeDViewStore = useThreeDViewStore.getState();
+  const viewModeStore = useViewModeStore.getState();
   const preferences = usePreferencesStore.getState();
   const historyStore = useHistoryStore.getState();
 
@@ -161,6 +165,17 @@ export function buildProjectFileFromStores(): ProjectFile | null {
       gridSize: preferences.gridSize,
       gridVisible: viewportStore.gridVisible,
       snapToGrid: viewportStore.snapToGrid,
+      activeViewMode: viewModeStore.activeViewMode,
+    },
+    threeDViewState: {
+      cameraTarget: threeDViewStore.cameraTarget,
+      cameraPosition: threeDViewStore.cameraPosition,
+      orbitRadius: threeDViewStore.orbitRadius,
+      polarAngle: threeDViewStore.polarAngle,
+      azimuthAngle: threeDViewStore.azimuthAngle,
+      showGrid: threeDViewStore.showGrid,
+      showAxes: threeDViewStore.showAxes,
+      showPlanOverlay: threeDViewStore.showPlanOverlay,
     },
     commandHistory: {
       commands: historyStore.past,
@@ -168,22 +183,22 @@ export function buildProjectFileFromStores(): ProjectFile | null {
     },
     calculations: calculateSystemMetrics(entityStore.byId),
     billOfMaterials: (() => {
-        const bom = generateBillOfMaterials(entityStore);
-        const mapItem = <T extends 'Duct' | 'Fitting' | 'Equipment'>(type: T) => (item: BomItem) => ({
-            id: String(item.itemNumber),
-            name: item.name,
-            quantity: item.quantity,
-            unit: item.unit,
-            cost: 0,
-            type: type,
-            details: item.specifications || item.description,
-        });
+      const bom = generateBillOfMaterials(entityStore);
+      const mapItem = <T extends 'Duct' | 'Fitting' | 'Equipment'>(type: T) => (item: BomItem) => ({
+        id: String(item.itemNumber),
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        cost: 0,
+        type: type,
+        details: item.specifications || item.description,
+      });
 
-        return {
-            ducts: bom.filter(i => i.type === 'Duct').map(mapItem('Duct')),
-            fittings: bom.filter(i => i.type === 'Fitting').map(mapItem('Fitting')),
-            equipment: bom.filter(i => i.type === 'Equipment').map(mapItem('Equipment')),
-        };
+      return {
+        ducts: bom.filter(i => i.type === 'Duct').map(mapItem('Duct')),
+        fittings: bom.filter(i => i.type === 'Fitting').map(mapItem('Fitting')),
+        equipment: bom.filter(i => i.type === 'Equipment').map(mapItem('Equipment')),
+      };
     })(),
   };
 }
@@ -617,7 +632,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
             }
 
             const result = await saveProject(projectFile, projectListItem.filePath!);
-            
+
             if (!result.success) {
               console.error('[useAutoSave] Failed to save to file:', result.error);
               // Fall back to localStorage on error
@@ -730,12 +745,43 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
       setDirty(true);
     });
 
+    // Dedicated immediate-debounce saves for view/camera state changes.
+    // These fire independently of the entity dirty-flag to guarantee mode and
+    // camera continuity on quick close/reopen where no entity mutation occurred.
+    let viewCameraDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+    const flushViewCameraSave = () => {
+      if (viewCameraDebounceTimer !== null) {
+        clearTimeout(viewCameraDebounceTimer);
+      }
+      viewCameraDebounceTimer = setTimeout(() => {
+        saveWithBackup('auto');
+        viewCameraDebounceTimer = null;
+      }, 1500);
+    };
+
+    const viewModeUnsub = useViewModeStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
+      flushViewCameraSave();
+    });
+
+    const threeDViewUnsub = useThreeDViewStore.subscribe(() => {
+      setLocalDirty(true);
+      setDirty(true);
+      flushViewCameraSave();
+    });
+
     return () => {
       entityUnsub();
       viewportUnsub();
       selectionUnsub();
       historyUnsub();
       preferencesUnsub();
+      viewModeUnsub();
+      threeDViewUnsub();
+      if (viewCameraDebounceTimer !== null) {
+        clearTimeout(viewCameraDebounceTimer);
+      }
     };
   }, [setDirty]);
 

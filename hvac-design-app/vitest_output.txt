@@ -1,0 +1,3624 @@
+
+> sizewise-hvac-canvas@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app
+
+ ✓ src/core/services/__tests__/OperationQueue.test.ts  (27 tests) 15ms
+ ✓ src/__tests__/user-journeys/calculation-workflow.test.ts  (65 tests) 5ms
+ ✓ src/utils/analytics/__tests__/analytics.test.ts  (27 tests) 7ms
+ ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts  (56 tests | 7 failed) 17ms
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > FR-CANV-001: Viewport Controls > Zoom Functionality > should zoom in by step
+     → expected 1 to be 1.1 // Object.is equality
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > FR-CANV-001: Viewport Controls > Zoom Functionality > should zoom out by step
+     → expected 1 to be 0.9 // Object.is equality
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > FR-CANV-001: Viewport Controls > Zoom Functionality > should clamp zoom to minimum (10%)
+     → expected 1 to be 0.1 // Object.is equality
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > FR-CANV-001: Viewport Controls > Zoom Functionality > should clamp zoom to maximum (400%)
+     → expected 1 to be 4 // Object.is equality
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > FR-CANV-001: Viewport Controls > Zoom Functionality > should zoom to specific level
+     → expected 1 to be 1.5 // Object.is equality
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > FR-CANV-001: Viewport Controls > Zoom Functionality > should zoom toward cursor position
+     → expected 1 to be greater than 1
+   ❯ src/__tests__/user-journeys/canvas-design-workflow.test.ts > Canvas Design Workflow User Journey > Complete Office HVAC Design Workflow > should complete full design workflow per UserJourney.md
+     → expected 1 to be greater than 1
+ ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts  (49 tests | 22 failed) 31ms
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should create project folder structure on first save
+     → expected "spy" to be called with arguments: [ …(2) ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should serialize project correctly
+     → expected "spy" to be called with arguments: [ ObjectContaining{…} ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should create backup before overwriting
+     → expected "spy" to be called at least once
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should use atomic write (temp file → rename pattern)
+     → expected "spy" to be called with arguments: [ Array(2) ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should return SaveResult with filePath and sizeBytes
+     → expected false to be true // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should handle permission denied errors
+     → expected 'VALIDATION_ERROR' to be 'PERMISSION_DENIED' // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveProject() > should handle disk full errors
+     → expected 'VALIDATION_ERROR' to be 'WRITE_ERROR' // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > duplicateProject() > should create copy with new ID and name
+     → expected false to be true // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > duplicateProject() > should preserve all entities and settings
+     → expected false to be true // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > duplicateProject() > should reset timestamps
+     → expected false to be true // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > listProjects() > should scan directory and return metadata
+     → expected [] to have a length of 1 but got +0
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > listProjects() > should skip corrupted files
+     → expected [] to have a length of 1 but got +0
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > listProjects() > should sort by modifiedAt descending
+     → Cannot read properties of undefined (reading 'projectId')
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > searchProjects() > should filter by project name (case-insensitive)
+     → expected [] to have a length of 1 but got +0
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > searchProjects() > should filter by project number
+     → expected [] to have a length of 1 but got +0
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > searchProjects() > should filter by client name
+     → expected [] to have a length of 1 but got +0
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > restoreAutoSave() > should load auto-save file
+     → expected false to be true // Object.is equality
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > restoreAutoSave() > should promote to main file
+     → expected "spy" to be called with arguments: [ StringContaining ".hvac", …(1) ]
+
+Received: 
+
+
+
+Number of calls: 0
+
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > updateMetadata() > should update metadata fields
+     → Failed to load project for metadata update
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > updateMetadata() > should preserve entities
+     → Failed to load project for metadata update
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveThumbnail() > should write thumbnail to .metadata/ directory
+     → imageData.arrayBuffer is not a function
+   ❯ src/core/persistence/adapters/__tests__/TauriStorageAdapter.test.ts > TauriStorageAdapter > saveThumbnail() > should handle Blob conversion
+     → promise rejected "TypeError: imageData.arrayBuffer is not a…" instead of resolving
+ ✓ src/core/store/__tests__/integration/store.integration.test.ts  (17 tests) 38ms
+ ❯ src/__tests__/user-journeys/entity-manipulation.test.ts  (60 tests | 1 failed) 69ms
+   ❯ src/__tests__/user-journeys/entity-manipulation.test.ts > Entity Manipulation User Journey > Property Updates (Inspector Panel) > Duct Property Updates > should update duct airflow
+     → expected +0 to be 1000 // Object.is equality
+ ✓ src/__tests__/user-journeys/export-workflow.test.ts  (30 tests) 19ms
+ ❯ src/__tests__/user-journeys/project-lifecycle.test.ts  (24 tests | 3 failed) 23ms
+   ❯ src/__tests__/user-journeys/project-lifecycle.test.ts > Project Lifecycle User Journey > FR-FILE-002: Save Operations - State Serialization > should serialize viewport state correctly
+     → expected 1 to be 1.5 // Object.is equality
+   ❯ src/__tests__/user-journeys/project-lifecycle.test.ts > Project Lifecycle User Journey > FR-FILE-003: Load Operations - State Hydration > should hydrate viewport state from project file
+     → expected 1 to be 0.75 // Object.is equality
+   ❯ src/__tests__/user-journeys/project-lifecycle.test.ts > Project Lifecycle User Journey > Project State Consistency > should maintain consistent state across multiple operations
+     → expected 1 to be 1.25 // Object.is equality
+ ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts  (18 tests | 14 failed) 39ms
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Room Tool Rendering > should render room preview while dragging
+     → ctx.save is not a function
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Duct Tool Rendering > should render duct preview while dragging
+     → ctx.save is not a function
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Duct Tool Rendering > should calculate correct duct rotation based on endpoints
+     → Cannot read properties of undefined (reading 'transform')
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Duct Tool Rendering > should render ducts with correct dimensions
+     → Cannot read properties of undefined (reading 'props')
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Equipment Tool Rendering > should render equipment preview at cursor
+     → expected 0 to be greater than 0
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Equipment Tool Rendering > should create equipment with proper dimensions
+     → Cannot read properties of undefined (reading 'props')
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Equipment Tool Rendering > should render multiple equipment units without overlap issues
+     → expected +0 to be 9 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Fitting Tool Rendering > should render fitting preview at cursor
+     → expected 0 to be greater than 0
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Fitting Tool Rendering > should create fittings with appropriate z-index for layering
+     → Cannot read properties of undefined (reading 'zIndex')
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Note Tool Rendering > should render note preview at cursor
+     → fillText does not exist
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Note Tool Rendering > should create notes with highest z-index
+     → Cannot read properties of undefined (reading 'zIndex')
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Mixed Entity Rendering > should render complex HVAC system with all entity types
+     → expected 2 to be 6 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Mixed Entity Rendering > should handle rendering with canvas transformations
+     → ctx.save is not a function
+   ❯ src/features/canvas/__tests__/integration/canvas-rendering.integration.test.ts > Canvas Rendering Integration Tests > Performance > should clear canvas efficiently before redraw
+     → clearRect does not exist
+ ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts  (15 tests | 8 failed) 58ms
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Complete HVAC Design Workflow > should create a complete HVAC design with rooms, ducts, equipment, and fittings
+     → expected 2 to be 3 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Complete HVAC Design Workflow > should maintain proper z-index ordering for all entity types
+     → expected undefined not to be undefined
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Undo/Redo Integration > undo removes full auto-insert fitting batch atomically
+     → expected +0 to be 3 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Undo/Redo Integration > should support undo/redo across multiple tool operations
+     → expected 1 to be 2 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Undo/Redo Integration > should maintain history stack across complex workflows
+     → expected 1 to be 3 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Undo/Redo Integration > cleans orphan auto-inserted fittings after connected duct removal on next insertion pass
+     → expected +0 to be 1 // Object.is equality
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Grid Snapping Integration > should snap entities to grid across all tools
+     → Cannot read properties of undefined (reading 'transform')
+   ❯ src/features/canvas/__tests__/integration/tool-workflow.integration.test.ts > Tool Workflow Integration Tests > Error Handling and Edge Cases > should handle creating entities at same location
+     → expected 2 to be 4 // Object.is equality
+ ✓ src/core/persistence/__tests__/projectIO.test.ts  (21 tests) 11ms
+stdout | src/features/export/__tests__/export.test.ts > Export - PDF > generates a valid PDF file header
+Of the table content, 107 units width could not fit page
+
+ ✓ src/features/export/__tests__/export.test.ts  (26 tests) 63ms
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > addProject > should add a new project to the beginning of the list
+[ProjectListStore] Adding project: {
+  projectId: '4304358f-64c9-442b-bea9-47ca8e2fd0a2',
+  projectName: 'First Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.120Z',
+  modifiedAt: '2026-03-07T19:29:09.120Z',
+  storagePath: 'project-c52ad22f-1538-44cc-a062-2d416fd35813',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > addProject > should prepend new projects (most recent first)
+[ProjectListStore] Adding project: {
+  projectId: 'ba2c0513-c355-4349-bb47-e8887b6d98f4',
+  projectName: 'First',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.121Z',
+  modifiedAt: '2026-03-07T19:29:09.121Z',
+  storagePath: 'project-3c396a29-48f4-4b3e-8d3a-e0bcf3fc07b7',
+  isArchived: false,
+  status: 'draft'
+}
+[ProjectListStore] Adding project: {
+  projectId: 'bac01331-beef-4f4c-a37d-f3f73ae1c248',
+  projectName: 'Second',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.121Z',
+  modifiedAt: '2026-03-07T19:29:09.121Z',
+  storagePath: 'project-0dd128d2-70b4-4588-9146-04d06b7da341',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > addProject > should persist project to localStorage
+[ProjectListStore] Adding project: {
+  projectId: 'b7fdd64e-eb78-47bf-8425-0c63da1de391',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.121Z',
+  modifiedAt: '2026-03-07T19:29:09.121Z',
+  storagePath: 'project-c130cd66-ec0f-4978-af95-8e3d966856df',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > updateProject > should update project name
+[ProjectListStore] Adding project: {
+  projectId: 'cf1efe5b-2424-4ee2-960b-dd4aa5bff28f',
+  projectName: 'Original',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.121Z',
+  modifiedAt: '2026-03-07T19:29:09.121Z',
+  storagePath: 'project-577d6236-6663-4e95-9675-0325eb54c5c2',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > updateProject > should update modifiedAt timestamp on update
+[ProjectListStore] Adding project: {
+  projectId: '1d308e61-bf3c-4a28-a844-f8c06757f0e3',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.121Z',
+  modifiedAt: '2024-01-01T00:00:00.000Z',
+  storagePath: 'project-3005443a-2feb-44ed-8e58-bfb7e9dabc86',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > updateProject > should persist updates to localStorage
+[ProjectListStore] Adding project: {
+  projectId: '783e96fe-19a1-490b-b521-273d5ff4f79a',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.121Z',
+  modifiedAt: '2026-03-07T19:29:09.121Z',
+  storagePath: 'project-fd09aa8c-7388-4540-8c2a-a509249ad297',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > removeProject > should remove project from list
+[ProjectListStore] Adding project: {
+  projectId: '5be74654-000f-4efe-96f2-7c3db3deee0d',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.122Z',
+  modifiedAt: '2026-03-07T19:29:09.122Z',
+  storagePath: 'project-453f3c3d-c4f6-4aee-8bc4-568199643960',
+  isArchived: false,
+  status: 'draft'
+}
+[StorageFactory] Detected Web environment, using IndexedDB
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > removeProject > should persist removal to localStorage
+[ProjectListStore] Adding project: {
+  projectId: 'f94b85aa-af0b-45c8-96f3-f26fed1450a8',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.126Z',
+  modifiedAt: '2026-03-07T19:29:09.126Z',
+  storagePath: 'project-221764a5-8414-4150-84cd-7acf57914578',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > removeProject > should not affect other projects when removing one
+[ProjectListStore] Adding project: {
+  projectId: '1b3fa11d-22e4-41ac-bc30-4034679285b4',
+  projectName: 'Keep',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.126Z',
+  modifiedAt: '2026-03-07T19:29:09.126Z',
+  storagePath: 'project-10b57c92-d25e-49f1-a988-5d83664e4b05',
+  isArchived: false,
+  status: 'draft'
+}
+[ProjectListStore] Adding project: {
+  projectId: 'fad16c08-a41d-433d-a9a5-606ade1f99b5',
+  projectName: 'Remove',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.126Z',
+  modifiedAt: '2026-03-07T19:29:09.126Z',
+  storagePath: 'project-07ce6d1f-e695-4505-8426-ff99cc6faeef',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > archiveProject > should set isArchived to true
+[ProjectListStore] Adding project: {
+  projectId: '3505d9d9-6e0f-45e4-b772-a5132e4290d1',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.127Z',
+  modifiedAt: '2026-03-07T19:29:09.127Z',
+  storagePath: 'project-a46f6d02-2eca-4c68-8da8-32813f81a251',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > archiveProject > should update modifiedAt timestamp
+[ProjectListStore] Adding project: {
+  projectId: 'f1e7a1cc-a215-45be-b37b-d6cfcd2f782e',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.127Z',
+  modifiedAt: '2024-01-01T00:00:00.000Z',
+  storagePath: 'project-a492f701-f131-421f-98b5-61f4a91dfd95',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > restoreProject > should set isArchived to false
+[ProjectListStore] Adding project: {
+  projectId: '78c2cbe1-e0ef-4736-8ba4-2fa91382bce9',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.127Z',
+  modifiedAt: '2026-03-07T19:29:09.127Z',
+  storagePath: 'project-3b36beb2-3905-481d-a73a-09f7fc6eac58',
+  isArchived: true,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should create a copy with new ID
+[ProjectListStore] Adding project: {
+  projectId: 'cd54ae65-5624-4b1f-a4f4-7903f5bed684',
+  projectName: 'Original',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.127Z',
+  modifiedAt: '2026-03-07T19:29:09.127Z',
+  storagePath: 'project-36593b12-79a5-485f-a820-f99fe385de6a',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should set new storagePath for duplicate
+[ProjectListStore] Adding project: {
+  projectId: '9fbcdecf-7c3d-4ca8-a16f-f34459fea3fa',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.128Z',
+  modifiedAt: '2026-03-07T19:29:09.128Z',
+  storagePath: 'project-803767c3-fced-482f-9e55-189d16ef372a',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should reset isArchived to false for duplicate
+[ProjectListStore] Adding project: {
+  projectId: '0dbc18eb-c6cc-4ea7-9b69-b6e26085ef67',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.128Z',
+  modifiedAt: '2026-03-07T19:29:09.128Z',
+  storagePath: 'project-8cba96f0-17ed-448e-ba18-a65a46e501f2',
+  isArchived: true,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should set new timestamps for duplicate
+[ProjectListStore] Adding project: {
+  projectId: 'ee0d3b7e-8a7a-4fc6-9f4f-1764db5f380b',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2020-01-01T00:00:00.000Z',
+  modifiedAt: '2020-01-01T00:00:00.000Z',
+  storagePath: 'project-543fb96e-8f31-4bb8-8b62-56c33bfa2c5b',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > selector hooks > useActiveProjects should filter out archived projects
+[ProjectListStore] Adding project: {
+  projectId: '39f9a58d-1f5b-42dd-82f0-f56325cd04e6',
+  projectName: 'Active',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.128Z',
+  modifiedAt: '2026-03-07T19:29:09.128Z',
+  storagePath: 'project-b52fa488-965b-4df7-9203-0f6f4a265715',
+  isArchived: false,
+  status: 'draft'
+}
+[ProjectListStore] Adding project: {
+  projectId: '6bd2ed7a-750c-4013-b80b-20aacc98ae80',
+  projectName: 'Archived',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.128Z',
+  modifiedAt: '2026-03-07T19:29:09.128Z',
+  storagePath: 'project-6f310e35-9969-4fa2-ad0f-fda8f33d4f32',
+  isArchived: true,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > selector hooks > useArchivedProjects should return only archived projects
+[ProjectListStore] Adding project: {
+  projectId: 'a7f03b26-2f07-4a4a-86fe-609c48d7121c',
+  projectName: 'Active',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.128Z',
+  modifiedAt: '2026-03-07T19:29:09.128Z',
+  storagePath: 'project-36f4f0f0-609a-41df-880e-17dbc0070394',
+  isArchived: false,
+  status: 'draft'
+}
+[ProjectListStore] Adding project: {
+  projectId: '3415adff-3b2c-4aa2-b5e2-db7ef804c2c1',
+  projectName: 'Archived',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.128Z',
+  modifiedAt: '2026-03-07T19:29:09.128Z',
+  storagePath: 'project-c2abd7ad-4002-46c3-8009-d31bd0d546f9',
+  isArchived: true,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > localStorage persistence > should use correct storage key
+[ProjectListStore] Adding project: {
+  projectId: 'cc595f4a-0299-4120-93fd-2244c6c4e4e3',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.129Z',
+  modifiedAt: '2026-03-07T19:29:09.129Z',
+  storagePath: 'project-31008d3d-2f3f-4172-bdb7-dead887bb0db',
+  isArchived: false,
+  status: 'draft'
+}
+
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > localStorage persistence > should validate ProjectListItem structure
+[ProjectListStore] Adding project: {
+  projectId: '13b84047-9764-45a1-905c-7d19b80e4173',
+  projectName: 'Test Project',
+  projectNumber: 'TEST-001',
+  clientName: 'Test Client',
+  createdAt: '2026-03-07T19:29:09.129Z',
+  modifiedAt: '2026-03-07T19:29:09.129Z',
+  storagePath: 'project-f992c838-bf25-4da7-872a-8b59d8de414c',
+  isArchived: false,
+  status: 'draft'
+}
+
+ ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts  (23 tests | 7 failed) 11ms
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > removeProject > should remove project from list
+     → expected [ { …(9) } ] to have a length of +0 but got 1
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > removeProject > should persist removal to localStorage
+     → expected [ { …(9) } ] to have a length of +0 but got 1
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > removeProject > should not affect other projects when removing one
+     → expected [ { …(9) }, { …(9) } ] to have a length of 1 but got 2
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should create a copy with new ID
+     → expected [ { …(9) } ] to have a length of 2 but got 1
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should set new storagePath for duplicate
+     → expected 'project-803767c3-fced-482f-9e55-189d1…' not to be 'project-803767c3-fced-482f-9e55-189d1…' // Object.is equality
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should reset isArchived to false for duplicate
+     → expected true to be false // Object.is equality
+   ❯ src/features/dashboard/store/__tests__/projectListStore.test.ts > ProjectListStore > duplicateProject > should set new timestamps for duplicate
+     → expected '2020-01-01T00:00:00.000Z' not to be '2020-01-01T00:00:00.000Z' // Object.is equality
+stdout | src/features/dashboard/store/__tests__/projectListStore.test.ts
+[StorageFactory] Detected Web environment, using IndexedDB
+[ProjectListStore] Event subscriptions initialized
+
+ ✓ src/core/store/__tests__/preferencesStore.test.ts  (24 tests) 4ms
+ ✓ src/core/services/__tests__/StorageRootService.test.ts  (13 tests) 6ms
+ ✓ src/features/canvas/utils/__tests__/ProfessionalRenderingHelper.test.ts  (23 tests) 10ms
+ ✓ src/features/canvas/hooks/__tests__/useUndoRedo.test.ts  (18 tests) 32ms
+stdout | createStorageAdapter (/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/persistence/factory.ts:42:11)
+[StorageFactory] Detected Web environment, using IndexedDB
+
+stdout | Object.debug (/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/utils/logger.ts:21:42)
+[ProjectListStore] Event subscriptions initialized
+
+stdout | createStorageAdapter (/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/persistence/factory.ts:42:11)
+[StorageFactory] Detected Web environment, using IndexedDB
+
+stdout | Object.debug (/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/utils/logger.ts:21:42)
+[ProjectListStore] Event subscriptions initialized
+
+ ❯ src/features/canvas/hooks/__tests__/useKeyboardShortcuts.test.ts  (24 tests | 3 failed) 26ms
+   ❯ src/features/canvas/hooks/__tests__/useKeyboardShortcuts.test.ts > useKeyboardShortcuts > Viewport Shortcuts > should zoom in when + is pressed
+     → expected 1 to be greater than 1
+   ❯ src/features/canvas/hooks/__tests__/useKeyboardShortcuts.test.ts > useKeyboardShortcuts > Viewport Shortcuts > should zoom in when = is pressed
+     → expected 1 to be greater than 1
+   ❯ src/features/canvas/hooks/__tests__/useKeyboardShortcuts.test.ts > useKeyboardShortcuts > Viewport Shortcuts > should zoom out when - is pressed
+     → expected 2 to be less than 2
+stdout | src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave - Storage Functions > should fall back to backup when primary is corrupted
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_corrupt {
+  projectId: '11111111-1111-4111-8111-111111111111',
+  source: 'primary'
+}
+[Telemetry] Skipping telemetry; endpoint not configured. localstorage_recovered { projectId: '11111111-1111-4111-8111-111111111111', source: 'backup' }
+
+stdout | src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave - Hook Behavior > should save when saveNow() is called
+[Telemetry] Skipping telemetry; endpoint not configured. manual_save_success {
+  projectId: '22222222-2222-4222-8222-222222222222',
+  projectSizeBytes: 2174,
+  source: 'manual'
+}
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: '22222222-2222-4222-8222-222222222222', source: 'auto' }
+
+stdout | src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave - Hook Behavior > should auto-save at interval
+[Telemetry] Skipping telemetry; endpoint not configured. auto_save_success {
+  projectId: '22222222-2222-4222-8222-222222222222',
+  projectSizeBytes: 2545,
+  source: 'auto'
+}
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: '22222222-2222-4222-8222-222222222222', source: 'auto' }
+
+stdout | src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave — view/camera debounced persistence > saves after viewModeStore changes within debounce window (1500ms)
+[Telemetry] Skipping telemetry; endpoint not configured. auto_save_success {
+  projectId: '44444444-4444-4444-8444-444444444444',
+  projectSizeBytes: 2176,
+  source: 'auto'
+}
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: '44444444-4444-4444-8444-444444444444', source: 'auto' }
+
+stdout | src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave — view/camera debounced persistence > saves after threeDViewStore changes within debounce window (1500ms)
+[Telemetry] Skipping telemetry; endpoint not configured. auto_save_success {
+  projectId: '44444444-4444-4444-8444-444444444444',
+  projectSizeBytes: 2172,
+  source: 'auto'
+}
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: '44444444-4444-4444-8444-444444444444', source: 'auto' }
+
+ ✓ src/features/canvas/hooks/__tests__/useAutoSave.test.ts  (11 tests) 30ms
+stdout | src/features/canvas/hooks/__tests__/useAutoSave.test.ts > useAutoSave — view/camera debounced persistence > debounces rapid successive camera changes into a single save
+[Telemetry] Skipping telemetry; endpoint not configured. auto_save_success {
+  projectId: '44444444-4444-4444-8444-444444444444',
+  projectSizeBytes: 2172,
+  source: 'auto'
+}
+[Telemetry] Skipping telemetry; endpoint not configured. cloud_backup_failure { projectId: '44444444-4444-4444-8444-444444444444', source: 'auto' }
+
+ ✓ src/stores/__tests__/useAppStateStore.test.ts  (18 tests) 7ms
+ ❯ src/features/canvas/components/__tests__/Toolbar.test.tsx  (19 tests | 2 failed) 166ms
+   ❯ src/features/canvas/components/__tests__/Toolbar.test.tsx > Toolbar - Undo/Redo Integration > Tool Buttons > should show equipment selector when equipment tool active
+     → Unable to find an element with the text: /equipment type/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33maria-label[39m=[32m"Canvas tools"[39m
+      [33mclass[39m=[32m"
+        flex gap-2 p-2 bg-slate-50 rounded-lg shadow-sm border border-slate-200
+        flex-col items-start
+        
+      "[39m
+      [33mdata-testid[39m=[32m"toolbar"[39m
+      [33mrole[39m=[32m"toolbar"[39m
+    [36m>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Select"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-select"[39m
+        [33mtitle[39m=[32m"Select (V)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mSelect[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mV[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Pan"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-pan"[39m
+        [33mtitle[39m=[32m"Pan (Space)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mPan[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mSpace[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Duct"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-duct"[39m
+        [33mtitle[39m=[32m"Duct (D)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<line[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mx1[39m=[32m"4"[39m
+            [33mx2[39m=[32m"20"[39m
+            [33my1[39m=[32m"12"[39m
+            [33my2[39m=[32m"12"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mx1[39m=[32m"4"[39m
+            [33mx2[39m=[32m"20"[39m
+            [33my1[39m=[32m"8"[39m
+            [33my2[39m=[32m"8"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mx1[39m=[32m"4"[39m
+            [33mx2[39m=[32m"20"[39m
+            [33my1[39m=[32m"16"[39m
+            [33my2[39m=[32m"16"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mDuct[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mD[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Fitting"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-fitting"[39m
+        [33mtitle[39m=[32m"Fitting (F)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M5 7h8v4h4v8H9v-4H5z"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mFitting[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mF[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Equipment"[39m
+        [33maria-pressed[39m=[32m"true"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        active bg-blue-500 text-white shadow-sm
+      "[39m
+        [33mdata-testid[39m=[32m"tool-equipment"[39m
+        [33mtitle[39m=[32m"Equipment (E)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<rect[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mrx[39m=[32m"2"[39m
+            [33mwidth[39m=[32m"16"[39m
+            [33mx[39m=[32m"4"[39m
+            [33my[39m=[32m"4"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"12"[39m
+            [33mcy[39m=[32m"12"[39m
+            [33mr[39m=[32m"4"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mEquipment[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mE[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Room"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-room"[39m
+        [33mtitle[39m=[32m"Room (R)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<rect[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mrx[39m=[32m"2"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mx[39m=[32m"3"[39m
+            [33my[39m=[32m"3"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mRoom[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mR[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Note"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-note"[39m
+        [33mtitle[39m=[32m"Note (N)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M14 3v4a1 1 0 0 0 1 1h4"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"9"[39m
+            [33mx2[39m=[32m"10"[39m
+            [33my1[39m=[32m"9"[39m
+            [33my2[39m=[32m"9"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"9"[39m
+            [33mx2[39m=[32m"15"[39m
+            [33my1[39m=[32m"13"[39m
+            [33my2[39m=[32m"13"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"9"[39m
+            [33mx2[39m=[32m"15"[39m
+            [33my1[39m=[32m"17"[39m
+            [33my2[39m=[32m"17"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mNote[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mN[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-1 ml-2 pl-2 border-l border-slate-200"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Undo (Ctrl+Z)"[39m
+          [33mclass[39m=[32m"
+        w-8 h-8 flex items-center justify-center rounded transition-colors
+        text-gray-400 cursor-not-allowed
+      "[39m
+          [33mdata-testid[39m=[32m"undo-button"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M3 7v6h6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Redo (Ctrl+Y)"[39m
+          [33mclass[39m=[32m"
+        w-8 h-8 flex items-center justify-center rounded transition-colors
+        text-gray-400 cursor-not-allowed
+      "[39m
+          [33mdata-testid[39m=[32m"redo-button"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M21 7v6h-6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/__tests__/Toolbar.test.tsx > Toolbar - Undo/Redo Integration > Tool Buttons > should show fitting selector when fitting tool active
+     → Unable to find an element with the text: /fitting type/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33maria-label[39m=[32m"Canvas tools"[39m
+      [33mclass[39m=[32m"
+        flex gap-2 p-2 bg-slate-50 rounded-lg shadow-sm border border-slate-200
+        flex-col items-start
+        
+      "[39m
+      [33mdata-testid[39m=[32m"toolbar"[39m
+      [33mrole[39m=[32m"toolbar"[39m
+    [36m>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Select"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-select"[39m
+        [33mtitle[39m=[32m"Select (V)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mSelect[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mV[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Pan"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-pan"[39m
+        [33mtitle[39m=[32m"Pan (Space)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mPan[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mSpace[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Duct"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-duct"[39m
+        [33mtitle[39m=[32m"Duct (D)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<line[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mx1[39m=[32m"4"[39m
+            [33mx2[39m=[32m"20"[39m
+            [33my1[39m=[32m"12"[39m
+            [33my2[39m=[32m"12"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mx1[39m=[32m"4"[39m
+            [33mx2[39m=[32m"20"[39m
+            [33my1[39m=[32m"8"[39m
+            [33my2[39m=[32m"8"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mx1[39m=[32m"4"[39m
+            [33mx2[39m=[32m"20"[39m
+            [33my1[39m=[32m"16"[39m
+            [33my2[39m=[32m"16"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mDuct[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mD[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Fitting"[39m
+        [33maria-pressed[39m=[32m"true"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        active bg-blue-500 text-white shadow-sm
+      "[39m
+        [33mdata-testid[39m=[32m"tool-fitting"[39m
+        [33mtitle[39m=[32m"Fitting (F)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M5 7h8v4h4v8H9v-4H5z"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mFitting[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mF[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Equipment"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-equipment"[39m
+        [33mtitle[39m=[32m"Equipment (E)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<rect[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mrx[39m=[32m"2"[39m
+            [33mwidth[39m=[32m"16"[39m
+            [33mx[39m=[32m"4"[39m
+            [33my[39m=[32m"4"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"12"[39m
+            [33mcy[39m=[32m"12"[39m
+            [33mr[39m=[32m"4"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mEquipment[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mE[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Room"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-room"[39m
+        [33mtitle[39m=[32m"Room (R)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<rect[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mrx[39m=[32m"2"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mx[39m=[32m"3"[39m
+            [33my[39m=[32m"3"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mRoom[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mR[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Note"[39m
+        [33maria-pressed[39m=[32m"false"[39m
+        [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+        [33mdata-testid[39m=[32m"tool-note"[39m
+        [33mtitle[39m=[32m"Note (N)"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"20"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"20"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M14 3v4a1 1 0 0 0 1 1h4"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"9"[39m
+            [33mx2[39m=[32m"10"[39m
+            [33my1[39m=[32m"9"[39m
+            [33my2[39m=[32m"9"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"9"[39m
+            [33mx2[39m=[32m"15"[39m
+            [33my1[39m=[32m"13"[39m
+            [33my2[39m=[32m"13"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"9"[39m
+            [33mx2[39m=[32m"15"[39m
+            [33my1[39m=[32m"17"[39m
+            [33my2[39m=[32m"17"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+        [36m>[39m
+          [0mNote[0m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m([0m
+            [0mN[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-1 ml-2 pl-2 border-l border-slate-200"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Undo (Ctrl+Z)"[39m
+          [33mclass[39m=[32m"
+        w-8 h-8 flex items-center justify-center rounded transition-colors
+        text-gray-400 cursor-not-allowed
+      "[39m
+          [33mdata-testid[39m=[32m"undo-button"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M3 7v6h6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Redo (Ctrl+Y)"[39m
+          [33mclass[39m=[32m"
+        w-8 h-8 flex items-center justify-center rounded transition-colors
+        text-gray-400 cursor-not-allowed
+      "[39m
+          [33mdata-testid[39m=[32m"redo-button"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M21 7v6h-6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ✓ src/features/canvas/services/__tests__/CanvasPerformanceService.test.ts  (20 tests) 7ms
+ ✓ src/features/canvas/tools/__tests__/NoteTool.test.ts  (14 tests) 12ms
+ ❯ src/core/schema/__tests__/project-file.schema.test.ts  (24 tests | 6 failed) 25ms
+   ❯ src/core/schema/__tests__/project-file.schema.test.ts > EntitySchema (discriminated union) > should parse duct entity
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "props",
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+   ❯ src/core/schema/__tests__/project-file.schema.test.ts > ViewportStateSchema > should enforce zoom range (0.1-4)
+     → expected [Function] to throw an error
+   ❯ src/core/schema/__tests__/project-file.schema.test.ts > ProjectSettingsSchema > should apply defaults
+     → expected 12 to be 24 // Object.is equality
+   ❯ src/core/schema/__tests__/project-file.schema.test.ts > ProjectFileSchema > should validate empty project file
+     → expected { schemaVersion: '1.0.0', …(10) } to deeply equal { schemaVersion: '1.0.0', …(7) }
+   ❯ src/core/schema/__tests__/project-file.schema.test.ts > ProjectFileSchema > should enforce schema version format (semver)
+     → expected [Function] to throw an error
+   ❯ src/core/schema/__tests__/project-file.schema.test.ts > PlanReferenceSchema > should validate valid plan reference
+     → expected { sourceType: 'pdf', …(4) } to deeply equal { sourceType: 'pdf', …(2) }
+ ❯ src/core/services/__tests__/connectionDetection.test.ts  (11 tests | 1 failed) 8ms
+   ❯ src/core/services/__tests__/connectionDetection.test.ts > ConnectionDetectionService > detectConnections > should detect multiple connections when duct connects to multiple existing ducts
+     → expected 0 to be greater than or equal to 1
+stdout | src/core/persistence/__tests__/ProjectRepository.corruption-integration.test.ts > ProjectRepository - Corruption Detection & Quarantine Flow > detects corrupted files, quarantines them, and returns CORRUPTED_FILE
+[ProjectRepository] File quarantined: /root/.quarantine/test-corrupted-project/project_20260210_154900.sws.corrupted
+
+stdout | src/core/persistence/__tests__/ProjectRepository.corruption-integration.test.ts > ProjectRepository - Corruption Detection & Quarantine Flow > emits project:quarantined event with details
+[ProjectRepository] File quarantined: /root/.quarantine/corrupted-test/project_20260210_154901.sws.corrupted
+
+stdout | src/core/persistence/__tests__/ProjectRepository.corruption-integration.test.ts > ProjectRepository - Corruption Detection & Quarantine Flow > keeps timestamped quarantine naming format
+[ProjectRepository] File quarantined: /root/.quarantine/timestamp-test/project_20260210_154902.sws.corrupted
+
+ ✓ src/core/persistence/__tests__/ProjectRepository.corruption-integration.test.ts  (6 tests) 4ms
+ ✓ src/core/commands/__tests__/entityCommands.test.ts  (14 tests) 11ms
+ ✓ src/features/canvas/components/__tests__/Minimap.test.tsx  (12 tests) 100ms
+ ❯ src/features/canvas/tools/__tests__/FittingTool.test.ts  (12 tests | 5 failed) 24ms
+   ❯ src/features/canvas/tools/__tests__/FittingTool.test.ts > FittingTool > mouse interactions > should create fitting entity on left mouse click
+     → expected +0 to be 1 // Object.is equality
+   ❯ src/features/canvas/tools/__tests__/FittingTool.test.ts > FittingTool > mouse interactions > should snap to grid when enabled
+     → Cannot read properties of undefined (reading 'transform')
+   ❯ src/features/canvas/tools/__tests__/FittingTool.test.ts > FittingTool > mouse interactions > should not snap to grid when disabled
+     → Cannot read properties of undefined (reading 'transform')
+   ❯ src/features/canvas/tools/__tests__/FittingTool.test.ts > FittingTool > mouse interactions > should create fitting with selected type
+     → Cannot read properties of undefined (reading 'type')
+   ❯ src/features/canvas/tools/__tests__/FittingTool.test.ts > FittingTool > render > should render preview when mouse is moved
+     → expected "spy" to be called at least once
+ ✓ src/features/dashboard/components/__tests__/ProjectCard.test.tsx  (21 tests) 136ms
+ ❯ src/components/layout/__tests__/Header.test.tsx  (23 tests | 1 failed) 98ms
+   ❯ src/components/layout/__tests__/Header.test.tsx > Header > Menu Bar > should render menu bar by default
+     → Unable to find an element by: [data-testid="tools-menu"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<header[39m
+      [33mclass[39m=[32m"h-12 glass-header flex items-center px-4 justify-between shrink-0 z-40"[39m
+      [33mdata-testid[39m=[32m"header"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 cursor-pointer group"[39m
+          [33mdata-testid[39m=[32m"app-logo"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-folder-open w-4 h-4 text-white"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</div>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-bold text-slate-800 text-sm tracking-tight"[39m
+          [36m>[39m
+            [0mHVAC Pro[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"h-5 w-px bg-slate-200"[39m
+        [36m/>[39m
+        [36m<nav[39m
+          [33mclass[39m=[32m"flex items-center gap-0.5"[39m
+          [33mrole[39m=[32m"menubar"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"file-menu"[39m
+          [36m>[39m
+            [0mFile[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"edit-menu"[39m
+          [36m>[39m
+            [0mEdit[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"view-menu"[39m
+          [36m>[39m
+            [0mView[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-testid[39m=[32m"help-menu"[39m
+          [36m>[39m
+            [0mHelp[0m
+          [36m</div>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"h-5 w-px bg-slate-200 ml-2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-1.5 text-sm"[39m
+          [33mdata-testid[39m=[32m"breadcrumb"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 py-2 text-xs gap-1.5 h-7 px-2 text-slate-500 hover:text-slate-900"[39m
+            [33mdata-testid[39m=[32m"breadcrumb-dashboard"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-house w-3.5 h-3.5"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"hidden sm:inline"[39m
+            [36m>[39m
+              [0mDashboard[0m
+            [36m</span>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Settings"[39m
+          [33mclass[39m=[32m"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 text-xs h-8 w-8 p-0 text-slate-500 hover:text-slate-900"[39m
+          [33mdata-testid[39m=[32m"settings-button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-settings w-4 h-4"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"12"[39m
+              [33mcy[39m=[32m"12"[39m
+              [33mr[39m=[32m"3"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</header>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ src/features/canvas/components/Inspector/__tests__/DuctInspector.test.tsx  (2 tests | 2 failed) 149ms
+   ❯ src/features/canvas/components/Inspector/__tests__/DuctInspector.test.tsx > DuctInspector Milestone 4 behavior > allows violating edits to persist while validation issues remain visible
+     → Unable to find a label with the text of: Airflow (CFM)
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"tabbed-properties-panel"[39m
+        [33mdata-entity-type[39m=[32m"duct"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tab-header flex border-b border-slate-200"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-blue-500 text-blue-600"[39m
+            [33mdata-testid[39m=[32m"tab-dimensions"[39m
+          [36m>[39m
+            [0mDimensions[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"[39m
+            [33mdata-testid[39m=[32m"tab-engineering"[39m
+          [36m>[39m
+            [0mEngineering[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"[39m
+            [33mdata-testid[39m=[32m"tab-costing"[39m
+          [36m>[39m
+            [0mCosting[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tab-content p-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-name"[39m
+              [36m>[39m
+                [0mName[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-name"[39m
+                  [33mtype[39m=[32m"text"[39m
+                  [33mvalue[39m=[32m"Main Duct"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-shape"[39m
+              [36m>[39m
+                [0mShape[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<select[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-shape"[39m
+                [36m>[39m
+                  [36m<option[39m
+                    [33mvalue[39m=[32m"round"[39m
+                  [36m>[39m
+                    [0mRound[0m
+                  [36m</option>[39m
+                  [36m<option[39m
+                    [33mvalue[39m=[32m"rectangular"[39m
+                  [36m>[39m
+                    [0mRectangular[0m
+                  [36m</option>[39m
+                [36m</select>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mb-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"auto-sizing-controls"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-diameter"[39m
+              [36m>[39m
+                [0mDiameter (in)[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-diameter"[39m
+                  [33mmax[39m=[32m"60"[39m
+                  [33mmin[39m=[32m"4"[39m
+                  [33mstep[39m=[32m"1"[39m
+                  [33mtype[39m=[32m"number"[39m
+                  [33mvalue[39m=[32m"12"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-length"[39m
+              [36m>[39m
+                [0mLength (ft)[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-length"[39m
+                  [33mmax[39m=[32m"1000"[39m
+                  [33mmin[39m=[32m"0.1"[39m
+                  [33mstep[39m=[32m"0.1"[39m
+                  [33mtype[39m=[32m"number"[39m
+                  [33mvalue[39m=[32m"20"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/Inspector/__tests__/DuctInspector.test.tsx > DuctInspector Milestone 4 behavior > applies one-click deterministic suggestion and shows cleared status
+     → Unable to find an accessible element with the role "button" and name `/Apply Fix/i`
+
+Here are the accessible roles:
+
+  button:
+
+  Name "Dimensions":
+  [36m<button[39m
+    [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-blue-500 text-blue-600"[39m
+    [33mdata-testid[39m=[32m"tab-dimensions"[39m
+  [36m/>[39m
+
+  Name "Engineering":
+  [36m<button[39m
+    [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"[39m
+    [33mdata-testid[39m=[32m"tab-engineering"[39m
+  [36m/>[39m
+
+  Name "Costing":
+  [36m<button[39m
+    [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"[39m
+    [33mdata-testid[39m=[32m"tab-costing"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Name":
+  [36m<input[39m
+    [33mclass[39m=[32m"_input_c58ce0"[39m
+    [33mid[39m=[32m"duct-name"[39m
+    [33mtype[39m=[32m"text"[39m
+    [33mvalue[39m=[32m"Main Duct"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  combobox:
+
+  Name "Shape":
+  [36m<select[39m
+    [33mclass[39m=[32m"_input_c58ce0"[39m
+    [33mid[39m=[32m"duct-shape"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  option:
+
+  Name "Round":
+  [36m<option[39m
+    [33mvalue[39m=[32m"round"[39m
+  [36m/>[39m
+
+  Name "Rectangular":
+  [36m<option[39m
+    [33mvalue[39m=[32m"rectangular"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  spinbutton:
+
+  Name "Diameter (in)":
+  [36m<input[39m
+    [33mclass[39m=[32m"_input_c58ce0"[39m
+    [33mid[39m=[32m"duct-diameter"[39m
+    [33mmax[39m=[32m"60"[39m
+    [33mmin[39m=[32m"4"[39m
+    [33mstep[39m=[32m"1"[39m
+    [33mtype[39m=[32m"number"[39m
+    [33mvalue[39m=[32m"12"[39m
+  [36m/>[39m
+
+  Name "Length (ft)":
+  [36m<input[39m
+    [33mclass[39m=[32m"_input_c58ce0"[39m
+    [33mid[39m=[32m"duct-length"[39m
+    [33mmax[39m=[32m"1000"[39m
+    [33mmin[39m=[32m"0.1"[39m
+    [33mstep[39m=[32m"0.1"[39m
+    [33mtype[39m=[32m"number"[39m
+    [33mvalue[39m=[32m"20"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"tabbed-properties-panel"[39m
+        [33mdata-entity-type[39m=[32m"duct"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tab-header flex border-b border-slate-200"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-blue-500 text-blue-600"[39m
+            [33mdata-testid[39m=[32m"tab-dimensions"[39m
+          [36m>[39m
+            [0mDimensions[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"[39m
+            [33mdata-testid[39m=[32m"tab-engineering"[39m
+          [36m>[39m
+            [0mEngineering[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tab-button px-4 py-2 text-sm font-medium border-b-2 transition-colors border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"[39m
+            [33mdata-testid[39m=[32m"tab-costing"[39m
+          [36m>[39m
+            [0mCosting[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tab-content p-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-name"[39m
+              [36m>[39m
+                [0mName[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-name"[39m
+                  [33mtype[39m=[32m"text"[39m
+                  [33mvalue[39m=[32m"Main Duct"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-shape"[39m
+              [36m>[39m
+                [0mShape[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<select[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-shape"[39m
+                [36m>[39m
+                  [36m<option[39m
+                    [33mvalue[39m=[32m"round"[39m
+                  [36m>[39m
+                    [0mRound[0m
+                  [36m</option>[39m
+                  [36m<option[39m
+                    [33mvalue[39m=[32m"rectangular"[39m
+                  [36m>[39m
+                    [0mRectangular[0m
+                  [36m</option>[39m
+                [36m</select>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mb-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"auto-sizing-controls"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-diameter"[39m
+              [36m>[39m
+                [0mDiameter (in)[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-diameter"[39m
+                  [33mmax[39m=[32m"60"[39m
+                  [33mmin[39m=[32m"4"[39m
+                  [33mstep[39m=[32m"1"[39m
+                  [33mtype[39m=[32m"number"[39m
+                  [33mvalue[39m=[32m"12"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex flex-col gap-1.5 mb-3.5"[39m
+            [36m>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-700"[39m
+                [33mfor[39m=[32m"duct-length"[39m
+              [36m>[39m
+                [0mLength (ft)[0m
+              [36m</label>[39m
+              [36m<div>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_input_c58ce0"[39m
+                  [33mid[39m=[32m"duct-length"[39m
+                  [33mmax[39m=[32m"1000"[39m
+                  [33mmin[39m=[32m"0.1"[39m
+                  [33mstep[39m=[32m"0.1"[39m
+                  [33mtype[39m=[32m"number"[39m
+                  [33mvalue[39m=[32m"20"[39m
+                [36m/>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ src/core/persistence/__tests__/filesystem.test.ts  (16 tests | 8 failed) 7ms
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > readTextFile should throw error in web environment
+     → promise resolved "''" instead of rejecting
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > writeTextFile should throw error in web environment
+     → promise resolved "undefined" instead of rejecting
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > createDir should throw error in web environment
+     → promise resolved "undefined" instead of rejecting
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > getDocumentsDir should return empty string in web environment (graceful fallback)
+     → expected 'indexeddb://documents' to be '' // Object.is equality
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > copyFile should throw error in web environment
+     → promise resolved "undefined" instead of rejecting
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > removeFile should throw error in web environment
+     → promise resolved "undefined" instead of rejecting
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > web environment fallbacks > renameFile should throw error in web environment
+     → promise resolved "undefined" instead of rejecting
+   ❯ src/core/persistence/__tests__/filesystem.test.ts > filesystem utilities > error handling > should provide meaningful error messages
+     → promise resolved "''" instead of rejecting
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Log Levels > should support DEBUG level
+[2026-03-07T19:29:10.405Z] [DEBUG] [TestComponent] Debug message
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Log Levels > should support INFO level
+[2026-03-07T19:29:10.407Z] [INFO] [TestComponent] Info message
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Log Rotation > should rotate logs when file exceeds 10MB
+[2026-03-07T19:29:10.409Z] [INFO] [Test] Message
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Log Rotation > should keep only 5 log files
+[2026-03-07T19:29:10.431Z] [INFO] [Test] Message
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Performance Metrics > should log performance metrics with duration
+[2026-03-07T19:29:10.450Z] [INFO] [ProjectRepo] loadProject completed in 150ms | {"projectId":"test-123","fileSize":1024}
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Performance Metrics > should handle metadata-less performance logs
+[2026-03-07T19:29:10.450Z] [INFO] [StorageService] validate completed in 50ms
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Log Format > should format logs with timestamp, level, component, and message
+[2026-03-07T19:29:10.450Z] [INFO] [TestComp] Test message
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Buffer Management > should buffer logs before flushing
+[2026-03-07T19:29:10.450Z] [INFO] [Test] Message 1
+[2026-03-07T19:29:10.450Z] [INFO] [Test] Message 2
+
+stdout | src/core/services/__tests__/LoggerService.test.ts > LoggerService > Buffer Management > should create log directory if it does not exist
+[2026-03-07T19:29:10.450Z] [INFO] [Test] Message
+
+ ✓ src/core/services/__tests__/LoggerService.test.ts  (11 tests) 48ms
+ ❯ src/features/canvas/__tests__/CanvasPageWrapper.hydration.backward-compat.test.ts  (0 test)
+ ✓ src/core/schema/__tests__/equipment.schema.test.ts  (19 tests) 6ms
+ ✓ src/features/canvas/store/__tests__/viewportStore.test.ts  (16 tests) 5ms
+ ✓ src/core/services/__tests__/constraintValidation.test.ts  (10 tests) 9ms
+ ❯ src/features/canvas/__tests__/CanvasPageWrapper.hydration.web.test.ts  (0 test)
+ ✓ src/core/geometry/__tests__/bounds.test.ts  (21 tests) 5ms
+ ❯ src/features/canvas/components/__tests__/ZoomControls.test.tsx  (14 tests | 1 failed) 195ms
+   ❯ src/features/canvas/components/__tests__/ZoomControls.test.tsx > ZoomControls > Styling > should have glassmorphism container styling
+     → Unable to find an accessible element with the role "group" and name `/zoom controls/i`
+
+Here are the accessible roles:
+
+  button:
+
+  Name "Zoom out":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Zoom out"[39m
+    [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"[39m
+    [33mdata-testid[39m=[32m"zoom-out"[39m
+    [33mtitle[39m=[32m"Zoom out"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Current zoom: 100%":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Current zoom: 100%"[39m
+    [33mclass[39m=[32m"min-w-[52px] h-8 px-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 bg-transparent"[39m
+    [33mdata-testid[39m=[32m"zoom-level"[39m
+  [36m/>[39m
+
+  Name "50%":
+  [36m<button[39m
+    [33mdata-testid[39m=[32m"select-50"[39m
+  [36m/>[39m
+
+  Name "100%":
+  [36m<button[39m
+    [33mdata-testid[39m=[32m"select-100"[39m
+  [36m/>[39m
+
+  Name "200%":
+  [36m<button[39m
+    [33mdata-testid[39m=[32m"select-200"[39m
+  [36m/>[39m
+
+  Name "Zoom in":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Zoom in"[39m
+    [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"[39m
+    [33mdata-testid[39m=[32m"zoom-in"[39m
+    [33mtitle[39m=[32m"Zoom in"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Toggle grid":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Toggle grid"[39m
+    [33maria-pressed[39m=[32m"true"[39m
+    [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg transition-all active:scale-95 bg-blue-50 text-blue-600"[39m
+    [33mdata-testid[39m=[32m"grid-toggle"[39m
+    [33mtitle[39m=[32m"Toggle grid"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Fit to content":
+  [36m<button[39m
+    [33maria-label[39m=[32m"Fit to content"[39m
+    [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"[39m
+    [33mdata-testid[39m=[32m"zoom-fit"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtitle[39m=[32m"Fit to content"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33maria-label[39m=[32m"Zoom controls"[39m
+      [33mclass[39m=[32m"flex items-center gap-0.5 bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-xl shadow-lg p-1 "[39m
+      [33mdata-testid[39m=[32m"zoom-control"[39m
+    [36m>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Zoom out"[39m
+        [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"[39m
+        [33mdata-testid[39m=[32m"zoom-out"[39m
+        [33mtitle[39m=[32m"Zoom out"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-zoom-out w-4 h-4"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"11"[39m
+            [33mcy[39m=[32m"11"[39m
+            [33mr[39m=[32m"8"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"21"[39m
+            [33mx2[39m=[32m"16.65"[39m
+            [33my1[39m=[32m"21"[39m
+            [33my2[39m=[32m"16.65"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"8"[39m
+            [33mx2[39m=[32m"14"[39m
+            [33my1[39m=[32m"11"[39m
+            [33my2[39m=[32m"11"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mdata-testid[39m=[32m"mock-select"[39m
+        [33mdata-value[39m=[32m"1"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Current zoom: 100%"[39m
+          [33mclass[39m=[32m"min-w-[52px] h-8 px-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 bg-transparent"[39m
+          [33mdata-testid[39m=[32m"zoom-level"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0m100[0m
+            [0m%[0m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mdata-value[39m=[32m"0.25"[39m
+          [36m>[39m
+            [0m25[0m
+            [0m%[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-value[39m=[32m"0.5"[39m
+          [36m>[39m
+            [0m50[0m
+            [0m%[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-value[39m=[32m"1"[39m
+          [36m>[39m
+            [0m100[0m
+            [0m%[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-value[39m=[32m"2"[39m
+          [36m>[39m
+            [0m200[0m
+            [0m%[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mdata-value[39m=[32m"4"[39m
+          [36m>[39m
+            [0m400[0m
+            [0m%[0m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33mdata-testid[39m=[32m"select-50"[39m
+        [36m>[39m
+          [0m50%[0m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mdata-testid[39m=[32m"select-100"[39m
+        [36m>[39m
+          [0m100%[0m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mdata-testid[39m=[32m"select-200"[39m
+        [36m>[39m
+          [0m200%[0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Zoom in"[39m
+        [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"[39m
+        [33mdata-testid[39m=[32m"zoom-in"[39m
+        [33mtitle[39m=[32m"Zoom in"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-zoom-in w-4 h-4"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"11"[39m
+            [33mcy[39m=[32m"11"[39m
+            [33mr[39m=[32m"8"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"21"[39m
+            [33mx2[39m=[32m"16.65"[39m
+            [33my1[39m=[32m"21"[39m
+            [33my2[39m=[32m"16.65"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"11"[39m
+            [33mx2[39m=[32m"11"[39m
+            [33my1[39m=[32m"8"[39m
+            [33my2[39m=[32m"14"[39m
+          [36m/>[39m
+          [36m<line[39m
+            [33mx1[39m=[32m"8"[39m
+            [33mx2[39m=[32m"14"[39m
+            [33my1[39m=[32m"11"[39m
+            [33my2[39m=[32m"11"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"h-5 w-px bg-slate-200 mx-0.5"[39m
+      [36m/>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Toggle grid"[39m
+        [33maria-pressed[39m=[32m"true"[39m
+        [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg transition-all active:scale-95 bg-blue-50 text-blue-600"[39m
+        [33mdata-testid[39m=[32m"grid-toggle"[39m
+        [33mtitle[39m=[32m"Toggle grid"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-grid3x3 lucide-grid-3x3 w-4 h-4"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<rect[39m
+            [33mheight[39m=[32m"18"[39m
+            [33mrx[39m=[32m"2"[39m
+            [33mwidth[39m=[32m"18"[39m
+            [33mx[39m=[32m"3"[39m
+            [33my[39m=[32m"3"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M3 9h18"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M3 15h18"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M9 3v18"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M15 3v18"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+      [36m</button>[39m
+      [36m<button[39m
+        [33maria-label[39m=[32m"Fit to content"[39m
+        [33mclass[39m=[32m"w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"[39m
+        [33mdata-testid[39m=[32m"zoom-fit"[39m
+        [33mdisabled[39m=[32m""[39m
+        [33mtitle[39m=[32m"Fit to content"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-maximize2 lucide-maximize-2 w-4 h-4"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M15 3h6v6"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"m21 3-7 7"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"m3 21 7-7"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M9 21H3v-6"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+      [36m</button>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx  (10 tests | 6 failed) 57ms
+   ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx > DockRail > Tool Selection > should render all tools
+     → Unable to find an element with the title: /Select/i.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col items-center w-14 bg-slate-900 border-r border-slate-800 py-4 gap-6 z-30 "[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            text-slate-400 hover:text-white hover:bg-slate-800
+          "[39m
+          [33mtitle[39m=[32m"Project Assets"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-package"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 22V12"[39m
+            [36m/>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"3.29 7 12 12 20.71 7"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m7.5 4.27 9 5.15"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex-1"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2 pb-4"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-undo2 lucide-undo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9 14 4 9l5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-redo2 lucide-redo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m15 14 5-5-5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx > DockRail > Tool Selection > should activate tool on click
+     → Unable to find an element with the title: /Duct/i.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col items-center w-14 bg-slate-900 border-r border-slate-800 py-4 gap-6 z-30 "[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            text-slate-400 hover:text-white hover:bg-slate-800
+          "[39m
+          [33mtitle[39m=[32m"Project Assets"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-package"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 22V12"[39m
+            [36m/>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"3.29 7 12 12 20.71 7"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m7.5 4.27 9 5.15"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex-1"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2 pb-4"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-undo2 lucide-undo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9 14 4 9l5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-redo2 lucide-redo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m15 14 5-5-5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx > DockRail > Tool Selection > should show active state styling
+     → Unable to find an element with the title: /Duct/i.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col items-center w-14 bg-slate-900 border-r border-slate-800 py-4 gap-6 z-30 "[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            text-slate-400 hover:text-white hover:bg-slate-800
+          "[39m
+          [33mtitle[39m=[32m"Project Assets"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-package"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 22V12"[39m
+            [36m/>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"3.29 7 12 12 20.71 7"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m7.5 4.27 9 5.15"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex-1"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2 pb-4"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-undo2 lucide-undo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9 14 4 9l5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-redo2 lucide-redo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m15 14 5-5-5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx > DockRail > Dock Panels > should render library and services toggles
+     → Unable to find an element with the title: Library.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col items-center w-14 bg-slate-900 border-r border-slate-800 py-4 gap-6 z-30 "[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            text-slate-400 hover:text-white hover:bg-slate-800
+          "[39m
+          [33mtitle[39m=[32m"Project Assets"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-package"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 22V12"[39m
+            [36m/>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"3.29 7 12 12 20.71 7"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m7.5 4.27 9 5.15"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex-1"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2 pb-4"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-undo2 lucide-undo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9 14 4 9l5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-redo2 lucide-redo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m15 14 5-5-5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx > DockRail > Dock Panels > should toggle library panel
+     → Unable to find an element with the title: Library.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col items-center w-14 bg-slate-900 border-r border-slate-800 py-4 gap-6 z-30 "[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            text-slate-400 hover:text-white hover:bg-slate-800
+          "[39m
+          [33mtitle[39m=[32m"Project Assets"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-package"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 22V12"[39m
+            [36m/>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"3.29 7 12 12 20.71 7"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m7.5 4.27 9 5.15"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex-1"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2 pb-4"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-undo2 lucide-undo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9 14 4 9l5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-redo2 lucide-redo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m15 14 5-5-5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/canvas/components/UnifiedDock/__tests__/DockRail.test.tsx > DockRail > Dock Panels > should toggle services panel
+     → Unable to find an element with the title: Services.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col items-center w-14 bg-slate-900 border-r border-slate-800 py-4 gap-6 z-30 "[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            text-slate-400 hover:text-white hover:bg-slate-800
+          "[39m
+          [33mtitle[39m=[32m"Project Assets"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-package"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 22V12"[39m
+            [36m/>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"3.29 7 12 12 20.71 7"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m7.5 4.27 9 5.15"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex-1"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-2 w-full px-2 pb-4"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Undo (Ctrl+Z)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-undo2 lucide-undo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M9 14 4 9l5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtitle[39m=[32m"Redo (Ctrl+Y)"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-redo2 lucide-redo-2"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"20"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"20"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m15 14 5-5-5-5"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ✓ src/core/persistence/__tests__/serialization.test.ts  (17 tests) 13ms
+ ✓ src/core/store/__tests__/entityStore.test.ts  (10 tests) 6ms
+ ✓ src/core/services/migration/__tests__/runMigration.test.ts  (7 tests) 11ms
+ ✓ src/core/services/__tests__/StorageRootService.integration.test.ts  (20 tests) 2045ms
+ ❯ src/core/services/__tests__/autoSizingService.test.ts  (7 tests | 6 failed) 6ms
+   ❯ src/core/services/__tests__/autoSizingService.test.ts > AutoSizingService > autoSizeDuct > should size round duct correctly for given airflow
+     → Cannot read properties of undefined (reading 'diameter')
+   ❯ src/core/services/__tests__/autoSizingService.test.ts > AutoSizingService > autoSizeDuct > should size rectangular duct correctly
+     → Cannot read properties of undefined (reading 'width')
+   ❯ src/core/services/__tests__/autoSizingService.test.ts > AutoSizingService > autoSizeDuct > should round to standard sizes when requested
+     → Cannot read properties of undefined (reading 'diameter')
+   ❯ src/core/services/__tests__/autoSizingService.test.ts > AutoSizingService > autoSizeDuct > should warn when velocity exceeds maximum
+     → expected false to be true // Object.is equality
+   ❯ src/core/services/__tests__/autoSizingService.test.ts > AutoSizingService > suggestDuctSizes > should provide size options in ascending velocity order
+     → expected 1870.8825963455454 to be greater than 1870.8825963455454
+   ❯ src/core/services/__tests__/autoSizingService.test.ts > AutoSizingService > batchAutoSize > should size multiple ducts efficiently
+     → Cannot read properties of undefined (reading 'diameter')
+ ❯ src/features/canvas/components/__tests__/StatusBar.test.tsx  (15 tests | 1 failed) 51ms
+   ❯ src/features/canvas/components/__tests__/StatusBar.test.tsx > StatusBar > Mouse Position > should display mouse position from cursor store when prop not provided
+     → Unable to find an element with the text: /X: 100/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33maria-live[39m=[32m"polite"[39m
+      [33mclass[39m=[32m"flex items-center justify-between h-8 px-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 select-none "[39m
+      [33mdata-testid[39m=[32m"status-bar"[39m
+      [33mrole[39m=[32m"status"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-4"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Mouse position"[39m
+          [33mclass[39m=[32m"flex items-center gap-1"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-400"[39m
+          [36m>[39m
+            [0m—[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-4"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Active view mode"[39m
+          [33mclass[39m=[32m"flex items-center gap-1"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-600"[39m
+          [36m>[39m
+            [0mView:[0m
+          [36m</span>[39m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-medium text-slate-900"[39m
+          [36m>[39m
+            [0mPlan View[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"h-4 w-px bg-slate-300"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Zoom level"[39m
+          [33mclass[39m=[32m"flex items-center gap-1"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-slate-600"[39m
+          [36m>[39m
+            [0mZoom:[0m
+          [36m</span>[39m
+          [0m [0m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-mono font-medium text-slate-900"[39m
+          [36m>[39m
+            [0m100[0m
+            [0m%[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"h-4 w-px bg-slate-300"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-1 text-blue-500"[39m
+          [33mtitle[39m=[32m"Grid visible"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mGrid: [0m
+            [0mOn[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"h-4 w-px bg-slate-300"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-1 text-blue-500"[39m
+          [33mtitle[39m=[32m"Snap to grid enabled"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mSnap: [0m
+            [0mOn[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center gap-4"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Selected entities"[39m
+          [33mclass[39m=[32m"flex items-center gap-1"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0mNo selection[0m
+          [36m</span>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ src/core/schema/__tests__/duct.schema.test.ts  (16 tests | 6 failed) 7ms
+   ❯ src/core/schema/__tests__/duct.schema.test.ts > DuctPropsSchema > should validate round duct with diameter
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+   ❯ src/core/schema/__tests__/duct.schema.test.ts > DuctPropsSchema > should validate rectangular duct with width and height
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+   ❯ src/core/schema/__tests__/duct.schema.test.ts > DuctPropsSchema > should enforce diameter range (4-60 inches)
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+   ❯ src/core/schema/__tests__/duct.schema.test.ts > DuctPropsSchema > should enforce length range (0.1-1000 feet)
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+   ❯ src/core/schema/__tests__/duct.schema.test.ts > DuctPropsSchema > should allow optional connection references
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+   ❯ src/core/schema/__tests__/duct.schema.test.ts > DuctSchema > should validate complete duct entity
+     → [
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 1,
+    "inclusive": true,
+    "path": [
+      "props",
+      "airflow"
+    ],
+    "message": "Too small: expected number to be >=1"
+  }
+]
+ ✓ src/core/commands/__tests__/historyStore.test.ts  (11 tests) 18ms
+ ✓ src/components/ui/__tests__/ToastContext.test.tsx  (6 tests) 32ms
+ ❯ src/core/store/__tests__/componentLibraryStoreV2.test.ts  (4 tests | 2 failed) 19ms
+   ❯ src/core/store/__tests__/componentLibraryStoreV2.test.ts > componentLibraryStoreV2 > supports search, category tree filtering, and tag filtering
+     → expected [] to include 'round-duct'
+   ❯ src/core/store/__tests__/componentLibraryStoreV2.test.ts > ENABLE_UNIFIED_COMPONENT_LIBRARY > honors NEXT_PUBLIC_ENABLE_UNIFIED_COMPONENT_LIBRARY=false
+     → expected true to be false // Object.is equality
+ ✓ src/core/geometry/__tests__/math.test.ts  (17 tests) 10ms
+stdout | src/core/services/validation/__tests__/quarantineFile.test.ts > quarantineFile > creates quarantine directory and moves file
+[Quarantine] Moved corrupted file to: /storage/.quarantine/test/project_20260308_032911.sws.corrupted
+
+stdout | src/core/services/validation/__tests__/quarantineFile.test.ts > quarantineFile > preserves original file name in quarantined path
+[Quarantine] Moved corrupted file to: /storage/.quarantine/test/my-hvac-design_20260308_032911.sws.corrupted
+
+ ✓ src/core/services/validation/__tests__/quarantineFile.test.ts  (8 tests) 3ms
+ ❯ src/core/schema/__tests__/fitting.schema.test.ts  (14 tests | 1 failed) 8ms
+   ❯ src/core/schema/__tests__/fitting.schema.test.ts > FittingSchema > should validate complete fitting entity
+     → expected { …(8) } to deeply equal { …(8) }
+ ✓ src/features/canvas/store/__tests__/selectionStore.test.ts  (14 tests) 8ms
+ ✓ src/core/store/__tests__/storageStore.test.ts  (9 tests) 3ms
+ ✓ src/core/services/__tests__/integration/bom-cost.integration.test.ts  (2 tests) 2ms
+ ✓ src/features/dashboard/components/__tests__/NewProjectDialog.test.tsx  (12 tests) 506ms
+ ✓ src/__tests__/flow-propagation.test.ts  (3 tests) 2ms
+ ✓ src/core/services/__tests__/fittingInsertionService.test.ts  (4 tests) 5ms
+ ✓ src/features/canvas/store/__tests__/threeDViewStore.test.ts  (10 tests) 6ms
+ ✓ src/features/canvas/clipboard/__tests__/entityClipboard.test.ts  (1 test) 6ms
+ ❯ src/core/schema/__tests__/room.schema.test.ts  (13 tests | 2 failed) 15ms
+   ❯ src/core/schema/__tests__/room.schema.test.ts > RoomPropsSchema > should enforce height validation range
+     → expected [Function] to throw an error
+   ❯ src/core/schema/__tests__/room.schema.test.ts > RoomSchema > should validate complete room entity
+     → expected { …(8) } to deeply equal { …(8) }
+ ✓ src/core/services/parametric/__tests__/parametricUpdateService.test.ts  (3 tests) 8ms
+ ✓ src/features/canvas/store/__tests__/viewModeStore.test.ts  (10 tests) 4ms
+ ✓ src/features/canvas/components/Inspector/__tests__/InspectorPanel.test.tsx  (8 tests) 115ms
+ ✓ src/features/dashboard/hooks/useProjectFilters.test.ts  (4 tests) 20ms
+ ✓ src/features/export/__tests__/canvasSnapshot.test.ts  (3 tests) 87ms
+ ✓ src/core/commands/__tests__/types.test.ts  (10 tests) 5ms
+ ✓ src/components/canvas/__tests__/BOMPanel.test.tsx  (2 tests) 98ms
+ ❯ src/features/canvas/__tests__/CanvasPageWrapper.hydration.tauri.test.ts  (0 test)
+ ✓ src/features/dashboard/components/__tests__/ConfirmDialog.test.tsx  (11 tests) 252ms
+ ❯ src/core/schema/__tests__/base.schema.test.ts  (12 tests | 3 failed) 15ms
+   ❯ src/core/schema/__tests__/base.schema.test.ts > TransformSchema > should validate a valid transform
+     → expected { x: 100, y: 200, elevation: +0, …(3) } to deeply equal { x: 100, y: 200, rotation: 45, …(2) }
+   ❯ src/core/schema/__tests__/base.schema.test.ts > BaseEntitySchema > should validate a complete base entity
+     → expected { …(6) } to deeply equal { …(6) }
+   ❯ src/core/schema/__tests__/base.schema.test.ts > createDefaultTransform > should create transform with default values
+     → expected { x: +0, y: +0, elevation: +0, …(3) } to deeply equal { x: +0, y: +0, rotation: +0, …(2) }
+ ✓ src/features/canvas/components/Inspector/__tests__/FloatingInspector.test.tsx  (4 tests) 183ms
+ ✓ src/core/services/validation/__tests__/detectCorruption.test.ts  (6 tests) 2ms
+ ✓ src/features/canvas/hooks/useSystemCalculations.test.ts  (3 tests) 2ms
+ ✓ src/components/layout/__tests__/EditMenu.test.tsx  (4 tests) 194ms
+ ❯ src/core/schema/__tests__/group.schema.test.ts  (9 tests | 1 failed) 11ms
+   ❯ src/core/schema/__tests__/group.schema.test.ts > GroupSchema > should validate complete group entity
+     → expected { …(7) } to deeply equal { …(7) }
+ ✓ src/core/persistence/__tests__/ProjectRepository.test.ts  (1 test) 12ms
+ ✓ src/hooks/__tests__/useStorageEvents.test.tsx  (4 tests) 15ms
+ ❯ src/core/schema/__tests__/note.schema.test.ts  (10 tests | 1 failed) 7ms
+   ❯ src/core/schema/__tests__/note.schema.test.ts > NoteSchema > should validate complete note entity
+     → expected { …(7) } to deeply equal { …(7) }
+ ✓ src/features/canvas/3d/__tests__/deriveEquipmentNode.test.ts  (6 tests) 3ms
+ ✓ src/core/services/__tests__/fittingGeneration.test.ts  (1 test) 1ms
+ ❯ src/core/store/__tests__/settingsStore.test.ts  (2 tests | 2 failed) 12ms
+   ❯ src/core/store/__tests__/settingsStore.test.ts > settingsStore - Milestone 7 > saves a template, persists it, and reapplies it in-session
+     → #<Object> could not be cloned.
+   ❯ src/core/store/__tests__/settingsStore.test.ts > settingsStore - Milestone 7 > marks settings as custom when editing after template application
+     → #<Object> could not be cloned.
+ ✓ src/features/canvas/3d/__tests__/deriveDuctNode.test.ts  (7 tests) 2ms
+ ✓ src/core/services/validation/__tests__/constraintValidator.test.ts  (2 tests) 2ms
+ ✓ src/features/canvas/clipboard/__tests__/clipboardPayload.test.ts  (3 tests) 6ms
+ ✓ src/core/store/__tests__/validationStore.test.ts  (3 tests) 3ms
+ ✓ src/features/canvas/3d/__tests__/deriveRoomNode.test.ts  (5 tests) 3ms
+ ✓ src/features/canvas/3d/__tests__/deriveFittingNode.test.ts  (7 tests) 1ms
+ ✓ src/features/canvas/components/__tests__/RightSidebar.test.tsx  (3 tests) 106ms
+ ✓ src/core/services/__tests__/engineeringCalculations.test.ts  (8 tests) 1ms
+ ✓ src/features/canvas/calculators/__tests__/ventilation.test.ts  (4 tests) 1ms
+ ✓ src/features/canvas/store/__tests__/inspectorPreferencesStore.test.ts  (4 tests) 2ms
+ ✓ src/core/store/__tests__/projectStore.test.ts  (3 tests) 5ms
+ ✓ src/features/canvas/hooks/__tests__/useFieldValidation.test.ts  (1 test) 23ms
+ ✓ src/features/canvas/components/UnifiedDock/__tests__/UnifiedDock.test.tsx  (4 tests) 20ms
+ ✓ src/features/canvas/components/Inspector/__tests__/InspectorAccordion.test.tsx  (3 tests) 181ms
+ ❯ src/features/canvas/components/__tests__/LeftSidebarTabs.test.tsx  (2 tests | 2 failed) 57ms
+   ❯ src/features/canvas/components/__tests__/LeftSidebarTabs.test.tsx > Canvas LeftSidebar Tabs > shows Project Properties by default
+     → Unable to find an element with the text: Project Details. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<aside[39m
+      [33mclass[39m=[32m"left-sidebar  "[39m
+      [33mdata-testid[39m=[32m"left-sidebar"[39m
+      [33mstyle[39m=[32m"width: 300px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"resize-handle"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex gap-2"[39m
+          [33mrole[39m=[32m"tablist"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-controls[39m=[32m"library-panel"[39m
+            [33maria-selected[39m=[32m"true"[39m
+            [33mclass[39m=[32m"rounded px-2 py-1 text-sm transition-colors active bg-slate-200 text-slate-900"[39m
+            [33mdata-testid[39m=[32m"tab-library"[39m
+            [33mrole[39m=[32m"tab"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mLibrary[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-controls[39m=[32m"services-panel"[39m
+            [33maria-selected[39m=[32m"false"[39m
+            [33mclass[39m=[32m"rounded px-2 py-1 text-sm transition-colors text-slate-600 hover:bg-slate-100"[39m
+            [33mdata-testid[39m=[32m"tab-services"[39m
+            [33mrole[39m=[32m"tab"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mServices[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Collapse sidebar"[39m
+          [33mclass[39m=[32m"p-1 rounded hover:bg-slate-100 text-slate-500 transition-transform "[39m
+          [33mdata-testid[39m=[32m"left-sidebar-toggle"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"15 18 9 12 15 6"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"border-b border-slate-200 bg-white px-3 py-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Canvas tools"[39m
+          [33mclass[39m=[32m"
+        flex gap-2 p-2 bg-slate-50 rounded-lg shadow-sm border border-slate-200
+        flex-row flex-wrap items-center
+        w-full
+      "[39m
+          [33mdata-testid[39m=[32m"toolbar"[39m
+          [33mrole[39m=[32m"toolbar"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Select"[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        active bg-blue-500 text-white shadow-sm
+      "[39m
+            [33mdata-testid[39m=[32m"tool-select"[39m
+            [33mtitle[39m=[32m"Select (V)"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"20"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"20"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+            [36m>[39m
+              [0mSelect[0m
+              [0m [0m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-slate-400"[39m
+              [36m>[39m
+                [0m([0m
+                [0mV[0m
+                [0m)[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Pan"[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+            [33mdata-testid[39m=[32m"tool-pan"[39m
+            [33mtitle[39m=[32m"Pan (Space)"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"20"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"20"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+            [36m>[39m
+              [0mPan[0m
+              [0m [0m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-slate-400"[39m
+              [36m>[39m
+                [0m([0m
+                [0mSpace[0m
+                [0m)[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Duct"[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+            [33mdata-testid[39m=[32m"tool-duct"[39m
+            [33mtitle[39m=[32m"Duct (D)"[39m
+         ...
+   ❯ src/features/canvas/components/__tests__/LeftSidebarTabs.test.tsx > Canvas LeftSidebar Tabs > switches to Product Catalog tab
+     → Unable to find an element by: [data-testid="tab-product-catalog"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<aside[39m
+      [33mclass[39m=[32m"left-sidebar  "[39m
+      [33mdata-testid[39m=[32m"left-sidebar"[39m
+      [33mstyle[39m=[32m"width: 300px;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"resize-handle"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex gap-2"[39m
+          [33mrole[39m=[32m"tablist"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-controls[39m=[32m"library-panel"[39m
+            [33maria-selected[39m=[32m"true"[39m
+            [33mclass[39m=[32m"rounded px-2 py-1 text-sm transition-colors active bg-slate-200 text-slate-900"[39m
+            [33mdata-testid[39m=[32m"tab-library"[39m
+            [33mrole[39m=[32m"tab"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mLibrary[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-controls[39m=[32m"services-panel"[39m
+            [33maria-selected[39m=[32m"false"[39m
+            [33mclass[39m=[32m"rounded px-2 py-1 text-sm transition-colors text-slate-600 hover:bg-slate-100"[39m
+            [33mdata-testid[39m=[32m"tab-services"[39m
+            [33mrole[39m=[32m"tab"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mServices[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33maria-label[39m=[32m"Collapse sidebar"[39m
+          [33mclass[39m=[32m"p-1 rounded hover:bg-slate-100 text-slate-500 transition-transform "[39m
+          [33mdata-testid[39m=[32m"left-sidebar-toggle"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"16"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"16"[39m
+          [36m>[39m
+            [36m<polyline[39m
+              [33mpoints[39m=[32m"15 18 9 12 15 6"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"border-b border-slate-200 bg-white px-3 py-2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Canvas tools"[39m
+          [33mclass[39m=[32m"
+        flex gap-2 p-2 bg-slate-50 rounded-lg shadow-sm border border-slate-200
+        flex-row flex-wrap items-center
+        w-full
+      "[39m
+          [33mdata-testid[39m=[32m"toolbar"[39m
+          [33mrole[39m=[32m"toolbar"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Select"[39m
+            [33maria-pressed[39m=[32m"true"[39m
+            [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        active bg-blue-500 text-white shadow-sm
+      "[39m
+            [33mdata-testid[39m=[32m"tool-select"[39m
+            [33mtitle[39m=[32m"Select (V)"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"20"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"20"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+            [36m>[39m
+              [0mSelect[0m
+              [0m [0m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-slate-400"[39m
+              [36m>[39m
+                [0m([0m
+                [0mV[0m
+                [0m)[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Pan"[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+            [33mdata-testid[39m=[32m"tool-pan"[39m
+            [33mtitle[39m=[32m"Pan (Space)"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"20"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"20"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"
+        absolute left-full ml-2 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs
+        whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none
+        transition-opacity duration-150 z-50
+      "[39m
+            [36m>[39m
+              [0mPan[0m
+              [0m [0m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-slate-400"[39m
+              [36m>[39m
+                [0m([0m
+                [0mSpace[0m
+                [0m)[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Duct"[39m
+            [33maria-pressed[39m=[32m"false"[39m
+            [33mclass[39m=[32m"
+        w-10 h-10 flex items-center justify-center rounded-lg
+        transition-colors duration-150 relative group
+        text-slate-500 hover:bg-slate-100 hover:text-slate-900
+      "[39m
+            [33mdata-testid[39m=[32m"tool-duct"[39m
+            [33mtitle[39m=[32m"Duct (D)"[39m
+         ...
+ ✓ src/features/canvas/utils/__tests__/validateFloatingPosition.test.ts  (5 tests) 1ms
+ ✓ src/features/canvas/calculators/__tests__/ductSizing.test.ts  (4 tests) 1ms
+ ✓ src/features/export/__tests__/csv-utils.test.ts  (2 tests) 1ms
+ ✓ src/features/canvas/calculators/__tests__/pressureDrop.test.ts  (4 tests) 1ms
+ ✓ src/features/canvas/components/__tests__/rulers.test.ts  (3 tests) 1ms
+ ✓ src/features/canvas/components/__tests__/RightSidebarTabs.test.tsx  (2 tests) 109ms
+
+ Test Files  31 failed | 76 passed (107)
+      Tests  124 failed | 1172 passed (1296)
+   Start at  03:29:07
+   Duration  7.44s (transform 2.40s, setup 8.62s, collect 11.61s, tests 5.95s, environment 35.55s, prepare 5.14s)
+

@@ -10,18 +10,8 @@ vi.mock('@/components/canvas/AutoSizingControls', () => ({
   AutoSizingControls: () => <div data-testid="auto-sizing-controls" />,
 }));
 
-vi.mock('../InspectorAccordion', () => ({
-  InspectorAccordion: ({ sections }: { sections: Array<{ title: string; content: React.ReactNode }> }) => (
-    <div>
-      {sections.map((section) => (
-        <section key={section.title}>
-          <h3>{section.title}</h3>
-          <div>{section.content}</div>
-        </section>
-      ))}
-    </div>
-  ),
-}));
+// Note: DuctInspector no longer uses TabbedPropertiesPanel or InspectorAccordion.
+// The layout is a flat card/section structure, so no panel-level mock is needed.
 
 vi.mock('@/core/services/parametric/parametricUpdateService', async () => {
   const actual = await vi.importActual('@/core/services/parametric/parametricUpdateService');

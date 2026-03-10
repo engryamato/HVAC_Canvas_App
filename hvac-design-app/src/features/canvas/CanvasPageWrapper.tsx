@@ -7,6 +7,8 @@ import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore
 import { useEntityStore } from '@/core/store/entityStore';
 import { useViewportStore } from './store/viewportStore';
 import { useSelectionStore } from './store/selectionStore';
+import { useThreeDViewStore } from './store/threeDViewStore';
+import { useViewModeStore } from './store/viewModeStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { type ReversibleCommand } from '@/core/commands/types';
@@ -76,7 +78,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       if (payload?.project?.entities) {
         useEntityStore.getState().hydrate(payload.project.entities);
       }
-      
+
       if (payload?.viewport) {
         const preferences = usePreferencesStore.getState();
         useViewportStore.setState({
@@ -88,14 +90,35 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
           snapToGrid: preferences.snapToGrid,
         });
       }
-      
+
+      // Deterministic hydration policy:
+      // If either field is missing, reset both stores to defaults first,
+      // then hydrate whichever fields are present — prevents prior-project residue.
+      const hasViewMode = Boolean(payload?.project?.settings?.activeViewMode);
+      const hasThreeDState = Boolean(payload?.project?.threeDViewState);
+
+      if (!hasViewMode || !hasThreeDState) {
+        useViewModeStore.getState().reset();
+        useThreeDViewStore.getState().reset();
+      }
+
+      if (hasViewMode) {
+        useViewModeStore.getState().hydrateViewMode({
+          activeViewMode: payload.project.settings.activeViewMode,
+        });
+      }
+
+      if (hasThreeDState) {
+        useThreeDViewStore.getState().hydrateThreeDView(payload.project.threeDViewState!);
+      }
+
       if (payload?.selection) {
         useSelectionStore.setState({
           selectedIds: payload.selection.selectedIds,
           hoveredId: payload.selection.hoveredId,
         });
       }
-      
+
       if (payload?.history) {
         useHistoryStore.setState({
           past: payload.history.past as unknown as ReversibleCommand[],
@@ -141,14 +164,14 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       // Check if we're in Tauri mode and have a file path
       const isTauri = useAppStateStore.getState().isTauri;
       const projectListItem = useProjectListStore.getState().projects.find(p => p.projectId === projectId);
-      
+
       if (isTauri && projectListItem?.filePath) {
         // Load from .sws file
         void (async () => {
           try {
             const { loadProject: loadProjectFromFile } = await import('@/core/persistence/projectIO');
             const result = await loadProjectFromFile(projectListItem.filePath!);
-            
+
             if (!result.success || !result.project) {
               setProjectError(`Failed to load project file: ${result.error || 'Unknown error'}`);
               return;
@@ -203,6 +226,25 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
                 panY: result.project.viewportState.panY,
                 zoom: result.project.viewportState.zoom,
               });
+            }
+
+            // Deterministic hydration policy for Tauri load path
+            const hasTauriViewMode = Boolean(result.project.settings?.activeViewMode);
+            const hasTauriThreeDState = Boolean(result.project.threeDViewState);
+
+            if (!hasTauriViewMode || !hasTauriThreeDState) {
+              useViewModeStore.getState().reset();
+              useThreeDViewStore.getState().reset();
+            }
+
+            if (hasTauriViewMode) {
+              useViewModeStore.getState().hydrateViewMode({
+                activeViewMode: result.project.settings!.activeViewMode,
+              });
+            }
+
+            if (hasTauriThreeDState) {
+              useThreeDViewStore.getState().hydrateThreeDView(result.project.threeDViewState!);
             }
 
             if (result.project.settings?.unitSystem) {

@@ -62,11 +62,11 @@ describe('ViewportStateSchema', () => {
     expect(result.zoom).toBe(1);
   });
 
-  it('should enforce zoom range (0.1-4)', () => {
+  it('should enforce zoom range (0.1-10)', () => {
     expect(() => ViewportStateSchema.parse({ zoom: 0.05 })).toThrow();
-    expect(() => ViewportStateSchema.parse({ zoom: 5 })).toThrow();
+    expect(() => ViewportStateSchema.parse({ zoom: 11 })).toThrow();
     expect(ViewportStateSchema.parse({ zoom: 0.1 })).toBeTruthy();
-    expect(ViewportStateSchema.parse({ zoom: 4 })).toBeTruthy();
+    expect(ViewportStateSchema.parse({ zoom: 10 })).toBeTruthy();
   });
 });
 
@@ -74,7 +74,7 @@ describe('ProjectSettingsSchema', () => {
   it('should apply defaults', () => {
     const result = ProjectSettingsSchema.parse({});
     expect(result.unitSystem).toBe('imperial');
-    expect(result.gridSize).toBe(24);
+    expect(result.gridSize).toBe(12);
     expect(result.gridVisible).toBe(true);
   });
 
@@ -100,8 +100,11 @@ describe('ProjectFileSchema', () => {
       byId: {},
       allIds: [],
     },
+    isArchived: false,
+    scope: { details: [], materials: [], projectType: 'Commercial' },
+    siteConditions: { elevation: '0', outdoorTemp: '70', indoorTemp: '70', windSpeed: '0', humidity: '50', localCodes: '' },
     viewportState: { panX: 0, panY: 0, zoom: 1 },
-    settings: { unitSystem: 'imperial' as const, gridSize: 24, gridVisible: true },
+    settings: { unitSystem: 'imperial' as const, gridSize: 24, gridVisible: true, snapToGrid: true, activeViewMode: 'plan' as const },
   };
 
   it('should validate empty project file', () => {
@@ -172,6 +175,8 @@ describe('PlanReferenceSchema', () => {
       sourceType: 'pdf' as const,
       sourcePath: '/path/to/plan.pdf',
       pageIndex: 0,
+      opacity: 0.5,
+      visible: true,
     };
     expect(PlanReferenceSchema.parse(plan)).toEqual(plan);
   });

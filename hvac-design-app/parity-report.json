@@ -1,85 +1,136 @@
 {
-  "timestamp": "2026-02-04T23:06:00.824Z",
-  "summary": "✅ All parity checks passed! Web and Tauri apps are in sync.",
-  "totalIssues": 0,
-  "totalWarnings": 15,
-  "issues": [],
+  "timestamp": "2026-03-10T19:30:51.348Z",
+  "summary": "❌ Found 1 issue(s) and 24 warning(s) affecting parity.",
+  "totalIssues": 1,
+  "totalWarnings": 24,
+  "issues": [
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/__tests__/setup.ts",
+      "description": "Uses Tauri API without platform detection guard. This will break web builds.",
+      "severity": "error"
+    }
+  ],
   "warnings": [
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\components\\onboarding\\AppInitializer.tsx",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/components/layout/FileMenu.tsx",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\components\\ui\\ToastHost.tsx",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/components/onboarding/AppInitializer.tsx",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\core\\store\\__tests__\\preferencesStore.test.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/components/ui/ToastHost.tsx",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\canvas\\CanvasPage.tsx",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/services/migration/BackupManager.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\canvas\\CanvasPageWrapper.tsx",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/services/migration/__tests__/runMigration.test.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\canvas\\hooks\\useAutoSave.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/services/migration/runMigration.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\canvas\\hooks\\__tests__\\useAutoSave.test.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/store/__tests__/preferencesStore.test.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\dashboard\\components\\EditProjectDialog.tsx",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/store/__tests__/settingsStore.test.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\dashboard\\components\\ProjectCard.tsx",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/store/__tests__/storageStore.test.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\dashboard\\store\\__tests__\\projectListStore.test.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/canvas/CanvasPage.tsx",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\features\\onboarding\\hooks\\useFirstLaunch.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/canvas/CanvasPageWrapper.tsx",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\hooks\\useAutoOpen.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/canvas/components/__tests__/RightSidebar.test.tsx",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\stores\\__tests__\\useAppStateStore.test.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/canvas/hooks/__tests__/useAutoSave.test.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\utils\\analytics\\config.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/canvas/hooks/useAutoSave.ts",
       "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
       "severity": "warning"
     },
     {
-      "file": "C:\\Users\\User\\Downloads\\GitHub\\HVAC_Canvas_App\\hvac-design-app\\src\\core\\persistence\\factory.ts",
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/canvas/store/__tests__/inspectorPreferencesStore.test.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/dashboard/components/EditProjectDialog.tsx",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/dashboard/components/ProjectCard.tsx",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/dashboard/store/__tests__/projectListStore.test.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/features/onboarding/hooks/useFirstLaunch.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/hooks/useAutoOpen.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/hooks/useStorageEvents.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/stores/__tests__/useAppStateStore.test.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/utils/analytics/config.ts",
+      "description": "Uses localStorage/sessionStorage directly instead of storage abstraction layer. Use createStorageAdapter() instead.",
+      "severity": "warning"
+    },
+    {
+      "file": "/Users/johnreyrazonable/Documents/GitHub/HVAC_Canvas_App/hvac-design-app/src/core/persistence/factory.ts",
       "description": "Storage factory throws errors instead of returning adapters for supported platforms",
       "severity": "warning"
     }
   ],
-  "status": "PASS"
+  "status": "FAIL"
 }

@@ -30,7 +30,7 @@ describe('Canvas RightSidebar Tabs', () => {
     render(<RightSidebar />);
     fireEvent.click(screen.getByTestId('tab-bom'));
     expect(screen.getByTestId('bom-panel')).toBeDefined();
-    expect(screen.getByText('Bill of Quantities')).toBeDefined();
+    expect(screen.getByText('Bill of Materials')).toBeDefined();
+    expect(screen.getByLabelText('Search BOM')).toBeDefined();
   });
 });
-

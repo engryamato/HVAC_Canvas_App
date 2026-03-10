@@ -14,6 +14,8 @@ import { useProjectStore } from '@/core/store/project.store';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useViewportStore } from '../../store/viewportStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
+import { useThreeDViewStore } from '../../store/threeDViewStore';
+import { useViewModeStore } from '../../store/viewModeStore';
 import type { Room } from '@/core/schema';
 
 // Spec reference: docs/user-journeys/08-file-management/tauri-offline/UJ-FM-002-AutoSave.md
@@ -267,5 +269,111 @@ describe('useAutoSave - Hook Behavior', () => {
     });
 
     expect(onSave).not.toHaveBeenCalled();
+  });
+});
+
+describe('useAutoSave — view/camera debounced persistence', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    usePreferencesStore.setState({ autoSaveEnabled: true });
+    useEntityStore.getState().clearAllEntities();
+    useViewportStore.setState({
+      panX: 0,
+      panY: 0,
+      zoom: 1,
+      gridVisible: true,
+      gridSize: 12,
+      snapToGrid: true,
+    });
+    useProjectStore.setState({
+      currentProjectId: '44444444-4444-4444-8444-444444444444',
+      projectDetails: {
+        projectId: '44444444-4444-4444-8444-444444444444',
+        projectName: 'View Camera Test',
+        projectNumber: 'VC-001',
+        clientName: 'Test Client',
+        isArchived: false,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        modifiedAt: '2025-01-01T00:00:00.000Z',
+      },
+      isDirty: false,
+    });
+    useHistoryStore.setState({ past: [], future: [], maxSize: 100 });
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.clearAllMocks();
+  });
+
+  it('saves after viewModeStore changes within debounce window (1500ms)', () => {
+    const onSave = vi.fn();
+    renderHook(() => useAutoSave({ enabled: true, onSave }));
+
+    act(() => {
+      // Trigger a view mode change (no entity mutation)
+      const { setViewMode } = useViewModeStore.getState();
+      setViewMode('3d');
+    });
+
+    // Before debounce fires — no save yet
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onSave).not.toHaveBeenCalled();
+
+    // After debounce window — save fires
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ source: 'auto', success: true }));
+  });
+
+  it('saves after threeDViewStore changes within debounce window (1500ms)', () => {
+    const onSave = vi.fn();
+    renderHook(() => useAutoSave({ enabled: true, onSave }));
+
+    act(() => {
+      // Simulate camera orbit change (no entity mutation)
+      useThreeDViewStore.getState().setOrbitState({
+        orbitRadius: 600,
+        polarAngle: 1.0,
+        azimuthAngle: 0.5,
+      });
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ source: 'auto', success: true }));
+  });
+
+  it('debounces rapid successive camera changes into a single save', () => {
+    const onSave = vi.fn();
+    renderHook(() => useAutoSave({ enabled: true, onSave }));
+
+    // Rapid orbit changes
+    act(() => {
+      for (let i = 0; i < 10; i++) {
+        useThreeDViewStore.getState().setOrbitState({
+          orbitRadius: 600 + i * 10,
+          polarAngle: 1.0,
+          azimuthAngle: 0.5,
+        });
+      }
+    });
+
+    // Before debounce window — no save
+    act(() => {
+      vi.advanceTimersByTime(1400);
+    });
+    expect(onSave).not.toHaveBeenCalled();
+
+    // After debounce window — exactly one save
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(onSave).toHaveBeenCalledTimes(1);
   });
 });

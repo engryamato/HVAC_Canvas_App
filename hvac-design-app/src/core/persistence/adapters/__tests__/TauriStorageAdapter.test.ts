@@ -45,7 +45,7 @@ import * as serialization from '../../serialization';
 function createMockProject(overrides?: Partial<ProjectFile>): ProjectFile {
   return {
     schemaVersion: '1.0.0',
-    projectId: 'test-project-id',
+    projectId: '550e8400-e29b-41d4-a716-446655440000',
     projectName: 'Test Project',
     projectNumber: 'PRJ-001',
     clientName: 'Test Client',
@@ -89,7 +89,30 @@ describe('TauriStorageAdapter', () => {
   let adapter: TauriStorageAdapter;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Use resetAllMocks to clear both call history AND mock implementations.
+    // clearAllMocks only clears call counts; mockReturnValue() leaks across tests.
+    vi.resetAllMocks();
+
+    // Re-initialize default mock implementations after reset
+    vi.mocked(filesystem.getDocumentsDir).mockResolvedValue('/mock/documents');
+    vi.mocked(filesystem.isTauri).mockReturnValue(true);
+    vi.mocked(serialization.serializeProject).mockImplementation((project: ProjectFile) => ({
+      success: true,
+      data: JSON.stringify(project),
+    }));
+    vi.mocked(serialization.deserializeProject).mockImplementation((json: string) => ({
+      success: true,
+      data: JSON.parse(json),
+    }));
+    vi.mocked(serialization.deserializeProjectLenient).mockImplementation((json: string) => ({
+      success: true,
+      data: JSON.parse(json),
+    }));
+    vi.mocked(serialization.migrateProject).mockImplementation((project: unknown) => ({
+      success: true,
+      data: project as ProjectFile,
+    }));
+
     adapter = new TauriStorageAdapter();
   });
 
@@ -132,7 +155,7 @@ describe('TauriStorageAdapter', () => {
 
       // Should create all required directories
       expect(filesystem.createDir).toHaveBeenCalledWith(
-        expect.stringContaining('test-project-id'),
+        expect.stringContaining('550e8400-e29b-41d4-a716-446655440000'),
         true
       );
       expect(filesystem.createDir).toHaveBeenCalledWith(
@@ -159,7 +182,7 @@ describe('TauriStorageAdapter', () => {
 
       expect(serialization.serializeProject).toHaveBeenCalledWith(
         expect.objectContaining({
-          projectId: 'test-project-id',
+          projectId: '550e8400-e29b-41d4-a716-446655440000',
           projectName: 'Test Project',
         })
       );
@@ -259,11 +282,11 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.exists).mockResolvedValue(true);
       vi.mocked(filesystem.readTextFile).mockResolvedValue(JSON.stringify(project));
 
-      const result = await adapter.loadProject('test-project-id');
+      const result = await adapter.loadProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
       expect(result.project).toEqual(expect.objectContaining({
-        projectId: 'test-project-id',
+        projectId: '550e8400-e29b-41d4-a716-446655440000',
         projectName: 'Test Project',
       }));
     });
@@ -274,12 +297,12 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.readTextFile)
         .mockResolvedValueOnce('corrupted data') // Main file
         .mockResolvedValueOnce(JSON.stringify(project)); // Backup file
-      
+
       vi.mocked(serialization.deserializeProject)
         .mockReturnValueOnce({ success: false, error: 'Invalid JSON' })
         .mockReturnValueOnce({ success: true, data: project });
 
-      const result = await adapter.loadProject('test-project-id');
+      const result = await adapter.loadProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
       expect(result.source).toBe('localStorage'); // Indicates backup
@@ -290,13 +313,13 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.exists).mockResolvedValue(true);
       vi.mocked(filesystem.readDir).mockResolvedValue(['2024-01-01T00-00-00.hvac']);
       vi.mocked(filesystem.readTextFile).mockResolvedValue(JSON.stringify(project));
-      
+
       vi.mocked(serialization.deserializeProject)
         .mockReturnValueOnce({ success: false, error: 'Invalid JSON' }) // Main
         .mockReturnValueOnce({ success: false, error: 'Invalid JSON' }) // Backup
         .mockReturnValueOnce({ success: true, data: project }); // Auto-save
 
-      const result = await adapter.loadProject('test-project-id');
+      const result = await adapter.loadProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
       expect(result.source).toBe('indexedDB'); // Indicates autosave
@@ -324,7 +347,7 @@ describe('TauriStorageAdapter', () => {
         error: 'Invalid JSON',
       });
 
-      const result = await adapter.loadProject('test-project-id');
+      const result = await adapter.loadProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(false);
       expect(result.errorCode).toBe('CORRUPTED_FILE');
@@ -335,19 +358,21 @@ describe('TauriStorageAdapter', () => {
     it('should delete entire project directory', async () => {
       vi.mocked(filesystem.exists).mockResolvedValue(true);
       vi.mocked(filesystem.removeFile).mockResolvedValue();
+      // readDir is called internally when cleaning up autosave/metadata subdirs
+      vi.mocked(filesystem.readDir).mockResolvedValue([]);
 
-      const result = await adapter.deleteProject('test-project-id');
+      const result = await adapter.deleteProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
       expect(filesystem.removeFile).toHaveBeenCalledWith(
-        expect.stringContaining('test-project-id')
+        expect.stringContaining('550e8400-e29b-41d4-a716-446655440000')
       );
     });
 
     it('should be idempotent (no error if already deleted)', async () => {
       vi.mocked(filesystem.exists).mockResolvedValue(false);
 
-      const result = await adapter.deleteProject('test-project-id');
+      const result = await adapter.deleteProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
       expect(filesystem.removeFile).not.toHaveBeenCalled();
@@ -355,11 +380,12 @@ describe('TauriStorageAdapter', () => {
 
     it('should handle permission denied errors', async () => {
       vi.mocked(filesystem.exists).mockResolvedValue(true);
+      vi.mocked(filesystem.readDir).mockResolvedValue([]);
       vi.mocked(filesystem.removeFile).mockRejectedValue(
         new Error('permission denied')
       );
 
-      const result = await adapter.deleteProject('test-project-id');
+      const result = await adapter.deleteProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(false);
       expect(result.errorCode).toBe('PERMISSION_DENIED');
@@ -374,29 +400,41 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.createDir).mockResolvedValue();
       vi.mocked(filesystem.renameFile).mockResolvedValue();
 
-      const result = await adapter.duplicateProject('test-project-id', 'Duplicated Project');
+      const result = await adapter.duplicateProject('550e8400-e29b-41d4-a716-446655440000', 'Duplicated Project');
 
       expect(result.success).toBe(true);
       expect(result.project?.projectName).toBe('Duplicated Project');
-      expect(result.project?.projectId).not.toBe('test-project-id');
+      expect(result.project?.projectId).not.toBe('550e8400-e29b-41d4-a716-446655440000');
     });
 
     it('should preserve all entities and settings', async () => {
+      const entityId = '660e8400-e29b-41d4-a716-446655440010';
       const project = createMockProject({
         entities: {
-          byId: { 'room-1': { id: 'room-1' } as any },
-          allIds: ['room-1'],
+          byId: {
+            [entityId]: {
+              id: entityId,
+              type: 'note',
+              props: { content: 'Test note', fontSize: 14, color: '#000000' },
+              transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+              zIndex: 0,
+              createdAt: '2024-01-01T00:00:00.000Z',
+              modifiedAt: '2024-01-01T00:00:00.000Z',
+            } as any,
+          },
+          allIds: [entityId],
         },
       });
       vi.mocked(filesystem.exists).mockResolvedValue(true);
       vi.mocked(filesystem.readTextFile).mockResolvedValue(JSON.stringify(project));
       vi.mocked(filesystem.createDir).mockResolvedValue();
       vi.mocked(filesystem.renameFile).mockResolvedValue();
+      vi.mocked(filesystem.writeTextFile).mockResolvedValue();
 
-      const result = await adapter.duplicateProject('test-project-id', 'Copy');
+      const result = await adapter.duplicateProject('550e8400-e29b-41d4-a716-446655440000', 'Copy');
 
       expect(result.success).toBe(true);
-      expect(result.project?.entities.allIds).toContain('room-1');
+      expect(result.project?.entities.allIds).toContain(entityId);
     });
 
     it('should reset timestamps', async () => {
@@ -405,8 +443,9 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.readTextFile).mockResolvedValue(JSON.stringify(project));
       vi.mocked(filesystem.createDir).mockResolvedValue();
       vi.mocked(filesystem.renameFile).mockResolvedValue();
+      vi.mocked(filesystem.writeTextFile).mockResolvedValue();
 
-      const result = await adapter.duplicateProject('test-project-id', 'Copy');
+      const result = await adapter.duplicateProject('550e8400-e29b-41d4-a716-446655440000', 'Copy');
 
       expect(result.success).toBe(true);
       expect(result.project?.createdAt).not.toBe(project.createdAt);
@@ -427,60 +466,61 @@ describe('TauriStorageAdapter', () => {
     it('should scan directory and return metadata', async () => {
       const project = createMockProject();
       vi.mocked(filesystem.exists).mockResolvedValue(true);
-      vi.mocked(filesystem.readDir).mockResolvedValue(['test-project-id']);
+      vi.mocked(filesystem.readDir).mockResolvedValue(['550e8400-e29b-41d4-a716-446655440000']);
       vi.mocked(filesystem.readTextFile).mockResolvedValue(JSON.stringify(project));
 
       const projects = await adapter.listProjects();
 
       expect(projects).toHaveLength(1);
-      expect(projects[0]!.projectId).toBe('test-project-id');
+      expect(projects[0]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440000');
     });
 
     it('should skip corrupted files', async () => {
       vi.mocked(filesystem.exists).mockResolvedValue(true);
-      vi.mocked(filesystem.readDir).mockResolvedValue(['project-1', 'project-2']);
+      vi.mocked(filesystem.readDir).mockResolvedValue(['550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440002']);
       vi.mocked(filesystem.readTextFile)
-        .mockResolvedValueOnce(JSON.stringify(createMockProject({ projectId: 'project-1' })))
+        .mockResolvedValueOnce(JSON.stringify(createMockProject({ projectId: '550e8400-e29b-41d4-a716-446655440001' })))
         .mockRejectedValueOnce(new Error('Corrupted'));
 
       const projects = await adapter.listProjects();
 
       expect(projects).toHaveLength(1);
-      expect(projects[0]!.projectId).toBe('project-1');
+      expect(projects[0]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440001');
     });
 
     it('should sort by modifiedAt descending', async () => {
-      const project1 = createMockProject({ projectId: 'p1', modifiedAt: '2024-01-01T00:00:00.000Z' });
-      const project2 = createMockProject({ projectId: 'p2', modifiedAt: '2024-01-02T00:00:00.000Z' });
-      
+      const project1 = createMockProject({ projectId: '550e8400-e29b-41d4-a716-446655440003', modifiedAt: '2024-01-01T00:00:00.000Z' });
+      const project2 = createMockProject({ projectId: '550e8400-e29b-41d4-a716-446655440004', modifiedAt: '2024-01-02T00:00:00.000Z' });
+
       vi.mocked(filesystem.exists).mockResolvedValue(true);
-      vi.mocked(filesystem.readDir).mockResolvedValue(['p1', 'p2']);
+      vi.mocked(filesystem.readDir).mockResolvedValue(['550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440004']);
       vi.mocked(filesystem.readTextFile)
         .mockResolvedValueOnce(JSON.stringify(project1))
         .mockResolvedValueOnce(JSON.stringify(project2));
 
       const projects = await adapter.listProjects();
 
-      expect(projects[0]!.projectId).toBe('p2'); // Most recent first
-      expect(projects[1]!.projectId).toBe('p1');
+      expect(projects[0]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440004'); // Most recent first
+      expect(projects[1]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440003');
     });
   });
 
   describe('searchProjects()', () => {
     beforeEach(() => {
-      const project1 = createMockProject({ 
-        projectId: 'p1',
+      const project1 = createMockProject({
+        projectId: '550e8400-e29b-41d4-a716-446655440003',
         projectName: 'HVAC Design Project',
         projectNumber: 'PRJ-001',
       });
       const project2 = createMockProject({
-        projectId: 'p2',
+        projectId: '550e8400-e29b-41d4-a716-446655440004',
         projectName: 'Plumbing Project',
+        projectNumber: 'PRJ-002',  // Different project number to avoid PRJ-001 match
         clientName: 'ACME Corp',
       });
 
       vi.mocked(filesystem.exists).mockResolvedValue(true);
-      vi.mocked(filesystem.readDir).mockResolvedValue(['p1', 'p2']);
+      vi.mocked(filesystem.readDir).mockResolvedValue(['550e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440004']);
       vi.mocked(filesystem.readTextFile)
         .mockResolvedValueOnce(JSON.stringify(project1))
         .mockResolvedValueOnce(JSON.stringify(project2));
@@ -490,21 +530,21 @@ describe('TauriStorageAdapter', () => {
       const results = await adapter.searchProjects('hvac');
 
       expect(results).toHaveLength(1);
-      expect(results[0]!.projectId).toBe('p1');
+      expect(results[0]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440003');
     });
 
     it('should filter by project number', async () => {
       const results = await adapter.searchProjects('PRJ-001');
 
       expect(results).toHaveLength(1);
-      expect(results[0]!.projectId).toBe('p1');
+      expect(results[0]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440003');
     });
 
     it('should filter by client name', async () => {
       const results = await adapter.searchProjects('acme');
 
       expect(results).toHaveLength(1);
-      expect(results[0]!.projectId).toBe('p2');
+      expect(results[0]!.projectId).toBe('550e8400-e29b-41d4-a716-446655440004');
     });
 
     it('should return empty array for no matches', async () => {
@@ -582,7 +622,7 @@ describe('TauriStorageAdapter', () => {
     it('should return empty array for no auto-saves', async () => {
       vi.mocked(filesystem.exists).mockResolvedValue(false);
 
-      const autoSaves = await adapter.listAutoSaves('test-project-id');
+      const autoSaves = await adapter.listAutoSaves('550e8400-e29b-41d4-a716-446655440000');
 
       expect(autoSaves).toEqual([]);
     });
@@ -594,7 +634,7 @@ describe('TauriStorageAdapter', () => {
         '2024-01-02T00:00:00.000Z.hvac',
       ]);
 
-      const autoSaves = await adapter.listAutoSaves('test-project-id');
+      const autoSaves = await adapter.listAutoSaves('550e8400-e29b-41d4-a716-446655440000');
 
       expect(autoSaves).toHaveLength(2);
       expect(autoSaves[0]!.timestamp).toBe('2024-01-02T00:00:00.000Z'); // Newest first
@@ -605,7 +645,7 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.exists).mockResolvedValue(true);
       vi.mocked(filesystem.readDir).mockResolvedValue(['2024-01-01T00:00:00.000Z.hvac']);
 
-      const autoSaves = await adapter.listAutoSaves('test-project-id');
+      const autoSaves = await adapter.listAutoSaves('550e8400-e29b-41d4-a716-446655440000');
 
       expect(autoSaves[0]!.sizeBytes).toBeDefined();
     });
@@ -620,13 +660,13 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.copyFile).mockResolvedValue();
 
       const result = await adapter.restoreAutoSave(
-        'test-project-id',
+        '550e8400-e29b-41d4-a716-446655440000',
         '2024-01-01T00:00:00.000Z'
       );
 
       expect(result.success).toBe(true);
       expect(result.project).toEqual(expect.objectContaining({
-        projectId: 'test-project-id',
+        projectId: '550e8400-e29b-41d4-a716-446655440000',
       }));
     });
 
@@ -637,7 +677,7 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.writeTextFile).mockResolvedValue();
       vi.mocked(filesystem.copyFile).mockResolvedValue();
 
-      await adapter.restoreAutoSave('test-project-id', '2024-01-01T00:00:00.000Z');
+      await adapter.restoreAutoSave('550e8400-e29b-41d4-a716-446655440000', '2024-01-01T00:00:00.000Z');
 
       expect(filesystem.writeTextFile).toHaveBeenCalledWith(
         expect.stringContaining('.hvac'),
@@ -652,7 +692,7 @@ describe('TauriStorageAdapter', () => {
       vi.mocked(filesystem.writeTextFile).mockResolvedValue();
       vi.mocked(filesystem.copyFile).mockResolvedValue();
 
-      await adapter.restoreAutoSave('test-project-id', '2024-01-01T00:00:00.000Z');
+      await adapter.restoreAutoSave('550e8400-e29b-41d4-a716-446655440000', '2024-01-01T00:00:00.000Z');
 
       expect(filesystem.exists).toHaveBeenCalled();
     });
@@ -670,7 +710,7 @@ describe('TauriStorageAdapter', () => {
       ]);
       vi.mocked(filesystem.removeFile).mockResolvedValue();
 
-      await adapter.cleanupAutoSaves('test-project-id', 3);
+      await adapter.cleanupAutoSaves('550e8400-e29b-41d4-a716-446655440000', 3);
 
       // Should delete 2 oldest auto-saves
       expect(filesystem.removeFile).toHaveBeenCalledTimes(2);
@@ -685,7 +725,7 @@ describe('TauriStorageAdapter', () => {
       ]);
       vi.mocked(filesystem.removeFile).mockResolvedValue();
 
-      await adapter.cleanupAutoSaves('test-project-id', 2);
+      await adapter.cleanupAutoSaves('550e8400-e29b-41d4-a716-446655440000', 2);
 
       expect(filesystem.removeFile).toHaveBeenCalledTimes(1);
       expect(filesystem.removeFile).toHaveBeenCalledWith(
@@ -701,7 +741,7 @@ describe('TauriStorageAdapter', () => {
       ]);
       vi.mocked(filesystem.removeFile).mockResolvedValue();
 
-      await adapter.cleanupAutoSaves('test-project-id', 0);
+      await adapter.cleanupAutoSaves('550e8400-e29b-41d4-a716-446655440000', 0);
 
       // Should delete all auto-saves
       expect(filesystem.removeFile).toHaveBeenCalledTimes(2);
@@ -720,7 +760,7 @@ describe('TauriStorageAdapter', () => {
         projectName: 'Updated Name',
       };
 
-      await adapter.updateMetadata('test-project-id', metadata);
+      await adapter.updateMetadata('550e8400-e29b-41d4-a716-446655440000', metadata);
 
       expect(serialization.serializeProject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -730,23 +770,35 @@ describe('TauriStorageAdapter', () => {
     });
 
     it('should preserve entities', async () => {
+      const entityId = '660e8400-e29b-41d4-a716-446655440010';
       const project = createMockProject({
         entities: {
-          byId: { 'room-1': { id: 'room-1' } as any },
-          allIds: ['room-1'],
+          byId: {
+            [entityId]: {
+              id: entityId,
+              type: 'note',
+              props: { content: 'Test note', fontSize: 14, color: '#000000' },
+              transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+              zIndex: 0,
+              createdAt: '2024-01-01T00:00:00.000Z',
+              modifiedAt: '2024-01-01T00:00:00.000Z',
+            } as any,
+          },
+          allIds: [entityId],
         },
       });
       vi.mocked(filesystem.exists).mockResolvedValue(true);
       vi.mocked(filesystem.readTextFile).mockResolvedValue(JSON.stringify(project));
       vi.mocked(filesystem.createDir).mockResolvedValue();
+      vi.mocked(filesystem.writeTextFile).mockResolvedValue();
       vi.mocked(filesystem.renameFile).mockResolvedValue();
 
-      await adapter.updateMetadata('test-project-id', { projectName: 'Updated' });
+      await adapter.updateMetadata('550e8400-e29b-41d4-a716-446655440000', { projectName: 'Updated' });
 
       expect(serialization.serializeProject).toHaveBeenCalledWith(
         expect.objectContaining({
           entities: expect.objectContaining({
-            allIds: ['room-1'],
+            allIds: [entityId],
           }),
         })
       );
@@ -755,11 +807,11 @@ describe('TauriStorageAdapter', () => {
 
   describe('saveThumbnail()', () => {
     it('should write thumbnail to .metadata/ directory', async () => {
-      const imageBlob = new Blob(['test image data'], { type: 'image/png' });
+      const imageBlob = { arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)) } as unknown as Blob;
       vi.mocked(filesystem.createDir).mockResolvedValue();
       vi.mocked(filesystem.writeTextFile).mockResolvedValue();
 
-      await adapter.saveThumbnail('test-project-id', imageBlob);
+      await adapter.saveThumbnail('550e8400-e29b-41d4-a716-446655440000', imageBlob);
 
       expect(filesystem.createDir).toHaveBeenCalledWith(
         expect.stringContaining('.metadata'),
@@ -772,11 +824,11 @@ describe('TauriStorageAdapter', () => {
     });
 
     it('should handle Blob conversion', async () => {
-      const imageBlob = new Blob([new Uint8Array([1, 2, 3])], { type: 'image/png' });
+      const imageBlob = { arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(3)) } as unknown as Blob;
       vi.mocked(filesystem.createDir).mockResolvedValue();
       vi.mocked(filesystem.writeTextFile).mockResolvedValue();
 
-      await expect(adapter.saveThumbnail('test-project-id', imageBlob)).resolves.not.toThrow();
+      await expect(adapter.saveThumbnail('550e8400-e29b-41d4-a716-446655440000', imageBlob)).resolves.not.toThrow();
     });
   });
 

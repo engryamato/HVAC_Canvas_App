@@ -92,29 +92,29 @@ export const DuctPropsSchema = z
     // Common properties
     length: z.number().min(0.1).max(1000).describe('Length in feet'),
     material: DuctMaterialSchema,
-    airflow: z.number().min(1).max(100000).describe('Airflow in CFM'),
+    airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),
     staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
     // Connection references
     connectedFrom: z.string().uuid().optional().describe('Source entity ID'),
     connectedTo: z.string().uuid().optional().describe('Destination entity ID'),
-    
+
     // Service & Catalog references
     serviceId: z.string().uuid().optional().describe('Active Service ID'),
     catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
-    
+
     // Parametric design fields
     systemType: SystemTypeSchema.optional(),
     materialSpec: MaterialSpecSchema.optional(),
     gauge: z.number().optional().describe('Metal gauge thickness'),
     insulated: z.boolean().optional(),
     insulationThickness: z.number().optional().describe('Insulation thickness in inches'),
-    
+
     // Engineering data
     engineeringData: DuctEngineeringDataSchema.optional(),
-    
+
     // Constraint status
     constraintStatus: ConstraintStatusSchema.optional(),
-    
+
     // Auto-sizing flag
     autoSized: z.boolean().optional().describe('Indicates if duct was auto-sized'),
   })

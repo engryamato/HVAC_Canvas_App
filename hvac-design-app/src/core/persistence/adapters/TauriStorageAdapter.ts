@@ -49,7 +49,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       this.baseDir = config.baseDir;
       this.initialized = true;
     }
-    
+
     // Initialize auto-save configuration
     this.autoSaveConfig = {
       enabled: config?.autoSave?.enabled ?? true,
@@ -123,11 +123,11 @@ export class TauriStorageAdapter implements StorageAdapter {
    */
   private async atomicWrite(filePath: string, content: string): Promise<void> {
     const tempPath = `${filePath}.tmp`;
-    
+
     try {
       // Write to temp file
       await writeTextFile(tempPath, content);
-      
+
       // Rename temp to target (atomic operation)
       await renameFile(tempPath, filePath);
     } catch (error) {
@@ -149,7 +149,7 @@ export class TauriStorageAdapter implements StorageAdapter {
   private async createBackup(projectId: string): Promise<void> {
     const mainPath = this.getProjectFilePath(projectId);
     const backupPath = this.getBackupFilePath(projectId);
-    
+
     try {
       if (await exists(mainPath)) {
         await copyFile(mainPath, backupPath);
@@ -232,7 +232,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       // Handle specific error types
       if (errorMessage.includes('permission') || errorMessage.includes('access denied')) {
         return {
@@ -240,7 +240,7 @@ export class TauriStorageAdapter implements StorageAdapter {
           errorCode: 'PERMISSION_DENIED',
         };
       }
-      
+
       if (errorMessage.includes('disk full') || errorMessage.includes('no space')) {
         return {
           success: false,
@@ -324,7 +324,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       // Check if migration is needed
       let migrated = false;
       let project = deserializeResult.data;
-      
+
       if (deserializeResult.requiresMigration && deserializeResult.foundVersion) {
         const migrationResult = migrateProject(project, deserializeResult.foundVersion);
         if (migrationResult.success && migrationResult.data) {
@@ -401,7 +401,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       // Remove main file and backup
       const mainFile = this.getProjectFilePath(projectId);
       const backupFile = this.getBackupFilePath(projectId);
-      
+
       if (await exists(mainFile)) {
         await removeFile(mainFile);
       }
@@ -415,7 +415,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       return { success: true };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       if (errorMessage.includes('permission') || errorMessage.includes('access denied')) {
         return {
           success: false,
@@ -504,30 +504,30 @@ export class TauriStorageAdapter implements StorageAdapter {
           if (await exists(projectFilePath)) {
             const content = await readTextFile(projectFilePath);
             const deserializeResult = deserializeProject(content);
-            
+
             if (deserializeResult.success && deserializeResult.data) {
               // Validate metadata
               const metadataResult = ProjectMetadataSchema.safeParse(deserializeResult.data);
               if (metadataResult.success) {
                 projects.push(metadataResult.data);
               } else {
-                console.warn(`Skipping corrupted project: ${projectId}`);
+                console.warn(`Skipping project with invalid metadata: ${projectId}`, metadataResult.error);
               }
             }
           }
         } catch (error) {
+          // Skip corrupted or unreadable project files
           console.warn(`Skipping corrupted project file: ${projectId}`, error);
         }
       }
 
       // Sort by modifiedAt descending
-      projects.sort((a, b) => 
+      projects.sort((a, b) =>
         new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime()
       );
 
       return projects;
     } catch (error: unknown) {
-      console.error('Failed to list projects:', error);
       return [];
     }
   }
@@ -620,7 +620,7 @@ export class TauriStorageAdapter implements StorageAdapter {
           // Extract sanitized timestamp from filename and convert back to ISO format
           const sanitizedTimestamp = entryName.replace('.hvac', '');
           const timestamp = this.unsanitizeTimestamp(sanitizedTimestamp);
-          
+
           autoSaves.push({
             projectId,
             timestamp,
@@ -632,7 +632,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       }
 
       // Sort by timestamp descending (newest first)
-      autoSaves.sort((a, b) => 
+      autoSaves.sort((a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
 
@@ -665,6 +665,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       const deserializeResult = deserializeProject(content);
 
       if (!deserializeResult.success || !deserializeResult.data) {
+        console.error('restoreAutoSave: CORRUPTED_FILE', deserializeResult);
         return {
           success: false,
           errorCode: 'CORRUPTED_FILE',
@@ -685,6 +686,7 @@ export class TauriStorageAdapter implements StorageAdapter {
         migrated: false,
       };
     } catch (error: unknown) {
+      console.error('restoreAutoSave: READ_ERROR', error);
       return {
         success: false,
         errorCode: 'READ_ERROR',
@@ -742,7 +744,7 @@ export class TauriStorageAdapter implements StorageAdapter {
 
     // Write to thumbnail file
     const thumbnailPath = this.getThumbnailPath(projectId);
-    
+
     // For now, use text file write (Tauri doesn't have writeBinaryFile in filesystem module)
     // This is placeholder - actual binary write would need different Tauri API
     const base64 = btoa(String.fromCharCode(...uint8Array));

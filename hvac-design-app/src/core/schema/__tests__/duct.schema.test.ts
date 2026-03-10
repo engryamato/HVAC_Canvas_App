@@ -70,8 +70,8 @@ describe('DuctPropsSchema', () => {
     expect(DuctPropsSchema.parse({ ...DEFAULT_ROUND_DUCT_PROPS, length: 1000 })).toBeTruthy();
   });
 
-  it('should enforce airflow range (1-100,000 CFM)', () => {
-    expect(() => DuctPropsSchema.parse({ ...DEFAULT_ROUND_DUCT_PROPS, airflow: 0 })).toThrow();
+  it('should enforce airflow range (0-100,000 CFM)', () => {
+    expect(() => DuctPropsSchema.parse({ ...DEFAULT_ROUND_DUCT_PROPS, airflow: -1 })).toThrow();
     expect(() =>
       DuctPropsSchema.parse({ ...DEFAULT_ROUND_DUCT_PROPS, airflow: 100001 })
     ).toThrow();
@@ -100,7 +100,7 @@ describe('DuctSchema', () => {
   const validDuct = {
     id: '550e8400-e29b-41d4-a716-446655440000',
     type: 'duct' as const,
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1, elevation: 0 },
     zIndex: 1,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',

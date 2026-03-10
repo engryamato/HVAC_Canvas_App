@@ -9,19 +9,50 @@ import {
 } from '@/core/schema/duct.schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { updateEntity as updateEntityCommand, updateEntities as updateEntitiesCommand } from '@/core/commands/entityCommands';
-import { TabbedPropertiesPanel } from './TabbedPropertiesPanel';
 import { AutoSizingControls } from '@/components/canvas/AutoSizingControls';
 import { ValidationDisplay } from '@/components/canvas/ValidationDisplay';
 import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import {
   generateDeterministicSuggestions,
+  ductValidator,
   type ValidationViolation,
 } from '@/core/services/validation/constraintValidator';
 
 interface DuctInspectorProps {
   entity: Duct;
 }
+
+// ---- Sub-components --------------------------------------------------------
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+      {children}
+    </h4>
+  );
+}
+
+function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function ReadOnlyField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-slate-500">{label}</span>
+      <div className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-2 text-sm text-slate-900">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+// ---- Main Component --------------------------------------------------------
 
 export function DuctInspector({ entity }: DuctInspectorProps) {
   const { errors, validateField } = useFieldValidation(entity);
@@ -30,6 +61,8 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
     state: 'cleared' | 'mitigated' | 'unchanged';
     message: string;
   } | null>(null);
+
+  // ---- Validation normalization -------------------------------------------
 
   const validationStatusForDisplay = useMemo(() => {
     const status = entity.props.constraintStatus;
@@ -80,6 +113,8 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
       violations: normalizedViolations,
     };
   }, [entity.props.constraintStatus]);
+
+  // ---- Commit helpers -----------------------------------------------------
 
   const commit = useCallback(
     <K extends keyof Duct['props']>(field: K, value: Duct['props'][K]) => {
@@ -177,7 +212,7 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
 
       const previous = JSON.parse(JSON.stringify(current)) as Duct;
       const nextProps = { ...current.props, ...newSize };
-      
+
       updateEntityCommand(
         entity.id,
         { props: nextProps, modifiedAt: new Date().toISOString() },
@@ -265,8 +300,9 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
     [engineeringLimits, entity.id, validateField]
   );
 
+  // ---- Derived display values ---------------------------------------------
+
   const isRound = entity.props.shape === 'round';
-  const readonlyClass = "px-2.5 py-2 rounded-md bg-slate-100 border border-slate-200 text-sm text-slate-900";
   const engineeringData = entity.props.engineeringData;
   const displayArea = engineeringData
     ? engineeringData.velocity > 0
@@ -276,13 +312,21 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
   const displayVelocity = engineeringData?.velocity ?? entity.calculated.velocity;
   const displayFrictionLoss = engineeringData?.pressureDrop ?? entity.calculated.frictionLoss;
 
-  const tabs = [
-    {
-      id: 'dimensions',
-      label: 'Dimensions',
-      content: (
-        <div className="space-y-4">
-          <PropertyField label="Name" htmlFor="duct-name">
+  const hasViolations =
+    (entity.props.constraintStatus?.violations ?? []).filter(
+      (v) => v.severity === 'error' || v.severity === 'warning'
+    ).length > 0;
+
+  // ---- Render -------------------------------------------------------------
+
+  return (
+    <div className="flex flex-col gap-4" data-testid="duct-inspector">
+
+      {/* ── Header card ────────────────────────────────────────────────── */}
+      <Card>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <span className="mb-1 block text-xs font-medium text-slate-500">Name</span>
             <ValidatedInput
               id="duct-name"
               type="text"
@@ -290,7 +334,25 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
               error={errors['name']}
               onChange={(val) => commit('name', val as string)}
             />
-          </PropertyField>
+          </div>
+          <div className="mt-5 shrink-0">
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                isRound
+                  ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
+                  : 'bg-purple-50 text-purple-700 ring-1 ring-purple-200'
+              }`}
+            >
+              {isRound ? 'Round' : 'Rectangular'}
+            </span>
+          </div>
+        </div>
+      </Card>
+
+      {/* ── Dimensions ─────────────────────────────────────────────────── */}
+      <Card>
+        <SectionHeader>Dimensions</SectionHeader>
+        <div className="flex flex-col gap-3">
           <PropertyField label="Shape" htmlFor="duct-shape">
             <ValidatedInput
               id="duct-shape"
@@ -303,9 +365,9 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
               ]}
             />
           </PropertyField>
-          <div className="mb-4">
-            <AutoSizingControls duct={entity.props} onSizeApplied={handleSizeApplied} />
-          </div>
+
+          <AutoSizingControls duct={entity.props} onSizeApplied={handleSizeApplied} />
+
           {isRound ? (
             <PropertyField label="Diameter (in)" htmlFor="duct-diameter">
               <ValidatedInput
@@ -347,6 +409,7 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
               </PropertyField>
             </>
           )}
+
           <PropertyField label="Length (ft)" htmlFor="duct-length">
             <ValidatedInput
               id="duct-length"
@@ -360,31 +423,12 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
             />
           </PropertyField>
         </div>
-      ),
-    },
-    {
-      id: 'engineering',
-      label: 'Engineering',
-      content: (
-        <div className="space-y-4">
-          {suggestionFeedback && (
-            <div
-              className={`mb-3 rounded-md border px-3 py-2 text-xs ${
-                suggestionFeedback.state === 'cleared'
-                  ? 'border-green-200 bg-green-50 text-green-800'
-                  : suggestionFeedback.state === 'mitigated'
-                    ? 'border-blue-200 bg-blue-50 text-blue-800'
-                    : 'border-amber-200 bg-amber-50 text-amber-800'
-              }`}
-              data-testid="duct-suggestion-feedback"
-            >
-              {suggestionFeedback.message}
-            </div>
-          )}
-          <ValidationDisplay 
-            constraintStatus={validationStatusForDisplay as Duct['props']['constraintStatus']}
-            onFixSuggestion={handleFixSuggestion}
-          />
+      </Card>
+
+      {/* ── Engineering ────────────────────────────────────────────────── */}
+      <Card>
+        <SectionHeader>Engineering</SectionHeader>
+        <div className="flex flex-col gap-3">
           <PropertyField label="Material" htmlFor="duct-material">
             <ValidatedInput
               id="duct-material"
@@ -399,6 +443,7 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
               ]}
             />
           </PropertyField>
+
           <PropertyField label="Airflow (CFM)" htmlFor="duct-airflow">
             <ValidatedInput
               id="duct-airflow"
@@ -411,6 +456,7 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
               onChange={(val) => commit('airflow', Number(val))}
             />
           </PropertyField>
+
           <PropertyField label="Static Pressure (in.w.g.)" htmlFor="duct-static-pressure">
             <ValidatedInput
               id="duct-static-pressure"
@@ -423,51 +469,59 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
               onChange={(val) => commit('staticPressure', Number(val))}
             />
           </PropertyField>
-          <div className="mt-4 pt-4 border-t border-slate-200">
-            <h5 className="text-sm font-semibold text-slate-700 mb-2">Calculated Values</h5>
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div>
-                <span className="text-slate-500">Area:</span>
-                <div className={readonlyClass}>{displayArea.toFixed(2)} sq in</div>
-              </div>
-              <div>
-                <span className="text-slate-500">Velocity:</span>
-                <div className={readonlyClass}>{displayVelocity.toFixed(2)} FPM</div>
-              </div>
-              <div>
-                <span className="text-slate-500">Friction:</span>
-                <div className={readonlyClass}>{displayFrictionLoss.toFixed(4)} in.w.g./100ft</div>
-              </div>
+
+          {/* Calculated read-only values */}
+          <div className="mt-1 border-t border-slate-100 pt-3">
+            <span className="mb-2 block text-xs font-medium text-slate-500">Calculated</span>
+            <div className="grid grid-cols-3 gap-2">
+              <ReadOnlyField label="Area" value={`${displayArea.toFixed(2)} sq in`} />
+              <ReadOnlyField label="Velocity" value={`${displayVelocity.toFixed(0)} FPM`} />
+              <ReadOnlyField label="Friction" value={`${displayFrictionLoss.toFixed(4)}`} />
             </div>
           </div>
         </div>
-      ),
-    },
-    {
-      id: 'costing',
-      label: 'Costing',
-      content: (
-        <div className="space-y-4">
-          <div className="text-sm text-slate-600">
-            Cost estimates are calculated based on material, labor rates, and markup settings.
-          </div>
-          <PropertyField label="Material Cost">
-            <div className={readonlyClass}>Calculated from component library</div>
-          </PropertyField>
-          <PropertyField label="Labor Hours">
-            <div className={readonlyClass}>Calculated from dimensions</div>
-          </PropertyField>
-          <PropertyField label="Total Estimate">
-            <div className={readonlyClass}>See BOM panel for details</div>
-          </PropertyField>
-        </div>
-      ),
-    },
-  ];
+      </Card>
 
-  return (
-    <div>
-      <TabbedPropertiesPanel entityType="duct" tabs={tabs} defaultTab="dimensions" />
+      {/* ── Validation ─────────────────────────────────────────────────── */}
+      {(hasViolations || suggestionFeedback) && (
+        <Card>
+          <SectionHeader>Validation</SectionHeader>
+
+          {suggestionFeedback && (
+            <div
+              className={`mb-3 rounded-md border px-3 py-2 text-xs ${
+                suggestionFeedback.state === 'cleared'
+                  ? 'border-green-200 bg-green-50 text-green-800'
+                  : suggestionFeedback.state === 'mitigated'
+                    ? 'border-blue-200 bg-blue-50 text-blue-800'
+                    : 'border-amber-200 bg-amber-50 text-amber-800'
+              }`}
+              data-testid="duct-suggestion-feedback"
+            >
+              {suggestionFeedback.message}
+            </div>
+          )}
+
+          <ValidationDisplay
+            constraintStatus={validationStatusForDisplay as Duct['props']['constraintStatus']}
+            onFixSuggestion={handleFixSuggestion}
+          />
+        </Card>
+      )}
+
+      {/* ── Costing ────────────────────────────────────────────────────── */}
+      <Card>
+        <SectionHeader>Costing</SectionHeader>
+        <div className="flex flex-col gap-3 text-sm text-slate-500">
+          <p className="text-xs text-slate-400">
+            Cost estimates are calculated based on material, labor rates, and markup settings.
+          </p>
+          <ReadOnlyField label="Material Cost" value="Calculated from component library" />
+          <ReadOnlyField label="Labor Hours" value="Calculated from dimensions" />
+          <ReadOnlyField label="Total Estimate" value="See BOM panel for details" />
+        </div>
+      </Card>
+
     </div>
   );
 }

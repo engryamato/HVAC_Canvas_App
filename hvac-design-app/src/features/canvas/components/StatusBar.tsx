@@ -4,6 +4,7 @@ import React from 'react';
 import { useZoom, useSnapToGrid, useGridVisible } from '../store/viewportStore';
 import { useSelectionCount } from '../store/selectionStore';
 import { useCursorStore } from '../store/cursorStore';
+import { useActiveViewMode } from '../store/viewModeStore';
 
 /**
  * StatusBar - Canvas status bar showing cursor position and zoom
@@ -28,6 +29,7 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
   const gridVisible = useGridVisible();
   const selectionCount = useSelectionCount();
   const lastCanvasPoint = useCursorStore((state) => state.lastCanvasPoint);
+  const activeViewMode = useActiveViewMode();
 
   const mousePosition = propMousePosition !== undefined ? propMousePosition : lastCanvasPoint;
 
@@ -60,6 +62,13 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
 
       {/* Center section: Zoom, Grid visibility, and Snap status */}
       <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1" aria-label="Active view mode">
+          <span className="text-slate-600">View:</span>{' '}
+          <span className="font-medium text-slate-900">{activeViewMode === 'plan' ? 'Plan View' : '3D View'}</span>
+        </div>
+
+        <div className="h-4 w-px bg-slate-300" />
+
         {/* Zoom level */}
         <div className="flex items-center gap-1" aria-label="Zoom level">
           <span className="text-slate-600">Zoom:</span>{' '}
@@ -85,6 +94,13 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
         >
           <span>Snap: {snapToGrid ? 'On' : 'Off'}</span>
         </div>
+
+        {activeViewMode === '3d' ? (
+          <>
+            <div className="h-4 w-px bg-slate-300" />
+            <div className="text-slate-500">Orbit: drag · Pan: Shift+drag · Zoom: wheel</div>
+          </>
+        ) : null}
       </div>
 
       {/* Right section: Selection count */}

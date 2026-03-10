@@ -11,6 +11,7 @@ import {
 import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
 import { useCursorStore } from '@/features/canvas/store/cursorStore';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { ViewModeToggle } from './ViewModeToggle';
 
 interface TopToolBarProps {
   className?: string;
@@ -56,6 +57,8 @@ export function TopToolBar({ className = '' }: TopToolBarProps) {
           <tool.icon size={18} strokeWidth={currentTool === tool.id ? 2.5 : 2} />
         </button>
       ))}
+      <div className="mx-1 h-7 w-px bg-slate-200" />
+      <ViewModeToggle />
     </div>
   );
 }
