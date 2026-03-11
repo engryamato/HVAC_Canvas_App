@@ -63,6 +63,8 @@
   "exclude": [
     "node_modules",
     "src-tauri",
-    "e2e"
+    "e2e",
+    "debug*.ts",
+    "debug*.tsx"
   ]
 }

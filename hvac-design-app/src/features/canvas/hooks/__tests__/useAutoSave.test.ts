@@ -376,4 +376,30 @@ describe('useAutoSave — view/camera debounced persistence', () => {
     });
     expect(onSave).toHaveBeenCalledTimes(1);
   });
+
+  it('flushes a pending view/camera save synchronously on beforeunload before the debounce fires', () => {
+    const onSave = vi.fn();
+    renderHook(() => useAutoSave({ enabled: true, onSave }));
+
+    act(() => {
+      useThreeDViewStore.getState().setOrbitState({
+        orbitRadius: 600,
+        polarAngle: 1.0,
+        azimuthAngle: 0.5,
+      });
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(onSave).toHaveBeenCalledTimes(0);
+
+    act(() => {
+      window.dispatchEvent(new Event('beforeunload'));
+    });
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ source: 'auto', success: true }));
+    expect(loadProjectFromStorage('44444444-4444-4444-8444-444444444444')).toBeTruthy();
+  });
 });

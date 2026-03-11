@@ -65,3 +65,7 @@ next-env.d.ts
 debug/*
 !debug/README.md
 !debug/.gitkeep
+
+# Ad-hoc debug scripts (must not ship)
+debug*.ts
+debug*.tsx
