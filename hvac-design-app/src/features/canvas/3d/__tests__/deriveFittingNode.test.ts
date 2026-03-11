@@ -43,11 +43,20 @@ describe('deriveFittingNode', () => {
         expect(node.geometryDescriptor.type).toBe('cylinder');
     });
 
-    it('falls back gracefully for unknown types', () => {
-        // "cap" is a known type with a default dimension mapping
+    it('uses box geometry for cap fitting', () => {
         const node = deriveFittingNode(makeFitting('cap'));
+        expect(node.geometryDescriptor.type).toBe('box');
+    });
+
+    it('falls back gracefully for unknown fittingType values', () => {
+        const fitting = makeFitting('cap');
+        fitting.props.fittingType = 'unknown_fitting' as unknown as Fitting['props']['fittingType'];
+
+        const node = deriveFittingNode(fitting);
+
         expect(node).toBeDefined();
         expect(node.geometryDescriptor.type).toBe('box');
+        expect(node.bounds).toEqual({ width: 24, height: 16, depth: 24 });
     });
 
     it('is selectable', () => {
