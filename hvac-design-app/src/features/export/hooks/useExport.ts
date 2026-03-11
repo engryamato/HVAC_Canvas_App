@@ -3,6 +3,54 @@ import type { Project } from '@/types/project';
 import type { ReportOptions } from '../services/ReportGenerator';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 
+type ExportFormat = NonNullable<ReportOptions['format']>;
+type TabularFormat = Exclude<ExportFormat, 'pdf'>;
+
+function sanitizeProjectName(projectName: string): string {
+    return projectName.replace(/[^a-z0-9]/gi, '_');
+}
+
+function toArrayBuffer(data: Uint8Array): ArrayBuffer {
+    return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
+}
+
+function triggerBrowserDownload(content: BlobPart, mimeType: string, fileName: string): void {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function buildTabularExportContent(
+    entities: NonNullable<Project['entities']>,
+    format: TabularFormat
+): { body: string; mimeType: string; extension: 'csv' | 'xls' } {
+    const rows = entities.allIds
+        .map((id) => entities.byId[id])
+        .filter(Boolean)
+        .map((entity, index) => [
+            String(index + 1),
+            entity.type,
+            entity.id,
+            (entity.properties?.model as string | undefined) ?? 'N/A',
+            '1',
+        ]);
+    const header = ['#', 'Type', 'ID', 'Model', 'Qty'];
+    const separator = format === 'csv' ? ',' : '\t';
+    const body = [header, ...rows].map((row) => row.join(separator)).join('\n');
+
+    if (format === 'csv') {
+        return { body, mimeType: 'text/csv;charset=utf-8', extension: 'csv' };
+    }
+
+    return { body, mimeType: 'application/vnd.ms-excel;charset=utf-8', extension: 'xls' };
+}
+
 /**
  * Hook for handling project export to PDF
  * Implements UJ-PM-008: Export Project Report
@@ -19,39 +67,16 @@ export function useExport() {
         setError(null);
 
         try {
-            const format = options.format ?? 'pdf';
+            const format: ExportFormat = options.format ?? 'pdf';
             const entities = project.entities;
             if (!entities) {
                 throw new Error('Project has no entities to export');
             }
+            const sanitizedProjectName = sanitizeProjectName(project.projectName);
 
             if (format !== 'pdf') {
-                const rows = entities.allIds
-                    .map((id) => entities.byId[id])
-                    .filter(Boolean)
-                    .map((entity, index) => [
-                        String(index + 1),
-                        entity.type,
-                        entity.id,
-                        (entity.properties?.model as string | undefined) ?? 'N/A',
-                        '1',
-                    ]);
-                const header = ['#', 'Type', 'ID', 'Model', 'Qty'];
-                const separator = format === 'csv' ? ',' : '\t';
-                const body = [header, ...rows].map((row) => row.join(separator)).join('\n');
-                const mime = format === 'csv' ? 'text/csv;charset=utf-8' : 'application/vnd.ms-excel;charset=utf-8';
-                const extension = format === 'csv' ? 'csv' : 'xls';
-
-                const blob = new Blob([body], { type: mime });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${project.projectName.replace(/[^a-z0-9]/gi, '_')}_Report.${extension}`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                setIsExporting(false);
+                const { body, mimeType, extension } = buildTabularExportContent(entities, format);
+                triggerBrowserDownload(body, mimeType, `${sanitizedProjectName}_Report.${extension}`);
                 return { success: true };
             }
 
@@ -64,7 +89,7 @@ export function useExport() {
                 const { TauriFileSystem } = await import('@/core/persistence/TauriFileSystem');
                 
                 // Show native save dialog
-                const defaultFileName = `${project.projectName.replace(/[^a-z0-9]/gi, '_')}_Report.pdf`;
+                const defaultFileName = `${sanitizedProjectName}_Report.pdf`;
                 const filePath = await TauriFileSystem.saveFileDialog({
                     defaultPath: defaultFileName,
                     filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
@@ -72,7 +97,6 @@ export function useExport() {
 
                 if (!filePath) {
                     // User cancelled
-                    setIsExporting(false);
                     return { success: false, cancelled: true };
                 }
 
@@ -83,33 +107,23 @@ export function useExport() {
                 // TODO: Replace with proper toast notification
                 alert(`Report exported successfully to:\n${filePath}`);
 
-                setIsExporting(false);
                 return { success: true, filePath };
-            } else {
-                // Web mode: Trigger browser download
-                const arrayBuffer = pdfBytes.buffer.slice(
-                    pdfBytes.byteOffset,
-                    pdfBytes.byteOffset + pdfBytes.byteLength
-                ) as ArrayBuffer;
-                const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${project.projectName.replace(/[^a-z0-9]/gi, '_')}_Report.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
-                setIsExporting(false);
-                return { success: true };
             }
+
+            // Web mode: Trigger browser download
+            triggerBrowserDownload(
+                toArrayBuffer(pdfBytes),
+                'application/pdf',
+                `${sanitizedProjectName}_Report.pdf`
+            );
+            return { success: true };
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
             setError(errorMessage);
-            setIsExporting(false);
             console.error('[useExport] Failed to export project:', err);
             return { success: false, error: errorMessage };
+        } finally {
+            setIsExporting(false);
         }
     };
 
