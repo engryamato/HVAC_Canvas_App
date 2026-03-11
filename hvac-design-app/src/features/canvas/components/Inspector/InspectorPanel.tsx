@@ -71,7 +71,7 @@ export function InspectorPanel({
   const panelClasses = `flex flex-col h-full bg-slate-50 border-l border-slate-200 w-80 min-w-[20rem] ${embedded ? 'w-auto min-w-0 border-l-0 bg-transparent' : ''
     } ${className ?? ''}`;
 
-  const show3DStrip = activeViewMode === '3d' && selectedIds.length > 0;
+  const show3DStrip = activeViewMode === '3d' && selectedIds.length === 1;
 
   return (
     <div className={panelClasses}>

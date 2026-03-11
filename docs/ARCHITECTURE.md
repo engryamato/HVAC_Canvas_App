@@ -1,106 +1,140 @@
-# System Architecture Diagram
+# System Architecture
 
-This document explains how the different parts of the HVAC Canvas App interact. It serves as the "connective tissue" between the detailed files in `docs/elements/`.
+This document is the current repository architecture map for `HVAC_Canvas_App`, based on the active code in `hvac-design-app/` and `src-tauri/`.
 
-## High-Level Data Flow
+## High-Level Overview
 
-The app follows a unidirectional data flow pattern, using **Zustand** for state management and **Pure Canvas 2D** for rendering.
+The system is a hybrid desktop/web HVAC design application:
+
+- Frontend: Next.js App Router + React + TypeScript.
+- State: Zustand stores split between `src/core/store`, `src/features/*/store`, and legacy `src/stores`.
+- Domain model: Zod schemas in `src/core/schema`.
+- Persistence: pluggable `StorageAdapter` + `ProjectRepository` over Web (IndexedDB/localStorage) and Tauri filesystem.
+- Canvas runtime: tool-driven editing, command history, and reactive calculations/BOM/export.
+- Desktop bridge: Tauri Rust commands under `src-tauri/src/commands`.
+
+## Module Map
+
+| Module/Directory | Responsibility | Depends On |
+|---|---|---|
+| `hvac-design-app/app` | Route entrypoints (`/`, `/dashboard`, `/canvas/[projectId]`) and top-level layout | `src/features/*`, `src/components/*` |
+| `hvac-design-app/src/features/canvas` | Main editor runtime: tools, viewport, selection, inspectors, 3D view state, autosave, calculations | `src/core/store`, `src/core/commands`, `src/core/schema`, `src/core/services`, `src/core/persistence` |
+| `hvac-design-app/src/features/dashboard` | Project browsing/filtering/create/open/archive/duplicate UI and list orchestration | `src/core/persistence`, `src/core/store`, `src/features/onboarding` |
+| `hvac-design-app/src/features/export` | BOM/report export UI and format generators | `src/core/store`, `src/core/services/export`, canvas data hooks |
+| `hvac-design-app/src/core/schema` | Canonical entity/project/service/component schemas and migration versioning | Zod + used by stores/persistence/features |
+| `hvac-design-app/src/core/store` | Global stores (project, entity, tool, settings, preferences, validation, storage, component library) | schema + selective services |
+| `hvac-design-app/src/core/commands` | Reversible command model + undo/redo history + entity command helpers | `entityStore`, `historyStore`, selection/validation/services |
+| `hvac-design-app/src/core/persistence` | Storage adapter contracts, adapters, serialization, repository policy layer, file utilities | schema + storage root service + platform fs |
+| `hvac-design-app/src/core/services` | Calculation, validation, automation, migration, storage-root, operation queue services | schema/store/persistence; some imports from `features` |
+| `hvac-design-app/src/components` | Shared shell/dialog/onboarding/ui components | core stores + feature components/hooks |
+| `hvac-design-app/src/stores` | Legacy persisted stores still used by onboarding/canvas/dashboard paths | localStorage + selected feature/core usage |
+| `hvac-design-app/src-tauri` | Native command handlers and Tauri plugin wiring | Rust std + Tauri plugins |
+| `hvac-design-app/e2e` | Playwright coverage for onboarding/project/canvas flows | app routes/runtime behavior |
+| `docs/` | Architecture/element/persistence/user-journey documentation | references code modules above |
+
+## Dependency Relationships
+
+### Simplified graph
 
 ```mermaid
 graph TD
-    User([User Interaction]) --> Tools[Canvas Tools]
-    Tools --> Commands[Command System]
-    Commands --> Stores[(Zustand Stores)]
-    
-    subgraph Stores
-        entityStore[Entity Store]
-        compLibStore[Component Library Store]
-        serviceStore[Service Store]
-    end
-    
-    Stores --> RenderLoop[Render Loop]
-    RenderLoop --> Renderers[Entity Renderers]
-    Renderers --> Canvas[HTML5 Canvas]
-    
-    Stores -.-> Persistence[Persistence Layer]
-    Persistence -.-> LocalFS[(Local File System)]
-    
-    Stores -.-> Calculators[HVAC Calculators]
-    Stores -.-> Automation[Automation Services]
-    Automation -.-> Stores
-    Calculators -.-> Stores
-    
-    
-    subgraph Automation
-        AutoSizing[Auto-Sizing]
-        FittingInsertion[Fitting Insertion]
-        BulkOps[Bulk Operations]
-        Validation[Validation]
-        Parametric[Parametric Updates]
-    end
+    app["app routes"] --> features["features/*"]
+    app --> components["components/*"]
+    features --> core["core/*"]
+    components --> core
+    core --> schema["core/schema"]
+    core --> persistence["core/persistence"]
+    persistence --> tauri["src-tauri commands (desktop)"]
+    features --> storesLegacy["src/stores (legacy)"]
 ```
 
-## Core Architectural Pillars
+### Observed import density (module-level, TS imports)
 
-### 1. State Management (The Source of Truth)
-We use a normalized state pattern in Zustand to ensure performance and data integrity.
-- **[entityStore](elements/02-stores/entityStore.md)**: Main database of the app, storing all HVAC entities (Rooms, Ducts, Equipment) flat by ID.
-- **[canvasStore](elements/02-stores/canvasStore.md)**: Manages UI-specific state like the active tool and selected equipment type.
-- **[selectionStore](elements/02-stores/selectionStore.md)**: Tracks which entities are currently selected or hovered.
-- **[viewportStore](elements/02-stores/viewportStore.md)**: Controls the pan and zoom level of the infinite canvas.
-- **componentLibraryStoreV2**: Manages the centralized catalog of HVAC components and templates.
-- **serviceStore**: Manages engineering services (Supply, Return) and their constraints.
+- `features -> core`: 272
+- `features -> components`: 91
+- `components -> core`: 43
+- `core -> core`: 61
+- `core -> features`: 5 (layer leakage)
 
-### 2. The Tool System (Write Operations)
-Tools are responsible for interpreting user mouse/keyboard input and converting them into state changes.
-- Every tool (Select, Room, Duct, Equipment) implements a base [Tool interface](elements/04-tools/BaseTool.md).
-- Instead of mutating state directly, tools dispatch [Commands](elements/09-commands/EntityCommands.md).
-- **[useKeyboardShortcuts](elements/07-hooks/useKeyboardShortcuts.md)** routes inputs to the active tool.
+## Data Flow
 
-### 3. The Command Pattern (Undo/Redo)
-To support robust undo/redo (up to 100 steps), every state mutation is wrapped in a [Command](elements/09-commands/CommandTypes.md).
-- **[EntityCommands](elements/09-commands/EntityCommands.md)** handle creation, deletion, and movement.
-- The **[HistoryStore](elements/09-commands/HistoryStore.md)** maintains the past/future stack.
+### 1. Startup / onboarding
 
-### 4. Rendering Pipeline (Read Operations)
-The canvas renders at 60fps (or on state change) by iterating through the entities in the `entityStore`.
-- **[CanvasContainer](elements/01-components/canvas/CanvasContainer.md)**: The heart of the rendering loop. It clears the canvas, applies the [Viewport](elements/07-hooks/useViewport.md) transform, and calls renderers.
-- **[Renderers](elements/05-renderers/)**: Specialized functions that take an entity state and draw it to the canvas context.
-- **Selection/Hover Highlights**: Rendered as an overlay on top of the entities.
+1. `app/page.tsx` renders `AppInitializer`.
+2. `AppInitializer` checks launch state (`useAppStateStore`), hydrates preferences, initializes storage root (`StorageRootService`), and can create initial project (`ProjectRepository.saveProject`).
+3. Successful creation updates both project list/session state, then navigates to `/canvas/:projectId`.
 
-### 5. Calculation Engine (Reactive Engineering)
-HVAC engineering calculations are decoupled from the UI but react to entity changes.
-- **[useCalculations](elements/07-hooks/useCalculations.md)**: A hook that watches the `entityStore`. When a room's dimensions change, it triggers the [VentilationCalculator](elements/06-calculators/VentilationCalculator.md) to update the required CFM automatically.
+### 2. Dashboard project lifecycle
 
-### 6. Component System (The Catalog)
-The Component Library provides a centralized catalog of HVAC components with hierarchical organization.
-- **[componentLibraryStoreV2](elements/02-stores/componentLibraryStoreV2.md)**: Manages the unified component definitions, categories, and templates.
-- **Unified Component Model**: Combines engineering properties, catalog data, and pricing into a single `UnifiedComponentDefinition`.
-- **Hierarchical Categories**: Supports nested taxonomies for efficient component browsing and selection.
+1. `app/dashboard/page.tsx` mounts `DashboardPage`.
+2. `DashboardPage` uses `projectListStore.refreshProjects`.
+3. `projectListStore` talks to `StorageAdapter` (list/update metadata) and `ProjectRepository` for event-driven sync.
+4. CRUD actions (archive/restore/duplicate/delete) apply optimistic updates, then persist via adapter/repository.
 
-### 7. Service Logic (Engineering Context)
-Services define the working context for entities, providing engineering constraints and visual organization.
-- **[serviceStore](elements/02-stores/serviceStore.md)**: Manages service definitions (Supply, Return, Exhaust) and the active service context.
-- **Automatic Inheritance**: New entities automatically inherit service properties from connected equipment or ducts.
-- **Visual Coding**: Entities are color-coded on the canvas based on their assigned service for immediate visual feedback.
+### 3. Canvas project load/hydration
 
-### 8. Automation Engine (Productivity)
-Background services that reduce manual work by reacting to graph changes.
-- **FittingInsertion**: Automatically places elbows/tees when ducts intersect or turn.
-- **AutoSizing**: Suggests optimal duct sizes based on airflow and service constraints.
-- **FlowPropagation**: Updates downstream entities when upstream properties change.
+1. Route `app/(main)/canvas/[projectId]/page.tsx` mounts `CanvasPageWrapper`.
+2. `CanvasPageWrapper` resolves project from repository + local payload and hydrates:
+   - `core` project/entity stores,
+   - feature stores (viewport, selection, 3D/view mode),
+   - history + preferences where needed.
+3. Wrapper then renders `CanvasPage`.
 
-### 9. Persistence & Serialization
-The project is saved as a single `.sws` file (JSON-based).
-- **[Serialization](elements/10-persistence/Serialization.md)**: Uses **Zod schemas** to validate data during both save and load, ensuring file integrity.
-- **[ProjectIO](elements/10-persistence/ProjectIO.md)**: Abstraction layer that routes I/O to **IndexedDB/Cloud** (Web) or **Native FS** (Tauri). See [Platform Adapters](architecture/01-platform-adapters.md).
+### 4. Edit pipeline (user action to rendered state)
 
-## Entity Lifecycle
-1. **Creation**: A [Tool](elements/04-tools/) uses an [Entity Factory](elements/08-entities/) to create a new object with [defaults](elements/08-entities/RoomDefaults.md).
-2. **Service Assignment**: New entities inherit a `serviceId` from the active service context or connected entities.
-3. **Component Reference**: Entities reference a `UnifiedComponentDefinition` via `catalogItemId` for engineering and pricing data.
-4. **Validation**: The new object is validated against its [Zod Schema](elements/03-schemas/).
-5. **Execution**: A `CreateEntityCommand` pushes it to the `entityStore`.
-6. **Service Context**: The new entity moves `serviceId` from the active context or connected ancestor.
-7. **Reaction**: The `useCalculations` hook updates derived engineering values; Automation services may insert fittings.
-8. **Display**: The corresponding `Renderer` draws it on the canvas.
+1. Input handled by active tool implementing `ITool` (`BaseTool` contract).
+2. Tool invokes command/store mutations (`entityCommands`, `entityStore`, selection).
+3. `historyStore` captures reversible operations (undo/redo).
+4. Canvas components read normalized entity + viewport + selection state and render.
+5. Reactive hooks (`useCalculations`, `useBOM`, validation services) recompute derived results.
+
+### 5. Save/export pipeline
+
+1. `useAutoSave` snapshots combined state and writes to local payload + repository output path.
+2. Serialization validates/migrates against `ProjectFileSchema`.
+3. Export UI (`ExportMenu`, `ExportReportDialog`) builds BOM/report payloads and generates CSV/PDF using export services.
+
+## Core Abstractions
+
+| Abstraction | Location | Role |
+|---|---|---|
+| `StorageAdapter` (interface) | `src/core/persistence/StorageAdapter.ts` | Platform-independent persistence contract (CRUD, metadata, autosave, backups) |
+| `ProjectRepository` | `src/core/persistence/ProjectRepository.ts` | Policy layer: canonical paths, locking via `OperationQueue`, index updates, repository events |
+| `ProjectFileSchema` | `src/core/schema/project-file.schema.ts` | Canonical persisted project format and version boundary |
+| `Command` / `ReversibleCommand` | `src/core/commands/types.ts` | Standard mutation envelope for undo/redo |
+| `useHistoryStore` | `src/core/commands/historyStore.ts` | Reversible command stacks and history limits |
+| `useEntityStore` | `src/core/store/entityStore.ts` | Normalized entity source-of-truth with hydration and flow recalculation |
+| `ITool` / `BaseTool` | `src/features/canvas/tools/BaseTool.ts` | Tool lifecycle/input contract for canvas runtime |
+| `projectListStore` | `src/features/dashboard/store/projectListStore.ts` | Project index, filtering, lifecycle actions, storage synchronization |
+
+## High Coupling / Risk Areas
+
+### Large and highly connected files
+
+- `src/features/canvas/hooks/useAutoSave.ts` (~826 LOC, high import fan-in): mixes serialization, storage fallback, legacy + new store reads, and save orchestration.
+- `src/components/layout/FileMenu.tsx` (~710 LOC, 24 imports): combines UI and persistence/migration actions.
+- `src/core/persistence/ProjectRepository.ts` (~631 LOC): central policy layer with locking, indexing, import/export, relocation and events.
+- `src/core/services/automation/fittingInsertionService.ts` (~606 LOC): heavy automation logic coupled to geometry/entity behavior.
+
+### Architectural hotspots / technical debt
+
+- Dual project-store model in active paths:
+  - `src/core/store/project.store.ts` and `src/stores/useProjectStore.ts`.
+  - `CanvasPageWrapper`/`useAutoSave` read both, increasing drift risk.
+- Layer leakage from core to feature:
+  - `core/commands/entityCommands.ts` imports `features/canvas/store/selectionStore`.
+  - `core/services/*fitting*` imports `features/canvas/entities/fittingDefaults`.
+- Route-level orchestration concentration:
+  - `AppInitializer` and `CanvasPageWrapper` each coordinate many stores/services directly; behavior changes here are high-impact.
+- Mixed persistence pathways:
+  - Both adapter/repository model and localStorage payload helpers are used in parallel; error-handling paths are complex.
+
+## Dependency Debt Summary
+
+Most dependencies follow `app/components/features -> core`, but the current architecture still has:
+
+1. Legacy state layer overlap (`src/stores`) in runtime-critical flows.
+2. Core module dependencies on feature modules (inversion of intended layering).
+3. Several orchestration files that are both large and cross-domain.
+
+These three areas are the primary maintenance and regression risk centers.
