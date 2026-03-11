@@ -41,6 +41,7 @@ const defaultThreeDViewState: ProjectFile['threeDViewState'] = {
     orbitRadius: 860,
     polarAngle: 1.12,
     azimuthAngle: 0.78,
+    cameraRestored: false,
     showGrid: true,
     showAxes: true,
     showPlanOverlay: false,

@@ -173,6 +173,7 @@ export function buildProjectFileFromStores(): ProjectFile | null {
       orbitRadius: threeDViewStore.orbitRadius,
       polarAngle: threeDViewStore.polarAngle,
       azimuthAngle: threeDViewStore.azimuthAngle,
+      cameraRestored: threeDViewStore.cameraRestored,
       showGrid: threeDViewStore.showGrid,
       showAxes: threeDViewStore.showAxes,
       showPlanOverlay: threeDViewStore.showPlanOverlay,
