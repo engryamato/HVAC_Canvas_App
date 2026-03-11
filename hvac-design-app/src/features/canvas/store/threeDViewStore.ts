@@ -73,6 +73,7 @@ export const useThreeDViewStore = create<ThreeDViewStore>()(
         Object.assign(state, {
           ...state,
           ...incomingState,
+          cameraRestored: true,
         });
       }),
 
