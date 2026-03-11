@@ -89,7 +89,7 @@
     "autoprefixer": "^10.4.24",
     "chromatic": "^11.0.0",
     "eslint": "^8.56.0",
-    "eslint-config-next": "^15.0.0",
+    "eslint-config-next": "^15.5.12",
     "fake-indexeddb": "^6.2.5",
     "husky": "^9.1.7",
     "jsdom": "27.4.0",
