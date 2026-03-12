@@ -39,6 +39,7 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
   const gridRef = useRef<THREE.GridHelper | null>(null);
   const axesRef = useRef<THREE.AxesHelper | null>(null);
   const [renderError, setRenderError] = useState<string | null>(null);
+  const hasSavedCameraRef = useRef(false);
 
   const entities = useEntityStore(
     useShallow((state) =>
@@ -82,6 +83,7 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
     const width = mount.clientWidth || 1000;
     const height = mount.clientHeight || 700;
     const initialThreeDView = useThreeDViewStore.getState();
+    hasSavedCameraRef.current = initialThreeDView.cameraRestored ?? false;
 
     try {
       const scene = createScene();
@@ -299,6 +301,9 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
     const camera = cameraRef.current;
     const sceneGroup = sceneGroupRef.current;
     if (!camera || !sceneGroup || nodes.length === 0) {
+      return;
+    }
+    if (hasSavedCameraRef.current) {
       return;
     }
     const bounds = computeSceneBounds(nodes);

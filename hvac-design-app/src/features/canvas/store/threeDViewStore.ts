@@ -13,6 +13,7 @@ export interface ThreeDViewState {
   orbitRadius: number;
   polarAngle: number;
   azimuthAngle: number;
+  cameraRestored: boolean;
   showGrid: boolean;
   showAxes: boolean;
   showPlanOverlay: boolean;
@@ -35,6 +36,7 @@ export const THREE_D_VIEW_INITIAL_STATE: ThreeDViewState = {
   orbitRadius: 860,
   polarAngle: 1.12,
   azimuthAngle: 0.78,
+  cameraRestored: false,
   showGrid: true,
   showAxes: true,
   showPlanOverlay: false,
@@ -72,6 +74,7 @@ export const useThreeDViewStore = create<ThreeDViewStore>()(
           ...state,
           ...incomingState,
         });
+        state.cameraRestored = true;
       }),
 
     reset: () =>

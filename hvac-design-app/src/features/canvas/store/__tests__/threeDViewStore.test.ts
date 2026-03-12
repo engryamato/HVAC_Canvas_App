@@ -16,6 +16,7 @@ describe('threeDViewStore', () => {
 
     it('has correct display option defaults', () => {
         const state = useThreeDViewStore.getState();
+        expect(state.cameraRestored).toBe(false);
         expect(state.showGrid).toBe(true);
         expect(state.showAxes).toBe(true);
         expect(state.showPlanOverlay).toBe(false);
@@ -53,6 +54,7 @@ describe('threeDViewStore', () => {
         it('hydrates camera target', () => {
             useThreeDViewStore.getState().hydrateThreeDView({ cameraTarget: { x: 50, y: 20, z: 80 } });
             expect(useThreeDViewStore.getState().cameraTarget).toEqual({ x: 50, y: 20, z: 80 });
+            expect(useThreeDViewStore.getState().cameraRestored).toBe(true);
         });
 
         it('hydrates orbit radius and angles', () => {
@@ -64,6 +66,7 @@ describe('threeDViewStore', () => {
             const state = useThreeDViewStore.getState();
             expect(state.orbitRadius).toBe(700);
             expect(state.polarAngle).toBe(1.0);
+            expect(state.cameraRestored).toBe(true);
         });
 
         it('allows partial hydration without clobbering other fields', () => {
@@ -82,6 +85,7 @@ describe('threeDViewStore', () => {
 
             const state = useThreeDViewStore.getState();
             expect(state.cameraTarget).toEqual({ x: 0, y: 0, z: 0 });
+            expect(state.cameraRestored).toBe(false);
             expect(state.showGrid).toBe(true);
             expect(state.showAxes).toBe(true);
         });

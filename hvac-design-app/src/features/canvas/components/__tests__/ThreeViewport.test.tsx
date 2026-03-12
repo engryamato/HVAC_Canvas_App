@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { deriveSceneNodes } from '@/features/canvas/3d/scene/deriveSceneNodes';
+import { computeSceneBounds } from '@/features/canvas/3d/utils/sceneBounds';
 
 const testState = vi.hoisted(() => {
   const selectSingleMock = vi.fn();
@@ -8,7 +10,7 @@ const testState = vi.hoisted(() => {
   const raycastSelectionMock = vi.fn();
   const rebuildSceneGraphMock = vi.fn();
   const syncToSelectionMock = vi.fn();
-  const gizmoHandlePointerDownMock = vi.fn<(_: PointerEvent) => boolean>();
+  const gizmoHandlePointerDownMock = vi.fn<[PointerEvent], boolean>();
   const gizmoHandlePointerMoveMock = vi.fn();
   const gizmoHandlePointerUpMock = vi.fn();
   const gizmoHandleCancelMock = vi.fn();
@@ -25,6 +27,7 @@ const testState = vi.hoisted(() => {
   const setCameraPositionMock = vi.fn();
   const setCameraTargetMock = vi.fn();
   const setOrbitStateMock = vi.fn();
+  const cameraLookAtMock = vi.fn();
 
   return {
     activeCapturedPointerId: null as number | null,
@@ -51,6 +54,7 @@ const testState = vi.hoisted(() => {
     setCameraPositionMock,
     setCameraTargetMock,
     setOrbitStateMock,
+    cameraLookAtMock,
     selectionState: {
       selectedIds: [] as string[],
       selectSingle: selectSingleMock,
@@ -62,6 +66,7 @@ const testState = vi.hoisted(() => {
       orbitRadius: 100,
       polarAngle: 1,
       azimuthAngle: 1,
+      cameraRestored: false,
       showGrid: true,
       showAxes: true,
       showPlanOverlay: false,
@@ -120,7 +125,11 @@ vi.mock('@/features/canvas/3d/runtime/createScene', () => ({
 }));
 
 vi.mock('@/features/canvas/3d/runtime/createCamera', () => ({
-  createCamera: vi.fn((width: number, height: number) => new THREE.PerspectiveCamera(60, width / height, 0.1, 1000)),
+  createCamera: vi.fn((width: number, height: number) => {
+    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+    camera.lookAt = testState.cameraLookAtMock;
+    return camera;
+  }),
 }));
 
 vi.mock('@/features/canvas/3d/runtime/createRenderer', () => ({
@@ -204,6 +213,7 @@ describe('ThreeViewport', () => {
     testState.activeCapturedPointerId = null;
     testState.rendererCanvas = null;
     testState.selectionState.selectedIds = [];
+    testState.threeDViewState.cameraRestored = false;
     testState.raycastSelectionMock.mockReturnValue([]);
     testState.gizmoHandlePointerDownMock.mockReturnValue(false);
     vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1));
@@ -285,5 +295,34 @@ describe('ThreeViewport', () => {
     expect(testState.raycastSelectionMock).not.toHaveBeenCalled();
     expect(testState.selectSingleMock).not.toHaveBeenCalled();
     expect(testState.clearSelectionMock).not.toHaveBeenCalled();
+  });
+
+  it('auto-frames when no saved camera was restored', () => {
+    vi.mocked(deriveSceneNodes).mockReturnValueOnce([{ id: 'node-1' }] as never[]);
+    vi.mocked(computeSceneBounds).mockReturnValueOnce({
+      minX: 0,
+      maxX: 24,
+      minY: 0,
+      maxY: 16,
+      minZ: 0,
+      maxZ: 8,
+      centerX: 12,
+      centerY: 8,
+      centerZ: 4,
+    });
+
+    render(<ThreeViewport />);
+
+    expect(testState.cameraLookAtMock).toHaveBeenCalledWith(12, 4, 4);
+  });
+
+  it('skips auto-frame when a saved camera was restored on mount', () => {
+    testState.threeDViewState.cameraRestored = true;
+    vi.mocked(deriveSceneNodes).mockReturnValueOnce([{ id: 'node-1' }] as never[]);
+
+    render(<ThreeViewport />);
+
+    expect(testState.cameraLookAtMock).not.toHaveBeenCalled();
+    expect(computeSceneBounds).not.toHaveBeenCalled();
   });
 });
