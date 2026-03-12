@@ -7,9 +7,11 @@
  * - This prevents previous-project state residue from leaking across project loads.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useViewModeStore } from '../store/viewModeStore';
+import { useViewModeStore, VIEW_MODE_INITIAL_STATE } from '../store/viewModeStore';
 import { useThreeDViewStore, THREE_D_VIEW_INITIAL_STATE } from '../store/threeDViewStore';
 import type { ProjectFile } from '@/core/schema/project-file.schema';
+import { createEmptyProject } from '@/core/schema/project-file.schema';
+import { createLocalStoragePayloadFromProjectFileWithDefaults } from '../hooks/useAutoSave';
 
 function combineHydrate(payload: { settings?: Partial<ProjectFile['settings']>; threeDViewState?: ProjectFile['threeDViewState'] } = {}) {
     const hasViewMode = Boolean(payload.settings?.activeViewMode);
@@ -94,5 +96,34 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
         });
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
         expect(useThreeDViewStore.getState().orbitRadius).toBe(targetOrbitRadius);
+    });
+
+    it('clears residue when switching from a 3d project to a legacy project with no view/camera fields', () => {
+        combineHydrate({});
+
+        expect(useViewModeStore.getState().activeViewMode).toBe('plan');
+        expect(useThreeDViewStore.getState().cameraTarget).toEqual(THREE_D_VIEW_INITIAL_STATE.cameraTarget);
+        expect(useThreeDViewStore.getState().orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
+        expect(useThreeDViewStore.getState().cameraRestored).toBe(false);
+    });
+
+    it('createLocalStoragePayloadFromProjectFileWithDefaults with old-schema file (no threeDViewState) produces clean defaults on hydration', () => {
+        const oldSchemaProject: ProjectFile = {
+            ...createEmptyProject('Old Project'),
+            threeDViewState: undefined,
+        };
+
+        const payload = createLocalStoragePayloadFromProjectFileWithDefaults(oldSchemaProject);
+
+        expect(payload.project.threeDViewState).toBeUndefined();
+
+        combineHydrate({
+            settings: payload.project.settings,
+            threeDViewState: payload.project.threeDViewState,
+        });
+
+        expect(useViewModeStore.getState().activeViewMode).toBe('plan');
+        expect(useThreeDViewStore.getState().orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
+        expect(useThreeDViewStore.getState().cameraRestored).toBe(false);
     });
 });
