@@ -40,10 +40,8 @@ export class ProjectRepository extends EventTarget {
         const release = await this.queue.acquireLock(`project:${project.projectId}`);
         
         try {
-            const rootService = await getStorageRootService();
-            const rootPath = rootService.getStorageRoot();
-            
-            if (!rootPath) {
+            const resolved = await this.resolveCanonicalPaths(project.projectId);
+            if (!resolved) {
                 return {
                     success: false,
                     errorCode: 'WRITE_ERROR',
@@ -51,7 +49,7 @@ export class ProjectRepository extends EventTarget {
                 };
             }
 
-            const canonical = this.getCanonicalProjectPaths(rootPath, project.projectId);
+            const { canonical } = resolved;
             const result = isTauri()
                 ? await this.saveProjectToCanonicalPath(project, canonical.projectFilePath)
                 : await this.adapter.saveProject(project, options);
@@ -80,10 +78,8 @@ export class ProjectRepository extends EventTarget {
     }
 
     async loadProject(projectId: string): Promise<LoadResult> {
-        const rootService = await getStorageRootService();
-        const rootPath = rootService.getStorageRoot();
-        
-        if (!rootPath) {
+        const resolved = await this.resolveCanonicalPaths(projectId);
+        if (!resolved) {
             return {
                 success: false,
                 errorCode: 'READ_ERROR',
@@ -92,7 +88,7 @@ export class ProjectRepository extends EventTarget {
         }
 
         if (isTauri()) {
-            const canonical = this.getCanonicalProjectPaths(rootPath, projectId);
+            const { rootPath, canonical } = resolved;
             
             // PSR-07: Corruption detection before loading
             const { detectCorruption } = await import('../services/validation/detectCorruption');
@@ -161,9 +157,8 @@ export class ProjectRepository extends EventTarget {
         try {
             let result: DeleteResult;
             if (isTauri()) {
-                const rootService = await getStorageRootService();
-                const rootPath = rootService.getStorageRoot();
-                if (!rootPath) {
+                const resolved = await this.resolveCanonicalPaths(projectId);
+                if (!resolved) {
                     return {
                         success: false,
                         errorCode: 'DELETE_ERROR',
@@ -171,7 +166,7 @@ export class ProjectRepository extends EventTarget {
                     };
                 }
 
-                const canonical = this.getCanonicalProjectPaths(rootPath, projectId);
+                const { canonical } = resolved;
                 try {
                     const projectFile = canonical.projectFilePath;
                     const backupFile = `${canonical.projectFilePath}.bak`;
@@ -237,9 +232,8 @@ export class ProjectRepository extends EventTarget {
                 };
             }
 
-            const rootService = await getStorageRootService();
-            const rootPath = rootService.getStorageRoot();
-            if (!rootPath) {
+            const resolved = await this.resolveCanonicalPaths(loadResult.project.projectId);
+            if (!resolved) {
                 return {
                     success: false,
                     errorCode: 'WRITE_ERROR',
@@ -248,7 +242,7 @@ export class ProjectRepository extends EventTarget {
                 };
             }
 
-            const canonical = this.getCanonicalProjectPaths(rootPath, loadResult.project.projectId);
+            const { canonical } = resolved;
 
             let saveResult: SaveResult;
             if (isTauri()) {
@@ -312,10 +306,8 @@ export class ProjectRepository extends EventTarget {
         const release = await this.queue.acquireLock(`export:${projectId}`);
         
         try {
-            const rootService = await getStorageRootService();
-            const rootPath = rootService.getStorageRoot();
-            
-            if (!rootPath) {
+            const resolved = await this.resolveCanonicalPaths(projectId);
+            if (!resolved) {
                 return {
                     success: false,
                     sourcePath: '',
@@ -324,7 +316,7 @@ export class ProjectRepository extends EventTarget {
                 };
             }
 
-            const canonical = this.getCanonicalProjectPaths(rootPath, projectId);
+            const { canonical } = resolved;
             const sourcePath = canonical.projectFilePath;
 
             // Verify source project exists
@@ -376,12 +368,11 @@ export class ProjectRepository extends EventTarget {
     }
 
     async getProjectPath(projectId: string): Promise<string> {
-        const rootService = await getStorageRootService();
-        const rootPath = rootService.getStorageRoot();
-        if (!rootPath) {
+        const resolved = await this.resolveCanonicalPaths(projectId);
+        if (!resolved) {
             return '';
         }
-        return this.getCanonicalProjectPaths(rootPath, projectId).projectFilePath;
+        return resolved.canonical.projectFilePath;
     }
 
     async relocateStorageRoot(newPath: string): Promise<RelocationResult> {
@@ -421,6 +412,24 @@ export class ProjectRepository extends EventTarget {
         const projectDir = this.joinPath(normalizedRoot, 'projects', projectId);
         const projectFilePath = this.joinPath(projectDir, 'project.sws');
         return { projectDir, projectFilePath };
+    }
+
+    private async getStorageRootPath(): Promise<string | null> {
+        const rootService = await getStorageRootService();
+        return rootService.getStorageRoot() || null;
+    }
+
+    private async resolveCanonicalPaths(
+        projectId: string
+    ): Promise<{ rootPath: string; canonical: { projectDir: string; projectFilePath: string } } | null> {
+        const rootPath = await this.getStorageRootPath();
+        if (!rootPath) {
+            return null;
+        }
+        return {
+            rootPath,
+            canonical: this.getCanonicalProjectPaths(rootPath, projectId),
+        };
     }
 
     private async copyFileAtomic(sourcePath: string, destinationPath: string): Promise<void> {
