@@ -9,31 +9,7 @@ import { useViewModeStore } from '../store/viewModeStore';
 import { useThreeDViewStore } from '../store/threeDViewStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { ProjectFile } from '@/core/schema/project-file.schema';
-
-// Simplified inline of the Tauri hydration branch logic from CanvasPageWrapper
-function hydrateTauriProject(project: Partial<ProjectFile>) {
-    const hasTauriViewMode = Boolean(project.settings?.activeViewMode);
-    const hasTauriThreeDState = Boolean(project.threeDViewState);
-
-    if (!hasTauriViewMode || !hasTauriThreeDState) {
-        useViewModeStore.getState().reset();
-        useThreeDViewStore.getState().reset();
-    }
-
-    if (hasTauriViewMode) {
-        useViewModeStore.getState().hydrateViewMode({
-            activeViewMode: project.settings!.activeViewMode,
-        });
-    }
-
-    if (hasTauriThreeDState) {
-        useThreeDViewStore.getState().hydrateThreeDView(project.threeDViewState!);
-    }
-
-    if (project.entities) {
-        useEntityStore.getState().hydrate(project.entities);
-    }
-}
+import { hydrateToStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 const defaultThreeDViewState: ProjectFile['threeDViewState'] = {
     cameraTarget: { x: 0, y: 0, z: 0 },
@@ -55,15 +31,15 @@ describe('CanvasPageWrapper hydration — Tauri file path', () => {
     });
 
     it('hydrates viewMode from settings.activeViewMode', () => {
-        hydrateTauriProject({
+        hydrateToStores({
             settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             threeDViewState: defaultThreeDViewState,
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
     });
 
     it('hydrates threeDViewStore camera from file payload', () => {
-        hydrateTauriProject({
+        hydrateToStores({
             settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             threeDViewState: {
                 ...defaultThreeDViewState,
@@ -71,16 +47,16 @@ describe('CanvasPageWrapper hydration — Tauri file path', () => {
                 polarAngle: 1.0,
                 cameraTarget: { x: 300, y: 0, z: 150 },
             },
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         expect(useThreeDViewStore.getState().orbitRadius).toBe(650);
         expect(useThreeDViewStore.getState().cameraTarget).toEqual({ x: 300, y: 0, z: 150 });
     });
 
     it('restores plan view when settings.activeViewMode is plan', () => {
-        hydrateTauriProject({
+        hydrateToStores({
             settings: { activeViewMode: 'plan', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             threeDViewState: defaultThreeDViewState,
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         expect(useViewModeStore.getState().activeViewMode).toBe('plan');
     });
 });

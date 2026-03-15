@@ -11,14 +11,12 @@ import { ProjectAlreadyExistsDialog } from '@/components/dialogs/ProjectAlreadyE
 import { UnsavedChangesDialog } from '@/components/dialogs/UnsavedChangesDialog';
 import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
 import { useCurrentProjectId, useIsDirty, useProjectActions, useProjectStore } from '@/core/store/project.store';
-import { useEntityStore } from '@/core/store/entityStore';
-import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import {
-  buildProjectFileFromStores,
   createLocalStoragePayloadFromProjectFileWithDefaults,
   loadProjectFromStorage,
   saveProjectToStorage,
 } from '@/features/canvas/hooks/useAutoSave';
+import { hydrateToStores, snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
 import { setWebProjectFileHandle } from '@/core/persistence/webFileHandles';
 import { openProjectFromPicker, saveProjectAsAndRememberHandle } from '@/core/persistence/webProjectFileIO';
 import { deserializeProjectLenient } from '@/core/persistence/serialization';
@@ -62,7 +60,7 @@ export function FileMenu() {
 
     const loadProjectDataForMigration = async (): Promise<ProjectFile | null> => {
         if (isCanvasRoute) {
-            return buildProjectFileFromStores();
+            return snapshotFromStores();
         }
 
         const lastProjectId = localStorage.getItem('lastActiveProjectId');
@@ -104,6 +102,21 @@ export function FileMenu() {
         window.dispatchEvent(new Event('sws:canvas-save'));
     }, []);
 
+    const requestCanvasSaveAndCheckSuccess = useCallback(async () => {
+        requestCanvasSave();
+
+        const pollIntervalMs = 50;
+        const timeoutMs = 2000;
+        for (let elapsed = 0; elapsed < timeoutMs; elapsed += pollIntervalMs) {
+            await new Promise<void>((resolve) => window.setTimeout(resolve, pollIntervalMs));
+            if (!useProjectStore.getState().isDirty) {
+                return true;
+            }
+        }
+
+        return !useProjectStore.getState().isDirty;
+    }, [requestCanvasSave]);
+
     const handleOpenFromFileInternal = useCallback(async () => {
         setIsOpen(false);
         setIsLoading(true);
@@ -118,6 +131,12 @@ export function FileMenu() {
                 const loadResult = await loadProject(filePath);
                 if (!loadResult.success || !loadResult.project) {
                     throw new Error(loadResult.error || 'Failed to load project');
+                }
+                if (loadResult.loadedFromBackup) {
+                    addToast({
+                        title: 'Project recovered from backup',
+                        type: 'warning',
+                    });
                 }
                 const importedProject = loadResult.project;
 
@@ -193,7 +212,7 @@ export function FileMenu() {
         } finally {
             setIsLoading(false);
         }
-    }, [isTauri, router]);
+    }, [isTauri, router, addToast]);
 
     const proceedAfterSaveOrDiscard = async (action: 'open' | 'new' | 'dashboard') => {
         if (action === 'new') {
@@ -280,14 +299,6 @@ export function FileMenu() {
                 modifiedAt: now,
                 isArchived: false,
                 location: projectData.location || undefined,
-                settings: projectData.settings ? {
-                    unitSystem: projectData.settings.unitSystem || 'imperial',
-                    gridSize: projectData.settings.gridSize || 12,
-                    gridVisible: projectData.settings.gridVisible ?? true,
-                    snapToGrid: projectData.settings.snapToGrid ?? true,
-                    // Include any other calculation settings from the wizard
-                    ...projectData.settings
-                } : undefined,
             });
 
             const repository = await getProjectRepository();
@@ -376,7 +387,7 @@ export function FileMenu() {
                 return;
             }
 
-            const projectFile = buildProjectFileFromStores();
+            const projectFile = snapshotFromStores();
             if (!projectFile) {
                 return;
             }
@@ -393,7 +404,7 @@ export function FileMenu() {
             return;
         }
 
-        const projectFile = buildProjectFileFromStores();
+        const projectFile = snapshotFromStores();
         if (!projectFile) {
             return;
         }
@@ -445,6 +456,35 @@ export function FileMenu() {
         setIsOpen(false);
         setExportDialogOpen(true);
     };
+
+    const handleUnsavedSaveAndLeave = useCallback(async () => {
+        const action = pendingAction;
+        setUnsavedDialogOpen(false);
+
+        if (!action) {
+            setPendingAction(null);
+            return;
+        }
+
+        if (action !== 'open') {
+            requestCanvasSave();
+            await proceedAfterSaveOrDiscard(action);
+            setPendingAction(null);
+            return;
+        }
+
+        const saveSucceeded = await requestCanvasSaveAndCheckSuccess();
+        if (!saveSucceeded) {
+            const shouldContinue = window.confirm('Save failed. Continue opening anyway?');
+            if (!shouldContinue) {
+                setPendingAction(null);
+                return;
+            }
+        }
+
+        await proceedAfterSaveOrDiscard(action);
+        setPendingAction(null);
+    }, [pendingAction, proceedAfterSaveOrDiscard, requestCanvasSave, requestCanvasSaveAndCheckSuccess]);
 
     return (
         <>
@@ -570,12 +610,7 @@ export function FileMenu() {
                 open={unsavedDialogOpen}
                 onOpenChange={setUnsavedDialogOpen}
                 onSaveAndLeave={() => {
-                    requestCanvasSave();
-                    setUnsavedDialogOpen(false);
-                    if (pendingAction) {
-                        void proceedAfterSaveOrDiscard(pendingAction);
-                    }
-                    setPendingAction(null);
+                    void handleUnsavedSaveAndLeave();
                 }}
                 onLeaveWithoutSaving={() => {
                     setUnsavedDialogOpen(false);
@@ -650,17 +685,7 @@ export function FileMenu() {
                             return;
                         }
 
-                        if (migratedData.entities) {
-                            useEntityStore.getState().hydrate(migratedData.entities);
-                        }
-
-                        if (migratedData.viewportState) {
-                            useViewportStore.setState({
-                                panX: migratedData.viewportState.panX,
-                                panY: migratedData.viewportState.panY,
-                                zoom: migratedData.viewportState.zoom,
-                            });
-                        }
+                        hydrateToStores(payload);
 
                         if (migratedData.settings) {
                             useSettingsStore.getState().setCalculationSettings(migratedData.settings);
