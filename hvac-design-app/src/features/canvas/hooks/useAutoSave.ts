@@ -23,8 +23,7 @@ import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } f
 import { trackTelemetry } from '@/utils/telemetry';
 import { sendCloudBackup } from '@/services/cloudBackupService';
 import { saveProjectToExistingHandleOrDownload } from '@/core/persistence/webProjectFileIO';
-import { calculateSystemMetrics } from './useSystemCalculations';
-import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
+import { snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 
 
@@ -113,6 +112,7 @@ export interface LocalStoragePayload {
   };
 }
 
+<<<<<<< HEAD
 export function buildProjectFileFromStores(): ProjectFile | null {
   const projectStore = useProjectStore.getState();
   if (!projectStore.currentProjectId || !projectStore.projectDetails) {
@@ -204,8 +204,10 @@ export function buildProjectFileFromStores(): ProjectFile | null {
   };
 }
 
+=======
+>>>>>>> 52856c1 (Add canonical snapshotFromStores orchestrator and route autosave snapshot creation)
 export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile): LocalStoragePayload | null {
-  const project = projectOverride ?? buildProjectFileFromStores();
+  const project = projectOverride ?? snapshotFromStores();
   if (!project) {
     return null;
   }
@@ -627,7 +629,7 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
           try {
             const { saveProject } = await import('@/core/persistence/projectIO');
 
-            const projectFile = buildProjectFileFromStores();
+            const projectFile = snapshotFromStores();
             if (!projectFile) {
               throw new Error('Missing project data');
             }
