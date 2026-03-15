@@ -4,14 +4,6 @@ import { useEffect, useState } from 'react';
 import { CanvasPage } from './CanvasPage';
 import { useProjectStore as useSessionStore } from '@/core/store/project.store';
 import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore';
-import { useEntityStore } from '@/core/store/entityStore';
-import { useViewportStore } from './store/viewportStore';
-import { useSelectionStore } from './store/selectionStore';
-import { useThreeDViewStore } from './store/threeDViewStore';
-import { useViewModeStore } from './store/viewModeStore';
-import { useHistoryStore } from '@/core/commands/historyStore';
-import { usePreferencesStore } from '@/core/store/preferencesStore';
-import { type ReversibleCommand } from '@/core/commands/types';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
@@ -28,6 +20,8 @@ import {
 } from './hooks/useAutoSave';
 import { useAppStateStore } from '@/stores/useAppStateStore';
 import initializeComponentLibraryV2 from '@/core/store/componentLibraryInitializer';
+import { hydrateToStores } from '@/core/persistence/ProjectStateOrchestrator';
+import { useToast } from '@/components/ui/ToastContext';
 
 interface CanvasPageWrapperProps {
   projectId: string;
@@ -57,8 +51,9 @@ function compareVersions(v1: string, v2: string): number {
  */
 export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const router = useRouter();
-  const { setProject, clearProject, setProjectSettings } = useSessionStore();
+  const { setProject, clearProject } = useSessionStore();
   const { getProject } = usePersistenceStore();
+  const { addToast } = useToast();
 
   const [projectError, setProjectError] = useState<string | null>(null);
   const [versionWarning, setVersionWarning] = useState(false);
@@ -67,67 +62,11 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const [needsMigration, setNeedsMigration] = useState(false);
   const [migrationData, setMigrationData] = useState<ProjectFile | null>(null);
 
-  const hydrateFromPayload = (payload: LocalStoragePayload) => {
+  const hydrateProject = (project: ProjectFile) => {
     try {
-      if (payload?.project?.settings?.unitSystem) {
-        const unitSystem = payload.project.settings.unitSystem;
-        usePreferencesStore.getState().setUnitSystem(unitSystem);
-        setProjectSettings({ unitSystem });
-      }
-
-      if (payload?.project?.entities) {
-        useEntityStore.getState().hydrate(payload.project.entities);
-      }
-
-      if (payload?.viewport) {
-        const preferences = usePreferencesStore.getState();
-        useViewportStore.setState({
-          panX: payload.viewport.panX,
-          panY: payload.viewport.panY,
-          zoom: payload.viewport.zoom,
-          gridVisible: payload.viewport.gridVisible,
-          gridSize: payload.viewport.gridSize,
-          snapToGrid: preferences.snapToGrid,
-        });
-      }
-
-      // Deterministic hydration policy:
-      // If either field is missing, reset both stores to defaults first,
-      // then hydrate whichever fields are present — prevents prior-project residue.
-      const hasViewMode = Boolean(payload?.project?.settings?.activeViewMode);
-      const hasThreeDState = Boolean(payload?.project?.threeDViewState);
-
-      if (!hasViewMode || !hasThreeDState) {
-        useViewModeStore.getState().reset();
-        useThreeDViewStore.getState().reset();
-      }
-
-      if (hasViewMode) {
-        useViewModeStore.getState().hydrateViewMode({
-          activeViewMode: payload.project.settings.activeViewMode,
-        });
-      }
-
-      if (hasThreeDState) {
-        useThreeDViewStore.getState().hydrateThreeDView(payload.project.threeDViewState!);
-      }
-
-      if (payload?.selection) {
-        useSelectionStore.setState({
-          selectedIds: payload.selection.selectedIds,
-          hoveredId: payload.selection.hoveredId,
-        });
-      }
-
-      if (payload?.history) {
-        useHistoryStore.setState({
-          past: payload.history.past as unknown as ReversibleCommand[],
-          future: payload.history.future as unknown as ReversibleCommand[],
-          maxSize: payload.history.maxSize,
-        });
-      }
+      hydrateToStores(project);
     } catch (error) {
-      logger.error('[CanvasPageWrapper] Failed to hydrate from localStorage payload', error);
+      logger.error('[CanvasPageWrapper] Failed to hydrate project data', error);
     }
   };
 
@@ -196,6 +135,15 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
               return;
             }
 
+            hydrateProject(result.project);
+            if (result.loadedFromBackup) {
+              addToast({
+                title: 'Project recovered from backup',
+                type: 'warning',
+              });
+              localStorage.removeItem('hvac-backup-recovered');
+            }
+
             // Convert ProjectFile to the format expected by loadProject
             const projectData = {
               id: proj.projectId,
@@ -215,43 +163,6 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
               createdAt: proj.createdAt,
               modifiedAt: proj.modifiedAt,
             };
-
-            // Hydrate stores from file
-            if (result.project.entities) {
-              useEntityStore.getState().hydrate(result.project.entities);
-            }
-            if (result.project.viewportState) {
-              useViewportStore.setState({
-                panX: result.project.viewportState.panX,
-                panY: result.project.viewportState.panY,
-                zoom: result.project.viewportState.zoom,
-              });
-            }
-
-            // Deterministic hydration policy for Tauri load path
-            const hasTauriViewMode = Boolean(result.project.settings?.activeViewMode);
-            const hasTauriThreeDState = Boolean(result.project.threeDViewState);
-
-            if (!hasTauriViewMode || !hasTauriThreeDState) {
-              useViewModeStore.getState().reset();
-              useThreeDViewStore.getState().reset();
-            }
-
-            if (hasTauriViewMode) {
-              useViewModeStore.getState().hydrateViewMode({
-                activeViewMode: result.project.settings!.activeViewMode,
-              });
-            }
-
-            if (hasTauriThreeDState) {
-              useThreeDViewStore.getState().hydrateThreeDView(result.project.threeDViewState!);
-            }
-
-            if (result.project.settings?.unitSystem) {
-              const unitSystem = result.project.settings.unitSystem;
-              usePreferencesStore.getState().setUnitSystem(unitSystem);
-              setProjectSettings({ unitSystem });
-            }
 
             loadProject(projectData);
           } catch (error) {
@@ -288,7 +199,14 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
 
       if (storedPayload) {
-        hydrateFromPayload(storedPayload);
+        hydrateProject(storedPayload.project);
+        if (storedProject?.source === 'backup') {
+          addToast({
+            title: 'Project recovered from backup',
+            type: 'warning',
+          });
+          localStorage.removeItem('hvac-backup-recovered');
+        }
       }
 
       // Check version compatibility
@@ -322,7 +240,14 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
         const storedProject = loadProjectFromStorage(projectId);
         const persistedProject = getProject(projectId);
         if (storedProject?.payload) {
-          hydrateFromPayload(storedProject.payload);
+          hydrateProject(storedProject.payload.project);
+          if (storedProject.source === 'backup') {
+            addToast({
+              title: 'Project recovered from backup',
+              type: 'warning',
+            });
+            localStorage.removeItem('hvac-backup-recovered');
+          }
         }
         if (persistedProject || storedProject?.payload) {
           loadProject(persistedProject, storedProject?.payload);
@@ -332,7 +257,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
       setShouldLoadProject(false);
     }
-  }, [shouldLoadProject, projectId, getProject]);
+  }, [shouldLoadProject, projectId, getProject, addToast]);
 
   function loadProject(persistedProject: any, storedPayload?: LocalStoragePayload) {
     const storedProject = storedPayload?.project;
@@ -391,7 +316,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
           if (migratedData) {
             const payload = createLocalStoragePayloadFromProjectFileWithDefaults(migratedData);
             saveProjectToStorage(migratedData.projectId, payload);
-            hydrateFromPayload(payload);
+            hydrateProject(payload.project);
 
             setProject(migratedData.projectId, {
               projectId: migratedData.projectId,

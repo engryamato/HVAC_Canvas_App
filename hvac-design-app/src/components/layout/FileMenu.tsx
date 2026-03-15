@@ -11,14 +11,12 @@ import { ProjectAlreadyExistsDialog } from '@/components/dialogs/ProjectAlreadyE
 import { UnsavedChangesDialog } from '@/components/dialogs/UnsavedChangesDialog';
 import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
 import { useCurrentProjectId, useIsDirty, useProjectActions, useProjectStore } from '@/core/store/project.store';
-import { useEntityStore } from '@/core/store/entityStore';
-import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import {
   createLocalStoragePayloadFromProjectFileWithDefaults,
   loadProjectFromStorage,
   saveProjectToStorage,
 } from '@/features/canvas/hooks/useAutoSave';
-import { snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
+import { hydrateToStores, snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
 import { setWebProjectFileHandle } from '@/core/persistence/webFileHandles';
 import { openProjectFromPicker, saveProjectAsAndRememberHandle } from '@/core/persistence/webProjectFileIO';
 import { deserializeProjectLenient } from '@/core/persistence/serialization';
@@ -134,6 +132,12 @@ export function FileMenu() {
                 if (!loadResult.success || !loadResult.project) {
                     throw new Error(loadResult.error || 'Failed to load project');
                 }
+                if (loadResult.loadedFromBackup) {
+                    addToast({
+                        title: 'Project recovered from backup',
+                        type: 'warning',
+                    });
+                }
                 const importedProject = loadResult.project;
 
                 const projectListStore = useProjectListStore.getState();
@@ -208,7 +212,7 @@ export function FileMenu() {
         } finally {
             setIsLoading(false);
         }
-    }, [isTauri, router]);
+    }, [isTauri, router, addToast]);
 
     const proceedAfterSaveOrDiscard = async (action: 'open' | 'new' | 'dashboard') => {
         if (action === 'new') {
@@ -689,17 +693,7 @@ export function FileMenu() {
                             return;
                         }
 
-                        if (migratedData.entities) {
-                            useEntityStore.getState().hydrate(migratedData.entities);
-                        }
-
-                        if (migratedData.viewportState) {
-                            useViewportStore.setState({
-                                panX: migratedData.viewportState.panX,
-                                panY: migratedData.viewportState.panY,
-                                zoom: migratedData.viewportState.zoom,
-                            });
-                        }
+                        hydrateToStores(migratedData);
 
                         if (migratedData.settings) {
                             useSettingsStore.getState().setCalculationSettings(migratedData.settings);
