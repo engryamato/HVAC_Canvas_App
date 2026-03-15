@@ -323,9 +323,9 @@ describe('useAutoSave — view/camera debounced persistence', () => {
     });
     expect(onSave).not.toHaveBeenCalled();
 
-    // After debounce window — save fires
+    // Within debounce window (<= 1500ms total) — save fires
     act(() => {
-      vi.advanceTimersByTime(600);
+      vi.advanceTimersByTime(400); // total elapsed: 1400ms
     });
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ source: 'auto', success: true }));
   });
@@ -373,6 +373,37 @@ describe('useAutoSave — view/camera debounced persistence', () => {
     // After debounce window — exactly one save
     act(() => {
       vi.advanceTimersByTime(200);
+    });
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
+  it('flushes a pending viewMode-only save synchronously on beforeunload before the debounce fires', () => {
+    const onSave = vi.fn();
+    renderHook(() => useAutoSave({ enabled: true, onSave }));
+
+    act(() => {
+      // View-mode-only change, no entity or camera mutation
+      useViewModeStore.getState().setViewMode('3d');
+    });
+
+    // Debounce window not yet elapsed — nothing saved
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(onSave).toHaveBeenCalledTimes(0);
+
+    // Simulate browser close — pending debounce should flush immediately
+    act(() => {
+      window.dispatchEvent(new Event('beforeunload'));
+    });
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ source: 'auto', success: true }));
+    expect(loadProjectFromStorage('44444444-4444-4444-8444-444444444444')).toBeTruthy();
+
+    // Debounce timer should be cleared; advancing time should not trigger another save
+    act(() => {
+      vi.advanceTimersByTime(2000);
     });
     expect(onSave).toHaveBeenCalledTimes(1);
   });
