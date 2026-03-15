@@ -62,9 +62,9 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const [needsMigration, setNeedsMigration] = useState(false);
   const [migrationData, setMigrationData] = useState<ProjectFile | null>(null);
 
-  const hydrateProject = (project: ProjectFile) => {
+  const hydrateProject = (project: ProjectFile, storedPayload?: LocalStoragePayload) => {
     try {
-      hydrateToStores(project);
+      hydrateToStores(storedPayload ?? project);
     } catch (error) {
       logger.error('[CanvasPageWrapper] Failed to hydrate project data', error);
     }
@@ -199,7 +199,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
 
       if (storedPayload) {
-        hydrateProject(storedPayload.project);
+        hydrateProject(storedPayload.project, storedPayload);
         if (storedProject?.source === 'backup') {
           addToast({
             title: 'Project recovered from backup',
@@ -240,7 +240,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
         const storedProject = loadProjectFromStorage(projectId);
         const persistedProject = getProject(projectId);
         if (storedProject?.payload) {
-          hydrateProject(storedProject.payload.project);
+          hydrateProject(storedProject.payload.project, storedProject.payload);
           if (storedProject.source === 'backup') {
             addToast({
               title: 'Project recovered from backup',
@@ -316,7 +316,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
           if (migratedData) {
             const payload = createLocalStoragePayloadFromProjectFileWithDefaults(migratedData);
             saveProjectToStorage(migratedData.projectId, payload);
-            hydrateProject(payload.project);
+            hydrateProject(payload.project, payload);
 
             setProject(migratedData.projectId, {
               projectId: migratedData.projectId,

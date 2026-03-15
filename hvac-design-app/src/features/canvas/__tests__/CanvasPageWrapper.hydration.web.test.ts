@@ -9,54 +9,10 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useViewModeStore } from '../store/viewModeStore';
 import { useThreeDViewStore } from '../store/threeDViewStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import { useViewportStore } from '../store/viewportStore';
 import { useSelectionStore } from '../store/selectionStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import type { LocalStoragePayload } from '../hooks/useAutoSave';
-
-// Inline a simplified version of the hydrateFromPayload logic from CanvasPageWrapper
-// to test the hydration contract without needing to mount the full Next.js component.
-function hydrateFromPayload(payload: Partial<LocalStoragePayload>) {
-    if (payload?.project?.entities) {
-        useEntityStore.getState().hydrate(payload.project.entities);
-    }
-
-    if (payload?.viewport) {
-        useViewportStore.setState({
-            panX: payload.viewport.panX,
-            panY: payload.viewport.panY,
-            zoom: payload.viewport.zoom,
-            gridVisible: payload.viewport.gridVisible,
-            gridSize: payload.viewport.gridSize,
-            snapToGrid: payload.viewport.snapToGrid,
-        });
-    }
-
-    const hasViewMode = Boolean(payload?.project?.settings?.activeViewMode);
-    const hasThreeDState = Boolean(payload?.project?.threeDViewState);
-
-    if (!hasViewMode || !hasThreeDState) {
-        useViewModeStore.getState().reset();
-        useThreeDViewStore.getState().reset();
-    }
-
-    if (hasViewMode) {
-        useViewModeStore.getState().hydrateViewMode({
-            activeViewMode: payload.project!.settings!.activeViewMode,
-        });
-    }
-
-    if (hasThreeDState) {
-        useThreeDViewStore.getState().hydrateThreeDView(payload.project!.threeDViewState!);
-    }
-
-    if (payload?.selection) {
-        useSelectionStore.setState({
-            selectedIds: payload.selection.selectedIds,
-            hoveredId: payload.selection.hoveredId,
-        });
-    }
-}
+import { hydrateToStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 describe('CanvasPageWrapper hydration — web/localStorage path', () => {
     beforeEach(() => {
@@ -67,7 +23,7 @@ describe('CanvasPageWrapper hydration — web/localStorage path', () => {
     });
 
     it('hydrates viewModeStore from activeViewMode field', () => {
-        hydrateFromPayload({
+        hydrateToStores({
             project: {
                 settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
                 threeDViewState: {
@@ -82,12 +38,12 @@ describe('CanvasPageWrapper hydration — web/localStorage path', () => {
                     showPlanOverlay: false,
                 },
             } as any,
-        });
+        } as Partial<LocalStoragePayload> as LocalStoragePayload);
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
     });
 
     it('hydrates threeDViewStore camera state', () => {
-        hydrateFromPayload({
+        hydrateToStores({
             project: {
                 settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
                 threeDViewState: {
@@ -102,13 +58,13 @@ describe('CanvasPageWrapper hydration — web/localStorage path', () => {
                     showPlanOverlay: false,
                 },
             } as any,
-        });
+        } as Partial<LocalStoragePayload> as LocalStoragePayload);
         expect(useThreeDViewStore.getState().cameraTarget).toEqual({ x: 100, y: 50, z: 200 });
         expect(useThreeDViewStore.getState().orbitRadius).toBe(500);
     });
 
     it('hydrates selection state', () => {
-        hydrateFromPayload({
+        hydrateToStores({
             project: {
                 settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
                 threeDViewState: {
@@ -124,7 +80,7 @@ describe('CanvasPageWrapper hydration — web/localStorage path', () => {
                 },
             } as any,
             selection: { selectedIds: ['entity-1'], hoveredId: null },
-        });
+        } as Partial<LocalStoragePayload> as LocalStoragePayload);
         expect(useSelectionStore.getState().selectedIds).toEqual(['entity-1']);
     });
 });

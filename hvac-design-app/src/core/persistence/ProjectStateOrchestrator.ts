@@ -4,10 +4,43 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectStore } from '@/core/store/project.store';
 import { calculateSystemMetrics } from '@/features/canvas/hooks/useSystemCalculations';
+import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import { useThreeDViewStore } from '@/features/canvas/store/threeDViewStore';
 import { useViewModeStore } from '@/features/canvas/store/viewModeStore';
 import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
+
+export interface ProjectHydrationPayload {
+  project: ProjectFile;
+  selection?: {
+    selectedIds: string[];
+    hoveredId: string | null;
+  };
+  viewport?: {
+    panX: number;
+    panY: number;
+    zoom: number;
+    gridVisible: boolean;
+    gridSize: number;
+    snapToGrid: boolean;
+  };
+  preferences?: {
+    unitSystem?: 'imperial' | 'metric';
+    gridSize?: number;
+    snapToGrid?: boolean;
+  };
+  history?: {
+    past: unknown[];
+    future: unknown[];
+    maxSize: number;
+  };
+}
+
+function isProjectHydrationPayload(
+  source: ProjectFile | ProjectHydrationPayload
+): source is ProjectHydrationPayload {
+  return 'project' in source;
+}
 
 export function snapshotFromStores(): ProjectFile | null {
   const projectStore = useProjectStore.getState();
@@ -69,6 +102,7 @@ export function snapshotFromStores(): ProjectFile | null {
       orbitRadius: threeDViewStore.orbitRadius,
       polarAngle: threeDViewStore.polarAngle,
       azimuthAngle: threeDViewStore.azimuthAngle,
+      cameraRestored: threeDViewStore.cameraRestored,
       showGrid: threeDViewStore.showGrid,
       showAxes: threeDViewStore.showAxes,
       showPlanOverlay: threeDViewStore.showPlanOverlay,
@@ -99,6 +133,97 @@ export function snapshotFromStores(): ProjectFile | null {
   };
 }
 
-export function hydrateToStores(_project: ProjectFile): void {
-  throw new Error('hydrateToStores is not implemented in this task scope.');
+export function buildProjectFileFromStores(): ProjectFile | null {
+  return snapshotFromStores();
+}
+
+export function hydrateToStores(source: ProjectFile | ProjectHydrationPayload): void {
+  const hydrationPayload = isProjectHydrationPayload(source) ? source : { project: source };
+  const { project } = hydrationPayload;
+
+  const entityStore = useEntityStore.getState();
+  const viewportStore = useViewportStore.getState();
+  const threeDViewStore = useThreeDViewStore.getState();
+  const viewModeStore = useViewModeStore.getState();
+  const historyStore = useHistoryStore.getState();
+  const projectStore = useProjectStore.getState();
+  const preferencesStore = usePreferencesStore.getState();
+
+  if (project.entities) {
+    entityStore.hydrate(project.entities);
+  } else {
+    entityStore.clearAllEntities();
+  }
+
+  if (hydrationPayload.viewport) {
+    useViewportStore.setState({
+      panX: hydrationPayload.viewport.panX,
+      panY: hydrationPayload.viewport.panY,
+      zoom: hydrationPayload.viewport.zoom,
+      gridVisible: hydrationPayload.viewport.gridVisible,
+      gridSize: hydrationPayload.viewport.gridSize,
+      snapToGrid: hydrationPayload.viewport.snapToGrid,
+    });
+  } else if (project.viewportState) {
+    useViewportStore.setState({
+      panX: project.viewportState.panX,
+      panY: project.viewportState.panY,
+      zoom: project.viewportState.zoom,
+      gridVisible: project.settings?.gridVisible ?? viewportStore.gridVisible,
+      gridSize: project.settings?.gridSize ?? preferencesStore.gridSize,
+      snapToGrid: project.settings?.snapToGrid ?? preferencesStore.snapToGrid,
+    });
+  }
+
+  const nextUnitSystem =
+    hydrationPayload.preferences?.unitSystem ??
+    project.settings?.unitSystem ??
+    preferencesStore.unitSystem;
+  const nextGridSize =
+    hydrationPayload.preferences?.gridSize ??
+    project.settings?.gridSize ??
+    preferencesStore.gridSize;
+  const nextSnapToGrid =
+    hydrationPayload.preferences?.snapToGrid ??
+    project.settings?.snapToGrid ??
+    preferencesStore.snapToGrid;
+
+  preferencesStore.setUnitSystem(nextUnitSystem);
+  preferencesStore.setGridSize(nextGridSize);
+  preferencesStore.setSnapToGrid(nextSnapToGrid);
+  projectStore.setProjectSettings({ unitSystem: nextUnitSystem });
+
+  const hasViewMode = Boolean(project.settings?.activeViewMode);
+  const hasThreeDState = Boolean(project.threeDViewState);
+
+  if (!hasViewMode || !hasThreeDState) {
+    viewModeStore.reset();
+    threeDViewStore.reset();
+  }
+
+  if (hasViewMode) {
+    viewModeStore.hydrateViewMode({
+      activeViewMode: project.settings?.activeViewMode,
+    });
+  }
+
+  if (hasThreeDState && project.threeDViewState) {
+    threeDViewStore.hydrateThreeDView(project.threeDViewState);
+  }
+
+  useSelectionStore.setState({
+    selectedIds: hydrationPayload.selection?.selectedIds ?? [],
+    hoveredId: hydrationPayload.selection?.hoveredId ?? null,
+  });
+
+  const fallbackPast = project.commandHistory?.commands ?? [];
+  const fallbackCurrentIndex =
+    project.commandHistory?.currentIndex ?? Math.max(fallbackPast.length - 1, 0);
+  const boundedIndex = Math.min(fallbackCurrentIndex + 1, fallbackPast.length);
+
+  useHistoryStore.setState({
+    past: (hydrationPayload.history?.past ?? fallbackPast.slice(0, boundedIndex)) as typeof historyStore.past,
+    future: (hydrationPayload.history?.future ?? []) as typeof historyStore.future,
+    maxSize: hydrationPayload.history?.maxSize ?? historyStore.maxSize,
+  });
 }

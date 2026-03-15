@@ -10,23 +10,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useViewModeStore } from '../store/viewModeStore';
 import { useThreeDViewStore, THREE_D_VIEW_INITIAL_STATE } from '../store/threeDViewStore';
 import type { ProjectFile } from '@/core/schema/project-file.schema';
-
-function combineHydrate(payload: { settings?: Partial<ProjectFile['settings']>; threeDViewState?: ProjectFile['threeDViewState'] } = {}) {
-    const hasViewMode = Boolean(payload.settings?.activeViewMode);
-    const hasThreeDState = Boolean(payload.threeDViewState);
-
-    if (!hasViewMode || !hasThreeDState) {
-        useViewModeStore.getState().reset();
-        useThreeDViewStore.getState().reset();
-    }
-
-    if (hasViewMode) {
-        useViewModeStore.getState().hydrateViewMode({ activeViewMode: payload.settings!.activeViewMode });
-    }
-    if (hasThreeDState) {
-        useThreeDViewStore.getState().hydrateThreeDView(payload.threeDViewState!);
-    }
-}
+import { hydrateToStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 describe('CanvasPageWrapper hydration — backward-compat / partial payloads', () => {
     beforeEach(() => {
@@ -37,7 +21,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
     });
 
     it('resets both stores when activeViewMode is missing', () => {
-        combineHydrate({
+        hydrateToStores({
             // NO settings.activeViewMode
             threeDViewState: {
                 cameraTarget: { x: 50, y: 0, z: 50 },
@@ -50,7 +34,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
                 showAxes: true,
                 showPlanOverlay: false,
             },
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         // After reset: viewMode defaults to 'plan'
         expect(useViewModeStore.getState().activeViewMode).toBe('plan');
         // threeDViewState is present → hydrated after reset
@@ -60,10 +44,10 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
     });
 
     it('resets both stores when threeDViewState is missing', () => {
-        combineHydrate({
+        hydrateToStores({
             settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             // NO threeDViewState
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         // After reset: viewMode re-hydrated to '3d' since it was present
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
         // threeDViewStore reset to defaults — contamination cleared
@@ -72,7 +56,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
     });
 
     it('resets both stores when both fields are missing (legacy file)', () => {
-        combineHydrate({});
+        hydrateToStores({} as Partial<ProjectFile> as ProjectFile);
         // Both stores at clean defaults — no residue from previous project
         expect(useViewModeStore.getState().activeViewMode).toBe('plan');
         expect(useThreeDViewStore.getState().orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
@@ -80,7 +64,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
 
     it('does NOT reset when both fields are present — hydrates directly', () => {
         const targetOrbitRadius = 450;
-        combineHydrate({
+        hydrateToStores({
             settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             threeDViewState: {
                 cameraTarget: { x: 0, y: 0, z: 0 },
@@ -93,7 +77,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
                 showAxes: true,
                 showPlanOverlay: false,
             },
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
         expect(useThreeDViewStore.getState().orbitRadius).toBe(targetOrbitRadius);
     });

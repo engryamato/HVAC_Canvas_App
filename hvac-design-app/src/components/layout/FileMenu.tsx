@@ -299,14 +299,6 @@ export function FileMenu() {
                 modifiedAt: now,
                 isArchived: false,
                 location: projectData.location || undefined,
-                settings: projectData.settings ? {
-                    unitSystem: projectData.settings.unitSystem || 'imperial',
-                    gridSize: projectData.settings.gridSize || 12,
-                    gridVisible: projectData.settings.gridVisible ?? true,
-                    snapToGrid: projectData.settings.snapToGrid ?? true,
-                    // Include any other calculation settings from the wizard
-                    ...projectData.settings
-                } : undefined,
             });
 
             const repository = await getProjectRepository();
@@ -693,7 +685,7 @@ export function FileMenu() {
                             return;
                         }
 
-                        hydrateToStores(migratedData);
+                        hydrateToStores(payload);
 
                         if (migratedData.settings) {
                             useSettingsStore.getState().setCalculationSettings(migratedData.settings);
