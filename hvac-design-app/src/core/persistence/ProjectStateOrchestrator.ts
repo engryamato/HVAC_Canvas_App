@@ -99,6 +99,45 @@ export function snapshotFromStores(): ProjectFile | null {
   };
 }
 
-export function hydrateToStores(_project: ProjectFile): void {
-  throw new Error('hydrateToStores is not implemented in this task scope.');
+export function hydrateToStores(project: ProjectFile): void {
+  if (project.settings?.unitSystem) {
+    usePreferencesStore.getState().setUnitSystem(project.settings.unitSystem);
+  }
+
+  if (project.entities) {
+    useEntityStore.getState().hydrate(project.entities);
+  }
+
+  const preferences = usePreferencesStore.getState();
+  const settings = project.settings ?? {};
+  const viewport = project.viewportState;
+
+  if (viewport) {
+    useViewportStore.setState({
+      panX: viewport.panX,
+      panY: viewport.panY,
+      zoom: viewport.zoom,
+      gridVisible: settings.gridVisible ?? true,
+      gridSize: settings.gridSize ?? preferences.gridSize,
+      snapToGrid: preferences.snapToGrid,
+    });
+  }
+
+  const hasViewMode = Boolean(settings.activeViewMode);
+  const hasThreeDState = Boolean(project.threeDViewState);
+
+  if (!hasViewMode || !hasThreeDState) {
+    useViewModeStore.getState().reset();
+    useThreeDViewStore.getState().reset();
+  }
+
+  if (hasViewMode) {
+    useViewModeStore.getState().hydrateViewMode({
+      activeViewMode: settings.activeViewMode,
+    });
+  }
+
+  if (hasThreeDState && project.threeDViewState) {
+    useThreeDViewStore.getState().hydrateThreeDView(project.threeDViewState);
+  }
 }
