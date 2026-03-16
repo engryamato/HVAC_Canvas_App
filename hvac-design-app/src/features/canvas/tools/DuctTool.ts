@@ -9,7 +9,7 @@ import {
 
 // ... inside class ...
 import { createDuct } from '../entities/ductDefaults';
-import { createEntities, createEntity, deleteEntities, validateAndRecord } from '@/core/commands/entityCommands';
+import { createEntity, deleteEntity, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import {
@@ -407,18 +407,21 @@ export class DuctTool extends BaseTool {
     const entities = useEntityStore.getState().byId as Record<string, Entity>;
     const autoInsertPlan = fittingInsertionService.planAutoInsertForDuct(duct.id, entities);
 
-    if (autoInsertPlan.insertions.length > 0) {
-      createEntities(autoInsertPlan.insertions);
+    const selection = { selectionBefore: [duct.id], selectionAfter: [duct.id] };
+
+    for (const fitting of autoInsertPlan.insertions) {
+      createEntity(fitting, selection);
     }
 
     if (autoInsertPlan.orphanFittingIds.length > 0) {
       const currentEntities = useEntityStore.getState().byId as Record<string, Entity>;
       const orphanEntities = autoInsertPlan.orphanFittingIds
         .map((id) => currentEntities[id])
-        .filter((entity): entity is Fitting => entity?.type === 'fitting');
+        .filter((entity): entity is Fitting => entity?.type === 'fitting')
+        .sort((a, b) => a.id.localeCompare(b.id));
 
-      if (orphanEntities.length > 0) {
-        deleteEntities(orphanEntities);
+      for (const orphan of orphanEntities) {
+        deleteEntity(orphan, selection);
       }
     }
   }

@@ -65,6 +65,15 @@ describe('FittingPropsSchema', () => {
     expect(result.name).toBe('Main Exhaust Elbow');
   });
 
+  it('defaults manualOverride to false when omitted', () => {
+    const result = FittingPropsSchema.parse({
+      fittingType: 'elbow_90',
+      angle: 90,
+    });
+
+    expect(result.manualOverride).toBe(false);
+  });
+
   it('should enforce name max length', () => {
     const props = {
       ...DEFAULT_FITTING_PROPS.tee,
@@ -87,7 +96,13 @@ describe('FittingSchema', () => {
   };
 
   it('should validate complete fitting entity', () => {
-    expect(FittingSchema.parse(validFitting)).toEqual(validFitting);
+    expect(FittingSchema.parse(validFitting)).toEqual({
+      ...validFitting,
+      props: {
+        ...validFitting.props,
+        manualOverride: false,
+      },
+    });
   });
 
   it('should reject non-fitting type', () => {

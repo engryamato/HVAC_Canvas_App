@@ -8,6 +8,7 @@ import type { Entity } from '@/core/schema';
 import RoomInspector from './RoomInspector';
 import DuctInspector from './DuctInspector';
 import EquipmentInspector from './EquipmentInspector';
+import FittingInspector from './FittingInspector';
 import { CanvasPropertiesInspector } from './CanvasPropertiesInspector';
 
 interface InspectorPanelProps {
@@ -29,6 +30,8 @@ function renderInspector(entity: Entity | null) {
       return <DuctInspector entity={entity} />;
     case 'equipment':
       return <EquipmentInspector entity={entity} />;
+    case 'fitting':
+      return <FittingInspector entity={entity} />;
     default:
       return (
         <div className="p-4 border border-dashed border-slate-300 rounded-lg text-slate-500 bg-slate-50 text-center">

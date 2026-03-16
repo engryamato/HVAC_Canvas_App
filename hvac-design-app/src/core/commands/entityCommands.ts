@@ -10,6 +10,7 @@ import { ConstraintValidationService } from '@/core/services/constraintValidatio
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
 import type { Duct, ValidationSeverity } from '@/core/schema/duct.schema';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 
 interface CommandOptions {
   selectionBefore?: string[];
@@ -358,6 +359,16 @@ export function deleteEntity(entityOrId: Entity | string, options?: CommandOptio
   const selection = captureSelection(options);
   const nextSelection = selection.after.filter((id) => id !== entityId);
 
+  if (entity.type === 'duct') {
+    const linkedAutoFittings = fittingInsertionService
+      .getAutoInsertedFittingsForDuct(entityId)
+      .filter((fitting) => fitting.id !== entityId);
+
+    for (const fitting of linkedAutoFittings) {
+      deleteEntity(fitting, { selectionBefore: selection.before, selectionAfter: nextSelection });
+    }
+  }
+
   const command: ReversibleCommand = {
     id: generateCommandId(),
     type: CommandType.DELETE_ENTITY,
@@ -384,6 +395,17 @@ export function deleteEntity(entityOrId: Entity | string, options?: CommandOptio
  * Creates a single undoable command for all deletions
  */
 export function deleteEntities(entities: Entity[], options?: CommandOptions): void {
+  if (entities.some((entity) => entity.type === 'duct')) {
+    const selection = captureSelection(options);
+    const remainingSelection = selection.after.filter((id) => !entities.some((entity) => entity.id === id));
+    const sortedEntities = [...entities].sort((a, b) => a.id.localeCompare(b.id));
+
+    for (const entity of sortedEntities) {
+      deleteEntity(entity, { selectionBefore: selection.before, selectionAfter: remainingSelection });
+    }
+    return;
+  }
+
   const selection = captureSelection(options);
   const entityIds = entities.map((e) => e.id);
   const remainingSelection = selection.after.filter((id) => !entityIds.includes(id));

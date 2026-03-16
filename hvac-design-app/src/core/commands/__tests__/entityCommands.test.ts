@@ -167,6 +167,54 @@ describe('Entity Commands', () => {
 
       expect(useHistoryStore.getState().past).toHaveLength(1);
     });
+
+    it('removes linked auto-inserted fittings when deleting a duct', () => {
+      const duct: Duct = {
+        id: 'duct-1',
+        type: 'duct',
+        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        zIndex: 1,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        modifiedAt: '2025-01-01T00:00:00.000Z',
+        props: {
+          name: 'Duct 1',
+          shape: 'round',
+          diameter: 12,
+          length: 20,
+          material: 'galvanized',
+          airflow: 1000,
+          staticPressure: 0.1,
+        },
+        calculated: { area: 113.1, velocity: 1273, frictionLoss: 0.03 },
+      };
+
+      const fitting: Fitting = {
+        id: 'fit-1',
+        type: 'fitting',
+        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        zIndex: 2,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        modifiedAt: '2025-01-01T00:00:00.000Z',
+        props: {
+          fittingType: 'elbow_90',
+          inletDuctId: duct.id,
+          outletDuctId: 'duct-2',
+          autoInserted: true,
+          manualOverride: false,
+        },
+        calculated: { equivalentLength: 30, pressureLoss: 0.01 },
+      };
+
+      createEntity(duct);
+      createEntity(fitting);
+      useHistoryStore.getState().clear();
+
+      deleteEntity(duct);
+
+      expect(selectEntity(duct.id)).toBeUndefined();
+      expect(selectEntity(fitting.id)).toBeUndefined();
+      expect(useHistoryStore.getState().past).toHaveLength(2);
+    });
   });
 
   describe('undo', () => {
@@ -236,4 +284,3 @@ describe('Entity Commands', () => {
     });
   });
 });
-

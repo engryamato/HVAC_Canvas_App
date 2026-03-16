@@ -13,6 +13,9 @@ vi.mock('../DuctInspector', () => ({
 vi.mock('../EquipmentInspector', () => ({
   default: () => <div data-testid="equipment-inspector">EquipmentInspector</div>,
 }));
+vi.mock('../FittingInspector', () => ({
+  default: () => <div data-testid="fitting-inspector">FittingInspector</div>,
+}));
 vi.mock('../CanvasPropertiesInspector', () => ({
   CanvasPropertiesInspector: () => <div data-testid="canvas-inspector">CanvasInspector</div>,
 }));
@@ -106,5 +109,13 @@ describe('InspectorPanel', () => {
 
     render(<InspectorPanel />);
     expect(screen.getByTestId('equipment-inspector')).toBeDefined();
+  });
+
+  it('renders Fitting inspector for fitting selection', () => {
+    mockSelection(['4']);
+    mockEntities({ '4': { id: '4', type: 'fitting' } });
+
+    render(<InspectorPanel />);
+    expect(screen.getByTestId('fitting-inspector')).toBeDefined();
   });
 });

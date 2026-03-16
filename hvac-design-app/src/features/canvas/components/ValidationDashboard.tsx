@@ -10,15 +10,40 @@ import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { Button } from '@/components/ui/button';
 import { ResolutionWizard } from './ResolutionWizard';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
+import {
+  createEntity,
+  deleteEntity,
+  updateEntity as updateEntityCommand,
+} from '@/core/commands/entityCommands';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export function ValidationDashboard() {
+  type ManualOverrideResetPlan = NonNullable<ReturnType<typeof fittingInsertionService.planManualOverrideReset>>;
   const [resolveEntityId, setResolveEntityId] = useState<string | null>(null);
+  const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
   const validationResults = useValidationStore((state) => state.validationResults);
   const exportBlockers = useValidationStore((state) => state.exportBlockers);
   const unresolvedCatalogItems = useValidationStore((state) => state.unresolvedCatalogItems);
   const entities = useEntityStore((state) => state.byId);
   const components = useComponentLibraryStoreV2((state) => state.components);
   const selectSingle = useSelectionStore((state) => state.selectSingle);
+  const selectedIds = useSelectionStore((state) => state.selectedIds);
+
+  const pushToast = (message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('sws:toast', { detail: { message, type } }));
+  };
 
   const issuesByService = useMemo(() => {
     const grouped: Record<
@@ -113,9 +138,120 @@ export function ValidationDashboard() {
   }, [entities]);
 
   const totalIssues = exportBlockers.length + unresolvedCatalogItems.length + constraintIssues;
+  const selectedEntity = selectedIds.length === 1 ? entities[selectedIds[0] ?? ''] : null;
+  const selectedOverrideFitting =
+    selectedEntity?.type === 'fitting' && selectedEntity.props.manualOverride ? selectedEntity : null;
+  const manualOverrideCount = useMemo(
+    () =>
+      Object.values(entities).filter(
+        (entity) => entity.type === 'fitting' && entity.props.autoInserted && entity.props.manualOverride
+      ).length,
+    [entities]
+  );
 
   const handleEntityClick = (entityId: string) => {
     selectSingle(entityId);
+  };
+
+  const handleRerunAutoFitting = () => {
+    const selection = [...selectedIds];
+    const plan = fittingInsertionService.buildReRunPlan(entities);
+    const result = fittingInsertionService.resolveReRunPlan(plan, entities);
+
+    for (const operation of result.operations) {
+      if (operation.action === 'insert') {
+        createEntity(operation.next, {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        });
+        continue;
+      }
+
+      if (operation.action === 'remove') {
+        deleteEntity(operation.previous, {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        });
+        continue;
+      }
+
+      updateEntityCommand(
+        operation.next.id,
+        {
+          props: operation.next.props,
+          transform: operation.next.transform,
+          modifiedAt: operation.next.modifiedAt,
+        },
+        operation.previous,
+        {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        }
+      );
+    }
+
+    pushToast(
+      `${result.insertedOrUpdatedCount} fittings inserted/updated, ${result.manualOverridesPreserved} manual overrides preserved`,
+      'success'
+    );
+  };
+
+  const handleResetSelectedOverride = () => {
+    if (!selectedOverrideFitting) {
+      return;
+    }
+
+    const reset = fittingInsertionService.planManualOverrideReset(selectedOverrideFitting.id, entities);
+
+    if (!reset) {
+      return;
+    }
+
+    updateEntityCommand(
+      reset.next.id,
+      {
+        props: reset.next.props,
+        transform: reset.next.transform,
+        modifiedAt: reset.next.modifiedAt,
+      },
+      reset.previous,
+      {
+        selectionBefore: [selectedOverrideFitting.id],
+        selectionAfter: [selectedOverrideFitting.id],
+      }
+    );
+    pushToast('Selected fitting reset to auto', 'success');
+  };
+
+  const handleResetAllManualOverrides = () => {
+    const selection = [...selectedIds];
+    const resetPlans: ManualOverrideResetPlan[] = [];
+    for (const fittingId of fittingInsertionService.getManualOverrideFittingIds(entities)) {
+      const reset = fittingInsertionService.planManualOverrideReset(fittingId, entities);
+      if (reset) {
+        resetPlans.push(reset);
+      }
+    }
+
+    for (const reset of resetPlans) {
+      updateEntityCommand(
+        reset.next.id,
+        {
+          props: reset.next.props,
+          transform: reset.next.transform,
+          modifiedAt: reset.next.modifiedAt,
+        },
+        reset.previous,
+        {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        }
+      );
+    }
+    setConfirmResetAllOpen(false);
+
+    const resetCount = resetPlans.length;
+    pushToast(`${resetCount} manual override${resetCount === 1 ? '' : 's'} reset`, 'success');
   };
 
   return (
@@ -139,6 +275,34 @@ export function ValidationDashboard() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="rounded border border-slate-200 bg-slate-50 p-3 space-y-2">
+          <Button type="button" className="w-full" onClick={handleRerunAutoFitting} data-testid="rerun-autofitting">
+            Re-run Auto-Fitting
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleResetSelectedOverride}
+            disabled={!selectedOverrideFitting}
+            data-testid="reset-selected-override"
+          >
+            Reset Selected Override
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => setConfirmResetAllOpen(true)}
+            data-testid="reset-all-overrides"
+          >
+            Reset All Manual Overrides
+          </Button>
+          <p className="text-xs text-slate-500">
+            {manualOverrideCount} locked override{manualOverrideCount === 1 ? '' : 's'} currently preserved from auto-fitting.
+          </p>
+        </div>
+
         {Object.keys(issuesByService).length === 0 ? (
           <div className="rounded border border-dashed p-6 text-center text-sm text-slate-500">No validation issues</div>
         ) : (
@@ -195,6 +359,25 @@ export function ValidationDashboard() {
       {resolveEntityId ? (
         <ResolutionWizard open={Boolean(resolveEntityId)} entityId={resolveEntityId} onClose={() => setResolveEntityId(null)} />
       ) : null}
+
+      <Dialog open={confirmResetAllOpen} onOpenChange={setConfirmResetAllOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset all manual overrides?</DialogTitle>
+            <DialogDescription>
+              This unlocks every manually adjusted auto-inserted fitting so future auto-fitting runs can update them again.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setConfirmResetAllOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleResetAllManualOverrides}>
+              Reset All
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
