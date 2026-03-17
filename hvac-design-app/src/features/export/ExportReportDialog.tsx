@@ -12,12 +12,9 @@ import { Button } from '@/components/ui/button';
 import { useExport } from '@/features/export/hooks/useExport';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
-import { usePreferencesStore } from '@/core/store/preferencesStore';
-import { useViewportStore } from '@/features/canvas/store/viewportStore';
-import { useHistoryStore } from '@/core/commands/historyStore';
 import { useValidationStore } from '@/core/store/validationStore';
-import { type Project } from '@/types/project';
 import { useShallow } from 'zustand/react/shallow';
+import { buildExportProjectSnapshot } from './buildExportProjectSnapshot';
 
 export interface ExportReportDialogProps {
     open: boolean;
@@ -44,7 +41,22 @@ export interface ExportOptions {
     orientation: Orientation;
 }
 
-// Helper removed in favor of useExport hook
+function formatEntityLabel(
+    entityId: string,
+    entity?: { type?: string; props?: Record<string, unknown> }
+) {
+    const typeLabel = entity?.type
+        ? entity.type.charAt(0).toUpperCase() + entity.type.slice(1)
+        : 'Entity';
+    const name =
+        typeof entity?.props?.name === 'string'
+            ? entity.props.name
+            : typeof entity?.props?.content === 'string'
+              ? entity.props.content
+              : undefined;
+    const identifier = name ?? entityId;
+    return `${typeLabel} ${identifier}`;
+}
 
 export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogProps) {
     const [options, setOptions] = useState<ExportOptions>({
@@ -63,7 +75,7 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
         orientation: 'portrait',
     });
 
-    const { exportProject, isExporting, error } = useExport();
+    const { exportProject, isExporting, error, snapshotWarning } = useExport();
     const warningViolations = useValidationStore(
         useShallow((state) =>
             Object.values(state.validationResults).flatMap((result) =>
@@ -71,6 +83,13 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
             )
         )
     );
+    const { exportBlockers, validationResults } = useValidationStore(
+        useShallow((state) => ({
+            exportBlockers: state.exportBlockers,
+            validationResults: state.validationResults,
+        }))
+    );
+    const entitiesById = useEntityStore(useShallow((state) => state.byId));
     
     // Store selectors for data aggregation
     const currentProjectId = useProjectStore((state) => state.currentProjectId);
@@ -118,55 +137,10 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
         if (!currentProjectId || !projectDetails) {
             return;
         }
-        if (warningViolations.length > 0 && options.includeEngineeringNotes) {
-            const shouldContinue = window.confirm(
-                `Design has ${warningViolations.length} warning(s). Include them in engineering notes and continue export?`
-            );
-            if (!shouldContinue) {
-                return;
-            }
+        const project = buildExportProjectSnapshot();
+        if (!project) {
+            return;
         }
-
-        // Aggregate project data from stores
-        const entityStore = useEntityStore.getState();
-        const viewportStore = useViewportStore.getState();
-        const preferences = usePreferencesStore.getState();
-        const historyStore = useHistoryStore.getState();
-
-        const project: Project = {
-            projectId: currentProjectId,
-            projectName: projectDetails.projectName,
-            projectNumber: projectDetails.projectNumber || undefined,
-            clientName: projectDetails.clientName || undefined,
-            location: projectDetails.location || undefined,
-            createdAt: projectDetails.createdAt,
-            modifiedAt: new Date().toISOString(),
-            entities: {
-                byId: entityStore.byId,
-                allIds: entityStore.allIds,
-            },
-            viewportState: {
-                panX: viewportStore.panX,
-                panY: viewportStore.panY,
-                zoom: viewportStore.zoom,
-            },
-            settings: {
-                unitSystem: preferences.unitSystem,
-                gridSize: preferences.gridSize,
-                gridVisible: viewportStore.gridVisible,
-            },
-            commandHistory: {
-                commands: historyStore.past,
-                currentIndex: Math.max(historyStore.past.length - 1, 0),
-            },
-            scope: {
-                projectType: 'HVAC Design', // Default
-                details: [],
-            },
-            siteConditions: {
-                // TODO: Add site conditions to store
-            }
-        };
 
         const result = await exportProject(project, {
             format: options.format,
@@ -179,6 +153,7 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
             includeCalculations: options.includeCalculations,
             includeEntities: options.includeEntities,
             includeBOM: options.includeBOM,
+            paperSize: options.paperSize,
             orientation: options.orientation,
         });
 
@@ -192,6 +167,28 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
             onOpenChange(false);
         }
     };
+
+    const blockerMessages = exportBlockers.flatMap((entityId) => {
+        const result = validationResults[entityId];
+        if (!result) {
+            return [];
+        }
+
+        const label = formatEntityLabel(entityId, entitiesById[entityId]);
+        return result.violations
+            .filter((violation) => violation.severity === 'blocker')
+            .map((violation) => `${label}: ${violation.message}`);
+    });
+
+    const warningSummary = Object.entries(
+        warningViolations.reduce<Record<string, number>>((counts, violation) => {
+            const key = violation.type ?? violation.ruleId ?? 'warning';
+            counts[key] = (counts[key] ?? 0) + 1;
+            return counts;
+        }, {})
+    )
+        .map(([type, count]) => `${count} ${type}`)
+        .join(', ');
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -213,12 +210,46 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                             />
                         </div>
                         <p className="text-center text-sm text-slate-500">Please wait...</p>
+                        {snapshotWarning && (
+                            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+                                {snapshotWarning}
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div className="space-y-6 py-4">
+                        {exportBlockers.length > 0 && (
+                            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+                                <p className="mb-2 font-medium">Export blockers detected</p>
+                                <ul className="list-disc pl-5">
+                                    {blockerMessages.map((message) => (
+                                        <li key={message}>{message}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {warningViolations.length > 0 && (
+                            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+                                <p className="font-medium">Warnings will be included in the export.</p>
+                                <p>{warningSummary}</p>
+                            </div>
+                        )}
                         {error && (
-                            <div className="p-3 bg-red-50 text-red-600 rounded-md text-sm">
-                                Error: {error}
+                            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+                                <p>Error: {error}</p>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-3"
+                                    onClick={() => void handleExport()}
+                                >
+                                    Retry
+                                </Button>
+                            </div>
+                        )}
+                        {snapshotWarning && (
+                            <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+                                {snapshotWarning}
                             </div>
                         )}
                         {/* Report Type */}
@@ -401,11 +432,15 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                         Cancel
                     </Button>
                     <Button
-                        onClick={handleExport}
+                        onClick={() => void handleExport()}
                         disabled={isExporting}
                         data-testid="export-btn"
                     >
-                        {isExporting ? 'Exporting...' : 'Export'}
+                        {isExporting
+                            ? 'Exporting...'
+                            : exportBlockers.length > 0 || warningViolations.length > 0
+                              ? 'Export Anyway'
+                              : 'Export'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

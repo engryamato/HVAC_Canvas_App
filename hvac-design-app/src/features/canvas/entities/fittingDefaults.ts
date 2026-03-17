@@ -49,7 +49,7 @@ export function createFitting(
   const typeDefaults = DEFAULT_FITTING_PROPS[fittingType];
 
   const props = {
-    name: overrides?.name ?? `Fitting ${fittingNumber}`,
+    name: overrides?.name ?? `${FITTING_TYPE_LABELS[fittingType]} ${fittingNumber}`,
     fittingType,
     angle: overrides?.angle ?? typeDefaults.angle,
     inletDuctId: overrides?.inletDuctId,

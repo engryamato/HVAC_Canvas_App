@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { autoSizingService } from '../automation/autoSizingService';
-import { EngineeringLimits } from '../../schema/calculation-settings.schema';
+import type { EngineeringLimits } from '../../schema/calculation-settings.schema';
+import type { DuctProps } from '../../schema/duct.schema';
 
 describe('AutoSizingService', () => {
   const mockLimits: EngineeringLimits = {
@@ -25,8 +26,8 @@ describe('AutoSizingService', () => {
       const duct = {
         airflow: 1000,
         shape: 'round' as const,
-        material: 'galvanized',
-      };
+        material: 'galvanized' as const,
+      } satisfies Partial<DuctProps>;
 
       const result = autoSizingService.autoSizeDuct(
         duct,
@@ -35,16 +36,16 @@ describe('AutoSizingService', () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.size.diameter).toBeGreaterThan(0);
-      expect(result.velocity).toBeCloseTo(1500, -2); // Within 100 FPM
+      expect(result.newSize.diameter).toBeGreaterThan(0);
+      expect(result.calculatedVelocity).toBeCloseTo(1500, -2); // Within 100 FPM
     });
 
     it('should size rectangular duct correctly', () => {
       const duct = {
         airflow: 2000,
         shape: 'rectangular' as const,
-        material: 'galvanized',
-      };
+        material: 'galvanized' as const,
+      } satisfies Partial<DuctProps>;
 
       const result = autoSizingService.autoSizeDuct(
         duct,
@@ -53,16 +54,16 @@ describe('AutoSizingService', () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.size.width).toBeGreaterThan(0);
-      expect(result.size.height).toBeGreaterThan(0);
+      expect(result.newSize.width).toBeGreaterThan(0);
+      expect(result.newSize.height).toBeGreaterThan(0);
     });
 
     it('should round to standard sizes when requested', () => {
       const duct = {
         airflow: 1234,
         shape: 'round' as const,
-        material: 'galvanized',
-      };
+        material: 'galvanized' as const,
+      } satisfies Partial<DuctProps>;
 
       const result = autoSizingService.autoSizeDuct(
         duct,
@@ -72,15 +73,15 @@ describe('AutoSizingService', () => {
 
       // Standard round sizes: 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, etc.
       const standardSizes = [6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
-      expect(standardSizes).toContain(result.size.diameter);
+      expect(standardSizes).toContain(result.newSize.diameter);
     });
 
     it('should warn when velocity exceeds maximum', () => {
       const duct = {
         airflow: 10000, // Very high airflow
         shape: 'round' as const,
-        material: 'galvanized',
-      };
+        material: 'galvanized' as const,
+      } satisfies Partial<DuctProps>;
 
       const result = autoSizingService.autoSizeDuct(
         duct,
@@ -98,6 +99,7 @@ describe('AutoSizingService', () => {
       const suggestions = autoSizingService.suggestDuctSizes(
         1500,
         'round',
+        'supply',
         mockLimits
       );
 
@@ -113,11 +115,16 @@ describe('AutoSizingService', () => {
       const suggestions = autoSizingService.suggestDuctSizes(
         2000,
         'round',
+        'supply',
         mockLimits
       );
 
       for (let i = 1; i < suggestions.length; i++) {
-        expect(suggestions[i].velocity).toBeGreaterThan(suggestions[i - 1].velocity);
+        const current = suggestions[i];
+        const previous = suggestions[i - 1];
+        expect(current).toBeDefined();
+        expect(previous).toBeDefined();
+        expect(current!.velocity).toBeGreaterThan(previous!.velocity);
       }
     });
   });
@@ -125,9 +132,9 @@ describe('AutoSizingService', () => {
   describe('batchAutoSize', () => {
     it('should size multiple ducts efficiently', () => {
       const ducts = [
-        { id: 'd1', airflow: 1000, shape: 'round' as const, material: 'galvanized' },
-        { id: 'd2', airflow: 1500, shape: 'round' as const,material: 'galvanized' },
-        { id: 'd3', airflow: 2000, shape: 'rectangular' as const, material: 'galvanized' },
+        { id: 'd1', props: { airflow: 1000, shape: 'round' as const, material: 'galvanized' as const } },
+        { id: 'd2', props: { airflow: 1500, shape: 'round' as const, material: 'galvanized' as const } },
+        { id: 'd3', props: { airflow: 2000, shape: 'rectangular' as const, material: 'galvanized' as const } },
       ];
 
       const results = autoSizingService.batchAutoSize(
@@ -136,9 +143,9 @@ describe('AutoSizingService', () => {
         mockLimits
       );
 
-      expect(results.sized).toHaveLength(3);
-      expect(results.failed).toHaveLength(0);
-      expect(results.totalProcessed).toBe(3);
+      expect(results.size).toBe(3);
+      expect(Array.from(results.values())).toHaveLength(3);
+      expect(Array.from(results.values()).every((result) => result.success)).toBe(true);
     });
   });
 });

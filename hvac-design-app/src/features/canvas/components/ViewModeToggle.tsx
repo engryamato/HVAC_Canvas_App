@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, DraftingCompass } from 'lucide-react';
+import { DraftingCompass } from 'lucide-react';
 import { useActiveViewMode, useViewModeStore, type CanvasViewMode } from '../store/viewModeStore';
 
 const viewModes: Array<{ id: CanvasViewMode; label: string; icon: typeof DraftingCompass; shortcut: string }> = [
   { id: 'plan', label: 'Plan View', icon: DraftingCompass, shortcut: 'Shift+2' },
-  { id: '3d', label: '3D View', icon: Box, shortcut: 'Shift+3' },
+  // 3D View suspended — { id: '3d', label: '3D View', icon: Box, shortcut: 'Shift+3' },
 ];
 
 export function ViewModeToggle(): React.ReactElement {
@@ -23,9 +23,7 @@ export function ViewModeToggle(): React.ReactElement {
         setViewMode('plan');
       }
 
-      if (event.key === '#' || event.key === '3') {
-        setViewMode('3d');
-      }
+      // Shift+3 shortcut for 3D view is suspended
     };
 
     window.addEventListener('keydown', handleKeyDown);

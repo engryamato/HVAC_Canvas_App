@@ -31,6 +31,55 @@ export interface LoadResult extends IOResult {
   originalVersion?: string;
 }
 
+async function deserializeProjectContent(
+  content: string,
+  options: { fromBackup?: boolean } = {}
+): Promise<LoadResult> {
+  const result = deserializeProject(content);
+
+  if (result.success && result.data) {
+    return {
+      success: true,
+      project: result.data,
+      loadedFromBackup: options.fromBackup,
+      migrated: Boolean(result.migrated),
+      originalVersion: result.originalVersion,
+    };
+  }
+
+  if (result.requiresMigration && result.foundVersion) {
+    const parsed = JSON.parse(content);
+    const migrated = migrateProject(parsed, result.foundVersion);
+    if (migrated.success && migrated.data) {
+      return {
+        success: true,
+        project: migrated.data,
+        loadedFromBackup: options.fromBackup,
+        migrated: Boolean(migrated.migrated),
+        originalVersion: migrated.originalVersion ?? result.foundVersion,
+      };
+    }
+
+    const lenient = deserializeProjectLenient(content);
+    if (lenient.success && lenient.data) {
+      return {
+        success: true,
+        project: lenient.data,
+        loadedFromBackup: options.fromBackup,
+        migrated: Boolean(lenient.migrated),
+        originalVersion: lenient.originalVersion ?? result.foundVersion,
+      };
+    }
+  }
+
+  return {
+    success: false,
+    error: result.error,
+    migrated: false,
+    originalVersion: result.originalVersion ?? result.foundVersion,
+  };
+}
+
 /**
  * Save project to .sws file with backup
  * Creates a .bak backup of the existing file before overwriting
@@ -95,34 +144,12 @@ export async function loadProject(path: string): Promise<LoadResult> {
     // Read file
     const content = await readTextFile(path);
 
-    // Deserialize
-    const result = deserializeProject(content);
-
+    const result = await deserializeProjectContent(content);
     if (!result.success) {
-      // Check if migration is needed
-      if (result.requiresMigration && result.foundVersion) {
-        const parsed = JSON.parse(content);
-        const migrated = migrateProject(parsed, result.foundVersion);
-        if (migrated.success) {
-          return { success: true, project: migrated.data };
-        }
-
-        const lenient = deserializeProjectLenient(content);
-        if (lenient.success && lenient.data) {
-          return {
-            success: true,
-            project: lenient.data,
-            migrated: false,
-            originalVersion: result.foundVersion,
-          };
-        }
-      }
-
-      // Try loading backup if main file is corrupted
       return loadBackup(path);
     }
 
-    return { success: true, project: result.data };
+    return result;
   } catch (error) {
     // Try backup on error
     return loadBackup(path);
@@ -141,17 +168,11 @@ export async function loadBackup(originalPath: string): Promise<LoadResult> {
     }
 
     const content = await readTextFile(backupPath);
-    const result = deserializeProject(content);
-
+    const result = await deserializeProjectContent(content, { fromBackup: true });
     if (!result.success) {
       return { success: false, error: 'Backup file is also corrupted' };
     }
-
-    return {
-      success: true,
-      project: result.data,
-      loadedFromBackup: true,
-    };
+    return result;
   } catch (error) {
     return {
       success: false,

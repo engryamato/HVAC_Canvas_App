@@ -18,6 +18,8 @@ export interface DeserializationResult {
   error?: string;
   requiresMigration?: boolean;
   foundVersion?: string;
+  migrated?: boolean;
+  originalVersion?: string;
 }
 
 /**
@@ -48,6 +50,8 @@ export function serializeProject(project: ProjectFile): SerializationResult {
 export function deserializeProject(json: string): DeserializationResult {
   try {
     const parsed = JSON.parse(json);
+    const originalVersion =
+      typeof parsed?.schemaVersion === 'string' ? parsed.schemaVersion : CURRENT_SCHEMA_VERSION;
 
     // Check schema version
     if (parsed.schemaVersion !== CURRENT_SCHEMA_VERSION) {
@@ -55,6 +59,8 @@ export function deserializeProject(json: string): DeserializationResult {
         success: false,
         requiresMigration: true,
         foundVersion: parsed.schemaVersion,
+        originalVersion,
+        migrated: false,
         error: `Schema version mismatch: found ${parsed.schemaVersion}, expected ${CURRENT_SCHEMA_VERSION}`,
       };
     }
@@ -62,7 +68,12 @@ export function deserializeProject(json: string): DeserializationResult {
     // Validate against schema
     const validated = ProjectFileSchema.parse(parsed);
 
-    return { success: true, data: validated };
+    return {
+      success: true,
+      data: validated,
+      migrated: false,
+      originalVersion,
+    };
   } catch (error) {
     if (error instanceof SyntaxError) {
       return { success: false, error: 'Invalid JSON format' };
@@ -84,7 +95,13 @@ export function deserializeProjectLenient(json: string): DeserializationResult {
   try {
     const parsed = JSON.parse(json);
     const validated = ProjectFileSchema.parse(parsed);
-    return { success: true, data: validated };
+    return {
+      success: true,
+      data: validated,
+      migrated: false,
+      originalVersion:
+        typeof parsed?.schemaVersion === 'string' ? parsed.schemaVersion : CURRENT_SCHEMA_VERSION,
+    };
   } catch (error) {
     if (error instanceof SyntaxError) {
       return { success: false, error: 'Invalid JSON format' };
@@ -105,7 +122,18 @@ export function migrateProject(project: unknown, fromVersion: string): Deseriali
   // For v1.0.0, no migrations needed yet
   // Future migrations will be added here as version-specific handlers
   if (fromVersion === '1.0.0') {
-    return deserializeProject(JSON.stringify(project));
+    const result = deserializeProjectLenient(JSON.stringify({
+      ...(project as Record<string, unknown>),
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+    }));
+    if (!result.success) {
+      return result;
+    }
+    return {
+      ...result,
+      migrated: true,
+      originalVersion: fromVersion,
+    };
   }
 
   // Add future migration handlers here:
@@ -116,6 +144,8 @@ export function migrateProject(project: unknown, fromVersion: string): Deseriali
 
   return {
     success: false,
+    migrated: false,
+    originalVersion: fromVersion,
     error: `Unknown schema version: ${fromVersion}`,
   };
 }

@@ -1,4 +1,6 @@
 import type { Project } from '@/types/project';
+import type { CanvasSnapshot } from '../canvasSnapshot';
+import type { PdfPageSize } from '../pdf';
 
 export interface ReportOptions {
     format?: 'pdf' | 'csv' | 'excel';
@@ -11,11 +13,12 @@ export interface ReportOptions {
     includeEngineeringNotes?: boolean;
     includeCanvasSnapshot?: boolean;
     templateId?: string;
+    paperSize?: PdfPageSize;
     orientation: 'portrait' | 'landscape';
 }
 
 export interface ReportGeneratorService {
-    generatePDF(project: Project, options: ReportOptions): Promise<Uint8Array>;
+    generatePDF(project: Project, options: ReportOptions, snapshot?: CanvasSnapshot): Promise<Uint8Array>;
 }
 
 /**
@@ -25,7 +28,7 @@ export interface ReportGeneratorService {
  * Generates professional PDF reports from project data using jsPDF
  */
 class ReportGenerator implements ReportGeneratorService {
-    async generatePDF(project: Project, options: ReportOptions): Promise<Uint8Array> {
+    async generatePDF(project: Project, options: ReportOptions, snapshot?: CanvasSnapshot): Promise<Uint8Array> {
         // Dynamically import jsPDF (to avoid SSR issues with Next.js)
         const { default: jsPDF } = await import('jspdf');
         const { default: autoTable } = await import('jspdf-autotable');
@@ -34,7 +37,7 @@ class ReportGenerator implements ReportGeneratorService {
         const doc = new jsPDF({
             orientation: options.orientation,
             unit: 'mm',
-            format: 'a4',
+            format: getPdfFormat(options.paperSize ?? 'a4'),
         });
 
         let yPosition = 20;
@@ -142,6 +145,24 @@ class ReportGenerator implements ReportGeneratorService {
             yPosition = (doc as any).lastAutoTable.finalY + 10;
         }
 
+        if (snapshot) {
+            if (yPosition > 180) {
+                doc.addPage();
+                yPosition = 20;
+            }
+
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Canvas Snapshot', 20, yPosition);
+            yPosition += 8;
+
+            yPosition = addSnapshotToPdf(doc, snapshot, {
+                marginX: 20,
+                marginY: 20,
+                yPosition,
+            });
+        }
+
         // Bill of Materials (BOM)
         if (options.includeBOM && project.entities) {
             const entitiesState = project.entities;
@@ -232,3 +253,48 @@ class ReportGenerator implements ReportGeneratorService {
 }
 
 export const reportGenerator = new ReportGenerator();
+
+function getPdfFormat(pageSize: PdfPageSize): [number, number] {
+    switch (pageSize) {
+        case 'a0':
+            return [841, 1189];
+        case 'a1':
+            return [594, 841];
+        case 'a2':
+            return [420, 594];
+        case 'a3':
+            return [297, 420];
+        case 'legal':
+            return [216, 356];
+        case 'tabloid':
+            return [279, 432];
+        case 'letter':
+            return [216, 279];
+        case 'a4':
+        default:
+            return [210, 297];
+    }
+}
+
+function addSnapshotToPdf(
+    doc: any,
+    snapshot: CanvasSnapshot,
+    layout: { marginX: number; marginY: number; yPosition: number }
+): number {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const availableWidth = pageWidth - layout.marginX * 2;
+    const availableHeight = pageHeight - layout.yPosition - layout.marginY;
+
+    const aspectRatio = snapshot.widthPx > 0 ? snapshot.heightPx / snapshot.widthPx : 1;
+    let renderWidth = availableWidth;
+    let renderHeight = renderWidth * aspectRatio;
+
+    if (renderHeight > availableHeight) {
+        renderHeight = availableHeight;
+        renderWidth = renderHeight / aspectRatio;
+    }
+
+    doc.addImage(snapshot.dataUrl, 'PNG', layout.marginX, layout.yPosition, renderWidth, renderHeight);
+    return layout.yPosition + renderHeight + 6;
+}

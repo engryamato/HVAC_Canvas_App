@@ -1,21 +1,16 @@
 'use client';
 
 import React from 'react';
-import { useActiveViewMode } from '../store/viewModeStore';
 import { CanvasContainer } from './CanvasContainer';
-import { ThreeViewport } from './ThreeViewport';
+
+// 3D View suspended — ThreeViewport is not loaded
 
 interface CanvasViewportHostProps {
   className?: string;
 }
 
 export function CanvasViewportHost({ className = '' }: CanvasViewportHostProps): React.ReactElement {
-  const activeViewMode = useActiveViewMode();
-
-  if (activeViewMode === '3d') {
-    return <ThreeViewport className={className} />;
-  }
-
+  // 3D view is currently suspended; always render the 2D plan canvas
   return <CanvasContainer className={className} />;
 }
 

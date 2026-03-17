@@ -34,6 +34,12 @@ export {
   type LoadResult,
 } from './projectIO';
 
+export {
+  snapshotFromStores,
+  hydrateToStores,
+  toProjectDetails,
+} from './ProjectStateOrchestrator';
+
 // Storage Adapter (Abstraction Layer)
 export { type StorageAdapter } from './StorageAdapter';
 export { createStorageAdapter } from './factory';

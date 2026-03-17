@@ -16,6 +16,7 @@ vi.mock('../filesystem', () => ({
 vi.mock('../serialization', () => ({
   serializeProject: vi.fn(),
   deserializeProject: vi.fn(),
+  deserializeProjectLenient: vi.fn(),
   migrateProject: vi.fn(),
 }));
 
@@ -121,6 +122,8 @@ describe('projectIO', () => {
       vi.mocked(serialization.deserializeProject).mockReturnValue({
         success: true,
         data: mockProject,
+        migrated: false,
+        originalVersion: mockProject.schemaVersion,
       });
 
       const result = await loadProject(mockPath);
@@ -128,6 +131,8 @@ describe('projectIO', () => {
       expect(result.success).toBe(true);
       expect(result.project).toEqual(mockProject);
       expect(result.loadedFromBackup).toBeUndefined();
+      expect(result.migrated).toBe(false);
+      expect(result.originalVersion).toBe(mockProject.schemaVersion);
     });
 
     it('should return error if file does not exist', async () => {
@@ -154,6 +159,8 @@ describe('projectIO', () => {
         .mockReturnValueOnce({
           success: true,
           data: mockProject,
+          migrated: false,
+          originalVersion: mockProject.schemaVersion,
         });
 
       const result = await loadProject(mockPath);
@@ -161,6 +168,7 @@ describe('projectIO', () => {
       expect(result.success).toBe(true);
       expect(result.project).toEqual(mockProject);
       expect(result.loadedFromBackup).toBe(true);
+      expect(result.originalVersion).toBe(mockProject.schemaVersion);
     });
 
     it('should attempt migration if version mismatch detected', async () => {
@@ -177,12 +185,16 @@ describe('projectIO', () => {
       vi.mocked(serialization.migrateProject).mockReturnValue({
         success: true,
         data: mockProject,
+        migrated: true,
+        originalVersion: '0.9.0',
       });
 
       const result = await loadProject(mockPath);
 
       expect(result.success).toBe(true);
       expect(serialization.migrateProject).toHaveBeenCalled();
+      expect(result.migrated).toBe(true);
+      expect(result.originalVersion).toBe('0.9.0');
     });
 
     it('should fall back to backup if migration fails', async () => {
@@ -203,6 +215,10 @@ describe('projectIO', () => {
           data: mockProject,
         });
       vi.mocked(serialization.migrateProject).mockReturnValue({
+        success: false,
+        error: 'Migration failed',
+      });
+      vi.mocked(serialization.deserializeProjectLenient).mockReturnValue({
         success: false,
         error: 'Migration failed',
       });

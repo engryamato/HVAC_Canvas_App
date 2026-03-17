@@ -1,4 +1,4 @@
-import { Duct, DuctProps, DuctEngineeringData } from '../../schema/duct.schema';
+import { DuctProps } from '../../schema/duct.schema';
 import { EngineeringLimits } from '../../schema/calculation-settings.schema';
 import { parametricUpdateService } from '../parametric/parametricUpdateService';
 import { engineeringCalculator } from '../calculations/engineeringCalculator';
@@ -27,6 +27,17 @@ export interface SizingResult {
   warnings: string[];
 }
 
+export interface SizingSuggestion {
+  size: { diameter?: number; width?: number; height?: number };
+  velocity: number;
+  pressureDrop: number;
+  recommendation: string;
+  compliant: boolean;
+}
+
+type DuctSize = { diameter?: number; width?: number; height?: number };
+type SizingSystemType = 'supply' | 'return' | 'exhaust';
+
 export class AutoSizingService {
   /**
    * Standard round duct sizes (inches)
@@ -53,7 +64,7 @@ export class AutoSizingService {
     const warnings: string[] = [];
 
     // Store original size
-    const originalSize = {
+    const originalSize: DuctSize = {
       diameter: duct.diameter,
       width: duct.width,
       height: duct.height,
@@ -71,7 +82,7 @@ export class AutoSizingService {
     );
 
     // Round to standard sizes if requested
-    let finalSize = {
+    let finalSize: DuctSize = {
       diameter: newSizeParams.diameter,
       width: newSizeParams.width,
       height: newSizeParams.height,
@@ -179,6 +190,19 @@ export class AutoSizingService {
     }
   }
 
+  private static getSizingSystemType(systemType?: DuctProps['systemType']): SizingSystemType {
+    switch (systemType) {
+      case 'return':
+        return 'return';
+      case 'exhaust':
+        return 'exhaust';
+      case 'outside_air':
+      case 'supply':
+      default:
+        return 'supply';
+    }
+  }
+
   /**
    * Round duct sizes to standard sizes
    */
@@ -226,14 +250,23 @@ export class AutoSizingService {
     airflow: number,
     shape: 'round' | 'rectangular',
     limits: EngineeringLimits
-  ): Array<{
-    size: { diameter?: number; width?: number; height?: number };
-    velocity: number;
-    pressureDrop: number;
-    recommendation: string;
-  }> {
-    const suggestions = [];
+  ): SizingSuggestion[];
+  static suggestDuctSizes(
+    airflow: number,
+    shape: 'round' | 'rectangular',
+    systemType: DuctProps['systemType'],
+    limits: EngineeringLimits
+  ): SizingSuggestion[];
+  static suggestDuctSizes(
+    airflow: number,
+    shape: 'round' | 'rectangular',
+    systemTypeOrLimits: DuctProps['systemType'] | EngineeringLimits,
+    maybeLimits?: EngineeringLimits
+  ): SizingSuggestion[] {
+    const suggestions: SizingSuggestion[] = [];
     const targetVelocities = [1200, 1500, 1800, 2000]; // Different velocity targets
+    const { systemType, limits } = this.normalizeSizingArguments(systemTypeOrLimits, maybeLimits);
+    const effectiveSystemType = this.getSizingSystemType(systemType);
 
     for (const targetVel of targetVelocities) {
       const sized = engineeringCalculator.autoSizeDuct(
@@ -245,6 +278,10 @@ export class AutoSizingService {
       );
 
       const result = engineeringCalculator.calculateDuct(sized, limits);
+      const compliant =
+        result.velocity >= limits.minVelocity[effectiveSystemType] &&
+        result.velocity <= limits.maxVelocity[effectiveSystemType] &&
+        result.pressureDrop <= limits.maxPressureDrop[effectiveSystemType];
 
       let recommendation = '';
       if (targetVel === 1200) {
@@ -266,10 +303,34 @@ export class AutoSizingService {
         velocity: result.velocity,
         pressureDrop: result.pressureDrop,
         recommendation,
+        compliant,
       });
     }
 
-    return suggestions;
+    return suggestions.sort((left, right) => {
+      if (left.compliant !== right.compliant) {
+        return Number(right.compliant) - Number(left.compliant);
+      }
+
+      return left.velocity - right.velocity;
+    });
+  }
+
+  private static normalizeSizingArguments(
+    systemTypeOrLimits: DuctProps['systemType'] | EngineeringLimits,
+    maybeLimits?: EngineeringLimits
+  ): { systemType: DuctProps['systemType']; limits: EngineeringLimits } {
+    if (maybeLimits) {
+      return {
+        systemType: systemTypeOrLimits as DuctProps['systemType'],
+        limits: maybeLimits,
+      };
+    }
+
+    return {
+      systemType: undefined,
+      limits: systemTypeOrLimits as EngineeringLimits,
+    };
   }
 
   /**
@@ -279,7 +340,7 @@ export class AutoSizingService {
   static optimizeForEfficiency(
     duct: Partial<DuctProps>,
     limits: EngineeringLimits,
-    energyCostPerKwh: number = 0.12 // $/kWh
+    _energyCostPerKwh: number = 0.12 // $/kWh
   ): SizingResult {
     // For energy optimization, target lower velocity to reduce fan power
     const criteria: SizingCriteria = {

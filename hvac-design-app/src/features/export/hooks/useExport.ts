@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Project } from '@/types/project';
 import type { ReportOptions } from '../services/ReportGenerator';
 import { useAppStateStore } from '@/stores/useAppStateStore';
+import { captureCanvasSnapshot } from '../canvasSnapshot';
 
 type ExportFormat = NonNullable<ReportOptions['format']>;
 type TabularFormat = Exclude<ExportFormat, 'pdf'>;
@@ -24,6 +25,10 @@ function triggerBrowserDownload(content: BlobPart, mimeType: string, fileName: s
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+function dispatchToast(message: string, type: 'success' | 'error' | 'warning' | 'info'): void {
+    window.dispatchEvent(new CustomEvent('sws:toast', { detail: { message, type } }));
 }
 
 function buildTabularExportContent(
@@ -60,11 +65,13 @@ function buildTabularExportContent(
 export function useExport() {
     const [isExporting, setIsExporting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [snapshotWarning, setSnapshotWarning] = useState<string | null>(null);
     const isTauri = useAppStateStore((state) => state.isTauri);
 
     const exportProject = async (project: Project, options: ReportOptions) => {
         setIsExporting(true);
         setError(null);
+        setSnapshotWarning(null);
 
         try {
             const format: ExportFormat = options.format ?? 'pdf';
@@ -82,7 +89,23 @@ export function useExport() {
 
             // Generate PDF
             const { reportGenerator } = await import('../services/ReportGenerator');
-            const pdfBytes = await reportGenerator.generatePDF(project, options);
+            let snapshot;
+            if (options.includeCanvasSnapshot) {
+                const warningMessage = 'Canvas screenshot could not be captured - export will proceed without it.';
+                try {
+                    snapshot = await captureCanvasSnapshot();
+                    if (!snapshot) {
+                        setSnapshotWarning(warningMessage);
+                        dispatchToast(warningMessage, 'warning');
+                    }
+                } catch {
+                    snapshot = undefined;
+                    setSnapshotWarning(warningMessage);
+                    dispatchToast(warningMessage, 'warning');
+                }
+            }
+
+            const pdfBytes = await reportGenerator.generatePDF(project, options, snapshot ?? undefined);
 
             if (isTauri) {
                 // Tauri mode: Use native save dialog
@@ -103,9 +126,7 @@ export function useExport() {
                 // Write file to disk
                 await TauriFileSystem.writeBinaryFile(filePath, pdfBytes);
 
-                // Show success notification
-                // TODO: Replace with proper toast notification
-                alert(`Report exported successfully to:\n${filePath}`);
+                dispatchToast(`Report exported successfully to ${filePath}`, 'success');
 
                 return { success: true, filePath };
             }
@@ -116,6 +137,7 @@ export function useExport() {
                 'application/pdf',
                 `${sanitizedProjectName}_Report.pdf`
             );
+            dispatchToast('Report exported successfully', 'success');
             return { success: true };
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -131,5 +153,6 @@ export function useExport() {
         exportProject,
         isExporting,
         error,
+        snapshotWarning,
     };
 }

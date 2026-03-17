@@ -97,24 +97,42 @@ export class DuctTool extends BaseTool {
     }
 
     if (this.state.mode === 'idle') {
-      // First click: set start point
-      const snappedPoint = this.snapToGrid(event.x, event.y);
+      // First click: set start point — prefer magnetic snap over grid snap
+      const magneticSnap = this.state.snapTarget;
+      const startPoint = magneticSnap
+        ? { x: magneticSnap.x, y: magneticSnap.y }
+        : this.snapToGrid(event.x, event.y);
       this.state = {
         mode: 'placing_end',
-        startPoint: snappedPoint,
-        currentPoint: snappedPoint,
+        startPoint,
+        currentPoint: startPoint,
         snapTarget: null,
       };
-    } else if (this.state.mode === 'placing_end') {
-      // Second click: finalize (handled in onMouseUp)
+    } else if (this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
+      // Second click: place the duct and chain — end point becomes next start point
+      const endPoint = this.state.currentPoint;
+      this.createDuctEntity(this.state.startPoint, endPoint);
+      // Chain: keep placing_end with end as the new start
+      this.state = {
+        mode: 'placing_end',
+        startPoint: endPoint,
+        currentPoint: endPoint,
+        snapTarget: null,
+      };
     }
   }
 
   onMouseMove(event: ToolMouseEvent): void {
-    if (this.state.mode === 'placing_end') {
-      // Check for magnetic snapping first
-      const snapResult = this.findSnapPoint(event.x, event.y);
-      
+    // Check for magnetic snapping in both idle and placing_end modes
+    const snapResult = this.findSnapPoint(event.x, event.y);
+
+    if (this.state.mode === 'idle') {
+      // Update snap target so the hover indicator renders and onMouseDown can use it
+      this.state.snapTarget = snapResult;
+      this.state.currentPoint = snapResult
+        ? { x: snapResult.x, y: snapResult.y }
+        : null;
+    } else if (this.state.mode === 'placing_end') {
       if (snapResult) {
         // Snap to endpoint
         this.state.currentPoint = { x: snapResult.x, y: snapResult.y };
@@ -129,11 +147,7 @@ export class DuctTool extends BaseTool {
   }
 
   onMouseUp(_event: ToolMouseEvent): void {
-    if (this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
-      // Second click: finalize the duct
-      this.createDuctEntity(this.state.startPoint, this.state.currentPoint);
-      this.reset();
-    }
+    // Finalization is handled in onMouseDown for the click-click drawing model.
   }
 
   onKeyDown(event: ToolKeyEvent): void {
@@ -147,11 +161,27 @@ export class DuctTool extends BaseTool {
   }
 
   render(context: ToolRenderContext): void {
-    if (this.state.mode !== 'placing_end' || !this.state.startPoint || !this.state.currentPoint) {
+    const { ctx, zoom } = context;
+
+    // In idle mode, draw a snap indicator circle if hovering near an endpoint
+    if (this.state.mode === 'idle') {
+      if (this.state.snapTarget && this.state.currentPoint) {
+        ctx.save();
+        ctx.strokeStyle = '#2196F3';
+        ctx.lineWidth = 2 / zoom;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(this.state.currentPoint.x, this.state.currentPoint.y, 8 / zoom, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
       return;
     }
 
-    const { ctx, zoom } = context;
+    if (!this.state.startPoint || !this.state.currentPoint) {
+      return;
+    }
+
     const { startPoint, currentPoint, snapTarget } = this.state;
     
     const activeComponent = this.getActiveComponent();
@@ -282,13 +312,15 @@ export class DuctTool extends BaseTool {
   }
 
   private snapToGrid(x: number, y: number): { x: number; y: number } {
-    const { snapToGrid, gridSize } = useViewportStore.getState();
+    const { snapToGrid } = useViewportStore.getState();
     if (!snapToGrid) {
       return { x, y };
     }
+    // Ducts snap to 1" (1 pixel) increments for fine-grained control,
+    // independent of the global grid size used for room placement.
     return {
-      x: Math.round(x / gridSize) * gridSize,
-      y: Math.round(y / gridSize) * gridSize,
+      x: Math.round(x),
+      y: Math.round(y),
     };
   }
 

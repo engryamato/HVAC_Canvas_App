@@ -10,12 +10,12 @@ import {
 import { useEntityStore } from '@/core/store/entityStore';
 import { updateEntity as updateEntityCommand, updateEntities as updateEntitiesCommand } from '@/core/commands/entityCommands';
 import { AutoSizingControls } from '@/components/canvas/AutoSizingControls';
+import type { SizingSuggestion } from '@/core/services/automation/autoSizingService';
 import { ValidationDisplay } from '@/components/canvas/ValidationDisplay';
 import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import {
   generateDeterministicSuggestions,
-  ductValidator,
   type ValidationViolation,
 } from '@/core/services/validation/constraintValidator';
 
@@ -61,6 +61,44 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
     state: 'cleared' | 'mitigated' | 'unchanged';
     message: string;
   } | null>(null);
+
+  const applySuggestionFeedback = useCallback(
+    (
+      priorIssueCount: number,
+      nextConstraintStatus?: Duct['props']['constraintStatus']
+    ) => {
+      const nextIssueCount = (nextConstraintStatus?.violations ?? []).filter(
+        (violation) => violation.severity === 'error' || violation.severity === 'warning'
+      ).length;
+
+      if (priorIssueCount === 0 && nextIssueCount === 0) {
+        setSuggestionFeedback(null);
+        return;
+      }
+
+      if (nextIssueCount === 0 && priorIssueCount > 0) {
+        setSuggestionFeedback({
+          state: 'cleared',
+          message: 'Suggestion applied. All warning/error violations cleared.',
+        });
+        return;
+      }
+
+      if (nextIssueCount < priorIssueCount) {
+        setSuggestionFeedback({
+          state: 'mitigated',
+          message: 'Suggestion applied. Violation severity/count was mitigated.',
+        });
+        return;
+      }
+
+      setSuggestionFeedback({
+        state: 'unchanged',
+        message: 'Suggestion applied, but warning/error violations remain.',
+      });
+    },
+    []
+  );
 
   // ---- Validation normalization -------------------------------------------
 
@@ -205,21 +243,51 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
   );
 
   const handleSizeApplied = useCallback(
-    (newSize: { diameter?: number; width?: number; height?: number }) => {
+    (option: SizingSuggestion) => {
       const { byId } = useEntityStore.getState();
       const current = byId[entity.id];
       if (!current || current.type !== 'duct') {return;}
 
       const previous = JSON.parse(JSON.stringify(current)) as Duct;
-      const nextProps = { ...current.props, ...newSize };
+      const newSizeProps = {
+        diameter: option.size.diameter,
+        width: option.size.width,
+        height: option.size.height,
+        autoSized: true,
+      } as Partial<Duct['props']>;
+      const nextProps = { ...current.props, ...newSizeProps } as Duct['props'];
+      const modifiedAt = new Date().toISOString();
+      const priorIssueCount = (current.props.constraintStatus?.violations ?? []).filter(
+        (violation) => violation.severity === 'error' || violation.severity === 'warning'
+      ).length;
+      const ducts = Object.values(byId).filter((item): item is Duct => item?.type === 'duct');
+      const fittings = Object.values(byId).filter((item): item is Fitting => item?.type === 'fitting');
 
-      updateEntityCommand(
-        entity.id,
-        { props: nextProps, modifiedAt: new Date().toISOString() },
-        previous
-      );
+      void parametricUpdateService
+        .scheduleDuctPropertyChange(
+          entity.id,
+          newSizeProps,
+          { ducts, fittings },
+          engineeringLimits,
+          'input',
+          0
+        )
+        .then((result) => {
+          const updatedPrimary = result.entityUpdates?.find((update) => update.id === entity.id);
+
+          if (result.entityUpdates && result.entityUpdates.length > 0) {
+            updateEntitiesCommand(result.entityUpdates);
+          } else {
+            updateEntityCommand(entity.id, { props: nextProps, modifiedAt }, previous);
+          }
+
+          const nextConstraintStatus = (updatedPrimary?.updates as Partial<Duct> | undefined)?.props
+            ?.constraintStatus ?? current.props.constraintStatus;
+
+          applySuggestionFeedback(priorIssueCount, nextConstraintStatus);
+        });
     },
-    [entity.id]
+    [applySuggestionFeedback, engineeringLimits, entity.id]
   );
 
   const handleFixSuggestion = useCallback(
@@ -270,34 +338,12 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
           }
 
           const nextConstraintStatus = (updatedPrimary?.updates as Partial<Duct> | undefined)?.props
-            ?.constraintStatus;
-          const nextIssueCount = (nextConstraintStatus?.violations ?? []).filter(
-            (violation) => violation.severity === 'error' || violation.severity === 'warning'
-          ).length;
+            ?.constraintStatus ?? current.props.constraintStatus;
 
-          if (nextIssueCount === 0 && priorIssueCount > 0) {
-            setSuggestionFeedback({
-              state: 'cleared',
-              message: 'Suggestion applied. All warning/error violations cleared.',
-            });
-            return;
-          }
-
-          if (nextIssueCount < priorIssueCount) {
-            setSuggestionFeedback({
-              state: 'mitigated',
-              message: 'Suggestion applied. Violation severity/count was mitigated.',
-            });
-            return;
-          }
-
-          setSuggestionFeedback({
-            state: 'unchanged',
-            message: 'Suggestion applied, but warning/error violations remain.',
-          });
+          applySuggestionFeedback(priorIssueCount, nextConstraintStatus);
         });
     },
-    [engineeringLimits, entity.id, validateField]
+    [applySuggestionFeedback, engineeringLimits, entity.id, validateField]
   );
 
   // ---- Derived display values ---------------------------------------------

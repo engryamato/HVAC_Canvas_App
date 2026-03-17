@@ -53,7 +53,7 @@ export function createDuct(
 
   // Build props based on shape
   const baseProps = {
-    name: overrides?.name ?? `Duct ${ductNumber}`,
+    name: overrides?.name ?? `${shape === 'round' ? 'Round' : 'Rectangular'} Duct ${ductNumber}`,
     shape,
     length: overrides?.length ?? DEFAULT_ROUND_DUCT_PROPS.length,
     material: overrides?.material ?? DEFAULT_ROUND_DUCT_PROPS.material,

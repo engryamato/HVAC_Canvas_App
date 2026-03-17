@@ -1,17 +1,15 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styles from './ExportMenu.module.css';
-import { exportProjectJSON, exportBOMtoCSV, exportProjectPDF, generateBOM } from './';
-import { createEmptyProjectFile } from '@/core/schema';
+import { exportProjectJSON, exportBOMtoCSV, generateBOM } from './';
 import { useEntityStore } from '@/core/store/entityStore';
-import { useCurrentProjectId, useProjectDetails } from '@/core/store/project.store';
+import { useProjectDetails } from '@/core/store/project.store';
 import { downloadFile } from './download';
-import { useAppStateStore } from '@/stores/useAppStateStore';
-import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
 import type { PdfPageSize } from './pdf';
-import { captureCanvasSnapshot } from './canvasSnapshot';
 import { ExportDialog, ExportDialogOptions } from './ExportDialog';
+import { useExport } from './hooks/useExport';
+import { buildExportProjectSnapshot } from './buildExportProjectSnapshot';
 
 const PDF_PAGE_SIZES: Array<{ label: string; value: PdfPageSize }> = [
   { label: 'Letter', value: 'letter' },
@@ -38,22 +36,14 @@ function sanitizeFileName(fileName: string): string {
 export function ExportMenu() {
   const entitiesById = useEntityStore((state) => state.byId);
   const entityIds = useEntityStore((state) => state.allIds);
-  const projectId = useCurrentProjectId();
   const projectDetails = useProjectDetails();
-  const isTauri = useAppStateStore((state) => state.isTauri);
   const [pdfPageSize, setPdfPageSize] = useState<PdfPageSize>('letter');
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-
-  const project = useMemo(() => {
-    if (!projectId) {
-      return null;
-    }
-    const base = createEmptyProjectFile(projectId, projectDetails?.projectName ?? projectId);
-    return { ...base, entities: { byId: entitiesById, allIds: entityIds } };
-  }, [entitiesById, entityIds, projectDetails?.projectName, projectId]);
+  const { exportProject } = useExport();
 
   const handleExportJson = () => {
+    const project = buildExportProjectSnapshot();
     if (!project) {
       return;
     }
@@ -76,37 +66,26 @@ export function ExportMenu() {
   };
 
   const handleExportPdf = async () => {
+    const project = buildExportProjectSnapshot();
     if (!project) {
       return;
     }
 
-    const snapshot = await captureCanvasSnapshot();
+    const result = await exportProject(project, {
+      format: 'pdf',
+      includeMetadata: true,
+      includeCalculations: true,
+      includeEntities: true,
+      includeBOM: true,
+      orientation: 'portrait',
+      includeCanvasSnapshot: true,
+      paperSize: pdfPageSize,
+    });
 
-    const pdfResult = await exportProjectPDF(project, { pageSize: pdfPageSize, snapshot: snapshot ?? undefined });
-    if (!pdfResult.success || !pdfResult.data) {
-      pushToast(pdfResult.error ?? 'PDF export failed', 'error');
+    if (!result.success && !result.cancelled) {
+      pushToast(result.error ?? 'PDF export failed', 'error');
       return;
     }
-
-    const pdfFileName = `${sanitizeFileName(project.projectName)}.pdf`;
-
-    if (isTauri) {
-      const filePath = await TauriFileSystem.saveFileDialog({
-        defaultPath: pdfFileName,
-        title: 'Export Project PDF',
-        filters: [{ name: 'PDF Files', extensions: ['pdf'] }],
-      });
-
-      if (!filePath) {
-        pushToast('Export cancelled', 'warning');
-        return;
-      }
-
-      await TauriFileSystem.writeBinaryFile(filePath, pdfResult.data);
-      return;
-    }
-
-    downloadFile(pdfResult.data, pdfFileName, 'application/pdf');
   };
 
   return (
@@ -127,7 +106,7 @@ export function ExportMenu() {
             </option>
           ))}
         </select>
-        <button onClick={handleExportPdf}>PDF</button>
+        <button onClick={() => void handleExportPdf()}>PDF</button>
         <button onClick={() => setExportDialogOpen(true)}>Export...</button>
       </div>
 
@@ -137,6 +116,7 @@ export function ExportMenu() {
         onExport={async (options: ExportDialogOptions) => {
           setIsExporting(true);
           try {
+            const project = buildExportProjectSnapshot();
             if (options.format === 'csv' && project) {
               const bom = generateBOM(
                 entityIds

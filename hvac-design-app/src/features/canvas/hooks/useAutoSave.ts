@@ -23,8 +23,7 @@ import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } f
 import { trackTelemetry } from '@/utils/telemetry';
 import { sendCloudBackup } from '@/services/cloudBackupService';
 import { saveProjectToExistingHandleOrDownload } from '@/core/persistence/webProjectFileIO';
-import { calculateSystemMetrics } from './useSystemCalculations';
-import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
+import { snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 
 
@@ -114,93 +113,7 @@ export interface LocalStoragePayload {
 }
 
 export function buildProjectFileFromStores(): ProjectFile | null {
-  const projectStore = useProjectStore.getState();
-  if (!projectStore.currentProjectId || !projectStore.projectDetails) {
-    return null;
-  }
-
-  const entityStore = useEntityStore.getState();
-  const viewportStore = useViewportStore.getState();
-  const threeDViewStore = useThreeDViewStore.getState();
-  const viewModeStore = useViewModeStore.getState();
-  const preferences = usePreferencesStore.getState();
-  const historyStore = useHistoryStore.getState();
-
-  const unitSystem = projectStore.projectSettings?.unitSystem ?? preferences.unitSystem;
-
-  return {
-    schemaVersion: STORAGE_SCHEMA_VERSION,
-    projectId: projectStore.currentProjectId,
-    projectName: projectStore.projectDetails.projectName,
-    projectNumber: projectStore.projectDetails.projectNumber || undefined,
-    clientName: projectStore.projectDetails.clientName || undefined,
-    location: projectStore.projectDetails.location || undefined,
-    scope: projectStore.projectDetails.scope ?? {
-      details: [],
-      materials: [],
-      projectType: 'Commercial',
-    },
-    siteConditions: projectStore.projectDetails.siteConditions ?? {
-      elevation: '0',
-      outdoorTemp: '70',
-      indoorTemp: '70',
-      windSpeed: '0',
-      humidity: '50',
-      localCodes: '',
-    },
-    createdAt: projectStore.projectDetails.createdAt,
-    modifiedAt: new Date().toISOString(),
-    isArchived: false,
-    entities: {
-      byId: entityStore.byId,
-      allIds: entityStore.allIds,
-    },
-    viewportState: {
-      panX: viewportStore.panX,
-      panY: viewportStore.panY,
-      zoom: viewportStore.zoom,
-    },
-    settings: {
-      unitSystem,
-      gridSize: preferences.gridSize,
-      gridVisible: viewportStore.gridVisible,
-      snapToGrid: viewportStore.snapToGrid,
-      activeViewMode: viewModeStore.activeViewMode,
-    },
-    threeDViewState: {
-      cameraTarget: threeDViewStore.cameraTarget,
-      cameraPosition: threeDViewStore.cameraPosition,
-      orbitRadius: threeDViewStore.orbitRadius,
-      polarAngle: threeDViewStore.polarAngle,
-      azimuthAngle: threeDViewStore.azimuthAngle,
-      showGrid: threeDViewStore.showGrid,
-      showAxes: threeDViewStore.showAxes,
-      showPlanOverlay: threeDViewStore.showPlanOverlay,
-    },
-    commandHistory: {
-      commands: historyStore.past,
-      currentIndex: Math.max(historyStore.past.length - 1, 0),
-    },
-    calculations: calculateSystemMetrics(entityStore.byId),
-    billOfMaterials: (() => {
-      const bom = generateBillOfMaterials(entityStore);
-      const mapItem = <T extends 'Duct' | 'Fitting' | 'Equipment'>(type: T) => (item: BomItem) => ({
-        id: String(item.itemNumber),
-        name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
-        cost: 0,
-        type: type,
-        details: item.specifications || item.description,
-      });
-
-      return {
-        ducts: bom.filter(i => i.type === 'Duct').map(mapItem('Duct')),
-        fittings: bom.filter(i => i.type === 'Fitting').map(mapItem('Fitting')),
-        equipment: bom.filter(i => i.type === 'Equipment').map(mapItem('Equipment')),
-      };
-    })(),
-  };
+  return snapshotFromStores();
 }
 
 export function buildLocalStoragePayloadFromStores(projectOverride?: ProjectFile): LocalStoragePayload | null {
@@ -379,6 +292,82 @@ export function createLocalStoragePayloadFromProjectFileWithDefaults(project: Pr
         isCompleted: tutorialState.isCompleted,
       },
     },
+  };
+}
+
+export async function persistProjectFromStores(source: SaveSource): Promise<SaveResult> {
+  const currentProjectId = useProjectStore.getState().currentProjectId;
+  if (!currentProjectId) {
+    return { success: false, source, error: 'Missing project id.' };
+  }
+
+  const project = snapshotFromStores();
+  if (!project) {
+    return { success: false, source, error: 'Missing project data.' };
+  }
+
+  const payload = buildLocalStoragePayloadFromStores(project);
+  if (!payload) {
+    return { success: false, source, error: 'Missing project payload.' };
+  }
+
+  const isTauri = useAppStateStore.getState().isTauri;
+  const projectListItem = useProjectListStore.getState().projects.find((item) => item.projectId === currentProjectId);
+
+  if (isTauri && projectListItem?.filePath) {
+    const { saveProject } = await import('@/core/persistence/projectIO');
+    const result = await saveProject(project, projectListItem.filePath);
+    if (!result.success) {
+      return {
+        success: false,
+        source,
+        error: result.error ?? 'Failed to save project file.',
+      };
+    }
+
+    useProjectStore.getState().setDirty(false);
+    return { success: true, source };
+  }
+
+  const storageResult = saveProjectToStorage(currentProjectId, payload);
+  if (!storageResult.success || !storageResult.envelope) {
+    return {
+      success: false,
+      source,
+      error: storageResult.error ?? 'Unable to save to localStorage.',
+    };
+  }
+
+  const backupResult = saveBackupToStorage(currentProjectId, payload);
+  if (backupResult.envelope) {
+    void sendCloudBackup({
+      projectId: backupResult.envelope.projectId,
+      savedAt: backupResult.envelope.savedAt,
+      schemaVersion: backupResult.envelope.schemaVersion,
+      checksum: backupResult.envelope.checksum,
+      payload: backupResult.envelope.payload,
+    });
+  }
+
+  if (source === 'manual') {
+    try {
+      await saveProjectToExistingHandleOrDownload(project);
+    } catch (error) {
+      // File output failed — localStorage is already saved, but surface a
+      // structured failure so callers can prompt the user appropriately.
+      return {
+        success: false,
+        source,
+        error: error instanceof Error ? error.message : 'Failed to write project file.',
+      };
+    }
+  }
+
+  useProjectStore.getState().setDirty(false);
+  return {
+    success: true,
+    source,
+    sizeBytes: storageResult.sizeBytes,
   };
 }
 
@@ -582,6 +571,8 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
 
   const [isDirty, setLocalDirty] = useState(storeIsDirty);
   const intervalTimer = useRef<NodeJS.Timeout | null>(null);
+  const viewCameraDebounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasPendingViewCameraSave = useRef(false);
 
   const buildPayload = useCallback(
     (): LocalStoragePayload | null => buildLocalStoragePayloadFromStores(),
@@ -748,14 +739,15 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
     // Dedicated immediate-debounce saves for view/camera state changes.
     // These fire independently of the entity dirty-flag to guarantee mode and
     // camera continuity on quick close/reopen where no entity mutation occurred.
-    let viewCameraDebounceTimer: ReturnType<typeof setTimeout> | null = null;
     const flushViewCameraSave = () => {
-      if (viewCameraDebounceTimer !== null) {
-        clearTimeout(viewCameraDebounceTimer);
+      if (viewCameraDebounceTimer.current !== null) {
+        clearTimeout(viewCameraDebounceTimer.current);
       }
-      viewCameraDebounceTimer = setTimeout(() => {
+      hasPendingViewCameraSave.current = true;
+      viewCameraDebounceTimer.current = setTimeout(() => {
         saveWithBackup('auto');
-        viewCameraDebounceTimer = null;
+        viewCameraDebounceTimer.current = null;
+        hasPendingViewCameraSave.current = false;
       }, 1500);
     };
 
@@ -779,9 +771,11 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
       preferencesUnsub();
       viewModeUnsub();
       threeDViewUnsub();
-      if (viewCameraDebounceTimer !== null) {
-        clearTimeout(viewCameraDebounceTimer);
+      if (viewCameraDebounceTimer.current !== null) {
+        clearTimeout(viewCameraDebounceTimer.current);
+        viewCameraDebounceTimer.current = null;
       }
+      hasPendingViewCameraSave.current = false;
     };
   }, [setDirty]);
 
@@ -809,14 +803,19 @@ export function useAutoSave(options: UseAutoSaveOptions = {}) {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (isAutoSaveActive && storeIsDirty) {
+      if (isAutoSaveActive && (useProjectStore.getState().isDirty || hasPendingViewCameraSave.current)) {
+        if (viewCameraDebounceTimer.current !== null) {
+          clearTimeout(viewCameraDebounceTimer.current);
+          viewCameraDebounceTimer.current = null;
+        }
+        hasPendingViewCameraSave.current = false;
         saveWithBackup('auto');
       }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isAutoSaveActive, storeIsDirty, saveWithBackup]);
+  }, [isAutoSaveActive, saveWithBackup]);
 
   return {
     save: saveNow,

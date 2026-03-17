@@ -55,6 +55,8 @@ describe('serialization', () => {
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+      expect(result.migrated).toBe(false);
+      expect(result.originalVersion).toBe(CURRENT_SCHEMA_VERSION);
     });
 
     it('should return error for invalid JSON', () => {
@@ -73,6 +75,7 @@ describe('serialization', () => {
       expect(result.success).toBe(false);
       expect(result.requiresMigration).toBe(true);
       expect(result.foundVersion).toBe('0.9.0');
+      expect(result.originalVersion).toBe('0.9.0');
     });
 
     it('should return error for invalid schema', () => {
@@ -96,6 +99,7 @@ describe('serialization', () => {
 
       expect(result.success).toBe(true);
       expect(result.data?.schemaVersion).toBe('9.9.9');
+      expect(result.originalVersion).toBe('9.9.9');
     });
   });
 
@@ -106,6 +110,8 @@ describe('serialization', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
+      expect(result.migrated).toBe(true);
+      expect(result.originalVersion).toBe('1.0.0');
     });
 
     it('should return error for unknown version', () => {
