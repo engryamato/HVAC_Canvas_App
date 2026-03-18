@@ -78,8 +78,8 @@ test.describe('UJ-GS-001: First Launch Experience (Tauri Offline)', () => {
 
     const projectCards = page.locator('[data-testid="project-card"]');
     if ((await projectCards.count()) === 0) {
-      const emptyStateButton = page.getByTestId('empty-state-create-btn');
-      const newProjectButton = page.getByTestId('new-project-btn');
+      const emptyStateButton = page.getByTestId('new-project-empty-state-btn');
+      const newProjectButton = page.getByTestId('new-project-header-btn');
       if (await emptyStateButton.isVisible()) {
         await emptyStateButton.click();
       } else {
@@ -109,8 +109,8 @@ test.describe('UJ-GS-001: First Launch Experience (Tauri Offline)', () => {
 
     const projectCards = page.locator('[data-testid="project-card"]');
     if ((await projectCards.count()) === 0) {
-      const emptyStateButton = page.getByTestId('empty-state-create-btn');
-      const newProjectButton = page.getByTestId('new-project-btn');
+      const emptyStateButton = page.getByTestId('new-project-empty-state-btn');
+      const newProjectButton = page.getByTestId('new-project-header-btn');
       if (await emptyStateButton.isVisible()) {
         await emptyStateButton.click();
       } else {

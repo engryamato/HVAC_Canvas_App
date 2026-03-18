@@ -2,13 +2,14 @@ import { test, expect, type Page } from '@playwright/test';
 
 const DEFAULT_DOCS_DIR = 'C:/Users/Test/Documents/';
 
-async function enableTauriMock(page: Page, options?: { documentDir?: string; openPath?: string; files?: Record<string, string> }) {
-  await page.addInitScript(({ documentDir, openPath, files }) => {
+async function enableTauriMock(page: Page, options?: { documentDir?: string; openPath?: string; savePath?: string; files?: Record<string, string> }) {
+  await page.addInitScript(({ documentDir, openPath, savePath, files }) => {
     const mock = {
       files: (files || {}) as Record<string, string>,
       calls: [] as Array<{ cmd: string; args?: any }>,
       documentDir: documentDir || 'C:/Users/Test/Documents/',
       openPath: openPath || 'C:/Users/Test/Documents/HVAC_Projects/Office HVAC.sws',
+      savePath: savePath || 'C:/Users/Test/Documents/HVAC_Projects/Saved From Canvas.sws',
     };
 
     (window as any).__TAURI__ = { __mock__: true };
@@ -22,8 +23,15 @@ async function enableTauriMock(page: Page, options?: { documentDir?: string; ope
         if (cmd === 'plugin:dialog|open') {
           return mock.openPath;
         }
+        if (cmd === 'plugin:dialog|save') {
+          return mock.savePath;
+        }
         if (cmd === 'plugin:fs|read_text_file') {
           return mock.files[args?.path] ?? '';
+        }
+        if (cmd === 'plugin:fs|write_text_file') {
+          mock.files[args?.path] = String(args?.contents ?? '');
+          return null;
         }
         if (cmd === 'plugin:fs|exists') {
           return Object.prototype.hasOwnProperty.call(mock.files, args?.path);
@@ -34,6 +42,7 @@ async function enableTauriMock(page: Page, options?: { documentDir?: string; ope
   }, {
     documentDir: options?.documentDir ?? DEFAULT_DOCS_DIR,
     openPath: options?.openPath ?? 'C:/Users/Test/Documents/HVAC_Projects/Office HVAC.sws',
+    savePath: options?.savePath ?? 'C:/Users/Test/Documents/HVAC_Projects/Saved From Canvas.sws',
     files: options?.files ?? {},
   });
 }
@@ -237,5 +246,75 @@ test.describe('UJ-PM-002: Open Existing Project (Tauri Offline)', () => {
 
     await expect(page.getByText('Newer Project Version')).toBeVisible({ timeout: 10000 });
     await expect(page.getByText(/Project version/i)).toBeVisible();
+  });
+
+  test('Save Project As and reopen from file completes a file round-trip', async ({ page }) => {
+    const existingFilePath = 'C:/Users/Test/Documents/HVAC_Projects/RoundTrip Existing.sws';
+    const savedFilePath = 'C:/Users/Test/Documents/HVAC_Projects/RoundTrip Saved.sws';
+    const savedProject = createProjectFile({
+      projectId: 'proj-open-roundtrip',
+      projectName: 'Round Trip Project',
+    });
+
+    await enableTauriMock(page, {
+      openPath: savedFilePath,
+      savePath: savedFilePath,
+      files: {
+        [existingFilePath]: JSON.stringify(savedProject),
+      },
+    });
+
+    await page.addInitScript(({ filePath, project }) => {
+      localStorage.setItem('hvac-app-storage', JSON.stringify({ state: { hasLaunched: true }, version: 0 }));
+      localStorage.setItem('sws.projectDetails', JSON.stringify({
+        state: {
+          projects: [{
+            id: project.projectId,
+            name: project.projectName,
+            ...project,
+          }],
+        },
+        version: 0,
+      }));
+      localStorage.setItem('sws.projectIndex', JSON.stringify({
+        state: {
+          projects: [{
+            projectId: project.projectId,
+            projectName: project.projectName,
+            projectNumber: project.projectNumber,
+            clientName: project.clientName,
+            entityCount: 0,
+            createdAt: project.createdAt,
+            modifiedAt: project.modifiedAt,
+            storagePath: filePath,
+            filePath,
+            isArchived: false,
+          }],
+          recentProjectIds: [project.projectId],
+          loading: false,
+        },
+        version: 0,
+      }));
+    }, { filePath: existingFilePath, project: savedProject });
+
+    await page.goto('/canvas/proj-open-roundtrip');
+    await expect(page.getByTestId('header')).toBeVisible();
+
+    await page.getByRole('button', { name: 'File' }).click();
+    await page.getByRole('menuitem', { name: /save project as/i }).click();
+
+    let tauriCalls = await page.evaluate(() => (window as any).__TAURI_MOCK__?.calls || []);
+    expect(tauriCalls.some((call: any) => call.cmd === 'plugin:dialog|save')).toBe(true);
+    expect(tauriCalls.some((call: any) => call.cmd === 'plugin:fs|write_text_file' && call.args?.path === 'C:/Users/Test/Documents/HVAC_Projects/RoundTrip Saved.sws')).toBe(true);
+
+    await page.getByRole('button', { name: 'File' }).click();
+    await page.getByRole('menuitem', { name: /open from file/i }).click();
+
+    await expect(page).toHaveURL(/\/canvas\//, { timeout: 10000 });
+    await expect(page.getByText('Round Trip Project')).toBeVisible({ timeout: 10000 });
+
+    tauriCalls = await page.evaluate(() => (window as any).__TAURI_MOCK__?.calls || []);
+    expect(tauriCalls.some((call: any) => call.cmd === 'plugin:dialog|open')).toBe(true);
+    expect(tauriCalls.some((call: any) => call.cmd === 'plugin:fs|read_text_file' && call.args?.path === 'C:/Users/Test/Documents/HVAC_Projects/RoundTrip Saved.sws')).toBe(true);
   });
 });

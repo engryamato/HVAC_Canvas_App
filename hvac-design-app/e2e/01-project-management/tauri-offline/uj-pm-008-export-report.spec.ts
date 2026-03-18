@@ -108,6 +108,7 @@ test.describe('UJ-PM-008: Export Project Report (Tauri Offline)', () => {
 
     await expect(page.getByTestId('export-report-dialog')).toBeVisible();
 
+    await page.getByTestId('format-select').selectOption('pdf');
     await page.getByTestId('report-type-select').selectOption('full');
     await page.getByTestId('orientation-select').selectOption('landscape');
 

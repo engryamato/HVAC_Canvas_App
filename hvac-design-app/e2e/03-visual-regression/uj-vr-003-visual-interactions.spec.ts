@@ -18,7 +18,7 @@ test.describe('UI Interaction Visual Tests', () => {
 
     test('should display button default state', async ({ page }) => {
       await withThemeVariants(page, async (theme) => {
-        const primaryBtn = page.getByTestId('new-project-btn');
+        const primaryBtn = page.getByTestId('new-project-header-btn');
         if (await primaryBtn.isVisible()) {
           await expect(primaryBtn).toHaveScreenshot(`button-default-${theme}.png`);
         }
@@ -27,7 +27,7 @@ test.describe('UI Interaction Visual Tests', () => {
 
     test('should display button hover state', async ({ page }) => {
       await withThemeVariants(page, async (theme) => {
-        const primaryBtn = page.getByTestId('new-project-btn');
+        const primaryBtn = page.getByTestId('new-project-header-btn');
         if (await primaryBtn.isVisible()) {
           await primaryBtn.hover();
           await page.waitForTimeout(200); // Wait for hover transition
@@ -38,7 +38,7 @@ test.describe('UI Interaction Visual Tests', () => {
 
     test('should display button focus state', async ({ page }) => {
       await withThemeVariants(page, async (theme) => {
-        const primaryBtn = page.getByTestId('new-project-btn');
+        const primaryBtn = page.getByTestId('new-project-header-btn');
         if (await primaryBtn.isVisible()) {
           await primaryBtn.focus();
           await page.waitForTimeout(150);
@@ -49,7 +49,7 @@ test.describe('UI Interaction Visual Tests', () => {
 
     test('should display button active/pressed state', async ({ page }) => {
       await withThemeVariants(page, async (theme) => {
-        const primaryBtn = page.getByTestId('new-project-btn');
+        const primaryBtn = page.getByTestId('new-project-header-btn');
         if (await primaryBtn.isVisible()) {
           await primaryBtn.hover();
           await page.mouse.down();
@@ -67,7 +67,7 @@ test.describe('UI Interaction Visual Tests', () => {
       await page.waitForLoadState('networkidle');
       // Set light mode as default for consistent baseline
       await setLightMode(page);
-      await page.getByTestId('new-project-btn').click();
+      await page.getByTestId('new-project-header-btn').click();
       await page.waitForTimeout(300);
     });
 

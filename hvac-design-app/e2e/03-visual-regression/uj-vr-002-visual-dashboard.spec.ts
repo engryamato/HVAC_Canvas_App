@@ -156,7 +156,7 @@ test.describe('Dashboard Visual Tests', () => {
     test('should display new project button', async ({ page }) => {
       await withThemeVariants(page, async (theme) => {
         const newProjectBtn = page.getByRole('button', { name: /new project/i }).or(
-          page.locator('[data-testid="new-project-btn"]')
+          page.locator('[data-testid="new-project-header-btn"]')
         );
 
         if (await newProjectBtn.isVisible()) {
@@ -168,7 +168,7 @@ test.describe('Dashboard Visual Tests', () => {
     test('should display new project dialog', async ({ page }) => {
       await withThemeVariants(page, async (theme) => {
         const newProjectBtn = page.getByRole('button', { name: /new project/i }).or(
-          page.locator('[data-testid="new-project-btn"]')
+          page.locator('[data-testid="new-project-header-btn"]')
         );
 
         if (await newProjectBtn.isVisible()) {

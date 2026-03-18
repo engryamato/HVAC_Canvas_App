@@ -114,8 +114,8 @@ test.describe('UJ-PM-009: Dashboard Structure Regression', () => {
         await expect(page.getByTestId('tab-archived')).toContainText('0');
 
         // Verify New Project Buttons
-        await expect(page.getByTestId('new-project-btn')).toBeVisible(); // Header button
-        await expect(page.getByTestId('empty-state-create-btn')).toBeVisible(); // Empty state button
+        await expect(page.getByTestId('new-project-header-btn')).toBeVisible(); // Header button
+        await expect(page.getByTestId('new-project-empty-state-btn')).toBeVisible(); // Empty state button
     });
 
     test('Populated State: Tabs match project counts', async ({ page }) => {

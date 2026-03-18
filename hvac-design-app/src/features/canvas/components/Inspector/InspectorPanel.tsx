@@ -16,9 +16,13 @@ interface InspectorPanelProps {
   embedded?: boolean;
   showHeader?: boolean;
   onFloat?: () => void;
+  onHighlightInBOM?: (entityId: string) => void;
 }
 
-function renderInspector(entity: Entity | null) {
+function renderInspector(
+  entity: Entity | null,
+  onHighlightInBOM?: (entityId: string) => void
+) {
   if (!entity) {
     return null;
   }
@@ -27,7 +31,7 @@ function renderInspector(entity: Entity | null) {
     case 'room':
       return <RoomInspector entity={entity} />;
     case 'duct':
-      return <DuctInspector entity={entity} />;
+      return <DuctInspector entity={entity} onHighlightInBOM={onHighlightInBOM} />;
     case 'equipment':
       return <EquipmentInspector entity={entity} />;
     case 'fitting':
@@ -46,6 +50,7 @@ export function InspectorPanel({
   embedded = false,
   showHeader = false,
   onFloat,
+  onHighlightInBOM,
 }: InspectorPanelProps) {
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const selectedId = selectedIds.length === 1 ? selectedIds[0] : null;
@@ -67,7 +72,7 @@ export function InspectorPanel({
       </div>
     );
   } else {
-    content = renderInspector(selectedEntity);
+    content = renderInspector(selectedEntity, onHighlightInBOM);
   }
 
   // Combined classes based on logic

@@ -7,6 +7,7 @@ import { InspectorPanel } from './Inspector/InspectorPanel';
 import { ValidationDashboard } from './ValidationDashboard';
 import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
+import { useBomHighlightStore } from '../store/bomHighlightStore';
 
 interface RightSidebarProps {
   isOpen?: boolean;
@@ -28,6 +29,7 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
   const setActiveRightTab = useLayoutStore((state) => state.setActiveRightTab);
   const rightSidebarCollapsed = useLayoutStore((state) => state.rightSidebarCollapsed);
   const toggleRightSidebar = useLayoutStore((state) => state.toggleRightSidebar);
+  const clearHighlightedEntityId = useBomHighlightStore((state) => state.clearHighlightedEntityId);
 
   const isFloating = useInspectorPreferencesStore((state) => state.isFloating);
   const floatingPosition = useInspectorPreferencesStore((state) => state.floatingPosition);
@@ -43,6 +45,12 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
       setFloatingPosition({ x: centerX, y: 80 });
     }
   }, [floatingPosition, setFloating, setFloatingPosition]);
+
+  React.useEffect(() => {
+    if (activeRightTab !== 'bom') {
+      clearHighlightedEntityId();
+    }
+  }, [activeRightTab, clearHighlightedEntityId]);
 
   if (!isOpen) {
     return null;

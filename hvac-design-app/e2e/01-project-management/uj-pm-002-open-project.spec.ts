@@ -487,7 +487,7 @@ test.describe('UJ-PM-002: Open Existing Project', () => {
             await expect(page.getByText(/no projects yet/i)).toBeVisible();
 
             // Verify "Create New Project" button in empty state
-            await expect(page.getByTestId('empty-state-create-btn')).toBeVisible();
+            await expect(page.getByTestId('new-project-empty-state-btn')).toBeVisible();
         });
     });
 });

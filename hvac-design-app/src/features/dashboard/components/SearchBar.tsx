@@ -68,6 +68,11 @@ export function SearchBar({
                     placeholder="Search projects..."
                     value={localValue}
                     onChange={(e) => setLocalValue(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                            handleClear();
+                        }
+                    }}
                     className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-200 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                     aria-label="Search projects"
                 />

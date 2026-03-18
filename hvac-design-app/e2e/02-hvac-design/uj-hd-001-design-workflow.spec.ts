@@ -26,11 +26,11 @@ test.describe('HVAC Design Workflow', () => {
 
   test('should create a new project', async ({ page }) => {
     // Wait for either button to be visible (empty state or header button)
-    const emptyStateBtn = page.locator('[data-testid="empty-state-create-btn"]');
-    const headerBtn = page.locator('[data-testid="new-project-btn"]');
+    const emptyStateBtn = page.locator('[data-testid="new-project-empty-state-btn"]');
+    const headerBtn = page.locator('[data-testid="new-project-header-btn"]');
 
     // Wait for dashboard to be interactive
-    await page.waitForSelector('[data-testid="empty-state-create-btn"], [data-testid="new-project-btn"]', { timeout: 10000 });
+    await page.waitForSelector('[data-testid="new-project-empty-state-btn"], [data-testid="new-project-header-btn"]', { timeout: 10000 });
 
     // Click whichever button is visible
     if (await emptyStateBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
@@ -54,11 +54,11 @@ test.describe('HVAC Design Workflow', () => {
 
   test('should navigate to canvas page', async ({ page }) => {
     // Wait for dashboard to be interactive
-    await page.waitForSelector('[data-testid="empty-state-create-btn"], [data-testid="new-project-btn"]', { timeout: 10000 });
+    await page.waitForSelector('[data-testid="new-project-empty-state-btn"], [data-testid="new-project-header-btn"]', { timeout: 10000 });
 
     // Create a project first
-    const emptyStateBtn = page.locator('[data-testid="empty-state-create-btn"]');
-    const headerBtn = page.locator('[data-testid="new-project-btn"]');
+    const emptyStateBtn = page.locator('[data-testid="new-project-empty-state-btn"]');
+    const headerBtn = page.locator('[data-testid="new-project-header-btn"]');
 
     if (await emptyStateBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
       await emptyStateBtn.click();

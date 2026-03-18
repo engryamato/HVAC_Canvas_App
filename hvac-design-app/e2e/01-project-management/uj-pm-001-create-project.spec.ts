@@ -35,7 +35,7 @@ test.describe('UJ-PM-001: Create New Project', () => {
             // User Action: Click "New Project" button in dashboard header
             // Note: Using the empty state button if no projects exist, or header button if they do.
             // For a fresh start, it's the empty state button.
-            await page.getByTestId('empty-state-create-btn').click();
+            await page.getByTestId('new-project-empty-state-btn').click();
 
             // Expected Result: NewProjectDialog modal opens
             await expect(page.getByTestId('new-project-dialog')).toBeVisible();
@@ -161,7 +161,7 @@ test.describe('UJ-PM-001: Create New Project', () => {
     });
 
     test('Edge Case: Project Name Too Long', async ({ page }) => {
-        await page.getByTestId('empty-state-create-btn').click();
+        await page.getByTestId('new-project-empty-state-btn').click();
         const longName = 'A'.repeat(101);
         await page.getByTestId('project-name-input').fill(longName);
         await expect(page.getByText('100/100')).toBeVisible();

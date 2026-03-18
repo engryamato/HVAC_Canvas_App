@@ -14,13 +14,22 @@ import type { SizingSuggestion } from '@/core/services/automation/autoSizingServ
 import { ValidationDisplay } from '@/components/canvas/ValidationDisplay';
 import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
 import { useSettingsStore } from '@/core/store/settingsStore';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useDialogStore } from '@/core/store/dialogStore';
+import {
+  costCalculationService,
+} from '@/core/services/cost/costCalculationService';
+import type { BOMItem as CostBOMItem } from '@/core/services/bom/bomGenerationService';
 import {
   generateDeterministicSuggestions,
   type ValidationViolation,
 } from '@/core/services/validation/constraintValidator';
+import { useLayoutStore } from '@/stores/useLayoutStore';
+import { useBomHighlightStore } from '../../store/bomHighlightStore';
 
 interface DuctInspectorProps {
   entity: Duct;
+  onHighlightInBOM?: (entityId: string) => void;
 }
 
 // ---- Sub-components --------------------------------------------------------
@@ -52,11 +61,78 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
   );
 }
 
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatHours(value: number): string {
+  return `${value.toFixed(1)} hrs`;
+}
+
+function getDuctSize(entity: Duct): string {
+  if (entity.props.shape === 'round') {
+    return `${entity.props.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter}"`;
+  }
+
+  return `${entity.props.width ?? DEFAULT_RECTANGULAR_DUCT_PROPS.width}" x ${entity.props.height ?? DEFAULT_RECTANGULAR_DUCT_PROPS.height}"`;
+}
+
+function getFallbackComponentDefinitionId(
+  entity: Duct,
+  components: ReturnType<typeof useComponentLibraryStoreV2.getState>['components']
+): string | undefined {
+  const mappedMaterial =
+    entity.props.material === 'galvanized'
+      ? 'galvanized_steel'
+      : entity.props.material === 'stainless'
+        ? 'stainless_steel'
+        : entity.props.material === 'flex'
+          ? 'flexible'
+          : 'aluminum';
+  const normalizedName = entity.props.name.trim().toLowerCase();
+  const ductComponents = components.filter((component) => component.type === 'duct');
+
+  if (entity.props.serviceId) {
+    const serviceLinkedComponent = ductComponents.find((component) => component.id === entity.props.serviceId);
+    if (serviceLinkedComponent) {
+      return serviceLinkedComponent.id;
+    }
+  }
+
+  const exactNameAndSpecMatch = ductComponents
+    .filter((component) => {
+      const nameMatches = normalizedName.length > 0 && component.name.trim().toLowerCase() === normalizedName;
+      const shapeMatches = component.subtype ? component.subtype === entity.props.shape : true;
+      const materialMatches = component.materials.some((material) => material.type === mappedMaterial);
+
+      return nameMatches && shapeMatches && materialMatches;
+    })
+    .sort((left, right) => left.id.localeCompare(right.id))[0];
+
+  if (exactNameAndSpecMatch) {
+    return exactNameAndSpecMatch.id;
+  }
+
+  return ductComponents
+    .filter((component) => {
+      const shapeMatches = component.subtype ? component.subtype === entity.props.shape : true;
+      return shapeMatches && component.materials.some((material) => material.type === mappedMaterial);
+    })
+    .sort((left, right) => left.id.localeCompare(right.id))[0]?.id;
+}
+
 // ---- Main Component --------------------------------------------------------
 
-export function DuctInspector({ entity }: DuctInspectorProps) {
+export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) {
   const { errors, validateField } = useFieldValidation(entity);
-  const engineeringLimits = useSettingsStore((state) => state.calculationSettings.engineeringLimits);
+  const calculationSettings = useSettingsStore((state) => state.calculationSettings);
+  const engineeringLimits = calculationSettings.engineeringLimits;
+  const components = useComponentLibraryStoreV2((state) => state.components);
   const [suggestionFeedback, setSuggestionFeedback] = useState<{
     state: 'cleared' | 'mitigated' | 'unchanged';
     message: string;
@@ -357,11 +433,66 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
     : entity.calculated.area;
   const displayVelocity = engineeringData?.velocity ?? entity.calculated.velocity;
   const displayFrictionLoss = engineeringData?.pressureDrop ?? entity.calculated.frictionLoss;
+  const componentPricing = useMemo(() => {
+    return new Map(components.map((component) => [component.id, component.pricing] as const));
+  }, [components]);
+  const ductCostResult = useMemo(() => {
+    const ductSize = getDuctSize(entity);
+    const componentDefinitionId =
+      entity.props.catalogItemId ??
+      getFallbackComponentDefinitionId(entity, components);
+
+    const wasteFactor =
+      calculationSettings.wasteFactors.ducts ?? calculationSettings.wasteFactors.default ?? 0;
+    const singleBomItem: CostBOMItem = {
+      id: `duct-${entity.id}`,
+      category: 'duct',
+      description: `${ductSize} ${entity.props.material} ${entity.props.shape} duct`,
+      quantity: entity.props.length,
+      unit: 'LF',
+      wasteFactor,
+      quantityWithWaste: entity.props.length * (1 + wasteFactor),
+      material: entity.props.material,
+      size: ductSize,
+      groupKey: `duct-${entity.props.shape}-${ductSize}-${entity.props.material}`,
+      sourceEntityIds: [entity.id],
+      componentDefinitionId,
+    };
+
+    const estimate = costCalculationService.calculateProjectCost(
+      [singleBomItem],
+      calculationSettings,
+      componentPricing
+    );
+    const itemCost = estimate.items[0];
+
+    return {
+      estimate,
+      itemCost: itemCost ?? null,
+    };
+  }, [calculationSettings, componentPricing, components, entity]);
+  const itemCost = ductCostResult.itemCost;
+  const isMaterialUnpriced = (itemCost?.materialUnitPrice ?? 0) === 0;
 
   const hasViolations =
     (entity.props.constraintStatus?.violations ?? []).filter(
       (v) => v.severity === 'error' || v.severity === 'warning'
     ).length > 0;
+  const handleOpenCalculationSettings = useCallback(() => {
+    useDialogStore.getState().setOpenCalculationSettings(true);
+  }, []);
+  const handleSeeInBOM = useCallback(() => {
+    useLayoutStore.getState().setActiveRightTab('bom');
+    useBomHighlightStore.getState().setHighlightedEntityId(entity.id);
+    onHighlightInBOM?.(entity.id);
+  }, [entity.id, onHighlightInBOM]);
+
+  const materialCostLabel = itemCost && !isMaterialUnpriced
+    ? formatCurrency(itemCost.materialSubtotal)
+    : '—';
+  const laborHoursLabel = formatHours(itemCost?.laborHours ?? 0);
+  const laborCostLabel = formatCurrency(itemCost?.laborSubtotal ?? 0);
+  const totalCostLabel = formatCurrency(ductCostResult.estimate.breakdown.totalCost);
 
   // ---- Render -------------------------------------------------------------
 
@@ -562,9 +693,29 @@ export function DuctInspector({ entity }: DuctInspectorProps) {
           <p className="text-xs text-slate-400">
             Cost estimates are calculated based on material, labor rates, and markup settings.
           </p>
-          <ReadOnlyField label="Material Cost" value="Calculated from component library" />
-          <ReadOnlyField label="Labor Hours" value="Calculated from dimensions" />
-          <ReadOnlyField label="Total Estimate" value="See BOM panel for details" />
+          <div className="flex flex-col gap-2">
+            <ReadOnlyField label="Material Cost" value={materialCostLabel} />
+            {isMaterialUnpriced ? (
+              <button
+                className="self-start text-xs font-medium text-blue-600 hover:text-blue-700"
+                onClick={handleOpenCalculationSettings}
+                type="button"
+              >
+                Set unit prices in Calculation Settings to see material costs
+              </button>
+            ) : null}
+          </div>
+          <ReadOnlyField label="Labor Hours" value={laborHoursLabel} />
+          <ReadOnlyField label="Labor Cost" value={laborCostLabel} />
+          <ReadOnlyField label="Total (w/ markup)" value={totalCostLabel} />
+          <button
+            className="mt-1 inline-flex items-center justify-center self-start rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+            data-testid="see-in-bom"
+            onClick={handleSeeInBOM}
+            type="button"
+          >
+            See in BOM →
+          </button>
         </div>
       </Card>
 

@@ -168,7 +168,7 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                     <button
                         onClick={() => setIsNewProjectDialogOpen(true)}
                         className="btn-primary py-1.5"
-                        data-testid="new-project-btn"
+                        data-testid="new-project-header-btn"
                     >
                         <Plus className="w-4 h-4" />
                         New Project
@@ -233,7 +233,7 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
                             <button
                                 onClick={() => setIsNewProjectDialogOpen(true)}
                                 className="btn-primary text-base px-6 py-3"
-                                data-testid="empty-state-create-btn"
+                                data-testid="new-project-empty-state-btn"
                             >
                                 <Plus className="w-5 h-5" />
                                 Create Project

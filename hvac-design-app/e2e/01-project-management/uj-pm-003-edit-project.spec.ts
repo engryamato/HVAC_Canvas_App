@@ -67,6 +67,7 @@ async function seedTestProject(
         version: 0,
     };
     await page.evaluate((data) => {
+        localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         localStorage.setItem('sws.projectDetails', JSON.stringify(data));
     }, projectStorage);
 
@@ -80,6 +81,7 @@ async function seedTestProject(
         version: 0,
     };
     await page.evaluate((data) => {
+        localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         localStorage.setItem('sws.projectIndex', JSON.stringify(data));
     }, projectIndex);
 
@@ -95,6 +97,7 @@ test.describe('UJ-PM-003: Edit Project Metadata', () => {
         await page.evaluate(() => {
             localStorage.clear();
             sessionStorage.clear();
+            localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         });
     });
 
@@ -186,5 +189,18 @@ test.describe('UJ-PM-003: Edit Project Metadata', () => {
 
         // Verify new name shows
         await expect(page.getByTestId('all-projects').getByRole('heading', { name: 'New Name via Enter' })).toBeVisible();
+    });
+
+    test('Project actions menu closes on outside click', async ({ page }) => {
+        await seedTestProject(page, {
+            name: 'Click Outside Project',
+        });
+
+        await page.getByTestId('project-card-menu-btn').first().click();
+        await expect(page.getByTestId('project-card-menu')).toBeVisible();
+
+        await page.locator('[data-testid="dashboard-page"]').click({ position: { x: 10, y: 10 } });
+
+        await expect(page.getByTestId('project-card-menu')).toBeHidden();
     });
 });

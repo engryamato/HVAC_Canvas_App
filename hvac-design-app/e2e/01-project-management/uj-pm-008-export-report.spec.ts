@@ -16,6 +16,10 @@ async function navigateToCanvas(page: Page) {
     const now = new Date().toISOString();
     const projectId = crypto.randomUUID();
 
+    await page.addInitScript(() => {
+        localStorage.setItem('hvac_has_seen_folder_setup', 'true');
+    });
+
     const project = {
         id: projectId,
         name: 'Test Project',
@@ -71,12 +75,13 @@ async function navigateToCanvas(page: Page) {
     return projectId;
 }
 
-// TODO: Enable when File menu and Export Report feature is implemented
-test.describe.skip('UJ-PM-008: Export Project Report', () => {
+test.describe('UJ-PM-008: Export Project Report', () => {
     test.beforeEach(async ({ page }) => {
+        await page.goto('/dashboard');
         await page.evaluate(() => {
             localStorage.clear();
             sessionStorage.clear();
+            localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         });
     });
 
@@ -101,14 +106,15 @@ test.describe.skip('UJ-PM-008: Export Project Report', () => {
         await page.getByRole('button', { name: 'File' }).click();
         await page.getByTestId('menu-export-report').click();
 
-        // Verify options are present
+        // Verify required options are present
         await expect(page.getByTestId('report-type-select')).toBeVisible();
+        await expect(page.getByTestId('format-select')).toBeVisible();
         await expect(page.getByTestId('include-details-checkbox')).toBeVisible();
         await expect(page.getByTestId('include-bom-checkbox')).toBeVisible();
         await expect(page.getByTestId('paper-size-select')).toBeVisible();
         await expect(page.getByTestId('orientation-select')).toBeVisible();
         await expect(page.getByTestId('export-btn')).toBeVisible();
-        await expect(page.getByTestId('export-cancel-btn')).toBeVisible();
+        await expect(page.getByTestId('cancel-btn')).toBeVisible();
     });
 
     test('Cancel button closes dialog', async ({ page }) => {
@@ -121,10 +127,33 @@ test.describe.skip('UJ-PM-008: Export Project Report', () => {
         await expect(page.getByTestId('export-report-dialog')).toBeVisible();
 
         // Click Cancel
-        await page.getByTestId('export-cancel-btn').click();
+        await page.getByTestId('cancel-btn').click();
 
         // Dialog should close
         await expect(page.getByTestId('export-report-dialog')).not.toBeVisible();
+    });
+
+    test('Export button triggers the export flow without window.confirm', async ({ page }) => {
+        await navigateToCanvas(page);
+
+        let confirmCalled = false;
+        await page.evaluate(() => {
+            window.confirm = () => {
+                (window as unknown as { __confirmCalled?: boolean }).__confirmCalled = true;
+                return true;
+            };
+        });
+
+        await page.getByRole('button', { name: 'File' }).click();
+        await page.getByTestId('menu-export-report').click();
+
+        await page.getByTestId('format-select').selectOption('csv');
+        await page.getByTestId('report-type-select').selectOption('summary');
+        await page.getByTestId('export-btn').click();
+
+        await expect(page.getByTestId('export-report-dialog')).not.toBeVisible({ timeout: 10000 });
+        confirmCalled = await page.evaluate(() => Boolean((window as unknown as { __confirmCalled?: boolean }).__confirmCalled));
+        expect(confirmCalled).toBe(false);
     });
 
     test('Report type selection updates included sections', async ({ page }) => {

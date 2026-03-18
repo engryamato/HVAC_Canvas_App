@@ -72,6 +72,7 @@ export function AutoSizingControls({ duct, onSizeApplied }: AutoSizingControlsPr
             className="w-full"
             variant="secondary"
             data-element-id="calculate-optimal-size"
+            data-testid="calculate-optimal-size"
           >
             {isCalculating ? 'Calculating...' : 'Calculate Optimal Size'}
           </Button>
@@ -90,6 +91,7 @@ export function AutoSizingControls({ duct, onSizeApplied }: AutoSizingControlsPr
                   option.compliant ? 'border-slate-200' : 'border-amber-300 bg-amber-50/60'
                 }`}
                 data-element-id={`size-option-${index + 1}`}
+                data-testid={`size-option-${index + 1}`}
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="space-y-1">

@@ -112,7 +112,7 @@ test.describe('OS-INIT-002: Environment Detection', () => {
             await expect(page).toHaveURL(/\/dashboard/);
 
             // Verify "New Project" button is available
-            const newProjectBtn = page.getByTestId('new-project-btn');
+            const newProjectBtn = page.getByTestId('new-project-header-btn');
             await expect(newProjectBtn).toBeVisible();
             await expect(newProjectBtn).toBeEnabled();
         });

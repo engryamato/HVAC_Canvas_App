@@ -20,7 +20,7 @@ test.describe('Project Management - Dashboard', () => {
   test.describe('Create Project', () => {
     test('should create a new project with all metadata fields', async ({ page }) => {
       // Click new project button (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
 
       // Wait for dialog to appear with proper timeout
@@ -50,7 +50,7 @@ test.describe('Project Management - Dashboard', () => {
 
     test('should persist new project to localStorage', async ({ page }) => {
       // Create a project (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
 
       // Wait for dialog to appear
@@ -83,7 +83,7 @@ test.describe('Project Management - Dashboard', () => {
 
     test('should validate project name is required', async ({ page }) => {
       // Click new project button (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
 
       // Wait for dialog to appear
@@ -99,7 +99,7 @@ test.describe('Project Management - Dashboard', () => {
 
     test('should validate project name length and characters', async ({ page }) => {
       // Click new project button (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
 
       // Wait for dialog to appear
@@ -123,7 +123,7 @@ test.describe('Project Management - Dashboard', () => {
       await expect(activeTab).toContainText('0');
 
       // Create a project (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
       await page.getByLabel(/project name/i).fill('First Project');
@@ -156,7 +156,7 @@ test.describe('Project Management - Dashboard', () => {
   test.describe('Project Card Actions', () => {
     test.beforeEach(async ({ page }) => {
       // Create a test project first (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
       await page.getByLabel(/project name/i).fill('Test Project');
@@ -329,7 +329,7 @@ test.describe('Project Management - Dashboard', () => {
    test.describe('Navigation to Canvas', () => {
     test.beforeEach(async ({ page }) => {
       // Create a test project (use header button)
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
       await page.getByLabel(/project name/i).fill('Canvas Test Project');
@@ -457,7 +457,7 @@ test.describe('Data Persistence Across Sessions', () => {
 
     // Create multiple projects (app navigates to canvas after each, so we go back)
     for (let i = 1; i <= 3; i++) {
-      const newProjectBtn = page.getByTestId('new-project-btn');
+      const newProjectBtn = page.getByTestId('new-project-header-btn');
       await newProjectBtn.click();
       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
       await page.getByLabel(/project name/i).fill(`Project ${i}`);
@@ -487,7 +487,7 @@ test.describe('Data Persistence Across Sessions', () => {
     await page.reload();
 
     // Create first project
-    const newProjectBtn = page.getByTestId('new-project-btn');
+    const newProjectBtn = page.getByTestId('new-project-header-btn');
     await newProjectBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await page.getByLabel(/project name/i).fill('First Created');
@@ -529,7 +529,7 @@ test.describe('Data Persistence Across Sessions', () => {
     await page.reload();
 
     // Create a project
-    const newProjectBtn = page.getByTestId('new-project-btn');
+    const newProjectBtn = page.getByTestId('new-project-header-btn');
     await newProjectBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await page.getByLabel(/project name/i).fill('Archived Project');
@@ -576,7 +576,7 @@ test.describe('Empty State Handling', () => {
 
    test('should show empty state for archived tab when no archived projects', async ({ page }) => {
     // Create a project (but don't archive it) - use header button
-    const newProjectBtn = page.getByTestId('new-project-btn');
+    const newProjectBtn = page.getByTestId('new-project-header-btn');
     await newProjectBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
    await page.getByLabel(/project name/i).fill('Active Project');
@@ -600,7 +600,7 @@ test.describe('Empty State Handling', () => {
 
   test('should provide create button in empty state', async ({ page }) => {
     // Click the create button in empty state
-    const createButton = page.getByTestId('empty-state-create-btn');
+    const createButton = page.getByTestId('new-project-empty-state-btn');
     await expect(createButton).toBeVisible({ timeout: 5000 });
     await createButton.click();
 
@@ -614,7 +614,7 @@ test.describe('localStorage Structure Validation', () => {
     await page.goto('/dashboard');
 
     // Create a project to trigger localStorage write - use header button
-    const newProjectBtn = page.getByTestId('new-project-btn');
+    const newProjectBtn = page.getByTestId('new-project-header-btn');
     await newProjectBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await page.getByLabel(/project name/i).fill('Storage Test');
@@ -631,7 +631,7 @@ test.describe('localStorage Structure Validation', () => {
     await page.goto('/dashboard');
 
     // Create a project with all fields - use header button
-    const newProjectBtn = page.getByTestId('new-project-btn');
+    const newProjectBtn = page.getByTestId('new-project-header-btn');
     await newProjectBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
 

@@ -30,6 +30,7 @@ export async function openCanvas(page: Page, projectName: string = 'E2E Test Pro
       state: { hasLaunched: true },
       version: 0,
     }));
+    localStorage.setItem('hvac_has_seen_folder_setup', 'true');
     localStorage.setItem('hvac-tutorial-storage', JSON.stringify({
       state: { isActive: false, isCompleted: true },
       version: 0,
@@ -47,10 +48,10 @@ export async function openCanvas(page: Page, projectName: string = 'E2E Test Pro
 
   if (projectCount === 0) {
     // Create new project
-    const emptyStateButton = page.getByTestId('empty-state-create-btn');
-    const newProjectButton = page.getByTestId('new-project-btn');
+    const emptyStateButton = page.getByTestId('new-project-empty-state-btn');
+    const newProjectButton = page.getByTestId('new-project-header-btn');
 
-    await page.waitForSelector('[data-testid="empty-state-create-btn"], [data-testid="new-project-btn"]', {
+    await page.waitForSelector('[data-testid="new-project-empty-state-btn"], [data-testid="new-project-header-btn"]', {
       timeout: 10000,
     });
 

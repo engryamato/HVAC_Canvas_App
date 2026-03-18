@@ -261,6 +261,7 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                                 value={options.format}
                                 onChange={(e) => setOptions({ ...options, format: e.target.value as ExportOptions['format'] })}
                                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                data-testid="format-select"
                             >
                                 <option value="pdf">PDF</option>
                                 <option value="csv">CSV</option>
@@ -427,7 +428,7 @@ export function ExportReportDialog({ open, onOpenChange }: ExportReportDialogPro
                         variant="ghost"
                         onClick={handleCancel}
                         disabled={isExporting}
-                        data-testid="export-cancel-btn"
+                        data-testid="cancel-btn"
                     >
                         Cancel
                     </Button>

@@ -69,7 +69,7 @@ test.describe('UJ-PM-001: Create New Project (Tauri Offline)', () => {
   });
 
   test('Strict flow: Create project with metadata and file persistence', async ({ page }) => {
-    await page.getByTestId('empty-state-create-btn').click();
+    await page.getByTestId('new-project-empty-state-btn').click();
 
     await expect(page.getByTestId('new-project-dialog')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Create New Project' })).toBeVisible();
@@ -125,7 +125,7 @@ test.describe('UJ-PM-001: Create New Project (Tauri Offline)', () => {
   });
 
   test('Edge case: Name too long is truncated to 100 characters', async ({ page }) => {
-    await page.getByTestId('empty-state-create-btn').click();
+    await page.getByTestId('new-project-empty-state-btn').click();
     const longName = 'A'.repeat(101);
     await page.getByTestId('project-name-input').fill(longName);
     await expect(page.getByText('100/100')).toBeVisible();
@@ -138,7 +138,7 @@ test.describe('UJ-PM-001: Create New Project (Tauri Offline)', () => {
     await enableTauriMock(page, { savePath: null });
     await page.reload();
 
-    await page.getByTestId('empty-state-create-btn').click();
+    await page.getByTestId('new-project-empty-state-btn').click();
     await page.getByTestId('project-name-input').fill('Cancelled Project');
     await page.getByTestId('create-button').click();
 
@@ -156,7 +156,7 @@ test.describe('UJ-PM-001: Create New Project (Tauri Offline)', () => {
     await enableTauriMock(page, { writeError: 'permission denied' });
     await page.reload();
 
-    await page.getByTestId('empty-state-create-btn').click();
+    await page.getByTestId('new-project-empty-state-btn').click();
     await page.getByTestId('project-name-input').fill('Permission Error Project');
     await page.getByTestId('create-button').click();
 

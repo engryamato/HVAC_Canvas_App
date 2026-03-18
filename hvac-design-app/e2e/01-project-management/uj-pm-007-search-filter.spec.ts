@@ -70,6 +70,7 @@ async function seedTestProjects(
         version: 0,
     };
     await page.evaluate((data) => {
+        localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         localStorage.setItem('sws.projectDetails', JSON.stringify(data));
     }, projectStorage);
 
@@ -83,6 +84,7 @@ async function seedTestProjects(
         version: 0,
     };
     await page.evaluate((data) => {
+        localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         localStorage.setItem('sws.projectIndex', JSON.stringify(data));
     }, projectIndex);
 
@@ -96,6 +98,7 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
         await page.evaluate(() => {
             localStorage.clear();
             sessionStorage.clear();
+            localStorage.setItem('hvac_has_seen_folder_setup', 'true');
         });
     });
 
@@ -150,6 +153,37 @@ test.describe('UJ-PM-007: Search & Filter Projects', () => {
         await page.waitForTimeout(500);
 
         // Now all projects should be visible
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
+    });
+
+    test('Clear search works via clear button and Escape key', async ({ page }) => {
+        await seedTestProjects(page, [
+            { name: 'Alpha One' },
+            { name: 'Beta Two' },
+            { name: 'Gamma Three' },
+        ]);
+
+        const allProjects = page.getByTestId('all-projects');
+        const searchInput = page.getByPlaceholder('Search projects...');
+
+        await searchInput.fill('Alpha');
+        await page.waitForTimeout(500);
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(1, { timeout: 5000 });
+
+        await page.getByRole('button', { name: 'Clear search' }).click();
+        await page.waitForTimeout(500);
+        await expect(searchInput).toHaveValue('');
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
+
+        await searchInput.fill('Beta');
+        await page.waitForTimeout(500);
+        await expect(allProjects.getByTestId('project-card')).toHaveCount(1, { timeout: 5000 });
+
+        await page.locator('body').click();
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(500);
+
+        await expect(searchInput).toHaveValue('');
         await expect(allProjects.getByTestId('project-card')).toHaveCount(3, { timeout: 5000 });
     });
 

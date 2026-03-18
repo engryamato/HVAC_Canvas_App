@@ -50,6 +50,7 @@ interface EntitiesLike {
 
 export interface BomItem {
   itemNumber: number;
+  entityId?: string;
   name: string;
   type: string;
   description: string;
@@ -92,6 +93,7 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
 
     items.push({
       itemNumber: itemNumber++,
+      entityId: String(entity.id ?? ''),
       name: String(props.name ?? entityType),
       type: displayType,
       description: String(props.description ?? `${displayType} item`),

@@ -284,6 +284,13 @@
   border-top: 1px solid #f3f4f6;
 }
 
+.rowHighlighted {
+  background: #eff6ff;
+  box-shadow: inset 3px 0 0 #60a5fa;
+  outline: 1px solid #bfdbfe;
+  outline-offset: -1px;
+}
+
 .qty,
 .unit {
   font-size: 11px;

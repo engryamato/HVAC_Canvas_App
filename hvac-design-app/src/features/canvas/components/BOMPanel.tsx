@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronRight, Download, Search } from 'lucide-react';
 import { useBOM } from '../hooks/useBOM';
 import { downloadBomCsv, type BomItem } from '@/features/export/csv';
@@ -8,6 +8,7 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
 import { useShallow } from 'zustand/react/shallow';
 import styles from './BOMPanel.module.css';
+import { useBomHighlightStore } from '../store/bomHighlightStore';
 
 type CategoryKey = 'Duct' | 'Fitting' | 'Equipment' | 'Accessory';
 type CategoryFilter = 'all' | CategoryKey;
@@ -56,11 +57,18 @@ function getItemMeta(item: BomItem): string {
   return segments.join(' / ');
 }
 
-export function BOMPanel() {
+interface BOMPanelProps {
+  highlightedEntityId?: string | null;
+}
+
+export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
+  const highlightedEntityIdFromStore = useBomHighlightStore((state) => state.highlightedEntityId);
+  const activeHighlightedEntityId = highlightedEntityId ?? highlightedEntityIdFromStore;
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [expandedGroups, setExpandedGroups] =
     useState<Record<CategoryKey, boolean>>(DEFAULT_EXPANDED_GROUPS);
+  const firstMatchingRowRef = useRef<HTMLDivElement | null>(null);
 
   const { all, totals, costEstimate } = useBOM();
   const entities = useEntityStore(
@@ -123,6 +131,49 @@ export function BOMPanel() {
       [category]: !current[category],
     }));
   };
+
+  const firstMatchingItemNumber = useMemo(() => {
+    if (!activeHighlightedEntityId) {
+      return null;
+    }
+
+    return all.find((item) => item.entityId === activeHighlightedEntityId)?.itemNumber ?? null;
+  }, [activeHighlightedEntityId, all]);
+
+  useEffect(() => {
+    if (!activeHighlightedEntityId) {
+      return;
+    }
+
+    const matchingCategories = new Set(
+      all
+        .filter((item) => item.entityId === activeHighlightedEntityId)
+        .map((item) => normalizeCategory(item))
+    );
+
+    if (matchingCategories.size === 0) {
+      return;
+    }
+
+    setExpandedGroups((current) => {
+      const next = { ...current };
+      matchingCategories.forEach((category) => {
+        next[category] = true;
+      });
+      return next;
+    });
+  }, [activeHighlightedEntityId, all]);
+
+  useEffect(() => {
+    if (!activeHighlightedEntityId) {
+      return;
+    }
+
+    firstMatchingRowRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }, [activeHighlightedEntityId, firstMatchingItemNumber]);
 
   return (
     <div className={styles.panel} data-testid="bom-panel-content">
@@ -220,18 +271,30 @@ export function BOMPanel() {
 
                     {expanded ? (
                       <div className={styles.rows}>
-                        {group.items.map((item) => (
-                          <div className={styles.row} key={`${group.category}-${item.itemNumber}`}>
-                            <span className={styles.qty}>{item.quantity}</span>
-                            <div className={styles.itemCopy}>
-                              <span className={styles.itemName}>{item.name}</span>
-                              <span className={styles.itemMeta}>{getItemMeta(item)}</span>
+                        {group.items.map((item) => {
+                          const isHighlighted = item.entityId === activeHighlightedEntityId;
+                          const isFirstMatchingRow =
+                            isHighlighted && item.itemNumber === firstMatchingItemNumber;
+
+                          return (
+                            <div
+                              className={`${styles.row} ${isHighlighted ? styles.rowHighlighted : ''}`}
+                              data-testid={`bom-row-${item.entityId ?? item.itemNumber}`}
+                              data-highlighted={isHighlighted ? 'true' : 'false'}
+                              key={`${group.category}-${item.itemNumber}`}
+                              ref={isFirstMatchingRow ? firstMatchingRowRef : null}
+                            >
+                              <span className={styles.qty}>{item.quantity}</span>
+                              <div className={styles.itemCopy}>
+                                <span className={styles.itemName}>{item.name}</span>
+                                <span className={styles.itemMeta}>{getItemMeta(item)}</span>
+                              </div>
+                              <span className={styles.unit}>{item.unit.toUpperCase()}</span>
+                              <span className={styles.spec}>{item.specifications || 'Standard'}</span>
+                              <span className={styles.wt}>—</span>
                             </div>
-                            <span className={styles.unit}>{item.unit.toUpperCase()}</span>
-                            <span className={styles.spec}>{item.specifications || 'Standard'}</span>
-                            <span className={styles.wt}>—</span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : null}
                   </div>

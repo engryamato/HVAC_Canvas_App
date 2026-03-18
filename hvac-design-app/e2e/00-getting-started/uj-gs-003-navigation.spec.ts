@@ -41,7 +41,7 @@ test.describe('Basic Navigation and Interface Overview', () => {
 
         if (projectCount === 0) {
             // Create new project - empty state uses different button ID
-            await page.click('[data-testid="empty-state-create-btn"]');
+            await page.click('[data-testid="new-project-empty-state-btn"]');
             await page.fill('[data-testid="project-name-input"]', 'Navigation Test Project');
             await page.click('[data-testid="create-button"]');
 
