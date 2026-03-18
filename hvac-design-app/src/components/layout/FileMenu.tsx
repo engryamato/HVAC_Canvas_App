@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import { useDialogStore } from '@/core/store/dialogStore';
@@ -11,19 +10,19 @@ import { TauriFileSystem } from '@/core/persistence/TauriFileSystem';
 import { ProjectAlreadyExistsDialog } from '@/components/dialogs/ProjectAlreadyExistsDialog';
 import { UnsavedChangesDialog } from '@/components/dialogs/UnsavedChangesDialog';
 import { ErrorDialog } from '@/components/dialogs/ErrorDialog';
-import { useCurrentProjectId, useIsDirty, useProjectActions } from '@/core/store/project.store';
+import { useCurrentProjectId, useIsDirty, useProjectActions, useProjectStore } from '@/core/store/project.store';
 import {
   createLocalStoragePayloadFromProjectFileWithDefaults,
   loadProjectFromStorage,
-  persistProjectFromStores,
   saveProjectToStorage,
 } from '@/features/canvas/hooks/useAutoSave';
+import { hydrateToStores, snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
 import { setWebProjectFileHandle } from '@/core/persistence/webFileHandles';
 import { openProjectFromPicker, saveProjectAsAndRememberHandle } from '@/core/persistence/webProjectFileIO';
 import { deserializeProjectLenient } from '@/core/persistence/serialization';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
-import { createEmptyProject, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema/project-file.schema';
+import { createEmptyProject, type ProjectFile } from '@/core/schema/project-file.schema';
 import { ProjectSetupWizard, type ProjectSetupData } from '@/features/project/components/ProjectSetupWizard';
 import { MigrationWizard } from '@/components/dialogs/MigrationWizard';
 import { useToast } from '@/components/ui/ToastContext';
@@ -32,7 +31,6 @@ import {
     ENABLE_PROJECT_SETUP_WIZARD,
     ENABLE_SYSTEM_TEMPLATE_DIALOG,
 } from '@/core/config/featureFlags';
-import { hydrateToStores, snapshotFromStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 export function FileMenu() {
     const router = useRouter();
@@ -46,7 +44,6 @@ export function FileMenu() {
     const [existingProjectFilePath, setExistingProjectFilePath] = useState<string | null>(null);
     const [pendingAction, setPendingAction] = useState<null | 'open' | 'new' | 'dashboard'>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [saveFailurePromptOpen, setSaveFailurePromptOpen] = useState(false);
     const [projectSetupOpen, setProjectSetupOpen] = useState(false);
     const [migrationWizardOpen, setMigrationWizardOpen] = useState(false);
     const [migrationWizardData, setMigrationWizardData] = useState<ProjectFile | Record<string, never>>({});
@@ -98,51 +95,27 @@ export function FileMenu() {
         };
     }, [isOpen]);
 
-    const notifyLoadSignals = useCallback((options: { loadedFromBackup?: boolean; originalVersion?: string } = {}) => {
-        if (options.loadedFromBackup) {
-            addToast({
-                title: 'Backup Recovered',
-                message: 'Backup loaded. Your project was recovered from a backup copy.',
-                type: 'warning',
-            });
+    const requestCanvasSave = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+        window.dispatchEvent(new Event('sws:canvas-save'));
+    }, []);
+
+    const requestCanvasSaveAndCheckSuccess = useCallback(async () => {
+        requestCanvasSave();
+
+        const pollIntervalMs = 50;
+        const timeoutMs = 2000;
+        for (let elapsed = 0; elapsed < timeoutMs; elapsed += pollIntervalMs) {
+            await new Promise<void>((resolve) => window.setTimeout(resolve, pollIntervalMs));
+            if (!useProjectStore.getState().isDirty) {
+                return true;
+            }
         }
 
-        if (options.originalVersion && options.originalVersion !== CURRENT_SCHEMA_VERSION) {
-            addToast({
-                title: 'Project Upgraded',
-                message: `Loaded project from schema ${options.originalVersion}.`,
-                type: 'info',
-            });
-        }
-    }, [addToast]);
-
-    const handleSave = useCallback(async () => {
-        if (!canSave) {
-            return { success: false, source: 'manual' as const, error: 'Save unavailable.' };
-        }
-
-        let result: Awaited<ReturnType<typeof persistProjectFromStores>>;
-        try {
-            result = await persistProjectFromStores('manual');
-        } catch (error) {
-            // Normalize any unexpected throw into a structured failure so that
-            // callers (e.g. onSaveAndLeave) always reach the continuation-prompt
-            // branch rather than hitting an unhandled rejection.
-            result = {
-                success: false,
-                source: 'manual' as const,
-                error: error instanceof Error ? error.message : 'Failed to save project.',
-            };
-        }
-
-        if (!result.success) {
-            setErrorMessage(result.error || 'Failed to save project');
-            return result;
-        }
-
-        setDirty(false);
-        return result;
-    }, [canSave, setDirty]);
+        return !useProjectStore.getState().isDirty;
+    }, [requestCanvasSave]);
 
     const handleOpenFromFileInternal = useCallback(async () => {
         setIsOpen(false);
@@ -159,11 +132,13 @@ export function FileMenu() {
                 if (!loadResult.success || !loadResult.project) {
                     throw new Error(loadResult.error || 'Failed to load project');
                 }
+                if (loadResult.loadedFromBackup) {
+                    addToast({
+                        title: 'Project recovered from backup',
+                        type: 'warning',
+                    });
+                }
                 const importedProject = loadResult.project;
-                notifyLoadSignals({
-                    loadedFromBackup: loadResult.loadedFromBackup,
-                    originalVersion: loadResult.originalVersion,
-                });
 
                 const projectListStore = useProjectListStore.getState();
                 const existing = projectListStore.projects.find(
@@ -212,8 +187,6 @@ export function FileMenu() {
                 }
 
             setWebProjectFileHandle(projectFile.projectId, opened.fileHandle);
-            hydrateToStores(projectFile, { payload });
-            notifyLoadSignals({ originalVersion: parsed.originalVersion });
 
             const projectListStore = useProjectListStore.getState();
             const existingById = projectListStore.projects.find(p => p.projectId === projectFile.projectId);
@@ -239,7 +212,7 @@ export function FileMenu() {
         } finally {
             setIsLoading(false);
         }
-    }, [isTauri, notifyLoadSignals, router]);
+    }, [isTauri, router, addToast]);
 
     const proceedAfterSaveOrDiscard = async (action: 'open' | 'new' | 'dashboard') => {
         if (action === 'new') {
@@ -320,21 +293,12 @@ export function FileMenu() {
         const now = new Date().toISOString();
 
         try {
-            const setupSettings = projectData.settings as Record<string, unknown> | undefined;
             const projectFile = createEmptyProject(projectData.projectName, {
                 projectId,
                 createdAt: now,
                 modifiedAt: now,
                 isArchived: false,
                 location: projectData.location || undefined,
-                settings: setupSettings ? {
-                    unitSystem: (setupSettings.unitSystem as 'imperial' | 'metric' | undefined) || 'imperial',
-                    gridSize: (setupSettings.gridSize as number | undefined) || 12,
-                    gridVisible: (setupSettings.gridVisible as boolean | undefined) ?? true,
-                    snapToGrid: (setupSettings.snapToGrid as boolean | undefined) ?? true,
-                    // Include any other calculation settings from the wizard
-                    ...setupSettings,
-                } : undefined,
             });
 
             const repository = await getProjectRepository();
@@ -446,12 +410,8 @@ export function FileMenu() {
         }
 
         await saveProjectAsAndRememberHandle(projectFile);
-        const result = await persistProjectFromStores('auto');
-        if (!result.success) {
-            setErrorMessage(result.error || 'Failed to save project');
-            return;
-        }
-    }, [canSave, isTauri, currentProjectId, setDirty]);
+        requestCanvasSave();
+    }, [canSave, isTauri, currentProjectId, requestCanvasSave, setDirty]);
 
     useEffect(() => {
         const isEditableTarget = (target: EventTarget | null) => {
@@ -476,15 +436,6 @@ export function FileMenu() {
                 return;
             }
 
-            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
-                if (!canSave) {
-                    return;
-                }
-                event.preventDefault();
-                void handleSave();
-                return;
-            }
-
             if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'o') {
                 event.preventDefault();
                 void handleOpenFromFile();
@@ -499,12 +450,41 @@ export function FileMenu() {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [canSave, handleOpenFromFile, handleNewProject, handleSave, handleSaveAs]);
+    }, [canSave, handleOpenFromFile, handleNewProject, handleSaveAs]);
 
     const handleExportReport = () => {
         setIsOpen(false);
         setExportDialogOpen(true);
     };
+
+    const handleUnsavedSaveAndLeave = useCallback(async () => {
+        const action = pendingAction;
+        setUnsavedDialogOpen(false);
+
+        if (!action) {
+            setPendingAction(null);
+            return;
+        }
+
+        if (action !== 'open') {
+            requestCanvasSave();
+            await proceedAfterSaveOrDiscard(action);
+            setPendingAction(null);
+            return;
+        }
+
+        const saveSucceeded = await requestCanvasSaveAndCheckSuccess();
+        if (!saveSucceeded) {
+            const shouldContinue = window.confirm('Save failed. Continue opening anyway?');
+            if (!shouldContinue) {
+                setPendingAction(null);
+                return;
+            }
+        }
+
+        await proceedAfterSaveOrDiscard(action);
+        setPendingAction(null);
+    }, [pendingAction, proceedAfterSaveOrDiscard, requestCanvasSave, requestCanvasSaveAndCheckSuccess]);
 
     return (
         <>
@@ -593,7 +573,7 @@ export function FileMenu() {
                         <button
                             onClick={() => {
                                 setIsOpen(false);
-                                void handleSave();
+                                requestCanvasSave();
                             }}
                             disabled={!canSave}
                             role="menuitem"
@@ -630,19 +610,7 @@ export function FileMenu() {
                 open={unsavedDialogOpen}
                 onOpenChange={setUnsavedDialogOpen}
                 onSaveAndLeave={() => {
-                    void (async () => {
-                        const result = await handleSave();
-                        setUnsavedDialogOpen(false);
-                        if (result.success) {
-                            if (pendingAction) {
-                                await proceedAfterSaveOrDiscard(pendingAction);
-                            }
-                            setPendingAction(null);
-                            return;
-                        }
-
-                        setSaveFailurePromptOpen(true);
-                    })();
+                    void handleUnsavedSaveAndLeave();
                 }}
                 onLeaveWithoutSaving={() => {
                     setUnsavedDialogOpen(false);
@@ -656,37 +624,6 @@ export function FileMenu() {
                     setPendingAction(null);
                 }}
             />
-
-            <Dialog open={saveFailurePromptOpen} onOpenChange={setSaveFailurePromptOpen}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Save Failed</DialogTitle>
-                        <DialogDescription>
-                            Save failed. Continue opening anyway?
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="mt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => setSaveFailurePromptOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={() => {
-                                setSaveFailurePromptOpen(false);
-                                if (pendingAction) {
-                                    void proceedAfterSaveOrDiscard(pendingAction);
-                                }
-                                setPendingAction(null);
-                            }}
-                        >
-                            Continue Anyway
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
 
             <ProjectAlreadyExistsDialog
                 open={existingProjectDialogOpen}
@@ -748,9 +685,22 @@ export function FileMenu() {
                             return;
                         }
 
-                        hydrateToStores(migratedData, { payload });
+                        hydrateToStores(payload);
+
+                        if (migratedData.settings) {
+                            useSettingsStore.getState().setCalculationSettings(migratedData.settings);
+                        }
 
                         const migratedProject = payload.project;
+                        useProjectStore.getState().setProject(migratedData.projectId, {
+                            projectId: migratedData.projectId,
+                            projectName: migratedProject.projectName,
+                            projectNumber: migratedProject.projectNumber,
+                            clientName: migratedProject.clientName,
+                            isArchived: migratedProject.isArchived,
+                            createdAt: migratedProject.createdAt,
+                            modifiedAt: migratedProject.modifiedAt,
+                        });
 
                         const projectListStore = useProjectListStore.getState();
                         projectListStore.updateProject(migratedData.projectId, {

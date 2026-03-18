@@ -12,6 +12,7 @@ describe('threeDViewStore', () => {
         expect(state.orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
         expect(state.polarAngle).toBe(THREE_D_VIEW_INITIAL_STATE.polarAngle);
         expect(state.azimuthAngle).toBe(THREE_D_VIEW_INITIAL_STATE.azimuthAngle);
+        expect(state.cameraRestored).toBe(false);
     });
 
     it('has correct display option defaults', () => {

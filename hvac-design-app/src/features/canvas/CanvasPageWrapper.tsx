@@ -7,11 +7,15 @@ import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
 import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
-import { CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema/project-file.schema';
+import { MigrationWizard } from '@/components/dialogs/MigrationWizard';
+import { VersionDetector } from '@/core/services/migration/VersionDetector';
+import { type ProjectFile } from '@/core/schema/project-file.schema';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
 import {
+  createLocalStoragePayloadFromProjectFileWithDefaults,
   loadProjectFromStorage,
+  saveProjectToStorage,
   type LocalStoragePayload,
 } from './hooks/useAutoSave';
 import { useAppStateStore } from '@/stores/useAppStateStore';
@@ -54,13 +58,17 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   const [projectError, setProjectError] = useState<string | null>(null);
   const [versionWarning, setVersionWarning] = useState(false);
   const [projectVersion, setProjectVersion] = useState<string>('');
-  const [pendingLoad, setPendingLoad] = useState<{
-    project: ProjectFile;
-    payload?: LocalStoragePayload;
-    storagePath?: string;
-    loadedFromBackup?: boolean;
-    originalVersion?: string;
-  } | null>(null);
+  const [shouldLoadProject, setShouldLoadProject] = useState(false);
+  const [needsMigration, setNeedsMigration] = useState(false);
+  const [migrationData, setMigrationData] = useState<ProjectFile | null>(null);
+
+  const hydrateProject = (project: ProjectFile, storedPayload?: LocalStoragePayload) => {
+    try {
+      hydrateToStores(storedPayload ?? project);
+    } catch (error) {
+      logger.error('[CanvasPageWrapper] Failed to hydrate project data', error);
+    }
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -72,76 +80,23 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
   // Set project ID in store when route loads
   useEffect(() => {
-    const projectListStore = useProjectListStore.getState();
-
-    const upsertProjectListEntry = (project: ProjectFile, storagePath?: string) => {
-      const existing = projectListStore.projects.find((item) => item.projectId === project.projectId);
-      const projectListItem = {
-        projectId: project.projectId,
-        projectName: project.projectName,
-        projectNumber: project.projectNumber,
-        clientName: project.clientName,
-        createdAt: project.createdAt,
-        modifiedAt: project.modifiedAt,
-        storagePath: storagePath ?? `project-${project.projectId}`,
-        filePath: storagePath,
-        isArchived: project.isArchived,
-      };
-
-      if (existing) {
-        projectListStore.updateProject(project.projectId, projectListItem);
-        return;
-      }
-
-      projectListStore.addProject(projectListItem);
-    };
-
-    const surfaceLoadSignals = (options: { loadedFromBackup?: boolean; originalVersion?: string } = {}) => {
-      if (options.loadedFromBackup) {
-        addToast({
-          title: 'Backup Recovered',
-          message: 'Backup loaded. Your project was recovered from a backup copy.',
-          type: 'warning',
-        });
-      }
-
-      if (options.originalVersion && options.originalVersion !== CURRENT_SCHEMA_VERSION) {
-        addToast({
-          title: 'Project Upgraded',
-          message: `Loaded project from schema ${options.originalVersion}.`,
-          type: 'info',
-        });
-      }
-    };
-
-    const applyLoadedProject = (project: ProjectFile, payload?: LocalStoragePayload, options: {
-      storagePath?: string;
-      loadedFromBackup?: boolean;
-      originalVersion?: string;
-    } = {}) => {
-      hydrateToStores(project, payload ? { payload } : undefined);
-      upsertProjectListEntry(project, options.storagePath);
-      surfaceLoadSignals(options);
-    };
-
     try {
       // Handle tutorial projects specially - they don't exist in storage
       // but we need to allow the tutorial flow to proceed
       if (projectId.startsWith('tutorial-')) {
         // Create a temporary tutorial project with minimal data
         const tutorialProject = {
-          projectId,
-          projectName: 'Tutorial Project',
+          id: projectId,
+          name: 'Tutorial Project',
           projectNumber: '',
           clientName: '',
           location: '',
           scope: { details: [], materials: [], projectType: 'Residential' },
           siteConditions: { elevation: '', outdoorTemp: '', indoorTemp: '', windSpeed: '', humidity: '', localCodes: '' },
-          isArchived: false,
           createdAt: new Date().toISOString(),
           modifiedAt: new Date().toISOString(),
         };
-        setProject(projectId, tutorialProject);
+        loadProject(tutorialProject);
         return;
       }
 
@@ -161,6 +116,13 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
               return;
             }
 
+            const detectedVersion = VersionDetector.detectVersion(result.project);
+            if (VersionDetector.needsMigration(detectedVersion)) {
+              setNeedsMigration(true);
+              setMigrationData(result.project as ProjectFile);
+              return;
+            }
+
             // Check version compatibility
             const proj = result.project as any; // Type assertion for dynamic import
             const projVersion = (proj as any).schemaVersion ?? proj.version ?? '1.0.0';
@@ -169,21 +131,40 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
             if (compareVersions(projVersion, APP_VERSION) > 0) {
               logger.debug('[CanvasPageWrapper] Version mismatch detected');
               setProjectVersion(projVersion);
-              setPendingLoad({
-                project: result.project,
-                storagePath: projectListItem.filePath,
-                loadedFromBackup: result.loadedFromBackup,
-                originalVersion: result.originalVersion,
-              });
               setVersionWarning(true);
               return;
             }
 
-            applyLoadedProject(result.project, undefined, {
-              storagePath: projectListItem.filePath,
-              loadedFromBackup: result.loadedFromBackup,
-              originalVersion: result.originalVersion,
-            });
+            hydrateProject(result.project);
+            if (result.loadedFromBackup) {
+              addToast({
+                title: 'Project recovered from backup',
+                type: 'warning',
+              });
+              localStorage.removeItem('hvac-backup-recovered');
+            }
+
+            // Convert ProjectFile to the format expected by loadProject
+            const projectData = {
+              id: proj.projectId,
+              name: proj.projectName,
+              projectNumber: proj.projectNumber ?? '',
+              clientName: proj.clientName ?? '',
+              location: proj.location ?? '',
+              scope: proj.scope ?? { details: [], materials: [], projectType: 'Commercial' },
+              siteConditions: proj.siteConditions ?? {
+                elevation: '0',
+                outdoorTemp: '70',
+                indoorTemp: '70',
+                windSpeed: '0',
+                humidity: '50',
+                localCodes: ''
+              },
+              createdAt: proj.createdAt,
+              modifiedAt: proj.modifiedAt,
+            };
+
+            loadProject(projectData);
           } catch (error) {
             logger.error('[CanvasPageWrapper] Failed to load from file:', error);
             setProjectError('Unable to load project file. The file may be corrupted or inaccessible.');
@@ -207,6 +188,27 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
         return;
       }
 
+      const loadedProjectData = storedPayload?.project;
+      if (loadedProjectData) {
+        const detectedVersion = VersionDetector.detectVersion(loadedProjectData);
+        if (VersionDetector.needsMigration(detectedVersion)) {
+          setNeedsMigration(true);
+          setMigrationData(loadedProjectData as ProjectFile);
+          return;
+        }
+      }
+
+      if (storedPayload) {
+        hydrateProject(storedPayload.project, storedPayload);
+        if (storedProject?.source === 'backup') {
+          addToast({
+            title: 'Project recovered from backup',
+            type: 'warning',
+          });
+          localStorage.removeItem('hvac-backup-recovered');
+        }
+      }
+
       // Check version compatibility
       const projVersion = storedPayload?.project?.schemaVersion ?? (persistedProject as any)?.version ?? '1.0.0';
       logger.debug(`[CanvasPageWrapper] Project: ${projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
@@ -214,61 +216,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       if (compareVersions(projVersion, APP_VERSION) > 0) {
         logger.debug('[CanvasPageWrapper] Version mismatch detected');
         setProjectVersion(projVersion);
-        if (storedPayload?.project) {
-          // Primary path: full project file present in localStorage payload.
-          setPendingLoad({
-            project: storedPayload.project,
-            payload: storedPayload,
-            originalVersion: storedPayload.project.schemaVersion,
-          });
-        } else {
-          // Legacy-only path: no storedPayload.project, but persistedProject
-          // metadata exists. Synthesize a minimal ProjectFile so that
-          // onContinue can still hydrate the canvas (via setProject) rather
-          // than silently no-oping.
-          const syntheticProject: ProjectFile = {
-            projectId,
-            schemaVersion: projVersion,
-            projectName: persistedProject?.name ?? 'Untitled Project',
-            projectNumber: persistedProject?.projectNumber || undefined,
-            clientName: persistedProject?.clientName || undefined,
-            location: persistedProject?.location || undefined,
-            scope: persistedProject?.scope,
-            siteConditions: persistedProject?.siteConditions,
-            isArchived: persistedProject?.isArchived ?? false,
-            createdAt: persistedProject?.createdAt ?? new Date().toISOString(),
-            modifiedAt: persistedProject?.modifiedAt ?? new Date().toISOString(),
-          } as unknown as ProjectFile;
-          setPendingLoad({
-            project: syntheticProject,
-            originalVersion: projVersion,
-          });
-        }
         setVersionWarning(true);
         return; // Wait for user decision
       }
 
-      if (storedPayload?.project) {
-        applyLoadedProject(storedPayload.project, storedPayload, {
-          loadedFromBackup: storedProject?.source === 'backup',
-          originalVersion: storedPayload.project.schemaVersion,
-        });
-        return;
-      }
-
-      setProject(projectId, {
-        projectId,
-        projectName: persistedProject?.name ?? 'Untitled Project',
-        projectNumber: persistedProject?.projectNumber || undefined,
-        clientName: persistedProject?.clientName || undefined,
-        location: persistedProject?.location || undefined,
-        scope: persistedProject?.scope,
-        siteConditions: persistedProject?.siteConditions,
-        isArchived: persistedProject?.isArchived ?? false,
-        createdAt: persistedProject?.createdAt ?? new Date().toISOString(),
-        modifiedAt: persistedProject?.modifiedAt ?? new Date().toISOString(),
-      });
-      localStorage.setItem('lastActiveProjectId', projectId);
+      // Load project
+      loadProject(persistedProject, storedPayload);
     } catch (error) {
       console.error('Failed to load project:', error);
       setProjectError('Unable to load project. The file may be corrupted or there was a storage error.');
@@ -278,7 +231,67 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
     return () => {
       clearProject();
     };
-  }, [addToast, clearProject, getProject, projectId, setProject]);
+  }, [projectId, setProject, clearProject, getProject]);
+
+  // Load project after version warning acceptance
+  useEffect(() => {
+    if (shouldLoadProject) {
+      try {
+        const storedProject = loadProjectFromStorage(projectId);
+        const persistedProject = getProject(projectId);
+        if (storedProject?.payload) {
+          hydrateProject(storedProject.payload.project, storedProject.payload);
+          if (storedProject.source === 'backup') {
+            addToast({
+              title: 'Project recovered from backup',
+              type: 'warning',
+            });
+            localStorage.removeItem('hvac-backup-recovered');
+          }
+        }
+        if (persistedProject || storedProject?.payload) {
+          loadProject(persistedProject, storedProject?.payload);
+        }
+      } catch (error) {
+        setProjectError('Unable to load project.');
+      }
+      setShouldLoadProject(false);
+    }
+  }, [shouldLoadProject, projectId, getProject, addToast]);
+
+  function loadProject(persistedProject: any, storedPayload?: LocalStoragePayload) {
+    const storedProject = storedPayload?.project;
+    const resolvedProjectId = storedProject?.projectId ?? persistedProject?.id ?? projectId;
+
+    setProject(projectId, {
+      projectId: resolvedProjectId,
+      projectName: storedProject?.projectName ?? persistedProject?.name ?? 'Untitled Project',
+      projectNumber: storedProject?.projectNumber ?? (persistedProject?.projectNumber || undefined),
+      clientName: storedProject?.clientName ?? (persistedProject?.clientName || undefined),
+      location: persistedProject?.location || undefined,
+      scope: persistedProject?.scope,
+      siteConditions: persistedProject?.siteConditions,
+      isArchived: storedProject?.isArchived ?? persistedProject?.isArchived ?? false,
+      createdAt: storedProject?.createdAt ?? persistedProject?.createdAt ?? new Date().toISOString(),
+      modifiedAt: storedProject?.modifiedAt ?? persistedProject?.modifiedAt ?? new Date().toISOString(),
+    });
+
+    // Track as last active project for auto-open feature
+    localStorage.setItem('lastActiveProjectId', projectId);
+
+    if (storedPayload) {
+      useProjectListStore.getState().addProject({
+        projectId: resolvedProjectId,
+        projectName: storedProject?.projectName ?? persistedProject?.name ?? 'Untitled Project',
+        projectNumber: storedProject?.projectNumber ?? persistedProject?.projectNumber,
+        clientName: storedProject?.clientName ?? persistedProject?.clientName,
+        createdAt: storedProject?.createdAt ?? new Date().toISOString(),
+        modifiedAt: storedProject?.modifiedAt ?? new Date().toISOString(),
+        storagePath: `project-${resolvedProjectId}`,
+        isArchived: false,
+      });
+    }
+  }
 
   // Show error page (404)
   if (projectError) {
@@ -286,6 +299,51 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       <ErrorPage
         title="Project Not Found"
         message={projectError}
+      />
+    );
+  }
+
+  if (needsMigration && migrationData) {
+    return (
+      <MigrationWizard
+        isOpen={true}
+        onClose={() => {
+          setNeedsMigration(false);
+          router.push('/dashboard');
+        }}
+        data={migrationData}
+        onMigrationComplete={(migratedData: any) => {
+          if (migratedData) {
+            const payload = createLocalStoragePayloadFromProjectFileWithDefaults(migratedData);
+            saveProjectToStorage(migratedData.projectId, payload);
+            hydrateProject(payload.project, payload);
+
+            setProject(migratedData.projectId, {
+              projectId: migratedData.projectId,
+              projectName: payload.project.projectName,
+              projectNumber: payload.project.projectNumber,
+              clientName: payload.project.clientName,
+              isArchived: payload.project.isArchived,
+              createdAt: payload.project.createdAt,
+              modifiedAt: payload.project.modifiedAt,
+            });
+
+            localStorage.setItem('lastActiveProjectId', migratedData.projectId);
+
+            useProjectListStore.getState().addProject({
+              projectId: migratedData.projectId,
+              projectName: payload.project.projectName,
+              projectNumber: payload.project.projectNumber,
+              clientName: payload.project.clientName,
+              createdAt: payload.project.createdAt,
+              modifiedAt: payload.project.modifiedAt,
+              storagePath: `project-${migratedData.projectId}`,
+              isArchived: false,
+            });
+          }
+
+          setNeedsMigration(false);
+        }}
       />
     );
   }
@@ -298,42 +356,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
         appVersion={APP_VERSION}
         onContinue={() => {
           setVersionWarning(false);
-          if (pendingLoad) {
-            hydrateToStores(pendingLoad.project, pendingLoad.payload ? { payload: pendingLoad.payload } : undefined);
-            const projectListStore = useProjectListStore.getState();
-            const existing = projectListStore.projects.find((item) => item.projectId === pendingLoad.project.projectId);
-            const projectListItem = {
-              projectId: pendingLoad.project.projectId,
-              projectName: pendingLoad.project.projectName,
-              projectNumber: pendingLoad.project.projectNumber,
-              clientName: pendingLoad.project.clientName,
-              createdAt: pendingLoad.project.createdAt,
-              modifiedAt: pendingLoad.project.modifiedAt,
-              storagePath: pendingLoad.storagePath ?? `project-${pendingLoad.project.projectId}`,
-              filePath: pendingLoad.storagePath,
-              isArchived: pendingLoad.project.isArchived,
-            };
-            if (existing) {
-              projectListStore.updateProject(pendingLoad.project.projectId, projectListItem);
-            } else {
-              projectListStore.addProject(projectListItem);
-            }
-            if (pendingLoad.loadedFromBackup) {
-              addToast({
-                title: 'Backup Recovered',
-                message: 'Backup loaded. Your project was recovered from a backup copy.',
-                type: 'warning',
-              });
-            }
-            if (pendingLoad.originalVersion && pendingLoad.originalVersion !== CURRENT_SCHEMA_VERSION) {
-              addToast({
-                title: 'Project Upgraded',
-                message: `Loaded project from schema ${pendingLoad.originalVersion}.`,
-                type: 'info',
-              });
-            }
-            setPendingLoad(null);
-          }
+          setShouldLoadProject(true);
         }}
         onCancel={() => router.push('/dashboard')}
       />

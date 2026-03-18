@@ -24,7 +24,6 @@ interface ThreeViewportProps {
 }
 
 export function ThreeViewport({ className = '' }: ThreeViewportProps): React.ReactElement {
-  const CLICK_MOVE_TOLERANCE_PX = 4;
   const mountRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -32,14 +31,11 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
   const sceneGroupRef = useRef<THREE.Group | null>(null);
   const gizmoGroupRef = useRef<THREE.Group | null>(null);
   const gizmoManagerRef = useRef<GizmoManager | null>(null);
-  const wasDraggingRef = useRef<boolean>(false);
-  const activeDragPointerIdRef = useRef<number | null>(null);
-  const pointerDownInfoRef = useRef<{ button: number; clientX: number; clientY: number } | null>(null);
   const controlsRef = useRef<ReturnType<typeof createControls> | null>(null);
   const gridRef = useRef<THREE.GridHelper | null>(null);
   const axesRef = useRef<THREE.AxesHelper | null>(null);
+  const hasSavedCameraRef = useRef<boolean | null>(null);
   const [renderError, setRenderError] = useState<string | null>(null);
-  const hasSavedCameraRef = useRef(false);
 
   const entities = useEntityStore(
     useShallow((state) =>
@@ -83,7 +79,10 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
     const width = mount.clientWidth || 1000;
     const height = mount.clientHeight || 700;
     const initialThreeDView = useThreeDViewStore.getState();
-    hasSavedCameraRef.current = initialThreeDView.cameraRestored ?? false;
+    const hasSavedCamera = initialThreeDView.cameraRestored;
+    if (hasSavedCameraRef.current === null) {
+      hasSavedCameraRef.current = hasSavedCamera;
+    }
 
     try {
       const scene = createScene();
@@ -131,8 +130,14 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
 
       // Build GizmoManager in its own group
       const gizmoManager = createGizmoManager(gizmoGroup, camera, renderer.domElement, {
-        onMoveEnd: (entityId, worldPose) => moveEntity3D(entityId, worldPose),
-        onRotateEnd: (entityId, targetRotationDeg) => rotateEntity3D(entityId, targetRotationDeg),
+        onMoveEnd: (entityId, worldPose) => {
+          moveEntity3D(entityId, worldPose);
+          controls.resume();
+        },
+        onRotateEnd: (entityId, targetRotationDeg) => {
+          rotateEntity3D(entityId, targetRotationDeg);
+          controls.resume();
+        },
       });
       gizmoManagerRef.current = gizmoManager;
 
@@ -145,37 +150,9 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
       };
 
       // Pointer-down: gizmo has priority; if it starts a drag, suspend orbit
-      const releaseDragPointer = () => {
-        const activePointerId = activeDragPointerIdRef.current;
-        if (activePointerId !== null && renderer.domElement.hasPointerCapture(activePointerId)) {
-          renderer.domElement.releasePointerCapture(activePointerId);
-        }
-        activeDragPointerIdRef.current = null;
-      };
-
-      const completeGizmoDrag = (event: PointerEvent) => {
-        if (!wasDraggingRef.current) {
-          return;
-        }
-
-        gizmoManager.handlePointerUp(event);
-        controls.resume();
-        wasDraggingRef.current = false;
-        releaseDragPointer();
-      };
-
       const handlePointerDown = (event: PointerEvent) => {
-        pointerDownInfoRef.current = {
-          button: event.button,
-          clientX: event.clientX,
-          clientY: event.clientY,
-        };
-
         const gizmoConsumed = gizmoManager.handlePointerDown(event);
-        wasDraggingRef.current = gizmoConsumed;
         if (gizmoConsumed) {
-          activeDragPointerIdRef.current = event.pointerId;
-          renderer.domElement.setPointerCapture(event.pointerId);
           controls.suspend();
         }
       };
@@ -185,25 +162,15 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
       };
 
       const handlePointerUp = (event: PointerEvent) => {
-        if (wasDraggingRef.current) {
-          pointerDownInfoRef.current = null;
-          completeGizmoDrag(event);
-          return;
+        if (gizmoManager.isDragging()) {
+          gizmoManager.handlePointerUp(event);
+          controls.resume();
         }
+      };
 
-        const pointerDownInfo = pointerDownInfoRef.current;
-        pointerDownInfoRef.current = null;
-
-        if (!pointerDownInfo || pointerDownInfo.button !== 0 || event.button !== 0) {
-          return;
-        }
-
-        const deltaX = event.clientX - pointerDownInfo.clientX;
-        const deltaY = event.clientY - pointerDownInfo.clientY;
-        const movedTooFar = Math.hypot(deltaX, deltaY) > CLICK_MOVE_TOLERANCE_PX;
-        if (movedTooFar) {
-          return;
-        }
+      // Click: only run entity raycasting if gizmo is NOT dragging
+      const handleClick = (event: MouseEvent) => {
+        if (gizmoManager.isDragging()) return;
 
         const intersections = raycastSelection(event, renderer.domElement, camera, sceneGroup.children);
         const hit = intersections[0];
@@ -215,29 +182,18 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
         }
       };
 
-      const handlePointerCancel = (event: PointerEvent) => {
-        if (!wasDraggingRef.current || event.pointerId !== activeDragPointerIdRef.current) {
-          return;
-        }
-        pointerDownInfoRef.current = null;
-        completeGizmoDrag(event);
-      };
-
       // Escape cancels an active gizmo drag
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape' && gizmoManager.isDragging()) {
           gizmoManager.handleCancel();
           controls.resume();
-          wasDraggingRef.current = false;
-          pointerDownInfoRef.current = null;
-          releaseDragPointer();
         }
       };
 
       renderer.domElement.addEventListener('pointerdown', handlePointerDown);
       renderer.domElement.addEventListener('pointermove', handlePointerMove);
       renderer.domElement.addEventListener('pointerup', handlePointerUp);
-      renderer.domElement.addEventListener('pointercancel', handlePointerCancel);
+      renderer.domElement.addEventListener('click', handleClick);
       window.addEventListener('keydown', handleKeyDown);
       window.addEventListener('resize', handleResize);
 
@@ -254,10 +210,9 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
         renderer.domElement.removeEventListener('pointerdown', handlePointerDown);
         renderer.domElement.removeEventListener('pointermove', handlePointerMove);
         renderer.domElement.removeEventListener('pointerup', handlePointerUp);
-        renderer.domElement.removeEventListener('pointercancel', handlePointerCancel);
+        renderer.domElement.removeEventListener('click', handleClick);
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('resize', handleResize);
-        releaseDragPointer();
         gizmoManager.dispose();
         controls.dispose();
         if (animationRef.current !== null) {
@@ -300,10 +255,7 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
   useEffect(() => {
     const camera = cameraRef.current;
     const sceneGroup = sceneGroupRef.current;
-    if (!camera || !sceneGroup || nodes.length === 0) {
-      return;
-    }
-    if (hasSavedCameraRef.current) {
+    if (hasSavedCameraRef.current === true || !camera || !sceneGroup || nodes.length === 0) {
       return;
     }
     const bounds = computeSceneBounds(nodes);

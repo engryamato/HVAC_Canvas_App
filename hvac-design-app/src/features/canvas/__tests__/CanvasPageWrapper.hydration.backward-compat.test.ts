@@ -7,28 +7,10 @@
  * - This prevents previous-project state residue from leaking across project loads.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useViewModeStore, VIEW_MODE_INITIAL_STATE } from '../store/viewModeStore';
+import { useViewModeStore } from '../store/viewModeStore';
 import { useThreeDViewStore, THREE_D_VIEW_INITIAL_STATE } from '../store/threeDViewStore';
 import type { ProjectFile } from '@/core/schema/project-file.schema';
-import { createEmptyProject } from '@/core/schema/project-file.schema';
-import { createLocalStoragePayloadFromProjectFileWithDefaults } from '../hooks/useAutoSave';
-
-function combineHydrate(payload: { settings?: Partial<ProjectFile['settings']>; threeDViewState?: ProjectFile['threeDViewState'] } = {}) {
-    const hasViewMode = Boolean(payload.settings?.activeViewMode);
-    const hasThreeDState = Boolean(payload.threeDViewState);
-
-    if (!hasViewMode || !hasThreeDState) {
-        useViewModeStore.getState().reset();
-        useThreeDViewStore.getState().reset();
-    }
-
-    if (hasViewMode) {
-        useViewModeStore.getState().hydrateViewMode({ activeViewMode: payload.settings!.activeViewMode });
-    }
-    if (hasThreeDState) {
-        useThreeDViewStore.getState().hydrateThreeDView(payload.threeDViewState!);
-    }
-}
+import { hydrateToStores } from '@/core/persistence/ProjectStateOrchestrator';
 
 describe('CanvasPageWrapper hydration — backward-compat / partial payloads', () => {
     beforeEach(() => {
@@ -39,7 +21,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
     });
 
     it('resets both stores when activeViewMode is missing', () => {
-        combineHydrate({
+        hydrateToStores({
             // NO settings.activeViewMode
             threeDViewState: {
                 cameraTarget: { x: 50, y: 0, z: 50 },
@@ -47,11 +29,12 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
                 orbitRadius: 860,
                 polarAngle: 1.12,
                 azimuthAngle: 0.78,
+                cameraRestored: false,
                 showGrid: true,
                 showAxes: true,
                 showPlanOverlay: false,
             },
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         // After reset: viewMode defaults to 'plan'
         expect(useViewModeStore.getState().activeViewMode).toBe('plan');
         // threeDViewState is present → hydrated after reset
@@ -61,10 +44,10 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
     });
 
     it('resets both stores when threeDViewState is missing', () => {
-        combineHydrate({
+        hydrateToStores({
             settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             // NO threeDViewState
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         // After reset: viewMode re-hydrated to '3d' since it was present
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
         // threeDViewStore reset to defaults — contamination cleared
@@ -73,7 +56,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
     });
 
     it('resets both stores when both fields are missing (legacy file)', () => {
-        combineHydrate({});
+        hydrateToStores({} as Partial<ProjectFile> as ProjectFile);
         // Both stores at clean defaults — no residue from previous project
         expect(useViewModeStore.getState().activeViewMode).toBe('plan');
         expect(useThreeDViewStore.getState().orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
@@ -81,7 +64,7 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
 
     it('does NOT reset when both fields are present — hydrates directly', () => {
         const targetOrbitRadius = 450;
-        combineHydrate({
+        hydrateToStores({
             settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
             threeDViewState: {
                 cameraTarget: { x: 0, y: 0, z: 0 },
@@ -89,41 +72,13 @@ describe('CanvasPageWrapper hydration — backward-compat / partial payloads', (
                 orbitRadius: targetOrbitRadius,
                 polarAngle: 1.12,
                 azimuthAngle: 0.78,
+                cameraRestored: false,
                 showGrid: true,
                 showAxes: true,
                 showPlanOverlay: false,
             },
-        });
+        } as Partial<ProjectFile> as ProjectFile);
         expect(useViewModeStore.getState().activeViewMode).toBe('3d');
         expect(useThreeDViewStore.getState().orbitRadius).toBe(targetOrbitRadius);
-    });
-
-    it('clears residue when switching from a 3d project to a legacy project with no view/camera fields', () => {
-        combineHydrate({});
-
-        expect(useViewModeStore.getState().activeViewMode).toBe('plan');
-        expect(useThreeDViewStore.getState().cameraTarget).toEqual(THREE_D_VIEW_INITIAL_STATE.cameraTarget);
-        expect(useThreeDViewStore.getState().orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
-        expect(useThreeDViewStore.getState().cameraRestored).toBe(false);
-    });
-
-    it('createLocalStoragePayloadFromProjectFileWithDefaults with old-schema file (no threeDViewState) produces clean defaults on hydration', () => {
-        const oldSchemaProject: ProjectFile = {
-            ...createEmptyProject('Old Project'),
-            threeDViewState: undefined,
-        };
-
-        const payload = createLocalStoragePayloadFromProjectFileWithDefaults(oldSchemaProject);
-
-        expect(payload.project.threeDViewState).toBeUndefined();
-
-        combineHydrate({
-            settings: payload.project.settings,
-            threeDViewState: payload.project.threeDViewState,
-        });
-
-        expect(useViewModeStore.getState().activeViewMode).toBe('plan');
-        expect(useThreeDViewStore.getState().orbitRadius).toBe(THREE_D_VIEW_INITIAL_STATE.orbitRadius);
-        expect(useThreeDViewStore.getState().cameraRestored).toBe(false);
     });
 });

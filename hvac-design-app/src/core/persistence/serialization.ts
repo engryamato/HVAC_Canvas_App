@@ -50,18 +50,17 @@ export function serializeProject(project: ProjectFile): SerializationResult {
 export function deserializeProject(json: string): DeserializationResult {
   try {
     const parsed = JSON.parse(json);
-    const originalVersion =
-      typeof parsed?.schemaVersion === 'string' ? parsed.schemaVersion : CURRENT_SCHEMA_VERSION;
+    const foundVersion = typeof parsed?.schemaVersion === 'string' ? parsed.schemaVersion : undefined;
 
     // Check schema version
-    if (parsed.schemaVersion !== CURRENT_SCHEMA_VERSION) {
+    if (foundVersion !== CURRENT_SCHEMA_VERSION) {
       return {
         success: false,
         requiresMigration: true,
-        foundVersion: parsed.schemaVersion,
-        originalVersion,
+        foundVersion,
         migrated: false,
-        error: `Schema version mismatch: found ${parsed.schemaVersion}, expected ${CURRENT_SCHEMA_VERSION}`,
+        originalVersion: foundVersion,
+        error: `Schema version mismatch: found ${foundVersion}, expected ${CURRENT_SCHEMA_VERSION}`,
       };
     }
 
@@ -72,7 +71,7 @@ export function deserializeProject(json: string): DeserializationResult {
       success: true,
       data: validated,
       migrated: false,
-      originalVersion,
+      originalVersion: validated.schemaVersion,
     };
   } catch (error) {
     if (error instanceof SyntaxError) {
@@ -99,8 +98,7 @@ export function deserializeProjectLenient(json: string): DeserializationResult {
       success: true,
       data: validated,
       migrated: false,
-      originalVersion:
-        typeof parsed?.schemaVersion === 'string' ? parsed.schemaVersion : CURRENT_SCHEMA_VERSION,
+      originalVersion: validated.schemaVersion,
     };
   } catch (error) {
     if (error instanceof SyntaxError) {
@@ -122,16 +120,14 @@ export function migrateProject(project: unknown, fromVersion: string): Deseriali
   // For v1.0.0, no migrations needed yet
   // Future migrations will be added here as version-specific handlers
   if (fromVersion === '1.0.0') {
-    const result = deserializeProjectLenient(JSON.stringify({
-      ...(project as Record<string, unknown>),
-      schemaVersion: CURRENT_SCHEMA_VERSION,
-    }));
+    const result = deserializeProject(JSON.stringify(project));
     if (!result.success) {
       return result;
     }
+
     return {
       ...result,
-      migrated: true,
+      migrated: false,
       originalVersion: fromVersion,
     };
   }
@@ -144,9 +140,9 @@ export function migrateProject(project: unknown, fromVersion: string): Deseriali
 
   return {
     success: false,
+    error: `Unknown schema version: ${fromVersion}`,
     migrated: false,
     originalVersion: fromVersion,
-    error: `Unknown schema version: ${fromVersion}`,
   };
 }
 

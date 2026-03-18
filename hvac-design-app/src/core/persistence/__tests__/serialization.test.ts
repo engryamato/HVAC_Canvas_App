@@ -75,6 +75,7 @@ describe('serialization', () => {
       expect(result.success).toBe(false);
       expect(result.requiresMigration).toBe(true);
       expect(result.foundVersion).toBe('0.9.0');
+      expect(result.migrated).toBe(false);
       expect(result.originalVersion).toBe('0.9.0');
     });
 
@@ -99,7 +100,22 @@ describe('serialization', () => {
 
       expect(result.success).toBe(true);
       expect(result.data?.schemaVersion).toBe('9.9.9');
+      expect(result.migrated).toBe(false);
       expect(result.originalVersion).toBe('9.9.9');
+    });
+
+    it('should keep originalVersion consistent with strict mismatch metadata', () => {
+      const project = makeProject();
+      const modified = { ...project, schemaVersion: '9.9.9' };
+      const json = JSON.stringify(modified);
+
+      const strictResult = deserializeProject(json);
+      const lenientResult = deserializeProjectLenient(json);
+
+      expect(strictResult.requiresMigration).toBe(true);
+      expect(strictResult.originalVersion).toBe('9.9.9');
+      expect(lenientResult.success).toBe(true);
+      expect(lenientResult.originalVersion).toBe('9.9.9');
     });
   });
 
@@ -110,7 +126,7 @@ describe('serialization', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      expect(result.migrated).toBe(true);
+      expect(result.migrated).toBe(false);
       expect(result.originalVersion).toBe('1.0.0');
     });
 
@@ -120,6 +136,8 @@ describe('serialization', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Unknown schema version');
+      expect(result.migrated).toBe(false);
+      expect(result.originalVersion).toBe('0.1.0');
     });
   });
 
