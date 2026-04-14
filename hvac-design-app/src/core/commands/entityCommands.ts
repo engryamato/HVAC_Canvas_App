@@ -1,16 +1,24 @@
-import type { Entity } from '@/core/schema';
+import type { Duct, Entity, Equipment, Fitting, Group } from '@/core/schema';
 import type { Command, ReversibleCommand } from './types';
 import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
-import { useValidationStore } from '@/core/store/validationStore';
+import {
+  useValidationStore,
+  type ConstraintViolation,
+} from '@/core/store/validationStore';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import { ConstraintValidationService } from '@/core/services/constraintValidation';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
-import type { Duct, ValidationSeverity } from '@/core/schema/duct.schema';
+import type { ValidationSeverity } from '@/core/schema/duct.schema';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
+import {
+  calculateDuctRuntime,
+  calculateEquipmentRuntime,
+  calculateFittingRuntime,
+} from '@/core/services/calculations/entityCalculationRuntime';
 
 interface CommandOptions {
   selectionBefore?: string[];
@@ -67,6 +75,168 @@ function resolveServiceById(serviceId: string) {
   return adaptComponentToService(component);
 }
 
+function isConstraintCarrier(entity: Entity): entity is Duct | Equipment | Fitting {
+  return entity.type === 'duct' || entity.type === 'equipment' || entity.type === 'fitting';
+}
+
+function getEntityServiceId(entity: Entity): string | undefined {
+  if (!('props' in entity) || !entity.props || typeof entity.props !== 'object') {
+    return undefined;
+  }
+
+  const serviceId = (entity.props as Record<string, unknown>).serviceId;
+  return typeof serviceId === 'string' ? serviceId : undefined;
+}
+
+function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
+  const entitiesById = useEntityStore.getState().byId;
+
+  if (entity.type === 'duct') {
+    return calculateDuctRuntime(entity).complianceWarnings.map((message, index) => ({
+      ruleId: `engine-runtime-duct-${index}`,
+      type: 'engine-runtime',
+      message,
+      severity: 'warning',
+    }));
+  }
+
+  if (entity.type === 'fitting') {
+    const runtime = calculateFittingRuntime(entity, entitiesById);
+    const violations: ConstraintViolation[] = runtime.complianceWarnings.map((message, index) => ({
+      ruleId: `engine-runtime-fitting-${index}`,
+      type: 'engine-runtime',
+      message,
+      severity: 'warning',
+    }));
+
+    if (
+      entity.props.engineeringSystem === 'generator_exhaust' &&
+      typeof entity.props.backpressureLimit === 'number' &&
+      runtime.calculated.pressureLoss > entity.props.backpressureLimit
+    ) {
+      violations.push({
+        ruleId: 'backpressure-limit',
+        type: 'backpressure-limit',
+        message: `Calculated fitting pressure loss ${runtime.calculated.pressureLoss.toFixed(2)} exceeds limit ${entity.props.backpressureLimit.toFixed(2)}.`,
+        suggestedFix: 'Reduce run resistance or select a higher-rated exhaust fitting.',
+        severity: 'warning',
+      });
+    }
+
+    return violations;
+  }
+
+  if (entity.type === 'equipment') {
+    const runtime = calculateEquipmentRuntime(entity, entitiesById);
+    const violations: ConstraintViolation[] = runtime.complianceWarnings.map((message, index) => ({
+      ruleId: `engine-runtime-equipment-${index}`,
+      type: 'engine-runtime',
+      message,
+      severity: 'warning',
+    }));
+
+    if (
+      typeof entity.props.loadRating === 'number' &&
+      typeof runtime.loadRating === 'number' &&
+      runtime.loadRating > entity.props.loadRating
+    ) {
+      violations.push({
+        ruleId: 'support-load-rating',
+        type: 'support-load-rating',
+        message: `Calculated support load ${runtime.loadRating.toFixed(1)} exceeds rated load ${entity.props.loadRating.toFixed(1)}.`,
+        suggestedFix: 'Select a higher-capacity support assembly or reduce spacing.',
+        severity: 'blocker',
+      });
+    }
+
+    if (typeof runtime.spacing === 'number' && entity.props.spacingRule) {
+      violations.push({
+        ruleId: 'support-spacing-guidance',
+        type: 'support-spacing-guidance',
+        message: `Computed support spacing is ${runtime.spacing.toFixed(1)} ft for the connected run.`,
+        suggestedFix: `Verify the configured spacing rule "${entity.props.spacingRule}" matches this run.`,
+        severity: 'warning',
+      });
+    }
+
+    if (
+      entity.props.engineeringSystem === 'generator_exhaust' &&
+      typeof entity.props.backpressureLimit === 'number' &&
+      typeof runtime.engineeringData.pressureDrop === 'number' &&
+      runtime.engineeringData.pressureDrop > entity.props.backpressureLimit
+    ) {
+      violations.push({
+        ruleId: 'backpressure-limit',
+        type: 'backpressure-limit',
+        message: `Calculated connected-run backpressure ${runtime.engineeringData.pressureDrop.toFixed(2)} exceeds limit ${entity.props.backpressureLimit.toFixed(2)}.`,
+        suggestedFix: 'Reduce run resistance or select a higher-rated exhaust component.',
+        severity: 'warning',
+      });
+    }
+
+    return violations;
+  }
+
+  return [];
+}
+
+function applyConstraintValidation(entity: Duct | Equipment | Fitting, violations: ConstraintViolation[]): void {
+  const warningMessages = violations.map((violation) => violation.message);
+  const currentWarnings = ((entity as { warnings?: Record<string, unknown> }).warnings ?? {}) as Record<string, unknown>;
+  const nextWarnings = { ...currentWarnings };
+  if (warningMessages.length > 0) {
+    nextWarnings.constraintViolations = warningMessages;
+  } else {
+    delete nextWarnings.constraintViolations;
+  }
+  const constraintStatus = {
+    isValid: violations.length === 0,
+    violations: violations.map((violation) => ({
+      type: violation.type ?? violation.ruleId,
+      severity: toConstraintSeverity(violation.severity),
+      message: violation.message,
+      suggestedFix: violation.suggestedFix,
+    })),
+    lastValidated: new Date(),
+  };
+
+  isApplyingValidationMutation = true;
+  try {
+    useEntityStore.getState().updateEntity(entity.id, {
+      props: {
+        ...entity.props,
+        constraintStatus,
+      },
+      warnings: Object.keys(nextWarnings).length > 0 ? nextWarnings : undefined,
+      modifiedAt: new Date().toISOString(),
+    } as Partial<Entity>);
+  } finally {
+    isApplyingValidationMutation = false;
+  }
+}
+
+function validateGroupEntity(entity: Group): void {
+  const childViolations = entity.props.childIds.flatMap((childId) => {
+    const childResult = useValidationStore.getState().validationResults[childId];
+    return childResult?.violations ?? [];
+  });
+
+  if (childViolations.length === 0) {
+    useValidationStore.getState().clearValidation(entity.id);
+    return;
+  }
+
+  useValidationStore.getState().setValidationResult(entity.id, {
+    entityId: entity.id,
+    violations: childViolations.map((violation, index) => ({
+      ...violation,
+      ruleId: `${violation.ruleId}-group-${index}`,
+    })),
+    catalogStatus: 'resolved',
+    lastValidated: new Date(),
+  });
+}
+
 export function validateAndRecord(entityId: string): void {
   const entity = useEntityStore.getState().byId[entityId];
   const validationStore = useValidationStore.getState();
@@ -75,41 +245,67 @@ export function validateAndRecord(entityId: string): void {
     return;
   }
 
-  if (entity.type !== 'duct') {
-    const serviceId = ('serviceId' in entity.props ? entity.props.serviceId : undefined) as string | undefined;
-    if (!serviceId) {
-      validationStore.clearValidation(entity.id);
-      return;
-    }
-    validationStore.setValidationResult(entity.id, {
-      entityId: entity.id,
-      serviceId,
-      violations: [],
-      catalogStatus: 'resolved',
-      lastValidated: new Date(),
-    });
+  if (entity.type === 'group') {
+    validateGroupEntity(entity);
     return;
   }
 
-  const serviceId = entity.props.serviceId;
-  if (!serviceId) {
+  const serviceId = getEntityServiceId(entity);
+  const runtimeViolations = buildRuntimeViolations(entity);
+
+  if (entity.type !== 'duct') {
+    if (!serviceId && runtimeViolations.length === 0) {
+      validationStore.clearValidation(entity.id);
+      return;
+    }
+
+    if (runtimeViolations.length === 0) {
+      validationStore.setValidationResult(entity.id, {
+        entityId: entity.id,
+        serviceId,
+        violations: [],
+        catalogStatus: 'resolved',
+        lastValidated: new Date(),
+      });
+    } else {
+      validationStore.setValidationResult(entity.id, {
+        entityId: entity.id,
+        serviceId,
+        violations: runtimeViolations,
+        catalogStatus: 'resolved',
+        lastValidated: new Date(),
+      });
+    }
+
+    if (isConstraintCarrier(entity)) {
+      applyConstraintValidation(entity, runtimeViolations);
+    }
+    return;
+  }
+
+  if (!serviceId && runtimeViolations.length === 0) {
     validationStore.clearValidation(entity.id);
     return;
   }
 
-  const service = resolveServiceById(serviceId);
-  if (!service) {
+  const service = serviceId ? resolveServiceById(serviceId) : null;
+  if (!service && runtimeViolations.length === 0) {
     validationStore.clearValidation(entity.id);
     return;
   }
 
   const engineeringLimits = useSettingsStore.getState().calculationSettings.engineeringLimits;
-  const violations = ConstraintValidationService.validateDuct(entity.props, service, { engineeringLimits });
+  const violations = service
+    ? ConstraintValidationService.validateDuct(entity.props, service, { engineeringLimits })
+    : [];
 
-  const normalizedViolations = violations.map((violation) => ({
-    ...violation,
-    severity: violation.severity ?? 'warning',
-  }));
+  const normalizedViolations = [
+    ...violations.map((violation) => ({
+      ...violation,
+      severity: violation.severity ?? 'warning',
+    })),
+    ...runtimeViolations,
+  ];
 
   if (normalizedViolations.length === 0) {
     validationStore.clearValidation(entity.id);
@@ -123,48 +319,10 @@ export function validateAndRecord(entityId: string): void {
     });
   }
 
-  const currentWarnings = ((entity as Duct).warnings ?? {}) as { constraintViolations?: string[] };
-  const warningMessages = normalizedViolations.map((violation) => violation.message);
-  const nextWarnings = { ...currentWarnings };
-  if (warningMessages.length > 0) {
-    nextWarnings.constraintViolations = warningMessages;
-  } else {
-    delete nextWarnings.constraintViolations;
-  }
-
-  const constraintStatus = {
-    isValid: normalizedViolations.length === 0,
-    violations: normalizedViolations.map((violation) => ({
-      type: violation.type ?? violation.ruleId,
-      severity: toConstraintSeverity(violation.severity),
-      message: violation.message,
-      suggestedFix: violation.suggestedFix,
-    })),
-    lastValidated: new Date(),
-  };
-
-  isApplyingValidationMutation = true;
-  try {
-    useEntityStore.getState().updateEntity(entity.id, {
-      props: {
-        ...(entity as Duct).props,
-        constraintStatus,
-      },
-      warnings: Object.keys(nextWarnings).length > 0 ? nextWarnings : undefined,
-      modifiedAt: new Date().toISOString(),
-    } as Partial<Entity>);
-  } finally {
-    isApplyingValidationMutation = false;
-  }
+  applyConstraintValidation(entity, normalizedViolations);
 }
 
 function syncEntityValidation(entity: Entity): void {
-  const validationStore = useValidationStore.getState();
-
-  if (entity.type !== 'duct') {
-    validationStore.clearValidation(entity.id);
-    return;
-  }
   validateAndRecord(entity.id);
 }
 

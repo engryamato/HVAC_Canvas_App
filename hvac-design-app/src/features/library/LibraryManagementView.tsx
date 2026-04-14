@@ -1,16 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 
 export function LibraryManagementView() {
-  const components = useComponentLibraryStoreV2((state) => state.components);
-  const categories = useComponentLibraryStoreV2((state) => state.categories);
-  const addComponent = useComponentLibraryStoreV2((state) => state.addComponent);
-  const updateComponent = useComponentLibraryStoreV2((state) => state.updateComponent);
-  const deleteComponent = useComponentLibraryStoreV2((state) => state.deleteComponent);
-  const duplicateComponent = useComponentLibraryStoreV2((state) => state.duplicateComponent);
+  const components = useUnifiedCatalogStore((state) => state.components);
+  const categories = useUnifiedCatalogStore((state) => state.categories);
+  const addComponent = useUnifiedCatalogStore((state) => state.addComponent);
+  const updateComponent = useUnifiedCatalogStore((state) => state.updateComponent);
+  const deleteComponent = useUnifiedCatalogStore((state) => state.deleteComponent);
+  const duplicateComponent = useUnifiedCatalogStore((state) => state.duplicateComponent);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = useMemo(() => components.find((item) => item.id === selectedId), [components, selectedId]);
@@ -22,12 +22,24 @@ export function LibraryManagementView() {
     const newComponent: UnifiedComponentDefinition = {
       id: `custom-${Date.now()}`,
       name: 'New Custom Component',
-      category: firstCategory as 'duct' | 'fitting' | 'equipment' | 'accessory',
-      type: 'accessory',
+      componentClass: 'accessory',
+      category: 'accessory',
+      categoryId: firstCategory,
+      typeId: 'custom_component',
+      type: 'custom_component',
+      engineeringSystem: 'universal',
+      placeable: true,
+      source: 'custom',
+      systemType: 'supply',
+      recommendedFittingEntryIds: [],
+      recommendedAccessoryEntryIds: [],
+      recommendedEquipmentEntryIds: [],
+      connectionNotes: [],
       materials: [],
       engineeringProperties: {
         frictionFactor: 0.0005,
         maxVelocity: 2000,
+        minVelocity: 0,
       },
       pricing: {
         materialCost: 0,
@@ -45,7 +57,7 @@ export function LibraryManagementView() {
     <div className="grid h-full grid-cols-[280px_1fr] gap-3 p-3">
       <div className="space-y-2 rounded border p-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Components</h3>
+          <h3 className="text-sm font-semibold">Catalog Components</h3>
           <button type="button" className="rounded border px-2 py-1 text-xs" onClick={handleCreate}>
             Add
           </button>
@@ -61,7 +73,7 @@ export function LibraryManagementView() {
               }`}
             >
               <div className="font-medium">{component.name}</div>
-              <div className="text-[11px]">{component.type}</div>
+              <div className="text-[11px]">{component.typeId ?? component.type}</div>
             </button>
           ))}
         </div>

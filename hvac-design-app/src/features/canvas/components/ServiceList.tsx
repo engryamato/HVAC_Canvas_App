@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
 
 interface ServiceListProps {
@@ -11,49 +11,49 @@ interface ServiceListProps {
 }
 
 export function ServiceList({ searchQuery }: ServiceListProps) {
-  const components = useComponentLibraryStoreV2((state) => state.components);
-  const activeComponentId = useComponentLibraryStoreV2((state) => state.activeComponentId);
-  const activateComponent = useComponentLibraryStoreV2((state) => state.activateComponent);
-  const duplicateComponent = useComponentLibraryStoreV2((state) => state.duplicateComponent);
-  const deleteComponent = useComponentLibraryStoreV2((state) => state.deleteComponent);
+  const components = useUnifiedCatalogStore((state) => state.components);
+  const activeComponentId = useUnifiedCatalogStore((state) => state.activeComponentId);
+  const activateComponent = useUnifiedCatalogStore((state) => state.activateComponent);
+  const duplicateComponent = useUnifiedCatalogStore((state) => state.duplicateComponent);
+  const deleteComponent = useUnifiedCatalogStore((state) => state.deleteComponent);
   
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'return' | 'exhaust'>('all');
 
-  // Get services from components
-  const services = useMemo(() => {
+  // Derive the view model from unified catalog components.
+  const catalogComponents = useMemo(() => {
     return components
       .filter((component) => Boolean(component.systemType))
       .map((component) => adaptComponentToService(component));
   }, [components]);
 
   // Filter by system type
-  const typeFilteredServices = useMemo(() => {
+  const typeFilteredComponents = useMemo(() => {
     if (filterType === 'all') {
-      return services;
+      return catalogComponents;
     }
-    return services.filter((service) => service.systemType === filterType);
-  }, [services, filterType]);
+    return catalogComponents.filter((component) => component.systemType === filterType);
+  }, [catalogComponents, filterType]);
 
   // Filter by search query
-  const filteredServices = useMemo(() => {
+  const filteredComponents = useMemo(() => {
     if (!searchQuery.trim()) {
-      return typeFilteredServices;
+      return typeFilteredComponents;
     }
     
     const query = searchQuery.toLowerCase();
-    return typeFilteredServices.filter((service) =>
-      service.name.toLowerCase().includes(query) ||
-      service.systemType.toLowerCase().includes(query) ||
-      service.material.toLowerCase().includes(query)
+    return typeFilteredComponents.filter((component) =>
+      component.name.toLowerCase().includes(query) ||
+      component.systemType.toLowerCase().includes(query) ||
+      component.material.toLowerCase().includes(query)
     );
-  }, [typeFilteredServices, searchQuery]);
+  }, [searchQuery, typeFilteredComponents]);
 
   const handleClone = (id: string) => {
     duplicateComponent(id);
   };
 
   const handleDelete = (id: string) => {
-    if (globalThis.confirm('Delete this service?')) {
+    if (globalThis.confirm('Delete this component?')) {
       deleteComponent(id);
     }
   };
@@ -75,23 +75,23 @@ export function ServiceList({ searchQuery }: ServiceListProps) {
         ))}
       </div>
 
-      {/* Service Cards */}
+      {/* Catalog component cards */}
       <div className="flex-1 space-y-3 overflow-y-auto pr-2">
-        {filteredServices.length === 0 ? (
+        {filteredComponents.length === 0 ? (
           <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-slate-300 p-8 text-sm text-slate-500">
             <div className="text-center">
-              <p className="font-medium">No services found</p>
+              <p className="font-medium">No components found</p>
               <p className="mt-1 text-xs">Try a different filter or search term</p>
             </div>
           </div>
         ) : (
-          filteredServices.map((service) => (
+          filteredComponents.map((component) => (
             <div
-              key={service.id}
+              key={component.id}
               className={`
                 space-y-3 rounded-lg border p-4 transition-all
                 ${
-                  activeComponentId === service.id
+                  activeComponentId === component.id
                     ? 'border-blue-500 bg-blue-50 shadow-sm'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }
@@ -100,24 +100,24 @@ export function ServiceList({ searchQuery }: ServiceListProps) {
               <button
                 type="button"
                 className="w-full text-left"
-                onClick={() => activateComponent(service.id)}
+                onClick={() => activateComponent(component.id)}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div
                       className="h-4 w-4 rounded-full shadow-sm"
-                      style={{ backgroundColor: service.color ?? '#94a3b8' }}
+                      style={{ backgroundColor: component.color ?? '#94a3b8' }}
                     />
-                    <span className="font-medium text-sm text-slate-800">{service.name}</span>
+                    <span className="font-medium text-sm text-slate-800">{component.name}</span>
                   </div>
-                  {activeComponentId === service.id && (
+                  {activeComponentId === component.id && (
                     <Badge variant="default" className="h-5 text-xs">
                       Active
                     </Badge>
                   )}
                 </div>
                 <p className="mt-2 text-xs text-slate-600">
-                  {service.systemType} • {service.pressureClass} • {service.material}
+                  {component.systemType} • {component.pressureClass} • {component.material}
                 </p>
               </button>
 
@@ -126,16 +126,16 @@ export function ServiceList({ searchQuery }: ServiceListProps) {
                   size="sm"
                   variant="outline"
                   className="h-7 text-xs"
-                  onClick={() => handleClone(service.id)}
+                  onClick={() => handleClone(component.id)}
                 >
                   Clone
                 </Button>
-                {service.source === 'custom' && (
+                {component.source === 'custom' && (
                   <Button
                     size="sm"
                     variant="outline"
                     className="h-7 text-xs text-red-600 hover:text-red-700"
-                    onClick={() => handleDelete(service.id)}
+                    onClick={() => handleDelete(component.id)}
                   >
                     Delete
                   </Button>

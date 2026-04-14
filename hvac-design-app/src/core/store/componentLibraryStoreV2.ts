@@ -1,8 +1,27 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { UnifiedComponentDefinition } from '../schema/unified-component.schema';
-import { ComponentCategory, ComponentTemplate } from '../schema/component-library.schema';
+import type {
+  ActivationIntent,
+  CatalogEntry,
+  ComponentClass,
+  ComponentCategory,
+  ComponentTemplate,
+  EngineeringSystem,
+  SystemProfile,
+  UnifiedComponentDefinition,
+} from '../schema/unified-component.schema';
+import {
+  ActivationIntentSchema,
+  CatalogEntrySchema,
+  ComponentCategorySchema,
+  ComponentTemplateSchema,
+  SystemProfileSchema,
+} from '../schema/unified-component.schema';
+import type { SystemType } from '../schema/duct.schema';
+
+export const UNIFIED_CATALOG_STORAGE_KEY = 'sws.unifiedCatalog.v1';
+export const UNIFIED_CATALOG_STORE_VERSION = 4;
 
 export interface ImportPreview {
   format: 'csv' | 'json';
@@ -24,25 +43,40 @@ export interface ImportRow {
   tags?: string[];
 }
 
-interface ComponentLibraryState {
-  components: UnifiedComponentDefinition[];
+type StoreShape = {
+  catalogEntries: CatalogEntry[];
   categories: ComponentCategory[];
+  systemProfiles: SystemProfile[];
   templates: ComponentTemplate[];
-  activeComponentId: string | null;
+  activeEntryId: string | null;
+  activeSystemType: SystemType;
   selectedCategoryId: string | null;
   searchQuery: string;
   filterTags: string[];
-  hoverComponentId: string | null;
+  hoverEntryId: string | null;
+  pendingEditEntryId: string | null;
   importPreview: ImportPreview | null;
   isLoading: boolean;
   error: string | null;
   isEnabled: boolean;
+};
 
-  addComponent: (component: UnifiedComponentDefinition) => void;
-  updateComponent: (id: string, updates: Partial<UnifiedComponentDefinition>) => void;
-  deleteComponent: (id: string) => void;
-  duplicateComponent: (id: string) => void;
-  getComponent: (id: string) => UnifiedComponentDefinition | undefined;
+export interface UnifiedCatalogState extends StoreShape {
+  // Compatibility aliases
+  components: CatalogEntry[];
+  activeComponentId: string | null;
+  hoverComponentId: string | null;
+
+  addEntry: (entry: CatalogEntry) => void;
+  updateEntry: (id: string, updates: Partial<CatalogEntry>) => void;
+  deleteEntry: (id: string) => void;
+  cloneEntry: (id: string) => string | null;
+  customizeEntry: (id: string) => string | null;
+  getEntry: (id: string) => CatalogEntry | undefined;
+
+  addSystemProfile: (profile: SystemProfile) => void;
+  updateSystemProfile: (id: string, updates: Partial<SystemProfile>) => void;
+  getSystemProfile: (engineeringSystem: EngineeringSystem) => SystemProfile | undefined;
 
   addCategory: (category: ComponentCategory) => void;
   updateCategory: (id: string, updates: Partial<ComponentCategory>) => void;
@@ -52,18 +86,38 @@ interface ComponentLibraryState {
   addTemplate: (template: ComponentTemplate) => void;
   updateTemplate: (id: string, updates: Partial<ComponentTemplate>) => void;
   deleteTemplate: (id: string) => void;
-  getTemplatesForComponent: (componentId: string) => ComponentTemplate[];
+  getTemplatesForEntry: (entryId: string) => ComponentTemplate[];
 
+  selectEntry: (entryId: string | null) => void;
+  setSystemType: (systemType: SystemType) => void;
+  clearPendingEditEntryId: () => void;
+  clearPendingEditEntry: () => void;
   setSearchQuery: (query: string) => void;
   setFilterTags: (tags: string[]) => void;
   setSelectedCategory: (categoryId: string | null) => void;
-  search: (query: string) => UnifiedComponentDefinition[];
-  getByCategoryTree: (categoryId: string) => UnifiedComponentDefinition[];
+  setHoverEntry: (entryId: string | null) => void;
+  search: (query: string) => CatalogEntry[];
+  getByCategoryTree: (categoryId: string) => CatalogEntry[];
+
+  getFilteredEntries: () => CatalogEntry[];
+  getActiveEntry: () => CatalogEntry | undefined;
+  getActiveSystemProfile: () => SystemProfile | undefined;
+  getAvailableArchetypes: () => string[];
+  getServiceConflictWarning: () => string | null;
+  getActivationIntent: () => ActivationIntent | null;
+
+  // Legacy callers
+  addComponent: (component: UnifiedComponentDefinition) => void;
+  updateComponent: (id: string, updates: Partial<UnifiedComponentDefinition>) => void;
+  deleteComponent: (id: string) => void;
+  duplicateComponent: (id: string) => void;
+  getComponent: (id: string) => UnifiedComponentDefinition | undefined;
   activateComponent: (componentId: string) => void;
   deactivateComponent: () => void;
   getActiveComponent: () => UnifiedComponentDefinition | undefined;
   setHoverComponent: (componentId: string | null) => void;
   getFilteredComponents: () => UnifiedComponentDefinition[];
+  getTemplatesForComponent: (componentId: string) => ComponentTemplate[];
 
   setEnabled: (enabled: boolean) => void;
   setLoading: (loading: boolean) => void;
@@ -71,251 +125,663 @@ interface ComponentLibraryState {
   reset: () => void;
 }
 
-const initialState = {
-  components: [],
+const defaultState: StoreShape = {
+  catalogEntries: [],
   categories: [],
+  systemProfiles: [],
   templates: [],
-  activeComponentId: null,
+  activeEntryId: null,
+  activeSystemType: 'supply',
   selectedCategoryId: null,
   searchQuery: '',
   filterTags: [],
-  hoverComponentId: null,
+  hoverEntryId: null,
+  pendingEditEntryId: null,
   importPreview: null,
   isLoading: false,
   error: null,
   isEnabled: false,
 };
 
-export const useComponentLibraryStoreV2 = create<ComponentLibraryState>()(
+const CATEGORY_ID_BY_ENGINEERING_SYSTEM: Record<EngineeringSystem, string> = {
+  standard_duct: 'standard_ductwork',
+  boiler_flue: 'boiler_flue',
+  grease_duct: 'grease_duct',
+  generator_exhaust: 'generator_exhaust',
+  universal: 'hangers_supports',
+};
+
+const FALLBACK_TYPE_ID_BY_COMPONENT_CLASS: Record<ComponentClass, string> = {
+  duct: 'straight',
+  fitting: 'elbow_90',
+  equipment: 'fan',
+  accessory: 'accessory',
+};
+
+function getDefaultSystemType(engineeringSystem: unknown): SystemType {
+  return engineeringSystem === 'boiler_flue' ||
+    engineeringSystem === 'grease_duct' ||
+    engineeringSystem === 'generator_exhaust'
+    ? 'exhaust'
+    : 'supply';
+}
+
+function inferComponentClass(input: Record<string, unknown>): ComponentClass {
+  const explicit = input.componentClass ?? input.category;
+  if (
+    explicit === 'duct' ||
+    explicit === 'fitting' ||
+    explicit === 'equipment' ||
+    explicit === 'accessory'
+  ) {
+    return explicit;
+  }
+
+  return 'duct';
+}
+
+function inferEngineeringSystem(input: Record<string, unknown>): EngineeringSystem {
+  if (
+    input.engineeringSystem === 'standard_duct' ||
+    input.engineeringSystem === 'boiler_flue' ||
+    input.engineeringSystem === 'grease_duct' ||
+    input.engineeringSystem === 'generator_exhaust' ||
+    input.engineeringSystem === 'universal'
+  ) {
+    return input.engineeringSystem;
+  }
+
+  if (
+    input.categoryId === 'boiler_flue' ||
+    input.categoryId === 'grease_duct' ||
+    input.categoryId === 'generator_exhaust'
+  ) {
+    return input.categoryId;
+  }
+
+  if (
+    input.categoryId === 'hangers_supports' ||
+    input.categoryId === 'universal_components'
+  ) {
+    return 'universal';
+  }
+
+  return 'standard_duct';
+}
+
+function inferCategoryId(input: Record<string, unknown>, engineeringSystem: EngineeringSystem): string {
+  if (typeof input.categoryId === 'string' && input.categoryId.length > 0) {
+    return input.categoryId;
+  }
+
+  return CATEGORY_ID_BY_ENGINEERING_SYSTEM[engineeringSystem];
+}
+
+function inferTypeId(input: Record<string, unknown>, componentClass: ComponentClass): string {
+  if (typeof input.typeId === 'string' && input.typeId.length > 0) {
+    return input.typeId;
+  }
+
+  if (typeof input.type === 'string' && input.type.length > 0) {
+    return input.type;
+  }
+
+  if (typeof input.subtype === 'string' && input.subtype.length > 0) {
+    return input.subtype;
+  }
+
+  return FALLBACK_TYPE_ID_BY_COMPONENT_CLASS[componentClass];
+}
+
+function parseCanonicalEntry(entry: CatalogEntry): CatalogEntry {
+  return CatalogEntrySchema.parse(entry);
+}
+
+export function normalizeLegacyEntry(input: Partial<CatalogEntry> & Record<string, unknown>): CatalogEntry {
+  const componentClass = inferComponentClass(input);
+  const engineeringSystem = inferEngineeringSystem(input);
+  const categoryId = inferCategoryId(input, engineeringSystem);
+  const typeId = inferTypeId(input, componentClass);
+  const parsed = CatalogEntrySchema.parse({
+    ...input,
+    componentClass,
+    categoryId,
+    typeId,
+    engineeringSystem,
+    source: input.source ?? (input.isCustom ? 'custom' : 'system'),
+    placeable: input.placeable ?? true,
+    systemType: input.systemType ?? getDefaultSystemType(engineeringSystem),
+    pricing: input.pricing ?? {
+      materialCost: 0,
+      laborUnits: 0,
+      wasteFactor: 0,
+    },
+    engineeringProperties: input.engineeringProperties ?? {
+      frictionFactor: 0.02,
+      maxVelocity: 2500,
+      minVelocity: 500,
+      maxPressureDrop: 0.1,
+    },
+    materials: input.materials ?? [],
+  });
+
+  return parsed;
+}
+
+function syncCompatibilityFields(state: UnifiedCatalogState): void {
+  state.components = state.catalogEntries;
+  state.activeComponentId = state.activeEntryId;
+  state.hoverComponentId = state.hoverEntryId;
+}
+
+function cloneEntryData(entry: CatalogEntry, suffix: string): CatalogEntry {
+  const now = new Date();
+  return parseCanonicalEntry({
+    ...entry,
+    id: `${entry.id}-${suffix}-${Date.now()}`,
+    name: `${entry.name} (${suffix === 'customize' ? 'Custom' : 'Copy'})`,
+    source: 'custom',
+    isCustom: true,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
+
+function includesQuery(entry: CatalogEntry, lowered: string): boolean {
+  return (
+    entry.name.toLowerCase().includes(lowered) ||
+    entry.description?.toLowerCase().includes(lowered) === true ||
+    entry.tags?.some((tag) => tag.toLowerCase().includes(lowered)) === true ||
+    entry.typeId.toLowerCase().includes(lowered) ||
+    entry.categoryId.toLowerCase().includes(lowered)
+  );
+}
+
+function resolveDefaultSystemType(entry: CatalogEntry, profile?: SystemProfile): SystemType | undefined {
+  return profile?.defaultSystemType ?? entry.systemType;
+}
+
+function resolveSpecialtyToolId(entry: CatalogEntry): string | null {
+  if (entry.componentClass !== 'duct') {
+    return null;
+  }
+
+  if (entry.engineeringSystem === 'standard_duct' || entry.engineeringSystem === 'universal') {
+    return null;
+  }
+
+  return entry.specialtyToolId ?? entry.id;
+}
+
+function shouldAutoApplySystemType(entry: CatalogEntry): boolean {
+  return (
+    entry.engineeringSystem === 'boiler_flue' ||
+    entry.engineeringSystem === 'grease_duct' ||
+    entry.engineeringSystem === 'generator_exhaust'
+  );
+}
+
+export function dedupeEntries(entries: CatalogEntry[]): CatalogEntry[] {
+  const seen = new Map<string, number>();
+
+  return entries.map((entry) => {
+    const count = seen.get(entry.id) ?? 0;
+    seen.set(entry.id, count + 1);
+    if (count === 0) {
+      return entry;
+    }
+
+    return parseCanonicalEntry({
+      ...entry,
+      id: `${entry.id}-dedupe-${count}`,
+    });
+  });
+}
+
+function dedupeProfiles(profiles: SystemProfile[]): SystemProfile[] {
+  const byId = new Map<string, SystemProfile>();
+
+  for (const profile of profiles) {
+    byId.set(profile.id, profile);
+  }
+
+  return [...byId.values()];
+}
+
+export function normalizeCategories(categories: unknown[]): ComponentCategory[] {
+  const flattened: ComponentCategory[] = [];
+  const seen = new Set<string>();
+
+  const visit = (rawCategory: unknown, parentId?: string | null): void => {
+    const parsed = ComponentCategorySchema.safeParse(rawCategory);
+    if (!parsed.success) {
+      return;
+    }
+
+    const category = parsed.data;
+    const normalized: ComponentCategory = {
+      ...category,
+      parentId: category.parentId ?? parentId ?? null,
+      subcategories: undefined,
+    };
+
+    if (!seen.has(normalized.id)) {
+      seen.add(normalized.id);
+      flattened.push(normalized);
+    }
+
+    for (const child of category.subcategories ?? []) {
+      visit(child, category.id);
+    }
+  };
+
+  for (const category of categories) {
+    visit(category);
+  }
+
+  return flattened;
+}
+
+export function migrateLegacyState(persisted: unknown): StoreShape {
+  if (!persisted || typeof persisted !== 'object') {
+    return defaultState;
+  }
+
+  const persistedRoot = persisted as Record<string, unknown>;
+  const raw =
+    persistedRoot.state && typeof persistedRoot.state === 'object'
+      ? (persistedRoot.state as Record<string, unknown>)
+      : persistedRoot;
+  const sourceEntries = Array.isArray(raw.catalogEntries)
+    ? raw.catalogEntries
+    : Array.isArray(raw.components)
+      ? raw.components
+      : [];
+  const sourceCategories = Array.isArray(raw.categories) ? raw.categories : [];
+  const sourceTemplates = Array.isArray(raw.templates) ? raw.templates : [];
+  const sourceProfiles = Array.isArray(raw.systemProfiles) ? raw.systemProfiles : [];
+
+  return {
+    ...defaultState,
+    catalogEntries: dedupeEntries(
+      sourceEntries.map((entry) => normalizeLegacyEntry(entry as Record<string, unknown>))
+    ),
+    categories: normalizeCategories(sourceCategories),
+    templates: sourceTemplates
+      .map((template) => ComponentTemplateSchema.safeParse(template))
+      .flatMap((result) => (result.success ? [result.data] : [])),
+    systemProfiles: dedupeProfiles(
+      sourceProfiles
+      .map((profile) => SystemProfileSchema.safeParse(profile))
+      .flatMap((result) => (result.success ? [result.data] : []))
+    ),
+    activeEntryId:
+      typeof raw.activeEntryId === 'string'
+        ? raw.activeEntryId
+        : typeof raw.activeComponentId === 'string'
+          ? raw.activeComponentId
+          : null,
+    activeSystemType:
+      raw.activeSystemType === 'return' ||
+      raw.activeSystemType === 'exhaust' ||
+      raw.activeSystemType === 'outside_air'
+        ? raw.activeSystemType
+        : 'supply',
+    selectedCategoryId: typeof raw.selectedCategoryId === 'string' ? raw.selectedCategoryId : null,
+    searchQuery: typeof raw.searchQuery === 'string' ? raw.searchQuery : '',
+    filterTags: Array.isArray(raw.filterTags) ? raw.filterTags.filter((tag): tag is string => typeof tag === 'string') : [],
+    hoverEntryId:
+      typeof raw.hoverEntryId === 'string'
+        ? raw.hoverEntryId
+        : typeof raw.hoverComponentId === 'string'
+          ? raw.hoverComponentId
+          : null,
+    pendingEditEntryId: typeof raw.pendingEditEntryId === 'string' ? raw.pendingEditEntryId : null,
+    importPreview: null,
+    isLoading: false,
+    error: null,
+    isEnabled: typeof raw.isEnabled === 'boolean' ? raw.isEnabled : true,
+  };
+}
+
+export const useUnifiedCatalogStore = create<UnifiedCatalogState>()(
   persist(
     immer((set, get) => ({
-      ...initialState,
+      ...defaultState,
+      components: [],
+      activeComponentId: null,
+      hoverComponentId: null,
 
-    addComponent: (component) =>
-      set((state) => {
-        state.components.push(component);
-      }),
+      addEntry: (entry) =>
+        set((state) => {
+          state.catalogEntries = dedupeEntries([...state.catalogEntries, parseCanonicalEntry(entry)]);
+          syncCompatibilityFields(state);
+        }),
 
-    updateComponent: (id, updates) =>
-      set((state) => {
-        const component = state.components.find((c) => c.id === id);
-        if (component) {
-          Object.assign(component, updates, { updatedAt: new Date() });
-        }
-      }),
-
-    deleteComponent: (id) =>
-      set((state) => {
-        state.components = state.components.filter((c) => c.id !== id);
-        if (state.activeComponentId === id) {
-          state.activeComponentId = null;
-        }
-      }),
-
-    duplicateComponent: (id) =>
-      set((state) => {
-        const component = state.components.find((c) => c.id === id);
-        if (component) {
-          state.components.push({
-            ...component,
-            id: `${component.id}-copy-${Date.now()}`,
-            name: `${component.name} (Copy)`,
-            isCustom: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-        }
-      }),
-
-    getComponent: (id) => {
-      return get().components.find((c) => c.id === id);
-    },
-
-    addCategory: (category) =>
-      set((state) => {
-        state.categories.push(category);
-      }),
-
-    updateCategory: (id, updates) =>
-      set((state) => {
-        const updateRecursive = (categories: ComponentCategory[]): boolean => {
-          for (const category of categories) {
-            if (category.id === id) {
-              Object.assign(category, updates);
-              return true;
-            }
-            if (category.subcategories && updateRecursive(category.subcategories)) {
-              return true;
-            }
+      updateEntry: (id, updates) =>
+        set((state) => {
+          const entry = state.catalogEntries.find((item) => item.id === id);
+          if (!entry) {
+            return;
           }
-          return false;
-        };
-        updateRecursive(state.categories);
-      }),
+          Object.assign(entry, parseCanonicalEntry({ ...entry, ...updates, updatedAt: new Date() }));
+          syncCompatibilityFields(state);
+        }),
 
-    deleteCategory: (id) =>
-      set((state) => {
-        const deleteRecursive = (categories: ComponentCategory[]): ComponentCategory[] => {
-          return categories.filter((cat) => {
-            if (cat.id === id) return false;
-            if (cat.subcategories) {
-              cat.subcategories = deleteRecursive(cat.subcategories);
+      deleteEntry: (id) =>
+        set((state) => {
+          state.catalogEntries = state.catalogEntries.filter((item) => item.id !== id);
+          if (state.activeEntryId === id) {
+            state.activeEntryId = null;
+          }
+          if (state.pendingEditEntryId === id) {
+            state.pendingEditEntryId = null;
+          }
+          syncCompatibilityFields(state);
+        }),
+
+      cloneEntry: (id) => {
+        const entry = get().catalogEntries.find((item) => item.id === id);
+        if (!entry) {
+          return null;
+        }
+        const cloned = cloneEntryData(entry, 'copy');
+        set((state) => {
+          state.catalogEntries.push(cloned);
+          syncCompatibilityFields(state);
+        });
+        return cloned.id;
+      },
+
+      customizeEntry: (id) => {
+        const entry = get().catalogEntries.find((item) => item.id === id);
+        if (!entry) {
+          return null;
+        }
+        const customized = cloneEntryData(entry, 'customize');
+        set((state) => {
+          state.catalogEntries.push(customized);
+          state.pendingEditEntryId = customized.id;
+          state.activeEntryId = customized.id;
+          syncCompatibilityFields(state);
+        });
+        return customized.id;
+      },
+
+      getEntry: (id) => get().catalogEntries.find((item) => item.id === id),
+
+      addSystemProfile: (profile) =>
+        set((state) => {
+          const parsed = SystemProfileSchema.parse(profile);
+          const existing = state.systemProfiles.findIndex((item) => item.id === parsed.id);
+          if (existing >= 0) {
+            state.systemProfiles[existing] = parsed;
+            return;
+          }
+          state.systemProfiles.push(parsed);
+        }),
+
+      updateSystemProfile: (id, updates) =>
+        set((state) => {
+          const profile = state.systemProfiles.find((item) => item.id === id);
+          if (!profile) {
+            return;
+          }
+          Object.assign(profile, SystemProfileSchema.parse({ ...profile, ...updates }));
+        }),
+
+      getSystemProfile: (engineeringSystem) =>
+        get().systemProfiles.find((profile) => profile.engineeringSystem === engineeringSystem),
+
+      addCategory: (category) =>
+        set((state) => {
+          const parsed = ComponentCategorySchema.parse(category);
+          if (state.categories.some((item) => item.id === parsed.id)) {
+            return;
+          }
+          state.categories.push(parsed);
+        }),
+
+      updateCategory: (id, updates) =>
+        set((state) => {
+          const visit = (nodes: ComponentCategory[]): boolean => {
+            for (const node of nodes) {
+              if (node.id === id) {
+                Object.assign(node, updates);
+                return true;
+              }
+              if (node.subcategories && visit(node.subcategories)) {
+                return true;
+              }
             }
-            return true;
-          });
-        };
-        state.categories = deleteRecursive(state.categories);
-      }),
+            return false;
+          };
 
-    getCategoryTree: () => {
-      return get().categories;
-    },
+          visit(state.categories);
+        }),
 
-    addTemplate: (template) =>
-      set((state) => {
-        state.templates.push(template);
-      }),
+      deleteCategory: (id) =>
+        set((state) => {
+          const prune = (nodes: ComponentCategory[]): ComponentCategory[] =>
+            nodes
+              .filter((node) => node.id !== id)
+              .map((node) => ({
+                ...node,
+                subcategories: node.subcategories ? prune(node.subcategories) : undefined,
+              }));
 
-    updateTemplate: (id, updates) =>
-      set((state) => {
-        const template = state.templates.find((t) => t.id === id);
-        if (!template) return;
-        Object.assign(template, updates);
-      }),
+          state.categories = prune(state.categories);
+        }),
 
-    deleteTemplate: (id) =>
-      set((state) => {
-        state.templates = state.templates.filter((t) => t.id !== id);
-      }),
+      getCategoryTree: () => get().categories,
 
-    getTemplatesForComponent: (componentId) => {
-      return get().templates.filter((t) => t.componentId === componentId);
-    },
+      addTemplate: (template) =>
+        set((state) => {
+          state.templates.push(ComponentTemplateSchema.parse(template));
+        }),
 
-    setSearchQuery: (query) =>
-      set((state) => {
-        state.searchQuery = query;
-      }),
-
-    setFilterTags: (tags) =>
-      set((state) => {
-        state.filterTags = tags;
-      }),
-
-    setSelectedCategory: (categoryId) =>
-      set((state) => {
-        state.selectedCategoryId = categoryId;
-      }),
-
-    search: (query) => {
-      const lowered = query.toLowerCase();
-      return get().components.filter((c) =>
-        c.name.toLowerCase().includes(lowered) ||
-        c.description?.toLowerCase().includes(lowered) ||
-        c.tags?.some((t) => t.toLowerCase().includes(lowered))
-      );
-    },
-
-    getByCategoryTree: (categoryId) => {
-      const categories = get().categories;
-      const components = get().components;
-      const categoryIds = new Set<string>();
-
-      const visitBranch = (node: ComponentCategory) => {
-        categoryIds.add(node.id);
-        for (const child of node.subcategories ?? []) {
-          visitBranch(child);
-        }
-      };
-
-      const findCategory = (nodes: ComponentCategory[]): boolean => {
-        for (const node of nodes) {
-          if (node.id === categoryId) {
-            visitBranch(node);
-            return true;
+      updateTemplate: (id, updates) =>
+        set((state) => {
+          const template = state.templates.find((item) => item.id === id);
+          if (!template) {
+            return;
           }
-          if (node.subcategories && findCategory(node.subcategories)) {
-            return true;
+          Object.assign(template, ComponentTemplateSchema.parse({ ...template, ...updates }));
+        }),
+
+      deleteTemplate: (id) =>
+        set((state) => {
+          state.templates = state.templates.filter((item) => item.id !== id);
+        }),
+
+      getTemplatesForEntry: (entryId) => get().templates.filter((template) => template.componentId === entryId),
+
+      selectEntry: (entryId) =>
+        set((state) => {
+          state.activeEntryId = entryId;
+          const entry = entryId ? state.catalogEntries.find((item) => item.id === entryId) : undefined;
+          if (entry && shouldAutoApplySystemType(entry)) {
+            state.activeSystemType = resolveDefaultSystemType(
+              entry,
+              state.systemProfiles.find((profile) => profile.engineeringSystem === entry.engineeringSystem)
+            ) ?? state.activeSystemType;
           }
-        }
-        return false;
-      };
+          syncCompatibilityFields(state);
+        }),
 
-      if (!findCategory(categories)) {
-        categoryIds.add(categoryId);
-      }
+      setSystemType: (systemType) =>
+        set((state) => {
+          state.activeSystemType = systemType;
+        }),
 
-      return components.filter((component) => categoryIds.has(component.category));
-    },
+      clearPendingEditEntryId: () =>
+        set((state) => {
+          state.pendingEditEntryId = null;
+        }),
 
-    activateComponent: (componentId) =>
-      set((state) => {
-        state.activeComponentId = componentId;
-      }),
+      clearPendingEditEntry: () => {
+        get().clearPendingEditEntryId();
+      },
 
-    deactivateComponent: () =>
-      set((state) => {
-        state.activeComponentId = null;
-      }),
+      setSearchQuery: (query) =>
+        set((state) => {
+          state.searchQuery = query;
+        }),
 
-    getActiveComponent: () => {
-      const { activeComponentId, components } = get();
-      return components.find((c) => c.id === activeComponentId);
-    },
+      setFilterTags: (tags) =>
+        set((state) => {
+          state.filterTags = tags;
+        }),
 
-    setHoverComponent: (componentId) =>
-      set((state) => {
-        state.hoverComponentId = componentId;
-      }),
+      setSelectedCategory: (categoryId) =>
+        set((state) => {
+          state.selectedCategoryId = categoryId;
+        }),
 
-    getFilteredComponents: () => {
-      const { components, searchQuery, filterTags, selectedCategoryId } = get();
-      return components.filter((c) => {
-        if (selectedCategoryId && c.category !== selectedCategoryId) return false;
-        if (searchQuery) {
-          const q = searchQuery.toLowerCase();
-          if (!c.name.toLowerCase().includes(q) &&
-              !c.description?.toLowerCase().includes(q) &&
-              !c.tags?.some((t) => t.toLowerCase().includes(q))) {
+      setHoverEntry: (entryId) =>
+        set((state) => {
+          state.hoverEntryId = entryId;
+          syncCompatibilityFields(state);
+        }),
+
+      search: (query) => {
+        const lowered = query.toLowerCase();
+        return get().catalogEntries.filter((entry) => includesQuery(entry, lowered));
+      },
+
+      getByCategoryTree: (categoryId) =>
+        get().catalogEntries.filter((entry) => entry.categoryId === categoryId),
+
+      getFilteredEntries: () => {
+        const { catalogEntries, selectedCategoryId, searchQuery, filterTags } = get();
+
+        return catalogEntries.filter((entry) => {
+          if (!entry.placeable) {
             return false;
           }
+          if (selectedCategoryId && entry.categoryId !== selectedCategoryId) {
+            return false;
+          }
+          if (searchQuery && !includesQuery(entry, searchQuery.toLowerCase())) {
+            return false;
+          }
+          if (filterTags.length > 0 && !filterTags.every((tag) => entry.tags?.includes(tag))) {
+            return false;
+          }
+          return true;
+        });
+      },
+
+      getActiveEntry: () => {
+        const { activeEntryId, catalogEntries } = get();
+        return catalogEntries.find((entry) => entry.id === activeEntryId);
+      },
+
+      getActiveSystemProfile: () => {
+        const entry = get().getActiveEntry();
+        return entry ? get().getSystemProfile(entry.engineeringSystem) : undefined;
+      },
+
+      getAvailableArchetypes: () => {
+        const entry = get().getActiveEntry();
+        const profile = get().getActiveSystemProfile();
+        if (!entry || !profile) {
+          return [];
         }
-        if (filterTags.length > 0) {
-          if (!filterTags.every((tag) => c.tags?.includes(tag))) return false;
+        return profile.supportedArchetypes[entry.componentClass];
+      },
+
+      getServiceConflictWarning: () => {
+        const entry = get().getActiveEntry();
+        const profile = get().getActiveSystemProfile();
+        if (!entry || !profile) {
+          return null;
         }
-        return true;
-      });
-    },
+        if (get().activeSystemType === profile.defaultSystemType) {
+          return null;
+        }
+        return `Service override is set to ${get().activeSystemType.replace('_', ' ')}, but ${entry.name} still follows ${profile.name} engineering rules.`;
+      },
 
-    setEnabled: (enabled) =>
-      set((state) => {
-        state.isEnabled = enabled;
-      }),
+      getActivationIntent: () => {
+        const entry = get().getActiveEntry();
+        const profile = get().getActiveSystemProfile();
+        if (!entry) {
+          return null;
+        }
 
-    setLoading: (loading) =>
-      set((state) => {
-        state.isLoading = loading;
-      }),
+        return ActivationIntentSchema.parse({
+          entryId: entry.id,
+          componentClass: entry.componentClass,
+          specialtyToolId: resolveSpecialtyToolId(entry),
+          engineeringSystem: entry.engineeringSystem,
+          systemType: get().activeSystemType,
+          defaultSystemType: resolveDefaultSystemType(entry, profile),
+        });
+      },
 
-    setError: (error) =>
-      set((state) => {
-        state.error = error;
-      }),
+      addComponent: (component) => get().addEntry(component),
+      updateComponent: (id, updates) => get().updateEntry(id, updates),
+      deleteComponent: (id) => get().deleteEntry(id),
+      duplicateComponent: (id) => {
+        void get().cloneEntry(id);
+      },
+      getComponent: (id) => get().getEntry(id),
+      activateComponent: (componentId) => get().selectEntry(componentId),
+      deactivateComponent: () => get().selectEntry(null),
+      getActiveComponent: () => get().getActiveEntry(),
+      setHoverComponent: (componentId) => get().setHoverEntry(componentId),
+      getFilteredComponents: () => get().getFilteredEntries(),
+      getTemplatesForComponent: (componentId) => get().getTemplatesForEntry(componentId),
 
-      reset: () => set(initialState),
+      setEnabled: (enabled) =>
+        set((state) => {
+          state.isEnabled = enabled;
+        }),
+
+      setLoading: (loading) =>
+        set((state) => {
+          state.isLoading = loading;
+        }),
+
+      setError: (error) =>
+        set((state) => {
+          state.error = error;
+        }),
+
+      reset: () =>
+        set((state) => {
+          Object.assign(state, defaultState);
+          syncCompatibilityFields(state);
+        }),
     })),
     {
-      name: 'sws.componentLibrary.v2',
+      name: UNIFIED_CATALOG_STORAGE_KEY,
+      version: UNIFIED_CATALOG_STORE_VERSION,
+      migrate: (persistedState) => migrateLegacyState(persistedState),
       partialize: (state) => ({
-        components: state.components,
+        catalogEntries: state.catalogEntries,
         categories: state.categories,
+        systemProfiles: state.systemProfiles,
         templates: state.templates,
-        activeComponentId: state.activeComponentId,
+        activeEntryId: state.activeEntryId,
+        activeSystemType: state.activeSystemType,
+        selectedCategoryId: state.selectedCategoryId,
+        searchQuery: state.searchQuery,
+        filterTags: state.filterTags,
+        pendingEditEntryId: state.pendingEditEntryId,
+        isEnabled: state.isEnabled,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) {
+          return;
+        }
+        syncCompatibilityFields(state);
+      },
     }
   )
 );
 
-// V2 is now the default and only component library store
-// This export is kept for backward compatibility but always returns true
-export const ENABLE_UNIFIED_COMPONENT_LIBRARY = true;
+export const useComponentLibraryStoreV2 = useUnifiedCatalogStore;
+export const ENABLE_UNIFIED_COMPONENT_LIBRARY =
+  process.env.NEXT_PUBLIC_ENABLE_UNIFIED_COMPONENT_LIBRARY !== 'false';

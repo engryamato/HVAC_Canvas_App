@@ -1,5 +1,8 @@
 import type { Equipment } from '@/core/schema';
-import type { EquipmentType } from '@/core/schema/equipment.schema';
+import type {
+  EquipmentProps,
+  EquipmentType,
+} from '@/core/schema/equipment.schema';
 
 /**
  * Counter for auto-incrementing equipment names
@@ -116,6 +119,17 @@ export function createEquipment(
     model: string;
     serviceId: string;
     catalogItemId: string;
+    engineeringSystem: EquipmentProps['engineeringSystem'];
+    mountHeight: number;
+    connectedDuctId: string;
+    loadRating: number;
+    spacingRule: string;
+    backpressureLimit: number;
+    engineModel: string;
+    draftType: 'natural' | 'forced';
+    btuInput: number;
+    greaseExtractionStage: 'single' | 'multi';
+    fireSuppressionReady: boolean;
   }>
 ): Equipment {
   const equipmentNumber = getNextEquipmentNumber();
@@ -129,6 +143,7 @@ export function createEquipment(
     transform: {
       x: overrides?.x ?? 0,
       y: overrides?.y ?? 0,
+      elevation: 0,
       rotation: 0,
       scaleX: 1,
       scaleY: 1,
@@ -138,6 +153,7 @@ export function createEquipment(
     modifiedAt: now,
     props: {
       name: overrides?.name ?? `${label} ${equipmentNumber}`,
+      engineeringSystem: overrides?.engineeringSystem ?? 'standard_duct',
       equipmentType,
       capacity: overrides?.capacity ?? defaults.capacity,
       capacityUnit: 'CFM',
@@ -146,11 +162,23 @@ export function createEquipment(
       width: overrides?.width ?? defaults.width,
       depth: overrides?.depth ?? defaults.depth,
       height: overrides?.height ?? defaults.height,
+      ...(overrides?.mountHeight !== undefined ? { mountHeight: overrides.mountHeight } : {}),
       mountHeightUnit: 'in',
       manufacturer: overrides?.manufacturer,
       model: overrides?.model,
       serviceId: overrides?.serviceId,
       catalogItemId: overrides?.catalogItemId,
+      ...(overrides?.connectedDuctId ? { connectedDuctId: overrides.connectedDuctId } : {}),
+      ...(overrides?.loadRating !== undefined ? { loadRating: overrides.loadRating } : {}),
+      ...(overrides?.spacingRule ? { spacingRule: overrides.spacingRule } : {}),
+      ...(overrides?.backpressureLimit !== undefined ? { backpressureLimit: overrides.backpressureLimit } : {}),
+      ...(overrides?.engineModel ? { engineModel: overrides.engineModel } : {}),
+      ...(overrides?.draftType ? { draftType: overrides.draftType } : {}),
+      ...(overrides?.btuInput !== undefined ? { btuInput: overrides.btuInput } : {}),
+      ...(overrides?.greaseExtractionStage ? { greaseExtractionStage: overrides.greaseExtractionStage } : {}),
+      ...(overrides?.fireSuppressionReady !== undefined
+        ? { fireSuppressionReady: overrides.fireSuppressionReady }
+        : {}),
     },
   };
 }

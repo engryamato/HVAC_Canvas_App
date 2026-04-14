@@ -9,7 +9,11 @@ type ServicePressureClass = Service['pressureClass'];
 const DEFAULT_ALLOWED_SHAPES: Array<'round' | 'rectangular'> = ['round', 'rectangular'];
 
 function toServiceSystemType(systemType?: string): ServiceSystemType {
-  if (systemType === 'return' || systemType === 'exhaust') {
+  if (
+    systemType === 'return' ||
+    systemType === 'exhaust' ||
+    systemType === 'outside_air'
+  ) {
     return systemType;
   }
   return 'supply';
@@ -69,11 +73,13 @@ function toComponentMaterialType(material: ServiceMaterial): 'galvanized_steel' 
 export function getServiceColor(systemType?: string): string {
   switch (systemType) {
     case 'supply':
-      return '#007bff';
+      return '#2563eb';
     case 'return':
-      return '#dc3545';
+      return '#16a34a';
     case 'exhaust':
-      return '#28a745';
+      return '#ea580c';
+    case 'outside_air':
+      return '#0f766e';
     default:
       return '#424242';
   }
@@ -132,14 +138,17 @@ export function adaptServiceToComponent(service: Service): UnifiedComponentDefin
   return {
     id: service.id,
     name: service.name,
+    componentClass: 'duct',
     category: 'duct',
-    type: 'duct',
+    categoryId: 'standard_ductwork',
+    typeId: typeIdFromService(service),
+    type: typeIdFromService(service),
     subtype: primaryShape,
+    engineeringSystem: 'standard_duct',
+    placeable: true,
+    source: 'custom',
     description: service.description,
-    systemType:
-      service.systemType === 'supply' || service.systemType === 'return' || service.systemType === 'exhaust'
-        ? service.systemType
-        : undefined,
+    systemType: service.systemType,
     pressureClass: toComponentPressureClass(service.pressureClass),
     engineeringProperties: {
       frictionFactor: 0.02,
@@ -170,6 +179,16 @@ export function adaptServiceToComponent(service: Service): UnifiedComponentDefin
     createdAt: service.createdAt ?? now,
     updatedAt: service.updatedAt ?? now,
   };
+}
+
+function typeIdFromService(service: Service): string {
+  if (service.systemType === 'exhaust') {
+    return 'exhaust_main';
+  }
+  if (service.systemType === 'return') {
+    return 'return_main';
+  }
+  return 'straight';
 }
 
 export function resolveActiveServiceFromStores(): Service | null {

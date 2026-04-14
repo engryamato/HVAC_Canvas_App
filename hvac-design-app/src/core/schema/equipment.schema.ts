@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { BaseEntitySchema } from './base.schema';
 import { ConstraintStatusSchema } from './duct.schema';
+import { EngineeringSystemSchema } from './unified-component.schema';
 
 /**
  * Equipment types for HVAC components
@@ -28,11 +29,7 @@ export type StaticPressureUnit = z.infer<typeof StaticPressureUnitSchema>;
 export const MountHeightUnitSchema = z.enum(['in', 'mm']);
 export type MountHeightUnit = z.infer<typeof MountHeightUnitSchema>;
 
-/**
- * Base equipment properties shared by all equipment types
- * Per Notion Data Models & Schema - Structure
- */
-export const EquipmentPropsSchema = z.object({
+const SharedEquipmentPropsSchema = z.object({
   name: z.string().min(1).max(100),
   equipmentType: EquipmentTypeSchema,
   manufacturer: z.string().max(100).optional(),
@@ -69,6 +66,62 @@ export const EquipmentPropsSchema = z.object({
   constraintStatus: ConstraintStatusSchema.optional(),
 });
 
+export const StandardEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
+  engineeringSystem: z.literal('standard_duct'),
+});
+
+export const BoilerFlueEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
+  engineeringSystem: z.literal('boiler_flue'),
+  draftType: z.enum(['natural', 'forced']).optional(),
+  btuInput: z.number().min(0).optional(),
+});
+
+export const GreaseDuctEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
+  engineeringSystem: z.literal('grease_duct'),
+  greaseExtractionStage: z.enum(['single', 'multi']).optional(),
+  fireSuppressionReady: z.boolean().optional(),
+});
+
+export const GeneratorExhaustEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
+  engineeringSystem: z.literal('generator_exhaust'),
+  engineModel: z.string().max(100).optional(),
+  backpressureLimit: z.number().min(0).optional(),
+});
+
+export const UniversalEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
+  engineeringSystem: z.literal('universal'),
+  spacingRule: z.string().optional(),
+  loadRating: z.number().min(0).optional(),
+});
+
+/**
+ * Base equipment properties shared by all equipment types
+ * Per Notion Data Models & Schema - Structure
+ */
+export const EquipmentPropsSchema = z.preprocess(
+  (value) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return value;
+    }
+
+    const candidate = value as Record<string, unknown>;
+    return {
+      engineeringSystem:
+        EngineeringSystemSchema.safeParse(candidate.engineeringSystem).success
+          ? candidate.engineeringSystem
+          : 'standard_duct',
+      ...candidate,
+    };
+  },
+  z.union([
+    StandardEquipmentPropsSchema,
+    BoilerFlueEquipmentPropsSchema,
+    GreaseDuctEquipmentPropsSchema,
+    GeneratorExhaustEquipmentPropsSchema,
+    UniversalEquipmentPropsSchema,
+  ])
+);
+
 export type EquipmentProps = z.infer<typeof EquipmentPropsSchema>;
 
 /**
@@ -89,6 +142,7 @@ export type Equipment = z.infer<typeof EquipmentSchema>;
  */
 export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps, 'name'>> = {
   hood: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'hood',
     capacity: 1000,
     capacityUnit: 'CFM',
@@ -100,6 +154,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     mountHeightUnit: 'in',
   },
   fan: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'fan',
     capacity: 2000,
     capacityUnit: 'CFM',
@@ -111,6 +166,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     mountHeightUnit: 'in',
   },
   diffuser: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'diffuser',
     capacity: 200,
     capacityUnit: 'CFM',
@@ -122,6 +178,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     mountHeightUnit: 'in',
   },
   damper: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'damper',
     capacity: 500,
     capacityUnit: 'CFM',
@@ -133,6 +190,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     mountHeightUnit: 'in',
   },
   air_handler: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'air_handler',
     capacity: 5000,
     capacityUnit: 'CFM',
@@ -144,6 +202,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     mountHeightUnit: 'in',
   },
   furnace: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'furnace',
     capacity: 80000,
     capacityUnit: 'CFM',
@@ -155,6 +214,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     mountHeightUnit: 'in',
   },
   rtu: {
+    engineeringSystem: 'standard_duct',
     equipmentType: 'rtu',
     capacity: 12000,
     capacityUnit: 'CFM',

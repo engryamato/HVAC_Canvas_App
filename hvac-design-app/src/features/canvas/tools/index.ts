@@ -15,3 +15,4 @@ export { DuctTool, default as DuctToolDefault } from './DuctTool';
 export { EquipmentTool, default as EquipmentToolDefault } from './EquipmentTool';
 export { FittingTool, default as FittingToolDefault } from './FittingTool';
 export { NoteTool, default as NoteToolDefault } from './NoteTool';
+export { SupportTool, default as SupportToolDefault } from './SupportTool';

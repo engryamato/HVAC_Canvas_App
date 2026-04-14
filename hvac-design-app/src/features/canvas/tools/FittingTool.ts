@@ -8,8 +8,8 @@ import { createFitting, FITTING_TYPE_LABELS } from '../entities/fittingDefaults'
 import { createEntity, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
-import type { FittingType } from '@/core/schema/fitting.schema';
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
+import { resolveFittingType } from './catalogPlacement';
 
 interface FittingToolState {
   currentPoint: { x: number; y: number } | null;
@@ -84,7 +84,7 @@ export class FittingTool extends BaseTool {
         return;
     }
 
-    const type = (activeComponent.subtype as FittingType) || 'elbow_90';
+    const type = resolveFittingType(activeComponent);
     const label = FITTING_TYPE_LABELS[type] || activeComponent.name;
 
     ctx.save();
@@ -141,7 +141,7 @@ export class FittingTool extends BaseTool {
         return;
     }
 
-    const type = (activeComponent.subtype as FittingType) || 'elbow_90';
+    const type = resolveFittingType(activeComponent);
     const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
 
     const fitting = createFitting(type, {
@@ -149,6 +149,33 @@ export class FittingTool extends BaseTool {
       y,
       serviceId: activeService?.id || activeComponent.id,
       catalogItemId: activeComponent.id,
+      engineeringSystem: activeComponent.engineeringSystem,
+      ...(activeComponent.engineeringSystem === 'generator_exhaust'
+        ? {
+            backpressureLimit:
+              typeof activeComponent.customFields?.backpressureLimit === 'number'
+                ? activeComponent.customFields.backpressureLimit
+                : undefined,
+            thermalExpansionJointRequired:
+              activeComponent.typeId === 'gasket_hardware',
+          }
+        : {}),
+      ...(activeComponent.engineeringSystem === 'grease_duct'
+        ? {
+            weldedAccessRequired:
+              activeComponent.typeId === 'mitered_elbow' ||
+              activeComponent.typeId === 'tee',
+            greaseRated: true,
+          }
+        : {}),
+      ...(activeComponent.engineeringSystem === 'boiler_flue'
+        ? {
+            wallType:
+              activeComponent.typeId === 'double_wall_pipe' ? 'double' : 'single',
+            condensateDrainRequired:
+              activeComponent.typeId === 'condensate_drain',
+          }
+        : {}),
     });
 
     createEntity(fitting);

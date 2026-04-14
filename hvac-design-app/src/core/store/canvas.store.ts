@@ -21,7 +21,53 @@ export type ComponentActivationState = 'inactive' | 'hover' | 'active' | 'placin
 /**
  * Available canvas tool types
  */
-export type CanvasTool = 'select' | 'pan' | 'duct' | 'equipment' | 'room' | 'note' | 'fitting';
+export type CanvasTool = 'select' | 'pan' | 'duct' | 'equipment' | 'room' | 'note' | 'fitting' | 'support';
+
+export type SupportCodeStandard = 'smacna' | 'ibc_asce7' | 'ashrae';
+export type SupportScope = 'selected' | 'all';
+export type SupportPreviewMode = 'auto_hanger_spacing' | 'continuous_trapeze_run' | null;
+export type SupportPreviewMarkerKind = 'hanger' | 'seismic' | 'trapeze' | 'strut';
+export type SupportPromptKind = 'mount_height';
+
+export interface SupportPreviewMarker {
+  id: string;
+  ductId: string;
+  x: number;
+  y: number;
+  rotation: number;
+  positionRatio: number;
+  spacingFt: number;
+  label: string;
+  kind: SupportPreviewMarkerKind;
+  catalogItemId: string;
+  loadRating: number;
+  locked?: boolean;
+}
+
+export interface SupportDraftAnchor {
+  ductId: string;
+  x: number;
+  y: number;
+  rotation: number;
+  positionRatio: number;
+}
+
+export interface SupportPromptState {
+  kind: SupportPromptKind;
+  title: string;
+  description: string;
+}
+
+export interface SupportWorkflowSettings {
+  codeStandard: SupportCodeStandard;
+  hangerEntryId: string | null;
+  maxSpacingFt: number | null;
+  seismicZone: 'none' | '0' | '1' | '2' | '3' | '4';
+  scope: SupportScope;
+  mountHeight: number | null;
+  rodDiameter: string;
+  strutSize: string;
+}
 
 /**
  * Tool category for unified component browser
@@ -57,12 +103,24 @@ interface ToolState {
   selectedFittingType: FittingType;
   /** Active tool definition for component browser */
   activeToolDefinition: ToolDefinition | null;
+  /** Active specialty routing overlay */
+  activeSpecialtyToolId: string | null;
   /** Status bar message */
   statusMessage: string;
   /** Whether tools remain active after placement (multi-placement mode) */
   multiPlacementMode: boolean;
   /** Keyboard shortcuts enabled */
   keyboardShortcutsEnabled: boolean;
+  /** Universal support workflow settings */
+  supportSettings: SupportWorkflowSettings;
+  /** Preview markers for universal support workflows */
+  supportPreviewMarkers: SupportPreviewMarker[];
+  /** Active universal preview mode */
+  supportPreviewMode: SupportPreviewMode;
+  /** Draft anchor for continuous trapeze placement */
+  supportDraftAnchor: SupportDraftAnchor | null;
+  /** Inline prompt state for support workflows */
+  supportPrompt: SupportPromptState | null;
 }
 
 interface ToolActions {
@@ -76,6 +134,8 @@ interface ToolActions {
   setFittingType: (type: FittingType) => void;
   /** Set active tool definition with full metadata */
   setActiveToolDefinition: (definition: ToolDefinition | null) => void;
+  /** Set active specialty overlay */
+  setSpecialtyToolId: (id: string | null) => void;
   /** Update tool activation state */
   setToolActivationState: (state: ComponentActivationState) => void;
   /** Set status bar message */
@@ -88,6 +148,18 @@ interface ToolActions {
   activateToolByShortcut: (shortcut: string) => boolean;
   /** Dispatch keyboard shortcut contract (V/D/F/E/Escape) */
   dispatchKeyboardShortcut: (shortcut: string) => boolean;
+  /** Update support workflow settings */
+  setSupportSettings: (updates: Partial<SupportWorkflowSettings>) => void;
+  /** Replace preview markers for support workflows */
+  setSupportPreviewMarkers: (mode: SupportPreviewMode, markers: SupportPreviewMarker[]) => void;
+  /** Update a single preview marker */
+  updateSupportPreviewMarker: (markerId: string, updates: Partial<SupportPreviewMarker>) => void;
+  /** Clear support preview state */
+  clearSupportPreview: () => void;
+  /** Set trapeze draft anchor */
+  setSupportDraftAnchor: (anchor: SupportDraftAnchor | null) => void;
+  /** Set inline support prompt */
+  setSupportPrompt: (prompt: SupportPromptState | null) => void;
 }
 
 type ToolStore = ToolState & ToolActions;
@@ -151,6 +223,14 @@ const defaultToolDefinitions: ToolDefinition[] = [
     description: 'Place HVAC equipment',
     activationState: 'inactive',
   },
+  {
+    id: 'support',
+    name: 'Supports',
+    type: 'support',
+    category: 'equipment',
+    description: 'Place hangers, supports, and trapeze runs',
+    activationState: 'inactive',
+  },
 ];
 
 const initialState: ToolState = {
@@ -158,9 +238,24 @@ const initialState: ToolState = {
   selectedEquipmentType: 'fan',
   selectedFittingType: 'elbow_90',
   activeToolDefinition: defaultToolDefinitions[0] || null,
+  activeSpecialtyToolId: null,
   statusMessage: 'Ready',
   multiPlacementMode: true,
   keyboardShortcutsEnabled: true,
+  supportSettings: {
+    codeStandard: 'smacna',
+    hangerEntryId: null,
+    maxSpacingFt: null,
+    seismicZone: 'none',
+    scope: 'selected',
+    mountHeight: null,
+    rodDiameter: '3/8"',
+    strutSize: '1-5/8"',
+  },
+  supportPreviewMarkers: [],
+  supportPreviewMode: null,
+  supportDraftAnchor: null,
+  supportPrompt: null,
 };
 
 export const useToolStore = create<ToolStore>()(
@@ -181,6 +276,7 @@ export const useToolStore = create<ToolStore>()(
       set((state) => {
         state.currentTool = 'select';
         state.activeToolDefinition = defaultToolDefinitions[0] || null;
+        state.activeSpecialtyToolId = null;
         state.statusMessage = 'Ready';
       }),
 
@@ -201,6 +297,11 @@ export const useToolStore = create<ToolStore>()(
           state.currentTool = definition.type;
           state.statusMessage = `Active tool: ${definition.name}`;
         }
+      }),
+
+    setSpecialtyToolId: (id) =>
+      set((state) => {
+        state.activeSpecialtyToolId = id;
       }),
 
     setToolActivationState: (activationState) =>
@@ -225,6 +326,47 @@ export const useToolStore = create<ToolStore>()(
         state.keyboardShortcutsEnabled = enabled;
       }),
 
+    setSupportSettings: (updates) =>
+      set((state) => {
+        state.supportSettings = { ...state.supportSettings, ...updates };
+      }),
+
+    setSupportPreviewMarkers: (mode, markers) =>
+      set((state) => {
+        state.supportPreviewMode = mode;
+        state.supportPreviewMarkers = markers;
+      }),
+
+    updateSupportPreviewMarker: (markerId, updates) =>
+      set((state) => {
+        const index = state.supportPreviewMarkers.findIndex((marker) => marker.id === markerId);
+        if (index < 0) {
+          return;
+        }
+
+        state.supportPreviewMarkers[index] = {
+          ...state.supportPreviewMarkers[index],
+          ...updates,
+        };
+      }),
+
+    clearSupportPreview: () =>
+      set((state) => {
+        state.supportPreviewMarkers = [];
+        state.supportPreviewMode = null;
+        state.supportDraftAnchor = null;
+      }),
+
+    setSupportDraftAnchor: (anchor) =>
+      set((state) => {
+        state.supportDraftAnchor = anchor;
+      }),
+
+    setSupportPrompt: (prompt) =>
+      set((state) => {
+        state.supportPrompt = prompt;
+      }),
+
     activateToolByShortcut: (shortcut) => {
       const toolDef = defaultToolDefinitions.find((t) => t.shortcut === shortcut.toLowerCase());
       if (toolDef) {
@@ -245,6 +387,7 @@ export const useToolStore = create<ToolStore>()(
         set((state) => {
           state.currentTool = 'select';
           state.activeToolDefinition = defaultToolDefinitions[0] || null;
+          state.activeSpecialtyToolId = null;
           state.statusMessage = 'Ready';
         });
         return true;
@@ -278,12 +421,18 @@ export const useSelectedEquipmentType = () => useToolStore((state) => state.sele
 export const useSelectedFittingType = () => useToolStore((state) => state.selectedFittingType);
 
 export const useActiveToolDefinition = () => useToolStore((state) => state.activeToolDefinition);
+export const useActiveSpecialtyToolId = () => useToolStore((state) => state.activeSpecialtyToolId);
 
 export const useStatusMessage = () => useToolStore((state) => state.statusMessage);
 
 export const useMultiPlacementMode = () => useToolStore((state) => state.multiPlacementMode);
 
 export const useKeyboardShortcutsEnabled = () => useToolStore((state) => state.keyboardShortcutsEnabled);
+export const useSupportSettings = () => useToolStore((state) => state.supportSettings);
+export const useSupportPreviewMarkers = () => useToolStore((state) => state.supportPreviewMarkers);
+export const useSupportPreviewMode = () => useToolStore((state) => state.supportPreviewMode);
+export const useSupportDraftAnchor = () => useToolStore((state) => state.supportDraftAnchor);
+export const useSupportPrompt = () => useToolStore((state) => state.supportPrompt);
 
 // Actions hook (per naming convention)
 export const useToolActions = () =>
@@ -294,12 +443,19 @@ export const useToolActions = () =>
       setEquipmentType: state.setEquipmentType,
       setFittingType: state.setFittingType,
       setActiveToolDefinition: state.setActiveToolDefinition,
+      setSpecialtyToolId: state.setSpecialtyToolId,
       setToolActivationState: state.setToolActivationState,
       setStatusMessage: state.setStatusMessage,
       setMultiPlacementMode: state.setMultiPlacementMode,
       setKeyboardShortcutsEnabled: state.setKeyboardShortcutsEnabled,
       activateToolByShortcut: state.activateToolByShortcut,
       dispatchKeyboardShortcut: state.dispatchKeyboardShortcut,
+      setSupportSettings: state.setSupportSettings,
+      setSupportPreviewMarkers: state.setSupportPreviewMarkers,
+      updateSupportPreviewMarker: state.updateSupportPreviewMarker,
+      clearSupportPreview: state.clearSupportPreview,
+      setSupportDraftAnchor: state.setSupportDraftAnchor,
+      setSupportPrompt: state.setSupportPrompt,
     }))
   );
 

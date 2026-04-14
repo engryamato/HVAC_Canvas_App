@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { BaseEntitySchema } from './base.schema';
 import { MaterialSpecSchema } from './component-library.schema';
+import { EngineeringSystemSchema } from './unified-component.schema';
 
 /**
  * Duct material types with associated roughness factors
@@ -65,18 +66,18 @@ export type DuctShape = z.infer<typeof DuctShapeSchema>;
  * - Round ducts require diameter
  * - Rectangular ducts require width and height
  */
-export const DuctPropsSchema = z
+const SharedDuctPropsSchema = z
   .object({
     name: z.string().min(1).max(100),
+    engineeringSystem: EngineeringSystemSchema.optional().default('standard_duct'),
+    specialtyToolId: z.string().optional(),
     shape: DuctShapeSchema,
-    // Round duct dimension (required if shape === 'round')
     diameter: z
       .number()
       .min(4)
       .max(60)
       .optional()
       .describe('Diameter in inches (round ducts only)'),
-    // Rectangular duct dimensions (required if shape === 'rectangular')
     width: z
       .number()
       .min(4)
@@ -89,48 +90,86 @@ export const DuctPropsSchema = z
       .max(96)
       .optional()
       .describe('Height in inches (rectangular ducts only)'),
-    // Common properties
     length: z.number().min(0.1).max(1000).describe('Length in feet'),
     material: DuctMaterialSchema,
     airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),
     staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
-    // Connection references
     connectedFrom: z.string().uuid().optional().describe('Source entity ID'),
     connectedTo: z.string().uuid().optional().describe('Destination entity ID'),
-
-    // Service & Catalog references
     serviceId: z.string().uuid().optional().describe('Active Service ID'),
     catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
-
-    // Parametric design fields
     systemType: SystemTypeSchema.optional(),
     materialSpec: MaterialSpecSchema.optional(),
     gauge: z.number().optional().describe('Metal gauge thickness'),
     insulated: z.boolean().optional(),
     insulationThickness: z.number().optional().describe('Insulation thickness in inches'),
-
-    // Engineering data
     engineeringData: DuctEngineeringDataSchema.optional(),
-
-    // Constraint status
     constraintStatus: ConstraintStatusSchema.optional(),
-
-    // Auto-sizing flag
     autoSized: z.boolean().optional().describe('Indicates if duct was auto-sized'),
   })
   .refine(
     (data) => {
-      // Validate shape-dependent fields
       if (data.shape === 'round') {
         return data.diameter !== undefined;
-      } else {
-        return data.width !== undefined && data.height !== undefined;
       }
+      return data.width !== undefined && data.height !== undefined;
     },
     {
       message: 'Round ducts require diameter; rectangular ducts require width and height',
     }
   );
+
+export const StandardDuctPropsSchema = SharedDuctPropsSchema.safeExtend({
+  engineeringSystem: z.literal('standard_duct'),
+});
+
+export const BoilerFluePropsSchema = SharedDuctPropsSchema.safeExtend({
+  engineeringSystem: z.literal('boiler_flue'),
+  wallType: z.enum(['single', 'double']).optional(),
+  condensateSlope: z.number().optional(),
+  btuRating: z.number().optional(),
+  flueGasDewpoint: z.number().optional(),
+  venting: z.enum(['natural', 'forced']).optional(),
+});
+
+export const GreaseDuctPropsSchema = SharedDuctPropsSchema.safeExtend({
+  engineeringSystem: z.literal('grease_duct'),
+  constructionType: z.string().optional(),
+  fireRating: z.string().optional(),
+  liquidTight: z.boolean().optional(),
+  weldSpec: z.string().optional(),
+});
+
+export const GeneratorExhaustPropsSchema = SharedDuctPropsSchema.safeExtend({
+  engineeringSystem: z.literal('generator_exhaust'),
+  connectionType: z.enum(['flanged', 'slip_fit']).optional(),
+  backpressureLimit: z.number().optional(),
+  exhaustTempF: z.number().optional(),
+  engineModel: z.string().optional(),
+});
+
+export const DuctPropsSchema = z.preprocess(
+  (value) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return value;
+    }
+
+    const candidate = value as Record<string, unknown>;
+    return {
+      engineeringSystem:
+        EngineeringSystemSchema.safeParse(candidate.engineeringSystem).success
+          ? candidate.engineeringSystem
+          : 'standard_duct',
+      ...candidate,
+    };
+  },
+  z.discriminatedUnion('engineeringSystem', [
+    StandardDuctPropsSchema,
+    BoilerFluePropsSchema,
+    GreaseDuctPropsSchema,
+    GeneratorExhaustPropsSchema,
+  ])
+);
 
 export type DuctProps = z.infer<typeof DuctPropsSchema>;
 
@@ -171,6 +210,7 @@ export type Duct = z.infer<typeof DuctSchema>;
 
 export const DEFAULT_ROUND_DUCT_PROPS = {
   name: 'New Duct',
+  engineeringSystem: 'standard_duct' as const,
   shape: 'round' as const,
   diameter: 12,
   length: 10,
@@ -181,6 +221,7 @@ export const DEFAULT_ROUND_DUCT_PROPS = {
 
 export const DEFAULT_RECTANGULAR_DUCT_PROPS = {
   name: 'New Duct',
+  engineeringSystem: 'standard_duct' as const,
   shape: 'rectangular' as const,
   width: 12,
   height: 8,

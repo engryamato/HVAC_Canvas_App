@@ -3,6 +3,7 @@ export {
   useToolStore,
   useCurrentTool,
   useIsToolActive,
+  useActiveSpecialtyToolId,
   useToolActions,
   useCanvasStore, // deprecated alias
   type CanvasTool,
@@ -44,8 +45,9 @@ export {
   type StorageRootType,
 } from './storageStore';
 
-// Component Library Store V2 (Phase 1.1)
+// Unified Catalog Store (compat alias for Traycer catalog work)
 export {
+  useUnifiedCatalogStore,
   useComponentLibraryStoreV2,
   type ImportPreview,
   type ImportRow,

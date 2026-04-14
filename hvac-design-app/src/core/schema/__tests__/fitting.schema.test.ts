@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
+  BoilerFlueFittingPropsSchema,
   FittingSchema,
   FittingPropsSchema,
+  StandardFittingPropsSchema,
   FittingTypeSchema,
   DEFAULT_FITTING_PROPS,
   DEFAULT_FITTING_CALCULATED,
@@ -71,7 +73,24 @@ describe('FittingPropsSchema', () => {
       angle: 90,
     });
 
+    expect(result.engineeringSystem).toBe('standard_duct');
     expect(result.manualOverride).toBe(false);
+  });
+
+  it('uses engineeringSystem as the level-2 discriminator', () => {
+    const result = BoilerFlueFittingPropsSchema.parse({
+      engineeringSystem: 'boiler_flue',
+      fittingType: 'elbow_90',
+      angle: 90,
+    });
+
+    expect(result.engineeringSystem).toBe('boiler_flue');
+    expect(() =>
+      StandardFittingPropsSchema.parse({
+        engineeringSystem: 'grease_duct',
+        fittingType: 'tee',
+      })
+    ).toThrow();
   });
 
   it('should enforce name max length', () => {
@@ -126,6 +145,7 @@ describe('createDefaultFittingProps', () => {
     const types = ['elbow_90', 'elbow_45', 'tee', 'reducer', 'cap'] as const;
     types.forEach((type) => {
       const props = createDefaultFittingProps(type);
+      expect(props.engineeringSystem).toBe('standard_duct');
       expect(props.fittingType).toBe(type);
       expect(props.name).toBeTruthy();
       expect(FittingPropsSchema.parse(props)).toBeTruthy();

@@ -8,8 +8,8 @@ import { createEquipment, EQUIPMENT_TYPE_DEFAULTS } from '../entities/equipmentD
 import { createEntity, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
-import type { EquipmentType } from '@/core/schema/equipment.schema';
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
+import { isEquipmentLike, resolveEquipmentType } from './catalogPlacement';
 
 interface EquipmentToolState {
   currentPoint: { x: number; y: number } | null;
@@ -76,7 +76,7 @@ export class EquipmentTool extends BaseTool {
     }
 
     const activeComponent = this.getActiveComponent();
-    if (!activeComponent || activeComponent.category !== 'equipment') {
+    if (!activeComponent || !isEquipmentLike(activeComponent)) {
       return;
     }
 
@@ -84,7 +84,7 @@ export class EquipmentTool extends BaseTool {
     const currentPoint = this.state.currentPoint;
     
     // Determine equipment type from subtype or fallback
-    const type = (activeComponent.subtype as EquipmentType) || 'fan';
+    const type = resolveEquipmentType(activeComponent);
     const defaults = EQUIPMENT_TYPE_DEFAULTS[type] || EQUIPMENT_TYPE_DEFAULTS['fan'];
     
     // Use component dimensions if available, otherwise defaults
@@ -132,12 +132,12 @@ export class EquipmentTool extends BaseTool {
 
   private createEquipmentEntity(x: number, y: number): void {
     const activeComponent = this.getActiveComponent();
-    if (!activeComponent || activeComponent.category !== 'equipment') {
+    if (!activeComponent || !isEquipmentLike(activeComponent)) {
       console.warn('No active equipment component selected');
       return;
     }
 
-    const type = (activeComponent.subtype as EquipmentType) || 'fan';
+    const type = resolveEquipmentType(activeComponent);
     const defaults = EQUIPMENT_TYPE_DEFAULTS[type] || EQUIPMENT_TYPE_DEFAULTS['fan'];
     const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
 
@@ -153,6 +153,50 @@ export class EquipmentTool extends BaseTool {
       name: activeComponent.name,
       serviceId: activeService?.id || activeComponent.id,
       catalogItemId: activeComponent.id,
+      engineeringSystem: activeComponent.engineeringSystem,
+      ...(activeComponent.engineeringSystem === 'universal'
+        ? {
+            loadRating:
+              typeof activeComponent.customFields?.loadRating === 'number'
+                ? activeComponent.customFields.loadRating
+                : undefined,
+            spacingRule:
+              typeof activeComponent.customFields?.spacingRule === 'string'
+                ? activeComponent.customFields.spacingRule
+                : undefined,
+          }
+        : {}),
+      ...(activeComponent.engineeringSystem === 'generator_exhaust'
+        ? {
+            backpressureLimit:
+              typeof activeComponent.customFields?.backpressureLimit === 'number'
+                ? activeComponent.customFields.backpressureLimit
+                : undefined,
+            engineModel:
+              typeof activeComponent.customFields?.engineModel === 'string'
+                ? activeComponent.customFields.engineModel
+                : undefined,
+          }
+        : {}),
+      ...(activeComponent.engineeringSystem === 'boiler_flue'
+        ? {
+            draftType:
+              activeComponent.typeId === 'draft_control' ? 'natural' : 'forced',
+            btuInput:
+              typeof activeComponent.customFields?.btuInput === 'number'
+                ? activeComponent.customFields.btuInput
+                : undefined,
+          }
+        : {}),
+      ...(activeComponent.engineeringSystem === 'grease_duct'
+        ? {
+            greaseExtractionStage:
+              activeComponent.typeId === 'pcu' ? 'multi' : 'single',
+            fireSuppressionReady:
+              activeComponent.typeId === 'hood_connection' ||
+              activeComponent.typeId === 'pcu',
+          }
+        : {}),
     };
 
     // Place equipment at the snapped position (corner, not centered)

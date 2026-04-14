@@ -80,6 +80,14 @@ export class VersionDetector {
 
     const dataObj = data as Record<string, unknown>;
 
+    // Project files persist schemaVersion; prefer it before heuristic detection.
+    if (dataObj.schemaVersion && typeof dataObj.schemaVersion === 'string') {
+      const parsed = this.parseVersion(dataObj.schemaVersion);
+      if (parsed) {
+        return parsed;
+      }
+    }
+
     // Check for explicit version field
     if (dataObj._version && typeof dataObj._version === 'string') {
       const parsed = this.parseVersion(dataObj._version);

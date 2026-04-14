@@ -1,4 +1,5 @@
 import { DataVersion, VersionDetector } from './VersionDetector';
+import { CURRENT_SCHEMA_VERSION, ProjectFileSchema, type ProjectFile } from '@/core/schema/project-file.schema';
 
 /**
  * Migration step function type
@@ -46,11 +47,46 @@ export interface MigrationResult {
   data?: unknown;
 }
 
+function migrateProjectFileV1ToV2(data: unknown): ProjectFile {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Project data must be an object');
+  }
+
+  const source = data as Record<string, unknown>;
+  const migrated = {
+    ...source,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    _version: CURRENT_SCHEMA_VERSION,
+  } as Record<string, unknown>;
+
+  delete migrated.catalogItems;
+  delete migrated.componentDefinitions;
+
+  return ProjectFileSchema.parse(migrated);
+}
+
 /**
  * Registry for managing data migrations
  */
 export class MigrationRegistry {
   private migrations: Map<string, MigrationEntry> = new Map();
+
+  constructor() {
+    this.registerBuiltInMigrations();
+  }
+
+  private registerBuiltInMigrations(): void {
+    if (this.hasMigration('1.0.0', CURRENT_SCHEMA_VERSION)) {
+      return;
+    }
+
+    this.register({
+      fromVersion: '1.0.0',
+      toVersion: CURRENT_SCHEMA_VERSION,
+      description: 'Upgrade legacy project files to schema v2 and remove legacy store snapshots',
+      migrate: async (data: unknown) => migrateProjectFileV1ToV2(data),
+    });
+  }
 
   /**
    * Register a migration step
@@ -198,9 +234,17 @@ export class MigrationRegistry {
 
     const dataObj = data as Record<string, unknown>;
 
-    // Basic structure validation
-    if (!Array.isArray(dataObj.components) && !Array.isArray(dataObj.entities)) {
-      errors.push('Data must have components or entities array');
+    const hasComponentsArray = Array.isArray(dataObj.components);
+    const hasEntitiesArray = Array.isArray(dataObj.entities);
+    const hasNormalizedEntities =
+      typeof dataObj.entities === 'object' &&
+      dataObj.entities !== null &&
+      Array.isArray((dataObj.entities as Record<string, unknown>).allIds) &&
+      typeof (dataObj.entities as Record<string, unknown>).byId === 'object' &&
+      (dataObj.entities as Record<string, unknown>).byId !== null;
+
+    if (!hasComponentsArray && !hasEntitiesArray && !hasNormalizedEntities) {
+      errors.push('Data must have components or normalized entities');
     }
 
     return { valid: errors.length === 0, errors };
@@ -223,5 +267,7 @@ export class MigrationRegistry {
 
 // Export singleton instance
 export const migrationRegistry = new MigrationRegistry();
+
+export { migrateProjectFileV1ToV2 };
 
 export default MigrationRegistry;

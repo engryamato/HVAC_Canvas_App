@@ -3,10 +3,13 @@
  * 
  * Manages the state of HVAC Services (specifications) and the active service context.
  * Follows the pattern of entityStore using Zustand and Immer.
+ *
+ * @deprecated Ticket T1 makes the unified catalog store and initializer the
+ * canonical source of baseline library data. Keep this store only for
+ * compatibility with legacy callers until those consumers migrate.
  */
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { v4 as uuidv4 } from 'uuid';
 import { 
   Service, 
   ServiceTemplate,
@@ -167,7 +170,7 @@ export const useServiceStore = create<ServiceState & ServiceActions>()(
         throw new Error(`Service source ${sourceId} not found`);
       }
 
-      const newId = uuidv4();
+      const newId = crypto.randomUUID();
       const { isTemplate: _isTemplate, ...sourceData } = source as ServiceTemplate & { isTemplate?: true };
       const newService: Service = {
         ...sourceData,
@@ -206,7 +209,9 @@ export const useServiceStore = create<ServiceState & ServiceActions>()(
 
 export const useActiveService = () => {
   const state = useServiceStore();
-  if (!state.activeServiceId) return null;
+  if (!state.activeServiceId) {
+    return null;
+  }
   return state.services[state.activeServiceId] || 
          state.baselineTemplates.find(t => t.id === state.activeServiceId) || 
          null;

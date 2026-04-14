@@ -7,7 +7,7 @@ import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../store/selectionStore';
 import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
-import type { Entity, Room, Duct, Equipment } from '@/core/schema';
+import type { Entity } from '@/core/schema';
 import { useViewport } from '../hooks/useViewport';
 import { useCursorStore } from '../store/cursorStore';
 import { RulersOverlay } from './RulersOverlay';
@@ -23,6 +23,7 @@ import {
   DuctTool,
   FittingTool,
   EquipmentTool,
+  SupportTool,
   NoteTool,
   type ITool,
   type ToolMouseEvent,
@@ -51,6 +52,7 @@ function createToolInstances(): Record<CanvasTool, ITool> {
     duct: new DuctTool(),
     fitting: new FittingTool(),
     equipment: new EquipmentTool(),
+    support: new SupportTool(),
     note: new NoteTool(),
   };
 }

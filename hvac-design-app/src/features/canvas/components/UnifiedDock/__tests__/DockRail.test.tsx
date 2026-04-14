@@ -1,12 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { DockRail } from '../DockRail';
-import { useToolStore } from '@/core/store/canvas.store';
-import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { createEntity } from '@/core/commands/entityCommands';
-import type { Room } from '@/core/schema';
 
 // Mock the hooks module
 vi.mock('../../hooks/useKeyboardShortcuts', () => ({
@@ -27,28 +23,8 @@ vi.mock('@/core/commands/historyStore', async (importOriginal) => {
   };
 });
 
-const createMockRoom = (id: string, name: string): Room => ({
-  id,
-  type: 'room',
-  transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
-  zIndex: 0,
-  createdAt: '2025-01-01T00:00:00.000Z',
-  modifiedAt: '2025-01-01T00:00:00.000Z',
-  props: {
-    name,
-    width: 120,
-    length: 120,
-    ceilingHeight: 96,
-    occupancyType: 'office',
-    airChangesPerHour: 4,
-  },
-  calculated: { area: 100, volume: 800, requiredCFM: 200 },
-});
-
 describe('DockRail', () => {
   beforeEach(() => {
-    useEntityStore.getState().clearAllEntities();
-    useToolStore.setState({ currentTool: 'select' });
     useLayoutStore.setState({ activeDockPanel: 'none' });
     
     // Reset default mock implementation
@@ -121,31 +97,6 @@ describe('DockRail', () => {
     });
   });
 
-  describe('Tool Selection', () => {
-    it('should render all tools', () => {
-      render(<DockRail />);
-      const tools = [/Select/i, /Pan/i, /Duct/i, /Fitting/i, /Equipment/i, /Room/i, /Note/i];
-      tools.forEach(tool => {
-        expect(screen.getByTitle(tool)).toBeDefined();
-      });
-    });
-
-    it('should activate tool on click', () => {
-      render(<DockRail />);
-      const ductButton = screen.getByTitle(/Duct/i);
-      fireEvent.click(ductButton);
-      expect(useToolStore.getState().currentTool).toBe('duct');
-    });
-
-    it('should show active state styling', () => {
-      render(<DockRail />);
-      const ductButton = screen.getByTitle(/Duct/i);
-      fireEvent.click(ductButton);
-      // Check for blue background class or similar active indicator
-      expect(ductButton.className).toContain('bg-blue-600');
-    });
-  });
-
   describe('Dock Panels', () => {
     it('should render library and services toggles', () => {
       render(<DockRail />);
@@ -165,14 +116,14 @@ describe('DockRail', () => {
     });
 
     it('should toggle services panel', () => {
-        render(<DockRail />);
-        const servicesButton = screen.getByTitle('Services');
-        
-        fireEvent.click(servicesButton);
-        expect(useLayoutStore.getState().activeDockPanel).toBe('services');
-        
-        fireEvent.click(servicesButton);
-        expect(useLayoutStore.getState().activeDockPanel).toBe('none');
-      });
+      render(<DockRail />);
+      const servicesButton = screen.getByTitle('Services');
+
+      fireEvent.click(servicesButton);
+      expect(useLayoutStore.getState().activeDockPanel).toBe('services');
+
+      fireEvent.click(servicesButton);
+      expect(useLayoutStore.getState().activeDockPanel).toBe('none');
+    });
   });
 });

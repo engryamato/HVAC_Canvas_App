@@ -44,6 +44,8 @@ export function createDuct(
     staticPressure: number;
     serviceId: string;
     catalogItemId: string;
+    engineeringSystem: Duct['props']['engineeringSystem'];
+    specialtyToolId: string;
   }>
 ): Duct {
   const ductNumber = getNextDuctNumber();
@@ -61,6 +63,8 @@ export function createDuct(
     staticPressure: overrides?.staticPressure ?? DEFAULT_ROUND_DUCT_PROPS.staticPressure,
     serviceId: overrides?.serviceId,
     catalogItemId: overrides?.catalogItemId,
+    engineeringSystem: overrides?.engineeringSystem ?? DEFAULT_ROUND_DUCT_PROPS.engineeringSystem,
+    specialtyToolId: overrides?.specialtyToolId,
   };
   const props =
     shape === 'round'
@@ -82,6 +86,7 @@ export function createDuct(
     transform: {
       x: overrides?.x ?? 0,
       y: overrides?.y ?? 0,
+      elevation: 0,
       rotation: 0,
       scaleX: 1,
       scaleY: 1,

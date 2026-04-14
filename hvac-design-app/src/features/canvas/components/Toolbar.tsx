@@ -9,17 +9,32 @@ import {
 import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
 import { useCursorStore } from '@/features/canvas/store/cursorStore';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
+import { EquipmentTypeSelector } from './EquipmentTypeSelector';
+import { FittingTypeSelector } from './FittingTypeSelector';
+import {
+  getPlacementToolbarMetadata,
+} from '@/features/canvas/tools/placementStrategies';
+import { HvacCatalogIcon, resolveToolbarIconKey } from './catalogIcons';
+import {
+  applyAutoHangerSpacing,
+  clearSupportDraft,
+  getSupportPreviewModeForEntry,
+  isSupportToolEntry,
+  previewAutoHangerSpacing,
+} from '@/features/canvas/tools/supportPlacement';
 
 interface ToolButtonProps {
   tool: CanvasTool;
   icon: React.ReactNode;
   label: string;
   shortcut: string;
+  tooltip?: string;
   isActive: boolean;
   onClick: () => void;
 }
 
-function ToolButton({ tool, icon, label, shortcut, isActive, onClick }: ToolButtonProps) {
+function ToolButton({ tool, icon, label, shortcut, tooltip, isActive, onClick }: ToolButtonProps) {
   return (
     <button
       type="button"
@@ -33,7 +48,7 @@ function ToolButton({ tool, icon, label, shortcut, isActive, onClick }: ToolButt
             : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
         }
       `}
-      title={`${label} (${shortcut})`}
+      title={tooltip ? `${label} (${shortcut}) - ${tooltip}` : `${label} (${shortcut})`}
       aria-label={label}
       aria-pressed={isActive}
       data-testid={`tool-${tool}`}
@@ -66,20 +81,6 @@ const PanIcon = () => (
   </svg>
 );
 
-const DuctIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
-    <line x1="4" y1="8" x2="20" y2="8" strokeLinecap="round" />
-    <line x1="4" y1="16" x2="20" y2="16" strokeLinecap="round" />
-  </svg>
-);
-
-const FittingIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M5 7h8v4h4v8H9v-4H5z" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 const EquipmentIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -106,8 +107,24 @@ const NoteIcon = () => (
 const TOOLS: { tool: CanvasTool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { tool: 'select', icon: <SelectIcon />, label: 'Select', shortcut: 'V' },
   { tool: 'pan', icon: <PanIcon />, label: 'Pan', shortcut: 'Space' },
-  { tool: 'duct', icon: <DuctIcon />, label: 'Duct', shortcut: 'D' },
-  { tool: 'fitting', icon: <FittingIcon />, label: 'Fitting', shortcut: 'F' },
+  {
+    tool: 'duct',
+    icon: <HvacCatalogIcon iconKey="duct_rectangular" size={20} strokeWidth={2} data-testid="toolbar-icon-duct" aria-hidden />,
+    label: 'Duct',
+    shortcut: 'D',
+  },
+  {
+    tool: 'fitting',
+    icon: <HvacCatalogIcon iconKey="fitting_elbow" size={20} strokeWidth={2} data-testid="toolbar-icon-fitting" aria-hidden />,
+    label: 'Fitting',
+    shortcut: 'F',
+  },
+  {
+    tool: 'support',
+    icon: <HvacCatalogIcon iconKey="accessory_support_hanger" size={20} strokeWidth={2} data-testid="toolbar-icon-support" aria-hidden />,
+    label: 'Supports',
+    shortcut: 'S',
+  },
   { tool: 'equipment', icon: <EquipmentIcon />, label: 'Equipment', shortcut: 'E' },
   { tool: 'room', icon: <RoomIcon />, label: 'Room', shortcut: 'R' },
   { tool: 'note', icon: <NoteIcon />, label: 'Note', shortcut: 'N' },
@@ -157,16 +174,232 @@ interface ToolButtonsProps {
   orientation?: 'vertical' | 'horizontal';
 }
 
+interface SupportWorkflowPanelProps {
+  className?: string;
+}
+
+export function SupportWorkflowPanel({ className = '' }: SupportWorkflowPanelProps) {
+  const currentTool = useToolStore((state) => state.currentTool);
+  const supportSettings = useToolStore((state) => state.supportSettings);
+  const supportPreviewMarkers = useToolStore((state) => state.supportPreviewMarkers);
+  const supportDraftAnchor = useToolStore((state) => state.supportDraftAnchor);
+  const supportPrompt = useToolStore((state) => state.supportPrompt);
+  const activeEntryId = useUnifiedCatalogStore((state) => state.activeEntryId);
+  const catalogEntries = useUnifiedCatalogStore((state) => state.catalogEntries);
+  const {
+    setSupportSettings,
+    clearSupportPreview,
+    setSupportDraftAnchor,
+    setSupportPrompt,
+    setStatusMessage,
+  } = useToolActions();
+  const activeEntry = catalogEntries.find((entry) => entry.id === activeEntryId) ?? null;
+  const previewMode = getSupportPreviewModeForEntry(activeEntry);
+  const hangerOptions = catalogEntries.filter(
+    (entry) =>
+      entry.engineeringSystem === 'universal' &&
+      entry.categoryId === 'hangers_supports' &&
+      entry.componentClass === 'accessory'
+  );
+
+  React.useEffect(() => {
+    if (previewMode !== 'auto_hanger_spacing' && supportPreviewMarkers.length > 0) {
+      clearSupportPreview();
+    }
+  }, [previewMode, supportPreviewMarkers.length, clearSupportPreview]);
+
+  if (currentTool !== 'support') {
+    return null;
+  }
+
+  if (!isSupportToolEntry(activeEntry)) {
+    return (
+      <div className={`rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 ${className}`}>
+        Select a Universal Components support entry from the catalog to use support workflows.
+      </div>
+    );
+  }
+
+  const handlePreview = () => {
+    const markers = previewAutoHangerSpacing();
+    setStatusMessage(
+      markers.length > 0
+        ? `Previewed ${markers.length} support markers`
+        : 'No duct runs available for hanger preview'
+    );
+  };
+
+  const handleApply = () => {
+    const created = applyAutoHangerSpacing();
+    setStatusMessage(
+      created > 0 ? `Placed ${created} support entities` : 'No preview markers available to apply'
+    );
+  };
+
+  const handleClear = () => {
+    clearSupportPreview();
+    clearSupportDraft();
+    setStatusMessage('Cleared support preview');
+  };
+
+  return (
+    <div className={`rounded-xl border border-slate-200 bg-white/95 p-3 text-xs shadow-sm ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Support Workflow</div>
+          <div className="text-sm font-semibold text-slate-900">{activeEntry.name}</div>
+        </div>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-700">
+          {previewMode === 'auto_hanger_spacing'
+            ? `${supportPreviewMarkers.length} preview`
+            : supportDraftAnchor
+              ? 'Start selected'
+              : 'Awaiting click'}
+        </span>
+      </div>
+
+      <div className="mt-3 grid gap-3 md:grid-cols-4">
+        <label className="space-y-1">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Mount Height</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={supportSettings.mountHeight ?? ''}
+            onChange={(event) => {
+              const value = event.target.value;
+              setSupportSettings({ mountHeight: value ? Number(value) : null });
+              if (value) {
+                setSupportPrompt(null);
+              }
+            }}
+            className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-700 outline-none focus:border-sky-400"
+            placeholder="96"
+          />
+        </label>
+
+        <label className="space-y-1">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Code Standard</span>
+          <select
+            value={supportSettings.codeStandard}
+            onChange={(event) =>
+              setSupportSettings({
+                codeStandard: event.target.value as typeof supportSettings.codeStandard,
+              })
+            }
+            className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-700 outline-none focus:border-sky-400"
+          >
+            <option value="smacna">SMACNA</option>
+            <option value="ibc_asce7">IBC / ASCE 7</option>
+            <option value="ashrae">ASHRAE</option>
+          </select>
+        </label>
+
+        <label className="space-y-1">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Scope</span>
+          <select
+            value={supportSettings.scope}
+            onChange={(event) =>
+              setSupportSettings({
+                scope: event.target.value as typeof supportSettings.scope,
+              })
+            }
+            className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-700 outline-none focus:border-sky-400"
+          >
+            <option value="selected">Selected ducts</option>
+            <option value="all">All duct runs</option>
+          </select>
+        </label>
+
+        <label className="space-y-1">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Hanger Type</span>
+          <select
+            value={supportSettings.hangerEntryId ?? ''}
+            onChange={(event) => setSupportSettings({ hangerEntryId: event.target.value || null })}
+            className="w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-700 outline-none focus:border-sky-400"
+          >
+            {hangerOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {previewMode === 'auto_hanger_spacing' ? (
+        <>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePreview}
+              className="rounded-full bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700"
+            >
+              Preview
+            </button>
+            <button
+              type="button"
+              onClick={handleApply}
+              className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="mt-2 text-[11px] text-slate-600">
+            Preview markers are generated for the selected ducts or all duct runs, then applied as one batch history action.
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">
+            <div>Click a duct centerline to start the continuous trapeze run, then click again to end it.</div>
+            {supportDraftAnchor ? (
+              <div className="mt-1">Start point set. Click the duct centerline again to finish the continuous trapeze run.</div>
+            ) : null}
+            {supportPrompt ? (
+              <div className="mt-1">
+                {supportPrompt.title}: {supportPrompt.description}
+              </div>
+            ) : null}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setSupportDraftAnchor(null);
+                setSupportPrompt(null);
+                setStatusMessage('Cleared trapeze draft');
+              }}
+              className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Clear
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /**
  * Reusable tool buttons list used by both the standalone toolbar and sidebar.
  */
 export function ToolButtons({ className = '', orientation = 'vertical' }: ToolButtonsProps) {
   const currentTool = useToolStore((state) => state.currentTool);
+  const activeSpecialtyToolId = useToolStore((state) => state.activeSpecialtyToolId);
   const { setTool, dispatchKeyboardShortcut } = useToolActions();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
   const isVertical = orientation === 'vertical';
   const setCursorMode = useCursorStore((state) => state.setCursorMode);
+  const ductToolbarMetadata = getPlacementToolbarMetadata(activeSpecialtyToolId);
 
   // Handle keyboard shortcuts
   React.useEffect(() => {
@@ -181,10 +414,14 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
         case 'd':
         case 'f':
         case 'e':
+        case 's':
         case 'escape': {
           const activated = dispatchKeyboardShortcut(e.key.toLowerCase());
           if (!activated && e.key.toLowerCase() === 'f') {
             setTool('fitting');
+          }
+          if (!activated && e.key.toLowerCase() === 's') {
+            setTool('support');
           }
           break;
         }
@@ -238,6 +475,15 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
     setCursorMode('default');
   }, [currentTool, setCursorMode]);
 
+  const handleToolClick = (tool: CanvasTool) => {
+    if (tool === 'duct' && activeSpecialtyToolId) {
+      setTool('duct');
+      return;
+    }
+
+    setTool(tool);
+  };
+
   return (
     <div
       className={`
@@ -249,17 +495,50 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
       aria-label="Canvas tools"
       data-testid="toolbar"
     >
-      {TOOLS.map(({ tool, icon, label, shortcut }) => (
-        <ToolButton
-          key={tool}
-          tool={tool}
-          icon={icon}
-          label={label}
-          shortcut={shortcut}
-          isActive={currentTool === tool}
-          onClick={() => setTool(tool)}
-        />
-      ))}
+      {TOOLS.map(({ tool, icon, label, shortcut }) => {
+        if (tool === 'duct') {
+          return (
+            <ToolButton
+              key={tool}
+              tool={tool}
+              icon={
+                <HvacCatalogIcon
+                  iconKey={resolveToolbarIconKey('duct', ductToolbarMetadata.iconKey) ?? 'duct_rectangular'}
+                  size={20}
+                  strokeWidth={2}
+                  data-testid="toolbar-icon-duct"
+                  aria-hidden
+                />
+              }
+              label={ductToolbarMetadata.label}
+              shortcut={shortcut}
+              tooltip={ductToolbarMetadata.tooltip}
+              isActive={currentTool === tool}
+              onClick={() => handleToolClick(tool)}
+            />
+          );
+        }
+
+        return (
+          <ToolButton
+            key={tool}
+            tool={tool}
+            icon={icon}
+            label={label}
+            shortcut={shortcut}
+            isActive={currentTool === tool}
+            onClick={() => handleToolClick(tool)}
+          />
+        );
+      })}
+
+      {currentTool === 'equipment' ? <EquipmentTypeSelector /> : null}
+      {currentTool === 'fitting' ? <FittingTypeSelector /> : null}
+      {currentTool === 'support' ? (
+        <div className={`w-full ${isVertical ? '' : 'basis-full'}`}>
+          <SupportWorkflowPanel />
+        </div>
+      ) : null}
 
       {/* Undo/Redo buttons */}
       <div className={`flex items-center gap-1 ${isVertical ? 'ml-2 pl-2 border-l' : 'ml-1 pl-2 border-l'} border-slate-200`}>

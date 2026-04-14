@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +16,7 @@ import {
   Clock
 } from 'lucide-react';
 import { VersionDetector, DataVersion, CURRENT_DATA_VERSION } from '@/core/services/migration/VersionDetector';
-import { MigrationRegistry, MigrationResult, MigrationError } from '@/core/services/migration/MigrationRegistry';
+import { migrationRegistry, MigrationResult, MigrationError } from '@/core/services/migration/MigrationRegistry';
 import { BackupManager, BackupMetadata } from '@/core/services/migration/BackupManager';
 
 interface MigrationWizardProps {
@@ -36,34 +36,9 @@ export function MigrationWizard({ isOpen, onClose, data, onMigrationComplete }: 
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const migrationRegistry = new MigrationRegistry();
   const backupManager = new BackupManager();
 
-  // Reset state when wizard opens or data changes to ensure fresh migration flow
-  useEffect(() => {
-    if (isOpen) {
-      setStep('detect');
-      setDetectedVersion(null);
-      setBackupMetadata(null);
-      setMigrationResult(null);
-      setError(null);
-      setProgress(0);
-    }
-  }, [isOpen, data]);
-
-  useEffect(() => {
-    if (isOpen && step === 'detect') {
-      detectVersion();
-    }
-  }, [isOpen, step]);
-
-  useEffect(() => {
-    if (step === 'migrate') {
-      handleMigrate();
-    }
-  }, [step]);
-
-  const detectVersion = () => {
+  const detectVersion = useCallback(() => {
     const version = VersionDetector.detectVersion(data);
     setDetectedVersion(version);
 
@@ -79,10 +54,12 @@ export function MigrationWizard({ isOpen, onClose, data, onMigrationComplete }: 
     }
 
     setStep('backup');
-  };
+  }, [data]);
 
   const handleCreateBackup = async () => {
-    if (!detectedVersion) return;
+    if (!detectedVersion) {
+      return;
+    }
 
     setProgress(25);
 
@@ -100,8 +77,10 @@ export function MigrationWizard({ isOpen, onClose, data, onMigrationComplete }: 
     }
   };
 
-  const handleMigrate = async () => {
-    if (!detectedVersion) return;
+  const handleMigrate = useCallback(async () => {
+    if (!detectedVersion) {
+      return;
+    }
 
     setProgress(75);
 
@@ -120,7 +99,31 @@ export function MigrationWizard({ isOpen, onClose, data, onMigrationComplete }: 
       setStep('error');
       setError(`Migration failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-  };
+  }, [data, detectedVersion]);
+
+  // Reset state when wizard opens or data changes to ensure fresh migration flow
+  useEffect(() => {
+    if (isOpen) {
+      setStep('detect');
+      setDetectedVersion(null);
+      setBackupMetadata(null);
+      setMigrationResult(null);
+      setError(null);
+      setProgress(0);
+    }
+  }, [isOpen, data]);
+
+  useEffect(() => {
+    if (isOpen && step === 'detect') {
+      detectVersion();
+    }
+  }, [detectVersion, isOpen, step]);
+
+  useEffect(() => {
+    if (step === 'migrate') {
+      void handleMigrate();
+    }
+  }, [handleMigrate, step]);
 
   const handleComplete = () => {
     if (migrationResult?.success && migrationResult.data) {
@@ -130,7 +133,9 @@ export function MigrationWizard({ isOpen, onClose, data, onMigrationComplete }: 
   };
 
   const handleRollback = async () => {
-    if (!backupMetadata) return;
+    if (!backupMetadata) {
+      return;
+    }
 
     try {
       const backup = await backupManager.restoreBackup(backupMetadata.id);

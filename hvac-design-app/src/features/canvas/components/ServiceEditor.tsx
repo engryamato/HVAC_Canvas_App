@@ -1,12 +1,11 @@
 /**
  * ServiceEditor
  *
- * Component for creating and editing service specifications
- * Uses unified component library store (componentLibraryStoreV2)
+ * Component for creating and editing catalog-backed component definitions.
  */
 import { useState, useEffect } from 'react';
 import { SystemType, PressureClass } from '@/core/schema/service.schema';
-import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
 import { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ type MaterialType = 'galvanized' | 'stainless' | 'aluminum' | 'flex';
 type ComponentSystemType = 'supply' | 'return' | 'exhaust';
 type ComponentPressureClass = 'low' | 'medium' | 'high';
 
-interface ServiceFormData {
+interface ComponentFormData {
   name: string;
   systemType: SystemType;
   pressureClass: PressureClass;
@@ -53,7 +52,7 @@ function toComponentMaterialType(material: MaterialType): 'galvanized_steel' | '
   }
 }
 
-function toServiceMaterial(materialType?: string): MaterialType {
+function toComponentMaterial(materialType?: string): MaterialType {
   switch (materialType) {
     case 'stainless_steel':
       return 'stainless';
@@ -67,7 +66,7 @@ function toServiceMaterial(materialType?: string): MaterialType {
   }
 }
 
-function getServiceColor(systemType?: string): string {
+function getComponentColor(systemType?: string): string {
   switch (systemType) {
     case 'supply':
       return '#007bff';
@@ -80,7 +79,7 @@ function getServiceColor(systemType?: string): string {
   }
 }
 
-function componentToFormData(component: UnifiedComponentDefinition | undefined): ServiceFormData {
+function componentToFormData(component: UnifiedComponentDefinition | undefined): ComponentFormData {
   if (!component) {
     return {
       name: '',
@@ -100,20 +99,20 @@ function componentToFormData(component: UnifiedComponentDefinition | undefined):
     name: component.name || '',
     systemType: (component.systemType as SystemType) || 'supply',
     pressureClass: (component.pressureClass as PressureClass) || 'low',
-    material: toServiceMaterial(component.materials?.[0]?.type),
-    color: getServiceColor(component.systemType),
+    material: toComponentMaterial(component.materials?.[0]?.type),
+    color: getComponentColor(component.systemType),
     allowedShapes: dimensionalConstraints?.allowedShapes || ['round', 'rectangular'],
   };
 }
 
 export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) {
-  const addComponent = useComponentLibraryStoreV2((state) => state.addComponent);
-  const updateComponent = useComponentLibraryStoreV2((state) => state.updateComponent);
-  const getComponent = useComponentLibraryStoreV2((state) => state.getComponent);
+  const addComponent = useUnifiedCatalogStore((state) => state.addComponent);
+  const updateComponent = useUnifiedCatalogStore((state) => state.updateComponent);
+  const getComponent = useUnifiedCatalogStore((state) => state.getComponent);
 
   const existingComponent = serviceId ? getComponent(serviceId) : undefined;
 
-  const [formData, setFormData] = useState<ServiceFormData>(componentToFormData(existingComponent));
+  const [formData, setFormData] = useState<ComponentFormData>(componentToFormData(existingComponent));
 
   useEffect(() => {
     if (open) {
@@ -128,10 +127,16 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
     const componentData: UnifiedComponentDefinition = {
       id: serviceId || crypto.randomUUID(),
       name: formData.name,
+      componentClass: 'duct',
       category: 'duct',
-      type: 'duct',
+      categoryId: 'standard_ductwork',
+      typeId: 'service_duct',
+      type: 'service_duct',
       subtype: primaryShape,
-      description: `${formData.name} - ${formData.systemType} air service`,
+      engineeringSystem: formData.systemType === 'exhaust' ? 'generator_exhaust' : 'standard_duct',
+      placeable: true,
+      source: 'custom',
+      description: `${formData.name} - ${formData.systemType} air component`,
       systemType: formData.systemType as ComponentSystemType,
       pressureClass: formData.pressureClass as ComponentPressureClass,
       engineeringProperties: {
@@ -154,9 +159,9 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
           costUnit: 'linear_foot',
         },
       ],
-      tags: ['service', formData.systemType, 'legacy-migrated'],
+      tags: ['component', formData.systemType, 'legacy-migrated'],
       customFields: {
-        serviceEditor: true,
+        componentEditor: true,
         dimensionalConstraints: {
           allowedShapes: formData.allowedShapes,
         },
@@ -181,12 +186,12 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{serviceId ? 'Edit Service' : 'Create Service'}</DialogTitle>
+          <DialogTitle>{serviceId ? 'Edit Component' : 'Create Component'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Service Name</Label>
+            <Label htmlFor="name">Component Name</Label>
             <Input
               id="name"
               value={formData.name}
@@ -251,7 +256,7 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
           </div>
 
           <div>
-            <Label htmlFor="color">Service Color</Label>
+            <Label htmlFor="color">Component Color</Label>
             <div className="flex gap-2">
               <Input
                 id="color"
@@ -271,7 +276,7 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave}>Save Service</Button>
+          <Button onClick={handleSave}>Save Component</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -31,6 +31,8 @@ export {
   default as createFittingDefault,
 } from './fittingDefaults';
 
+export { createGroup, default as createGroupDefault } from './groupDefaults';
+
 export {
   createNote,
   getNextNoteNumber,

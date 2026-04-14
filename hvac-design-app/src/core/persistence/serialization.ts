@@ -1,4 +1,5 @@
 import { ProjectFileSchema, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
+import { migrateProjectFileV1ToV2 } from '@/core/services/migration/MigrationRegistry';
 
 /**
  * Serialization result with error handling
@@ -117,19 +118,23 @@ export function deserializeProjectLenient(json: string): DeserializationResult {
  * Future versions will add migration logic here
  */
 export function migrateProject(project: unknown, fromVersion: string): DeserializationResult {
-  // For v1.0.0, no migrations needed yet
-  // Future migrations will be added here as version-specific handlers
   if (fromVersion === '1.0.0') {
-    const result = deserializeProject(JSON.stringify(project));
-    if (!result.success) {
-      return result;
+    try {
+      const migrated = migrateProjectFileV1ToV2(project);
+      return {
+        success: true,
+        data: migrated,
+        migrated: true,
+        originalVersion: fromVersion,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Migration failed',
+        migrated: false,
+        originalVersion: fromVersion,
+      };
     }
-
-    return {
-      ...result,
-      migrated: false,
-      originalVersion: fromVersion,
-    };
   }
 
   // Add future migration handlers here:

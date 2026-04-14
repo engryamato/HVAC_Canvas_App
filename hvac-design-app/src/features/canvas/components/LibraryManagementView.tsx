@@ -1,19 +1,19 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
 import { useToolActions } from '@/core/store/canvas.store';
 import type { FittingType } from '@/core/schema/fitting.schema';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 
 export function LibraryManagementView() {
-  const components = useComponentLibraryStoreV2((state) => state.components);
-  const categories = useComponentLibraryStoreV2((state) => state.categories);
-  const addComponent = useComponentLibraryStoreV2((state) => state.addComponent);
-  const updateComponent = useComponentLibraryStoreV2((state) => state.updateComponent);
-  const deleteComponent = useComponentLibraryStoreV2((state) => state.deleteComponent);
-  const duplicateComponent = useComponentLibraryStoreV2((state) => state.duplicateComponent);
-  const activateComponent = useComponentLibraryStoreV2((state) => state.activateComponent);
+  const components = useUnifiedCatalogStore((state) => state.components);
+  const categories = useUnifiedCatalogStore((state) => state.categories);
+  const addComponent = useUnifiedCatalogStore((state) => state.addComponent);
+  const updateComponent = useUnifiedCatalogStore((state) => state.updateComponent);
+  const deleteComponent = useUnifiedCatalogStore((state) => state.deleteComponent);
+  const duplicateComponent = useUnifiedCatalogStore((state) => state.duplicateComponent);
+  const activateComponent = useUnifiedCatalogStore((state) => state.activateComponent);
 
   const { setTool, setFittingType } = useToolActions();
 
@@ -31,12 +31,20 @@ export function LibraryManagementView() {
     addComponent({
       id: `custom-${Date.now()}`,
       name: 'New Custom Component',
-      category: firstCategory,
-      type: 'accessory',
+      componentClass: 'accessory',
+      category: 'accessory',
+      categoryId: firstCategory,
+      typeId: 'custom_component',
+      type: 'custom_component',
+      engineeringSystem: 'universal',
+      placeable: true,
+      source: 'custom',
+      systemType: 'supply',
       materials: [],
       engineeringProperties: {
         frictionFactor: 0.0005,
         maxVelocity: 2000,
+        minVelocity: 0,
       },
       pricing: {
         materialCost: 0,
@@ -50,7 +58,7 @@ export function LibraryManagementView() {
   };
 
   const handleDelete = (id: string) => {
-    if (!window.confirm('Delete this library component?')) {
+    if (!window.confirm('Delete this catalog component?')) {
       return;
     }
     deleteComponent(id);
@@ -61,19 +69,20 @@ export function LibraryManagementView() {
 
   const activateForTooling = (component: UnifiedComponentDefinition) => {
     activateComponent(component.id);
+    const componentClass = component.componentClass ?? component.category;
 
-    if (component.type === 'duct') {
+    if (componentClass === 'duct') {
       setTool('duct');
       return;
     }
 
-    if (component.type === 'fitting') {
+    if (componentClass === 'fitting') {
       setFittingType((component.subtype ?? 'elbow_90') as FittingType);
       setTool('fitting');
       return;
     }
 
-    if (component.type === 'equipment') {
+    if (componentClass === 'equipment') {
       setTool('equipment');
       return;
     }
@@ -85,7 +94,7 @@ export function LibraryManagementView() {
     <div className="grid h-full grid-cols-[320px_1fr] gap-3 p-3" data-testid="library-management-view">
       <aside className="space-y-2 rounded border p-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Library Components</h3>
+          <h3 className="text-sm font-semibold">Catalog Components</h3>
           <button type="button" className="rounded border px-2 py-1 text-xs" onClick={handleCreate}>
             Add
           </button>
@@ -104,7 +113,7 @@ export function LibraryManagementView() {
             >
               <div className="font-medium">{component.name}</div>
               <div className="text-[11px]">
-                {component.type} · {component.category}
+                {component.typeId ?? component.type} · {component.categoryId}
               </div>
             </button>
           ))}
@@ -155,9 +164,9 @@ export function LibraryManagementView() {
             <input
               id="library-component-category"
               className="w-full rounded border px-2 py-1 text-sm"
-              value={selected.category}
+              value={selected.categoryId}
               title="Component category"
-              onChange={(event) => updateComponent(selected.id, { category: (event.target.value || 'uncategorized') as 'duct' | 'fitting' | 'equipment' | 'accessory' })}
+              onChange={(event) => updateComponent(selected.id, { categoryId: event.target.value || 'uncategorized' })}
             />
 
             <label htmlFor="library-component-description" className="block text-xs font-medium">

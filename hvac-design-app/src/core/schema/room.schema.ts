@@ -68,4 +68,3 @@ export const DEFAULT_ROOM_PROPS: RoomProps = {
   occupancyType: 'office',
   airChangesPerHour: 4,
 };
-

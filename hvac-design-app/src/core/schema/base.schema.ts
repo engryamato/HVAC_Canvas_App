@@ -66,4 +66,3 @@ export function createDefaultTransform(overrides?: Partial<Transform>): Transfor
 export function getCurrentTimestamp(): string {
   return new Date().toISOString();
 }
-

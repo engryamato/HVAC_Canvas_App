@@ -11,6 +11,7 @@ export const SystemTypeSchema = z.enum([
   'supply',
   'return',
   'exhaust',
+  'outside_air',
   'fresh_air',
   'relief_air',
   'other'
@@ -101,7 +102,7 @@ export const ServiceSchema = z.object({
   updatedAt: z.date().optional(),
 });
 
-export type Service = z.input<typeof ServiceSchema>;
+export type Service = z.infer<typeof ServiceSchema>;
 
 // Inferred type for the industrialConstraints field
 export type IndustrialConstraints = NonNullable<z.infer<typeof ServiceSchema>['industrialConstraints']>;

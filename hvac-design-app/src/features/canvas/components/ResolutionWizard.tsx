@@ -5,7 +5,7 @@
  */
 import { useState } from 'react';
 import { useValidationStore } from '@/core/store/validationStore';
-import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,8 +21,8 @@ export function ResolutionWizard({ open, onClose, entityId }: ResolutionWizardPr
   const [mode, setMode] = useState<'find' | 'create' | 'modify'>('find');
   const [searchQuery, setSearchQuery] = useState('');
   const validationResult = useValidationStore((state) => state.validationResults[entityId]);
-  const searchComponents = useComponentLibraryStoreV2((state) => state.search);
-  const activateComponent = useComponentLibraryStoreV2((state) => state.activateComponent);
+  const searchComponents = useUnifiedCatalogStore((state) => state.search);
+  const activateComponent = useUnifiedCatalogStore((state) => state.activateComponent);
   const [searchResults, setSearchResults] = useState<Array<ReturnType<typeof searchComponents>[number]>>([]);
 
   const handleSearch = () => {
@@ -36,7 +36,9 @@ export function ResolutionWizard({ open, onClose, entityId }: ResolutionWizardPr
     onClose();
   };
 
-  if (!validationResult) return null;
+  if (!validationResult) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>

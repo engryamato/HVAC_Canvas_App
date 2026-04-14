@@ -1,12 +1,12 @@
 'use client';
 
-import { UnifiedComponentBrowser } from './UnifiedComponentBrowser';
+import { CatalogPanel } from './CatalogPanel';
 
 /**
- * Product catalog backed by the unified component library V2.
+ * Product catalog backed by the unified catalog store.
  */
 export function ProductCatalogPanel() {
-  return <UnifiedComponentBrowser />;
+  return <CatalogPanel />;
 }
 
 export default ProductCatalogPanel;

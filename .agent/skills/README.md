@@ -98,6 +98,7 @@ Skills for extending AI capabilities:
 - `@mcp-builder` - Build MCP (Model Context Protocol) servers
 - `@skill-creator` - Create new skills or update existing ones
 - `@writing-skills` - Tools for writing and validating skill files
+- `@codex-subagent-orchestration` - Supervise Codex sub-agents with agent-defined skill routing
 - `@dispatching-parallel-agents` - Distribute tasks to multiple agents
 
 ---

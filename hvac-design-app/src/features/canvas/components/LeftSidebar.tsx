@@ -5,7 +5,7 @@ import { useStatusMessage } from '@/core/store/canvas.store';
 import { useCursorStore } from '@/features/canvas/store/cursorStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { ProductCatalogPanel } from './ProductCatalogPanel';
-import { ServicesPanel } from './ServicesPanel';
+import { ManagePanel } from './ManagePanel';
 import { ToolButtons } from './Toolbar';
 
 interface LeftSidebarProps {
@@ -17,16 +17,16 @@ interface LeftSidebarProps {
   className?: string;
 }
 
-type LeftTabId = 'library' | 'services';
+type LeftTabId = 'catalog' | 'manage';
 
 function normalizeLeftTab(value: string): LeftTabId {
-  if (value === 'library' || value === 'services') {
+  if (value === 'catalog' || value === 'manage') {
     return value;
   }
-  if (value === 'product-catalog' || value === 'equipment') {
-    return 'library';
+  if (value === 'library' || value === 'product-catalog') {
+    return 'catalog';
   }
-  return 'library';
+  return 'catalog';
 }
 
 export function LeftSidebar({
@@ -100,32 +100,32 @@ export function LeftSidebar({
             <button
               type="button"
               role="tab"
-              aria-selected={activeLeftTab === 'library'}
-              aria-controls="library-panel"
-              onClick={() => setActiveLeftTab('library')}
+              aria-selected={activeLeftTab === 'catalog'}
+              aria-controls="catalog-panel"
+              onClick={() => setActiveLeftTab('catalog')}
               className={`rounded px-2 py-1 text-sm transition-colors ${
-                activeLeftTab === 'library'
+                activeLeftTab === 'catalog'
                   ? 'active bg-slate-200 text-slate-900'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
-              data-testid="tab-library"
+              data-testid="tab-catalog"
             >
-              Library
+              Catalog
             </button>
             <button
               type="button"
               role="tab"
-              aria-selected={activeLeftTab === 'services'}
-              aria-controls="services-panel"
-              onClick={() => setActiveLeftTab('services')}
+              aria-selected={activeLeftTab === 'manage'}
+              aria-controls="manage-panel"
+              onClick={() => setActiveLeftTab('manage')}
               className={`rounded px-2 py-1 text-sm transition-colors ${
-                activeLeftTab === 'services'
+                activeLeftTab === 'manage'
                   ? 'active bg-slate-200 text-slate-900'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
-              data-testid="tab-services"
+              data-testid="tab-manage"
             >
-              Services
+              Manage
             </button>
           </div>
         )}
@@ -165,15 +165,15 @@ export function LeftSidebar({
 
       {!leftSidebarCollapsed && (
         <div className="sidebar-content overflow-y-auto">
-          {activeLeftTab === 'library' && (
-            <div className="p-3" data-testid="library-panel" id="library-panel" role="tabpanel">
+          {activeLeftTab === 'catalog' && (
+            <div className="p-3" data-testid="catalog-panel" id="catalog-panel" role="tabpanel">
               <ProductCatalogPanel />
             </div>
           )}
 
-          {activeLeftTab === 'services' && (
-            <div className="p-3" data-testid="services-panel" id="services-panel" role="tabpanel">
-              <ServicesPanel />
+          {activeLeftTab === 'manage' && (
+            <div className="p-3" data-testid="manage-panel" id="manage-panel" role="tabpanel">
+              <ManagePanel activeTab="manage" />
             </div>
           )}
         </div>

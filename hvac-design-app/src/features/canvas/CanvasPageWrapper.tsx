@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CanvasPage } from './CanvasPage';
 import { useProjectStore as useSessionStore } from '@/core/store/project.store';
 import { useProjectStore as usePersistenceStore } from '@/stores/useProjectStore';
@@ -70,6 +70,31 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
     }
   };
 
+  const handleBackupRecovery = useCallback(
+    (fromBackup: boolean) => {
+      if (!fromBackup) {
+        return;
+      }
+      addToast({
+        title: 'Project recovered from backup',
+        type: 'warning',
+      });
+      localStorage.removeItem('hvac-backup-recovered');
+    },
+    [addToast]
+  );
+
+  const handleVersionCheck = useCallback((name: string, version: string): boolean => {
+    logger.debug(`[CanvasPageWrapper] Project: ${name}, Version: ${version}, App Version: ${APP_VERSION}`);
+    if (compareVersions(version, APP_VERSION) > 0) {
+      logger.debug('[CanvasPageWrapper] Version mismatch detected');
+      setProjectVersion(version);
+      setVersionWarning(true);
+      return true;
+    }
+    return false;
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -126,23 +151,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
             // Check version compatibility
             const proj = result.project as any; // Type assertion for dynamic import
             const projVersion = (proj as any).schemaVersion ?? proj.version ?? '1.0.0';
-            logger.debug(`[CanvasPageWrapper] Project: ${proj.projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
-
-            if (compareVersions(projVersion, APP_VERSION) > 0) {
-              logger.debug('[CanvasPageWrapper] Version mismatch detected');
-              setProjectVersion(projVersion);
-              setVersionWarning(true);
+            if (handleVersionCheck(proj.projectName, projVersion)) {
               return;
             }
 
             hydrateProject(result.project);
-            if (result.loadedFromBackup) {
-              addToast({
-                title: 'Project recovered from backup',
-                type: 'warning',
-              });
-              localStorage.removeItem('hvac-backup-recovered');
-            }
+            handleBackupRecovery(Boolean(result.loadedFromBackup));
 
             // Convert ProjectFile to the format expected by loadProject
             const projectData = {
@@ -200,23 +214,12 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
 
       if (storedPayload) {
         hydrateProject(storedPayload.project, storedPayload);
-        if (storedProject?.source === 'backup') {
-          addToast({
-            title: 'Project recovered from backup',
-            type: 'warning',
-          });
-          localStorage.removeItem('hvac-backup-recovered');
-        }
+        handleBackupRecovery(storedProject?.source === 'backup');
       }
 
       // Check version compatibility
       const projVersion = storedPayload?.project?.schemaVersion ?? (persistedProject as any)?.version ?? '1.0.0';
-      logger.debug(`[CanvasPageWrapper] Project: ${projectName}, Version: ${projVersion}, App Version: ${APP_VERSION}`);
-
-      if (compareVersions(projVersion, APP_VERSION) > 0) {
-        logger.debug('[CanvasPageWrapper] Version mismatch detected');
-        setProjectVersion(projVersion);
-        setVersionWarning(true);
+      if (handleVersionCheck(projectName, projVersion)) {
         return; // Wait for user decision
       }
 
@@ -231,7 +234,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
     return () => {
       clearProject();
     };
-  }, [projectId, setProject, clearProject, getProject]);
+  }, [projectId, setProject, clearProject, getProject, handleBackupRecovery, handleVersionCheck]);
 
   // Load project after version warning acceptance
   useEffect(() => {
@@ -241,13 +244,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
         const persistedProject = getProject(projectId);
         if (storedProject?.payload) {
           hydrateProject(storedProject.payload.project, storedProject.payload);
-          if (storedProject.source === 'backup') {
-            addToast({
-              title: 'Project recovered from backup',
-              type: 'warning',
-            });
-            localStorage.removeItem('hvac-backup-recovered');
-          }
+          handleBackupRecovery(storedProject.source === 'backup');
         }
         if (persistedProject || storedProject?.payload) {
           loadProject(persistedProject, storedProject?.payload);
@@ -257,7 +254,7 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       }
       setShouldLoadProject(false);
     }
-  }, [shouldLoadProject, projectId, getProject, addToast]);
+  }, [shouldLoadProject, projectId, getProject, handleBackupRecovery]);
 
   function loadProject(persistedProject: any, storedPayload?: LocalStoragePayload) {
     const storedProject = storedPayload?.project;

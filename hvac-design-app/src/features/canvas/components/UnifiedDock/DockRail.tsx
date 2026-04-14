@@ -2,6 +2,7 @@
 
 import { 
   Package,
+  Settings2,
   Undo2,
   Redo2
 } from 'lucide-react';
@@ -27,16 +28,29 @@ export function DockRail({ className = '' }: DockRailProps) {
       <div className="flex flex-col gap-2 w-full px-2">
         <button
           onClick={() => toggleDockPanel('library')}
-          title="Project Assets"
+          title="Library"
           className={`
             w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
-            ${activeDockPanel !== 'none' 
+            ${activeDockPanel === 'library' 
               ? 'bg-slate-800 text-white border border-slate-700' 
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
             }
           `}
         >
           <Package size={20} />
+        </button>
+        <button
+          onClick={() => toggleDockPanel('services')}
+          title="Services"
+          className={`
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200
+            ${activeDockPanel === 'services'
+              ? 'bg-slate-800 text-white border border-slate-700'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }
+          `}
+        >
+          <Settings2 size={20} />
         </button>
       </div>
 

@@ -16,12 +16,18 @@ import {
   DuctMaterialSchema as DuctEntityMaterialSchema,
   DuctShapeSchema as DuctEntityShapeSchema,
 } from '@/core/schema/duct.schema';
+import { useToolStore } from '@/core/store/canvas.store';
 import { ConnectionDetectionService } from '@/core/services/connectionDetection';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import type { Entity, Fitting, Duct } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import { adaptComponentToService, getServiceColor } from '@/core/services/componentServiceInterop';
+import {
+  resolvePlacementStrategy,
+  type PlacementPreviewDecoration,
+  type PlacementContext,
+} from './placementStrategies';
 
 /**
  * Minimum duct length in pixels (for 0.1 feet minimum)
@@ -152,12 +158,17 @@ export class DuctTool extends BaseTool {
 
   onKeyDown(event: ToolKeyEvent): void {
     if (event.key === 'Escape') {
+      useToolStore.getState().setSpecialtyToolId(null);
       this.reset();
     }
   }
 
   private getActiveComponent(): UnifiedComponentDefinition | null {
     return useComponentLibraryStoreV2.getState().getActiveComponent() ?? null;
+  }
+
+  private getPlacementStrategy() {
+    return resolvePlacementStrategy(useToolStore.getState().activeSpecialtyToolId);
   }
 
   render(context: ToolRenderContext): void {
@@ -186,6 +197,30 @@ export class DuctTool extends BaseTool {
     
     const activeComponent = this.getActiveComponent();
     const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
+    const placementStrategy = this.getPlacementStrategy();
+    const activeEngineeringSystem =
+      activeComponent?.engineeringSystem === 'universal'
+        ? 'standard_duct'
+        : activeComponent?.engineeringSystem ?? 'standard_duct';
+    const placementContext: PlacementContext = {
+      engineeringSystem: activeEngineeringSystem,
+      specialtyToolId: useToolStore.getState().activeSpecialtyToolId,
+      startPoint,
+      endPoint: currentPoint,
+      snapTarget,
+    };
+    const previewStyle: PlacementPreviewDecoration =
+      placementStrategy.augmentPreview?.(placementContext) ??
+      placementStrategy.getPreviewStyle?.(placementContext) ??
+      {};
+    const snapBehavior = placementStrategy.resolveSnapBehavior?.(placementContext) ?? null;
+    const strategyWarnings = placementStrategy.validatePlacement?.(placementContext) ?? [];
+    const previewLabel = previewStyle.label ?? snapBehavior?.label ?? strategyWarnings[0] ?? '';
+    const ghostFittingType =
+      snapBehavior?.ghostFittingType ??
+      placementStrategy.getGhostFittingType?.(placementContext) ??
+      null;
+    const previewStrokeStyle = snapBehavior?.strokeStyle ?? previewStyle.strokeStyle;
 
     // Calculate duct length
     const dx = currentPoint.x - startPoint.x;
@@ -194,11 +229,13 @@ export class DuctTool extends BaseTool {
     
     // Minimum length check
     const isValid = length >= MIN_DUCT_LENGTH;
-    const warningMessage = length < MIN_DUCT_LENGTH ? 'Too Short' : '';
+    const warningMessage = length < MIN_DUCT_LENGTH ? 'Too Short' : strategyWarnings[0] ?? '';
     const isSnapped = snapTarget !== null;
 
     // Service Constraints Check - visualize service color
-    if (isValid && activeService) {
+    if (previewStrokeStyle) {
+        ctx.strokeStyle = previewStrokeStyle;
+    } else if (isValid && activeService) {
         ctx.strokeStyle = activeService.color || getServiceColor(activeService.systemType);
     } else {
         ctx.strokeStyle = isValid ? (isSnapped ? '#2196F3' : '#424242') : '#D32F2F';
@@ -209,7 +246,7 @@ export class DuctTool extends BaseTool {
     // Draw preview line
     ctx.lineWidth = 12 / zoom; // Approximate duct visual width
     ctx.lineCap = 'round';
-    ctx.setLineDash([8 / zoom, 4 / zoom]);
+    ctx.setLineDash(previewStyle.dash ? previewStyle.dash.map((dash) => dash / zoom) : [8 / zoom, 4 / zoom]);
 
     ctx.beginPath();
     ctx.moveTo(startPoint.x, startPoint.y);
@@ -225,7 +262,11 @@ export class DuctTool extends BaseTool {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     const snapHint = isSnapped ? ' [SNAP]' : '';
-    ctx.fillText(`${lengthFt}' ${warningMessage}${snapHint}`, midX, midY - 8 / zoom);
+    ctx.fillText(
+      `${lengthFt}' ${warningMessage}${snapHint}${previewLabel ? ` • ${previewLabel}` : ''}`,
+      midX,
+      midY - 8 / zoom
+    );
 
     // Draw endpoints
     ctx.fillStyle = isValid ? (activeService?.color || (isSnapped ? '#2196F3' : '#424242')) : '#D32F2F';
@@ -238,7 +279,7 @@ export class DuctTool extends BaseTool {
 
     // Draw Ghost Fitting Preview when snapped
     if (isSnapped && snapTarget && isValid) {
-      this.renderGhostFitting(ctx, zoom, snapTarget, currentPoint, startPoint);
+      this.renderGhostFitting(ctx, zoom, snapTarget, currentPoint, startPoint, ghostFittingType, previewLabel);
     }
 
     ctx.restore();
@@ -252,7 +293,9 @@ export class DuctTool extends BaseTool {
     zoom: number,
     snapTarget: SnapTarget,
     connectionPoint: { x: number; y: number },
-    newDuctStart: { x: number; y: number }
+    newDuctStart: { x: number; y: number },
+    fittingType: string | null,
+    labelHint?: string
   ): void {
     // Calculate angle between new duct and existing duct
     const newDuctAngle = Math.atan2(
@@ -296,7 +339,7 @@ export class DuctTool extends BaseTool {
       const labelAngle = (startAngle + endAngle) / 2;
       const labelX = connectionPoint.x + (radius + 12 / zoom) * Math.cos(labelAngle);
       const labelY = connectionPoint.y + (radius + 12 / zoom) * Math.sin(labelAngle);
-      ctx.fillText(Math.abs(normalizedAngle - 45) <= 20 ? '45°' : '90°', labelX, labelY);
+      ctx.fillText(labelHint ?? fittingType ?? (Math.abs(normalizedAngle - 45) <= 20 ? '45°' : '90°'), labelX, labelY);
     }
 
     ctx.restore();
@@ -398,14 +441,31 @@ export class DuctTool extends BaseTool {
     // Get Active Component and adapt to Service
     const activeComponent = this.getActiveComponent();
     const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
+    const placementStrategy = this.getPlacementStrategy();
+    const activeEngineeringSystem =
+      activeComponent?.engineeringSystem === 'universal'
+        ? 'standard_duct'
+        : activeComponent?.engineeringSystem ?? 'standard_duct';
+    const placementContext: PlacementContext = {
+      engineeringSystem: activeEngineeringSystem,
+      specialtyToolId: useToolStore.getState().activeSpecialtyToolId,
+      startPoint: start,
+      endPoint: end,
+    };
+    const strategyOverrides =
+      placementStrategy.createEntityProps(start, end, placementContext) ??
+      placementStrategy.getCreateOverrides?.() ??
+      {};
 
     // Create duct Props with defaults + Service info
-    const ductProps: Parameters<typeof createDuct>[0] = {
+    const ductProps: NonNullable<Parameters<typeof createDuct>[0]> = {
         x: start.x,
         y: start.y,
         length: lengthFt,
         serviceId: activeService?.id ?? activeComponent?.id,
         catalogItemId: activeComponent?.id,
+        engineeringSystem: activeEngineeringSystem,
+        specialtyToolId: useToolStore.getState().activeSpecialtyToolId ?? undefined,
     };
 
     if (activeService) {
@@ -424,6 +484,7 @@ export class DuctTool extends BaseTool {
     }
 
     const duct = createDuct(ductProps);
+    Object.assign(duct.props, strategyOverrides);
     duct.transform.rotation = rotation;
 
     createEntity(duct);

@@ -1,7 +1,9 @@
-import type { Fitting, FittingType } from '@/core/schema';
+import type { Fitting } from '@/core/schema';
 import {
   DEFAULT_FITTING_PROPS,
   DEFAULT_FITTING_CALCULATED,
+  type FittingProps,
+  type FittingType,
 } from '@/core/schema/fitting.schema';
 
 /**
@@ -42,6 +44,13 @@ export function createFitting(
     autoInserted: boolean;
     manualOverride: boolean;
     connectionPoints: Array<{ ductId: string; pointIndex?: number }>;
+    engineeringSystem: FittingProps['engineeringSystem'];
+    backpressureLimit: number;
+    thermalExpansionJointRequired: boolean;
+    weldedAccessRequired: boolean;
+    greaseRated: boolean;
+    wallType: 'single' | 'double';
+    condensateDrainRequired: boolean;
   }>
 ): Fitting {
   const fittingNumber = getNextFittingNumber();
@@ -50,6 +59,7 @@ export function createFitting(
 
   const props = {
     name: overrides?.name ?? `${FITTING_TYPE_LABELS[fittingType]} ${fittingNumber}`,
+    engineeringSystem: overrides?.engineeringSystem ?? typeDefaults.engineeringSystem ?? 'standard_duct',
     fittingType,
     angle: overrides?.angle ?? typeDefaults.angle,
     inletDuctId: overrides?.inletDuctId,
@@ -60,6 +70,18 @@ export function createFitting(
     autoInserted: overrides?.autoInserted ?? false,
     manualOverride: overrides?.manualOverride ?? typeDefaults.manualOverride ?? false,
     connectionPoints: overrides?.connectionPoints,
+    ...(overrides?.backpressureLimit !== undefined ? { backpressureLimit: overrides.backpressureLimit } : {}),
+    ...(overrides?.thermalExpansionJointRequired !== undefined
+      ? { thermalExpansionJointRequired: overrides.thermalExpansionJointRequired }
+      : {}),
+    ...(overrides?.weldedAccessRequired !== undefined
+      ? { weldedAccessRequired: overrides.weldedAccessRequired }
+      : {}),
+    ...(overrides?.greaseRated !== undefined ? { greaseRated: overrides.greaseRated } : {}),
+    ...(overrides?.wallType ? { wallType: overrides.wallType } : {}),
+    ...(overrides?.condensateDrainRequired !== undefined
+      ? { condensateDrainRequired: overrides.condensateDrainRequired }
+      : {}),
   };
 
   return {
@@ -68,6 +90,7 @@ export function createFitting(
     transform: {
       x: overrides?.x ?? 0,
       y: overrides?.y ?? 0,
+      elevation: 0,
       rotation: overrides?.rotation ?? 0,
       scaleX: 1,
       scaleY: 1,

@@ -10,13 +10,22 @@ import {
 } from '@/features/canvas/clipboard/entityClipboard';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+import { useDialogStore } from '@/core/store/dialogStore';
+import {
+  ENABLE_BULK_EDIT_DIALOG,
+  ENABLE_CALCULATION_SETTINGS_DIALOG,
+} from '@/core/config/featureFlags';
 
 export function EditMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const canUndo = useCanUndo();
     const canRedo = useCanRedo();
-    const hasSelection = useSelectionStore((state) => state.selectedIds.length > 0);
+    const selectedCount = useSelectionStore((state) => state.selectedIds.length);
+    const hasSelection = selectedCount > 0;
+    const canOpenBulkEdit = ENABLE_BULK_EDIT_DIALOG && selectedCount > 1;
+    const setOpenCalculationSettings = useDialogStore((state) => state.setOpenCalculationSettings);
+    const setOpenBulkEdit = useDialogStore((state) => state.setOpenBulkEdit);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -112,6 +121,31 @@ export function EditMenu() {
                         className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex justify-between"
                     >
                         Select All <span className="text-xs opacity-50">Ctrl+A</span>
+                    </button>
+
+                    <div className="h-px bg-slate-200 my-1" />
+
+                    <button
+                        onClick={() => {
+                            setOpenCalculationSettings(true);
+                            setIsOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent text-sm"
+                        disabled={!ENABLE_CALCULATION_SETTINGS_DIALOG}
+                        data-testid="menu-open-calculation-settings"
+                    >
+                        Calculation Settings...
+                    </button>
+                    <button
+                        onClick={() => {
+                            setOpenBulkEdit(true);
+                            setIsOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent text-sm"
+                        disabled={!canOpenBulkEdit}
+                        data-testid="menu-open-bulk-edit"
+                    >
+                        Bulk Edit Selection...
                     </button>
                 </div>
             )}

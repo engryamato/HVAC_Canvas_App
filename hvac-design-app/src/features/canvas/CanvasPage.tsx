@@ -12,7 +12,7 @@ import { RightSidebar } from './components/RightSidebar';
 import { useViewportStore } from './store/viewportStore';
 import { useActiveViewMode } from './store/viewModeStore';
 
-import { useAutoSave } from './hooks';
+import { useActivationBridge, useAutoSave } from './hooks';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectDetails, useProjectStore } from '@/core/store/project.store';
 import { TutorialOverlay } from '@/components/onboarding/TutorialOverlay';
@@ -49,6 +49,8 @@ interface CanvasPageProps {
 }
 
 export function CanvasPage({ className = '' }: CanvasPageProps): React.ReactElement {
+  useActivationBridge();
+
   // Track mouse position handled by viewport store or internal canvas logic
   // AppShell now handles the framing
 

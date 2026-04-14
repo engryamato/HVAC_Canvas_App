@@ -27,6 +27,7 @@ import { ProjectSetupWizard, type ProjectSetupData } from '@/features/project/co
 import { MigrationWizard } from '@/components/dialogs/MigrationWizard';
 import { useToast } from '@/components/ui/ToastContext';
 import {
+    ENABLE_CALCULATION_SETTINGS_DIALOG,
     ENABLE_MIGRATION_WIZARD,
     ENABLE_PROJECT_SETUP_WIZARD,
     ENABLE_SYSTEM_TEMPLATE_DIALOG,
@@ -55,6 +56,7 @@ export function FileMenu() {
     const { setDirty, setProject } = useProjectActions();
     const isCanvasRoute = pathname.startsWith('/canvas/');
     const canSave = Boolean(currentProjectId && pathname.startsWith('/canvas/'));
+    const canOpenCalculationSettings = isCanvasRoute && ENABLE_CALCULATION_SETTINGS_DIALOG;
     const canOpenSystemTemplate = isCanvasRoute && ENABLE_SYSTEM_TEMPLATE_DIALOG;
     const { addToast } = useToast();
 
@@ -542,6 +544,22 @@ export function FileMenu() {
                         </button>
 
                         <div className="h-px bg-slate-200 w-full my-1" role="separator" />
+
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                if (!canOpenCalculationSettings) {
+                                    useDialogStore.getState().setOpenCalculationSettings(false);
+                                    return;
+                                }
+                                useDialogStore.getState().setOpenCalculationSettings(true);
+                            }}
+                            disabled={!canOpenCalculationSettings}
+                            role="menuitem"
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                        >
+                            Calculation Settings...
+                        </button>
 
                         <button
                             onClick={handleMigration}

@@ -5,6 +5,8 @@ import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { createEntity } from '@/core/commands/entityCommands';
+import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
+import { createDuct } from '@/features/canvas/entities/ductDefaults';
 import type { Room } from '@/core/schema';
 
 // Mock the hooks module to avoid Next.js specific issues
@@ -17,7 +19,7 @@ vi.mock('next/link', () => ({
 const createMockRoom = (id: string, name: string): Room => ({
   id,
   type: 'room',
-  transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -32,11 +34,148 @@ const createMockRoom = (id: string, name: string): Room => ({
   calculated: { area: 100, volume: 800, requiredCFM: 200 },
 });
 
+function seedSupportCatalog() {
+  const store = useUnifiedCatalogStore.getState();
+  store.reset();
+
+  store.addEntry({
+    id: 'auto-hanger-spacing',
+    name: 'Auto-Hanger Spacing',
+    componentClass: 'equipment',
+    category: 'equipment',
+    categoryId: 'hangers_supports',
+    typeId: 'auto_hanger_spacing',
+    type: 'auto_hanger_spacing',
+    engineeringSystem: 'universal',
+    placeable: true,
+    source: 'system',
+    recommendedAccessoryEntryIds: ['clevis-hanger'],
+    recommendedFittingEntryIds: [],
+    recommendedEquipmentEntryIds: [],
+    connectionNotes: [],
+    systemType: 'supply',
+    engineeringProperties: {
+      frictionFactor: 0.01,
+      maxVelocity: 2000,
+      minVelocity: 500,
+      maxPressureDrop: 0.1,
+    },
+    pricing: {
+      materialCost: 0,
+      laborUnits: 0,
+      wasteFactor: 0,
+    },
+    materials: [],
+    isCustom: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  store.addEntry({
+    id: 'continuous-trapeze-run',
+    name: 'Continuous Trapeze Run',
+    componentClass: 'equipment',
+    category: 'equipment',
+    categoryId: 'hangers_supports',
+    typeId: 'continuous_trapeze_run',
+    type: 'continuous_trapeze_run',
+    engineeringSystem: 'universal',
+    placeable: true,
+    source: 'system',
+    recommendedAccessoryEntryIds: ['trapeze-hanger'],
+    recommendedFittingEntryIds: [],
+    recommendedEquipmentEntryIds: [],
+    connectionNotes: [],
+    systemType: 'supply',
+    engineeringProperties: {
+      frictionFactor: 0.01,
+      maxVelocity: 2000,
+      minVelocity: 500,
+      maxPressureDrop: 0.1,
+    },
+    pricing: {
+      materialCost: 0,
+      laborUnits: 0,
+      wasteFactor: 0,
+    },
+    materials: [],
+    isCustom: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  store.addEntry({
+    id: 'clevis-hanger',
+    name: 'Clevis Hanger',
+    componentClass: 'accessory',
+    category: 'accessory',
+    categoryId: 'hangers_supports',
+    typeId: 'clevis_hanger',
+    type: 'clevis_hanger',
+    engineeringSystem: 'universal',
+    placeable: true,
+    source: 'system',
+    recommendedAccessoryEntryIds: [],
+    recommendedFittingEntryIds: [],
+    recommendedEquipmentEntryIds: [],
+    connectionNotes: [],
+    systemType: 'supply',
+    engineeringProperties: {
+      frictionFactor: 0.01,
+      maxVelocity: 2000,
+      minVelocity: 500,
+      maxPressureDrop: 0.1,
+    },
+    pricing: {
+      materialCost: 0,
+      laborUnits: 0,
+      wasteFactor: 0,
+    },
+    materials: [],
+    isCustom: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  store.addEntry({
+    id: 'trapeze-hanger',
+    name: 'Trapeze Hanger',
+    componentClass: 'accessory',
+    category: 'accessory',
+    categoryId: 'hangers_supports',
+    typeId: 'trapeze_hanger',
+    type: 'trapeze_hanger',
+    engineeringSystem: 'universal',
+    placeable: true,
+    source: 'system',
+    recommendedAccessoryEntryIds: [],
+    recommendedFittingEntryIds: [],
+    recommendedEquipmentEntryIds: [],
+    connectionNotes: [],
+    systemType: 'supply',
+    engineeringProperties: {
+      frictionFactor: 0.01,
+      maxVelocity: 2000,
+      minVelocity: 500,
+      maxPressureDrop: 0.1,
+    },
+    pricing: {
+      materialCost: 0,
+      laborUnits: 0,
+      wasteFactor: 0,
+    },
+    materials: [],
+    isCustom: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+
 describe('Toolbar - Undo/Redo Integration', () => {
   beforeEach(() => {
     useEntityStore.getState().clearAllEntities();
     useHistoryStore.getState().clear();
-    useToolStore.setState({ currentTool: 'select' });
+    useToolStore.setState({ currentTool: 'select', activeSpecialtyToolId: null });
   });
 
   describe('Undo/Redo Buttons', () => {
@@ -180,6 +319,7 @@ describe('Toolbar - Undo/Redo Integration', () => {
       expect(screen.getByLabelText(/select/i)).toBeDefined();
       expect(screen.getByLabelText(/room/i)).toBeDefined();
       expect(screen.getByLabelText(/duct/i)).toBeDefined();
+      expect(screen.getByLabelText(/supports/i)).toBeDefined();
       expect(screen.getByLabelText(/equipment/i)).toBeDefined();
       expect(screen.getByLabelText(/fitting/i)).toBeDefined();
       expect(screen.getByLabelText(/note/i)).toBeDefined();
@@ -192,6 +332,33 @@ describe('Toolbar - Undo/Redo Integration', () => {
       fireEvent.click(roomButton);
 
       expect(useToolStore.getState().currentTool).toBe('room');
+    });
+
+    it('should morph the duct button when a specialty tool is active', () => {
+      act(() => {
+        useToolStore.setState({
+          currentTool: 'duct',
+          activeSpecialtyToolId: 'single_wall_pipe',
+        });
+      });
+
+      render(<Toolbar />);
+
+      const specialtyButton = screen.getByLabelText(/single wall pipe/i);
+      expect(specialtyButton).toBeDefined();
+      expect(screen.getByTitle(/single wall pipe/i)).toBeDefined();
+
+      fireEvent.click(specialtyButton);
+
+      expect(useToolStore.getState().currentTool).toBe('duct');
+      expect(useToolStore.getState().activeSpecialtyToolId).toBe('single_wall_pipe');
+      expect(screen.getByTestId('toolbar-icon-duct')).toHaveAttribute('data-icon-key', 'duct_boiler_flue');
+    });
+
+    it('should render the fitting button with the HVAC fitting glyph', () => {
+      render(<Toolbar />);
+
+      expect(screen.getByTestId('toolbar-icon-fitting')).toHaveAttribute('data-icon-key', 'fitting_elbow');
     });
 
     it('should show equipment selector when equipment tool active', () => {
@@ -210,6 +377,76 @@ describe('Toolbar - Undo/Redo Integration', () => {
       fireEvent.click(fittingButton);
 
       expect(screen.getByText(/fitting type/i)).toBeDefined();
+    });
+  });
+
+  describe('Support Workflow', () => {
+    beforeEach(() => {
+      useEntityStore.getState().clearAllEntities();
+      useUnifiedCatalogStore.getState().reset();
+      seedSupportCatalog();
+      useToolStore.setState({
+        currentTool: 'select',
+        activeSpecialtyToolId: null,
+        supportPrompt: null,
+        supportPreviewMarkers: [],
+        supportDraftAnchor: null,
+      });
+    });
+
+    it('shows the support workflow panel and applies auto hanger previews', () => {
+      const duct = createDuct({
+        name: 'Support Target',
+        x: 0,
+        y: 0,
+        length: 24,
+        airflow: 1200,
+        catalogItemId: 'round-duct',
+        engineeringSystem: 'standard_duct',
+      });
+
+      useEntityStore.getState().addEntity(duct);
+      act(() => {
+        useUnifiedCatalogStore.getState().selectEntry('auto-hanger-spacing');
+      });
+
+      render(<Toolbar />);
+
+      fireEvent.click(screen.getByLabelText(/supports/i));
+
+      expect(screen.getByText('Support Workflow')).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Preview' })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Apply' })).toBeDefined();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
+
+      expect(useToolStore.getState().supportPreviewMarkers.length).toBeGreaterThan(0);
+      expect(screen.getByText(/preview markers are generated/i)).toBeDefined();
+
+      const entityCountBeforeApply = useEntityStore.getState().allIds.length;
+      fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+
+      expect(useEntityStore.getState().allIds.length).toBeGreaterThan(entityCountBeforeApply);
+      expect(useToolStore.getState().supportPreviewMarkers).toHaveLength(0);
+    });
+
+    it('shows continuous trapeze instructions and prompt text when provided', () => {
+      act(() => {
+        useUnifiedCatalogStore.getState().selectEntry('continuous-trapeze-run');
+        useToolStore.getState().setSupportPrompt({
+          kind: 'mount_height',
+          title: 'Mount height required',
+          description: 'Set a mount height before placing a continuous trapeze run.',
+        });
+      });
+
+      render(<Toolbar />);
+
+      fireEvent.click(screen.getByLabelText(/supports/i));
+
+      expect(screen.getByText(/click a duct centerline to start the continuous trapeze run/i)).toBeDefined();
+      expect(screen.getByText(/mount height required/i)).toBeDefined();
+      expect(screen.getByText(/set a mount height before placing a continuous trapeze run/i)).toBeDefined();
     });
   });
 
@@ -315,4 +552,3 @@ describe('Toolbar - Undo/Redo Integration', () => {
     });
   });
 });
-

@@ -27,4 +27,3 @@ export type Group = z.infer<typeof GroupSchema>;
 export const DEFAULT_GROUP_PROPS: Omit<GroupProps, 'childIds'> = {
   name: 'New Group',
 };
-

@@ -120,13 +120,21 @@ describe('serialization', () => {
   });
 
   describe('migrateProject', () => {
-    it('should handle current version', () => {
-      const project = makeProject();
+    it('should migrate v1 projects to the current schema version', () => {
+      const project = {
+        ...makeProject(),
+        schemaVersion: '1.0.0',
+        catalogItems: [],
+        services: {},
+      };
       const result = migrateProject(project, '1.0.0');
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      expect(result.migrated).toBe(false);
+      expect(result.data?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+      expect((result.data as Record<string, unknown>)?.catalogItems).toBeUndefined();
+      expect((result.data as Record<string, unknown>)?.services).toEqual({});
+      expect(result.migrated).toBe(true);
       expect(result.originalVersion).toBe('1.0.0');
     });
 

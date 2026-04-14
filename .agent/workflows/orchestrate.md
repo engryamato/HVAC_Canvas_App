@@ -4,23 +4,23 @@ description: Coordinate multiple agents for complex tasks. Use for multi-perspec
 
 # Multi-Agent Orchestration
 
-You are now in **ORCHESTRATION MODE**. Your task: coordinate specialized agents to solve this complex problem.
+You are now in **ORCHESTRATION MODE**. Your task: act as the Codex supervisor for specialist sub-agents and return one synthesized result.
 
 ## Task to Orchestrate
 $ARGUMENTS
 
 ---
 
-## 🔴 CRITICAL: Minimum Agent Requirement
+## 🔴 CRITICAL: Delegation Threshold
 
-> ⚠️ **ORCHESTRATION = MINIMUM 3 DIFFERENT AGENTS**
-> 
-> If you use fewer than 3 agents, you are NOT orchestrating - you're just delegating.
-> 
+> ⚠️ Use sub-agents only when delegation materially improves the outcome.
+>
+> If one specialist or the main agent can handle the task safely, stay single-agent.
+>
 > **Validation before completion:**
-> - Count invoked agents
-> - If `agent_count < 3` → STOP and invoke more agents
-> - Single agent = FAILURE of orchestration
+> - Was the task multi-domain, parallelizable, or in need of specialist review?
+> - Were ownership boundaries explicit?
+> - Did the supervisor avoid fake parallelism?
 
 ### Agent Selection Matrix
 
@@ -28,63 +28,47 @@ $ARGUMENTS
 |-----------|---------------------------|
 | **Web App** | frontend-specialist, backend-specialist, test-engineer |
 | **API** | backend-specialist, security-auditor, test-engineer |
-| **UI/Design** | frontend-specialist, seo-specialist, performance-optimizer |
-| **Database** | database-architect, backend-specialist, security-auditor |
-| **Full Stack** | project-planner, frontend-specialist, backend-specialist, devops-engineer |
+| **UI/Design** | frontend-specialist, performance-optimizer |
+| **Database** | database-architect, backend-specialist |
+| **Full Stack** | project-planner, frontend-specialist, backend-specialist, test-engineer |
 | **Debug** | debugger, explorer-agent, test-engineer |
-| **Security** | security-auditor, penetration-tester, devops-engineer |
+| **Security** | security-auditor, penetration-tester |
 
 ---
 
-## Pre-Flight: Mode Check
+## Pre-Flight
 
-| Current Mode | Task Type | Action |
-|--------------|-----------|--------|
-| **plan** | Any | ✅ Proceed with planning-first approach |
-| **edit** | Simple execution | ✅ Proceed directly |
-| **edit** | Complex/multi-file | ⚠️ Ask: "This task requires planning. Switch to plan mode?" |
-| **ask** | Any | ⚠️ Ask: "Ready to orchestrate. Switch to edit or plan mode?" |
-
-### Socratic Gate
-
-- Ask clarifying questions before planning or invoking agents.
+- Clarify scope before broad delegation.
+- Read the active `PLAN-{task-slug}.md` for complex work.
+- Use `orchestrator` plus `codex-subagent-orchestration` as the canonical control path.
+- Choose the agent first; rely on that agent's `skills:` frontmatter for specialist behavior.
 
 ---
 
-## 🔴 STRICT 2-PHASE ORCHESTRATION
+## 🔴 SUPERVISOR FLOW
 
-### PHASE 1: PLANNING (Sequential - NO parallel agents)
+### Phase 1: Establish the Plan
 
 | Step | Agent | Action |
 |------|-------|--------|
 | 1 | `project-planner` | Create PLAN-{task-slug}.md |
 | 2 | (optional) `explorer-agent` | Codebase discovery if needed |
 
-> 🔴 **NO OTHER AGENTS during planning!** Only project-planner and explorer-agent.
+> Keep planning and discovery sequential until scope and ownership are clear.
 
-### ⏸️ CHECKPOINT: User Approval
+### Phase 2: Choose Local vs Delegated Work
 
-```
-After PLAN-{task-slug}.md is complete, ASK:
+Stay local when:
+- the task is single-domain
+- the next step depends on tight local iteration
+- delegation would add more overhead than value
 
-"✅ Plan oluşturuldu: PLAN-{task-slug}.md
+Delegate when:
+- the task spans multiple domains
+- work can be partitioned cleanly
+- specialist review reduces risk
 
-Onaylıyor musunuz? (Y/N)
-- Y: Implementation başlatılır
-- N: Planı düzeltirim"
-```
-
-> 🔴 **DO NOT proceed to Phase 2 without explicit user approval!**
-
-### PHASE 2: IMPLEMENTATION (Parallel agents after approval)
-
-| Parallel Group | Agents |
-|----------------|--------|
-| Foundation | `database-architect`, `security-auditor` |
-| Core | `backend-specialist`, `frontend-specialist` |
-| Polish | `test-engineer`, `devops-engineer` |
-
-> ✅ After user approval, invoke multiple agents in PARALLEL.
+Parallelize only when scopes do not conflict.
 
 ## Available Agents (17 total)
 
@@ -126,38 +110,22 @@ Identify ALL domains this task touches:
 □ Planning     → project-planner
 ```
 
-### Step 2: Phase Detection
+### Step 2: Decide Whether to Delegate
 
-| If Plan Exists | Action |
-|----------------|--------|
-| NO `PLAN-{task-slug}.md` | → Go to PHASE 1 (planning only) |
-| YES `PLAN-{task-slug}.md` + user approved | → Go to PHASE 2 (implementation) |
+- If the task is single-domain and bounded, stay local.
+- If the task is complex and no plan exists, create or refresh `PLAN-{task-slug}.md`.
+- If delegation is justified, assign specialists with clear ownership.
 
-### Step 3: Execute Based on Phase
-
-**PHASE 1 (Planning):**
-```
-Use the project-planner agent to create PLAN-{task-slug}.md
-→ STOP after plan is created
-→ ASK user for approval
-```
-
-**PHASE 2 (Implementation - after approval):**
-```
-Invoke agents in PARALLEL:
-Use the frontend-specialist agent to [task]
-Use the backend-specialist agent to [task]
-Use the test-engineer agent to [task]
-```
-
-**🔴 CRITICAL: Context Passing (MANDATORY)**
+### Step 3: Build a Task Packet
 
 When invoking ANY subagent, you MUST include:
 
 1. **Original User Request:** Full text of what user asked
 2. **Decisions Made:** All user answers to Socratic questions
 3. **Previous Agent Work:** Summary of what previous agents did
-4. **Current Plan State:** If `~/.claude/plans/` has a plan, include it
+4. **Current Plan State:** Relevant `PLAN-{task-slug}.md` context if it exists
+5. **Scope Ownership:** Which files or domains this agent owns
+6. **Stop Conditions:** When to stop and return control
 
 **Example with FULL context:**
 ```
@@ -168,22 +136,31 @@ Use the project-planner agent to create PLAN-{task-slug}.md:
 - Decisions: Tech=Vue 3, Layout=Grid Widget, Auth=Mock, Design=Genç Dinamik
 - Previous Work: Orchestrator asked 6 questions, user chose all options
 - Current Plan: PLAN-playful-roaming-dream.md exists with initial structure
+- Scope Ownership: plan file only
+- Stop Conditions: stop after plan is written or if required assumptions are missing
 
 **TASK:** Create detailed PLAN-{task-slug}.md based on ABOVE decisions. Do NOT infer from folder name.
 ```
 
 > ⚠️ **VIOLATION:** Invoking subagent without full context = subagent will make wrong assumptions!
 
+### Step 4: Control the Communication Loop
 
-### Step 4: Verification (MANDATORY)
+- Spawn the sub-agent with the task packet.
+- Continue local non-overlapping work while it runs.
+- Wait only when the next critical step depends on the sub-agent's result.
+- Send follow-up input only when scope changes or clarification is required.
+- Synthesize all sub-agent outputs once, in the supervisor's voice.
+
+### Step 5: Verification (MANDATORY)
 The LAST agent must run appropriate verification scripts:
 ```bash
 python .agent/skills/vulnerability-scanner/scripts/security_scan.py .
 python .agent/skills/lint-and-validate/scripts/lint_runner.py .
 ```
 
-### Step 5: Synthesize Results
-Combine all agent outputs into unified report.
+### Step 6: Synthesize Results
+Combine sub-agent outputs into one unified report. Sub-agents do not answer the user directly.
 
 ---
 
@@ -195,10 +172,10 @@ Combine all agent outputs into unified report.
 ### Task
 [Original task summary]
 
-### Mode
-[Current Claude Code mode: plan/edit/ask]
+### Supervisor Decision
+[Why work stayed local or why sub-agents were used]
 
-### Agents Invoked (MINIMUM 3)
+### Agents Invoked
 | # | Agent | Focus Area | Status |
 |---|-------|------------|--------|
 | 1 | project-planner | Task breakdown | ✅ |
@@ -230,12 +207,13 @@ Combine all agent outputs into unified report.
 
 Before completing orchestration, verify:
 
-1. ✅ **Agent Count:** `invoked_agents >= 3`
-2. ✅ **Scripts Executed:** At least `security_scan.py` ran
-3. ✅ **Report Generated:** Orchestration Report with all agents listed
+1. ✅ **Delegation Justified:** multi-domain, parallelizable, or specialist review needed
+2. ✅ **Ownership Clear:** no conflicting write surfaces between parallel agents
+3. ✅ **Scripts Executed:** required verification ran for the task
+4. ✅ **Report Generated:** one supervisor-authored synthesis
 
-> **If any check fails → DO NOT mark orchestration complete. Invoke more agents or run scripts.**
+> **If any check fails → DO NOT mark orchestration complete. Reduce scope, re-route, or gather more context.**
 
 ---
 
-**Begin orchestration now. Select 3+ agents, execute sequentially, run verification scripts, synthesize results.**
+**Begin orchestration now. Decide if delegation is warranted, assign bounded specialist work, control the loop, and synthesize once.**

@@ -8,3 +8,4 @@ export { useFieldValidation } from './useFieldValidation';
 export { useCalculations } from './useCalculations';
 export { useAutoSave } from './useAutoSave';
 export { useKeyboardShortcuts } from './useKeyboardShortcuts';
+export { useActivationBridge } from './useActivationBridge';

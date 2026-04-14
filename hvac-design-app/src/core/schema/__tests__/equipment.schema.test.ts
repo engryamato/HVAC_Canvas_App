@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
+  BoilerFlueEquipmentPropsSchema,
   EquipmentSchema,
   EquipmentPropsSchema,
+  StandardEquipmentPropsSchema,
   EquipmentTypeSchema,
   CapacityUnitSchema,
   StaticPressureUnitSchema,
@@ -45,7 +47,9 @@ describe('Unit Schemas', () => {
 describe('EquipmentPropsSchema', () => {
   it('should validate valid equipment props', () => {
     const props = createDefaultEquipmentProps('hood');
-    expect(EquipmentPropsSchema.parse(props)).toBeTruthy();
+    const result = EquipmentPropsSchema.parse(props);
+    expect(result).toBeTruthy();
+    expect(result.engineeringSystem).toBe('standard_duct');
   });
 
   it('should reject empty name', () => {
@@ -116,6 +120,21 @@ describe('EquipmentPropsSchema', () => {
     const props = createDefaultEquipmentProps('fan');
     const result = EquipmentPropsSchema.parse(props);
     expect(result.staticPressureUnit).toBe('in_wg');
+  });
+
+  it('uses engineeringSystem as the level-2 discriminator', () => {
+    const result = BoilerFlueEquipmentPropsSchema.parse({
+      ...createDefaultEquipmentProps('fan'),
+      engineeringSystem: 'boiler_flue',
+    });
+
+    expect(result.engineeringSystem).toBe('boiler_flue');
+    expect(() =>
+      StandardEquipmentPropsSchema.parse({
+        ...createDefaultEquipmentProps('fan'),
+        engineeringSystem: 'generator_exhaust',
+      })
+    ).toThrow();
   });
 });
 
