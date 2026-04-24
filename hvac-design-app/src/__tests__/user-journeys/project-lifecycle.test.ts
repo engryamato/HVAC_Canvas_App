@@ -25,7 +25,7 @@ import { ProjectFileSchema } from '@/core/schema';
 const createMockRoom = (id: string, name: string, overrides?: Partial<Room>): Room => ({
   id,
   type: 'room',
-  transform: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 100, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
@@ -44,11 +44,12 @@ const createMockRoom = (id: string, name: string, overrides?: Partial<Room>): Ro
 const createMockDuct = (id: string, name: string): Duct => ({
   id,
   type: 'duct',
-  transform: { x: 200, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 200, y: 150, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
     name,
     shape: 'round',
     diameter: 12,
@@ -63,11 +64,12 @@ const createMockDuct = (id: string, name: string): Duct => ({
 const createMockEquipment = (id: string, name: string): Equipment => ({
   id,
   type: 'equipment',
-  transform: { x: 300, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 300, y: 200, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
     name,
     equipmentType: 'fan',
     capacity: 2000,
@@ -84,11 +86,13 @@ const createMockEquipment = (id: string, name: string): Equipment => ({
 const createMockFitting = (id: string): Fitting => ({
   id,
   type: 'fitting',
-  transform: { x: 250, y: 175, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 250, y: 175, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 10,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
+    manualOverride: false,
     fittingType: 'elbow_90',
     angle: 90,
   },

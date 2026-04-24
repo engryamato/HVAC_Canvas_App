@@ -7,14 +7,17 @@ import { z } from 'zod';
 export const TransformSchema = z.object({
   x: z.number().describe('X position in pixels from origin'),
   y: z.number().describe('Y position in pixels from origin'),
-  elevation: z.number().default(0).describe('Vertical world position in 3D space (inches from floor)'),
+  elevation: z
+    .number()
+    .optional()
+    .default(0)
+    .describe('Vertical world position in 3D space (inches from floor)'),
   rotation: z.number().min(0).max(360).default(0).describe('Rotation in degrees'),
   scaleX: z.number().positive().default(1).describe('Horizontal scale factor'),
   scaleY: z.number().positive().default(1).describe('Vertical scale factor'),
 });
 
 export type Transform = z.infer<typeof TransformSchema>;
-
 /**
  * All supported entity types in the application
  * Each type has its own schema and renderer

@@ -85,8 +85,8 @@ export class GraphTraversal {
     while (queue.length > 0) {
       const current = queue.shift()!;
       
-      if (current.depth > hops) continue;
-      if (visited.has(current.id)) continue;
+      if (current.depth > hops) {continue;}
+      if (visited.has(current.id)) {continue;}
       
       visited.add(current.id);
       if (current.id !== entityId) {
@@ -140,7 +140,7 @@ export class GraphTraversal {
         return current.path;
       }
 
-      if (visited.has(current.id)) continue;
+      if (visited.has(current.id)) {continue;}
       visited.add(current.id);
 
       const node = this.graph.nodes.get(current.id);

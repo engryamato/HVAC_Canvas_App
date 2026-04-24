@@ -255,7 +255,6 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
       setShouldLoadProject(false);
     }
   }, [shouldLoadProject, projectId, getProject, handleBackupRecovery]);
-  }, [shouldLoadProject, projectId, getProject, handleBackupRecovery]);
 
   function loadProject(persistedProject: any, storedPayload?: LocalStoragePayload) {
     const storedProject = storedPayload?.project;

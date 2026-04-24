@@ -58,11 +58,12 @@ const createMockDuct = (
 ): Duct => ({
   id,
   type: 'duct',
-  transform: { x: 200, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 200, y: 150, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
     name,
     shape: 'round',
     diameter,
@@ -81,7 +82,7 @@ const createMockEquipment = (
 ): Equipment => ({
   id,
   type: 'equipment',
-  transform: { x: 300, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 300, y: 200, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
@@ -107,7 +108,7 @@ const createMockFitting = (
 ): Fitting => ({
   id,
   type: 'fitting',
-  transform: { x: 250, y: 175, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 250, y: 175, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 10,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),

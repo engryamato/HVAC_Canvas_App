@@ -2,8 +2,6 @@ name: CodeQL Security Scan
 
 on:
   push:
-    branches: [main, develop, 'claude/**']
-  pull_request:
     branches: [main, develop]
   schedule:
     # Run weekly on Monday at 6:00 AM UTC
@@ -38,12 +36,13 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './hvac-design-app/package-lock.json'
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
         working-directory: ./hvac-design-app
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v4

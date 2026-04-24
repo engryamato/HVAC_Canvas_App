@@ -152,7 +152,7 @@ export function ProjectSetupWizard({ isOpen, onClose, onComplete }: ProjectSetup
               <Rocket className="h-12 w-12 mx-auto text-primary" />
               <h3 className="text-lg font-semibold">Welcome to Project Setup</h3>
               <p className="text-muted-foreground">
-                Let's configure your new HVAC project. This wizard will guide you through setting up
+                Let&apos;s configure your new HVAC project. This wizard will guide you through setting up
                 system types, calculation settings, and templates.
               </p>
             </div>

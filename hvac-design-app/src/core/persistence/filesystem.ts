@@ -31,7 +31,21 @@ export function isTauri(): boolean {
   return typeof window !== 'undefined' && '__TAURI__' in window;
 }
 
-
+/**
+ * Open a native directory picker in Tauri.
+ * Returns null when the picker is unavailable or the user cancels.
+ */
+export async function selectDirectory(): Promise<string | null> {
+  if (isTauri()) {
+    const { open } = await import('@tauri-apps/plugin-dialog');
+    const selected = await open({
+      directory: true,
+      multiple: false,
+    });
+    return typeof selected === 'string' ? selected : null;
+  }
+  return null;
+}
 
 /**
  * Read text file from filesystem

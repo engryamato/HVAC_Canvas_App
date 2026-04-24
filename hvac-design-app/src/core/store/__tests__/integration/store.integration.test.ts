@@ -51,7 +51,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -80,7 +80,7 @@ describe('Store Integration Tests', () => {
       const room1: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -121,7 +121,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -162,7 +162,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -189,7 +189,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -218,7 +218,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -249,7 +249,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -276,7 +276,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -309,7 +309,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -333,11 +333,12 @@ describe('Store Integration Tests', () => {
       const duct: Duct = {
         id: 'duct-1',
         type: 'duct',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 5,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
         props: {
+          engineeringSystem: 'standard_duct',
           name: 'Test Duct',
           shape: 'rectangular',
           length: 120,
@@ -364,7 +365,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -452,7 +453,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -510,7 +511,7 @@ describe('Store Integration Tests', () => {
         const room: Room = {
           id: `room-${i}`,
           type: 'room',
-          transform: { x: i * 100, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          transform: { x: i * 100, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           zIndex: 0,
           createdAt: new Date().toISOString(),
           modifiedAt: new Date().toISOString(),
@@ -549,7 +550,7 @@ describe('Store Integration Tests', () => {
       const room: Room = {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: new Date().toISOString(),
         modifiedAt: new Date().toISOString(),
@@ -595,7 +596,7 @@ describe('Store Integration Tests', () => {
         const room: Room = {
           id: `room-${i}`,
           type: 'room',
-          transform: { x: i * 50, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          transform: { x: i * 50, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           zIndex: 0,
           createdAt: new Date().toISOString(),
           modifiedAt: new Date().toISOString(),
@@ -626,7 +627,7 @@ describe('Store Integration Tests', () => {
         const room: Room = {
           id: `room-${i}`,
           type: 'room',
-          transform: { x: i * 50, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          transform: { x: i * 50, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           zIndex: 0,
           createdAt: new Date().toISOString(),
           modifiedAt: new Date().toISOString(),

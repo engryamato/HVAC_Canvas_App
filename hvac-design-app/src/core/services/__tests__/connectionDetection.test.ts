@@ -24,7 +24,7 @@ describe('ConnectionDetectionService', () => {
   ): Duct => ({
     id,
     type: 'duct',
-    transform: { x, y, rotation, scaleX: 1, scaleY: 1 },
+    transform: { x, y, elevation: 0, rotation, scaleX: 1, scaleY: 1 },
     zIndex: 5,
     createdAt: new Date().toISOString(),
     modifiedAt: new Date().toISOString(),
@@ -33,6 +33,7 @@ describe('ConnectionDetectionService', () => {
       shape: 'round',
       diameter: 12,
       length,
+      engineeringSystem: 'standard_duct',
       material: 'galvanized',
       airflow: 1000,
       staticPressure: 1.5,
@@ -125,7 +126,7 @@ describe('ConnectionDetectionService', () => {
 
     it('should detect multiple connections when duct connects to multiple existing ducts', () => {
       const duct1 = createMockDuct('duct1', 100, 100, 0, 10);
-      const duct2 = createMockDuct('duct2', 100, 220, 90, 10);
+      const duct2 = createMockDuct('duct2', 220, 100, 90, 10);
       const duct3 = createMockDuct('duct3', 220, 220, 0, 10); // Connects to duct2 end
 
       (useEntityStore.getState as any).mockReturnValue({

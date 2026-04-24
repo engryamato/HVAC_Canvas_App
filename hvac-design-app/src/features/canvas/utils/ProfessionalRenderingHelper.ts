@@ -81,7 +81,7 @@ export class ProfessionalRenderingHelper {
     const dy = end.y - start.y;
     const length = Math.sqrt(dx * dx + dy * dy);
 
-    if (length === 0) return;
+    if (length === 0) {return;}
 
     const offsetX = (-dy / length) * (width / 2);
     const offsetY = (dx / length) * (width / 2);
@@ -456,7 +456,7 @@ export class ProfessionalRenderingHelper {
     const dy = end.y - start.y;
     const length = Math.sqrt(dx * dx + dy * dy);
 
-    if (length === 0) return;
+    if (length === 0) {return;}
 
     const perpX = (-dy / length);
     const perpY = (dx / length);

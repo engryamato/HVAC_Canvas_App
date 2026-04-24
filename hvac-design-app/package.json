@@ -11,8 +11,8 @@
   },
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "node scripts/validate-env.js && next build",
-    "build:prod": "NODE_ENV=production node scripts/validate-env.js && next build",
+    "build": "node scripts/validate-env.js && next build --webpack",
+    "build:prod": "NODE_ENV=production node scripts/validate-env.js && next build --webpack",
     "start": "next start",
     "tauri:dev": "tauri dev",
     "tauri:build": "NODE_ENV=production node scripts/validate-env.js && tauri build",
@@ -96,7 +96,7 @@
     "lint-staged": "^16.4.0",
     "postcss": "^8.5.9",
     "prettier": "^3.8.2",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^3.4.17",
     "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "vitest": "^1.6.1"

@@ -101,6 +101,7 @@ describe('Entity Commands', () => {
 	        createdAt: '2025-01-01T00:00:00.000Z',
 	        modifiedAt: '2025-01-01T00:00:00.000Z',
 	        props: {
+	          manualOverride: false,
 	          engineeringSystem: 'standard_duct',
 	          fittingType: 'elbow_90',
 	          inletDuctId: duct.id,
@@ -200,6 +201,7 @@ describe('Entity Commands', () => {
 	        createdAt: '2025-01-01T00:00:00.000Z',
 	        modifiedAt: '2025-01-01T00:00:00.000Z',
 	        props: {
+	          manualOverride: false,
 	          engineeringSystem: 'standard_duct',
 	          fittingType: 'elbow_90',
 	          inletDuctId: duct.id,

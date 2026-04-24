@@ -29,7 +29,7 @@ vi.mock('@/components/ui/select', () => ({
 const createMockRoom = (id: string, name: string): Room => ({
   id,
   type: 'room',
-  transform: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 100, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',

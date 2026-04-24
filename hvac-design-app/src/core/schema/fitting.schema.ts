@@ -36,7 +36,11 @@ const SharedFittingPropsSchema = z.object({
 
   // Phase 1 foundation fields for auto-fitting workflows
   autoInserted: z.boolean().optional().describe('Created automatically by fitting generation'),
-  manualOverride: z.boolean().default(false).describe('Locked because the user manually edited an auto-inserted fitting'),
+  manualOverride: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe('Locked because the user manually edited an auto-inserted fitting'),
   connectionPoints: z.array(z.object({
     ductId: z.string().uuid(),
     pointIndex: z.number().int().nonnegative().optional(),
@@ -128,7 +132,7 @@ export const FittingSchema = BaseEntitySchema.extend({
   }).optional(),
 });
 
-export type Fitting = z.infer<typeof FittingSchema>;
+export type Fitting = Omit<z.infer<typeof FittingSchema>, 'props'> & { props: FittingProps };
 
 /**
  * Default values for fittings by type

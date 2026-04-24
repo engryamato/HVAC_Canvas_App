@@ -9,7 +9,7 @@ const createRoom = (
 ): Room => ({
   id,
   type: 'room',
-  transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),

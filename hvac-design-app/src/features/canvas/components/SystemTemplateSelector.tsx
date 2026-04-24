@@ -56,9 +56,9 @@ export function SystemTemplateSelector({ isOpen, onClose, onSelect }: SystemTemp
 
     if (selectedCategory !== 'all') {
       templates = templates.filter(t => {
-        if (selectedCategory === 'commercial') return t.id.includes('commercial');
-        if (selectedCategory === 'residential') return t.id.includes('residential');
-        if (selectedCategory === 'industrial') return t.id.includes('industrial');
+        if (selectedCategory === 'commercial') {return t.id.includes('commercial');}
+        if (selectedCategory === 'residential') {return t.id.includes('residential');}
+        if (selectedCategory === 'industrial') {return t.id.includes('industrial');}
         return true;
       });
     }
@@ -86,9 +86,9 @@ export function SystemTemplateSelector({ isOpen, onClose, onSelect }: SystemTemp
   };
 
   const getTemplateCategory = (template: CalculationTemplate): string => {
-    if (template.id.includes('commercial')) return 'commercial';
-    if (template.id.includes('residential')) return 'residential';
-    if (template.id.includes('industrial')) return 'industrial';
+    if (template.id.includes('commercial')) {return 'commercial';}
+    if (template.id.includes('residential')) {return 'residential';}
+    if (template.id.includes('industrial')) {return 'industrial';}
     return 'custom';
   };
 

@@ -11,6 +11,7 @@ function makeEquipment(overrides: Partial<Equipment['props']> = {}): Equipment {
         createdAt: '2025-01-01T00:00:00.000Z',
         modifiedAt: '2025-01-01T00:00:00.000Z',
         props: {
+            engineeringSystem: 'standard_duct',
             name: 'Air Handler',
             equipmentType: 'air_handler',
             width: 60,

@@ -51,7 +51,7 @@ export function createRoom(
   const calculated = calculateRoomValues({
     id: 'temp',
     type: 'room',
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 0,
     createdAt: now,
     modifiedAt: now,

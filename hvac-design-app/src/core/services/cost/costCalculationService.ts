@@ -213,10 +213,10 @@ export class CostCalculationService {
 
     for (let i = 0; i < bomItems.length; i++) {
       const item = bomItems[i];
-      if (!item) continue;
+      if (!item) {continue;}
       
       const cost = itemCosts[i];
-      if (!cost) continue;
+      if (!cost) {continue;}
       
       const category = item.category;
       
@@ -245,7 +245,7 @@ export class CostCalculationService {
     const size = bomItem.size || '';
     const dimensions = size.split('x').map(Number).filter(Boolean);
     
-    if (dimensions.length === 0) return 1;
+    if (dimensions.length === 0) {return 1;}
     
     const dim0 = dimensions[0] || 0;
     const dim1 = dimensions[1] || dim0;

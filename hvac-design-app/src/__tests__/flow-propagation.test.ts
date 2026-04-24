@@ -14,12 +14,13 @@ describe('Flow Propagation Integration', () => {
       id: 'diffuser-1',
       type: 'equipment',
       props: {
+        engineeringSystem: 'standard_duct',
         capacity: 1000,
         equipmentType: 'diffuser',
         name: 'Diffuser 1'
       } as any,
       connectedTo: 'duct-1',
-      transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
       zIndex: 1,
       createdAt: new Date().toISOString(),
       modifiedAt: new Date().toISOString(),
@@ -34,7 +35,7 @@ describe('Flow Propagation Integration', () => {
         length: 10,
         name: 'Duct 1'
       } as any,
-      transform: { x: 10, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 10, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
       zIndex: 1,
       createdAt: new Date().toISOString(),
       modifiedAt: new Date().toISOString(),
@@ -60,12 +61,13 @@ describe('Flow Propagation Integration', () => {
       id: 'diffuser-1',
       type: 'equipment',
       props: {
+        engineeringSystem: 'standard_duct',
         capacity: 500,
         equipmentType: 'diffuser',
         name: 'Diffuser 1'
       } as any,
       connectedTo: 'duct-1',
-      transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
       zIndex: 1,
       createdAt: '', modifiedAt: ''
     } as unknown as Entity;
@@ -74,7 +76,7 @@ describe('Flow Propagation Integration', () => {
       id: 'duct-1',
       type: 'duct',
       props: { airflow: 0 } as any,
-      transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
       zIndex: 1,
       createdAt: '', modifiedAt: ''
     } as unknown as Entity;
@@ -97,19 +99,19 @@ describe('Flow Propagation Integration', () => {
     const diffuser: Entity = {
       id: 'd1', type: 'equipment', connectedTo: 'duct1',
       props: { capacity: 800, equipmentType: 'diffuser' } as any,
-      transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
+      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
     } as unknown as Entity;
     
     const duct1: Entity = {
       id: 'duct1', type: 'duct', connectedTo: 'duct2',
       props: { airflow: 0 } as any,
-      transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
+      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
     } as unknown as Entity;
     
     const duct2: Entity = {
       id: 'duct2', type: 'duct',
       props: { airflow: 0 } as any,
-      transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
+      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
     } as unknown as Entity;
 
     useEntityStore.getState().addEntities([diffuser, duct1, duct2]);

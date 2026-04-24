@@ -31,7 +31,7 @@ function makeRoom(id: string, x: number, y: number): Entity {
   return {
     id,
     type: 'room',
-    transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 0,
     createdAt: now,
     modifiedAt: now,
@@ -56,7 +56,7 @@ function makeGroup(id: string, childIds: string[]): Entity {
   return {
     id,
     type: 'group',
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 0,
     createdAt: now,
     modifiedAt: now,

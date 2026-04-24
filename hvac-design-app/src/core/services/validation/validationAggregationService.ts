@@ -178,7 +178,7 @@ export class ValidationAggregationService {
     entityType: 'duct' | 'fitting' | 'equipment',
     issueMap: Map<string, ValidationIssue>
   ): void {
-    if (!entity.constraintStatus) return;
+    if (!entity.constraintStatus) {return;}
 
     for (const violation of entity.constraintStatus.violations) {
       const key = `${violation.type}-${violation.severity}`;
@@ -209,7 +209,7 @@ export class ValidationAggregationService {
     const entityIds: string[] = [];
 
     for (const entity of entities) {
-      if (!entity.constraintStatus) continue;
+      if (!entity.constraintStatus) {continue;}
 
       const hasIssue = entity.constraintStatus.violations.some(
         v => v.type === issueType
@@ -229,7 +229,7 @@ export class ValidationAggregationService {
   static getHealthScore(dashboard: ValidationDashboardData): number {
     const { summary } = dashboard;
 
-    if (summary.totalEntities === 0) return 100;
+    if (summary.totalEntities === 0) {return 100;}
 
     // Weight errors more heavily than warnings
     const errorWeight = 2;

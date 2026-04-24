@@ -40,7 +40,7 @@ export class EngineeringCalculator {
    */
   static calculateArea(params: DuctSizingParams): number {
     if (params.shape === 'round') {
-      if (!params.diameter) throw new Error('Diameter required for round duct');
+      if (!params.diameter) {throw new Error('Diameter required for round duct');}
       const radius = params.diameter / 2;
       return Math.PI * radius * radius;
     } else {
@@ -56,7 +56,7 @@ export class EngineeringCalculator {
    * velocity = (CFM / area) * 144 (convert sq ft to sq in)
    */
   static calculateVelocity(airflow: number, area: number): number {
-    if (area <= 0) throw new Error('Area must be greater than zero');
+    if (area <= 0) {throw new Error('Area must be greater than zero');}
     return (airflow / area) * 144;
   }
 
@@ -102,7 +102,7 @@ export class EngineeringCalculator {
     diameter: number,
     friction: number
   ): number {
-    if (diameter <= 0) throw new Error('Diameter must be greater than zero');
+    if (diameter <= 0) {throw new Error('Diameter must be greater than zero');}
     
     // Simplified pressure drop formula for HVAC (in.w.g. per 100 ft)
     // This is an approximation based on standard air density

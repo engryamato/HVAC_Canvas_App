@@ -20,6 +20,7 @@ describe('useSystemCalculations', () => {
           id: '1',
           type: 'equipment',
           props: {
+            engineeringSystem: 'standard_duct',
             equipmentType: 'air_handler',
             capacity: 1200,
             staticPressure: 0.5,
@@ -31,6 +32,7 @@ describe('useSystemCalculations', () => {
           id: '2',
           type: 'equipment',
           props: {
+            engineeringSystem: 'standard_duct',
             equipmentType: 'diffuser', // Should be ignored by current logic
             capacity: 500,
             staticPressure: 0.1,
@@ -42,6 +44,7 @@ describe('useSystemCalculations', () => {
           id: '3',
           type: 'equipment',
           props: {
+            engineeringSystem: 'standard_duct',
             equipmentType: 'furnace',
             capacity: 800,
             staticPressure: 0.4,
@@ -62,6 +65,7 @@ describe('useSystemCalculations', () => {
           id: '1',
           type: 'duct',
           props: {
+            engineeringSystem: 'standard_duct',
             shape: 'round',
             diameter: 12,
             length: 10,
@@ -73,6 +77,7 @@ describe('useSystemCalculations', () => {
           id: '2',
           type: 'duct',
           props: {
+            engineeringSystem: 'standard_duct',
             shape: 'rectangular',
             width: 12,
             height: 12,

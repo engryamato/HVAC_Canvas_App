@@ -11,7 +11,7 @@ vi.mock('../DockRail', () => ({
 vi.mock('../DockDrawer', () => ({
   DockDrawer: () => {
     const activePanel = useLayoutStore((state) => state.activeDockPanel);
-    if (activePanel === 'none') return null;
+    if (activePanel === 'none') {return null;}
     return <div data-testid="dock-drawer">Drawer: {activePanel}</div>;
   }
 }));

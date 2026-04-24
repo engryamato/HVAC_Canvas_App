@@ -1,4 +1,10 @@
-import { CalculationTemplate, CalculationSettings } from '../../schema/calculation-settings.schema';
+import {
+  COMMERCIAL_STANDARD_TEMPLATE,
+  CalculationTemplate,
+  CalculationSettings,
+  INDUSTRIAL_HEAVY_TEMPLATE,
+  RESIDENTIAL_BUDGET_TEMPLATE,
+} from '../../schema/calculation-settings.schema';
 
 export class SystemTemplateService {
   private templates: Map<string, CalculationTemplate> = new Map();
@@ -8,12 +14,6 @@ export class SystemTemplateService {
   }
 
   private initializeDefaultTemplates(): void {
-    const { 
-      COMMERCIAL_STANDARD_TEMPLATE, 
-      RESIDENTIAL_BUDGET_TEMPLATE, 
-      INDUSTRIAL_HEAVY_TEMPLATE 
-    } = require('../../schema/calculation-settings.schema');
-
     this.templates.set(COMMERCIAL_STANDARD_TEMPLATE.id, COMMERCIAL_STANDARD_TEMPLATE);
     this.templates.set(RESIDENTIAL_BUDGET_TEMPLATE.id, RESIDENTIAL_BUDGET_TEMPLATE);
     this.templates.set(INDUSTRIAL_HEAVY_TEMPLATE.id, INDUSTRIAL_HEAVY_TEMPLATE);
@@ -78,7 +78,7 @@ export class SystemTemplateService {
 
   updateTemplate(id: string, updates: Partial<CalculationTemplate>): CalculationTemplate | null {
     const template = this.templates.get(id);
-    if (!template) return null;
+    if (!template) {return null;}
 
     const updated = { ...template, ...updates, updatedAt: new Date() };
     this.templates.set(id, updated);
@@ -95,7 +95,7 @@ export class SystemTemplateService {
 
   applyTemplateToSettings(templateId: string, settings: CalculationSettings): CalculationSettings {
     const template = this.getTemplate(templateId);
-    if (!template) return settings;
+    if (!template) {return settings;}
 
     return {
       ...settings,
@@ -110,7 +110,7 @@ export class SystemTemplateService {
 
   exportTemplate(id: string): string | null {
     const template = this.getTemplate(id);
-    if (!template) return null;
+    if (!template) {return null;}
     return JSON.stringify(template, null, 2);
   }
 

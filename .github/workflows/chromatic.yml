@@ -1,13 +1,10 @@
 name: Chromatic Visual Regression Tests
 
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   chromatic:
@@ -23,16 +20,17 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          cache: 'npm'
-          cache-dependency-path: hvac-design-app/package-lock.json
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
         working-directory: hvac-design-app
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
         working-directory: hvac-design-app
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run Chromatic
         id: chromatic
@@ -40,7 +38,7 @@ jobs:
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
         run: |
-          npx chromatic --playwright --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --exit-zero-on-changes | tee chromatic-output.txt
+          pnpm exec chromatic --playwright --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --exit-zero-on-changes | tee chromatic-output.txt
           # Extract build URL from output
           BUILD_URL=$(grep -oP 'View your Storybook at \K.+' chromatic-output.txt || echo '')
           echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT

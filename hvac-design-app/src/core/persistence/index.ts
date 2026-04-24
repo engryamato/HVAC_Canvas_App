@@ -3,6 +3,7 @@ export {
   isTauri,
   readTextFile,
   writeTextFile,
+  selectDirectory,
   exists,
   createDir,
   readDir,
@@ -37,7 +38,6 @@ export {
 export {
   snapshotFromStores,
   hydrateToStores,
-  toProjectDetails,
 } from './ProjectStateOrchestrator';
 
 // Storage Adapter (Abstraction Layer)

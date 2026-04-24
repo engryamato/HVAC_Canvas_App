@@ -538,8 +538,8 @@ describe('Canvas Design Workflow User Journey', () => {
         moveEntities([
           {
             id: 'room-1',
-            from: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-            to: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+            from: { x: 100, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+            to: { x: 200, y: 200,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           },
         ]);
 
@@ -555,13 +555,13 @@ describe('Canvas Design Workflow User Journey', () => {
         moveEntities([
           {
             id: 'room-1',
-            from: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-            to: { x: 150, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+            from: { x: 100, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+            to: { x: 150, y: 150,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           },
           {
             id: 'room-2',
-            from: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
-            to: { x: 250, y: 250, rotation: 0, scaleX: 1, scaleY: 1 },
+            from: { x: 200, y: 200,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+            to: { x: 250, y: 250,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           },
         ]);
 
@@ -577,8 +577,8 @@ describe('Canvas Design Workflow User Journey', () => {
         moveEntities([
           {
             id: 'room-1',
-            from: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-            to: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+            from: { x: 100, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+            to: { x: 200, y: 200,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
           },
         ]);
 
@@ -651,6 +651,7 @@ describe('Canvas Design Workflow User Journey', () => {
         const updatedDuct: Duct = {
           ...duct,
           props: {
+            engineeringSystem: 'standard_duct',
             name: 'Duct',
             shape: 'rectangular',
             width: 16,

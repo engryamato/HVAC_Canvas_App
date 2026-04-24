@@ -28,11 +28,12 @@ function createDuct(overrides: Partial<Duct['props']> = {}): Duct {
   return {
     id: '00000000-0000-4000-8000-000000000111',
     type: 'duct',
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 1,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',
     props: {
+      engineeringSystem: 'standard_duct',
       name: 'Main Duct',
       shape: 'round',
       diameter: 12,

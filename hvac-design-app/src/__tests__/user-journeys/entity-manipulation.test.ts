@@ -35,7 +35,7 @@ import type { Room, Duct, Equipment, Fitting } from '@/core/schema';
 const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
   id,
   type: 'room',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
@@ -53,11 +53,12 @@ const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
 const createMockDuct = (id: string, name: string, x = 200, y = 150): Duct => ({
   id,
   type: 'duct',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
     name,
     shape: 'round',
     diameter: 12,
@@ -72,11 +73,12 @@ const createMockDuct = (id: string, name: string, x = 200, y = 150): Duct => ({
 const createMockEquipment = (id: string, name: string, x = 300, y = 200): Equipment => ({
   id,
   type: 'equipment',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
     name,
     equipmentType: 'fan',
     capacity: 2000,
@@ -93,11 +95,13 @@ const createMockEquipment = (id: string, name: string, x = 300, y = 200): Equipm
 const createMockFitting = (id: string, x = 250, y = 175): Fitting => ({
   id,
   type: 'fitting',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 10,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
+    manualOverride: false,
     fittingType: 'elbow_90',
     angle: 90,
   },
@@ -236,8 +240,8 @@ describe('Entity Manipulation User Journey', () => {
       moveEntities([
         {
           id: 'room-1',
-          from: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-          to: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+          from: { x: 100, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          to: { x: 200, y: 200,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         },
       ]);
 
@@ -255,13 +259,13 @@ describe('Entity Manipulation User Journey', () => {
       moveEntities([
         {
           id: 'room-1',
-          from: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-          to: { x: 150, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+          from: { x: 100, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          to: { x: 150, y: 150,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         },
         {
           id: 'room-2',
-          from: { x: 200, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-          to: { x: 250, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+          from: { x: 200, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          to: { x: 250, y: 150,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         },
       ]);
 
@@ -279,13 +283,13 @@ describe('Entity Manipulation User Journey', () => {
       moveEntities([
         {
           id: 'room-1',
-          from: { x: 100, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-          to: { x: 150, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+          from: { x: 100, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          to: { x: 150, y: 150,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         },
         {
           id: 'room-2',
-          from: { x: 200, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
-          to: { x: 250, y: 150, rotation: 0, scaleX: 1, scaleY: 1 },
+          from: { x: 200, y: 100,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+          to: { x: 250, y: 150,  elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         },
       ]);
 
@@ -629,6 +633,7 @@ describe('Entity Manipulation User Journey', () => {
         const updated: Duct = {
           ...duct,
           props: {
+            engineeringSystem: 'standard_duct',
             name: 'Duct',
             shape: 'rectangular',
             width: 16,

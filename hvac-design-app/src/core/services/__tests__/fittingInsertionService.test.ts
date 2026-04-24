@@ -38,7 +38,7 @@ function createMockAutoInsertedFitting(id: string, inletDuctId?: string, outletD
   return {
     id,
     type: 'fitting',
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 10,
     createdAt: '2026-01-01T00:00:00.000Z',
     modifiedAt: '2026-01-01T00:00:00.000Z',
@@ -140,7 +140,7 @@ describe('FittingInsertionService', () => {
     const newDuct = createMockDuct('new', 220, 100, 90, 12);
     const locked = {
       ...createMockAutoInsertedFitting('fit-locked', 'existing', 'new'),
-      transform: { x: 220, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 220, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
       props: {
         ...createMockAutoInsertedFitting('fit-locked', 'existing', 'new').props,
         manualOverride: true,
@@ -162,7 +162,7 @@ describe('FittingInsertionService', () => {
     const newDuct = createMockDuct('new', 220, 100, 90, 12);
     const manual = {
       ...createMockUserPlacedFitting('fit-user', 'existing', 'new'),
-      transform: { x: 220, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 220, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     };
 
     const plan = FittingInsertionService.buildReRunPlan({
@@ -184,7 +184,7 @@ describe('FittingInsertionService', () => {
     });
     const manual = {
       ...createMockUserPlacedFitting('fit-user', 'existing', 'new'),
-      transform: { x: 220, y: 100, rotation: 0, scaleX: 1, scaleY: 1 },
+      transform: { x: 220, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     };
 
     const result = FittingInsertionService.resolveReRunPlan(plan, {

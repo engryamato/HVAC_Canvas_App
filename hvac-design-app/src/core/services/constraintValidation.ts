@@ -199,16 +199,16 @@ export class ConstraintValidationService {
     
     switch (type) {
       case 'diameter':
-        if (c.minDiameter !== undefined && dimension < c.minDiameter) return { valid: false, message: `Min ${c.minDiameter}"` };
-        if (c.maxDiameter !== undefined && dimension > c.maxDiameter) return { valid: false, message: `Max ${c.maxDiameter}"` };
+        if (c.minDiameter !== undefined && dimension < c.minDiameter) {return { valid: false, message: `Min ${c.minDiameter}"` };}
+        if (c.maxDiameter !== undefined && dimension > c.maxDiameter) {return { valid: false, message: `Max ${c.maxDiameter}"` };}
         break;
       case 'width':
-        if (c.minWidth !== undefined && dimension < c.minWidth) return { valid: false, message: `Min ${c.minWidth}"` };
-        if (c.maxWidth !== undefined && dimension > c.maxWidth) return { valid: false, message: `Max ${c.maxWidth}"` };
+        if (c.minWidth !== undefined && dimension < c.minWidth) {return { valid: false, message: `Min ${c.minWidth}"` };}
+        if (c.maxWidth !== undefined && dimension > c.maxWidth) {return { valid: false, message: `Max ${c.maxWidth}"` };}
         break;
       case 'height':
-        if (c.minHeight !== undefined && dimension < c.minHeight) return { valid: false, message: `Min ${c.minHeight}"` };
-        if (c.maxHeight !== undefined && dimension > c.maxHeight) return { valid: false, message: `Max ${c.maxHeight}"` };
+        if (c.minHeight !== undefined && dimension < c.minHeight) {return { valid: false, message: `Min ${c.minHeight}"` };}
+        if (c.maxHeight !== undefined && dimension > c.maxHeight) {return { valid: false, message: `Max ${c.maxHeight}"` };}
         break;
     }
 

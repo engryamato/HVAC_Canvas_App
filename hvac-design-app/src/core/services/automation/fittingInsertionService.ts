@@ -911,6 +911,7 @@ export class FittingInsertionService {
       key: this.getFittingKey(fitting),
       fittingType: fitting.props.fittingType,
       angle: fitting.props.angle ?? null,
+      elevation: 0,
       rotation: this.roundCoordinate(fitting.transform.rotation ?? 0),
       serviceId: fitting.props.serviceId ?? null,
       connectionPoints: (fitting.props.connectionPoints ?? [])

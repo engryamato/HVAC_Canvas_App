@@ -24,7 +24,7 @@ function createDuct(id: string): Duct {
   return {
     id,
     type: 'duct',
-    transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 1,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -49,11 +49,13 @@ function createFitting(id: string, ductId: string): Fitting {
   return {
     id,
     type: 'fitting',
-    transform: { x: 10, y: 10, rotation: 0, scaleX: 1, scaleY: 1 },
+    transform: { x: 10, y: 10, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
     zIndex: 2,
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',
     props: {
+      engineeringSystem: 'standard_duct',
+      manualOverride: false,
       fittingType: 'elbow_90',
       inletDuctId: ductId,
       autoInserted: true,

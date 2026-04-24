@@ -197,7 +197,7 @@ export class ExcelGenerator {
    */
   static exportToCSV(workbook: ExcelWorkbook, sheetIndex: number = 0): string {
     const sheet = workbook.sheets[sheetIndex];
-    if (!sheet) return '';
+    if (!sheet) {return '';}
 
     const rows = [sheet.headers, ...sheet.rows];
     const bom = '\uFEFF';

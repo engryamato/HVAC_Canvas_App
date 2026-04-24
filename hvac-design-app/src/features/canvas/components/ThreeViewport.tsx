@@ -170,7 +170,7 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
 
       // Click: only run entity raycasting if gizmo is NOT dragging
       const handleClick = (event: MouseEvent) => {
-        if (gizmoManager.isDragging()) return;
+        if (gizmoManager.isDragging()) {return;}
 
         const intersections = raycastSelection(event, renderer.domElement, camera, sceneGroup.children);
         const hit = intersections[0];
@@ -247,7 +247,7 @@ export function ThreeViewport({ className = '' }: ThreeViewportProps): React.Rea
   // Sync gizmo position whenever selection or nodes change
   useEffect(() => {
     const gizmoManager = gizmoManagerRef.current;
-    if (!gizmoManager) return;
+    if (!gizmoManager) {return;}
     gizmoManager.syncToSelection(selectedIds, nodes);
   }, [selectedIds, nodes]);
 

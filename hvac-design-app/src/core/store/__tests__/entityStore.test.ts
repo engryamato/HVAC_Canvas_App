@@ -11,7 +11,7 @@ import type { Room, Duct } from '@/core/schema';
 const createMockRoom = (id: string, name: string): Room => ({
   id,
   type: 'room',
-  transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -29,11 +29,12 @@ const createMockRoom = (id: string, name: string): Room => ({
 const createMockDuct = (id: string, name: string): Duct => ({
   id,
   type: 'duct',
-  transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 1,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',
   props: {
+    engineeringSystem: 'standard_duct',
     name,
     shape: 'round',
     diameter: 12,

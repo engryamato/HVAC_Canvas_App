@@ -40,7 +40,7 @@ Object.defineProperty(document, 'querySelector', {
 const createMockRoom = (id: string, x: number, y: number): Room => ({
   id,
   type: 'room',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -58,7 +58,7 @@ const createMockRoom = (id: string, x: number, y: number): Room => ({
 const createMockDuct = (id: string, x: number, y: number): Duct => ({
   id,
   type: 'duct',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 1,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -82,7 +82,7 @@ const createMockDuct = (id: string, x: number, y: number): Duct => ({
 const createMockEquipment = (id: string, x: number, y: number): Equipment => ({
   id,
   type: 'equipment',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 2,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',

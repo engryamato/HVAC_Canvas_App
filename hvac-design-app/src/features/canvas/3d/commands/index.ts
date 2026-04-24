@@ -86,6 +86,7 @@ export function rotateEntity3D(entityId: string, targetRotationDeg: number): voi
     updateEntity(entityId, {
         transform: {
             ...entity.transform,
+            elevation: 0,
             rotation: normalizeRotation(targetRotationDeg),
         },
     }, previousState);

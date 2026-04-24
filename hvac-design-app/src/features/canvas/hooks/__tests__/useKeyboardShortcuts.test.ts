@@ -9,7 +9,7 @@ import type { Room } from '@/core/schema';
 const createMockRoom = (id: string): Room => ({
   id,
   type: 'room',
-  transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: '2025-01-01T00:00:00.000Z',
   modifiedAt: '2025-01-01T00:00:00.000Z',

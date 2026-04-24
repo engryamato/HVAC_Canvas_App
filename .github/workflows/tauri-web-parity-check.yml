@@ -7,17 +7,11 @@ on:
       - 'hvac-design-app/src/**'
       - 'hvac-design-app/app/**'
       - 'hvac-design-app/package.json'
-  pull_request:
-    branches: [main, develop]
-    paths:
-      - 'hvac-design-app/src/**'
-      - 'hvac-design-app/app/**'
-      - 'hvac-design-app/package.json'
   workflow_dispatch:
 
 env:
   NODE_VERSION: '18'
-  PNPM_VERSION: '8'
+  PNPM_VERSION: '10'
 
 jobs:
   parity-analysis:

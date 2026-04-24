@@ -135,7 +135,7 @@ export const EquipmentSchema = BaseEntitySchema.extend({
   }).optional(),
 });
 
-export type Equipment = z.infer<typeof EquipmentSchema>;
+export type Equipment = Omit<z.infer<typeof EquipmentSchema>, 'props'> & { props: EquipmentProps };
 
 /**
  * Default values for equipment by type

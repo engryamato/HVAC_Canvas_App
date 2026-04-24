@@ -43,7 +43,7 @@ export function createControls(
   };
 
   const onMouseDown = (event: MouseEvent) => {
-    if (suspended) return;
+    if (suspended) {return;}
     dragging = event.button === 0;
     panning = event.button === 2 || event.shiftKey;
     lastX = event.clientX;
@@ -76,7 +76,7 @@ export function createControls(
   };
 
   const onWheel = (event: WheelEvent) => {
-    if (suspended) return;
+    if (suspended) {return;}
     event.preventDefault();
     orbitRadius = Math.max(120, Math.min(4000, orbitRadius + event.deltaY * 0.6));
     syncCamera();

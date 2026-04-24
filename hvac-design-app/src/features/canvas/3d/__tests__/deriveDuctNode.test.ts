@@ -10,6 +10,7 @@ const baseDuct: Duct = {
     createdAt: '2025-01-01T00:00:00.000Z',
     modifiedAt: '2025-01-01T00:00:00.000Z',
     props: {
+        engineeringSystem: 'standard_duct',
         name: 'Supply Duct',
         shape: 'rectangular',
         length: 10,

@@ -180,12 +180,12 @@ export function createGizmoManager(
     }
 
     function _hitTest(event: PointerEvent): { mesh: THREE.Mesh; role: GizmoRole; axis: GizmoAxis } | null {
-        if (!gizmoRoot.visible) return null;
+        if (!gizmoRoot.visible) {return null;}
 
         raycaster.setFromCamera(_getNDC(event), camera);
         const hits = raycaster.intersectObjects(gizmoMeshes, true);
         const firstHit = hits[0];
-        if (!firstHit) return null;
+        if (!firstHit) {return null;}
 
         const mesh = firstHit.object as THREE.Mesh;
         return {
@@ -205,7 +205,7 @@ export function createGizmoManager(
             }
         });
 
-        if (!mesh) return;
+        if (!mesh) {return;}
 
         const hoverMat = new THREE.MeshBasicMaterial({ color: COLOR_HOVER, depthTest: false });
         mesh.material = hoverMat;
@@ -242,7 +242,7 @@ export function createGizmoManager(
 
     function handlePointerDown(event: PointerEvent): boolean {
         const hit = _hitTest(event);
-        if (!hit || !currentEntityId) return false;
+        if (!hit || !currentEntityId) {return false;}
 
         const pos = gizmoRoot.position.clone();
 
@@ -294,7 +294,7 @@ export function createGizmoManager(
     }
 
     function handlePointerUp(_event: PointerEvent) {
-        if (!dragState) return;
+        if (!dragState) {return;}
 
         const { entityId, axis, startEntityRotationY, startPointerX } = dragState;
 
@@ -317,7 +317,7 @@ export function createGizmoManager(
     }
 
     function handleCancel() {
-        if (!dragState) return;
+        if (!dragState) {return;}
 
         // Restore pre-drag position/rotation
         gizmoRoot.position.copy(dragState.startEntityPosition);

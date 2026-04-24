@@ -206,7 +206,7 @@ export const DuctSchema = BaseEntitySchema.extend({
 
 
 
-export type Duct = z.infer<typeof DuctSchema>;
+export type Duct = Omit<z.infer<typeof DuctSchema>, 'props'> & { props: DuctProps };
 
 export const DEFAULT_ROUND_DUCT_PROPS = {
   name: 'New Duct',
