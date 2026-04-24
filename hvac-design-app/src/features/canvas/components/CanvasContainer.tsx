@@ -31,7 +31,7 @@ import {
 } from '../tools';
 
 // Renderers
-import { renderRoom, renderDuct, renderEquipment, type RenderContext } from '../renderers';
+import { renderRoom, renderDuct, renderEquipment, renderFitting, type RenderContext } from '../renderers';
 
 interface CanvasContainerProps {
   className?: string;
@@ -74,12 +74,14 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   // Store state
   const { panX, panY, zoom, gridVisible, gridSize } = useViewportStore();
   const showRulers = usePreferencesStore((state) => state.showRulers);
+  const showFittingLabels = usePreferencesStore((state) => state.showFittingLabels);
   const unitSystem = usePreferencesStore((state) => state.unitSystem);
   const currentTool = useToolStore((state) => state.currentTool);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
   const setLastCanvasPoint = useCursorStore((state) => state.setLastCanvasPoint);
   const clearLastCanvasPoint = useCursorStore((state) => state.clearLastCanvasPoint);
+  const entitiesById = useEntityStore((state) => state.byId);
   const entities = useEntityStore(
     useShallow((state) => {
       const byId = state.byId;
@@ -191,22 +193,6 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   );
 
   /**
-   * Render a fitting entity (inline - not yet in Phase 3 renderers)
-   */
-  const renderFittingInline = useCallback((ctx: CanvasRenderingContext2D, fitting: Entity) => {
-    if (fitting.type !== 'fitting') {
-      return;
-    }
-    ctx.fillStyle = '#E8F5E9';
-    ctx.strokeStyle = '#388E3C';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, 15, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-  }, []);
-
-  /**
    * Render a note entity (inline - not yet in Phase 3 renderers)
    */
   const renderNoteInline = useCallback((ctx: CanvasRenderingContext2D, note: Entity) => {
@@ -242,6 +228,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
           zoom,
           isSelected: selectedIds.includes(entity.id),
           isHovered: hoveredId === entity.id,
+          entitiesById,
+          showFittingLabels,
+          unitSystem,
         };
 
         // Render based on entity type using Phase 3 renderers
@@ -256,7 +245,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
             renderEquipment(entity, renderContext);
             break;
           case 'fitting':
-            renderFittingInline(ctx, entity);
+            renderFitting(entity, renderContext);
             break;
           case 'note':
             renderNoteInline(ctx, entity);
@@ -269,7 +258,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         ctx.restore();
       }
     },
-    [entities, zoom, selectedIds, hoveredId, renderFittingInline, renderNoteInline]
+    [entities, zoom, selectedIds, hoveredId, entitiesById, showFittingLabels, unitSystem, renderNoteInline]
   );
 
   /**

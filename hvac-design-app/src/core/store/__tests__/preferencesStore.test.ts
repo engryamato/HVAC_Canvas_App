@@ -24,6 +24,7 @@ describe('PreferencesStore', () => {
       expect(state.compactMode).toBe(false);
       expect(state.snapToGrid).toBe(true);
       expect(state.showRulers).toBe(false);
+      expect(state.showFittingLabels).toBe(false);
     });
   });
 
@@ -138,6 +139,13 @@ describe('PreferencesStore', () => {
     });
   });
 
+  describe('setShowFittingLabels', () => {
+    it('updates fitting labels visibility', () => {
+      usePreferencesStore.getState().setShowFittingLabels(true);
+      expect(usePreferencesStore.getState().showFittingLabels).toBe(true);
+    });
+  });
+
   describe('multiple preference updates', () => {
     it('updates individual preferences', () => {
       const actions = usePreferencesStore.getState();
@@ -151,6 +159,7 @@ describe('PreferencesStore', () => {
       actions.setCompactMode(true);
       actions.setSnapToGrid(false);
       actions.setShowRulers(true);
+      actions.setShowFittingLabels(true);
 
       expect(usePreferencesStore.getState()).toMatchObject({
         projectFolder: '/custom',
@@ -162,6 +171,7 @@ describe('PreferencesStore', () => {
         compactMode: true,
         snapToGrid: false,
         showRulers: true,
+        showFittingLabels: true,
       });
     });
 
@@ -176,6 +186,7 @@ describe('PreferencesStore', () => {
       actions.setCompactMode(true);
       actions.setSnapToGrid(false);
       actions.setShowRulers(true);
+      actions.setShowFittingLabels(true);
 
       const stored = JSON.parse(localStorage.getItem('sws.preferences') ?? '{}');
       expect(stored.state).toMatchObject({
@@ -188,6 +199,7 @@ describe('PreferencesStore', () => {
         compactMode: true,
         snapToGrid: false,
         showRulers: true,
+        showFittingLabels: true,
       });
     });
   });
@@ -211,6 +223,7 @@ describe('PreferencesStore', () => {
           compactMode: true,
           snapToGrid: false,
           showRulers: true,
+          showFittingLabels: true,
         },
         version: 0,
       };

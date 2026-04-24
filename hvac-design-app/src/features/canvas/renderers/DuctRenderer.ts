@@ -185,3 +185,5 @@ function renderDuctLabel(
 
   ctx.fillText(`${name} (${sizeLabel})`, lengthPixels / 2, -8 / zoom);
 }
+
+export default renderDuct;

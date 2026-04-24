@@ -24,12 +24,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     const compactMode = usePreferencesStore((state) => state.compactMode);
     const snapToGrid = usePreferencesStore((state) => state.snapToGrid);
     const showRulers = usePreferencesStore((state) => state.showRulers);
+    const showFittingLabels = usePreferencesStore((state) => state.showFittingLabels);
     const autoSaveEnabled = usePreferencesStore((state) => state.autoSaveEnabled);
     const {
         setTheme,
         setCompactMode,
         setSnapToGrid,
         setShowRulers,
+        setShowFittingLabels,
         setAutoSaveEnabled,
     } = usePreferencesStore(
         useShallow((state) => ({
@@ -37,6 +39,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             setCompactMode: state.setCompactMode,
             setSnapToGrid: state.setSnapToGrid,
             setShowRulers: state.setShowRulers,
+            setShowFittingLabels: state.setShowFittingLabels,
             setAutoSaveEnabled: state.setAutoSaveEnabled,
         }))
     );
@@ -95,6 +98,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                                     id="show-rulers"
                                     checked={showRulers}
                                     onCheckedChange={setShowRulers}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="show-fitting-labels">Show Fitting Labels</Label>
+                                <Switch
+                                    id="show-fitting-labels"
+                                    checked={showFittingLabels}
+                                    onCheckedChange={setShowFittingLabels}
                                 />
                             </div>
                         </div>

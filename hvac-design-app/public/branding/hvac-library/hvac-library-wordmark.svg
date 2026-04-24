@@ -1,0 +1,29 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="40" y1="24" x2="296" y2="296" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.45" stop-color="#0F3A67"/>
+      <stop offset="1" stop-color="#0E7490"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="108" y1="104" x2="252" y2="212" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <rect x="24" y="24" width="272" height="272" rx="66" fill="url(#bg)"/>
+  <rect x="72" y="92" width="176" height="136" rx="18" stroke="#E2F3FF" stroke-width="12"/>
+  <path d="M104 92V228" stroke="#E2F3FF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M216 92V228" stroke="#E2F3FF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M72 136H248" stroke="#E2F3FF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M72 182H248" stroke="#E2F3FF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M94 224C119 196 145 182 174 182C200 182 224 190 244 206" stroke="url(#accent)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M114 130C132 112 153 103 177 103C203 103 224 114 242 136" stroke="url(#accent)" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="123" cy="130" r="9" fill="#7DD3FC"/>
+  <circle cx="244" cy="206" r="9" fill="#22C55E"/>
+  <path d="M136 256H184" stroke="#F59E0B" stroke-width="12" stroke-linecap="round"/>
+  <path d="M160 232V280" stroke="#F59E0B" stroke-width="12" stroke-linecap="round"/>
+  <path d="M356 118H597" stroke="#0F172A" stroke-width="18" stroke-linecap="round"/>
+  <path d="M356 202H780" stroke="#0F172A" stroke-width="18" stroke-linecap="round"/>
+  <text x="356" y="118" fill="#0F172A" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="-1.5">HVAC Library</text>
+  <text x="356" y="202" fill="#0F766E" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="6">SYMBOLS • COMPONENTS • CATALOG</text>
+</svg>

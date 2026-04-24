@@ -110,7 +110,7 @@ export function LeftSidebar({
               }`}
               data-testid="tab-catalog"
             >
-              Catalog
+              Library
             </button>
             <button
               type="button"

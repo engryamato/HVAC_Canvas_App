@@ -1,5 +1,7 @@
 import type { Room } from '@/core/schema';
 
+import type { Entity } from '@/core/schema';
+
 /**
  * Render context for entity rendering
  */
@@ -8,6 +10,9 @@ export interface RenderContext {
   zoom: number;
   isSelected: boolean;
   isHovered: boolean;
+  entitiesById?: Record<string, Entity>;
+  showFittingLabels?: boolean;
+  unitSystem?: 'imperial' | 'metric';
 }
 
 /**

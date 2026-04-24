@@ -2,7 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Home, Settings, FolderOpen } from 'lucide-react';
+import { ChevronRight, Home, Settings } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FileMenu } from './FileMenu';
 import { EditMenu } from './EditMenu';
@@ -65,12 +66,21 @@ export const Header: React.FC<HeaderProps> = ({
                         data-testid="app-logo"
                         onClick={() => router.push('/dashboard')}
                     >
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
-                            <FolderOpen className="w-4 h-4 text-white" />
+                        <Image
+                            src="/branding/hvac-library/hvac-library-app-icon.svg"
+                            alt="HVAC Library"
+                            width={28}
+                            height={28}
+                            className="h-7 w-7 rounded-lg shadow-sm transition-shadow group-hover:shadow"
+                        />
+                        <div className="flex flex-col leading-none">
+                            <span className="font-bold text-slate-800 text-sm tracking-tight">
+                                HVAC Library
+                            </span>
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                SizeWise Canvas
+                            </span>
                         </div>
-                        <span className="font-bold text-slate-800 text-sm tracking-tight">
-                            HVAC Pro
-                        </span>
                     </div>
 
                     {/* Divider */}

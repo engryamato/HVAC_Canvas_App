@@ -6,8 +6,8 @@ import { ToastHost } from '@components/ui/ToastHost'
 import { ToastProvider } from '@/components/ui/ToastContext'
 
 export const metadata: Metadata = {
-  title: 'SizeWise HVAC Canvas',
-  description: 'Professional HVAC design and estimation desktop application',
+  title: 'HVAC Library | SizeWise HVAC Canvas',
+  description: 'Professional HVAC component library, design, and estimation desktop application',
 }
 
 export default function RootLayout({

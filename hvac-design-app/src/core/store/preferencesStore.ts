@@ -14,6 +14,7 @@ export interface PreferencesState {
   compactMode: boolean;
   snapToGrid: boolean;
   showRulers: boolean;
+  showFittingLabels: boolean;
 }
 
 interface PreferencesActions {
@@ -26,6 +27,7 @@ interface PreferencesActions {
   setCompactMode: (enabled: boolean) => void;
   setSnapToGrid: (enabled: boolean) => void;
   setShowRulers: (enabled: boolean) => void;
+  setShowFittingLabels: (enabled: boolean) => void;
 }
 
 type PreferencesStore = PreferencesState & PreferencesActions;
@@ -40,6 +42,7 @@ export const PREFERENCES_DEFAULTS: PreferencesState = {
   compactMode: false,
   snapToGrid: true,
   showRulers: false,
+  showFittingLabels: false,
 };
 
 export const usePreferencesStore = create<PreferencesStore>()(
@@ -55,6 +58,7 @@ export const usePreferencesStore = create<PreferencesStore>()(
       setCompactMode: (enabled) => set({ compactMode: enabled }),
       setSnapToGrid: (enabled) => set({ snapToGrid: enabled }),
       setShowRulers: (enabled) => set({ showRulers: enabled }),
+      setShowFittingLabels: (enabled) => set({ showFittingLabels: enabled }),
     }),
     { name: 'sws.preferences' }
   )
@@ -72,4 +76,5 @@ export const usePreferencesActions = () =>
     setCompactMode: state.setCompactMode,
     setSnapToGrid: state.setSnapToGrid,
     setShowRulers: state.setShowRulers,
+    setShowFittingLabels: state.setShowFittingLabels,
   }));

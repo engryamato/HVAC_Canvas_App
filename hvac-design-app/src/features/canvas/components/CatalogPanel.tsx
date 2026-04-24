@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
 import type {
@@ -403,9 +404,18 @@ export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
     <div className="flex h-full flex-col gap-3 rounded-2xl bg-gradient-to-b from-slate-50 via-white to-slate-50 p-3">
       <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <div className="flex items-center justify-between gap-2">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Catalog</div>
-            <h3 className="text-sm font-semibold text-slate-900">Browse placeable components</h3>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/branding/hvac-library/hvac-library-symbol.svg"
+              alt="HVAC Library"
+              width={44}
+              height={44}
+              className="h-11 w-11 rounded-2xl border border-slate-200 bg-slate-950/95 p-1 shadow-sm"
+            />
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">HVAC Library</div>
+              <h3 className="text-sm font-semibold text-slate-900">Browse placeable components</h3>
+            </div>
           </div>
           <button
             type="button"
