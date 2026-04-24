@@ -2,6 +2,7 @@ import type { Duct } from '@/core/schema';
 import type { RenderContext } from './RoomRenderer';
 import { ProfessionalRenderingHelper } from '../utils';
 import { canvasPerformanceService } from '../services';
+import { feetToPixels } from '@/core/constants/coordinates';
 
 /**
  * Duct colors
@@ -26,8 +27,7 @@ export function renderDuct(duct: Duct, context: RenderContext): void {
   const { ctx, zoom, isSelected } = context;
   const { shape, length, airflow, name, insulated, insulationThickness } = duct.props;
   
-  // Convert length from feet to pixels (12 inches per foot)
-  const lengthPixels = length * 12;
+  const lengthPixels = feetToPixels(length);
 
   const helper = new ProfessionalRenderingHelper(ctx, zoom);
   const perfHints = canvasPerformanceService.getPerformanceHints();

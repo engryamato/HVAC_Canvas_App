@@ -5,6 +5,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { boundsContainsPoint, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
+import { feetToPixels } from '@/core/constants/coordinates';
 
 interface UseSelectionOptions {
   screenToCanvas: (x: number, y: number) => { x: number; y: number };
@@ -45,7 +46,7 @@ export function useSelection({ screenToCanvas }: UseSelectionOptions) {
         return {
           x,
           y,
-          width: entity.props.length * 12, // Convert feet to pixels
+          width: feetToPixels(entity.props.length),
           height: entity.props.width ?? entity.props.height ?? 10, // Use width or height, default to 10
         };
       case 'fitting':

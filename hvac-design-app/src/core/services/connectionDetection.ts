@@ -6,6 +6,7 @@
  */
 import { Duct, Entity } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
+import { feetToPixels } from '@/core/constants/coordinates';
 
 export interface ConnectionPoint {
   entityId: string;
@@ -32,7 +33,7 @@ export interface DetectedConnection {
   angle: number; // Angle between ducts (0-180)
 }
 
-const CONNECTION_TOLERANCE = 12; // pixels (1 foot at 12px/ft scale)
+const CONNECTION_TOLERANCE = feetToPixels(1);
 const STRAIGHT_ANGLE_TOLERANCE = 15;
 
 export class ConnectionDetectionService {
@@ -112,7 +113,7 @@ export class ConnectionDetectionService {
    */
   private static getDuctEndpoints(duct: Duct): ConnectionPoint[] {
     const { x, y, rotation } = duct.transform;
-    const length = duct.props.length * 12; // Convert feet to pixels
+    const length = feetToPixels(duct.props.length);
 
     // Calculate end point based on rotation
     const radians = (rotation * Math.PI) / 180;

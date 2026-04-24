@@ -3,6 +3,7 @@ import type { Entity } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { selectLastCanvasPoint } from '@/features/canvas/store/cursorStore';
+import { feetToPixels } from '@/core/constants/coordinates';
 import { readClipboardText, writeClipboardText } from './clipboardAdapter';
 import {
   createClipboardPayload,
@@ -71,7 +72,7 @@ function getEntityBounds(entity: Entity, entitiesById: Record<string, Entity>, s
     case 'equipment':
       return { minX: x, minY: y, maxX: x + entity.props.width, maxY: y + entity.props.depth };
     case 'duct': {
-      const length = entity.props.length * 12;
+      const length = feetToPixels(entity.props.length);
       const thickness = entity.props.width ?? entity.props.height ?? 10;
       return { minX: x, minY: y, maxX: x + length, maxY: y + thickness };
     }

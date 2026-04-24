@@ -8,6 +8,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
+import { feetToPixels } from '@/core/constants/coordinates';
 import {
   createEntity,
   deleteEntity,
@@ -335,7 +336,7 @@ export class SelectTool extends BaseTool {
         return {
           x,
           y,
-          width: entity.props.length * 12,
+          width: feetToPixels(entity.props.length),
           height: entity.props.width ?? entity.props.height ?? 10,
         };
       case 'fitting':

@@ -23,6 +23,7 @@ import type { Entity, Fitting, Duct } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import { adaptComponentToService, getServiceColor } from '@/core/services/componentServiceInterop';
+import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
 import {
   resolvePlacementStrategy,
   type PlacementPreviewDecoration,
@@ -32,12 +33,12 @@ import {
 /**
  * Minimum duct length in pixels (for 0.1 feet minimum)
  */
-const MIN_DUCT_LENGTH = 12; // 1 foot minimum for usability
+const MIN_DUCT_LENGTH = feetToPixels(1); // 1 foot minimum for usability
 
 /**
  * Snap tolerance for magnetic endpoints (pixels)
  */
-const SNAP_TOLERANCE = 12;
+const SNAP_TOLERANCE = feetToPixels(1);
 
 interface SnapTarget {
   ductId: string;
@@ -254,7 +255,7 @@ export class DuctTool extends BaseTool {
     ctx.stroke();
 
     // Draw length label
-    const lengthFt = (length / 12).toFixed(1);
+    const lengthFt = pixelsToFeet(length).toFixed(1);
     const midX = (startPoint.x + currentPoint.x) / 2;
     const midY = (startPoint.y + currentPoint.y) / 2;
     ctx.font = `${12 / zoom}px sans-serif`;
@@ -402,7 +403,7 @@ export class DuctTool extends BaseTool {
    */
   private getDuctEndpointsForSnap(duct: Duct): SnapTarget[] {
     const { x, y, rotation } = duct.transform;
-    const lengthPixels = duct.props.length * 12;
+    const lengthPixels = feetToPixels(duct.props.length);
     const radians = (rotation * Math.PI) / 180;
     const endX = x + lengthPixels * Math.cos(radians);
     const endY = y + lengthPixels * Math.sin(radians);
@@ -435,7 +436,7 @@ export class DuctTool extends BaseTool {
       return;
     }
 
-    const lengthFt = lengthPixels / 12;
+    const lengthFt = pixelsToFeet(lengthPixels);
     const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
 
     // Get Active Component and adapt to Service

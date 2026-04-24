@@ -3,6 +3,7 @@ import type { Fitting, FittingProps, FittingType } from '../../schema/fitting.sc
 import type { Duct, DuctProps } from '../../schema/duct.schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { createFitting } from '@/features/canvas/entities/fittingDefaults';
+import { feetToPixels } from '@/core/constants/coordinates';
 
 /**
  * Automatic Fitting Insertion Service
@@ -730,7 +731,7 @@ export class FittingInsertionService {
 
   private static getDuctEndpoints(duct: Duct): ConnectionPoint[] {
     const { x, y, rotation } = duct.transform;
-    const lengthPixels = duct.props.length * 12;
+    const lengthPixels = feetToPixels(duct.props.length);
     const radians = (rotation * Math.PI) / 180;
     const endX = x + lengthPixels * Math.cos(radians);
     const endY = y + lengthPixels * Math.sin(radians);
