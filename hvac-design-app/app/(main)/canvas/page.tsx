@@ -1,18 +1,19 @@
-// hvac-design-app/app/(main)/canvas/page.tsx
-import { redirect } from 'next/navigation';
-import { nanoid } from 'nanoid';
+'use client';
 
-/**
- * Canvas Index Route Handler
- * 
- * This page handles navigation to `/canvas` without a projectId.
- * It creates a new "Tutorial Project" ID and redirects to `/canvas/[projectId]`.
- * This supports the onboarding tutorial flow where a project context is needed.
- */
-export default function CanvasIndexRoute() {
-    // Generate a temporary project ID for the tutorial session
-    const tutorialProjectId = `tutorial-${nanoid(8)}`;
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { CanvasPageWrapper } from '@/features/canvas/CanvasPageWrapper';
 
-    // Redirect to the canvas with the generated project ID
-    redirect(`/canvas/${tutorialProjectId}`);
+function CanvasContent() {
+    const searchParams = useSearchParams();
+    const projectId = searchParams.get('projectId') || 'untitled';
+    return <CanvasPageWrapper projectId={projectId} />;
+}
+
+export default function CanvasPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-50">Loading Canvas...</div>}>
+            <CanvasContent />
+        </Suspense>
+    );
 }

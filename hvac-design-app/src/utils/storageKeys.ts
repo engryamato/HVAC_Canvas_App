@@ -2,6 +2,11 @@ export const PROJECT_STORAGE_PREFIX = 'hvac-project-';
 
 export const PROJECT_BACKUP_SUFFIX = '-backup';
 
+/**
+ * Known storage keys:
+ * - 'sws.inspector-preferences': Stores inspector width and section collapse state (managed by Zustand persist)
+ */
+
 export function getProjectStorageKey(projectId: string): string {
   return `${PROJECT_STORAGE_PREFIX}${projectId}`;
 }

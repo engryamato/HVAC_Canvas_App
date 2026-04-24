@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { requestDirectoryAccess } from '@/core/persistence/directoryHandleManager';
 import { resetAdapter } from '@/core/persistence/factory';
 import { useProjectListStore } from '@/features/dashboard/store/projectListStore';
+import { isTauri, selectDirectory } from '@/core/persistence/filesystem';
+import { TauriPathManager } from '@/core/persistence/TauriPathManager';
 
 interface ConnectFolderDialogProps {
   isOpen: boolean;
@@ -14,33 +16,56 @@ export function ConnectFolderDialog({ isOpen, onClose, onConnected }: ConnectFol
   const [error, setError] = useState<string | null>(null);
   const refreshProjects = useProjectListStore((state) => state.refreshProjects);
 
+
   const handleConnect = async () => {
     setIsConnecting(true);
     setError(null);
 
     try {
-      const dirHandle = await requestDirectoryAccess();
-      
-      if (!dirHandle) {
-        setError('Folder access was denied or cancelled.');
-        setIsConnecting(false);
-        return;
+      if (isTauri()) {
+        const selectedPath = await selectDirectory();
+        
+        if (!selectedPath) {
+          setIsConnecting(false);
+          return;
+        }
+
+        // Save path preference
+        TauriPathManager.setPath(selectedPath);
+        
+        // Reset adapter to force recreation with new path
+        resetAdapter();
+
+        // Refresh projects list
+        await refreshProjects();
+        
+        // Notify parent
+        onConnected?.();
+
+        // Close dialog
+        onClose();
+      } else {
+        // Web environment
+        const dirHandle = await requestDirectoryAccess();
+        
+        if (!dirHandle) {
+          setError('Folder access was denied or cancelled.');
+          setIsConnecting(false);
+          return;
+        }
+
+        // Reset adapter to force recreation with new directory handle
+        resetAdapter();
+
+        // Refresh projects list
+        await refreshProjects();
+        
+        // Notify parent
+        onConnected?.();
+
+        // Close dialog
+        onClose();
       }
-
-      // Verify it's the correct folder by checking for expected structure
-      // (Optional: could check for existence of project folders)
-      
-      // Reset adapter to force recreation with new directory handle
-      resetAdapter();
-
-      // Refresh projects list
-      await refreshProjects();
-      
-      // Notify parent
-      onConnected?.();
-
-      // Close dialog
-      onClose();
     } catch (err) {
       console.error('Failed to connect folder:', err);
       setError(err instanceof Error ? err.message : 'Failed to connect folder');
@@ -77,8 +102,14 @@ export function ConnectFolderDialog({ isOpen, onClose, onConnected }: ConnectFol
 
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              <strong>Note:</strong> You will need to grant permission to access this folder.
-              This only works in Chrome/Edge browsers.
+              {isTauri() ? (
+                <strong>Select any folder on your computer to store your projects.</strong>
+              ) : (
+                <>
+                  <strong>Note:</strong> You will need to grant permission to access this folder.
+                  This only works in Chrome/Edge browsers.
+                </>
+              )}
             </p>
           </div>
 

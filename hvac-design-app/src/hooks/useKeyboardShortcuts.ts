@@ -1,14 +1,13 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLayoutStore } from '@/stores/useLayoutStore';
-import { useToolStore } from '@/stores/useToolStore';
-import { useViewportStore } from '@/stores/useViewportStore';
+
+import { useToolStore } from '@/core/store/canvas.store';
+import { useViewportStore } from '@/features/canvas/store/viewportStore';
 
 export const useKeyboardShortcuts = () => {
     const router = useRouter();
-    const {
-        setActiveTool
-    } = useToolStore();
+    const setActiveTool = useToolStore((state) => state.setTool);
 
     const {
         toggleLeftSidebar,
@@ -17,10 +16,13 @@ export const useKeyboardShortcuts = () => {
     } = useLayoutStore();
 
     const {
-        setZoom,
-        zoom,
+        zoomTo: setZoom,
         toggleGrid
-    } = useViewportStore();
+    } = useViewportStore((state) => ({
+        zoomTo: state.zoomTo,
+        toggleGrid: state.toggleGrid
+    }));
+    const zoom = useViewportStore((state) => state.zoom);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

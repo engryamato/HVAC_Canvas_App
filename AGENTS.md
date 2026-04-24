@@ -1,50 +1,32 @@
-# AGENTS
+# PROJECT KNOWLEDGE BASE
 
-## Purpose
-Central routing guide for the `.agent` system and repo-specific workflows.
+**Generated:** 2026-02-05 16:34 ET
+**Commit:** 58192dd
+**Branch:** feat/resizable-inspector
 
-## Required Reads (in order)
-1. `.agent/ARCHITECTURE.md`
-2. `.agent/rules/GEMINI.md`
-3. `CODEBASE.md`
-4. `.github/copilot-instructions.md`
+## OVERVIEW
+SizeWise HVAC Canvas monorepo with a Next.js (App Router) frontend and Tauri desktop backend.
+Use this root map to orient; directory-level AGENTS files cover specifics.
 
-## Plan File Convention
-- Planning output lives in project root as `PLAN-{task-slug}.md`.
-- Read existing `PLAN-*.md` before creating a new one.
+## STRUCTURE
+```
+./
+├── hvac-design-app/       # primary app workspace
+├── docs/                  # product + technical documentation
+├── scripts/               # parity and sync scripts
+├── .github/workflows/     # CI/CD pipelines
+└── .agent/                # agent skills and workflows
+```
 
-## Agent Routing
-- **UI/UX**: `frontend-specialist`
-- **Backend/API**: `backend-specialist`
-- **Database**: `database-architect`
-- **Security**: `security-auditor`
-- **Testing**: `test-engineer`
-- **Debugging**: `debugger`
-- **Multi-domain**: `orchestrator` (requires plan + 3+ agents)
-- **Discovery**: `explorer-agent` (codebase mapping)
+## CONVENTIONS
+- Primary app root is `hvac-design-app/` (root `package.json` is tooling).
+- Tauri APIs must be guarded for web builds; Next config externalizes them.
+- Plan outputs use `PLAN-{task-slug}.md` at repo root.
 
-## Workflow Shortcuts
-- `/plan` for planning only
-- `/create` for new app creation
-- `/orchestrate` for multi-agent work
-- `/debug` for systematic debugging
-- `/test` for test generation/execution
-- `/ui-ux-pro-max` for UI research workflow
+## ANTI-PATTERNS
+- Editing build outputs (`.next/`, `out/`, `src-tauri/target/`).
+- Direct use of `@tauri-apps/*` APIs in shared web code without `isTauri` guards.
 
-## Verification Scripts
-- Scripts live in `.agent/skills/<skill>/scripts/`
-- Use the script matching the agent domain (see `.agent/skills/clean-code/SKILL.md`)
-
-## Socratic Gate Qs (Template)
-Ask before planning or multi-file changes:
-- **Goal**: What is the user trying to achieve and why now?
-- **Scope**: Which areas are in or out of scope for this change?
-- **Constraints**: Any constraints on timeline, tech, or behavior?
-- **Edge cases**: What could break or behave unexpectedly?
-- **Verification**: How should we verify the result (tests, steps, scripts)?
-
-## Repo Entry Points
-- App routes: `hvac-design-app/app/`
-- Feature modules: `hvac-design-app/src/features/`
-- Core utilities: `hvac-design-app/src/core/`
-- Tauri backend: `hvac-design-app/src-tauri/`
+## NOTES
+- LSP tools are not safe on Windows with Bun v1.3.5 (segfault risk).
+- Tauri/web parity checks use `scripts/check-tauri-web-parity.js`.

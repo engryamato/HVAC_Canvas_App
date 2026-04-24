@@ -65,8 +65,17 @@ export class TauriStorageAdapter implements StorageAdapter {
    */
   private async ensureInitialized(): Promise<void> {
     if (!this.initialized) {
-      const docsDir = await getDocumentsDir();
-      this.baseDir = `${docsDir}/SizeWise/Projects`;
+      // Check for custom path first
+      const { TauriPathManager } = await import('../TauriPathManager');
+      const customPath = TauriPathManager.getPath();
+
+      if (customPath) {
+        this.baseDir = customPath;
+      } else {
+        // Fallback to default Documents/SizeWise/Projects
+        const docsDir = await getDocumentsDir();
+        this.baseDir = `${docsDir}/SizeWise/Projects`;
+      }
       this.initialized = true;
     }
   }
