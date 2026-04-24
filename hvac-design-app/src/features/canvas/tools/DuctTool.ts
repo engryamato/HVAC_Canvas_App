@@ -31,7 +31,8 @@ import {
 } from './placementStrategies';
 
 /**
- * Minimum duct length in pixels (for 0.1 feet minimum)
+ * Minimum duct length in pixels.
+ * Uses 1 foot minimum for canvas usability.
  */
 const MIN_DUCT_LENGTH = feetToPixels(1); // 1 foot minimum for usability
 

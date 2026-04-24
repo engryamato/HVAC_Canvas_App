@@ -5,7 +5,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { boundsContainsPoint, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
-import { feetToPixels } from '@/core/constants/coordinates';
+import { getLegacyDuctCanvasBounds } from '@/core/geometry/ductBounds';
 
 interface UseSelectionOptions {
   screenToCanvas: (x: number, y: number) => { x: number; y: number };
@@ -43,12 +43,7 @@ export function useSelection({ screenToCanvas }: UseSelectionOptions) {
           height: entity.props.depth,
         };
       case 'duct':
-        return {
-          x,
-          y,
-          width: feetToPixels(entity.props.length),
-          height: entity.props.width ?? entity.props.height ?? 10, // Use width or height, default to 10
-        };
+        return getLegacyDuctCanvasBounds(entity);
       case 'fitting':
         return {
           x: x - 15,

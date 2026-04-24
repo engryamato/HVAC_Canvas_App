@@ -8,7 +8,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
-import { feetToPixels } from '@/core/constants/coordinates';
+import { getLegacyDuctCanvasBounds } from '@/core/geometry/ductBounds';
 import {
   createEntity,
   deleteEntity,
@@ -333,12 +333,7 @@ export class SelectTool extends BaseTool {
       case 'equipment':
         return { x, y, width: entity.props.width, height: entity.props.depth };
       case 'duct':
-        return {
-          x,
-          y,
-          width: feetToPixels(entity.props.length),
-          height: entity.props.width ?? entity.props.height ?? 10,
-        };
+        return getLegacyDuctCanvasBounds(entity);
       case 'fitting':
         return { x: x - 15, y: y - 15, width: 30, height: 30 };
       case 'note':
