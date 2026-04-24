@@ -11,7 +11,7 @@ vi.mock('../../hooks/useKeyboardShortcuts', () => ({
 
 // Mock useHistoryStore to allow controlling state
 vi.mock('@/core/commands/historyStore', async (importOriginal) => {
-  const original = await importOriginal();
+  const original = (await importOriginal()) as typeof import('@/core/commands/historyStore');
   return {
     ...original,
     useHistoryStore: vi.fn(() => ({

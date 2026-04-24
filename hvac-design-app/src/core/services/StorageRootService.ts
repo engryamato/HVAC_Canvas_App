@@ -381,6 +381,14 @@ export class StorageRootService extends EventTarget {
   }
 
   private async assertWritable(path: string): Promise<void> {
+    if (path.startsWith('indexeddb://')) {
+      const validation = await validateStorageRoot(path);
+      if (!validation.writable) {
+        throw new Error('IndexedDB storage is not writable');
+      }
+      return;
+    }
+
     const testFile = this.toNormalizedPath(path, `.write-test-${Date.now()}`);
     await writeTextFile(testFile, 'ok');
     await removeFile(testFile);
@@ -522,4 +530,28 @@ export async function getStorageRootService(): Promise<StorageRootService> {
     serviceInstance = createStorageRootService(queue, useStorageStore);
   }
   return serviceInstance;
+}
+
+export async function ensureStorageRootReady(): Promise<InitResult> {
+  const service = await getStorageRootService();
+  const currentRoot = service.getStorageRoot();
+  const result = currentRoot
+    ? { success: true, path: currentRoot, migrationRan: false }
+    : await service.initialize();
+
+  if (!result.success) {
+    return result;
+  }
+
+  const validation = await service.validate();
+  if (!validation.is_valid || !validation.is_writable) {
+    return {
+      success: false,
+      path: result.path,
+      migrationRan: result.migrationRan,
+      error: validation.errors.join('; ') || 'Storage root is not writable',
+    };
+  }
+
+  return result;
 }

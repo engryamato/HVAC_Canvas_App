@@ -47,7 +47,7 @@ import {
 const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
   id,
   type: 'room',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0, // Room z-index: 0
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
@@ -71,7 +71,7 @@ const createMockDuct = (
 ): Duct => ({
   id,
   type: 'duct',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5, // Duct z-index: 5
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
@@ -79,6 +79,7 @@ const createMockDuct = (
     shape === 'round'
       ? {
           name,
+          engineeringSystem: 'standard_duct',
           shape: 'round',
           diameter: 12,
           length: 10,
@@ -88,6 +89,7 @@ const createMockDuct = (
         }
       : {
           name,
+          engineeringSystem: 'standard_duct',
           shape: 'rectangular',
           width: 12,
           height: 8,
@@ -108,12 +110,13 @@ const createMockEquipment = (
 ): Equipment => ({
   id,
   type: 'equipment',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 5, // Equipment z-index: 5
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
     name,
+    engineeringSystem: 'standard_duct',
     equipmentType,
     capacity: 2000,
     capacityUnit: 'CFM',
@@ -134,13 +137,15 @@ const createMockFitting = (
 ): Fitting => ({
   id,
   type: 'fitting',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 10, // Fitting z-index: 10
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct',
     fittingType,
     angle: fittingType === 'elbow_90' ? 90 : fittingType === 'elbow_45' ? 45 : undefined,
+    manualOverride: false,
   },
   calculated: { equivalentLength: 10, pressureLoss: 0.02 },
 });

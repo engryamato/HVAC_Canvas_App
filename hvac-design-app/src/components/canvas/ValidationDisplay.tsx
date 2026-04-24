@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,7 +42,7 @@ export function ValidationDisplay({ constraintStatus, onFixSuggestion }: Validat
               </Badge>
             )}
             {warnings.length > 0 && (
-              <Badge variant="warning" className="text-xs bg-yellow-500">
+              <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-900">
                 {warnings.length} Warning{warnings.length > 1 ? 's' : ''}
               </Badge>
             )}

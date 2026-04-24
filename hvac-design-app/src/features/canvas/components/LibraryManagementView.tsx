@@ -39,6 +39,10 @@ export function LibraryManagementView() {
       engineeringSystem: 'universal',
       placeable: true,
       source: 'custom',
+      recommendedFittingEntryIds: [],
+      recommendedAccessoryEntryIds: [],
+      recommendedEquipmentEntryIds: [],
+      connectionNotes: [],
       systemType: 'supply',
       materials: [],
       engineeringProperties: {
@@ -54,7 +58,7 @@ export function LibraryManagementView() {
       isCustom: true,
       createdAt: now,
       updatedAt: now,
-    } as UnifiedComponentDefinition);
+    } satisfies UnifiedComponentDefinition);
   };
 
   const handleDelete = (id: string) => {

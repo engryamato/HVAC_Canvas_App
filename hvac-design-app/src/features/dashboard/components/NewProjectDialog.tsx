@@ -13,6 +13,7 @@ import { useProjectListActions } from '@/features/dashboard/store/projectListSto
 import { useRouter } from 'next/navigation';
 import { createEmptyProject } from '@/core/schema/project-file.schema';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
+import { ensureStorageRootReady } from '@/core/services/StorageRootService';
 
 interface NewProjectDialogProps {
     open: boolean;
@@ -73,6 +74,11 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
         setIsLoading(true);
 
         try {
+            const storageResult = await ensureStorageRootReady();
+            if (!storageResult.success) {
+                throw new Error(storageResult.error || 'Storage is not ready');
+            }
+
             // Construct Scope object
             const scopeDetails: string[] = [];
             if (scopeHvac) { scopeDetails.push('HVAC'); }
@@ -171,7 +177,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
 
         } catch (error) {
             console.error('[NewProjectDialog] Failed to create project:', error);
-            // TODO: Toast notification
+            alert(error instanceof Error ? error.message : 'Failed to create project');
         } finally {
             setIsLoading(false);
         }

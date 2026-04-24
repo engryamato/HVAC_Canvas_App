@@ -37,6 +37,9 @@ pw-*.json
 typecheck-*.txt
 typecheck-*.count.txt
 
+# Superpowers visual companion artifacts
+.superpowers/
+
 # Python
 __pycache__/
 *.pyc

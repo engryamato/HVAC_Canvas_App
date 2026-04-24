@@ -188,16 +188,16 @@ export class EquipmentTool extends BaseTool {
                 : undefined,
           }
         : {}),
-      ...(activeComponent.engineeringSystem === 'grease_duct'
-        ? {
-            greaseExtractionStage:
-              activeComponent.typeId === 'pcu' ? 'multi' : 'single',
-            fireSuppressionReady:
-              activeComponent.typeId === 'hood_connection' ||
-              activeComponent.typeId === 'pcu',
-          }
-        : {}),
-    };
+	      ...(activeComponent.engineeringSystem === 'grease_duct'
+	        ? {
+	            greaseExtractionStage:
+	              activeComponent.typeId === 'pcu' ? ('multi' as const) : ('single' as const),
+	            fireSuppressionReady:
+	              activeComponent.typeId === 'hood_connection' ||
+	              activeComponent.typeId === 'pcu',
+	          }
+	        : {}),
+	    };
 
     // Place equipment at the snapped position (corner, not centered)
     // This ensures the transform position is grid-aligned

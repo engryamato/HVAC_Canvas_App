@@ -3,10 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Rocket, Building, Factory, Home } from 'lucide-react';
-import { projectInitializationService, ProjectInitializationOptions } from '@/core/services/project/projectInitializationService';
+import { projectInitializationService } from '@/core/services/project/projectInitializationService';
 
 interface ProjectWizardProps {
   open: boolean;
@@ -15,12 +14,10 @@ interface ProjectWizardProps {
 }
 
 export function ProjectInitializationWizard({ open, onClose, onComplete }: ProjectWizardProps) {
-  const [step, setStep] = React.useState(1);
   const [projectName, setProjectName] = React.useState('');
   const [location, setLocation] = React.useState('');
   const [estimator, setEstimator] = React.useState('');
   const [projectType, setProjectType] = React.useState<'commercial' | 'residential' | 'industrial'>('commercial');
-  const [useQuickSetup, setUseQuickSetup] = React.useState(true);
 
   const handleQuickSetup = () => {
     if (!projectName) {
