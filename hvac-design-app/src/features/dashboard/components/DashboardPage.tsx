@@ -16,6 +16,7 @@ import { useAutoOpen } from '@/hooks/useAutoOpen';
 import { useSearchParams } from 'next/navigation';
 import { isTauri } from '@/core/persistence/filesystem';
 import { getDirectoryHandle } from '@/core/persistence/directoryHandleManager';
+import { ensureStorageRootReady } from '@/core/services/StorageRootService';
 
 /**
  * Dashboard Page - Modern Engineering Project Management Interface
@@ -78,9 +79,17 @@ export function DashboardPage({ initialNewProjectOpen = false }: DashboardPagePr
         await refreshProjects();
     };
 
+    const hydrateStorageRoot = async () => {
+        const result = await ensureStorageRootReady();
+        if (!result.success) {
+            console.error('[DashboardPage] Storage initialization failed:', result.error);
+        }
+    };
+
     useEffect(() => {
         void (async () => {
             await useProjectListStore.persist.rehydrate();
+            await hydrateStorageRoot();
             await fetchProjects();
         })();
     }, []); // Removed refreshProjects from dependency array as fetchProjects is defined within this scope or is a stable function.

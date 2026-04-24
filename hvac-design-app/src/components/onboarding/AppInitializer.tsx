@@ -42,14 +42,7 @@ export const AppInitializer: React.FC = () => {
                 modifiedAt: now,
                 isArchived: false,
                 location: projectData.location || undefined,
-                settings: projectData.settings ? {
-                    unitSystem: projectData.settings.unitSystem || 'imperial',
-                    gridSize: projectData.settings.gridSize || 12,
-                    gridVisible: projectData.settings.gridVisible ?? true,
-                    snapToGrid: projectData.settings.snapToGrid ?? true,
-                    // Include any other calculation settings from the wizard
-                    ...projectData.settings
-                } : undefined,
+                settings: projectData.settings ? { ...projectData.settings } : undefined,
             });
 
             const repository = await getProjectRepository();

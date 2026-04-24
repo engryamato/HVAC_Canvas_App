@@ -2,7 +2,7 @@ import type { ProjectFile, ProjectMetadata, SaveResult, LoadResult, DeleteResult
 import type { OperationQueue } from '../services/OperationQueue';
 import { getSharedOperationQueue } from '../services/OperationQueue';
 import type { StorageAdapter } from './StorageAdapter';
-import { getStorageRootService } from '../services/StorageRootService';
+import { ensureStorageRootReady, getStorageRootService } from '../services/StorageRootService';
 import type { QuarantinedFile } from '../services/types';
 import { loadProject as loadProjectFromPath, saveProject as saveProjectToPath } from './projectIO';
 import { createDir, copyFile, exists, readTextFile, renameFile, removeFile, removePath } from './filesystem';
@@ -416,7 +416,17 @@ export class ProjectRepository extends EventTarget {
 
     private async getStorageRootPath(): Promise<string | null> {
         const rootService = await getStorageRootService();
-        return rootService.getStorageRoot() || null;
+        const currentRoot = rootService.getStorageRoot();
+        if (currentRoot) {
+            return currentRoot;
+        }
+
+        const initResult = await ensureStorageRootReady();
+        if (!initResult.success) {
+            return null;
+        }
+
+        return initResult.path || rootService.getStorageRoot() || null;
     }
 
     private async resolveCanonicalPaths(

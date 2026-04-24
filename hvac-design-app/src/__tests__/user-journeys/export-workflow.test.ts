@@ -34,7 +34,7 @@ const testUUID = (num: number) =>
 const createMockRoom = (id: string, name: string, x = 100, y = 100): Room => ({
   id,
   type: 'room',
-  transform: { x, y, rotation: 0, scaleX: 1, scaleY: 1 },
+  transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
   zIndex: 0,
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
@@ -698,13 +698,13 @@ describe('Export Workflow User Journey', () => {
       expect(exported.calculated.requiredCFM).toBe(2400);
     });
 
-    it('should preserve entity transform in export', () => {
-      const duct = createMockDuct('duct-1', 'Test Duct');
-      duct.transform = { x: 150, y: 250, rotation: 45, scaleX: 1.5, scaleY: 1 };
+	    it('should preserve entity transform in export', () => {
+	      const duct = createMockDuct('duct-1', 'Test Duct');
+	      duct.transform = { x: 150, y: 250, elevation: 0, rotation: 45, scaleX: 1.5, scaleY: 1 };
 
-      createEntity(duct);
-      const projectFile = createProjectFile('Test', {
-        byId: { 'duct-1': duct },
+	      createEntity(duct);
+	      const projectFile = createProjectFile('Test', {
+	        byId: { 'duct-1': duct },
         allIds: ['duct-1'],
       });
 

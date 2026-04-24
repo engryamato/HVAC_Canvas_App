@@ -47,6 +47,7 @@ export function createNote(
     transform: {
       x: overrides?.x ?? 0,
       y: overrides?.y ?? 0,
+      elevation: 0,
       rotation: 0,
       scaleX: 1,
       scaleY: 1,

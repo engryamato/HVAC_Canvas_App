@@ -42,7 +42,7 @@ const createMockProject = (): ProjectFile => ({
       'room-1': {
         id: 'room-1',
         type: 'room',
-        transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 0,
         createdAt: '2025-01-01T00:00:00.000Z',
         modifiedAt: '2025-01-01T00:00:00.000Z',
@@ -59,12 +59,13 @@ const createMockProject = (): ProjectFile => ({
       'duct-1': {
         id: 'duct-1',
         type: 'duct',
-        transform: { x: 100, y: 100, rotation: 45, scaleX: 1, scaleY: 1 },
+        transform: { x: 100, y: 100, elevation: 0, rotation: 45, scaleX: 1, scaleY: 1 },
         zIndex: 5,
         createdAt: '2025-01-01T00:00:00.000Z',
         modifiedAt: '2025-01-01T00:00:00.000Z',
         props: {
           name: 'Main Duct',
+          engineeringSystem: 'standard_duct',
           shape: 'rectangular',
           length: 120,
           width: 12,
@@ -78,12 +79,13 @@ const createMockProject = (): ProjectFile => ({
       'equipment-1': {
         id: 'equipment-1',
         type: 'equipment',
-        transform: { x: 200, y: 200, rotation: 0, scaleX: 1, scaleY: 1 },
+        transform: { x: 200, y: 200, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
         zIndex: 5,
         createdAt: '2025-01-01T00:00:00.000Z',
         modifiedAt: '2025-01-01T00:00:00.000Z',
         props: {
           name: 'Supply Fan',
+          engineeringSystem: 'standard_duct',
           equipmentType: 'fan',
           width: 24,
           depth: 24,

@@ -29,6 +29,12 @@ vi.mock('@/core/persistence/ProjectRepository', () => ({
   ),
 }));
 
+vi.mock('@/core/services/StorageRootService', () => ({
+  ensureStorageRootReady: vi.fn(() =>
+    Promise.resolve({ success: true, path: 'indexeddb://documents/SizeWise', migrationRan: false })
+  ),
+}));
+
 vi.mock('@/core/schema/project-file.schema', () => ({
   createEmptyProject: (name: string) => ({
     projectId: '',

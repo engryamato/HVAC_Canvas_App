@@ -321,12 +321,10 @@ function createSupportEntity(
   return entity;
 }
 
-export function isSupportToolEntry(entry: UnifiedComponentDefinition | null | undefined): boolean {
-  return Boolean(
-    entry &&
-      entry.engineeringSystem === 'universal' &&
-      entry.categoryId === UNIVERSAL_CATEGORY_ID
-  );
+export function isSupportToolEntry(
+  entry: UnifiedComponentDefinition | null | undefined
+): entry is UnifiedComponentDefinition {
+  return Boolean(entry && entry.engineeringSystem === 'universal' && entry.categoryId === UNIVERSAL_CATEGORY_ID);
 }
 
 export function getSupportPreviewModeForEntry(
@@ -395,10 +393,10 @@ export function getNearestSupportAnchor(point: Point, ductId?: string): SupportD
 
   let closest: (SupportDraftAnchor & { distance: number }) | null = null;
 
-  geometries.forEach((geometry) => {
+  for (const geometry of geometries) {
     const projection = projectPointOnSegment(point, geometry.start, geometry.end);
     if (projection.distance > SUPPORT_SNAP_TOLERANCE) {
-      return;
+      continue;
     }
 
     if (!closest || projection.distance < closest.distance) {
@@ -411,17 +409,19 @@ export function getNearestSupportAnchor(point: Point, ductId?: string): SupportD
         distance: projection.distance,
       };
     }
-  });
+  }
 
-  return closest
-    ? {
-        ductId: closest.ductId,
-        x: closest.x,
-        y: closest.y,
-        rotation: closest.rotation,
-        positionRatio: closest.positionRatio,
-      }
-    : null;
+  if (!closest) {
+    return null;
+  }
+
+  return {
+    ductId: closest.ductId,
+    x: closest.x,
+    y: closest.y,
+    rotation: closest.rotation,
+    positionRatio: closest.positionRatio,
+  };
 }
 
 export function projectPointToDuct(point: Point, ductId: string): SupportDraftAnchor | null {

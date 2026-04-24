@@ -175,6 +175,11 @@ export class SupportTool extends BaseTool {
     }
 
     if (this.state.currentPoint && previewMode === null) {
+      if (!activeEntry) {
+        ctx.restore();
+        return;
+      }
+
       ctx.translate(this.state.currentPoint.x, this.state.currentPoint.y);
       ctx.rotate((this.state.hoverAnchor?.rotation ?? 0) * Math.PI / 180);
       ctx.fillStyle = 'rgba(15, 118, 110, 0.16)';

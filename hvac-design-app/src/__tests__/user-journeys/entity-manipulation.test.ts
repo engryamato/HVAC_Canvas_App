@@ -717,19 +717,19 @@ describe('Entity Manipulation User Journey', () => {
       });
     });
 
-    describe('Fitting Property Updates', () => {
-      it('should update fitting type', () => {
-        const fitting = createMockFitting('fit-1');
-        createEntity(fitting);
+	    describe('Fitting Property Updates', () => {
+	      it('should update fitting type', () => {
+	        const fitting = createMockFitting('fit-1');
+	        createEntity(fitting);
 
-        const updated: Fitting = {
-          ...fitting,
-          props: { fittingType: 'tee' },
-        };
-        updateEntity(updated);
+	        const updated: Fitting = {
+	          ...fitting,
+	          props: { ...fitting.props, fittingType: 'tee' },
+	        };
+	        updateEntity(updated);
 
-        expect((selectEntity('fit-1') as Fitting).props.fittingType).toBe('tee');
-      });
+	        expect((selectEntity('fit-1') as Fitting).props.fittingType).toBe('tee');
+	      });
 
       it('should update fitting angle', () => {
         const fitting = createMockFitting('fit-1');

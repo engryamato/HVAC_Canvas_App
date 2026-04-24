@@ -68,6 +68,7 @@ const estimate: ProjectCostEstimate = {
   items: [],
   generatedAt: new Date('2026-01-01T00:00:00.000Z'),
   settings,
+  method: 'unit',
   breakdown: {
     materialCost: 150,
     laborCost: 75,

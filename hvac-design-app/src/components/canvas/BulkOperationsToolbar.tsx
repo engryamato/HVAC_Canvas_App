@@ -1,11 +1,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Layers, Zap, Trash2, Check } from 'lucide-react';
+import { Layers, Zap, Trash2 } from 'lucide-react';
 
 interface BulkOperationsToolbarProps {
   selectedCount: number;
