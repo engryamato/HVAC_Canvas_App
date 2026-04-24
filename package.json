@@ -3,7 +3,7 @@
     "@genkit-ai/mcp": "^1.28.0"
   },
   "devDependencies": {
-    "@chromatic-com/playwright": "^0.12.8",
+    "@chromatic-com/playwright": "^0.13.1",
     "chromatic": "^15.0.0"
   }
 }
