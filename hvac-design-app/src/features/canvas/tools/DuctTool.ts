@@ -19,7 +19,7 @@ import {
 import { useToolStore } from '@/core/store/canvas.store';
 import { ConnectionDetectionService } from '@/core/services/connectionDetection';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
-import type { Entity, Fitting, Duct } from '@/core/schema';
+import type { Entity, Fitting } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import { adaptComponentToService, getServiceColor } from '@/core/services/componentServiceInterop';
@@ -29,6 +29,11 @@ import {
   type PlacementPreviewDecoration,
   type PlacementContext,
 } from './placementStrategies';
+import {
+  magneticConnectionService,
+  type MagneticSnapResult,
+} from '../services/magneticConnectionService';
+import { splitDuctRunAtPoint } from '@/core/commands/entityCommands';
 
 /**
  * Minimum duct length in pixels.
@@ -39,21 +44,12 @@ const MIN_DUCT_LENGTH = feetToPixels(1); // 1 foot minimum for usability
 /**
  * Snap tolerance for magnetic endpoints (pixels)
  */
-const SNAP_TOLERANCE = feetToPixels(1);
-
-interface SnapTarget {
-  ductId: string;
-  endPoint: 'start' | 'end';
-  x: number;
-  y: number;
-  angle: number;
-}
-
 interface DuctToolState {
   mode: 'idle' | 'placing_end';
   startPoint: { x: number; y: number } | null;
   currentPoint: { x: number; y: number } | null;
-  snapTarget: SnapTarget | null;
+  startSnapTarget: MagneticSnapResult | null;
+  snapTarget: MagneticSnapResult | null;
 }
 
 /**
@@ -84,6 +80,7 @@ export class DuctTool extends BaseTool {
     mode: 'idle',
     startPoint: null,
     currentPoint: null,
+    startSnapTarget: null,
     snapTarget: null,
   };
 
@@ -108,23 +105,25 @@ export class DuctTool extends BaseTool {
       // First click: set start point — prefer magnetic snap over grid snap
       const magneticSnap = this.state.snapTarget;
       const startPoint = magneticSnap
-        ? { x: magneticSnap.x, y: magneticSnap.y }
+        ? { x: magneticSnap.point.x, y: magneticSnap.point.y }
         : this.snapToGrid(event.x, event.y);
       this.state = {
         mode: 'placing_end',
         startPoint,
         currentPoint: startPoint,
+        startSnapTarget: magneticSnap,
         snapTarget: null,
       };
     } else if (this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
       // Second click: place the duct and chain — end point becomes next start point
       const endPoint = this.state.currentPoint;
-      this.createDuctEntity(this.state.startPoint, endPoint);
+      this.createDuctEntity(this.state.startPoint, endPoint, this.state.startSnapTarget, this.state.snapTarget);
       // Chain: keep placing_end with end as the new start
       this.state = {
         mode: 'placing_end',
         startPoint: endPoint,
         currentPoint: endPoint,
+        startSnapTarget: this.state.snapTarget,
         snapTarget: null,
       };
     }
@@ -138,12 +137,12 @@ export class DuctTool extends BaseTool {
       // Update snap target so the hover indicator renders and onMouseDown can use it
       this.state.snapTarget = snapResult;
       this.state.currentPoint = snapResult
-        ? { x: snapResult.x, y: snapResult.y }
+        ? { x: snapResult.point.x, y: snapResult.point.y }
         : null;
     } else if (this.state.mode === 'placing_end') {
       if (snapResult) {
         // Snap to endpoint
-        this.state.currentPoint = { x: snapResult.x, y: snapResult.y };
+        this.state.currentPoint = { x: snapResult.point.x, y: snapResult.point.y };
         this.state.snapTarget = snapResult;
       } else {
         // Normal grid snap
@@ -180,12 +179,21 @@ export class DuctTool extends BaseTool {
     if (this.state.mode === 'idle') {
       if (this.state.snapTarget && this.state.currentPoint) {
         ctx.save();
-        ctx.strokeStyle = '#2196F3';
+        ctx.strokeStyle = this.state.snapTarget.snapType === 'duct_body' ? '#7B1FA2' : '#2196F3';
         ctx.lineWidth = 2 / zoom;
         ctx.setLineDash([]);
-        ctx.beginPath();
-        ctx.arc(this.state.currentPoint.x, this.state.currentPoint.y, 8 / zoom, 0, Math.PI * 2);
-        ctx.stroke();
+        if (this.state.snapTarget.snapType === 'duct_body') {
+          ctx.strokeRect(
+            this.state.currentPoint.x - 6 / zoom,
+            this.state.currentPoint.y - 6 / zoom,
+            12 / zoom,
+            12 / zoom
+          );
+        } else {
+          ctx.beginPath();
+          ctx.arc(this.state.currentPoint.x, this.state.currentPoint.y, 8 / zoom, 0, Math.PI * 2);
+          ctx.stroke();
+        }
         ctx.restore();
       }
       return;
@@ -204,12 +212,22 @@ export class DuctTool extends BaseTool {
       activeComponent?.engineeringSystem === 'universal'
         ? 'standard_duct'
         : activeComponent?.engineeringSystem ?? 'standard_duct';
+    const placementSnapTarget =
+      snapTarget?.ductId && snapTarget.endPoint
+        ? {
+            ductId: snapTarget.ductId,
+            endPoint: snapTarget.endPoint,
+            x: snapTarget.point.x,
+            y: snapTarget.point.y,
+            angle: snapTarget.angle ?? 0,
+          }
+        : null;
     const placementContext: PlacementContext = {
       engineeringSystem: activeEngineeringSystem,
       specialtyToolId: useToolStore.getState().activeSpecialtyToolId,
       startPoint,
       endPoint: currentPoint,
-      snapTarget,
+      snapTarget: placementSnapTarget,
     };
     const previewStyle: PlacementPreviewDecoration =
       placementStrategy.augmentPreview?.(placementContext) ??
@@ -218,7 +236,10 @@ export class DuctTool extends BaseTool {
     const snapBehavior = placementStrategy.resolveSnapBehavior?.(placementContext) ?? null;
     const strategyWarnings = placementStrategy.validatePlacement?.(placementContext) ?? [];
     const previewLabel = previewStyle.label ?? snapBehavior?.label ?? strategyWarnings[0] ?? '';
+    const effectivePreviewLabel =
+      snapTarget?.snapType === 'duct_body' ? 'Split + auto-tee' : previewLabel;
     const ghostFittingType =
+      (snapTarget?.snapType === 'duct_body' ? 'tee' : null) ??
       snapBehavior?.ghostFittingType ??
       placementStrategy.getGhostFittingType?.(placementContext) ??
       null;
@@ -265,7 +286,7 @@ export class DuctTool extends BaseTool {
     ctx.textBaseline = 'bottom';
     const snapHint = isSnapped ? ' [SNAP]' : '';
     ctx.fillText(
-      `${lengthFt}' ${warningMessage}${snapHint}${previewLabel ? ` • ${previewLabel}` : ''}`,
+      `${lengthFt}' ${warningMessage}${snapHint}${effectivePreviewLabel ? ` • ${effectivePreviewLabel}` : ''}`,
       midX,
       midY - 8 / zoom
     );
@@ -281,7 +302,7 @@ export class DuctTool extends BaseTool {
 
     // Draw Ghost Fitting Preview when snapped
     if (isSnapped && snapTarget && isValid) {
-      this.renderGhostFitting(ctx, zoom, snapTarget, currentPoint, startPoint, ghostFittingType, previewLabel);
+      this.renderGhostFitting(ctx, zoom, snapTarget, currentPoint, startPoint, ghostFittingType, effectivePreviewLabel);
     }
 
     ctx.restore();
@@ -293,7 +314,7 @@ export class DuctTool extends BaseTool {
   private renderGhostFitting(
     ctx: CanvasRenderingContext2D,
     zoom: number,
-    snapTarget: SnapTarget,
+    snapTarget: MagneticSnapResult,
     connectionPoint: { x: number; y: number },
     newDuctStart: { x: number; y: number },
     fittingType: string | null,
@@ -305,10 +326,29 @@ export class DuctTool extends BaseTool {
       connectionPoint.x - newDuctStart.x
     ) * (180 / Math.PI);
     
-    const angleDiff = Math.abs(newDuctAngle - snapTarget.angle) % 360;
+    const baseAngle = snapTarget.angle ?? 0;
+    const angleDiff = Math.abs(newDuctAngle - baseAngle) % 360;
     const normalizedAngle = angleDiff > 180 ? 360 - angleDiff : angleDiff;
 
     // Determine fitting type based on angle
+    if (snapTarget.snapType === 'duct_body') {
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = '#7B1FA2';
+      ctx.lineWidth = 8 / zoom;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(connectionPoint.x, connectionPoint.y, 10 / zoom, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.font = `${10 / zoom}px sans-serif`;
+      ctx.fillStyle = '#7B1FA2';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(labelHint ?? fittingType ?? 'Tee', connectionPoint.x, connectionPoint.y - 18 / zoom);
+      ctx.restore();
+      return;
+    }
+
     const isStraight = normalizedAngle <= 15 || normalizedAngle >= 165;
     const isElbow = !isStraight && (Math.abs(normalizedAngle - 90) <= 20 || Math.abs(normalizedAngle - 45) <= 20);
 
@@ -326,7 +366,7 @@ export class DuctTool extends BaseTool {
     if (isElbow) {
       // Draw elbow arc
       const radius = 24 / zoom;
-      const startAngle = (snapTarget.angle * Math.PI) / 180;
+      const startAngle = (baseAngle * Math.PI) / 180;
       const endAngle = (newDuctAngle * Math.PI) / 180;
 
       ctx.beginPath();
@@ -352,6 +392,7 @@ export class DuctTool extends BaseTool {
       mode: 'idle',
       startPoint: null,
       currentPoint: null,
+      startSnapTarget: null,
       snapTarget: null,
     };
   }
@@ -372,62 +413,17 @@ export class DuctTool extends BaseTool {
   /**
    * Find nearby duct endpoint within snap tolerance
    */
-  private findSnapPoint(x: number, y: number): SnapTarget | null {
+  private findSnapPoint(x: number, y: number): MagneticSnapResult | null {
     const entities = useEntityStore.getState().byId as Record<string, Entity>;
-    const ducts = Object.values(entities).filter(
-      (entity): entity is Duct => entity.type === 'duct'
-    );
-
-    let closestSnap: SnapTarget | null = null;
-    let closestDistance = SNAP_TOLERANCE;
-
-    for (const duct of ducts) {
-      const endpoints = this.getDuctEndpointsForSnap(duct);
-      
-      for (const endpoint of endpoints) {
-        const dx = endpoint.x - x;
-        const dy = endpoint.y - y;
-        const distance = Math.hypot(dx, dy);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestSnap = endpoint;
-        }
-      }
-    }
-
-    return closestSnap;
+    return magneticConnectionService.resolveSnapTarget(x, y, entities);
   }
 
-  /**
-   * Get duct endpoints for snapping calculations
-   */
-  private getDuctEndpointsForSnap(duct: Duct): SnapTarget[] {
-    const { x, y, rotation } = duct.transform;
-    const lengthPixels = feetToPixels(duct.props.length);
-    const radians = (rotation * Math.PI) / 180;
-    const endX = x + lengthPixels * Math.cos(radians);
-    const endY = y + lengthPixels * Math.sin(radians);
-
-    return [
-      {
-        ductId: duct.id,
-        endPoint: 'start',
-        x,
-        y,
-        angle: rotation,
-      },
-      {
-        ductId: duct.id,
-        endPoint: 'end',
-        x: endX,
-        y: endY,
-        angle: rotation,
-      },
-    ];
-  }
-
-  private createDuctEntity(start: { x: number; y: number }, end: { x: number; y: number }): void {
+  private createDuctEntity(
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    startSnapTarget: MagneticSnapResult | null,
+    endSnapTarget: MagneticSnapResult | null
+  ): void {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const lengthPixels = Math.hypot(dx, dy);
@@ -488,6 +484,46 @@ export class DuctTool extends BaseTool {
     const duct = createDuct(ductProps);
     Object.assign(duct.props, strategyOverrides);
     duct.transform.rotation = rotation;
+
+    const bodySnapTarget =
+      endSnapTarget?.snapType === 'duct_body'
+        ? endSnapTarget
+        : startSnapTarget?.snapType === 'duct_body'
+          ? startSnapTarget
+          : null;
+
+    if (bodySnapTarget?.ductId) {
+      const splitPoint =
+        endSnapTarget?.snapType === 'duct_body'
+          ? end
+          : start;
+      const branchDuct =
+        endSnapTarget?.snapType === 'duct_body'
+          ? duct
+          : (() => {
+              duct.transform.x = splitPoint.x;
+              duct.transform.y = splitPoint.y;
+              duct.props.length = pixelsToFeet(lengthPixels);
+              return duct;
+            })();
+
+      const branchStart = endSnapTarget?.snapType === 'duct_body' ? start : end;
+      const branchEnd = splitPoint;
+      const branchDx = branchEnd.x - branchStart.x;
+      const branchDy = branchEnd.y - branchStart.y;
+      branchDuct.transform.x = branchStart.x;
+      branchDuct.transform.y = branchStart.y;
+      branchDuct.transform.rotation = Math.atan2(branchDy, branchDx) * (180 / Math.PI);
+      branchDuct.props.length = pixelsToFeet(Math.hypot(branchDx, branchDy));
+
+      splitDuctRunAtPoint({
+        originalDuctId: bodySnapTarget.ductId,
+        splitPoint,
+        branchDuct,
+        selectionAfter: [branchDuct.id],
+      });
+      return;
+    }
 
     createEntity(duct);
     validateAndRecord(duct.id);

@@ -13,7 +13,7 @@ function createMockDuct(
   return {
     id,
     type: 'duct',
-    transform: { x, y, rotation, scaleX: 1, scaleY: 1 },
+    transform: { x, y, elevation: 0, rotation, scaleX: 1, scaleY: 1 },
     zIndex: 5,
     createdAt: '2026-01-01T00:00:00.000Z',
     modifiedAt: '2026-01-01T00:00:00.000Z',

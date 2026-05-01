@@ -19,6 +19,8 @@ import {
   calculateEquipmentRuntime,
   calculateFittingRuntime,
 } from '@/core/services/calculations/entityCalculationRuntime';
+import { createDuct } from '@/features/canvas/entities/ductDefaults';
+import { feetToPixels } from '@/core/constants/coordinates';
 
 interface CommandOptions {
   selectionBefore?: string[];
@@ -34,6 +36,22 @@ interface TransformChange {
 interface TransformCommandPayload {
   transforms: Array<{ id: string; transform: Entity['transform'] }>;
   selection?: string[];
+}
+
+interface EntityReplacementPayload {
+  createEntities: Entity[];
+  removeEntityIds: string[];
+  selection?: string[];
+}
+
+interface SplitDuctRunOptions extends CommandOptions {
+  selectionAfter?: string[];
+}
+
+interface SplitDuctRunParams extends SplitDuctRunOptions {
+  originalDuctId: string;
+  splitPoint: { x: number; y: number };
+  branchDuct: Duct;
 }
 
 function captureSelection(options?: CommandOptions): { before: string[]; after: string[] } {
@@ -58,6 +76,157 @@ function applySelection(selection?: string[]): void {
 function executeAndRecord(command: ReversibleCommand): void {
   executeCommand(command);
   useHistoryStore.getState().push(command);
+}
+
+function buildReplacementCommand(
+  type: typeof CommandType.SPLIT_DUCT_RUN | typeof CommandType.MERGE_DUCT_RUNS,
+  createEntities: Entity[],
+  removeEntities: Entity[],
+  selectionBefore: string[],
+  selectionAfter: string[]
+): ReversibleCommand {
+  return {
+    id: generateCommandId(),
+    type,
+    payload: {
+      createEntities,
+      removeEntityIds: removeEntities.map((entity) => entity.id),
+      selection: selectionAfter,
+    } satisfies EntityReplacementPayload,
+    timestamp: Date.now(),
+    inverse: {
+      id: generateCommandId(),
+      type: type === CommandType.SPLIT_DUCT_RUN ? CommandType.MERGE_DUCT_RUNS : CommandType.SPLIT_DUCT_RUN,
+      payload: {
+        createEntities: removeEntities,
+        removeEntityIds: createEntities.map((entity) => entity.id),
+        selection: selectionBefore,
+      } satisfies EntityReplacementPayload,
+      timestamp: Date.now(),
+    },
+    selectionBefore,
+    selectionAfter,
+  };
+}
+
+function applyEntityReplacement(payload: EntityReplacementPayload): void {
+  const entityStore = useEntityStore.getState();
+
+  if (payload.removeEntityIds.length > 0) {
+    entityStore.removeEntities(payload.removeEntityIds);
+    payload.removeEntityIds.forEach((id) => useValidationStore.getState().clearValidation(id));
+  }
+
+  if (payload.createEntities.length > 0) {
+    entityStore.addEntities(payload.createEntities);
+    payload.createEntities.forEach((entity) => syncEntityValidation(entity));
+  }
+
+  applySelection(payload.selection);
+}
+
+function cloneDuctWithNewGeometry(
+  source: Duct,
+  overrides: {
+    x: number;
+    y: number;
+    lengthFeet: number;
+    connectedFrom?: string;
+    connectedTo?: string;
+  }
+): Duct {
+  const now = new Date().toISOString();
+  const duct = createDuct({
+    ...source.props,
+    x: overrides.x,
+    y: overrides.y,
+    length: overrides.lengthFeet,
+  });
+
+  duct.props = {
+    ...JSON.parse(JSON.stringify(source.props)),
+    length: overrides.lengthFeet,
+    connectedFrom: overrides.connectedFrom,
+    connectedTo: overrides.connectedTo,
+  };
+  duct.transform = {
+    ...source.transform,
+    x: overrides.x,
+    y: overrides.y,
+  };
+  duct.createdAt = now;
+  duct.modifiedAt = now;
+
+  return duct;
+}
+
+export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
+  const entities = useEntityStore.getState().byId as Record<string, Entity>;
+  const original = entities[params.originalDuctId];
+  if (!original || original.type !== 'duct') {
+    return false;
+  }
+
+  const startPoint = { x: original.transform.x, y: original.transform.y };
+  const dx = params.splitPoint.x - startPoint.x;
+  const dy = params.splitPoint.y - startPoint.y;
+  const splitLengthPixels = Math.hypot(dx, dy);
+  const totalLengthFeet = original.props.length;
+  const totalLengthPixels = feetToPixels(totalLengthFeet);
+  if (totalLengthFeet <= 0) {
+    return false;
+  }
+
+  const splitRatio = splitLengthPixels / totalLengthPixels;
+  if (splitRatio <= 0 || splitRatio >= 1) {
+    return false;
+  }
+
+  const upstreamLengthFeet = totalLengthFeet * splitRatio;
+  const downstreamLengthFeet = totalLengthFeet - upstreamLengthFeet;
+  if (upstreamLengthFeet <= 0 || downstreamLengthFeet <= 0) {
+    return false;
+  }
+
+  const upstream = cloneDuctWithNewGeometry(original, {
+    x: original.transform.x,
+    y: original.transform.y,
+    lengthFeet: upstreamLengthFeet,
+    connectedFrom: original.props.connectedFrom,
+    connectedTo: undefined,
+  });
+  const downstream = cloneDuctWithNewGeometry(original, {
+    x: params.splitPoint.x,
+    y: params.splitPoint.y,
+    lengthFeet: downstreamLengthFeet,
+    connectedFrom: undefined,
+    connectedTo: original.props.connectedTo,
+  });
+
+  const branch = params.branchDuct;
+  const workingEntities: Record<string, Entity> = {
+    ...entities,
+    [upstream.id]: upstream,
+    [downstream.id]: downstream,
+    [branch.id]: branch,
+  };
+  delete workingEntities[original.id];
+
+  const insertionPlan = fittingInsertionService.planAutoInsertForDuct(branch.id, workingEntities);
+  const createEntities = [upstream, downstream, branch, ...insertionPlan.insertions];
+  const removeEntities = [original];
+  const selection = captureSelection(params);
+  const nextSelection = params.selectionAfter ?? [branch.id];
+  const command = buildReplacementCommand(
+    CommandType.SPLIT_DUCT_RUN,
+    createEntities,
+    removeEntities,
+    selection.before,
+    nextSelection
+  );
+
+  executeAndRecord(command);
+  return true;
 }
 
 let isApplyingValidationMutation = false;
@@ -723,6 +892,11 @@ function executeCommand(command: Command): void {
       applySelection(selection);
       break;
     }
+
+    case CommandType.SPLIT_DUCT_RUN:
+    case CommandType.MERGE_DUCT_RUNS:
+      applyEntityReplacement(command.payload as EntityReplacementPayload);
+      break;
 
     case CommandType.MOVE_ENTITY:
     case CommandType.MOVE_ENTITIES: {

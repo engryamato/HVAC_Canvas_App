@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createEntity, updateEntity, updateEntities, deleteEntity, undo, redo } from '../entityCommands';
+import { createEntity, updateEntity, updateEntities, deleteEntity, undo, redo, splitDuctRunAtPoint } from '../entityCommands';
 import { useEntityStore, selectEntity, selectEntityCount } from '@/core/store/entityStore';
 import { useHistoryStore } from '../historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import type { Duct, Fitting, Room } from '@/core/schema';
+import { createDuct } from '@/features/canvas/entities/ductDefaults';
 
 const createMockRoom = (id: string, name: string): Room => ({
   id,
@@ -149,6 +150,70 @@ describe('Entity Commands', () => {
       const revertedFitting = selectEntity(fitting.id) as Fitting;
       expect(revertedDuct.props.diameter).toBe(12);
       expect(revertedFitting.calculated.equivalentLength).toBe(30);
+    });
+  });
+
+  describe('splitDuctRunAtPoint', () => {
+    it('splits a duct, inserts a tee through the existing fitter, and undoes atomically', () => {
+      const trunk: Duct = {
+        id: 'duct-trunk',
+        type: 'duct',
+        transform: { x: 100, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+        zIndex: 1,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        modifiedAt: '2025-01-01T00:00:00.000Z',
+        props: {
+          name: 'Trunk',
+          engineeringSystem: 'standard_duct',
+          shape: 'round',
+          diameter: 12,
+          length: 10,
+          material: 'galvanized',
+          airflow: 1000,
+          staticPressure: 0.1,
+        },
+        calculated: { area: 113.1, velocity: 1273, frictionLoss: 0.03 },
+      };
+      const branch = createDuct({
+        x: 160,
+        y: 220,
+        length: 10,
+        shape: 'round',
+        diameter: 12,
+        material: 'galvanized',
+        airflow: 0,
+        staticPressure: 0.1,
+        engineeringSystem: 'standard_duct',
+      });
+      branch.transform.rotation = -90;
+
+      createEntity(trunk);
+      useHistoryStore.getState().clear();
+
+      const result = splitDuctRunAtPoint({
+        originalDuctId: trunk.id,
+        splitPoint: { x: 160, y: 100 },
+        branchDuct: branch,
+      });
+
+      expect(result).toBe(true);
+      expect(useHistoryStore.getState().past).toHaveLength(1);
+
+      const entities = useEntityStore.getState().allIds.map((id) => useEntityStore.getState().byId[id]);
+      const ducts = entities.filter((entity): entity is Duct => entity?.type === 'duct');
+      const fittings = entities.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      expect(ducts).toHaveLength(3);
+      expect(fittings).toHaveLength(1);
+      expect(fittings[0]?.props.fittingType).toBe('tee');
+
+      undo();
+
+      const entitiesAfterUndo = useEntityStore.getState().allIds.map((id) => useEntityStore.getState().byId[id]);
+      const ductsAfterUndo = entitiesAfterUndo.filter((entity): entity is Duct => entity?.type === 'duct');
+      const fittingsAfterUndo = entitiesAfterUndo.filter((entity): entity is Fitting => entity?.type === 'fitting');
+      expect(ductsAfterUndo).toHaveLength(1);
+      expect(ductsAfterUndo[0]?.id).toBe(trunk.id);
+      expect(fittingsAfterUndo).toHaveLength(0);
     });
   });
 
