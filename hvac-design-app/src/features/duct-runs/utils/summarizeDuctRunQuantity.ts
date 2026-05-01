@@ -1,16 +1,13 @@
-import type { DuctShape } from '@/core/schema/duct.schema';
-import type { EngineeringSystem } from '@/core/schema/unified-component.schema';
+import type {
+  DuctRunFamily,
+  DuctRunShape,
+  DuctSegment,
+} from '@/core/schema/duct-run.schema';
 
-export type DuctRunShape = DuctShape | 'flat_oval' | 'flexible';
-export type DuctRunFamily = Exclude<EngineeringSystem, 'universal'>;
-
-export interface DuctRunSegmentSummarySource {
-  index: number;
-  length: number;
-  isPartial: boolean;
-  startStation?: number;
-  endStation?: number;
-}
+export type DuctRunSegmentSummarySource = Pick<
+  DuctSegment,
+  'index' | 'length' | 'isPartial' | 'startStation' | 'endStation'
+>;
 
 interface BaseDuctRunQuantitySource {
   shape: DuctRunShape;
