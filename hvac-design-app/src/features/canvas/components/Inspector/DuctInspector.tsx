@@ -653,7 +653,7 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
             <div className="grid grid-cols-3 gap-2">
               <ReadOnlyField label="Area" value={`${displayArea.toFixed(2)} sq in`} />
               <ReadOnlyField label="Velocity" value={`${displayVelocity.toFixed(0)} FPM`} />
-              <ReadOnlyField label="Pressure Drop" value={`${displayFrictionLoss.toFixed(4)} in.w.g./100ft`} />
+              <ReadOnlyField label="Pressure Drop (per 100 ft)" value={`${displayFrictionLoss.toFixed(4)} in.w.g./100ft`} />
             </div>
           </div>
         </div>

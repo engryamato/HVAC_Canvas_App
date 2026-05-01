@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MagneticConnectionService } from '../magneticConnectionService';
 import type { Duct, Entity, Equipment, Fitting } from '@/core/schema';
+import { createDuctRun } from '../../entities/ductRunDefaults';
 
 function createDuct(id: string, x: number, y: number, rotation: number, length = 10): Duct {
   return {
@@ -68,6 +69,15 @@ function createEquipment(id: string, x: number, y: number): Equipment {
   };
 }
 
+function createRun(id: string, x: number, y: number, rotation: number, installLength = 10) {
+  const run = createDuctRun({ x, y, installLength, sectionLengthOverride: 5 });
+  run.id = id;
+  run.transform.rotation = rotation;
+  run.props.startPoint = { x, y };
+  run.props.endPoint = { x: x + installLength * 12, y };
+  return run;
+}
+
 describe('MagneticConnectionService', () => {
   it('prefers duct endpoints over duct-body projections near a run end', () => {
     const entities: Record<string, Entity> = {
@@ -91,6 +101,21 @@ describe('MagneticConnectionService', () => {
     expect(result?.ductId).toBe('duct');
     expect(result?.point.x).toBeCloseTo(160, 3);
     expect(result?.point.y).toBeCloseTo(100, 3);
+  });
+
+  it('resolves duct_run endpoints and mid-run body projections', () => {
+    const entities: Record<string, Entity> = {
+      run: createRun('run', 100, 100, 0, 10),
+    };
+
+    const endpointResult = MagneticConnectionService.resolveSnapTarget(101, 100, entities);
+    const bodyResult = MagneticConnectionService.resolveSnapTarget(160, 104, entities);
+
+    expect(endpointResult?.snapType).toBe('duct_endpoint');
+    expect(endpointResult?.entityType).toBe('duct_run');
+    expect(bodyResult?.snapType).toBe('duct_body');
+    expect(bodyResult?.ductId).toBe('run');
+    expect(bodyResult?.entityType).toBe('duct_run');
   });
 
   it('uses the documented snap priority across endpoints, fitting ports, and equipment points', () => {

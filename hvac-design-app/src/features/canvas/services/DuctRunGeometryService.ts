@@ -11,7 +11,21 @@ export type DuctRunSegmentGeometry = {
   segment: DuctSegment;
   start: Point;
   end: Point;
+  center: Point;
+  polygon: [Point, Point, Point, Point];
   bounds: Bounds;
+};
+
+export type DuctRunWall = {
+  side: 'left' | 'right';
+  start: Point;
+  end: Point;
+};
+
+export type DuctRunCenterline = {
+  start: Point;
+  end: Point;
+  midpoint: Point;
 };
 
 export type DuctRunGeometry = {
@@ -21,14 +35,18 @@ export type DuctRunGeometry = {
   normal: Point;
   lengthPx: number;
   thicknessPx: number;
+  centerline: DuctRunCenterline;
+  walls: [DuctRunWall, DuctRunWall];
   corners: [Point, Point, Point, Point];
   hitBounds: Bounds;
   labelAnchor: Point;
+  segmentPlanes: DuctRunSegmentGeometry[];
   segmentGeometries: DuctRunSegmentGeometry[];
 };
 
 export class DuctRunGeometryService {
   private static cache = new Map<string, DuctRunGeometry>();
+  private static cacheKeysByRunId = new Map<string, Set<string>>();
 
   static getGeometry(run: DuctRun): DuctRunGeometry {
     const key = JSON.stringify({
@@ -49,6 +67,9 @@ export class DuctRunGeometryService {
 
     const geometry = this.buildGeometry(run);
     this.cache.set(key, geometry);
+    const cacheKeys = this.cacheKeysByRunId.get(run.id) ?? new Set<string>();
+    cacheKeys.add(key);
+    this.cacheKeysByRunId.set(run.id, cacheKeys);
     return geometry;
   }
 
@@ -56,16 +77,44 @@ export class DuctRunGeometryService {
     return this.getGeometry(run).hitBounds;
   }
 
-  static getSegmentIndexAtPoint(run: DuctRun, point: Point): number | null {
+  static hitTestRun(run: DuctRun, point: Point): boolean {
+    const geometry = this.getGeometry(run);
+    return this.pointInRunRect(point, geometry.start, geometry.end, geometry.thicknessPx);
+  }
+
+  static hitTestSegment(run: DuctRun, point: Point): DuctRunSegmentGeometry | null {
     const geometry = this.getGeometry(run);
 
     for (const segmentGeometry of geometry.segmentGeometries) {
       if (this.pointInRunRect(point, segmentGeometry.start, segmentGeometry.end, geometry.thicknessPx)) {
-        return segmentGeometry.segment.index;
+        return segmentGeometry;
       }
     }
 
     return null;
+  }
+
+  static getSegmentIndexAtPoint(run: DuctRun, point: Point): number | null {
+    return this.hitTestSegment(run, point)?.segment.index ?? null;
+  }
+
+  static invalidateRun(run: Pick<DuctRun, 'id'> | string): void {
+    const runId = typeof run === 'string' ? run : run.id;
+    const cacheKeys = this.cacheKeysByRunId.get(runId);
+    if (!cacheKeys) {
+      return;
+    }
+
+    for (const key of cacheKeys) {
+      this.cache.delete(key);
+    }
+
+    this.cacheKeysByRunId.delete(runId);
+  }
+
+  static clearCache(): void {
+    this.cache.clear();
+    this.cacheKeysByRunId.clear();
   }
 
   private static buildGeometry(run: DuctRun): DuctRunGeometry {
@@ -88,6 +137,23 @@ export class DuctRunGeometryService {
     ];
     const hitBounds = this.boundsFromPoints(corners);
     const labelAnchor = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+    const centerline = {
+      start,
+      end,
+      midpoint: labelAnchor,
+    };
+    const walls: [DuctRunWall, DuctRunWall] = [
+      {
+        side: 'left',
+        start: corners[0],
+        end: corners[1],
+      },
+      {
+        side: 'right',
+        start: corners[3],
+        end: corners[2],
+      },
+    ];
     const segmentGeometries = run.props.segments.map((segment) => {
       const segmentStart = {
         x: start.x + direction.x * feetToPixels(segment.startStation),
@@ -97,17 +163,23 @@ export class DuctRunGeometryService {
         x: start.x + direction.x * feetToPixels(segment.endStation),
         y: start.y + direction.y * feetToPixels(segment.endStation),
       };
-      const segmentBounds = this.boundsFromPoints([
+      const polygon: [Point, Point, Point, Point] = [
         this.offsetPoint(segmentStart, normal, halfThickness),
         this.offsetPoint(segmentEnd, normal, halfThickness),
         this.offsetPoint(segmentEnd, normal, -halfThickness),
         this.offsetPoint(segmentStart, normal, -halfThickness),
-      ]);
+      ];
+      const segmentBounds = this.boundsFromPoints(polygon);
 
       return {
         segment,
         start: segmentStart,
         end: segmentEnd,
+        center: {
+          x: (segmentStart.x + segmentEnd.x) / 2,
+          y: (segmentStart.y + segmentEnd.y) / 2,
+        },
+        polygon,
         bounds: segmentBounds,
       };
     });
@@ -119,9 +191,12 @@ export class DuctRunGeometryService {
       normal,
       lengthPx,
       thicknessPx,
+      centerline,
+      walls,
       corners,
       hitBounds,
       labelAnchor,
+      segmentPlanes: segmentGeometries,
       segmentGeometries,
     };
   }

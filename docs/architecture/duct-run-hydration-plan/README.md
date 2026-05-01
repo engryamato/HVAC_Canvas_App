@@ -28,6 +28,7 @@ This folder captures the full DuctRun migration and hydration strategy for the H
 ## Folder Contents
 - `README.md` (this file): architecture decision + implementation scope
 - `PHASE-BY-PHASE.md`: detailed execution phases with acceptance checks
+- `DUCT-RUN-DOMAIN-ACCEPTANCE-GATES.md`: rollout domain gates for CTO, coder, and QA review
 
 ## Key Output Behavior
 - 50 ft run at 5 ft sections -> 10 full sections

@@ -17,6 +17,13 @@ describe('pressure drop calculations', () => {
     expect(loss).toBeLessThan(2);
   });
 
+  it('returns the same per-100-ft pressure drop regardless of run length', () => {
+    const shortRun = calculateFrictionLoss(1500, 12, 10);
+    const longRun = calculateFrictionLoss(1500, 12, 80);
+
+    expect(shortRun).toBe(longRun);
+  });
+
   it('calculates fitting loss', () => {
     expect(calculateFittingLoss(0.4, 30)).toBeCloseTo(0.12, 2);
   });

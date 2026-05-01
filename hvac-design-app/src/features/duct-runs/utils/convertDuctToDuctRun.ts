@@ -55,6 +55,10 @@ export function convertDuctToDuctRun(
 }
 
 export function convertLegacyDuctEntitiesInProject(project: ProjectFile): ProjectFile {
+  if (!project.entities?.byId) {
+    return project;
+  }
+
   const nextById: Record<string, Entity> = { ...project.entities.byId };
   let changed = false;
 

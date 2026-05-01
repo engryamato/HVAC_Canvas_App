@@ -46,8 +46,8 @@ export type ConstraintStatus = z.infer<typeof ConstraintStatusSchema>;
 export const DuctEngineeringDataSchema = z.object({
   airflow: z.number().min(0), // CFM
   velocity: z.number().min(0), // FPM (calculated)
-  pressureDrop: z.number().min(0).describe('Pressure drop / friction rate in in.w.g./100ft'),
-  friction: z.number().min(0).describe('Alias of pressureDrop retained for compatibility'),
+  pressureDrop: z.number().min(0).describe('Stored pressure-drop / friction-rate value in in.w.g./100ft'),
+  friction: z.number().min(0).describe('Compatibility alias of the stored per-100-ft pressure-drop value'),
   equivalentDiameter: z.number().min(0).optional(), // for rectangular ducts
   reynoldsNumber: z.number().optional(),
   systemType: SystemTypeSchema.optional().describe('System bucket used for validation limits'),
@@ -180,7 +180,7 @@ export type DuctProps = z.infer<typeof DuctPropsSchema>;
 export const DuctCalculatedSchema = z.object({
   area: z.number().nonnegative().describe('Cross-sectional area in sq in'),
   velocity: z.number().nonnegative().describe('Air velocity in FPM'),
-  frictionLoss: z.number().nonnegative().describe('Friction loss in in.w.g./100ft'),
+  frictionLoss: z.number().nonnegative().describe('Stored pressure-drop / friction-rate value in in.w.g./100ft'),
 });
 
 export type DuctCalculated = z.infer<typeof DuctCalculatedSchema>;

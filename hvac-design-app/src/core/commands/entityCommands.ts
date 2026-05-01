@@ -1,4 +1,4 @@
-import type { Duct, Entity, Equipment, Fitting, Group } from '@/core/schema';
+import type { Duct, DuctRun, Entity, Equipment, Fitting, Group } from '@/core/schema';
 import type { Command, ReversibleCommand } from './types';
 import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
@@ -20,7 +20,10 @@ import {
   calculateFittingRuntime,
 } from '@/core/services/calculations/entityCalculationRuntime';
 import { createDuct } from '@/features/canvas/entities/ductDefaults';
+import { createDuctRun } from '@/features/canvas/entities/ductRunDefaults';
 import { feetToPixels } from '@/core/constants/coordinates';
+import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
+import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
 
 interface CommandOptions {
   selectionBefore?: string[];
@@ -51,7 +54,7 @@ interface SplitDuctRunOptions extends CommandOptions {
 interface SplitDuctRunParams extends SplitDuctRunOptions {
   originalDuctId: string;
   splitPoint: { x: number; y: number };
-  branchDuct: Duct;
+  branchDuct: Duct | DuctRun;
 }
 
 function captureSelection(options?: CommandOptions): { before: string[]; after: string[] } {
@@ -160,10 +163,67 @@ function cloneDuctWithNewGeometry(
   return duct;
 }
 
+function cloneDuctRunWithNewGeometry(
+  source: DuctRun,
+  overrides: {
+    x: number;
+    y: number;
+    splitPoint?: { x: number; y: number };
+    lengthFeet: number;
+    connectedFrom?: string;
+    connectedTo?: string;
+  }
+): DuctRun {
+  const now = new Date().toISOString();
+  const run = createDuctRun({
+    x: overrides.x,
+    y: overrides.y,
+    shape: source.props.shape,
+    installLength: overrides.lengthFeet,
+    material: source.props.material,
+    airflow: source.props.airflow,
+    staticPressure: source.props.staticPressure,
+    serviceId: source.props.serviceId,
+    catalogItemId: source.props.catalogItemId,
+    engineeringSystem: source.props.engineeringSystem,
+    specialtyToolId: source.props.specialtyToolId,
+    sectionLengthOverride: source.props.sectionLengthOverride,
+    diameter: 'diameter' in source.props ? source.props.diameter : undefined,
+    width: 'width' in source.props ? source.props.width : undefined,
+    height: 'height' in source.props ? source.props.height : undefined,
+  });
+
+  const directionRadians = (source.transform.rotation * Math.PI) / 180;
+  const endPoint = overrides.splitPoint ?? {
+    x: overrides.x + feetToPixels(overrides.lengthFeet) * Math.cos(directionRadians),
+    y: overrides.y + feetToPixels(overrides.lengthFeet) * Math.sin(directionRadians),
+  };
+  const sectionLength = getActiveSectionLength(source);
+
+  run.props = {
+    ...JSON.parse(JSON.stringify(source.props)),
+    installLength: overrides.lengthFeet,
+    startPoint: { x: overrides.x, y: overrides.y },
+    endPoint,
+    connectedFrom: overrides.connectedFrom,
+    connectedTo: overrides.connectedTo,
+    segments: recomputeDuctRunSegments(overrides.lengthFeet, sectionLength),
+  };
+  run.transform = {
+    ...source.transform,
+    x: overrides.x,
+    y: overrides.y,
+  };
+  run.createdAt = now;
+  run.modifiedAt = now;
+
+  return run;
+}
+
 export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
   const entities = useEntityStore.getState().byId as Record<string, Entity>;
   const original = entities[params.originalDuctId];
-  if (!original || original.type !== 'duct') {
+  if (!original || (original.type !== 'duct' && original.type !== 'duct_run')) {
     return false;
   }
 
@@ -171,7 +231,7 @@ export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
   const dx = params.splitPoint.x - startPoint.x;
   const dy = params.splitPoint.y - startPoint.y;
   const splitLengthPixels = Math.hypot(dx, dy);
-  const totalLengthFeet = original.props.length;
+  const totalLengthFeet = original.type === 'duct' ? original.props.length : original.props.installLength;
   const totalLengthPixels = feetToPixels(totalLengthFeet);
   if (totalLengthFeet <= 0) {
     return false;
@@ -188,20 +248,39 @@ export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
     return false;
   }
 
-  const upstream = cloneDuctWithNewGeometry(original, {
-    x: original.transform.x,
-    y: original.transform.y,
-    lengthFeet: upstreamLengthFeet,
-    connectedFrom: original.props.connectedFrom,
-    connectedTo: undefined,
-  });
-  const downstream = cloneDuctWithNewGeometry(original, {
-    x: params.splitPoint.x,
-    y: params.splitPoint.y,
-    lengthFeet: downstreamLengthFeet,
-    connectedFrom: undefined,
-    connectedTo: original.props.connectedTo,
-  });
+  const upstream =
+    original.type === 'duct'
+      ? cloneDuctWithNewGeometry(original, {
+          x: original.transform.x,
+          y: original.transform.y,
+          lengthFeet: upstreamLengthFeet,
+          connectedFrom: original.props.connectedFrom,
+          connectedTo: undefined,
+        })
+      : cloneDuctRunWithNewGeometry(original, {
+          x: original.transform.x,
+          y: original.transform.y,
+          splitPoint: params.splitPoint,
+          lengthFeet: upstreamLengthFeet,
+          connectedFrom: original.props.connectedFrom,
+          connectedTo: undefined,
+        });
+  const downstream =
+    original.type === 'duct'
+      ? cloneDuctWithNewGeometry(original, {
+          x: params.splitPoint.x,
+          y: params.splitPoint.y,
+          lengthFeet: downstreamLengthFeet,
+          connectedFrom: undefined,
+          connectedTo: original.props.connectedTo,
+        })
+      : cloneDuctRunWithNewGeometry(original, {
+          x: params.splitPoint.x,
+          y: params.splitPoint.y,
+          lengthFeet: downstreamLengthFeet,
+          connectedFrom: undefined,
+          connectedTo: original.props.connectedTo,
+        });
 
   const branch = params.branchDuct;
   const workingEntities: Record<string, Entity> = {
@@ -212,7 +291,10 @@ export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
   };
   delete workingEntities[original.id];
 
-  const insertionPlan = fittingInsertionService.planAutoInsertForDuct(branch.id, workingEntities);
+  const insertionPlan =
+    original.type === 'duct' && branch.type === 'duct'
+      ? fittingInsertionService.planAutoInsertForDuct(branch.id, workingEntities)
+      : { insertions: [], orphanFittingIds: [] };
   const createEntities = [upstream, downstream, branch, ...insertionPlan.insertions];
   const removeEntities = [original];
   const selection = captureSelection(params);

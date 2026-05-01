@@ -91,6 +91,13 @@ describe('useCalculations helpers', () => {
     expect(engineeringData.systemType).toBeUndefined();
   });
 
+  it('keeps stored pressure-drop semantics stable across run lengths', () => {
+    const shortRun = calculateDuct(createTestDuct({ length: 10 })).calculated;
+    const longRun = calculateDuct(createTestDuct({ length: 50 })).calculated;
+
+    expect(shortRun.frictionLoss).toBe(longRun.frictionLoss);
+  });
+
   it('builds a valid constraint status from engineering-limit validation', () => {
     const duct = createTestDuct({ systemType: 'return', airflow: 1000 });
     const status = buildConstraintStatus(

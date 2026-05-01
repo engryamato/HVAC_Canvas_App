@@ -3,8 +3,9 @@ import { createEntity, updateEntity, updateEntities, deleteEntity, undo, redo, s
 import { useEntityStore, selectEntity, selectEntityCount } from '@/core/store/entityStore';
 import { useHistoryStore } from '../historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
-import type { Duct, Fitting, Room } from '@/core/schema';
+import type { Duct, DuctRun, Fitting, Room } from '@/core/schema';
 import { createDuct } from '@/features/canvas/entities/ductDefaults';
+import { createDuctRun } from '@/features/canvas/entities/ductRunDefaults';
 
 const createMockRoom = (id: string, name: string): Room => ({
   id,
@@ -214,6 +215,52 @@ describe('Entity Commands', () => {
       expect(ductsAfterUndo).toHaveLength(1);
       expect(ductsAfterUndo[0]?.id).toBe(trunk.id);
       expect(fittingsAfterUndo).toHaveLength(0);
+    });
+
+    it('splits a duct_run into two runs plus the branch and undoes atomically', () => {
+      const trunk = createDuctRun({ x: 100, y: 100, installLength: 10, sectionLengthOverride: 5 });
+      trunk.id = '550e8400-e29b-41d4-a716-446655440010';
+      trunk.props.connectedFrom = '550e8400-e29b-41d4-a716-446655440011';
+      trunk.props.connectedTo = '550e8400-e29b-41d4-a716-446655440012';
+
+      const branch = createDuctRun({ x: 160, y: 100, installLength: 10, sectionLengthOverride: 5 });
+      branch.transform.rotation = 90;
+      branch.props.startPoint = { x: 160, y: 100 };
+      branch.props.endPoint = { x: 160, y: 220 };
+
+      createEntity(trunk);
+      useHistoryStore.getState().clear();
+
+      const result = splitDuctRunAtPoint({
+        originalDuctId: trunk.id,
+        splitPoint: { x: 160, y: 100 },
+        branchDuct: branch,
+      });
+
+      expect(result).toBe(true);
+      expect(useHistoryStore.getState().past).toHaveLength(1);
+
+      const runs = useEntityStore
+        .getState()
+        .allIds.map((id) => useEntityStore.getState().byId[id])
+        .filter((entity): entity is DuctRun => entity?.type === 'duct_run');
+
+      expect(runs).toHaveLength(3);
+      expect(runs.some((run) => run.id === trunk.id)).toBe(false);
+      expect(runs.map((run) => run.props.installLength).sort((a, b) => a - b)).toEqual([5, 5, 10]);
+
+      const splitRuns = runs.filter((run) => run.id !== branch.id).sort((a, b) => a.transform.x - b.transform.x);
+      expect(splitRuns[0]?.props.connectedFrom).toBe(trunk.props.connectedFrom);
+      expect(splitRuns[0]?.props.connectedTo).toBeUndefined();
+      expect(splitRuns[1]?.props.connectedFrom).toBeUndefined();
+      expect(splitRuns[1]?.props.connectedTo).toBe(trunk.props.connectedTo);
+
+      undo();
+
+      const entitiesAfterUndo = useEntityStore.getState().allIds.map((id) => useEntityStore.getState().byId[id]);
+      const runsAfterUndo = entitiesAfterUndo.filter((entity): entity is DuctRun => entity?.type === 'duct_run');
+      expect(runsAfterUndo).toHaveLength(1);
+      expect(runsAfterUndo[0]?.id).toBe(trunk.id);
     });
   });
 

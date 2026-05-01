@@ -73,7 +73,7 @@ export class ExcelGenerator {
     }
 
     if (options.includeEngineeringNotes) {
-      headers.push('Velocity (FPM)', 'Pressure Drop');
+      headers.push('Velocity (FPM)', 'Pressure Drop (in.w.g./100ft)');
     }
 
     const dataRows = rows.map(row => {

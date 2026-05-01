@@ -115,7 +115,7 @@ export class BOMExportService {
     }
 
     if (options.includeEngineeringNotes) {
-      headers.push('Velocity (FPM)', 'Pressure Drop');
+      headers.push('Velocity (FPM)', 'Pressure Drop (in.w.g./100ft)');
     }
 
     return headers;

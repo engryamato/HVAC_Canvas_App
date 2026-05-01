@@ -7,13 +7,13 @@ export function calculateVelocityPressure(velocityFpm: number): number {
 }
 
 /**
- * Friction loss (in.w.g.) for given length using a simplified ASHRAE-based approximation.
+ * Friction rate / pressure drop (in.w.g./100ft) using a simplified ASHRAE-based approximation.
  * - velocity in FPM
  * - diameter in inches (use equivalent diameter for rectangular)
  * - length in feet
  * - roughness in feet (defaults to galvanized)
  *
- * Returns total loss for the given length.
+ * Returns the stored per-100-ft value used across schema, validation, and UI.
  */
 export function calculateFrictionLoss(
   velocityFpm: number,
@@ -32,8 +32,7 @@ export function calculateFrictionLoss(
     Math.pow(12 / diameterInches, 1.22) *
     roughnessAdjustment(roughnessFeet);
 
-  const friction = (frictionPer100 / 100) * lengthFeet;
-  return round(friction, 2);
+  return round(frictionPer100, 2);
 }
 
 /**
