@@ -4,6 +4,7 @@ export * from './base.schema';
 // Entity schemas
 export * from './room.schema';
 export * from './duct.schema';
+export * from './duct-run.schema';
 export * from './equipment.schema';
 export * from './fitting.schema';
 export * from './note.schema';

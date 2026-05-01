@@ -12,6 +12,7 @@ import {
 } from '../project-file.schema';
 import { DEFAULT_ROOM_PROPS } from '../room.schema';
 import { DEFAULT_ROUND_DUCT_PROPS } from '../duct.schema';
+import { DEFAULT_ROUND_DUCT_RUN_PROPS } from '../duct-run.schema';
 
 describe('EntitySchema (discriminated union)', () => {
   const baseEntity = {
@@ -42,6 +43,17 @@ describe('EntitySchema (discriminated union)', () => {
     };
     const result = EntitySchema.parse(duct);
     expect(result.type).toBe('duct');
+  });
+
+  it('should parse duct_run entity', () => {
+    const ductRun = {
+      ...baseEntity,
+      type: 'duct_run' as const,
+      props: DEFAULT_ROUND_DUCT_RUN_PROPS,
+      calculated: { area: 113.1, velocity: 636.6, frictionLoss: 0.05 },
+    };
+    const result = EntitySchema.parse(ductRun);
+    expect(result.type).toBe('duct_run');
   });
 
   it('should reject invalid entity type', () => {
@@ -131,6 +143,30 @@ describe('ProjectFileSchema', () => {
     const result = ProjectFileSchema.parse(withOptional);
     expect(result.projectNumber).toBe('PRJ-001');
     expect(result.clientName).toBe('ACME Corp');
+  });
+
+  it('should validate project files containing duct_run entities', () => {
+    const ductRunId = '550e8400-e29b-41d4-a716-446655440099';
+    const projectWithDuctRun = {
+      ...validProjectFile,
+      entities: {
+        byId: {
+          [ductRunId]: {
+            id: ductRunId,
+            type: 'duct_run' as const,
+            transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+            zIndex: 0,
+            createdAt: '2025-01-01T00:00:00.000Z',
+            modifiedAt: '2025-01-01T00:00:00.000Z',
+            props: DEFAULT_ROUND_DUCT_RUN_PROPS,
+            calculated: { area: 113.1, velocity: 636.6, frictionLoss: 0.05 },
+          },
+        },
+        allIds: [ductRunId],
+      },
+    };
+
+    expect(ProjectFileSchema.parse(projectWithDuctRun)).toEqual(projectWithDuctRun);
   });
 });
 

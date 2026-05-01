@@ -34,7 +34,7 @@ describe('TransformSchema', () => {
 
 describe('EntityTypeSchema', () => {
   it('should accept all valid entity types', () => {
-    const types = ['room', 'duct', 'equipment', 'fitting', 'note', 'group'];
+    const types = ['room', 'duct', 'duct_run', 'equipment', 'fitting', 'note', 'group'];
     types.forEach((type) => {
       expect(EntityTypeSchema.parse(type)).toBe(type);
     });

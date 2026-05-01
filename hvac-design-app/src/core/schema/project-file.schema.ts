@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { RoomSchema } from './room.schema';
 import { DuctSchema } from './duct.schema';
+import { DuctRunSchema } from './duct-run.schema';
 import { EquipmentSchema } from './equipment.schema';
 import { FittingSchema } from './fitting.schema';
 import { NoteSchema } from './note.schema';
@@ -12,6 +13,7 @@ import { GroupSchema } from './group.schema';
 export const EntitySchema = z.discriminatedUnion('type', [
   RoomSchema,
   DuctSchema,
+  DuctRunSchema,
   EquipmentSchema,
   FittingSchema,
   NoteSchema,

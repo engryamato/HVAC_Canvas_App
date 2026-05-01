@@ -25,6 +25,7 @@ export type Transform = z.infer<typeof TransformSchema>;
 export const EntityTypeSchema = z.enum([
   'room',
   'duct',
+  'duct_run',
   'equipment',
   'fitting',
   'note',

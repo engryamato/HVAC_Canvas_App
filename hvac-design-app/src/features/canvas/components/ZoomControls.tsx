@@ -18,6 +18,7 @@ import {
 const ENTITY_DIMENSIONS = {
     room: { width: 200, height: 200 },
     duct: { width: 100, height: 50 },
+    duct_run: { width: 100, height: 50 },
     equipment: { width: 50, height: 50 },
     fitting: { width: 30, height: 30 },
     note: { width: 100, height: 50 },
