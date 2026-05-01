@@ -8,6 +8,7 @@ import {
   getSchemaVersion,
 } from '../serialization';
 import { createEmptyProjectFile, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
+import { createDuct } from '@/features/canvas/entities/ductDefaults';
 
 describe('serialization', () => {
   const makeProject = () => createEmptyProjectFile('550e8400-e29b-41d4-a716-446655440000');
@@ -57,6 +58,21 @@ describe('serialization', () => {
       expect(result.data?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
       expect(result.migrated).toBe(false);
       expect(result.originalVersion).toBe(CURRENT_SCHEMA_VERSION);
+    });
+
+    it('hydrates legacy duct entities as duct_run during deserialization', () => {
+      const project = makeProject();
+      const duct = createDuct({ length: 12 });
+      project.entities.byId[duct.id] = duct;
+      project.entities.allIds = [duct.id];
+
+      const result = deserializeProject(JSON.stringify(project));
+
+      expect(result.success).toBe(true);
+      expect(result.data?.entities.byId[duct.id]?.type).toBe('duct_run');
+      expect(result.data?.entities.byId[duct.id]?.props).toMatchObject({
+        installLength: 12,
+      });
     });
 
     it('should return error for invalid JSON', () => {
@@ -121,11 +137,18 @@ describe('serialization', () => {
 
   describe('migrateProject', () => {
     it('should migrate v1 projects to the current schema version', () => {
+      const duct = createDuct({ length: 13 });
       const project = {
         ...makeProject(),
         schemaVersion: '1.0.0',
         catalogItems: [],
         services: {},
+        entities: {
+          byId: {
+            [duct.id]: duct,
+          },
+          allIds: [duct.id],
+        },
       };
       const result = migrateProject(project, '1.0.0');
 
@@ -134,6 +157,7 @@ describe('serialization', () => {
       expect(result.data?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
       expect((result.data as Record<string, unknown>)?.catalogItems).toBeUndefined();
       expect((result.data as Record<string, unknown>)?.services).toEqual({});
+      expect(result.data?.entities.byId[duct.id]?.type).toBe('duct_run');
       expect(result.migrated).toBe(true);
       expect(result.originalVersion).toBe('1.0.0');
     });

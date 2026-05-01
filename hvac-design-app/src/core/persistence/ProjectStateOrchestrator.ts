@@ -9,6 +9,7 @@ import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import { useThreeDViewStore } from '@/features/canvas/store/threeDViewStore';
 import { useViewModeStore } from '@/features/canvas/store/viewModeStore';
 import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
+import { convertLegacyDuctEntitiesInProject } from '@/features/duct-runs/utils/convertDuctToDuctRun';
 
 export interface ProjectHydrationPayload {
   project: ProjectFile;
@@ -34,6 +35,10 @@ export interface ProjectHydrationPayload {
     future: unknown[];
     maxSize: number;
   };
+}
+
+interface LegacyHydrationOptions {
+  payload?: Omit<ProjectHydrationPayload, 'project'>;
 }
 
 function isProjectHydrationPayload(
@@ -91,7 +96,7 @@ export function snapshotFromStores(): ProjectFile | null {
     },
     settings: {
       unitSystem,
-      gridSize: preferences.gridSize,
+      gridSize: viewportStore.gridSize,
       gridVisible: viewportStore.gridVisible,
       snapToGrid: viewportStore.snapToGrid,
       activeViewMode: viewModeStore.activeViewMode,
@@ -137,9 +142,17 @@ export function buildProjectFileFromStores(): ProjectFile | null {
   return snapshotFromStores();
 }
 
-export function hydrateToStores(source: ProjectFile | ProjectHydrationPayload): void {
-  const hydrationPayload = isProjectHydrationPayload(source) ? source : { project: source };
-  const { project } = hydrationPayload;
+export function hydrateToStores(
+  source: ProjectFile | ProjectHydrationPayload,
+  legacyOptions?: LegacyHydrationOptions
+): void {
+  const hydrationPayload = isProjectHydrationPayload(source)
+    ? source
+    : {
+        project: source,
+        ...legacyOptions?.payload,
+      };
+  const project = convertLegacyDuctEntitiesInProject(hydrationPayload.project);
 
   const entityStore = useEntityStore.getState();
   const viewportStore = useViewportStore.getState();
@@ -188,10 +201,23 @@ export function hydrateToStores(source: ProjectFile | ProjectHydrationPayload): 
     project.settings?.snapToGrid ??
     preferencesStore.snapToGrid;
 
+  projectStore.setProject(project.projectId, {
+    projectId: project.projectId,
+    projectName: project.projectName,
+    projectNumber: project.projectNumber,
+    clientName: project.clientName,
+    location: project.location,
+    scope: project.scope,
+    siteConditions: project.siteConditions,
+    isArchived: project.isArchived,
+    createdAt: project.createdAt,
+    modifiedAt: project.modifiedAt,
+  });
   preferencesStore.setUnitSystem(nextUnitSystem);
   preferencesStore.setGridSize(nextGridSize);
   preferencesStore.setSnapToGrid(nextSnapToGrid);
   projectStore.setProjectSettings({ unitSystem: nextUnitSystem });
+  localStorage.setItem('lastActiveProjectId', project.projectId);
 
   const hasViewMode = Boolean(project.settings?.activeViewMode);
   const hasThreeDState = Boolean(project.threeDViewState);

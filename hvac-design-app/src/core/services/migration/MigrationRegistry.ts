@@ -1,5 +1,6 @@
 import { DataVersion, VersionDetector } from './VersionDetector';
 import { CURRENT_SCHEMA_VERSION, ProjectFileSchema, type ProjectFile } from '@/core/schema/project-file.schema';
+import { convertLegacyDuctEntitiesInProject } from '@/features/duct-runs/utils/convertDuctToDuctRun';
 
 /**
  * Migration step function type
@@ -62,7 +63,7 @@ function migrateProjectFileV1ToV2(data: unknown): ProjectFile {
   delete migrated.catalogItems;
   delete migrated.componentDefinitions;
 
-  return ProjectFileSchema.parse(migrated);
+  return convertLegacyDuctEntitiesInProject(ProjectFileSchema.parse(migrated));
 }
 
 /**

@@ -31,7 +31,7 @@ import {
 } from '../tools';
 
 // Renderers
-import { renderRoom, renderDuct, renderEquipment, renderFitting, type RenderContext } from '../renderers';
+import { renderRoom, renderDuct, renderDuctRun, renderEquipment, renderFitting, type RenderContext } from '../renderers';
 
 interface CanvasContainerProps {
   className?: string;
@@ -240,6 +240,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
             break;
           case 'duct':
             renderDuct(entity, renderContext);
+            break;
+          case 'duct_run':
+            renderDuctRun(entity, renderContext);
             break;
           case 'equipment':
             renderEquipment(entity, renderContext);

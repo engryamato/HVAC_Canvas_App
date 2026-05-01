@@ -1,6 +1,7 @@
-import type { Duct } from '@/core/schema';
+import type { Duct, DuctRun } from '@/core/schema';
 import { feetToPixels, inchesToPixels } from '@/core/constants/coordinates';
 import type { Bounds } from '@/core/geometry/bounds';
+import { DuctRunGeometryService } from '@/features/canvas/services/DuctRunGeometryService';
 
 type Point = {
   x: number;
@@ -55,6 +56,10 @@ export function getLegacyDuctCanvasBounds(duct: Duct): Bounds {
     width: maxX - minX,
     height: maxY - minY,
   };
+}
+
+export function getDuctRunCanvasBounds(run: DuctRun): Bounds {
+  return DuctRunGeometryService.getBounds(run);
 }
 
 function resolveDuctThicknessPx(duct: Duct): number {

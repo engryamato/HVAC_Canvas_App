@@ -1,5 +1,6 @@
 import { ProjectFileSchema, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
 import { migrateProjectFileV1ToV2 } from '@/core/services/migration/MigrationRegistry';
+import { convertLegacyDuctEntitiesInProject } from '@/features/duct-runs/utils/convertDuctToDuctRun';
 
 /**
  * Serialization result with error handling
@@ -66,7 +67,7 @@ export function deserializeProject(json: string): DeserializationResult {
     }
 
     // Validate against schema
-    const validated = ProjectFileSchema.parse(parsed);
+    const validated = convertLegacyDuctEntitiesInProject(ProjectFileSchema.parse(parsed));
 
     return {
       success: true,
@@ -94,7 +95,7 @@ export function deserializeProject(json: string): DeserializationResult {
 export function deserializeProjectLenient(json: string): DeserializationResult {
   try {
     const parsed = JSON.parse(json);
-    const validated = ProjectFileSchema.parse(parsed);
+    const validated = convertLegacyDuctEntitiesInProject(ProjectFileSchema.parse(parsed));
     return {
       success: true,
       data: validated,
@@ -120,7 +121,7 @@ export function deserializeProjectLenient(json: string): DeserializationResult {
 export function migrateProject(project: unknown, fromVersion: string): DeserializationResult {
   if (fromVersion === '1.0.0') {
     try {
-      const migrated = migrateProjectFileV1ToV2(project);
+      const migrated = convertLegacyDuctEntitiesInProject(migrateProjectFileV1ToV2(project));
       return {
         success: true,
         data: migrated,

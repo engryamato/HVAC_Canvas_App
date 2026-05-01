@@ -8,7 +8,8 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
 import type { Entity } from '@/core/schema';
-import { getLegacyDuctCanvasBounds } from '@/core/geometry/ductBounds';
+import { getDuctRunCanvasBounds, getLegacyDuctCanvasBounds } from '@/core/geometry/ductBounds';
+import { DuctRunGeometryService } from '../services/DuctRunGeometryService';
 import {
   createEntity,
   deleteEntity,
@@ -26,9 +27,11 @@ interface SelectToolState {
   hasMoved: boolean;
 }
 
-/**
- * Selection tool for selecting, moving, and marquee-selecting entities.
- */
+type EntityHit = {
+  entity: Entity;
+  segmentIndex?: number;
+};
+
 export class SelectTool extends BaseTool {
   readonly name = 'select';
 
@@ -67,11 +70,32 @@ export class SelectTool extends BaseTool {
       return;
     }
 
-    const entity = this.findEntityAtPoint(event.x, event.y);
+    const hit = this.findEntityHitAtPoint(event.x, event.y);
+    const entity = hit?.entity ?? null;
 
     if (entity) {
       const selectionStore = useSelectionStore.getState();
-      const { selectedIds, select, toggleSelection } = selectionStore;
+      const {
+        selectedIds,
+        select,
+        toggleSelection,
+        clearSelectedSegments,
+        selectSegment,
+        toggleSegmentSelection,
+      } = selectionStore;
+
+      if (entity.type === 'duct_run' && typeof hit?.segmentIndex === 'number') {
+        if (!selectedIds.includes(entity.id)) {
+          select(entity.id);
+          clearSelectedSegments();
+        } else if (event.shiftKey || event.ctrlKey) {
+          toggleSegmentSelection(entity.id, hit.segmentIndex);
+        } else {
+          selectSegment(entity.id, hit.segmentIndex, false);
+        }
+      } else {
+        clearSelectedSegments();
+      }
 
       if (event.shiftKey) {
         toggleSelection(entity.id);
@@ -102,22 +126,23 @@ export class SelectTool extends BaseTool {
         initialSelection: finalSelection,
         hasMoved: false,
       };
-    } else {
-      if (!event.shiftKey) {
-        useSelectionStore.getState().clearSelection();
-      }
-
-      this.state = {
-        mode: 'marquee',
-        startPoint: { x: event.x, y: event.y },
-        currentPoint: { x: event.x, y: event.y },
-        draggedEntityId: null,
-        dragOffset: null,
-        initialEntities: null,
-        initialSelection: [],
-        hasMoved: false,
-      };
+      return;
     }
+
+    if (!event.shiftKey) {
+      useSelectionStore.getState().clearSelection();
+    }
+
+    this.state = {
+      mode: 'marquee',
+      startPoint: { x: event.x, y: event.y },
+      currentPoint: { x: event.x, y: event.y },
+      draggedEntityId: null,
+      dragOffset: null,
+      initialEntities: null,
+      initialSelection: [],
+      hasMoved: false,
+    };
   }
 
   onMouseMove(event: ToolMouseEvent): void {
@@ -188,14 +213,12 @@ export class SelectTool extends BaseTool {
     const { selectedIds, clearSelection, selectMultiple } = useSelectionStore.getState();
     const { byId } = useEntityStore.getState();
 
-    // Escape: clear selection
     if (event.key === 'Escape') {
       this.reset();
       clearSelection();
       return;
     }
 
-    // Delete/Backspace: remove selected entities
     if (event.key === 'Delete' || event.key === 'Backspace') {
       const selectionBefore = [...selectedIds];
       for (const id of selectedIds) {
@@ -208,7 +231,6 @@ export class SelectTool extends BaseTool {
       return;
     }
 
-    // Ctrl+D: duplicate selected entities
     if (event.ctrlKey && event.key === 'd') {
       const selectionBefore = [...selectedIds];
       const duplicates: Entity[] = selectedIds
@@ -217,7 +239,7 @@ export class SelectTool extends BaseTool {
         .map((entity) => {
           const duplicate = JSON.parse(JSON.stringify(entity)) as Entity;
           duplicate.id = crypto.randomUUID();
-          duplicate.transform.x += 24; // Offset by 2 feet
+          duplicate.transform.x += 24;
           duplicate.transform.y += 24;
           return duplicate;
         });
@@ -226,15 +248,13 @@ export class SelectTool extends BaseTool {
       duplicates.forEach((duplicate) =>
         createEntity(duplicate, { selectionBefore, selectionAfter: newIds })
       );
-      // Select the duplicated entities
       if (newIds.length > 0) {
         selectMultiple(newIds);
       }
       return;
     }
 
-    // Arrow keys: move selected entities
-    const moveAmount = event.shiftKey ? 12 : 1; // Shift = 1 foot, otherwise 1 inch
+    const moveAmount = event.shiftKey ? 12 : 1;
     let deltaX = 0;
     let deltaY = 0;
 
@@ -309,15 +329,26 @@ export class SelectTool extends BaseTool {
   }
 
   private findEntityAtPoint(x: number, y: number): Entity | null {
-    const { byId, allIds } = useEntityStore.getState();
-    const entities = allIds.map((id) => byId[id]).filter((e): e is Entity => e !== undefined);
+    return this.findEntityHitAtPoint(x, y)?.entity ?? null;
+  }
 
+  private findEntityHitAtPoint(x: number, y: number): EntityHit | null {
+    const { byId, allIds } = useEntityStore.getState();
+    const entities = allIds.map((id) => byId[id]).filter((entity): entity is Entity => entity !== undefined);
     const sortedEntities = [...entities].sort((a, b) => b.zIndex - a.zIndex);
 
     for (const entity of sortedEntities) {
+      if (entity.type === 'duct_run') {
+        const segmentIndex = DuctRunGeometryService.getSegmentIndexAtPoint(entity, { x, y });
+        if (segmentIndex !== null) {
+          return { entity, segmentIndex };
+        }
+        continue;
+      }
+
       const bounds = this.getEntityBounds(entity);
       if (boundsContainsPoint(bounds, { x, y })) {
-        return entity;
+        return { entity };
       }
     }
 
@@ -334,6 +365,8 @@ export class SelectTool extends BaseTool {
         return { x, y, width: entity.props.width, height: entity.props.depth };
       case 'duct':
         return getLegacyDuctCanvasBounds(entity);
+      case 'duct_run':
+        return getDuctRunCanvasBounds(entity);
       case 'fitting':
         return { x: x - 15, y: y - 15, width: 30, height: 30 };
       case 'note':
@@ -347,13 +380,11 @@ export class SelectTool extends BaseTool {
 
   private selectEntitiesInBounds(bounds: Bounds, additive: boolean): void {
     const { byId, allIds } = useEntityStore.getState();
-    const entities = allIds.map((id) => byId[id]).filter((e): e is Entity => e !== undefined);
-
+    const entities = allIds.map((id) => byId[id]).filter((entity): entity is Entity => entity !== undefined);
     const selectedIds: string[] = [];
 
     for (const entity of entities) {
       const entityBounds = this.getEntityBounds(entity);
-
       const intersects = !(
         entityBounds.x + entityBounds.width < bounds.x ||
         bounds.x + bounds.width < entityBounds.x ||
@@ -367,13 +398,13 @@ export class SelectTool extends BaseTool {
     }
 
     const { selectMultiple } = useSelectionStore.getState();
-
     if (additive) {
       const current = useSelectionStore.getState().selectedIds;
       selectMultiple([...new Set([...current, ...selectedIds])]);
-    } else {
-      selectMultiple(selectedIds);
+      return;
     }
+
+    selectMultiple(selectedIds);
   }
 }
 
