@@ -8,6 +8,7 @@ import {
   buildEngineDispatchWarning,
   calculateDuct,
 } from '../useCalculations';
+import type { EngineeringLimits } from '@/core/schema/calculation-settings.schema';
 
 const createTestDuct = (overrides: Partial<Duct['props']> = {}): Duct => ({
   id: 'duct-1',
@@ -36,6 +37,23 @@ const createTestDuct = (overrides: Partial<Duct['props']> = {}): Duct => ({
 } as Duct);
 
 describe('useCalculations helpers', () => {
+  const engineeringLimits: EngineeringLimits = {
+    maxVelocity: { supply: 2500, return: 2000, exhaust: 2000 },
+    minVelocity: { supply: 600, return: 500, exhaust: 500 },
+    maxPressureDrop: { supply: 0.1, return: 0.08, exhaust: 0.08 },
+    frictionFactors: {
+      galvanized: 0.0005,
+      stainless: 0.00015,
+      flexible: 0.003,
+      fiberglass: 0.0003,
+    },
+    standardConditions: {
+      temperature: 70,
+      pressure: 29.92,
+      altitude: 0,
+    },
+  };
+
   beforeEach(() => {
     useUnifiedCatalogStore.getState().reset();
     useUnifiedCatalogStore.getState().addSystemProfile({
@@ -70,13 +88,45 @@ describe('useCalculations helpers', () => {
     expect(engineeringData.pressureDrop).toBe(calculated.frictionLoss);
     expect(engineeringData.friction).toBe(calculated.frictionLoss);
     expect(engineeringData.equivalentDiameter).toBe(12);
+    expect(engineeringData.systemType).toBeUndefined();
   });
 
-  it('builds a valid constraint status when no warnings are present', () => {
-    const status = buildConstraintStatus(undefined, undefined);
+  it('builds a valid constraint status from engineering-limit validation', () => {
+    const duct = createTestDuct({ systemType: 'return', airflow: 1000 });
+    const status = buildConstraintStatus(
+      duct,
+      {
+        airflow: 1000,
+        velocity: 800,
+        pressureDrop: 0.04,
+        friction: 0.04,
+        equivalentDiameter: 12,
+        systemType: 'return',
+      },
+      engineeringLimits
+    );
 
     expect(status.isValid).toBe(true);
-    expect(status.violations).toHaveLength(0);
+    expect(status.violations.filter((violation) => violation.severity !== 'info')).toHaveLength(0);
+  });
+
+  it('uses the duct system bucket for validation results', () => {
+    const duct = createTestDuct({ systemType: 'return', airflow: 1000 });
+    const status = buildConstraintStatus(
+      duct,
+      {
+        airflow: 1000,
+        velocity: 2300,
+        pressureDrop: 0.09,
+        friction: 0.09,
+        equivalentDiameter: 12,
+        systemType: 'return',
+      },
+      engineeringLimits
+    );
+
+    expect(status.isValid).toBe(false);
+    expect(status.violations.some((violation) => violation.message.includes('return system'))).toBe(true);
   });
 
   it('builds warnings for unsupported systems only when required', () => {

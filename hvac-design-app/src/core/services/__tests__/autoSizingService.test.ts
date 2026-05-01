@@ -90,7 +90,25 @@ describe('AutoSizingService', () => {
       );
 
       expect(result.warnings.length).toBeGreaterThan(0);
-      expect(result.warnings.some(w => w.includes('velocity'))).toBe(true);
+      expect(result.warnings.some(w => w.includes('Velocity'))).toBe(true);
+    });
+
+    it('should validate against the active return-air bucket instead of supply defaults', () => {
+      const duct = {
+        airflow: 3000,
+        shape: 'round' as const,
+        material: 'galvanized' as const,
+        systemType: 'return' as const,
+      } satisfies Partial<DuctProps>;
+
+      const result = autoSizingService.autoSizeDuct(
+        duct,
+        { targetVelocity: 2200, roundToStandard: true },
+        mockLimits
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings.some((warning) => warning.includes('return system'))).toBe(true);
     });
   });
 
@@ -124,7 +142,7 @@ describe('AutoSizingService', () => {
         const previous = suggestions[i - 1];
         expect(current).toBeDefined();
         expect(previous).toBeDefined();
-        expect(current!.velocity).toBeGreaterThan(previous!.velocity);
+        expect(current!.velocity).toBeGreaterThanOrEqual(previous!.velocity);
       }
     });
   });

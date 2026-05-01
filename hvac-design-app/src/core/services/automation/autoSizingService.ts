@@ -2,6 +2,7 @@ import { DuctProps } from '../../schema/duct.schema';
 import { EngineeringLimits } from '../../schema/calculation-settings.schema';
 import { parametricUpdateService } from '../parametric/parametricUpdateService';
 import { engineeringCalculator } from '../calculations/engineeringCalculator';
+import { getSystemBucket, validateDuctConstraints } from '../validation/constraintValidator';
 
 /**
  * Auto-Sizing Service
@@ -36,8 +37,6 @@ export interface SizingSuggestion {
 }
 
 type DuctSize = { diameter?: number; width?: number; height?: number };
-type SizingSystemType = 'supply' | 'return' | 'exhaust';
-
 export class AutoSizingService {
   /**
    * Standard round duct sizes (inches)
@@ -100,28 +99,25 @@ export class AutoSizingService {
     );
 
     // Check constraints
-    const meetsVelocity =
-      engineeringData.velocity >= limits.minVelocity.supply &&
-      engineeringData.velocity <= limits.maxVelocity.supply;
+    const validationStatus = validateDuctConstraints(engineeringData, limits, testDuct.systemType);
 
-    const meetsPressureDrop =
-      !criteria.maxPressureDrop ||
-      engineeringData.pressureDrop <= criteria.maxPressureDrop;
-
-    if (!meetsVelocity) {
-      warnings.push(
-        `Velocity ${engineeringData.velocity.toFixed(0)} FPM outside acceptable range`
-      );
+    for (const violation of validationStatus.violations) {
+      if (violation.severity === 'error' || violation.severity === 'warning') {
+        warnings.push(violation.message);
+      }
     }
 
-    if (!meetsPressureDrop) {
+    if (
+      criteria.maxPressureDrop !== undefined &&
+      engineeringData.pressureDrop > criteria.maxPressureDrop
+    ) {
       warnings.push(
         `Pressure drop ${engineeringData.pressureDrop.toFixed(3)} exceeds target`
       );
     }
 
     return {
-      success: meetsVelocity && meetsPressureDrop,
+      success: validationStatus.isValid && warnings.length === 0,
       originalSize,
       newSize: finalSize,
       calculatedVelocity: engineeringData.velocity,
@@ -178,7 +174,7 @@ export class AutoSizingService {
    * Get default target velocity based on system type
    */
   private static getDefaultTargetVelocity(systemType?: string): number {
-    switch (systemType) {
+    switch (getSystemBucket(systemType as DuctProps['systemType'])) {
       case 'supply':
         return 1500; // 1500 FPM for supply
       case 'return':
@@ -187,19 +183,6 @@ export class AutoSizingService {
         return 1500; // 1500 FPM for exhaust
       default:
         return 1500; // Default to supply
-    }
-  }
-
-  private static getSizingSystemType(systemType?: DuctProps['systemType']): SizingSystemType {
-    switch (systemType) {
-      case 'return':
-        return 'return';
-      case 'exhaust':
-        return 'exhaust';
-      case 'outside_air':
-      case 'supply':
-      default:
-        return 'supply';
     }
   }
 
@@ -266,7 +249,7 @@ export class AutoSizingService {
     const suggestions: SizingSuggestion[] = [];
     const targetVelocities = [1200, 1500, 1800, 2000]; // Different velocity targets
     const { systemType, limits } = this.normalizeSizingArguments(systemTypeOrLimits, maybeLimits);
-    const effectiveSystemType = this.getSizingSystemType(systemType);
+    const effectiveSystemType = getSystemBucket(systemType);
 
     for (const targetVel of targetVelocities) {
       const sized = engineeringCalculator.autoSizeDuct(

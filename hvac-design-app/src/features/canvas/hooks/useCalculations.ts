@@ -10,6 +10,8 @@ import {
   calculateEquipmentRuntime,
   calculateFittingRuntime,
 } from '@/core/services/calculations/entityCalculationRuntime';
+import { validateDuctConstraints } from '@/core/services/validation/constraintValidator';
+import { useSettingsStore } from '@/core/store/settingsStore';
 
 const VELOCITY_LIMITS = {
   residential: { min: 600, max: 900 },
@@ -29,6 +31,7 @@ export function useCalculations(profile: VelocityProfile = 'commercial') {
     state.allIds.map((id) => state.byId[id]).filter((entity): entity is NonNullable<typeof entity> => Boolean(entity))
   );
   const updateEntity = useEntityStore((state) => state.updateEntity);
+  const engineeringLimits = useSettingsStore((state) => state.calculationSettings.engineeringLimits);
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export function useCalculations(profile: VelocityProfile = 'commercial') {
         }
 
         if (entity.type === 'duct') {
-          syncDuctCalculation(entity as Duct, updateEntity, profile);
+          syncDuctCalculation(entity as Duct, updateEntity, profile, engineeringLimits);
           return;
         }
 
@@ -75,7 +78,7 @@ export function useCalculations(profile: VelocityProfile = 'commercial') {
         clearTimeout(timer.current);
       }
     };
-  }, [entities, updateEntity, profile]);
+  }, [entities, updateEntity, profile, engineeringLimits]);
 }
 
 function roomChanged(a: Room['calculated'], b: Room['calculated']): boolean {
@@ -85,14 +88,15 @@ function roomChanged(a: Room['calculated'], b: Room['calculated']): boolean {
 function syncDuctCalculation(
   duct: Duct,
   updateEntity: (id: string, updates: Partial<Entity>) => void,
-  profile: VelocityProfile
+  profile: VelocityProfile,
+  engineeringLimits: ReturnType<typeof useSettingsStore.getState>['calculationSettings']['engineeringLimits']
 ): void {
   const calculation = calculateDuct(duct);
   const nextVelocityWarning = buildVelocityWarning(calculation.calculated.velocity, profile);
   const nextEngineWarning = buildEngineComplianceWarning(calculation.complianceWarnings);
   const nextWarnings = mergeWarnings(nextVelocityWarning, nextEngineWarning);
   const nextEngineeringData = buildEngineeringData(duct, calculation.calculated);
-  const nextConstraintStatus = buildConstraintStatus(nextVelocityWarning, nextEngineWarning);
+  const nextConstraintStatus = buildConstraintStatus(duct, nextEngineeringData, engineeringLimits);
 
   const changed =
     duct.calculated.area !== calculation.calculated.area ||
@@ -224,40 +228,16 @@ export function buildEngineeringData(
       duct.props.shape === 'round'
         ? duct.props.diameter
         : calculateEquivalentDiameter(duct.props.width ?? 0, duct.props.height ?? 0),
+    systemType: duct.props.systemType,
   };
 }
 
 export function buildConstraintStatus(
-  velocityWarning: Duct['warnings'] | undefined,
-  engineWarning: Duct['warnings'] | undefined
+  duct: Duct,
+  engineeringData: NonNullable<Duct['props']['engineeringData']>,
+  engineeringLimits: ReturnType<typeof useSettingsStore.getState>['calculationSettings']['engineeringLimits']
 ): NonNullable<Duct['props']['constraintStatus']> {
-  const violations = [
-    ...(velocityWarning?.velocity
-      ? [
-          {
-            type: 'velocity',
-            severity: 'warning' as const,
-            message: velocityWarning.velocity,
-          },
-        ]
-      : []),
-    ...(velocityWarning?.constraintViolations?.map((message) => ({
-      type: 'velocity',
-      severity: 'warning' as const,
-      message,
-    })) ?? []),
-    ...(engineWarning?.constraintViolations?.map((message) => ({
-      type: 'engine-dispatch',
-      severity: 'warning' as const,
-      message,
-    })) ?? []),
-  ];
-
-  return {
-    isValid: violations.length === 0,
-    violations,
-    lastValidated: new Date(),
-  };
+  return validateDuctConstraints(engineeringData, engineeringLimits, duct.props.systemType);
 }
 
 export function buildEngineDispatchWarning(engine: EngineResolution): Duct['warnings'] | undefined {

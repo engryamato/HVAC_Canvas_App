@@ -6,7 +6,7 @@ import {
   engineeringCalculator,
   DuctSizingParams 
 } from '../calculations/engineeringCalculator';
-import { ductValidator } from '../validation/constraintValidator';
+import { validateDuctConstraints } from '../validation/constraintValidator';
 import { FittingGenerationService } from '../fittingGeneration';
 
 /**
@@ -67,9 +67,10 @@ export class ParametricUpdateService {
       airflow: params.airflow,
       velocity: result.velocity,
       pressureDrop: result.pressureDrop,
-      friction: result.friction,
+      friction: result.pressureDrop,
       equivalentDiameter: result.equivalentDiameter,
       reynoldsNumber: result.reynoldsNumber,
+      systemType: duct.systemType,
     };
   }
 
@@ -78,9 +79,10 @@ export class ParametricUpdateService {
    */
   static validateDuct(
     engineeringData: DuctEngineeringData,
-    limits: EngineeringLimits
+    limits: EngineeringLimits,
+    systemType?: DuctProps['systemType']
   ) {
-    return ductValidator.validate(engineeringData, limits);
+    return validateDuctConstraints(engineeringData, limits, systemType);
   }
 
   /**
@@ -119,7 +121,7 @@ export class ParametricUpdateService {
     const newEngineeringData = this.updateDuctCalculations(mergedProps, limits);
 
     // Step 2: Validate
-    const validationStatus = this.validateDuct(newEngineeringData, limits);
+    const validationStatus = this.validateDuct(newEngineeringData, limits, mergedProps.systemType);
 
     // Track violations
     if (!validationStatus.isValid) {
@@ -333,7 +335,7 @@ export class ParametricUpdateService {
     for (const update of updates) {
       try {
         const engineeringData = this.updateDuctCalculations(update.props, limits);
-        const validationStatus = this.validateDuct(engineeringData, limits);
+        const validationStatus = this.validateDuct(engineeringData, limits, update.props.systemType);
 
         updatedEntities.push(update.ductId);
 

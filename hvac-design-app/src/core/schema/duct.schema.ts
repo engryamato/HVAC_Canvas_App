@@ -46,10 +46,11 @@ export type ConstraintStatus = z.infer<typeof ConstraintStatusSchema>;
 export const DuctEngineeringDataSchema = z.object({
   airflow: z.number().min(0), // CFM
   velocity: z.number().min(0), // FPM (calculated)
-  pressureDrop: z.number().min(0), // in.w.g./100ft (calculated)
-  friction: z.number().min(0), // friction factor
+  pressureDrop: z.number().min(0).describe('Pressure drop / friction rate in in.w.g./100ft'),
+  friction: z.number().min(0).describe('Alias of pressureDrop retained for compatibility'),
   equivalentDiameter: z.number().min(0).optional(), // for rectangular ducts
   reynoldsNumber: z.number().optional(),
+  systemType: SystemTypeSchema.optional().describe('System bucket used for validation limits'),
 });
 
 export type DuctEngineeringData = z.infer<typeof DuctEngineeringDataSchema>;

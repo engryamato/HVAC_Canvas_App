@@ -10,12 +10,28 @@ import { EngineeringLimits } from '../../schema/calculation-settings.schema';
  * Get the system bucket for limits lookup based on systemType
  * Defaults to 'supply' when undefined
  */
-function getSystemBucket(systemType?: DuctProps['systemType']): 'supply' | 'return' | 'exhaust' {
+export function getSystemBucket(systemType?: DuctProps['systemType']): 'supply' | 'return' | 'exhaust' {
   if (systemType === 'return' || systemType === 'exhaust') {
     return systemType;
   }
   // Default to supply for undefined, 'supply', or 'outside_air'
   return 'supply';
+}
+
+export type DuctValidationInput = DuctEngineeringData & {
+  systemType?: DuctProps['systemType'];
+};
+
+export function toDuctValidationInput(
+  engineeringData: DuctEngineeringData,
+  systemType?: DuctProps['systemType']
+): DuctValidationInput {
+  return {
+    ...engineeringData,
+    systemType: systemType ?? engineeringData.systemType,
+    // `friction` is a compatibility alias for the per-100ft pressure-drop field.
+    friction: engineeringData.pressureDrop,
+  };
 }
 
 /**
@@ -141,7 +157,7 @@ export function generateDeterministicSuggestions(
  * Duct Validation Rules
  */
 export class DuctValidator {
-  private rules: ValidationRule<DuctEngineeringData>[] = [];
+  private rules: ValidationRule<DuctValidationInput>[] = [];
 
   constructor() {
     this.registerDefaultRules();
@@ -271,7 +287,7 @@ export class DuctValidator {
     });
   }
 
-  addRule(rule: ValidationRule<DuctEngineeringData>) {
+  addRule(rule: ValidationRule<DuctValidationInput>) {
     this.rules.push(rule);
   }
 
@@ -280,7 +296,7 @@ export class DuctValidator {
   }
 
   validate(
-    engineeringData: DuctEngineeringData,
+    engineeringData: DuctValidationInput,
     limits: EngineeringLimits
   ): ConstraintStatus {
     const violations: ValidationViolation[] = [];
@@ -303,7 +319,7 @@ export class DuctValidator {
    * Get validation status with only errors (for critical checks)
    */
   validateCritical(
-    engineeringData: DuctEngineeringData,
+    engineeringData: DuctValidationInput,
     limits: EngineeringLimits
   ): ConstraintStatus {
     const fullStatus = this.validate(engineeringData, limits);
@@ -390,6 +406,14 @@ export class EquipmentValidator {
  */
 export const ductValidator = new DuctValidator();
 export const equipmentValidator = new EquipmentValidator();
+
+export function validateDuctConstraints(
+  engineeringData: DuctEngineeringData,
+  limits: EngineeringLimits,
+  systemType?: DuctProps['systemType']
+): ConstraintStatus {
+  return ductValidator.validate(toDuctValidationInput(engineeringData, systemType), limits);
+}
 
 /**
  * Validation helper functions

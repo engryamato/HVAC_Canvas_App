@@ -29,7 +29,7 @@ function createEngineeringData(overrides: Partial<DuctEngineeringData> = {}): Du
     airflow: 3000,
     velocity: 3200,
     pressureDrop: 0.25,
-    friction: 0.002,
+    friction: 0.25,
     equivalentDiameter: 10,
     reynoldsNumber: 120000,
     ...overrides,
