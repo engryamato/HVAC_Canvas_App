@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -50,96 +51,97 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="max-w-md"
+                className="max-h-[85vh] max-w-4xl overflow-hidden p-0"
                 data-testid="settings-dialog"
             >
-                <DialogHeader>
+                <DialogHeader className="border-b border-slate-200 px-6 pt-6 pb-4">
                     <DialogTitle>Settings</DialogTitle>
+                    <DialogDescription>
+                        Appearance, canvas, and storage settings are automatically saved. Fabrication profile changes apply when you press Save.
+                    </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-6 mt-4">
-                    {/* Appearance */}
-                    <div>
-                        <h3 className="font-semibold text-sm mb-3">Appearance</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="dark-mode">Dark Mode</Label>
-                                <Switch
-                                    id="dark-mode"
-                                    checked={theme === 'dark'}
-                                    onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="compact-mode">Compact Mode</Label>
-                                <Switch
-                                    id="compact-mode"
-                                    checked={compactMode}
-                                    onCheckedChange={setCompactMode}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Canvas */}
-                    <div>
-                        <h3 className="font-semibold text-sm mb-3">Canvas</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="snap-grid">Snap to Grid</Label>
-                                <Switch
-                                    id="snap-grid"
-                                    checked={snapToGrid}
-                                    onCheckedChange={setSnapToGrid}
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="show-rulers">Show Rulers</Label>
-                                <Switch
-                                    id="show-rulers"
-                                    checked={showRulers}
-                                    onCheckedChange={setShowRulers}
-                                />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="show-fitting-labels">Show Fitting Labels</Label>
-                                <Switch
-                                    id="show-fitting-labels"
-                                    checked={showFittingLabels}
-                                    onCheckedChange={setShowFittingLabels}
-                                />
+                <div className="overflow-y-auto px-6 py-4">
+                    <div className="space-y-6">
+                        {/* Appearance */}
+                        <div>
+                            <h3 className="font-semibold text-sm mb-3">Appearance</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="dark-mode">Dark Mode</Label>
+                                    <Switch
+                                        id="dark-mode"
+                                        checked={theme === 'dark'}
+                                        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="compact-mode">Compact Mode</Label>
+                                    <Switch
+                                        id="compact-mode"
+                                        checked={compactMode}
+                                        onCheckedChange={setCompactMode}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Auto-save */}
-                    <div>
-                        <h3 className="font-semibold text-sm mb-3">Auto-save</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="auto-save">Enable Auto-save</Label>
-                                <Switch
-                                    id="auto-save"
-                                    checked={autoSaveEnabled}
-                                    onCheckedChange={setAutoSaveEnabled}
-                                />
+                        {/* Canvas */}
+                        <div>
+                            <h3 className="font-semibold text-sm mb-3">Canvas</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="snap-grid">Snap to Grid</Label>
+                                    <Switch
+                                        id="snap-grid"
+                                        checked={snapToGrid}
+                                        onCheckedChange={setSnapToGrid}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="show-rulers">Show Rulers</Label>
+                                    <Switch
+                                        id="show-rulers"
+                                        checked={showRulers}
+                                        onCheckedChange={setShowRulers}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="show-fitting-labels">Show Fitting Labels</Label>
+                                    <Switch
+                                        id="show-fitting-labels"
+                                        checked={showFittingLabels}
+                                        onCheckedChange={setShowFittingLabels}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Storage */}
-                    <div>
-                        <h3 className="font-semibold text-sm mb-3">Storage</h3>
-                        <StorageSettingsPanel onOpenQuarantine={() => setShowQuarantine(true)} />
-                    </div>
+                        {/* Auto-save */}
+                        <div>
+                            <h3 className="font-semibold text-sm mb-3">Auto-save</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="auto-save">Enable Auto-save</Label>
+                                    <Switch
+                                        id="auto-save"
+                                        checked={autoSaveEnabled}
+                                        onCheckedChange={setAutoSaveEnabled}
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                    <div>
-                        <FabricationProfileSettingsPanel />
-                    </div>
-                </div>
+                        {/* Storage */}
+                        <div>
+                            <h3 className="font-semibold text-sm mb-3">Storage</h3>
+                            <StorageSettingsPanel onOpenQuarantine={() => setShowQuarantine(true)} />
+                        </div>
 
-                <div className="mt-6 pt-4 border-t text-xs text-slate-500">
-                    Appearance, canvas, and storage settings are automatically saved. Fabrication profile changes apply when you press Save.
+                        <div>
+                            <FabricationProfileSettingsPanel />
+                        </div>
+                    </div>
                 </div>
             </DialogContent>
             <QuarantineManagerDialog 
@@ -149,4 +151,3 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         </Dialog>
     );
 }
-

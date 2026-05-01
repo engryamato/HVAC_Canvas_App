@@ -132,7 +132,7 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
           <div className="space-y-1">
             <div className="text-sm font-semibold text-slate-900">{entity.props.name}</div>
             <div className="text-xs text-slate-500">
-              {entity.props.engineeringSystem.replace(/_/g, ' ')} · {getRunSizeLabel(entity)}
+              {entity.props.engineeringSystem.replace(/_/g, ' ')} | {getRunSizeLabel(entity)}
             </div>
           </div>
           <Badge
@@ -148,49 +148,83 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
         <SectionHeader>Section Rule</SectionHeader>
         <div className="flex flex-col gap-3">
           <ReadOnlyField label="Fabrication Profile" value={getFamilyProfile(profileEntry)} />
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-slate-500" htmlFor="section-length-override">
-              Section Length Override (ft)
-            </label>
-            <Input
-              data-testid="duct-run-section-length-override"
-              id="section-length-override"
-              max={profileEntry.maxSectionLength}
-              min={profileEntry.minSectionLength}
-              step={0.5}
-              type="number"
-              value={entity.props.sectionLengthOverride ?? ''}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                if (nextValue === '') {
-                  applySectionLength(undefined);
-                  return;
-                }
+          <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="space-y-1">
+                <div className="text-xs font-semibold text-slate-900">
+                  {usesOverride ? 'This run is using a local override.' : 'This run is following the global fabrication default.'}
+                </div>
+                <p className="text-xs text-slate-500">
+                  {usesOverride
+                    ? `Clear the override to resume the ${formatFeet(profileEntry.defaultSectionLength)} shared default for ${profileEntry.name}.`
+                    : `Add an override only when this run needs a different piece length than the ${formatFeet(profileEntry.defaultSectionLength)} shared default.`}
+                </p>
+              </div>
+              <Badge className="border-slate-200 bg-white text-slate-700" variant="outline">
+                Active: {usesOverride ? `Override ${formatFeet(activeSectionLength)}` : `Global ${formatFeet(activeSectionLength)}`}
+              </Badge>
+            </div>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_16rem]">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500" htmlFor="section-length-override">
+                Section Length Override (ft)
+              </label>
+              <Input
+                data-testid="duct-run-section-length-override"
+                id="section-length-override"
+                max={profileEntry.maxSectionLength}
+                min={profileEntry.minSectionLength}
+                step={0.5}
+                type="number"
+                value={entity.props.sectionLengthOverride ?? ''}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  if (nextValue === '') {
+                    applySectionLength(undefined);
+                    return;
+                  }
 
-                const parsed = Number(nextValue);
-                if (
-                  Number.isFinite(parsed) &&
-                  parsed >= profileEntry.minSectionLength &&
-                  parsed <= profileEntry.maxSectionLength
-                ) {
-                  applySectionLength(parsed);
-                }
-              }}
-            />
+                  const parsed = Number(nextValue);
+                  if (
+                    Number.isFinite(parsed) &&
+                    parsed >= profileEntry.minSectionLength &&
+                    parsed <= profileEntry.maxSectionLength
+                  ) {
+                    applySectionLength(parsed);
+                  }
+                }}
+              />
+              <p className="text-xs text-slate-500">
+                Valid range: {formatFeet(profileEntry.minSectionLength)} to {formatFeet(profileEntry.maxSectionLength)}.
+                Allowed lengths: {profileEntry.allowedSectionLengths.map(formatFeet).join(', ')}.
+              </p>
+            </div>
+            <div className="rounded-md border border-slate-200 bg-white px-3 py-3 text-xs text-slate-500">
+              <div className="font-semibold text-slate-900">Global default</div>
+              <p className="mt-1">Global defaults come from fabrication settings. Any override here only affects this run.</p>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {profileEntry.allowedSectionLengths.map((length) => (
               <Button
+                aria-pressed={activeSectionLength === length ? 'true' : 'false'}
                 key={length}
                 size="sm"
                 type="button"
-                variant={activeSectionLength === length && usesOverride ? 'default' : 'outline'}
+                variant={activeSectionLength === length ? 'default' : 'outline'}
                 onClick={() => applySectionLength(length)}
               >
-                {formatFeet(length)}
+                {usesOverride || profileEntry.defaultSectionLength !== length ? formatFeet(length) : `${formatFeet(length)} default`}
               </Button>
             ))}
-            <Button size="sm" type="button" variant="ghost" onClick={() => applySectionLength(undefined)}>
+            <Button
+              aria-pressed={usesOverride ? 'false' : 'true'}
+              size="sm"
+              type="button"
+              variant="ghost"
+              onClick={() => applySectionLength(undefined)}
+            >
               Use global default
             </Button>
           </div>
@@ -220,7 +254,7 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
             <ReadOnlyField label="Start Station" value={formatFeet(singleSelectedSegment.startStation)} />
             <ReadOnlyField label="End Station" value={formatFeet(singleSelectedSegment.endStation)} />
             <ReadOnlyField label="Piece Type" value={singleSelectedSegment.isPartial ? 'Partial' : 'Full'} />
-            <ReadOnlyField label="Active Rule" value={usesOverride ? `Override · ${formatFeet(activeSectionLength)}` : `Global · ${formatFeet(activeSectionLength)}`} />
+            <ReadOnlyField label="Active Rule" value={usesOverride ? `Override | ${formatFeet(activeSectionLength)}` : `Global | ${formatFeet(activeSectionLength)}`} />
           </div>
         ) : null}
 
@@ -231,7 +265,7 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
             <ReadOnlyField label="Partial Segments" value={String(multiSelectionPartialCount)} />
             <ReadOnlyField label="Full Segments" value={String(multiSelectedSegments.length - multiSelectionPartialCount)} />
             <ReadOnlyField label="Segment Indexes" value={selectedIndexes.map((index) => index + 1).join(', ')} />
-            <ReadOnlyField label="Active Rule" value={usesOverride ? `Override · ${formatFeet(activeSectionLength)}` : `Global · ${formatFeet(activeSectionLength)}`} />
+            <ReadOnlyField label="Active Rule" value={usesOverride ? `Override | ${formatFeet(activeSectionLength)}` : `Global | ${formatFeet(activeSectionLength)}`} />
           </div>
         ) : null}
       </Card>

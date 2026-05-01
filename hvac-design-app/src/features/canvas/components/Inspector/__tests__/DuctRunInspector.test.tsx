@@ -91,6 +91,14 @@ describe('DuctRunInspector', () => {
     expect(screen.getByText('Custom section rule')).toBeDefined();
   });
 
+  it('marks the active quick-pick even when the run is using the global default', () => {
+    render(<DuctRunInspector entity={createRun()} />);
+
+    expect(screen.getByText('Global default')).toBeDefined();
+    expect(screen.getByRole('button', { name: /5 ft default/i }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: /use global default/i }).getAttribute('aria-pressed')).toBe('true');
+  });
+
   it('routes override edits through the update command', () => {
     render(<DuctRunInspector entity={createRun()} />);
 

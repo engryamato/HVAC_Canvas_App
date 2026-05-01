@@ -62,9 +62,23 @@ describe('FabricationProfileSettingsPanel', () => {
   it('resets the draft form to defaults', () => {
     render(<FabricationProfileSettingsPanel />);
     fireEvent.change(getRectangularDefaultInput(), { target: { value: '7' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset to defaults' }));
 
     expect(getRectangularDefaultInput().value).toBe('5');
+  });
+
+  it('switches between fabrication families with tabs instead of rendering a full stacked form', () => {
+    render(<FabricationProfileSettingsPanel />);
+
+    const rectangularTab = screen.getByRole('tab', { name: 'Rectangular' });
+    const roundTab = screen.getByRole('tab', { name: 'Round Rigid' });
+
+    expect(rectangularTab.getAttribute('data-state')).toBe('active');
+
+    fireEvent.click(roundTab);
+
+    expect(roundTab.getAttribute('data-state')).toBe('active');
+    expect(rectangularTab.getAttribute('data-state')).toBe('inactive');
   });
 
   it('recomputes non-overridden runs on save and leaves overrides unchanged', () => {
