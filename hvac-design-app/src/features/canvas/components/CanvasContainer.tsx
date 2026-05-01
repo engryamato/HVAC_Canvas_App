@@ -78,6 +78,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const unitSystem = usePreferencesStore((state) => state.unitSystem);
   const currentTool = useToolStore((state) => state.currentTool);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
+  const selectedSegments = useSelectionStore((state) => state.selectedSegments);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
   const setLastCanvasPoint = useCursorStore((state) => state.setLastCanvasPoint);
   const clearLastCanvasPoint = useCursorStore((state) => state.clearLastCanvasPoint);
@@ -223,11 +224,18 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         ctx.scale(entity.transform.scaleX, entity.transform.scaleY);
 
         // Create render context for this entity
+        const selectedSegmentIndexes =
+          entity.type === 'duct_run'
+            ? selectedSegments
+                .filter((segment) => segment.runId === entity.id)
+                .map((segment) => segment.segmentIndex)
+            : undefined;
         const renderContext: RenderContext = {
           ctx,
           zoom,
           isSelected: selectedIds.includes(entity.id),
           isHovered: hoveredId === entity.id,
+          selectedSegmentIndexes,
           entitiesById,
           showFittingLabels,
           unitSystem,
@@ -261,7 +269,17 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         ctx.restore();
       }
     },
-    [entities, zoom, selectedIds, hoveredId, entitiesById, showFittingLabels, unitSystem, renderNoteInline]
+    [
+      entities,
+      zoom,
+      selectedIds,
+      selectedSegments,
+      hoveredId,
+      entitiesById,
+      showFittingLabels,
+      unitSystem,
+      renderNoteInline,
+    ]
   );
 
   /**

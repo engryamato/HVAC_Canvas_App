@@ -10,6 +10,7 @@ export interface RenderContext {
   zoom: number;
   isSelected: boolean;
   isHovered: boolean;
+  selectedSegmentIndexes?: number[];
   entitiesById?: Record<string, Entity>;
   showFittingLabels?: boolean;
   unitSystem?: 'imperial' | 'metric';
