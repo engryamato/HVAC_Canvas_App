@@ -78,29 +78,35 @@ export class SelectTool extends BaseTool {
       const {
         selectedIds,
         select,
+        addToSelection,
         toggleSelection,
         clearSelectedSegments,
         selectSegment,
         toggleSegmentSelection,
       } = selectionStore;
+      const isAdditiveSegmentSelection = Boolean(event.shiftKey || event.ctrlKey || event.metaKey);
 
       if (entity.type === 'duct_run' && typeof hit?.segmentIndex === 'number') {
         if (!selectedIds.includes(entity.id)) {
-          select(entity.id);
+          if (isAdditiveSegmentSelection) {
+            addToSelection(entity.id);
+          } else {
+            select(entity.id);
+          }
           clearSelectedSegments();
-        } else if (event.shiftKey || event.ctrlKey) {
+        } else if (isAdditiveSegmentSelection) {
           toggleSegmentSelection(entity.id, hit.segmentIndex);
         } else {
           selectSegment(entity.id, hit.segmentIndex, false);
         }
       } else {
         clearSelectedSegments();
-      }
 
-      if (event.shiftKey) {
-        toggleSelection(entity.id);
-      } else if (!selectedIds.includes(entity.id)) {
-        select(entity.id);
+        if (event.shiftKey) {
+          toggleSelection(entity.id);
+        } else if (!selectedIds.includes(entity.id)) {
+          select(entity.id);
+        }
       }
 
       const finalSelection = [...useSelectionStore.getState().selectedIds];

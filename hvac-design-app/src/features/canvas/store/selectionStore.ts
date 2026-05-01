@@ -99,6 +99,10 @@ export const useSelectionStore = create<SelectionStore>()(
 
     selectSegment: (runId, segmentIndex, additive = false) =>
       set((state) => {
+        if (!state.selectedIds.includes(runId)) {
+          return;
+        }
+
         if (!additive) {
           state.selectedSegments = [{ runId, segmentIndex }];
           return;
@@ -114,6 +118,10 @@ export const useSelectionStore = create<SelectionStore>()(
 
     toggleSegmentSelection: (runId, segmentIndex) =>
       set((state) => {
+        if (!state.selectedIds.includes(runId)) {
+          return;
+        }
+
         const existingIndex = state.selectedSegments.findIndex(
           (segment) => segment.runId === runId && segment.segmentIndex === segmentIndex
         );
@@ -139,6 +147,7 @@ export const useSelectionStore = create<SelectionStore>()(
     selectAll: (allIds) =>
       set((state) => {
         state.selectedIds = [...allIds];
+        state.selectedSegments = filterSegmentsForSelection(state.selectedSegments, state.selectedIds);
       }),
 
     setHovered: (id) =>

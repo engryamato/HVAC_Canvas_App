@@ -76,6 +76,36 @@ describe('SelectionStore', () => {
     });
   });
 
+  describe('segment selection', () => {
+    it('requires the parent run to be selected before selecting a segment', () => {
+      useSelectionStore.getState().selectSegment('run-1', 0);
+      expect(useSelectionStore.getState().selectedSegments).toEqual([]);
+
+      useSelectionStore.getState().toggleSegmentSelection('run-1', 0);
+      expect(useSelectionStore.getState().selectedSegments).toEqual([]);
+    });
+
+    it('supports additive segment selection for the active run', () => {
+      useSelectionStore.getState().select('run-1');
+
+      useSelectionStore.getState().selectSegment('run-1', 0);
+      useSelectionStore.getState().selectSegment('run-1', 1, true);
+
+      expect(useSelectionStore.getState().selectedSegments).toEqual([
+        { runId: 'run-1', segmentIndex: 0 },
+        { runId: 'run-1', segmentIndex: 1 },
+      ]);
+    });
+
+    it('drops segment selections when the parent run leaves selection', () => {
+      useSelectionStore.getState().select('run-1');
+      useSelectionStore.getState().selectSegment('run-1', 0);
+
+      useSelectionStore.getState().clearSelection();
+      expect(useSelectionStore.getState().selectedSegments).toEqual([]);
+    });
+  });
+
   describe('selectAll', () => {
     it('should select all provided IDs', () => {
       const allIds = ['entity-1', 'entity-2', 'entity-3', 'entity-4'];
