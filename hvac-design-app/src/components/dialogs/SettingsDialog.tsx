@@ -13,6 +13,7 @@ import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useShallow } from 'zustand/react/shallow';
 import { QuarantineManagerDialog } from './QuarantineManagerDialog';
 import { StorageSettingsPanel } from './StorageSettings/StorageSettingsPanel';
+import { FabricationProfileSettingsPanel } from './FabricationProfileSettingsPanel';
 
 interface SettingsDialogProps {
     open: boolean;
@@ -131,10 +132,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         <h3 className="font-semibold text-sm mb-3">Storage</h3>
                         <StorageSettingsPanel onOpenQuarantine={() => setShowQuarantine(true)} />
                     </div>
+
+                    <div>
+                        <FabricationProfileSettingsPanel />
+                    </div>
                 </div>
 
                 <div className="mt-6 pt-4 border-t text-xs text-slate-500">
-                    Settings are automatically saved.
+                    Appearance, canvas, and storage settings are automatically saved. Fabrication profile changes apply when you press Save.
                 </div>
             </DialogContent>
             <QuarantineManagerDialog 

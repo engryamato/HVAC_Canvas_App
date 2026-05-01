@@ -22,6 +22,8 @@ interface FabricationProfileActions {
     allowedSectionLengths: number[]
   ) => void;
   setDraftName: (family: DuctFabricationFamily, name: string) => void;
+  replaceDraft: (profile: FabricationProfile) => void;
+  resetDraftToDefaults: () => void;
   commitDraft: () => void;
   revertDraft: () => void;
   resetProfiles: () => void;
@@ -85,6 +87,16 @@ export const useFabricationProfileStore = create<FabricationProfileStore>()(
               },
             },
           }),
+        })),
+
+      replaceDraft: (profile) =>
+        set(() => ({
+          draft: cloneFabricationProfile(profile),
+        })),
+
+      resetDraftToDefaults: () =>
+        set(() => ({
+          draft: cloneFabricationProfile(DEFAULT_FABRICATION_PROFILE),
         })),
 
       commitDraft: () =>

@@ -10,6 +10,9 @@ vi.mock('../RoomInspector', () => ({
 vi.mock('../DuctInspector', () => ({
   default: () => <div data-testid="duct-inspector">DuctInspector</div>,
 }));
+vi.mock('../DuctRunInspector', () => ({
+  default: () => <div data-testid="duct-run-inspector">DuctRunInspector</div>,
+}));
 vi.mock('../EquipmentInspector', () => ({
   default: () => <div data-testid="equipment-inspector">EquipmentInspector</div>,
 }));
@@ -31,8 +34,8 @@ const mockUseSelectionStore = useSelectionStore as unknown as ReturnType<typeof 
 const mockUseEntityStore = useEntityStore as unknown as ReturnType<typeof vi.fn>;
 
 function mockSelection(selectedIds: string[]) {
-  mockUseSelectionStore.mockImplementation((selector: (state: { selectedIds: string[]; hoveredId: null }) => unknown) =>
-    selector({ selectedIds, hoveredId: null })
+  mockUseSelectionStore.mockImplementation((selector: (state: { selectedIds: string[]; selectedSegments: []; hoveredId: null }) => unknown) =>
+    selector({ selectedIds, selectedSegments: [], hoveredId: null })
   );
 }
 
@@ -117,5 +120,13 @@ describe('InspectorPanel', () => {
 
     render(<InspectorPanel />);
     expect(screen.getByTestId('fitting-inspector')).toBeDefined();
+  });
+
+  it('renders DuctRun inspector for duct run selection', () => {
+    mockSelection(['5']);
+    mockEntities({ '5': { id: '5', type: 'duct_run' } });
+
+    render(<InspectorPanel />);
+    expect(screen.getByTestId('duct-run-inspector')).toBeDefined();
   });
 });

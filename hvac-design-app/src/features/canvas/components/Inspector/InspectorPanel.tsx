@@ -7,6 +7,7 @@ import { useActiveViewMode } from '../../store/viewModeStore';
 import type { Entity } from '@/core/schema';
 import RoomInspector from './RoomInspector';
 import DuctInspector from './DuctInspector';
+import DuctRunInspector from './DuctRunInspector';
 import EquipmentInspector from './EquipmentInspector';
 import FittingInspector from './FittingInspector';
 import { CanvasPropertiesInspector } from './CanvasPropertiesInspector';
@@ -32,6 +33,8 @@ function renderInspector(
       return <RoomInspector entity={entity} />;
     case 'duct':
       return <DuctInspector entity={entity} onHighlightInBOM={onHighlightInBOM} />;
+    case 'duct_run':
+      return <DuctRunInspector entity={entity} />;
     case 'equipment':
       return <EquipmentInspector entity={entity} />;
     case 'fitting':
