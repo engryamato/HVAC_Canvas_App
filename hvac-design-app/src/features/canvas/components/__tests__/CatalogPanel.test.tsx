@@ -210,6 +210,7 @@ function seedStore() {
 
 describe('CatalogPanel', () => {
   beforeEach(() => {
+    localStorage.removeItem('hvac-layout-preferences');
     useLayoutStore.getState().resetLayout();
     seedStore();
   });
@@ -236,7 +237,7 @@ describe('CatalogPanel', () => {
     expect(screen.getByTestId('catalog-category-hangers_supports')).toBeDefined();
   });
 
-  it('shows spec preview and inline delete confirmation for custom cards', async () => {
+  it('shows spec preview and inline delete confirmation for custom rows', async () => {
     render(<CatalogPanel />);
 
     expect(screen.getByText('Inline custom spec')).toBeDefined();
@@ -253,18 +254,18 @@ describe('CatalogPanel', () => {
     });
   });
 
-  it('renders type-aware duct and fitting icons for library cards', () => {
+  it('renders type-aware duct and fitting icons for library rows', () => {
     render(<CatalogPanel />);
 
-    expect(screen.getByTestId('catalog-card-icon-round-duct')).toHaveAttribute('data-icon-key', 'duct_round');
-    expect(screen.getByTestId('catalog-card-icon-single-wall-pipe')).toHaveAttribute('data-icon-key', 'duct_boiler_single_wall');
-    expect(screen.getByTestId('catalog-card-icon-radius-elbow')).toHaveAttribute('data-icon-key', 'fitting_elbow_radius');
+    expect(screen.getByTestId('catalog-row-icon-round-duct')).toHaveAttribute('data-icon-key', 'duct_round');
+    expect(screen.getByTestId('catalog-row-icon-single-wall-pipe')).toHaveAttribute('data-icon-key', 'duct_boiler_single_wall');
+    expect(screen.getByTestId('catalog-row-icon-radius-elbow')).toHaveAttribute('data-icon-key', 'fitting_elbow_radius');
   });
 
-  it('shows the active component compatibility summary outside the card grid', () => {
+  it('shows the active component compatibility summary outside the row list', () => {
     render(<CatalogPanel />);
 
-    fireEvent.click(screen.getByTestId('catalog-card-icon-round-duct').closest('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByTestId('catalog-row-icon-round-duct').closest('button') as HTMLButtonElement);
 
     expect(screen.getByTestId('catalog-active-fittings')).toHaveTextContent('Radius Elbow');
     expect(screen.getByTestId('catalog-active-accessories')).toHaveTextContent('Custom Hanger');
@@ -283,14 +284,67 @@ describe('CatalogPanel', () => {
     expect(screen.getByText(/system override is set to exhaust/i)).toBeDefined();
   });
 
-  it('switches the sidebar to Manage when customizing a catalog card', () => {
+  it('switches the sidebar to Manage when customizing a catalog row', () => {
     render(<CatalogPanel />);
 
-    fireEvent.click(screen.getByTestId('catalog-card-icon-round-duct').closest('button') as HTMLButtonElement);
+    fireEvent.click(screen.getByTestId('catalog-row-icon-round-duct').closest('button') as HTMLButtonElement);
     fireEvent.click(screen.getByRole('button', { name: /open actions for round duct/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Customize' }));
 
     expect(useLayoutStore.getState().activeLeftTab).toBe('manage');
     expect(useComponentLibraryStoreV2.getState().pendingEditEntryId).not.toBeNull();
+  });
+
+  it('defaults to compact density and persists changes', () => {
+    render(<CatalogPanel />);
+
+    expect(screen.getByRole('button', { name: 'compact' })).toHaveAttribute('aria-pressed', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'comfortable' }));
+
+    expect(screen.getByRole('button', { name: 'comfortable' })).toHaveAttribute('aria-pressed', 'true');
+    expect(useLayoutStore.getState().catalogDensity).toBe('comfortable');
+
+    const persisted = JSON.parse(localStorage.getItem('hvac-layout-preferences') ?? '{}');
+    expect(persisted.state.catalogDensity).toBe('comfortable');
+  });
+
+  it('exposes accessible density and row action controls', () => {
+    render(<CatalogPanel />);
+
+    expect(screen.getByRole('group', { name: 'Catalog density' })).toBeDefined();
+    expect(screen.getAllByRole('button', { name: /round duct/i })).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Open actions for Round Duct' })).toBeDefined();
+    expect(screen.getByRole('combobox', { name: /service context/i })).toBeDefined();
+  });
+
+  it('closes the row actions menu when escape is pressed', async () => {
+    render(<CatalogPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open actions for Round Duct' }));
+    expect(screen.getByTestId('catalog-row-actions-menu-round-duct')).toBeDefined();
+
+    fireEvent.keyDown(window, { key: 'Escape' });
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('catalog-row-actions-menu-round-duct')).toBeNull();
+    });
+    expect(screen.getByTestId('catalog-row-trigger-round-duct')).toHaveFocus();
+  });
+
+  it('supports arrow-key navigation across visible catalog rows', () => {
+    render(<CatalogPanel />);
+
+    const firstRow = screen.getByTestId('catalog-row-trigger-round-duct');
+    const secondRow = screen.getByTestId('catalog-row-trigger-single-wall-pipe');
+
+    firstRow.focus();
+    expect(firstRow).toHaveFocus();
+
+    fireEvent.keyDown(firstRow, { key: 'ArrowDown' });
+    expect(secondRow).toHaveFocus();
+
+    fireEvent.keyDown(secondRow, { key: 'ArrowUp' });
+    expect(firstRow).toHaveFocus();
   });
 });

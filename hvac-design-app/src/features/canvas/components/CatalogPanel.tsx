@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useLayoutStore } from '@/stores/useLayoutStore';
@@ -25,6 +25,8 @@ const COMPONENT_CLASS_LABELS: Record<UnifiedComponentDefinition['componentClass'
   equipment: 'Equipment',
   accessory: 'Accessory',
 };
+
+type CatalogDensity = 'compact' | 'comfortable';
 
 function summarizeCompatibility(
   ids: string[] | undefined,
@@ -66,9 +68,10 @@ function getCategoryColor(id: string): string {
   return '#0f766e';
 }
 
-function CatalogCard({
+function CatalogRow({
   entry,
   active,
+  density,
   onSelect,
   onClone,
   onCustomize,
@@ -77,6 +80,7 @@ function CatalogCard({
 }: {
   entry: UnifiedComponentDefinition;
   active: boolean;
+  density: CatalogDensity;
   onSelect: () => void;
   onClone: () => void;
   onCustomize: () => void;
@@ -85,51 +89,81 @@ function CatalogCard({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const rowRef = useRef<HTMLButtonElement | null>(null);
   const iconKey = resolveCatalogEntryIconKey(entry);
   const specPreview = entry.keySpec ?? entry.description ?? entry.typeId;
   const detailPreview =
-    [entry.systemType, entry.manufacturer, entry.model].filter(Boolean).join(' · ') ||
+    [entry.systemType?.replace(/_/g, ' '), entry.manufacturer, entry.model].filter(Boolean).join(' · ') ||
     entry.categoryId.replace(/_/g, ' ');
+  const isCompact = density === 'compact';
 
   const closeMenu = () => {
     setMenuOpen(false);
     setDeleteConfirmOpen(false);
   };
 
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      event.preventDefault();
+      closeMenu();
+      rowRef.current?.focus();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen]);
+
   return (
     <article
-      className={`group relative rounded-2xl border p-3 transition-all ${
+      className={`group relative rounded-2xl border transition-all ${
         active ? 'border-sky-500 bg-sky-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
       }`}
+      data-testid={`catalog-entry-row-${entry.id}`}
     >
-      <button type="button" onClick={onSelect} className="flex w-full items-start gap-3 text-left">
+      <button
+        ref={rowRef}
+        type="button"
+        onClick={onSelect}
+        className={`flex w-full items-start gap-3 text-left ${isCompact ? 'px-3 py-2.5' : 'px-3 py-3.5'}`}
+        data-catalog-row-trigger="true"
+        data-testid={`catalog-row-trigger-${entry.id}`}
+      >
         <span
-          className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-sm"
+          className={`mt-0.5 flex items-center justify-center rounded-xl text-white shadow-sm ${isCompact ? 'h-8 w-8' : 'h-10 w-10'}`}
           style={{ backgroundColor: getCategoryColor(entry.categoryId) }}
         >
           <HvacCatalogIcon
             iconKey={iconKey}
-            size={18}
+            size={isCompact ? 15 : 17}
             strokeWidth={2.25}
             aria-hidden
-            data-testid={`catalog-card-icon-${entry.id}`}
+            data-testid={`catalog-row-icon-${entry.id}`}
           />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold text-slate-900">{entry.name}</span>
-          <span className="mt-1 block text-[11px] uppercase tracking-[0.18em] text-slate-500">
-            {entry.categoryId.replace(/_/g, ' ')}
-          </span>
-          <span className="mt-2 inline-flex items-center gap-2">
+        <span className="min-w-0 flex-1 pr-8">
+          <span className="flex flex-wrap items-center gap-2">
+            <span className="truncate text-sm font-semibold text-slate-900">{entry.name}</span>
             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-700">
               {COMPONENT_CLASS_LABELS[entry.componentClass]}
             </span>
-            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-              {entry.placeable ? 'Placeable' : 'Managed'}
-            </span>
+            {entry.source === 'custom' ? (
+              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                Custom
+              </span>
+            ) : null}
           </span>
-          <span className="mt-2 block text-xs font-medium text-slate-700">{specPreview}</span>
-          <span className="mt-1 block text-[11px] text-slate-500">{detailPreview}</span>
+          <span className="mt-1 block text-[11px] uppercase tracking-[0.16em] text-slate-500">{detailPreview}</span>
+          <span className={`mt-1 block text-slate-700 ${isCompact ? 'text-xs' : 'text-sm font-medium'}`}>
+            {specPreview}
+          </span>
         </span>
       </button>
 
@@ -139,14 +173,17 @@ function CatalogCard({
           setMenuOpen((value) => !value);
           setDeleteConfirmOpen(false);
         }}
-        className="absolute right-2 top-2 rounded-md px-2 py-1 text-slate-500 opacity-0 transition hover:bg-slate-100 hover:text-slate-900 group-hover:opacity-100"
+        className="absolute right-2 top-2 rounded-md px-2 py-1 text-slate-500 opacity-0 transition hover:bg-slate-100 hover:text-slate-900 focus:opacity-100 group-hover:opacity-100"
         aria-label={`Open actions for ${entry.name}`}
       >
         ⋮
       </button>
 
       {menuOpen ? (
-        <div className="absolute right-2 top-10 z-20 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+        <div
+          className="absolute right-2 top-10 z-20 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+          data-testid={`catalog-row-actions-menu-${entry.id}`}
+        >
           <button
             type="button"
             className="block w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
@@ -224,6 +261,8 @@ interface CatalogPanelProps {
 
 export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
   const setActiveLeftTab = useLayoutStore((state) => state.setActiveLeftTab);
+  const density = useLayoutStore((state) => state.catalogDensity);
+  const setCatalogDensity = useLayoutStore((state) => state.setCatalogDensity);
 
   const categories = useUnifiedCatalogStore((state) => state.categories);
   const catalogEntries = useUnifiedCatalogStore((state) => state.catalogEntries);
@@ -361,6 +400,41 @@ export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
   }, [filteredEntries, selectedCategoryId]);
   const treeEntries = query ? matchingEntries : catalogEntries.filter((entry) => entry.placeable);
 
+  const handleEntryListKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    if (!target?.matches('[data-catalog-row-trigger="true"]')) {
+      return;
+    }
+
+    const rowButtons = Array.from(
+      event.currentTarget.querySelectorAll<HTMLButtonElement>('[data-catalog-row-trigger="true"]')
+    );
+    const currentIndex = rowButtons.indexOf(target as HTMLButtonElement);
+    if (currentIndex === -1) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (event.key === 'Home') {
+      rowButtons[0]?.focus();
+      return;
+    }
+
+    if (event.key === 'End') {
+      rowButtons[rowButtons.length - 1]?.focus();
+      return;
+    }
+
+    const delta = event.key === 'ArrowDown' ? 1 : -1;
+    const nextIndex = Math.min(Math.max(currentIndex + delta, 0), rowButtons.length - 1);
+    rowButtons[nextIndex]?.focus();
+  };
+
   const visibleRoots = useMemo(() => {
     if (!query) {
       return rootCategories;
@@ -401,7 +475,10 @@ export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
   };
 
   return (
-    <div className="flex h-full flex-col gap-3 rounded-2xl bg-gradient-to-b from-slate-50 via-white to-slate-50 p-3">
+    <div
+      className="flex h-full flex-col gap-3 rounded-2xl bg-gradient-to-b from-slate-50 via-white to-slate-50 p-3"
+      data-testid="catalog-panel"
+    >
       <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
@@ -417,16 +494,33 @@ export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
               <h3 className="text-sm font-semibold text-slate-900">Browse placeable components</h3>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              selectCategory(null);
-              setSearchQuery('');
-            }}
-            className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
-          >
-            Clear
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-full border border-slate-200 bg-slate-50 p-1" role="group" aria-label="Catalog density">
+              {(['compact', 'comfortable'] as CatalogDensity[]).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setCatalogDensity(option)}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold capitalize transition ${
+                    density === option ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-white'
+                  }`}
+                  aria-pressed={density === option}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                selectCategory(null);
+                setSearchQuery('');
+              }}
+              className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+            >
+              Clear
+            </button>
+          </div>
         </div>
 
         <label className="mt-3 block">
@@ -535,12 +629,17 @@ export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
               No placeable entries match this filter.
             </div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
+            <div
+              className={`flex flex-col ${density === 'compact' ? 'gap-2' : 'gap-3'}`}
+              data-testid="catalog-entry-list"
+              onKeyDown={handleEntryListKeyDown}
+            >
               {visibleEntries.map((entry) => (
-                <CatalogCard
+                <CatalogRow
                   key={entry.id}
                   entry={entry}
                   active={activeEntry?.id === entry.id}
+                  density={density}
                   onSelect={() => selectEntry(entry.id)}
                   onClone={() => cloneEntry(entry.id)}
                   onCustomize={() => {
@@ -579,6 +678,7 @@ export function CatalogPanel({ onOpenManage }: CatalogPanelProps = {}) {
               value={activeSystemType ?? 'supply'}
               onChange={(event) => setSystemType(event.target.value as CatalogSystemType)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-sky-400 focus:bg-white"
+              data-testid="catalog-service-context"
             >
               {SYSTEM_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
