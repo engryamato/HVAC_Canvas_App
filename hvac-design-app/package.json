@@ -56,11 +56,11 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "idb": "^8.0.3",
-    "immer": "^11.1.4",
+    "immer": "^11.1.8",
     "jspdf": "^4.0.0",
-    "jspdf-autotable": "^5.0.7",
+    "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.8.0",
-    "nanoid": "^5.1.7",
+    "nanoid": "^5.1.11",
     "next": "^16.2.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -69,7 +69,7 @@
     "three": "^0.183.2",
     "vibe-kanban-web-companion": "^0.0.5",
     "zod": "4.3.6",
-    "zustand": "5.0.12"
+    "zustand": "5.0.13"
   },
   "devDependencies": {
     "@chromatic-com/playwright": "^0.13.1",
