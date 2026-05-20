@@ -36,6 +36,27 @@ pw-*.json
 .tmp/
 typecheck-*.txt
 typecheck-*.count.txt
+.codex-typecheck-latest.txt
+.playwright-mcp/
+.sisyphus/
+
+# Root planning drafts (canonical copies live under docs/)
+PLAN-*.md
+PRD-*.md
+PRD_*.md
+RESTORATION_SUMMARY.md
+
+# Local UX reference and QA captures
+SizeWise UI/
+sidebar_design_mockup.html
+canvas-fan-*.png
+draw-fan-expanded.png
+duct-fitting-*.png
+duct-real-mouse-*.png
+sizaa*.png
+
+# Vitest run output dumps (not config)
+hvac-design-app/vitest-*.json
 
 # Superpowers visual companion artifacts
 .superpowers/
