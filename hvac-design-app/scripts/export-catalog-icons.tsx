@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { HvacCatalogIcon } from '../src/features/canvas/components/catalogIcons';
 import type { CatalogIconKey } from '../src/features/canvas/components/catalogIcons';

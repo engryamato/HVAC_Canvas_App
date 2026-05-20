@@ -3,10 +3,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { logger } from '@/utils/logger';
-import { createStorageAdapter } from '@/core/persistence/factory';
-import { StorageAdapter } from '@/core/persistence/StorageAdapter';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
-// type ProjectListItem as OriginalProjectListItem removed
+import { isTauri } from '@/core/persistence/filesystem';
+import { useStorageStore } from '@/core/store/storageStore';
 
 export interface ProjectListItem {
   projectId: string;
@@ -57,14 +56,18 @@ type ProjectListStore = ProjectListState & ProjectListActions;
 
 const INDEX_KEY = 'sws.projectIndex';
 
-// Lazy adapter initialization
-let adapterPromise: Promise<StorageAdapter> | null = null;
-const getAdapter = () => {
-  if (!adapterPromise) {
-    adapterPromise = createStorageAdapter();
+/**
+ * Compute the canonical on-disk path for a project on Tauri.
+ * Returns undefined on web (where IndexedDB is used instead).
+ */
+function canonicalFilePath(projectId: string): string | undefined {
+  const storageRoot = useStorageStore.getState().storageRootPath;
+  if (!storageRoot || !isTauri()) {
+    return undefined;
   }
-  return adapterPromise;
-};
+  const norm = storageRoot.replace(/[\\/]+$/, '');
+  return `${norm}/projects/${projectId}/project.sws`;
+}
 
 export const useProjectListStore = create<ProjectListStore>()(
   persist(
@@ -101,30 +104,46 @@ export const useProjectListStore = create<ProjectListStore>()(
       // === Storage Operations ===
 
       removeProject: async (projectId) => {
+        // Capture current state for rollback
+        const removedProject = get().projects.find((p) => p.projectId === projectId);
+        const removedRecentIdx = get().recentProjectIds.indexOf(projectId);
+
+        // ── Optimistic update (synchronous) ──────────────────────────────────
+        set((state) => ({
+          projects: state.projects.filter((p) => p.projectId !== projectId),
+          recentProjectIds: state.recentProjectIds.filter((id) => id !== projectId),
+        }));
+
+        // ── Persist deletion to storage (async) ──────────────────────────────
         try {
-          const adapter = await getAdapter();
-          const result = await adapter.deleteProject(projectId);
+          const repo = await getProjectRepository();
+          const result = await repo.deleteProject(projectId);
 
           if (!result.success) {
-             throw new Error(result.error || 'Failed to delete project');
+            throw new Error(result.error || 'Failed to delete project');
           }
 
-          // Update state
-          set((state) => ({
-            projects: state.projects.filter((p) => p.projectId !== projectId),
-            recentProjectIds: state.recentProjectIds.filter((id) => id !== projectId),
-          }));
-          
           logger.info('[ProjectListStore] Project deleted:', projectId);
         } catch (error) {
-          logger.error('[ProjectListStore] Error removing project:', error);
+          logger.error('[ProjectListStore] Error removing project, rolling back:', error);
+          // Roll back the optimistic removal
+          if (removedProject) {
+            set((state) => {
+              const projects = [...state.projects, removedProject];
+              const recentProjectIds = [...state.recentProjectIds];
+              if (removedRecentIdx !== -1) {
+                recentProjectIds.splice(removedRecentIdx, 0, projectId);
+              }
+              return { projects, recentProjectIds };
+            });
+          }
           throw error;
         }
       },
 
       archiveProject: async (projectId) => {
         const project = get().projects.find((p) => p.projectId === projectId);
-        if (!project) {return;}
+        if (!project) { return; }
 
         // Optimistic update
         set((state) => ({
@@ -136,8 +155,18 @@ export const useProjectListStore = create<ProjectListStore>()(
         }));
 
         try {
-          const adapter = await getAdapter();
-          await adapter.updateMetadata(projectId, { isArchived: true });
+          const repo = await getProjectRepository();
+          const loadResult = await repo.loadProject(projectId);
+          if (!loadResult.success || !loadResult.project) {
+            throw new Error(loadResult.error || 'Failed to load project for archiving');
+          }
+          const saveResult = await repo.saveProject(
+            { ...loadResult.project, isArchived: true },
+            { createBackup: false }
+          );
+          if (!saveResult.success) {
+            throw new Error(saveResult.error || 'Failed to persist archived state');
+          }
           logger.info('[ProjectListStore] Project archived:', projectId);
         } catch (error) {
           logger.error('[ProjectListStore] Failed to archive project:', error);
@@ -153,7 +182,7 @@ export const useProjectListStore = create<ProjectListStore>()(
 
       restoreProject: async (projectId) => {
         const project = get().projects.find((p) => p.projectId === projectId);
-        if (!project) {return;}
+        if (!project) { return; }
 
         // Optimistic update
         set((state) => ({
@@ -165,8 +194,18 @@ export const useProjectListStore = create<ProjectListStore>()(
         }));
 
         try {
-          const adapter = await getAdapter();
-          await adapter.updateMetadata(projectId, { isArchived: false });
+          const repo = await getProjectRepository();
+          const loadResult = await repo.loadProject(projectId);
+          if (!loadResult.success || !loadResult.project) {
+            throw new Error(loadResult.error || 'Failed to load project for restoring');
+          }
+          const saveResult = await repo.saveProject(
+            { ...loadResult.project, isArchived: false },
+            { createBackup: false }
+          );
+          if (!saveResult.success) {
+            throw new Error(saveResult.error || 'Failed to persist restored state');
+          }
           logger.info('[ProjectListStore] Project restored:', projectId);
         } catch (error) {
           logger.error('[ProjectListStore] Failed to restore project:', error);
@@ -181,36 +220,63 @@ export const useProjectListStore = create<ProjectListStore>()(
       },
 
       duplicateProject: async (projectId, newName) => {
-        try {
-          const adapter = await getAdapter();
-          const result = await adapter.duplicateProject(projectId, newName);
+        // Find source in current store state so we can do an immediate optimistic
+        // update (mirrors the pattern used by archiveProject / restoreProject).
+        const sourceProject = get().projects.find((p) => p.projectId === projectId);
+        if (!sourceProject) {
+          return;
+        }
 
-          if (!result.success || !result.project) {
-            throw new Error(result.error || 'Failed to duplicate project');
+        const newProjectId = crypto.randomUUID();
+        const now = new Date().toISOString();
+        const filePath = canonicalFilePath(newProjectId);
+
+        const newProject: ProjectListItem = {
+          ...sourceProject,
+          projectId: newProjectId,
+          projectName: newName,
+          createdAt: now,
+          modifiedAt: now,
+          isArchived: false,
+          // Use canonical on-disk path on Tauri; fall back to a project-prefixed
+          // key for web / test environments.
+          storagePath: filePath ?? `project-${newProjectId}`,
+          filePath,
+          status: 'draft',
+        };
+
+        // ── Optimistic update (synchronous) ──────────────────────────────────
+        set((state) => ({ projects: [newProject, ...state.projects] }));
+        logger.info('[ProjectListStore] Project duplicated (optimistic):', newName);
+
+        // ── Persist to storage (async) ────────────────────────────────────────
+        try {
+          const repo = await getProjectRepository();
+          const loadResult = await repo.loadProject(projectId);
+          if (!loadResult.success || !loadResult.project) {
+            throw new Error(loadResult.error || 'Failed to load source project for duplication');
           }
 
-          // Add new project to state with status reset to 'draft' for duplicates
-          const newProject: ProjectListItem = {
-            projectId: result.project.projectId,
-            projectName: result.project.projectName,
-            projectNumber: result.project.projectNumber,
-            clientName: result.project.clientName,
-            // entityCount not readily available in partial result unless extra logic
-            // but adapter usually returns loaded project
-            entityCount: 0, 
-            createdAt: result.project.createdAt,
-            modifiedAt: result.project.modifiedAt,
-            // Use virtual path or file path
-            storagePath: result.source === 'file' ? (result as any).filePath || '' : `indexeddb://${result.project.projectId}`,
+          const duplicated = {
+            ...loadResult.project,
+            projectId: newProjectId,
+            projectName: newName,
+            createdAt: now,
+            modifiedAt: now,
             isArchived: false,
-            filePath: (result as any).filePath, // Only present if 'file' source
-            status: 'draft', // Reset status for duplicated projects
           };
 
-          set((state) => ({ projects: [newProject, ...state.projects] }));
-          logger.info('[ProjectListStore] Project duplicated:', newName);
+          const saveResult = await repo.saveProject(duplicated);
+          if (!saveResult.success) {
+            throw new Error(saveResult.error || 'Failed to save duplicated project');
+          }
+          logger.info('[ProjectListStore] Project duplicated (persisted):', newName);
         } catch (error) {
-          logger.error('[ProjectListStore] Duplicate failed:', error);
+          logger.error('[ProjectListStore] Duplicate persistence failed, rolling back:', error);
+          // Roll back the optimistic entry
+          set((state) => ({
+            projects: state.projects.filter((p) => p.projectId !== newProjectId),
+          }));
           throw error;
         }
       },
@@ -218,38 +284,43 @@ export const useProjectListStore = create<ProjectListStore>()(
       refreshProjects: async () => {
         set({ loading: true, error: undefined });
         try {
-          const adapter = await getAdapter();
-          const projects = await adapter.listProjects();
+          // Always go through ProjectRepository so Tauri uses the canonical
+          // path ({storageRoot}/projects/{id}/project.sws) and web uses IndexedDB.
+          const repo = await getProjectRepository();
+          const projects = await repo.listProjects();
 
-          // Map metadata to ProjectListItem
-          // Ideally we keep ProjectMetadata type consistent with ProjectListItem
-          // But ProjectListItem has extra fields like 'storagePath'.
-          
-          const projectItems: ProjectListItem[] = projects.map(p => ({
-            projectId: p.projectId,
-            projectName: p.projectName,
-            projectNumber: p.projectNumber,
-            clientName: p.clientName,
-            entityCount: 0, // Metadata doesn't usually carry entity count
-            createdAt: p.createdAt,
-            modifiedAt: p.modifiedAt,
-            isArchived: !!p.isArchived,
-            // In Tauri adapter, listProjects returns valid metadata. 
-            // StoragePath/FilePath might need to be inferred or is not critical for list
-            storagePath: '', 
-            filePath: undefined, // Can update this if adapter returns it, but listProjects returns ProjectMetadata[] which usually doesn't have system path
-            status: (p as any).status || 'draft', // Map status from adapter metadata if available
-          }));
+          const projectItems: ProjectListItem[] = projects.map(p => {
+            // Compute the canonical on-disk path so useAutoSave can write back
+            // to the right location without needing to re-resolve the root.
+            const filePath = canonicalFilePath(p.projectId);
+            return {
+              projectId: p.projectId,
+              projectName: p.projectName,
+              projectNumber: p.projectNumber,
+              clientName: p.clientName,
+              entityCount: 0,
+              createdAt: p.createdAt,
+              modifiedAt: p.modifiedAt,
+              isArchived: !!p.isArchived,
+              storagePath: filePath ?? `indexeddb://${p.projectId}`,
+              filePath,
+              status: (p as any).status ?? 'draft',
+            };
+          });
 
-          // Dedup projects by ID, preferring the one from adapter (latest)
-          const uniqueProjects = Array.from(new Map(projectItems.map(p => [p.projectId, p])).values());
-          
+          // Deduplicate by projectId, keeping the entry from the filesystem scan
+          const uniqueProjects = Array.from(
+            new Map(projectItems.map(p => [p.projectId, p])).values()
+          );
+
           if (uniqueProjects.length !== projectItems.length) {
-              logger.warn(`[ProjectListStore] Found ${projectItems.length - uniqueProjects.length} duplicate projects in refresh, removing them.`);
+            logger.warn(
+              `[ProjectListStore] Deduplicated ${projectItems.length - uniqueProjects.length} projects during refresh`
+            );
           }
 
           set({ projects: uniqueProjects, loading: false });
-          logger.info(`[ProjectListStore] Refreshed ${projectItems.length} projects`);
+          logger.info(`[ProjectListStore] Refreshed ${uniqueProjects.length} projects`);
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Failed to refresh projects';
           logger.error('[ProjectListStore] Refresh failed:', error);
@@ -259,9 +330,9 @@ export const useProjectListStore = create<ProjectListStore>()(
 
       syncProject: async (projectId) => {
         try {
-          const adapter = await getAdapter();
-          const result = await adapter.loadProject(projectId);
-          
+          const repo = await getProjectRepository();
+          const result = await repo.loadProject(projectId);
+
           if (result.success && result.project) {
             get().updateProject(projectId, {
               projectName: result.project.projectName,

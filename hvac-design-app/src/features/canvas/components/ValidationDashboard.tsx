@@ -5,12 +5,15 @@
  */
 import { useMemo, useState } from 'react';
 import { useValidationStore } from '@/core/store/validationStore';
+import { buildOverlayStatusMap, type DuctOverlayMode, useDuctOverlayStore } from '@/core/store/ductOverlayStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { Button } from '@/components/ui/button';
 import { ResolutionWizard } from './ResolutionWizard';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
+import { ConnectionGraphBuilder } from '@/core/services/graph/ConnectionGraphBuilder';
+import { TopologyValidationService } from '@/core/services/graph/TopologyValidationService';
 import {
   createEntity,
   deleteEntity,
@@ -33,6 +36,9 @@ export function ValidationDashboard() {
   const exportBlockers = useValidationStore((state) => state.exportBlockers);
   const unresolvedCatalogItems = useValidationStore((state) => state.unresolvedCatalogItems);
   const entities = useEntityStore((state) => state.byId);
+  const overlayMode = useDuctOverlayStore((state) => state.overlayMode);
+  const setOverlayMode = useDuctOverlayStore((state) => state.setOverlayMode);
+  const setOverlayStatusMap = useDuctOverlayStore((state) => state.setOverlayStatusMap);
   const components = useComponentLibraryStoreV2((state) => state.components);
   const selectSingle = useSelectionStore((state) => state.selectSingle);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
@@ -196,6 +202,13 @@ export function ValidationDashboard() {
     );
   };
 
+  const handleOverlayModeChange = (mode: DuctOverlayMode) => {
+    setOverlayMode(mode);
+    const graph = ConnectionGraphBuilder.buildFromPersistedMetadata(entities);
+    const topologyResults = TopologyValidationService.validate(graph, entities);
+    setOverlayStatusMap(buildOverlayStatusMap(entities, topologyResults, mode));
+  };
+
   const handleResetSelectedOverride = () => {
     if (!selectedOverrideFitting) {
       return;
@@ -275,6 +288,38 @@ export function ValidationDashboard() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="rounded border border-slate-200 bg-slate-50 p-3 space-y-2">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Duct Color Overlay
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ['off', 'Off'],
+              ['velocity', 'By Velocity'],
+              ['pressure', 'By Pressure'],
+            ].map(([mode, label]) => (
+              <label
+                key={mode}
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-xs ${
+                  overlayMode === mode
+                    ? 'border-blue-500 bg-blue-50 font-semibold text-blue-700'
+                    : 'border-slate-200 bg-white text-slate-600'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="duct-color-overlay"
+                  value={mode}
+                  checked={overlayMode === mode}
+                  onChange={() => handleOverlayModeChange(mode as DuctOverlayMode)}
+                  className="h-3 w-3"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded border border-slate-200 bg-slate-50 p-3 space-y-2">
           <Button type="button" className="w-full" onClick={handleRerunAutoFitting} data-testid="rerun-autofitting">
             Re-run Auto-Fitting

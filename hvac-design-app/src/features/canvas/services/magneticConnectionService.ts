@@ -1,10 +1,9 @@
-import type { Duct, DuctRun, Entity, Equipment, Fitting } from '@/core/schema';
+import type { Entity, Equipment, Fitting } from '@/core/schema';
 import { feetToPixels } from '@/core/constants/coordinates';
-import { DuctRunGeometryService } from './DuctRunGeometryService';
+import { getDuctStartAndEnd, type DuctLike } from './ductGeometryHelpers';
 
 const SNAP_TOLERANCE = feetToPixels(1);
 const ENDPOINT_PRIORITY_TOLERANCE = SNAP_TOLERANCE;
-type DuctLike = Duct | DuctRun;
 
 export type MagneticSnapType = 'duct_endpoint' | 'fitting_port' | 'equipment_point' | 'duct_body';
 
@@ -29,25 +28,6 @@ interface DuctProjection {
   start: { x: number; y: number };
   end: { x: number; y: number };
   angle: number;
-}
-
-function getDuctStartAndEnd(duct: DuctLike): { start: { x: number; y: number }; end: { x: number; y: number } } {
-  if (duct.type === 'duct_run') {
-    const geometry = DuctRunGeometryService.getGeometry(duct);
-    return { start: geometry.start, end: geometry.end };
-  }
-
-  const { x, y, rotation } = duct.transform;
-  const lengthPixels = feetToPixels(duct.props.length);
-  const radians = (rotation * Math.PI) / 180;
-
-  return {
-    start: { x, y },
-    end: {
-      x: x + lengthPixels * Math.cos(radians),
-      y: y + lengthPixels * Math.sin(radians),
-    },
-  };
 }
 
 function getDuctEndPoint(duct: DuctLike, endPoint: 'start' | 'end'): { x: number; y: number } {
@@ -198,17 +178,23 @@ function resolveNearestDuctBody(ducts: DuctLike[], x: number, y: number): Magnet
 export class MagneticConnectionService {
   static readonly SNAP_TOLERANCE = SNAP_TOLERANCE;
 
-  static resolveSnapTarget(x: number, y: number, entitiesById: Record<string, Entity>): MagneticSnapResult | null {
-    const entities = Object.values(entitiesById);
+  static resolveSnapTarget(
+    x: number,
+    y: number,
+    entitiesById: Record<string, Entity>,
+    excludeIds: string[] = []
+  ): MagneticSnapResult | null {
+    const excluded = new Set(excludeIds);
+    const entities = Object.values(entitiesById).filter((entity) => !excluded.has(entity.id));
     const ducts = entities.filter((entity): entity is DuctLike => entity.type === 'duct' || entity.type === 'duct_run');
     const fittings = entities.filter((entity): entity is Fitting => entity.type === 'fitting');
     const equipment = entities.filter((entity): entity is Equipment => entity.type === 'equipment');
 
     return (
       resolveNearestDuctEndpoint(ducts, x, y) ??
+      resolveNearestDuctBody(ducts, x, y) ??
       resolveNearestFittingPort(fittings, x, y) ??
-      resolveNearestEquipmentPoint(equipment, x, y) ??
-      resolveNearestDuctBody(ducts, x, y)
+      resolveNearestEquipmentPoint(equipment, x, y)
     );
   }
 }

@@ -42,7 +42,6 @@ export const AppInitializer: React.FC = () => {
                 modifiedAt: now,
                 isArchived: false,
                 location: projectData.location || undefined,
-                settings: projectData.settings ? { ...projectData.settings } : undefined,
             });
 
             const repository = await getProjectRepository();

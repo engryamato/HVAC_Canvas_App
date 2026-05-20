@@ -97,8 +97,11 @@ describe('summarizeDuctRunQuantity', () => {
         engineeringSystem: 'standard_duct',
         width: 30,
         height: 14,
-        segments: [{ index: 0, length: 0, isPartial: false }],
+        segments: [{ index: 0, length: 0, isPartial: false, startStation: 0, endStation: 0 }],
       })
     ).toThrow('Duct run segment 0 must have a positive length.');
+  });
+});
+a positive length.');
   });
 });

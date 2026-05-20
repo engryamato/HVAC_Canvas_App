@@ -41,7 +41,7 @@ function normalizeCategory(value: string): UnifiedComponentDefinition['category'
 }
 
 function normalizeSystemType(value: string | undefined): UnifiedComponentDefinition['systemType'] {
-  if (value === 'supply' || value === 'return' || value === 'exhaust') {
+  if (value === 'supply' || value === 'return' || value === 'exhaust' || value === 'outside_air') {
     return value;
   }
   return undefined;
@@ -91,6 +91,12 @@ export function migrateFromComponentLibrary(
     const candidate: UnifiedComponentDefinition = {
       id: old.id,
       name: old.name,
+      componentClass: normalizeCategory(old.type),
+      categoryId: `${normalizeCategory(old.type)}_legacy`,
+      typeId: old.type,
+      engineeringSystem: 'standard_duct',
+      placeable: true,
+      source: 'custom',
       category: normalizeCategory(old.type),
       type: old.type,
       subtype: old.subtype,
@@ -107,6 +113,10 @@ export function migrateFromComponentLibrary(
       tags: old.tags,
       customFields: old.customFields,
       isCustom: old.isCustom,
+      recommendedFittingEntryIds: [],
+      recommendedAccessoryEntryIds: [],
+      recommendedEquipmentEntryIds: [],
+      connectionNotes: [],
       createdAt: old.createdAt,
       updatedAt: old.updatedAt,
     };
@@ -130,6 +140,12 @@ export function migrateFromCatalog(
     const candidate: UnifiedComponentDefinition = {
       id: item.id,
       name: item.name,
+      componentClass: normalizeCategory(item.type),
+      categoryId: `${normalizeCategory(item.type)}_catalog`,
+      typeId: item.type,
+      engineeringSystem: 'standard_duct',
+      placeable: true,
+      source: 'system',
       category: normalizeCategory(item.type),
       type: item.type,
       manufacturer: item.manufacturer,
@@ -145,6 +161,10 @@ export function migrateFromCatalog(
       materials: [],
       tags: item.tags,
       isCustom: false,
+      recommendedFittingEntryIds: [],
+      recommendedAccessoryEntryIds: [],
+      recommendedEquipmentEntryIds: [],
+      connectionNotes: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -173,6 +193,12 @@ export function migrateFromServices(
     const candidate: UnifiedComponentDefinition = {
       id: service.id,
       name: service.name,
+      componentClass: 'equipment',
+      categoryId: 'service_equipment',
+      typeId: 'service',
+      engineeringSystem: 'standard_duct',
+      placeable: true,
+      source: service.source === 'custom' ? 'custom' : 'system',
       category: 'equipment',
       type: 'service',
       subtype: systemType,
@@ -187,6 +213,10 @@ export function migrateFromServices(
       materials: [],
       tags: systemType ? [systemType] : [],
       isCustom: service.source === 'custom',
+      recommendedFittingEntryIds: [],
+      recommendedAccessoryEntryIds: [],
+      recommendedEquipmentEntryIds: [],
+      connectionNotes: [],
       createdAt,
       updatedAt,
     };
@@ -270,3 +300,4 @@ export function migrateToUnifiedComponentLibrary(
     },
   });
 }
+

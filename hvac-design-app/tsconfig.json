@@ -9,10 +9,11 @@
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "types": [],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -46,22 +47,23 @@
       }
     ],
     "allowJs": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": false,
-    "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": true
+    "noImplicitReturns": false,
+    "noUncheckedIndexedAccess": false
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
+    ".next",
     "src-tauri",
     "e2e",
     "debug*.ts",

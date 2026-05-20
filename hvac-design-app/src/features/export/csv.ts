@@ -59,51 +59,238 @@ export interface BomItem {
   specifications: string;
 }
 
+// ---------------------------------------------------------------------------
+// Helpers for description formatting
+// ---------------------------------------------------------------------------
+
+/** Humanise a duct shape enum value: "rectangular" → "Rectangular", etc. */
+function formatShapeLabel(shape: string): string {
+  switch (shape) {
+    case 'rectangular': return 'Rectangular';
+    case 'round':       return 'Round';
+    case 'flat_oval':   return 'Flat Oval';
+    case 'flexible':    return 'Flexible';
+    default: return shape ? shape.charAt(0).toUpperCase() + shape.slice(1) : '';
+  }
+}
+
 /**
- * Generate bill of materials from entities
- * Returns BomItem array suitable for display in BOM data grids
+ * Duct / duct_run description.
+ * Format: "<Shape> Duct <size> × <length>"
+ * Example: "Rectangular Duct 12\" × 8\" × 5'"
+ */
+function formatDuctDescription(props: Record<string, unknown>): string {
+  const shape = String(props.shape ?? '');
+  const shapeLabel = formatShapeLabel(shape) || 'Duct';
+
+  let sizeStr = '';
+  if (shape === 'round' || shape === 'flexible') {
+    sizeStr = props.diameter != null ? `${props.diameter}"` : '';
+  } else if (shape === 'rectangular' || shape === 'flat_oval') {
+    sizeStr =
+      props.width != null && props.height != null
+        ? `${props.width}" × ${props.height}"`
+        : '';
+  }
+
+  // installLength (duct_run) or length (legacy duct) — both in feet
+  const rawLength = props.installLength ?? props.length;
+  const lengthStr = rawLength != null ? `${rawLength}'` : '';
+
+  const label = `${shapeLabel} Duct`;
+  if (sizeStr && lengthStr) return `${label} ${sizeStr} × ${lengthStr}`;
+  if (sizeStr) return `${label} ${sizeStr}`;
+  if (lengthStr) return `${label} ${lengthStr}`;
+  return label;
+}
+
+/**
+ * Fitting description with optional shape prefix.
+ * Format: "<Shape> <angle>° Elbow" or "<Shape> Tee" etc.
+ * Example: "Round 90° Elbow", "Rectangular Reducer"
+ */
+function formatFittingDescription(props: Record<string, unknown>, shape = ''): string {
+  const fittingType = String(props.fittingType ?? '');
+  const shapeLabel = formatShapeLabel(shape);
+
+  // Prefer explicit angle prop; fall back to type-encoded angle
+  const rawAngle = props.angle != null ? Math.round(Number(props.angle)) : null;
+
+  // Elbow variants
+  if (fittingType === 'elbow_90' || fittingType === 'elbow_45') {
+    const deg = rawAngle ?? (fittingType === 'elbow_90' ? 90 : 45);
+    return [shapeLabel, `${deg}° Elbow`].filter(Boolean).join(' ');
+  }
+  if (fittingType === 'elbow_mitered') {
+    return [shapeLabel, 'Mitered Elbow'].filter(Boolean).join(' ');
+  }
+  // Generic elbow_ prefix with a stored angle
+  if (fittingType.startsWith('elbow_') && rawAngle != null) {
+    return [shapeLabel, `${rawAngle}° Elbow`].filter(Boolean).join(' ');
+  }
+
+  const labelMap: Record<string, string> = {
+    tee:                        'Tee',
+    wye:                        'Wye',
+    reducer:                    'Reducer',
+    reducer_tapered:            'Tapered Reducer',
+    reducer_eccentric:          'Eccentric Reducer',
+    cap:                        'Cap',
+    transition_square_to_round: 'Square-to-Round Transition',
+    end_boot:                   'End Boot',
+  };
+
+  const label =
+    labelMap[fittingType] ??
+    (fittingType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) || 'Fitting');
+
+  return [shapeLabel, label].filter(Boolean).join(' ');
+}
+
+function formatEquipmentDescription(props: Record<string, unknown>): string {
+  const parts = [props.manufacturer, props.model ?? props.modelNumber, props.equipmentType]
+    .filter(Boolean)
+    .map(String);
+  return parts.join(' ') || 'Equipment';
+}
+
+/**
+ * Generate bill of materials from entities.
+ *
+ * Handles both modern `duct_run` and legacy `duct` entity types.
+ * Identical items (same type + description) are automatically grouped.
+ * Fitting descriptions include duct shape derived from connected duct runs.
  */
 export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
   const entityList = entities.allIds
     .map((id) => entities.byId[id])
     .filter((e): e is Record<string, unknown> => e !== undefined);
 
-  const items: BomItem[] = [];
-  let itemNumber = 1;
+  // Build a quick shape lookup: entityId → shape string
+  // Used to derive fitting shapes from connected duct runs.
+  const shapeByEntityId = new Map<string, string>();
+  entityList.forEach((entity) => {
+    const t = String(entity.type ?? '');
+    if (t === 'duct_run' || t === 'duct') {
+      const id = String(entity.id ?? '');
+      const shape = String((entity.props as Record<string, unknown> ?? {}).shape ?? '');
+      if (id && shape) shapeByEntityId.set(id, shape);
+    }
+  });
+
+  // --- Build raw (ungrouped) line items ---
+  type RawItem = Omit<BomItem, 'itemNumber'>;
+  const rawItems: RawItem[] = [];
 
   entityList.forEach((entity) => {
     const entityType = String(entity.type ?? 'unknown');
     const props = (entity.props ?? {}) as Record<string, unknown>;
+    const entityId = String(entity.id ?? '');
 
-    // Map entity type to display name
-    let displayType = 'Other';
-    if (entityType === 'duct') {
-      displayType = 'Duct';
-    } else if (entityType === 'equipment') {
-      displayType = 'Equipment';
-    } else if (entityType === 'fitting') {
-      displayType = 'Fitting';
-    } else if (entityType === 'room') {
-      return; // Skip rooms in BOM
+    switch (entityType) {
+      case 'duct_run':
+      case 'duct': {
+        const description = formatDuctDescription(props);
+        const shape = String(props.shape ?? '');
+        let sizeStr = '';
+        if (shape === 'round' || shape === 'flexible') {
+          sizeStr = props.diameter != null ? `${props.diameter}"` : '';
+        } else if (shape === 'rectangular' || shape === 'flat_oval') {
+          sizeStr =
+            props.width != null && props.height != null
+              ? `${props.width}" × ${props.height}"`
+              : '';
+        }
+        rawItems.push({
+          entityId,
+          name: description,
+          type: 'Duct',
+          description,
+          quantity: 1,
+          unit: 'EA',
+          specifications: sizeStr,
+        });
+        break;
+      }
+      case 'fitting': {
+        // Derive shape from transitionData, connectionPoints, or inletDuctId
+        const transitionData = props.transitionData as Record<string, unknown> | undefined;
+        let fittingShape = '';
+        if (transitionData?.fromShape) {
+          fittingShape = String(transitionData.fromShape);
+        } else {
+          const connectionPoints = props.connectionPoints as Array<{ ductId: string }> | undefined;
+          if (connectionPoints && connectionPoints.length > 0) {
+            fittingShape = shapeByEntityId.get(connectionPoints[0].ductId) ?? '';
+          }
+          if (!fittingShape && props.inletDuctId) {
+            fittingShape = shapeByEntityId.get(String(props.inletDuctId)) ?? '';
+          }
+        }
+
+        const description = formatFittingDescription(props, fittingShape);
+        rawItems.push({
+          entityId,
+          name: description,
+          type: 'Fitting',
+          description,
+          quantity: 1,
+          unit: 'EA',
+          specifications: '',
+        });
+        break;
+      }
+      case 'equipment': {
+        const description = formatEquipmentDescription(props);
+        rawItems.push({
+          entityId,
+          name: description,
+          type: 'Equipment',
+          description,
+          quantity: 1,
+          unit: 'EA',
+          specifications: String(props.equipmentType ?? ''),
+        });
+        break;
+      }
+      // Skip non-BOM entity types
+      case 'room':
+      case 'note':
+      case 'group':
+        break;
+      default: {
+        const description = String(props.name ?? entityType);
+        rawItems.push({
+          entityId,
+          name: description,
+          type: 'Accessory',
+          description,
+          quantity: 1,
+          unit: 'EA',
+          specifications: '',
+        });
+      }
     }
-
-    const size = props.width && props.height
-      ? `${props.width}" x ${props.height}"`
-      : props.size as string | undefined;
-
-    items.push({
-      itemNumber: itemNumber++,
-      entityId: String(entity.id ?? ''),
-      name: String(props.name ?? entityType),
-      type: displayType,
-      description: String(props.description ?? `${displayType} item`),
-      quantity: 1,
-      unit: 'ea',
-      specifications: size ?? '',
-    });
   });
 
-  return items;
+  // --- Group identical items (same type + description) ---
+  const grouped = new Map<string, RawItem>();
+  for (const item of rawItems) {
+    const key = `${item.type}::${item.description}`;
+    const existing = grouped.get(key);
+    if (existing) {
+      existing.quantity += 1;
+      // Keep the first entityId for canvas highlight sync
+    } else {
+      grouped.set(key, { ...item });
+    }
+  }
+
+  // --- Assign sequential item numbers ---
+  return Array.from(grouped.values()).map((item, index) => ({
+    ...item,
+    itemNumber: index + 1,
+  }));
 }
 
 export function downloadBomCsv(entities: EntitiesLike, projectName: string): void {

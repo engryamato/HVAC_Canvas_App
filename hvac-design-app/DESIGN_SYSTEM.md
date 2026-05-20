@@ -36,6 +36,19 @@ Treat the UI as a rigorous grid system.
 | **Input Height** | 32px | `h-8` | Standard form input height for density. |
 | **Button Height** | 36px | `h-9` | Standard action button. |
 
+### Catalog Compact-Mode Tokens
+| Token | Value | Tailwind Class | Usage |
+|:---|:---|:---|:---|
+| **Catalog Row Height** | 36px | `min-h-9` | Compact library rows must stay scannable while fitting 10+ rows in the default viewport. |
+| **Catalog Row Padding X** | 12px | `px-3` | Preserves icon, label, and meta spacing on the 4px grid. |
+| **Catalog Row Gap** | 8px | `gap-2` | Default spacing between icon, label stack, and row actions. |
+| **Catalog Chip Height** | 28px | `h-7` | Keeps category filters compact without clipping labels. |
+| **Catalog Chip Radius** | 9999px | `rounded-full` | Maintains the horizontal chip-strip affordance. |
+| **Catalog Search Height** | 32px | `h-8` | Matches the existing input density contract. |
+| **Catalog Compact Icon** | 16px | `h-4 w-4` | Default icon size for compact rows. |
+| **Catalog Comfortable Icon** | 20px | `h-5 w-5` | Used when the panel is in comfortable/card mode. |
+| **Catalog Active Accent** | Blue-500 | `border-sky-500 bg-sky-50` | Selected row state must remain obvious at narrow widths. |
+
 ### Z-Index Stratification
 | Layer | Z-Index | Note |
 |:---|:---|:---|

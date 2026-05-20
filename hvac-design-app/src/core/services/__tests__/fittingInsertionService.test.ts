@@ -18,6 +18,7 @@ function createMockDuct(
     createdAt: '2026-01-01T00:00:00.000Z',
     modifiedAt: '2026-01-01T00:00:00.000Z',
     props: {
+      engineeringSystem: 'standard_duct' as const,
       name: `Duct ${id}`,
       shape: 'round',
       diameter,
@@ -43,6 +44,7 @@ function createMockAutoInsertedFitting(id: string, inletDuctId?: string, outletD
     createdAt: '2026-01-01T00:00:00.000Z',
     modifiedAt: '2026-01-01T00:00:00.000Z',
     props: {
+      engineeringSystem: 'standard_duct' as const,
       name: `Fitting ${id}`,
       fittingType: 'elbow_90',
       inletDuctId,

@@ -22,6 +22,16 @@ export const FittingTypeSchema = z.enum([
 
 export type FittingType = z.infer<typeof FittingTypeSchema>;
 
+export const FittingPortSchema = z.object({
+  id: z.string().min(1),
+  role: z.enum(['inlet', 'outlet', 'straight_out', 'branch_out']),
+  direction: z.enum(['in', 'out']),
+  connectedDuctRunId: z.string().uuid(),
+  connectedEnd: z.enum(['start', 'end']),
+});
+
+export type FittingPort = z.infer<typeof FittingPortSchema>;
+
 const SharedFittingPropsSchema = z.object({
   name: z.string().min(1).max(100).optional().describe('Optional fitting name/label'),
   fittingType: FittingTypeSchema,
@@ -45,6 +55,7 @@ const SharedFittingPropsSchema = z.object({
     ductId: z.string().uuid(),
     pointIndex: z.number().int().nonnegative().optional(),
   })).optional(),
+  ports: z.array(FittingPortSchema).optional(),
   transitionData: z.object({
     fromShape: z.enum(['round', 'rectangular']).optional(),
     toShape: z.enum(['round', 'rectangular']).optional(),
@@ -116,6 +127,16 @@ export type FittingProps = z.infer<typeof FittingPropsSchema>;
 export const FittingCalculatedSchema = z.object({
   equivalentLength: z.number().nonnegative().describe('Equivalent length in feet'),
   pressureLoss: z.number().nonnegative().describe('Pressure loss in in.w.g.'),
+  cumulativePressureDrop: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('Total pressure loss from source equipment to this fitting in in.w.g.'),
+  availableStaticPressure: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('Remaining source static pressure at this fitting in in.w.g.'),
 });
 
 export type FittingCalculated = z.infer<typeof FittingCalculatedSchema>;

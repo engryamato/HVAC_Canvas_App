@@ -121,6 +121,22 @@ describe('DuctRunSchema', () => {
     expect(DuctRunSchema.parse(validDuctRun)).toEqual(validDuctRun);
   });
 
+  it('should accept optional propagated pressure fields in calculated data', () => {
+    const runWithPressure = {
+      ...validDuctRun,
+      calculated: {
+        ...validDuctRun.calculated,
+        cumulativePressureDrop: 0.24,
+        availableStaticPressure: 1.76,
+      },
+    };
+
+    expect(DuctRunSchema.parse(runWithPressure).calculated).toMatchObject({
+      cumulativePressureDrop: 0.24,
+      availableStaticPressure: 1.76,
+    });
+  });
+
   it('should reject non duct-run entities', () => {
     expect(() => DuctRunSchema.parse({ ...validDuctRun, type: 'duct' })).toThrow();
   });

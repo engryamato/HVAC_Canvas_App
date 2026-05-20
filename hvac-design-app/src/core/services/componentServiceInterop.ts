@@ -148,7 +148,9 @@ export function adaptServiceToComponent(service: Service): UnifiedComponentDefin
     placeable: true,
     source: 'custom',
     description: service.description,
-    systemType: service.systemType,
+    systemType: (['supply', 'return', 'exhaust', 'outside_air'] as const).find(
+      (t) => t === service.systemType
+    ),
     pressureClass: toComponentPressureClass(service.pressureClass),
     engineeringProperties: {
       frictionFactor: 0.02,

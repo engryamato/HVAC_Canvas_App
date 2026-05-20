@@ -44,6 +44,7 @@ export function createFitting(
     autoInserted: boolean;
     manualOverride: boolean;
     connectionPoints: Array<{ ductId: string; pointIndex?: number }>;
+    transitionData: FittingProps['transitionData'];
     engineeringSystem: FittingProps['engineeringSystem'];
     backpressureLimit: number;
     thermalExpansionJointRequired: boolean;
@@ -70,6 +71,7 @@ export function createFitting(
     autoInserted: overrides?.autoInserted ?? false,
     manualOverride: overrides?.manualOverride ?? typeDefaults.manualOverride ?? false,
     connectionPoints: overrides?.connectionPoints,
+    transitionData: overrides?.transitionData,
     ...(overrides?.backpressureLimit !== undefined ? { backpressureLimit: overrides.backpressureLimit } : {}),
     ...(overrides?.thermalExpansionJointRequired !== undefined
       ? { thermalExpansionJointRequired: overrides.thermalExpansionJointRequired }

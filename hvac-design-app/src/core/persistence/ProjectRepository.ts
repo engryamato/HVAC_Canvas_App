@@ -5,8 +5,9 @@ import type { StorageAdapter } from './StorageAdapter';
 import { ensureStorageRootReady, getStorageRootService } from '../services/StorageRootService';
 import type { QuarantinedFile } from '../services/types';
 import { loadProject as loadProjectFromPath, saveProject as saveProjectToPath } from './projectIO';
-import { createDir, copyFile, exists, readTextFile, renameFile, removeFile, removePath } from './filesystem';
+import { createDir, copyFile, exists, readDir, readTextFile, renameFile, removeFile, removePath } from './filesystem';
 import { isTauri } from './filesystem';
+import { ProjectMetadataSchema } from '../schema/project-file.schema';
 
 export interface ImportResult extends SaveResult {
     projectId: string;
@@ -215,7 +216,56 @@ export class ProjectRepository extends EventTarget {
     }
 
     async listProjects(): Promise<ProjectMetadata[]> {
+        if (isTauri()) {
+            return await this.listProjectsCanonical();
+        }
         return await this.adapter.listProjects();
+    }
+
+    /**
+     * Scans the canonical Tauri storage path ({storageRoot}/projects/{id}/project.sws)
+     * for all projects instead of delegating to TauriStorageAdapter which uses the
+     * legacy {baseDir}/{id}/{id}.hvac path structure.
+     */
+    private async listProjectsCanonical(): Promise<ProjectMetadata[]> {
+        const rootPath = await this.getStorageRootPath();
+        if (!rootPath) {
+            return [];
+        }
+
+        const projectsDir = `${this.normalizePath(rootPath)}/projects`;
+        if (!(await exists(projectsDir))) {
+            return [];
+        }
+
+        const entries = await readDir(projectsDir);
+        const projects: ProjectMetadata[] = [];
+
+        for (const entryName of entries) {
+            const projectFilePath = `${projectsDir}/${entryName}/project.sws`;
+            try {
+                if (!(await exists(projectFilePath))) {
+                    continue;
+                }
+                const loadResult = await loadProjectFromPath(projectFilePath);
+                if (loadResult.success && loadResult.project) {
+                    const metaResult = ProjectMetadataSchema.safeParse(loadResult.project);
+                    if (metaResult.success) {
+                        projects.push(metaResult.data);
+                    } else {
+                        console.warn(`[ProjectRepository] Skipping project with invalid metadata: ${entryName}`);
+                    }
+                }
+            } catch (error) {
+                console.warn(`[ProjectRepository] Skipping unreadable project entry: ${entryName}`, error);
+            }
+        }
+
+        projects.sort(
+            (a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime()
+        );
+
+        return projects;
     }
 
     async importProject(externalPath: string): Promise<ImportResult> {
@@ -584,6 +634,7 @@ export class ProjectRepository extends EventTarget {
                     projects,
                     recentProjectIds: Array.isArray(state.recentProjectIds) ? state.recentProjectIds : [],
                 },
+        
             })
         );
     }
@@ -628,8 +679,8 @@ export class ProjectRepository extends EventTarget {
 let repositoryInstance: ProjectRepository | null = null;
 
 export function createProjectRepository(
-    adapter: StorageAdapter, 
-    queue: OperationQueue, 
+    adapter: StorageAdapter,
+    queue: OperationQueue,
     store: any
 ): ProjectRepository {
     return new ProjectRepository(adapter, queue, store);
@@ -639,11 +690,11 @@ export async function getProjectRepository(): Promise<ProjectRepository> {
     if (!repositoryInstance) {
         const { useStorageStore } = await import('../store/storageStore');
         const { getAdapter } = await import('./factory');
-        
+
         const adapter = await getAdapter();
         const queue = getSharedOperationQueue();
         const store = useStorageStore.getState();
-        
+
         repositoryInstance = createProjectRepository(adapter, queue, store);
     }
     return repositoryInstance;

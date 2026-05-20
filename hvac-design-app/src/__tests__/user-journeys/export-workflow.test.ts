@@ -87,6 +87,7 @@ const createMockEquipment = (
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct' as const,
     name,
     equipmentType,
     capacity: 2000,
@@ -113,8 +114,10 @@ const createMockFitting = (
   createdAt: new Date().toISOString(),
   modifiedAt: new Date().toISOString(),
   props: {
+    engineeringSystem: 'standard_duct' as const,
     fittingType,
     angle: fittingType === 'elbow_90' ? 90 : fittingType === 'elbow_45' ? 45 : undefined,
+    manualOverride: false,
   },
   calculated: { equivalentLength: 10, pressureLoss: 0.02 },
 });

@@ -121,4 +121,18 @@ describe('DuctRunRenderer', () => {
     expect(fillRect).toHaveBeenCalledWith(720, -12, 36, 24);
     expect(context.ctx.fillText).toHaveBeenCalledWith('Supply Main', 378, -18);
   });
+
+  it('uses overlay color for duct body fill while keeping selection as an outline', () => {
+    const run = createRun(10, [10]);
+    const context = createContext({
+      isSelected: true,
+      overlayColor: '#dc2626',
+    });
+
+    renderDuctRun(run, context);
+
+    expect(context.ctx.fillStyle).toBe('#111827');
+    expect(context.ctx.fillRect).toHaveBeenNthCalledWith(1, 0, -12, 120, 24);
+    expect(context.ctx.strokeStyle).toBe('#1976D2');
+  });
 });

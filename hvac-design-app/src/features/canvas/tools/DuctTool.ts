@@ -4,7 +4,8 @@ import {
   type ToolMouseEvent,
   type ToolRenderContext,
 } from './BaseTool';
-import { createEntity, splitDuctRunAtPoint } from '@/core/commands/entityCommands';
+import { createEntity, createEntities, splitDuctRunAtPoint } from '@/core/commands/entityCommands';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
 import type { Duct, DuctRun, Entity } from '@/core/schema';
 import {
@@ -24,10 +25,20 @@ import {
   resolvePlacementStrategy,
   type PlacementContext,
   type PlacementPreviewDecoration,
+  type PlacementSnapTarget,
 } from './placementStrategies';
 import { MagneticConnectionService, type MagneticSnapResult } from '../services/magneticConnectionService';
+import { getDuctStartAndEnd } from '../services/ductGeometryHelpers';
 
 const MIN_DUCT_LENGTH = feetToPixels(1);
+const DRAG_COMMIT_THRESHOLD = 4;
+type DuctRunSegmentDefaults = {
+  insulationType?: string | null;
+  insulationThickness?: number;
+  startEndType?: string;
+  endEndType?: string;
+};
+
 type SnapTarget = MagneticSnapResult & {
   entityId: string;
   entityType: 'duct' | 'duct_run';
@@ -44,9 +55,18 @@ interface DuctToolState {
   snapTarget: SnapTarget | null;
 }
 
+interface CancelGhost {
+  startPoint: { x: number; y: number };
+  currentPoint: { x: number; y: number };
+  startedAt: number;
+}
+
 export class DuctTool extends BaseTool {
   readonly name = 'duct';
-  private static autoFittingEnabled = false;
+  private static autoFittingEnabledOverride: boolean | null = null;
+  private cancelGhost: CancelGhost | null = null;
+  private pointerDragStart: { x: number; y: number } | null = null;
+  private hasDragMoved = false;
 
   private state: DuctToolState = {
     mode: 'idle',
@@ -57,11 +77,14 @@ export class DuctTool extends BaseTool {
   };
 
   static setAutoFittingEnabled(enabled: boolean): void {
-    this.autoFittingEnabled = enabled;
+    this.autoFittingEnabledOverride = enabled;
   }
 
   static isAutoFittingEnabled(): boolean {
-    return this.autoFittingEnabled;
+    if (this.autoFittingEnabledOverride !== null) {
+      return this.autoFittingEnabledOverride;
+    }
+    return process.env.NEXT_PUBLIC_ENABLE_AUTO_FITTING === 'true';
   }
 
   getCursor(): string {
@@ -69,11 +92,12 @@ export class DuctTool extends BaseTool {
   }
 
   onActivate(): void {
-    this.reset();
+    this.resetPlacement();
   }
 
   onDeactivate(): void {
-    this.reset();
+    this.captureCancelGhost();
+    this.resetPlacement();
   }
 
   onMouseDown(event: ToolMouseEvent): void {
@@ -84,6 +108,8 @@ export class DuctTool extends BaseTool {
     if (this.state.mode === 'idle') {
       const magneticSnap = this.state.snapTarget;
       const startPoint = magneticSnap ? { x: magneticSnap.x, y: magneticSnap.y } : this.snapToGrid(event.x, event.y);
+      this.pointerDragStart = startPoint;
+      this.hasDragMoved = false;
       this.state = {
         mode: 'placing_end',
         startPoint,
@@ -112,7 +138,7 @@ export class DuctTool extends BaseTool {
 
     if (this.state.mode === 'idle') {
       this.state.snapTarget = snapResult;
-      this.state.currentPoint = snapResult ? { x: snapResult.x, y: snapResult.y } : null;
+      this.state.currentPoint = snapResult ? { x: snapResult.x, y: snapResult.y } : { x: event.x, y: event.y };
       return;
     }
 
@@ -124,10 +150,32 @@ export class DuctTool extends BaseTool {
         this.state.currentPoint = this.snapToGrid(event.x, event.y);
         this.state.snapTarget = null;
       }
+
+      if (this.pointerDragStart && this.state.currentPoint) {
+        const dragDistance = Math.hypot(
+          this.state.currentPoint.x - this.pointerDragStart.x,
+          this.state.currentPoint.y - this.pointerDragStart.y
+        );
+        if (dragDistance >= DRAG_COMMIT_THRESHOLD) {
+          this.hasDragMoved = true;
+        }
+      }
     }
   }
 
-  onMouseUp(_event: ToolMouseEvent): void {}
+  onMouseUp(event: ToolMouseEvent): void {
+    if (event.button !== undefined && event.button !== 0) {
+      this.resetDragTracking();
+      return;
+    }
+
+    if (this.hasDragMoved && this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
+      this.createDuctRunEntity(this.state.startPoint, this.state.currentPoint, this.state.startSnapTarget, this.state.snapTarget);
+      this.resetPlacement();
+    }
+
+    this.resetDragTracking();
+  }
 
   onKeyDown(event: ToolKeyEvent): void {
     if (event.key === 'Escape') {
@@ -139,6 +187,8 @@ export class DuctTool extends BaseTool {
   render(context: ToolRenderContext): void {
     const { ctx, zoom } = context;
 
+    this.renderProximityEndpointIndicators(context);
+
     if (this.state.mode === 'idle') {
       if (this.state.snapTarget && this.state.currentPoint) {
         ctx.save();
@@ -149,10 +199,12 @@ export class DuctTool extends BaseTool {
         ctx.stroke();
         ctx.restore();
       }
+      this.renderCancelGhost(context);
       return;
     }
 
     if (!this.state.startPoint || !this.state.currentPoint) {
+      this.renderCancelGhost(context);
       return;
     }
 
@@ -164,12 +216,13 @@ export class DuctTool extends BaseTool {
       activeComponent?.engineeringSystem === 'universal'
         ? 'standard_duct'
         : activeComponent?.engineeringSystem ?? 'standard_duct';
+    const placementSnapTarget = this.toPlacementSnapTarget(snapTarget);
     const placementContext: PlacementContext = {
       engineeringSystem: activeEngineeringSystem,
       specialtyToolId: useToolStore.getState().activeSpecialtyToolId,
       startPoint,
       endPoint: currentPoint,
-      snapTarget,
+      snapTarget: placementSnapTarget,
     };
     const previewStyle: PlacementPreviewDecoration =
       placementStrategy.augmentPreview?.(placementContext) ??
@@ -210,9 +263,16 @@ export class DuctTool extends BaseTool {
       (startPoint.y + currentPoint.y) / 2 - 8 / zoom
     );
     ctx.restore();
+    this.renderCancelGhost(context);
   }
 
   protected reset(): void {
+    this.cancelGhost = null;
+    this.resetPlacement();
+  }
+
+  private resetPlacement(): void {
+    this.resetDragTracking();
     this.state = {
       mode: 'idle',
       startPoint: null,
@@ -220,6 +280,112 @@ export class DuctTool extends BaseTool {
       currentPoint: null,
       snapTarget: null,
     };
+  }
+
+  private resetDragTracking(): void {
+    this.pointerDragStart = null;
+    this.hasDragMoved = false;
+  }
+
+  private captureCancelGhost(): void {
+    if (this.state.mode !== 'placing_end' || !this.state.startPoint || !this.state.currentPoint) {
+      return;
+    }
+
+    this.cancelGhost = {
+      startPoint: { ...this.state.startPoint },
+      currentPoint: { ...this.state.currentPoint },
+      startedAt: Date.now(),
+    };
+  }
+
+  private toPlacementSnapTarget(snapTarget: SnapTarget | null): PlacementSnapTarget | null {
+    if (!snapTarget) {
+      return null;
+    }
+
+    return {
+      ductId: snapTarget.entityId,
+      endPoint: snapTarget.endPoint ?? 'end',
+      x: snapTarget.x,
+      y: snapTarget.y,
+      angle: snapTarget.angle,
+    };
+  }
+
+  private renderCancelGhost({ ctx, zoom }: ToolRenderContext): void {
+    if (!this.cancelGhost) {
+      return;
+    }
+
+    const elapsed = Date.now() - this.cancelGhost.startedAt;
+    const progress = Math.min(Math.max(elapsed / 200, 0), 1);
+    if (progress >= 1) {
+      this.cancelGhost = null;
+      return;
+    }
+
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    const { startPoint, currentPoint } = this.cancelGhost;
+
+    ctx.save();
+    ctx.globalAlpha = 1 - easedProgress;
+    ctx.strokeStyle = '#424242';
+    ctx.lineWidth = 12 / zoom;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([8 / zoom, 4 / zoom]);
+    ctx.beginPath();
+    ctx.moveTo(startPoint.x, startPoint.y);
+    ctx.lineTo(currentPoint.x, currentPoint.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private renderProximityEndpointIndicators({ ctx, zoom }: ToolRenderContext): void {
+    const cursorPoint = this.state.currentPoint;
+    if (!cursorPoint) {
+      return;
+    }
+
+    const entities = useEntityStore.getState().byId as Record<string, Entity>;
+    const snapTolerance = MagneticConnectionService.SNAP_TOLERANCE;
+    const fadeStart = snapTolerance * 1.5;
+    const fadeEnd = snapTolerance * 0.3;
+
+    for (const entity of Object.values(entities)) {
+      if (entity.type !== 'duct_run' && entity.type !== 'duct') {
+        continue;
+      }
+
+      const { start, end } = getDuctStartAndEnd(entity as Duct | DuctRun);
+      for (const point of [start, end]) {
+        const distance = Math.hypot(point.x - cursorPoint.x, point.y - cursorPoint.y);
+        if (distance > fadeStart) {
+          continue;
+        }
+
+        const alpha = 1 - Math.max(0, (distance - fadeEnd) / (fadeStart - fadeEnd));
+        const snapTarget = this.state.snapTarget;
+        const isSnapped =
+          snapTarget !== null &&
+          Math.abs(snapTarget.x - point.x) < 1 &&
+          Math.abs(snapTarget.y - point.y) < 1;
+        const radius = isSnapped ? 7 / zoom : 5 / zoom;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#2196F3';
+        ctx.lineWidth = 1.5 / zoom;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 2.5 / zoom, 0, Math.PI * 2);
+        ctx.fillStyle = '#2196F3';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
   }
 
   private getActiveComponent(): UnifiedComponentDefinition | null {
@@ -293,8 +459,17 @@ export class DuctTool extends BaseTool {
       placementStrategy.getCreateOverrides?.() ??
       {};
 
-    const requestedShape = activeComponent?.subtype ?? activeService?.dimensionalConstraints.allowedShapes[0] ?? 'round';
+    const ductDrawSettings = useToolStore.getState().ductDrawSettings;
+    const requestedShape =
+      ductDrawSettings.shape ??
+      activeComponent?.subtype ??
+      activeService?.dimensionalConstraints.allowedShapes[0] ??
+      'rectangular';
     const shape = this.normalizeRunShape(requestedShape);
+    const insulationType =
+      shape === 'flexible' && ductDrawSettings.insulationType && ductDrawSettings.insulationType !== 'wrap'
+        ? null
+        : ductDrawSettings.insulationType;
 
     const run = createDuctRun({
       x: start.x,
@@ -309,21 +484,31 @@ export class DuctTool extends BaseTool {
     });
 
     Object.assign(run.props, strategyOverrides);
+    const segmentDefaults = run.props as DuctRun['props'] & DuctRunSegmentDefaults;
+    segmentDefaults.insulationType = insulationType ?? undefined;
+    segmentDefaults.insulationThickness = ductDrawSettings.insulationThickness;
+    segmentDefaults.startEndType = ductDrawSettings.startEndType;
+    segmentDefaults.endEndType = ductDrawSettings.endEndType;
 
-    if ((shape === 'round' || shape === 'flexible') && activeComponent?.defaultDimensions?.diameter) {
-      run.props.diameter = activeComponent.defaultDimensions.diameter;
+    if (shape === 'round' || shape === 'flexible') {
+      run.props.diameter = ductDrawSettings.diameter ?? activeComponent?.defaultDimensions?.diameter ?? 12;
     }
 
-    if ((shape === 'rectangular' || shape === 'flat_oval') && activeComponent?.defaultDimensions) {
-      run.props.width = activeComponent.defaultDimensions.width ?? run.props.width;
-      run.props.height = activeComponent.defaultDimensions.height ?? run.props.height;
+    if (shape === 'rectangular' || shape === 'flat_oval') {
+      run.props.width = ductDrawSettings.width ?? activeComponent?.defaultDimensions?.width ?? 12;
+      run.props.height = ductDrawSettings.height ?? activeComponent?.defaultDimensions?.height ?? 8;
     }
 
     run.transform.rotation = rotation;
     run.props.startPoint = { ...start };
     run.props.endPoint = { ...end };
     const sectionLength = getActiveSectionLength(run);
-    run.props.segments = recomputeDuctRunSegments(run.props.installLength, sectionLength);
+    run.props.segments = recomputeDuctRunSegments(run.props.installLength, sectionLength, {
+      insulationType: segmentDefaults.insulationType,
+      insulationThickness: segmentDefaults.insulationThickness,
+      startEndType: segmentDefaults.startEndType,
+      endEndType: segmentDefaults.endEndType,
+    });
 
     const splitTarget =
       startSnapTarget?.snapType === 'duct_body'
@@ -341,6 +526,15 @@ export class DuctTool extends BaseTool {
       })
     ) {
       return;
+    }
+
+    if (DuctTool.isAutoFittingEnabled()) {
+      const workingEntities = { ...useEntityStore.getState().byId, [run.id]: run };
+      const insertionPlan = fittingInsertionService.planAutoInsertForDuct(run.id, workingEntities);
+      if (insertionPlan.insertions.length > 0) {
+        createEntities([run, ...insertionPlan.insertions]);
+        return;
+      }
     }
 
     createEntity(run);

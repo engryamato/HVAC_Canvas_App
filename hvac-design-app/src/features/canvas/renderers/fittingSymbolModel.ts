@@ -1,4 +1,4 @@
-import type { Duct, Entity, Fitting } from '@/core/schema';
+import type { Duct, DuctRun, Entity, Fitting } from '@/core/schema';
 
 export type DynamicFittingSymbolKind =
   | 'elbow_90'
@@ -106,16 +106,32 @@ function createRectangularProfile(width: number, height: number): DuctProfile {
 }
 
 export function getDuctProfile(entity: Entity | undefined): DuctProfile | undefined {
-  if (!entity || entity.type !== 'duct') {
+  if (!entity) {
     return undefined;
   }
 
-  const duct = entity as Duct;
-  if (duct.props.shape === 'round') {
-    return createRoundProfile(duct.props.diameter ?? DEFAULT_SIZE);
+  if (entity.type === 'duct') {
+    const duct = entity as Duct;
+    if (duct.props.shape === 'round') {
+      return createRoundProfile(duct.props.diameter ?? DEFAULT_SIZE);
+    }
+
+    return createRectangularProfile(duct.props.width ?? DEFAULT_SIZE, duct.props.height ?? 8);
   }
 
-  return createRectangularProfile(duct.props.width ?? DEFAULT_SIZE, duct.props.height ?? 8);
+  if (entity.type === 'duct_run') {
+    const run = entity as DuctRun;
+    if (run.props.shape === 'round' || run.props.shape === 'flexible') {
+      const diameter = 'diameter' in run.props ? (run.props.diameter ?? DEFAULT_SIZE) : DEFAULT_SIZE;
+      return createRoundProfile(diameter);
+    }
+
+    const width = 'width' in run.props ? (run.props.width ?? DEFAULT_SIZE) : DEFAULT_SIZE;
+    const height = 'height' in run.props ? (run.props.height ?? 8) : 8;
+    return createRectangularProfile(width, height);
+  }
+
+  return undefined;
 }
 
 function getTransitionProfiles(fitting: Fitting): { from?: DuctProfile; to?: DuctProfile } {

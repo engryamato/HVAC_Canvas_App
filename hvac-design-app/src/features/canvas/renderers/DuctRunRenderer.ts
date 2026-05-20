@@ -3,14 +3,14 @@ import type { RenderContext } from './RoomRenderer';
 import { DuctRunGeometryService } from '../services/DuctRunGeometryService';
 
 export function renderDuctRun(run: DuctRun, context: RenderContext): void {
-  const { ctx, zoom, isSelected, isHovered, selectedSegmentIndexes = [] } = context;
+  const { ctx, zoom, isSelected, isHovered, selectedSegmentIndexes = [], overlayColor } = context;
   const geometry = DuctRunGeometryService.getGeometry(run);
   const halfThickness = geometry.thicknessPx / 2;
   const outerHalfThickness = halfThickness + 2 / zoom;
 
   ctx.save();
-  ctx.fillStyle = isSelected ? 'rgba(25, 118, 210, 0.08)' : 'rgba(75, 85, 99, 0.04)';
-  if (isHovered && !isSelected) {
+  ctx.fillStyle = overlayColor ?? (isSelected ? 'rgba(25, 118, 210, 0.08)' : 'rgba(75, 85, 99, 0.04)');
+  if (isHovered && !isSelected && !overlayColor) {
     ctx.fillStyle = 'rgba(75, 85, 99, 0.08)';
   }
   ctx.fillRect(0, -halfThickness, geometry.lengthPx, geometry.thicknessPx);
@@ -44,7 +44,7 @@ export function renderDuctRun(run: DuctRun, context: RenderContext): void {
   ctx.lineTo(0, outerHalfThickness);
   ctx.moveTo(geometry.lengthPx, -outerHalfThickness);
   ctx.lineTo(geometry.lengthPx, outerHalfThickness);
-  ctx.strokeStyle = isSelected ? '#1976D2' : '#4B5563';
+  ctx.strokeStyle = isSelected ? '#1976D2' : (overlayColor ?? '#4B5563');
   ctx.lineWidth = 2 / zoom;
   ctx.stroke();
 

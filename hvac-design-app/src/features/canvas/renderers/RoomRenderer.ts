@@ -13,7 +13,9 @@ export interface RenderContext {
   selectedSegmentIndexes?: number[];
   entitiesById?: Record<string, Entity>;
   showFittingLabels?: boolean;
+  backgroundColor?: string;
   unitSystem?: 'imperial' | 'metric';
+  overlayColor?: string | null;
 }
 
 /**

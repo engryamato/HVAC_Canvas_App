@@ -22,7 +22,6 @@ function createTestDuct(engineeringSystem: Duct['props']['engineeringSystem']): 
     createdAt: '2026-01-01T00:00:00.000Z',
     modifiedAt: '2026-01-01T00:00:00.000Z',
     props: {
-      engineeringSystem: 'standard_duct',
       name: 'Test Duct',
       engineeringSystem,
       shape: 'round',

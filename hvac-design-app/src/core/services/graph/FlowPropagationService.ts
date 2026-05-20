@@ -12,7 +12,7 @@ import type { ConnectionGraph } from './types';
 
 interface FlowNode {
   entityId: string;
-  type: 'duct' | 'fitting' | 'equipment' | 'accessory';
+  type: 'duct' | 'duct_run' | 'fitting' | 'equipment' | 'accessory';
   connections: Set<string>;
   unprocessedConnections: number;
   accumulatedFlow: number;
@@ -47,7 +47,7 @@ export class FlowPropagationService {
       if (!entity) {continue;}
 
       // Add node to graph if it's a flow-carrying entity
-      if (entity.type !== 'duct' && entity.type !== 'equipment' && entity.type !== 'fitting') {
+      if (entity.type !== 'duct' && entity.type !== 'duct_run' && entity.type !== 'equipment' && entity.type !== 'fitting') {
         continue; // Skip entities that are not flow-carrying
       }
 
@@ -74,7 +74,8 @@ export class FlowPropagationService {
       // IMPORTANT: Do not treat Ducts as leaves to initiate propagation. 
       // Ducts are passive carriers and should only process when pushed by terminals or fittings.
       const isFlowSource = flowNode.accumulatedFlow > 0;
-      const isLeafNonDuct = flowNode.unprocessedConnections <= 1 && flowNode.type !== 'duct';
+      const isLeafNonDuct =
+        flowNode.unprocessedConnections <= 1 && flowNode.type !== 'duct' && flowNode.type !== 'duct_run';
 
       if (isFlowSource || isLeafNonDuct) {
         queue.push(nodeId);
@@ -95,7 +96,7 @@ export class FlowPropagationService {
 
       // Record flow for ducts
       const entity = entities[currentId];
-      if (entity?.type === 'duct') {
+      if (entity?.type === 'duct' || entity?.type === 'duct_run') {
         flowMap.set(currentId, currentNode.accumulatedFlow);
       }
 
@@ -119,7 +120,7 @@ export class FlowPropagationService {
     for (const [nodeId] of nodeMap.entries()) {
       if (!processed.has(nodeId)) {
         const entity = entities[nodeId];
-        if (entity?.type === 'duct') {
+        if (entity?.type === 'duct' || entity?.type === 'duct_run') {
           // Unprocessed ducts in cycles get 0 flow (ambiguous flow direction)
           flowMap.set(nodeId, 0);
         }
@@ -133,8 +134,11 @@ export class FlowPropagationService {
    * Determine if equipment is a terminal (demand source) vs source equipment
    */
   private static isTerminalEquipment(equipment: Equipment): boolean {
-    const terminalTypes = ['diffuser', 'hood', 'damper'] as const;
-    return terminalTypes.includes(equipment.props.equipmentType as any);
+    return (
+      equipment.props.equipmentType === 'diffuser' ||
+      equipment.props.equipmentType === 'hood' ||
+      equipment.props.equipmentType === 'damper'
+    );
   }
 
   /**

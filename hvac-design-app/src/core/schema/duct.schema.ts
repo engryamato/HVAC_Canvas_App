@@ -181,6 +181,16 @@ export const DuctCalculatedSchema = z.object({
   area: z.number().nonnegative().describe('Cross-sectional area in sq in'),
   velocity: z.number().nonnegative().describe('Air velocity in FPM'),
   frictionLoss: z.number().nonnegative().describe('Stored pressure-drop / friction-rate value in in.w.g./100ft'),
+  cumulativePressureDrop: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('Total pressure loss from source equipment to this duct in in.w.g.'),
+  availableStaticPressure: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('Remaining source static pressure at this duct in in.w.g.'),
 });
 
 export type DuctCalculated = z.infer<typeof DuctCalculatedSchema>;

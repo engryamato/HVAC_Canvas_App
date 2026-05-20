@@ -305,7 +305,7 @@ describe('TauriStorageAdapter', () => {
       const result = await adapter.loadProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
-      expect(result.source).toBe('localStorage'); // Indicates backup
+      expect(result.source).toBe('file'); // Indicates backup file
     });
 
     it('should fallback to auto-save if backup corrupted', async () => {
@@ -322,7 +322,7 @@ describe('TauriStorageAdapter', () => {
       const result = await adapter.loadProject('550e8400-e29b-41d4-a716-446655440000');
 
       expect(result.success).toBe(true);
-      expect(result.source).toBe('indexedDB'); // Indicates autosave
+      expect(result.source).toBe('file'); // Indicates autosave file
     });
 
     it('should return FILE_NOT_FOUND for missing projects', async () => {

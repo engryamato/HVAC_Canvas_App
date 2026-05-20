@@ -33,6 +33,10 @@ function createEntry(overrides: Partial<UnifiedComponentDefinition>): UnifiedCom
     icon: overrides.icon,
     iconKey: overrides.iconKey,
     isCustom: overrides.isCustom ?? false,
+    recommendedFittingEntryIds: overrides.recommendedFittingEntryIds ?? [],
+    recommendedAccessoryEntryIds: overrides.recommendedAccessoryEntryIds ?? [],
+    recommendedEquipmentEntryIds: overrides.recommendedEquipmentEntryIds ?? [],
+    connectionNotes: overrides.connectionNotes ?? [],
     createdAt: overrides.createdAt ?? now,
     updatedAt: overrides.updatedAt ?? now,
   };
@@ -91,6 +95,13 @@ describe('catalogIcons', () => {
   });
 
   it('falls back safely for unknown duct and fitting archetypes', () => {
+    expect(resolveCatalogEntryIconKey(createEntry({ typeId: 'mystery_duct' }))).toBe('duct');
+    expect(
+      resolveCatalogEntryIconKey(createEntry({ componentClass: 'fitting', category: 'fitting', typeId: 'mystery_fitting' }))
+    ).toBe('fitting');
+  });
+});
+ting archetypes', () => {
     expect(resolveCatalogEntryIconKey(createEntry({ typeId: 'mystery_duct' }))).toBe('duct');
     expect(
       resolveCatalogEntryIconKey(createEntry({ componentClass: 'fitting', category: 'fitting', typeId: 'mystery_fitting' }))

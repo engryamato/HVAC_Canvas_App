@@ -3,9 +3,10 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ConnectionDetectionService } from '../connectionDetection';
-import { Duct } from '@/core/schema';
+import { Duct, DuctRun } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import type { DetectedConnection } from '../connectionDetection';
+import { createDuctRun } from '@/features/canvas/entities/ductRunDefaults';
 
 // Mock the entity store
 vi.mock('@/core/store/entityStore', () => ({
@@ -44,6 +45,24 @@ describe('ConnectionDetectionService', () => {
       frictionLoss: 0.05,
     },
   });
+
+  const createMockDuctRun = (
+    id: string,
+    x: number,
+    y: number,
+    rotation: number,
+    installLength = 10
+  ): DuctRun => {
+    const run = createDuctRun({ x, y, installLength, sectionLengthOverride: 5 });
+    run.id = id;
+    run.transform.rotation = rotation;
+    run.props.startPoint = { x, y };
+    run.props.endPoint =
+      rotation === 90
+        ? { x, y: y + installLength * 12 }
+        : { x: x + installLength * 12, y };
+    return run;
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -176,6 +195,28 @@ describe('ConnectionDetectionService', () => {
       const connections = ConnectionDetectionService.detectConnections('small');
       expect(connections).toHaveLength(1);
       expect(connections[0]?.fittingType).toBe('transition');
+    });
+
+    // Latest magnetic-center snapping regression: endpoint-to-body connections must be
+    // detected at the final centerline coordinate, not from cursor or edge proximity.
+    it('detects endpoint-to-body duct_run connections at the final centerline point', () => {
+      const trunk = createMockDuctRun('trunk', 100, 100, 0, 10);
+      const branch = createMockDuctRun('branch', 160, 100, 90, 10);
+
+      (useEntityStore.getState as any).mockReturnValue({
+        byId: {
+          trunk,
+          branch,
+        },
+      });
+
+      const connections = ConnectionDetectionService.detectConnections('branch');
+
+      expect(connections).toHaveLength(1);
+      expect(connections[0]?.fittingType).toBe('tee');
+      expect(connections[0]?.newDuct.position).toEqual({ x: 160, y: 100 });
+      expect(connections[0]?.existingDuct.position).toEqual({ x: 160, y: 100 });
+      expect(connections[0]?.existingDuct.endPoint).toBe('body');
     });
 
     it('should return empty array for non-existent duct', () => {

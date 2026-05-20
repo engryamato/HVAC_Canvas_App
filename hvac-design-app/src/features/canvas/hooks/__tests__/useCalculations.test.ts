@@ -10,7 +10,7 @@ import {
 } from '../useCalculations';
 import type { EngineeringLimits } from '@/core/schema/calculation-settings.schema';
 
-const createTestDuct = (overrides: Partial<Duct['props']> = {}): Duct => ({
+const createTestDuct = (overrides: Partial<Duct['props']> & Record<string, unknown> = {}): Duct => ({
   id: 'duct-1',
   type: 'duct',
   transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
@@ -185,6 +185,10 @@ describe('useCalculations helpers', () => {
     expect(universal.engine.capabilities).toEqual(['load', 'compliance']);
     expect(universal.complianceWarnings).toContain(
       'Large duct runs should verify seismic support spacing against IBC/ASCE 7 tables.'
+    );
+  });
+});
+tables.'
     );
   });
 });

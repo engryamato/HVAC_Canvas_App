@@ -250,36 +250,36 @@ export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
 
   const upstream =
     original.type === 'duct'
-      ? cloneDuctWithNewGeometry(original, {
+      ? cloneDuctWithNewGeometry(original as Duct, {
           x: original.transform.x,
           y: original.transform.y,
           lengthFeet: upstreamLengthFeet,
-          connectedFrom: original.props.connectedFrom,
+          connectedFrom: (original as Duct).props.connectedFrom,
           connectedTo: undefined,
         })
-      : cloneDuctRunWithNewGeometry(original, {
+      : cloneDuctRunWithNewGeometry(original as DuctRun, {
           x: original.transform.x,
           y: original.transform.y,
           splitPoint: params.splitPoint,
           lengthFeet: upstreamLengthFeet,
-          connectedFrom: original.props.connectedFrom,
+          connectedFrom: (original as DuctRun).props.connectedFrom,
           connectedTo: undefined,
         });
   const downstream =
     original.type === 'duct'
-      ? cloneDuctWithNewGeometry(original, {
+      ? cloneDuctWithNewGeometry(original as Duct, {
           x: params.splitPoint.x,
           y: params.splitPoint.y,
           lengthFeet: downstreamLengthFeet,
           connectedFrom: undefined,
-          connectedTo: original.props.connectedTo,
+          connectedTo: (original as Duct).props.connectedTo,
         })
-      : cloneDuctRunWithNewGeometry(original, {
+      : cloneDuctRunWithNewGeometry(original as DuctRun, {
           x: params.splitPoint.x,
           y: params.splitPoint.y,
           lengthFeet: downstreamLengthFeet,
           connectedFrom: undefined,
-          connectedTo: original.props.connectedTo,
+          connectedTo: (original as DuctRun).props.connectedTo,
         });
 
   const branch = params.branchDuct;
@@ -343,7 +343,8 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
   const entitiesById = useEntityStore.getState().byId;
 
   if (entity.type === 'duct') {
-    return calculateDuctRuntime(entity).complianceWarnings.map((message, index) => ({
+    const duct = entity as Duct;
+    return calculateDuctRuntime(duct).complianceWarnings.map((message, index) => ({
       ruleId: `engine-runtime-duct-${index}`,
       type: 'engine-runtime',
       message,
@@ -352,7 +353,8 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
   }
 
   if (entity.type === 'fitting') {
-    const runtime = calculateFittingRuntime(entity, entitiesById);
+    const fitting = entity as Fitting;
+    const runtime = calculateFittingRuntime(fitting, entitiesById);
     const violations: ConstraintViolation[] = runtime.complianceWarnings.map((message, index) => ({
       ruleId: `engine-runtime-fitting-${index}`,
       type: 'engine-runtime',
@@ -361,14 +363,14 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
     }));
 
     if (
-      entity.props.engineeringSystem === 'generator_exhaust' &&
-      typeof entity.props.backpressureLimit === 'number' &&
-      runtime.calculated.pressureLoss > entity.props.backpressureLimit
+      fitting.props.engineeringSystem === 'generator_exhaust' &&
+      typeof fitting.props.backpressureLimit === 'number' &&
+      runtime.calculated.pressureLoss > fitting.props.backpressureLimit
     ) {
       violations.push({
         ruleId: 'backpressure-limit',
         type: 'backpressure-limit',
-        message: `Calculated fitting pressure loss ${runtime.calculated.pressureLoss.toFixed(2)} exceeds limit ${entity.props.backpressureLimit.toFixed(2)}.`,
+        message: `Calculated fitting pressure loss ${runtime.calculated.pressureLoss.toFixed(2)} exceeds limit ${fitting.props.backpressureLimit.toFixed(2)}.`,
         suggestedFix: 'Reduce run resistance or select a higher-rated exhaust fitting.',
         severity: 'warning',
       });
@@ -378,7 +380,8 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
   }
 
   if (entity.type === 'equipment') {
-    const runtime = calculateEquipmentRuntime(entity, entitiesById);
+    const equipment = entity as Equipment;
+    const runtime = calculateEquipmentRuntime(equipment, entitiesById);
     const violations: ConstraintViolation[] = runtime.complianceWarnings.map((message, index) => ({
       ruleId: `engine-runtime-equipment-${index}`,
       type: 'engine-runtime',
@@ -387,39 +390,44 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
     }));
 
     if (
-      typeof entity.props.loadRating === 'number' &&
+      equipment.props.engineeringSystem === 'universal' &&
+      typeof equipment.props.loadRating === 'number' &&
       typeof runtime.loadRating === 'number' &&
-      runtime.loadRating > entity.props.loadRating
+      runtime.loadRating > equipment.props.loadRating
     ) {
       violations.push({
         ruleId: 'support-load-rating',
         type: 'support-load-rating',
-        message: `Calculated support load ${runtime.loadRating.toFixed(1)} exceeds rated load ${entity.props.loadRating.toFixed(1)}.`,
+        message: `Calculated support load ${runtime.loadRating.toFixed(1)} exceeds rated load ${equipment.props.loadRating.toFixed(1)}.`,
         suggestedFix: 'Select a higher-capacity support assembly or reduce spacing.',
         severity: 'blocker',
       });
     }
 
-    if (typeof runtime.spacing === 'number' && entity.props.spacingRule) {
+    if (
+      equipment.props.engineeringSystem === 'universal' &&
+      typeof runtime.spacing === 'number' &&
+      equipment.props.spacingRule
+    ) {
       violations.push({
         ruleId: 'support-spacing-guidance',
         type: 'support-spacing-guidance',
         message: `Computed support spacing is ${runtime.spacing.toFixed(1)} ft for the connected run.`,
-        suggestedFix: `Verify the configured spacing rule "${entity.props.spacingRule}" matches this run.`,
+        suggestedFix: `Verify the configured spacing rule "${equipment.props.spacingRule}" matches this run.`,
         severity: 'warning',
       });
     }
 
     if (
-      entity.props.engineeringSystem === 'generator_exhaust' &&
-      typeof entity.props.backpressureLimit === 'number' &&
+      equipment.props.engineeringSystem === 'generator_exhaust' &&
+      typeof equipment.props.backpressureLimit === 'number' &&
       typeof runtime.engineeringData.pressureDrop === 'number' &&
-      runtime.engineeringData.pressureDrop > entity.props.backpressureLimit
+      runtime.engineeringData.pressureDrop > equipment.props.backpressureLimit
     ) {
       violations.push({
         ruleId: 'backpressure-limit',
         type: 'backpressure-limit',
-        message: `Calculated connected-run backpressure ${runtime.engineeringData.pressureDrop.toFixed(2)} exceeds limit ${entity.props.backpressureLimit.toFixed(2)}.`,
+        message: `Calculated connected-run backpressure ${runtime.engineeringData.pressureDrop.toFixed(2)} exceeds limit ${equipment.props.backpressureLimit.toFixed(2)}.`,
         suggestedFix: 'Reduce run resistance or select a higher-rated exhaust component.',
         severity: 'warning',
       });
@@ -570,7 +578,7 @@ export function validateAndRecord(entityId: string): void {
     });
   }
 
-  applyConstraintValidation(entity, normalizedViolations);
+  applyConstraintValidation(entity as Duct, normalizedViolations);
 }
 
 function syncEntityValidation(entity: Entity): void {

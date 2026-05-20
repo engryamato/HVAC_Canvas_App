@@ -20,9 +20,12 @@ describe('ConstraintValidationService', () => {
       maxDiameter: 24,
     },
     fittingRules: [],
+    manufacturerPreferences: [],
+    source: 'custom',
   };
 
   const createMockDuct = (overrides: Partial<Duct['props']> = {}): Duct['props'] => ({
+    engineeringSystem: 'standard_duct' as const,
     name: 'Test Duct',
     shape: 'round',
     diameter: 12,

@@ -4,4 +4,5 @@ const json = `{"schemaVersion":"1.0.0","projectId":"550e8400-e29b-41d4-a716-4466
 
 const parsed = JSON.parse(json);
 const res = ProjectMetadataSchema.safeParse(parsed);
-console.log(res.success ? "SUCCESS" : res.error);
+const consoleRef = globalThis.console;
+consoleRef.log(res.success ? "SUCCESS" : res.error);

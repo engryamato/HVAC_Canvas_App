@@ -1,0 +1,305 @@
+
+<style>
+  .sb-transition{transition:width 200ms ease-in-out}
+  .icon-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:none;cursor:pointer;color:var(--color-text-secondary)}
+  .icon-btn:hover{background:var(--color-background-secondary)}
+  .rail-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:none;background:none;cursor:pointer;color:var(--color-text-secondary);position:relative}
+  .rail-btn:hover{background:var(--color-background-secondary)}
+  .rail-btn.active{background:rgba(59,130,246,.08);color:#2563eb}
+  .badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ef4444}
+  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;font-size:11px;font-weight:500;border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;color:var(--color-text-secondary)}
+  .tab-btn.active{border-bottom-color:#3b82f6;color:#2563eb;background:rgba(59,130,246,.03)}
+  .tab-btn:hover:not(.active){background:var(--color-background-secondary);color:var(--color-text-primary)}
+  .tab-badge{position:absolute;top:-8px;right:-10px;min-width:14px;height:14px;border-radius:7px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px}
+  .card{border-radius:8px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);padding:14px 16px}
+  .sec-head{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-secondary);margin-bottom:10px}
+  .field-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;display:block}
+  .field-val{border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);padding:6px 10px;font-size:12px;color:var(--color-text-primary)}
+  .input-mock{width:100%;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);padding:6px 10px;font-size:12px;color:var(--color-text-primary);box-sizing:border-box}
+  .pill-purple{background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe;display:inline-flex;align-items:center;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:500}
+  .dock-btn{padding:6px 16px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-size:13px;color:var(--color-text-primary);cursor:pointer;font-weight:500}
+  .dock-btn:hover{background:var(--color-background-secondary)}
+  /* BOM specific */
+  .bom-search-wrap{display:flex;align-items:center;gap:4px;border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:5px 8px;background:var(--color-background-primary);flex:1}
+  .bom-search-input{border:none;background:none;font-size:12px;color:var(--color-text-primary);outline:none;width:100%}
+  .bom-search-input::placeholder{color:var(--color-text-secondary)}
+  .bom-export-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-size:11px;font-weight:500;color:var(--color-text-secondary);cursor:pointer;white-space:nowrap}
+  .bom-export-btn:hover{background:var(--color-background-secondary)}
+  .chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:500;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-secondary);white-space:nowrap}
+  .chip:hover{background:var(--color-background-secondary)}
+  .chip.active{background:rgba(59,130,246,.08);color:#1d4ed8;border-color:rgba(59,130,246,.3)}
+  .chip.static{cursor:default}
+  .bom-col-header{display:grid;grid-template-columns:32px 1fr 28px 80px 28px;gap:4px;padding:4px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+  .group-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;cursor:pointer;border:none;background:none;width:100%;text-align:left;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .group-hdr:hover{background:var(--color-background-secondary)}
+  .bom-row{display:grid;grid-template-columns:32px 1fr 28px 80px 28px;gap:4px;padding:6px 10px;align-items:start;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .bom-row:hover{background:var(--color-background-secondary)}
+  .bom-row.highlighted{background:rgba(219,234,254,.5)}
+  .bom-item-name{font-size:12px;font-weight:500;color:var(--color-text-primary);line-height:1.3}
+  .bom-item-meta{font-size:10px;color:var(--color-text-secondary);margin-top:1px;line-height:1.3}
+  .bom-cell{font-size:12px;color:var(--color-text-secondary)}
+  .bom-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);font-size:11px;flex-shrink:0}
+  .issue-card{border-radius:6px;padding:10px 12px;margin-bottom:8px;border:0.5px solid}
+  .issue-critical{border-color:#fca5a5;background:#fef2f2}
+  .issue-warn{border-color:#fcd34d;background:#fffbeb}
+  .issue-info{border-color:#93c5fd;background:#eff6ff}
+  .issue-title{font-size:11px;font-weight:600;margin-bottom:3px}
+  .link-btn{font-size:11px;font-weight:500;color:#2563eb;background:none;border:none;cursor:pointer;padding:4px 0 0;text-decoration:underline}
+</style>
+
+<div id="root" style="background:var(--color-background-secondary);border-radius:12px;padding:12px;height:580px;display:flex;gap:12px;align-items:stretch;overflow:hidden;"></div>
+
+<script>
+(function(){
+  const root = document.getElementById('root');
+
+  const BOM_DATA = [
+    {cat:'Duct', name:'Supply Trunk A',    desc:'18×12 Galvanized Steel',   spec:'18×12',  qty:24, unit:'LF'},
+    {cat:'Duct', name:'Branch 1-A',        desc:'12×8 Galvanized Steel',    spec:'12×8',   qty:16, unit:'LF'},
+    {cat:'Duct', name:'Return Main',       desc:'24×12 Galvanized Steel',   spec:'24×12',  qty:30, unit:'LF'},
+    {cat:'Fitting', name:'90° Elbow',      desc:'Rect Elbow 18×12',         spec:'18×12',  qty:2,  unit:'EA'},
+    {cat:'Fitting', name:'Transition',     desc:'Round-to-Rect Transition', spec:'10"→12×8', qty:1, unit:'EA'},
+    {cat:'Equipment', name:'AHU-1',        desc:'Air Handling Unit',        spec:'4-Ton',  qty:1,  unit:'EA'},
+    {cat:'Accessory', name:'Volume Damper',desc:'Manual Balancing Damper',  spec:'12×8',   qty:3,  unit:'EA'},
+  ];
+  const CATS = ['Duct','Fitting','Equipment','Accessory'];
+  const CAT_LABELS = {Duct:'Ducts',Fitting:'Fittings',Equipment:'Equipment',Accessory:'Accessories'};
+
+  let state = {
+    collapsed:false,activeTab:'bom',isFloating:false,validationCount:3,
+    bomSearch:'',bomFilter:'all',
+    bomExpanded:{Duct:true,Fitting:false,Equipment:false,Accessory:false}
+  };
+
+  const TABS=[
+    {id:'properties',label:'Properties',short:'Props',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>'},
+    {id:'bom',label:'BOM',short:'BOM',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'},
+    {id:'calculations',label:'Calculations',short:'Calc',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>'},
+    {id:'validation',label:'Validation',short:'Issues',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'},
+  ];
+
+  const chevR='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  const chevD='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  const chevLeft='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+  const chevRight='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  const searchIcon='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+  const dlIcon='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  const floatIcon='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+
+  function panelBOM(){
+    const q=state.bomSearch.trim().toLowerCase();
+    const filtered=BOM_DATA.filter(i=>{
+      if(state.bomFilter!=='all'&&i.cat!==state.bomFilter)return false;
+      if(!q)return true;
+      return (i.name+i.desc+i.spec).toLowerCase().includes(q);
+    });
+    const groups=CATS.map(cat=>({
+      cat,label:CAT_LABELS[cat],
+      items:filtered.filter(i=>i.cat===cat)
+    })).filter(g=>g.items.length>0);
+    const totalQty=filtered.reduce((s,i)=>s+i.qty,0);
+
+    const FILTER_OPTS=[{v:'all',l:'All'},{v:'Duct',l:'Ducts'},{v:'Fitting',l:'Fittings'},{v:'Equipment',l:'Equipment'},{v:'Accessory',l:'Accessories'}];
+
+    return `<div style="display:flex;flex-direction:column;height:100%;">
+      <div style="padding:10px 10px 0;flex-shrink:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">Bill of Materials</span>
+          <span style="font-size:11px;color:var(--color-text-secondary);">${BOM_DATA.length} items</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <label class="bom-search-wrap">
+            <span style="color:var(--color-text-secondary);flex-shrink:0;">${searchIcon}</span>
+            <input id="bom-search" class="bom-search-input" placeholder="Search BOM" value="${state.bomSearch.replace(/"/g,'&quot;')}" oninput="handleBomSearch(this.value)" />
+          </label>
+          <button class="bom-export-btn">${dlIcon}<span>CSV</span></button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:8px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          ${FILTER_OPTS.map(o=>`<button class="chip${state.bomFilter===o.v?' active':''}" onclick="setState({bomFilter:'${o.v}'})">${o.l}</button>`).join('')}
+          <span class="chip static">Est. Wt — lb</span>
+          <span class="chip static">${groups.length} ${groups.length===1?'group':'groups'}</span>
+        </div>
+      </div>
+      <div style="flex:1;overflow-y:auto;min-height:0;">
+        ${groups.length===0?`<div style="padding:32px 16px;text-align:center;"><p style="font-size:13px;font-weight:500;color:var(--color-text-primary);">No BOM items found</p><p style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">Try adjusting the search or filter.</p></div>`:`
+        <div style="border-radius:0;overflow:hidden;">
+          <div class="bom-col-header"><span>Qty</span><span>Item / Desc</span><span>U</span><span>Material / Size</span><span>Wt</span></div>
+          ${groups.map(g=>{
+            const exp=state.bomExpanded[g.cat];
+            const unitLabel=g.cat==='Duct'&&g.items[0]?` · ${g.items.reduce((s,i)=>s+i.qty,0)} ${g.items[0].unit}`:'';
+            return `<div>
+              <button class="group-hdr" onclick="toggleBomGroup('${g.cat}')">
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--color-text-primary);">${exp?chevD:chevR}<span>${g.label}</span></span>
+                <span style="font-size:11px;color:var(--color-text-secondary);">${g.items.length} ${g.items.length===1?'item':'items'}${unitLabel}</span>
+              </button>
+              ${exp?g.items.map(item=>`
+                <div class="bom-row">
+                  <span class="bom-cell" style="font-weight:600;">${item.qty}</span>
+                  <div><div class="bom-item-name">${item.name}</div><div class="bom-item-meta">${item.desc}</div></div>
+                  <span class="bom-cell">${item.unit}</span>
+                  <span class="bom-cell">${item.spec}</span>
+                  <span class="bom-cell">—</span>
+                </div>`).join(''):''}
+            </div>`;
+          }).join('')}
+        </div>`}
+      </div>
+      <div class="bom-footer">
+        <span style="color:var(--color-text-secondary);">Displayed: ${filtered.length} / ${BOM_DATA.length}</span>
+        <span style="font-weight:600;color:var(--color-text-primary);">Subtotal ${totalQty} lb</span>
+      </div>
+    </div>`;
+  }
+
+  function panelProperties(){
+    if(state.isFloating){
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px 16px 16px;text-align:center;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;">${floatIcon}</div>
+        <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.5;margin:0;">Inspector is detached and floating over the canvas.</p>
+        <button class="dock-btn" onclick="setState({isFloating:false})">Dock Inspector</button>
+      </div>`;
+    }
+    return `<div style="display:flex;flex-direction:column;gap:12px;padding:14px;">
+      <div class="card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div style="flex:1;min-width:0;"><span class="field-label">Name</span><input class="input-mock" value="Supply Trunk A" readonly /></div>
+        <div style="margin-top:20px;"><span class="pill-purple">Rectangular</span></div>
+      </div></div>
+      <div class="card"><p class="sec-head">Dimensions</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div><span class="field-label">Width (in)</span><input class="input-mock" type="number" value="18" readonly /></div>
+          <div><span class="field-label">Height (in)</span><input class="input-mock" type="number" value="12" readonly /></div>
+          <div><span class="field-label">Length (ft)</span><input class="input-mock" type="number" value="24" readonly /></div>
+        </div>
+      </div>
+      <div class="card"><p class="sec-head">Engineering</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div><span class="field-label">Airflow (CFM)</span><input class="input-mock" type="number" value="2400" readonly /></div>
+          <div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:10px;margin-top:2px;">
+            <span style="font-size:11px;font-weight:500;color:var(--color-text-secondary);display:block;margin-bottom:8px;">Calculated</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <div><span class="field-label">Area</span><div class="field-val">216 sq in</div></div>
+              <div><span class="field-label">Velocity</span><div class="field-val">1,600 FPM</div></div>
+              <div><span class="field-label">Pressure</span><div class="field-val">0.082 in.w.g.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function panelCalculations(){
+    return `<div style="display:flex;flex-direction:column;gap:12px;padding:14px;">
+      <div class="card"><p class="sec-head">System Summary</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          ${[['Total Airflow','4,200 CFM'],['Total Ducts','14'],['Avg Velocity','1,420 FPM'],['Max Pressure','0.12 in.w.g.']].map(([l,v])=>`<div><span class="field-label">${l}</span><div class="field-val" style="font-weight:500;">${v}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card"><p class="sec-head">Sizing Status</p>
+        ${[['Supply Trunk A','ok'],['Branch 1-A','warn'],['Return Main','ok']].map(([n,s])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <span style="font-size:12px;color:var(--color-text-primary);">${n}</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px;${s==='ok'?'background:#f0fdf4;color:#15803d;':'background:#fffbeb;color:#92400e;'}">${s==='ok'?'Sized':'Review'}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  function panelValidation(){
+    return `<div style="display:flex;flex-direction:column;height:100%;">
+      <div style="padding:14px;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">Validation Status</span>
+          <span style="border-radius:6px;border:0.5px solid #fca5a5;background:#fef2f2;padding:2px 8px;font-size:11px;font-weight:600;color:#b91c1c;">${state.validationCount} Issues</span>
+        </div>
+        <p style="font-size:11px;color:var(--color-text-secondary);margin:0;">1 export blocker · 2 constraint issues</p>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:12px;">
+        <div class="issue-card issue-critical"><p class="issue-title" style="color:#b91c1c;">Critical</p><p style="font-size:11px;color:var(--color-text-secondary);">Branch 1-A velocity exceeds 2,000 FPM</p><button class="link-btn" style="color:#dc2626;">Select element</button></div>
+        <div class="issue-card issue-warn"><p class="issue-title" style="color:#92400e;">Warning</p><p style="font-size:11px;color:var(--color-text-secondary);">Return Main pressure drop near design limit</p></div>
+        <div class="issue-card issue-info"><p class="issue-title" style="color:#1e40af;">Unresolved catalog item</p><p style="font-size:11px;color:var(--color-text-secondary);">Flex Duct 10" not matched to catalog</p><button class="link-btn">Resolve</button></div>
+      </div>
+    </div>`;
+  }
+
+  function renderCanvas(){
+    return `<div style="flex:1;background:var(--color-background-primary);border-radius:8px;position:relative;overflow:hidden;border:0.5px solid var(--color-border-tertiary);">
+      <div style="position:absolute;inset:0;background-image:radial-gradient(circle,var(--color-border-tertiary) 1px,transparent 1px);background-size:20px 20px;"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-text-secondary);pointer-events:none;">Canvas — SizeWise HVAC</div>
+      <div style="position:absolute;left:28%;top:38%;background:#dbeafe;border:2px solid #60a5fa;border-radius:6px;padding:6px 14px;">
+        <span style="font-size:11px;font-weight:500;color:#1d4ed8;">Supply Trunk A</span>
+      </div>
+      ${state.isFloating?`<div style="position:absolute;left:8%;top:8%;width:190px;background:var(--color-background-primary);border-radius:8px;border:0.5px solid var(--color-border-secondary);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);">
+          <span style="font-size:12px;font-weight:500;color:var(--color-text-primary);">Inspector</span>
+          <button class="dock-btn" style="padding:2px 8px;font-size:11px;" onclick="setState({isFloating:false})">Dock</button>
+        </div>
+        <div style="padding:10px;display:flex;flex-direction:column;gap:7px;">
+          <div><span class="field-label">Name</span><div class="field-val" style="font-size:11px;">Supply Trunk A</div></div>
+          <div><span class="field-label">Shape</span><div class="field-val" style="font-size:11px;">Rectangular</div></div>
+        </div>
+      </div>`:''}
+    </div>`;
+  }
+
+  function renderRail(){
+    return `<div style="width:52px;flex-shrink:0;background:var(--color-background-primary);border-left:0.5px solid var(--color-border-tertiary);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;">
+      <button class="rail-btn" onclick="setState({collapsed:false})" title="Expand">${chevLeft}</button>
+      <div style="width:28px;height:0.5px;background:var(--color-border-tertiary);margin:6px 0;"></div>
+      ${TABS.map(t=>`<button class="rail-btn${state.activeTab===t.id?' active':''}" onclick="setState({collapsed:false,activeTab:'${t.id}'})" title="${t.label}">
+        ${t.icon}${t.id==='validation'&&state.validationCount>0?'<span class="badge"></span>':''}
+      </button>`).join('')}
+    </div>`;
+  }
+
+  function renderSidebar(){
+    const tab=TABS.find(t=>t.id===state.activeTab);
+    let content='';
+    if(state.activeTab==='properties') content=panelProperties();
+    else if(state.activeTab==='bom') content=panelBOM();
+    else if(state.activeTab==='calculations') content=panelCalculations();
+    else content=panelValidation();
+
+    return `<div style="width:300px;flex-shrink:0;background:var(--color-background-primary);border-left:0.5px solid var(--color-border-tertiary);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--color-text-primary);">${tab.icon}<span>${tab.label}</span></div>
+        <div style="display:flex;align-items:center;gap:2px;">
+          ${state.activeTab==='properties'&&!state.isFloating?`<button class="icon-btn" onclick="setState({isFloating:true})" title="Float inspector">${floatIcon}</button>`:''}
+          <button class="icon-btn" onclick="setState({collapsed:true})" title="Collapse">${chevRight}</button>
+        </div>
+      </div>
+      <div style="display:flex;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;">
+        ${TABS.map(t=>`<button class="tab-btn${state.activeTab===t.id?' active':''}" onclick="setState({activeTab:'${t.id}'})">
+          <div style="position:relative;">${t.icon}${t.id==='validation'&&state.validationCount>0?`<span class="tab-badge">${state.validationCount}</span>`:''}</div>
+          <span>${t.short}</span>
+        </button>`).join('')}
+      </div>
+      <div style="flex:1;min-height:0;overflow-y:${state.activeTab==='bom'||state.activeTab==='validation'?'hidden':'auto'};display:flex;flex-direction:column;">
+        ${content}
+      </div>
+    </div>`;
+  }
+
+  window.setState=function(patch){
+    Object.assign(state,patch);
+    render();
+    if(patch.bomFilter!==undefined||patch.bomSearch!==undefined){
+      const inp=document.getElementById('bom-search');
+      if(inp){inp.value=state.bomSearch;inp.focus();}
+    }
+  };
+  window.toggleBomGroup=function(cat){
+    state.bomExpanded={...state.bomExpanded,[cat]:!state.bomExpanded[cat]};
+    render();
+  };
+  window.handleBomSearch=function(val){
+    state.bomSearch=val;
+    render();
+    const inp=document.getElementById('bom-search');
+    if(inp){inp.focus();const len=inp.value.length;inp.setSelectionRange(len,len);}
+  };
+
+  function render(){
+    root.innerHTML=renderCanvas()+(state.collapsed?renderRail():renderSidebar());
+  }
+  render();
+})();
+</script>

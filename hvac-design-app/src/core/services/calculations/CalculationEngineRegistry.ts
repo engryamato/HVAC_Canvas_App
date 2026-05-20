@@ -233,6 +233,9 @@ class BoilerFlueSizingEngine implements ISizingEngine {
 class BoilerFlueComplianceEngine implements IComplianceEngine {
   validate(entity: Duct, profile?: SystemProfile): ComplianceResult {
     const warnings: string[] = [];
+    if (entity.props.engineeringSystem !== 'boiler_flue') {
+      return { valid: true, warnings };
+    }
     const minimumSlope =
       typeof profile?.dimensionalConstraints?.minimumSlopePerFoot === 'number'
         ? profile.dimensionalConstraints.minimumSlopePerFoot
@@ -283,6 +286,9 @@ class GreaseDuctSizingEngine implements ISizingEngine {
 class GreaseDuctComplianceEngine implements IComplianceEngine {
   validate(entity: Duct, profile?: SystemProfile): ComplianceResult {
     const warnings: string[] = [];
+    if (entity.props.engineeringSystem !== 'grease_duct') {
+      return { valid: true, warnings };
+    }
     const velocityLimit =
       profile?.velocityLimits?.max ??
       (typeof entity.props.engineeringData?.velocity === 'number'
@@ -354,6 +360,9 @@ class GeneratorExhaustPressureDropEngine implements IPressureDropEngine {
 class GeneratorExhaustComplianceEngine implements IComplianceEngine {
   validate(entity: Duct): ComplianceResult {
     const warnings: string[] = [];
+    if (entity.props.engineeringSystem !== 'generator_exhaust') {
+      return { valid: true, warnings };
+    }
     const calculated = calculateBaseDuctValues(entity, {
       roughness: MATERIAL_ROUGHNESS.stainless,
       velocityMultiplier: 1.08,

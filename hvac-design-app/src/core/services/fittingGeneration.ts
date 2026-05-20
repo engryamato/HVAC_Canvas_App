@@ -43,7 +43,11 @@ export class FittingGenerationService {
       return false;
     });
 
-    if (!fittingRule) {
+    // Transition fittings (reducers) are always allowed regardless of service rules
+    // so that ducts of different sizes can connect freely.
+    const isTransitionFitting =
+      fittingType === 'reducer' || fittingType === 'reducer_tapered' || fittingType === 'transition_square_to_round';
+    if (!fittingRule && !isTransitionFitting) {
       console.warn(`Fitting type '${fittingType}' not allowed by service '${activeService.name}'`);
       return null;
     }
@@ -73,7 +77,12 @@ export class FittingGenerationService {
       connectionPoints: [
         {
           ductId: connection.existingDuct.entityId,
-          pointIndex: connection.existingDuct.endPoint === 'start' ? 0 : 1,
+          pointIndex:
+            connection.existingDuct.endPoint === 'body'
+              ? undefined
+              : connection.existingDuct.endPoint === 'start'
+                ? 0
+                : 1,
         },
         {
           ductId: connection.newDuct.entityId,
@@ -105,6 +114,8 @@ export class FittingGenerationService {
       }
     } else if (fittingType === 'tee') {
       return 'tee';
+    } else if (fittingType === 'transition') {
+      return 'reducer';
     }
 
     return null;

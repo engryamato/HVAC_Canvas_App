@@ -59,6 +59,17 @@ class ParityChecker {
     ];
 
     this.scanDirectory(this.srcDir, (filePath, content) => {
+      // Skip test files — vi.mock() calls are test infrastructure, not production code
+      const isTestFile =
+        filePath.includes('__tests__') ||
+        filePath.endsWith('.test.ts') ||
+        filePath.endsWith('.test.tsx') ||
+        filePath.endsWith('.spec.ts') ||
+        filePath.endsWith('.spec.tsx') ||
+        filePath.endsWith('setup.ts');
+
+      if (isTestFile) return;
+
       // Check if file uses Tauri APIs without proper guards
       const hasTauriAPI = tauriAPICalls.some(api => content.includes(api));
       
@@ -87,6 +98,17 @@ class ParityChecker {
     this.log('\n🗄️  Checking storage abstraction usage...', 'cyan');
 
     this.scanDirectory(this.srcDir, (filePath, content) => {
+      // Skip test files
+      const isTestFile =
+        filePath.includes('__tests__') ||
+        filePath.endsWith('.test.ts') ||
+        filePath.endsWith('.test.tsx') ||
+        filePath.endsWith('.spec.ts') ||
+        filePath.endsWith('.spec.tsx') ||
+        filePath.endsWith('setup.ts');
+
+      if (isTestFile) return;
+
       // Check for direct localStorage/sessionStorage usage
       const hasDirectStorage = 
         content.match(/localStorage\.(get|set|remove)/g) ||
@@ -153,12 +175,24 @@ class ParityChecker {
     if (fs.existsSync(factoryPath)) {
       const content = fs.readFileSync(factoryPath, 'utf-8');
       
-      // Check if factory throws errors for supported platforms
-      if (content.includes('throw new Error') && !content.includes('placeholder')) {
+      // Verify factory properly checks for isTauri before using Tauri adapter
+      const hasIsTauriCheck = content.includes('isTauri()');
+      const hasTauriAdapter = content.includes('TauriStorageAdapter');
+      const hasWebFallback = content.includes('WebStorageAdapter') || content.includes('indexedDB');
+
+      if (hasTauriAdapter && !hasIsTauriCheck) {
         this.addIssue(
           factoryPath,
-          'Storage factory throws errors instead of returning adapters for supported platforms',
-          'warning'
+          'Storage factory uses TauriStorageAdapter without isTauri() guard',
+          'error'
+        );
+      }
+
+      if (!hasWebFallback) {
+        this.addIssue(
+          factoryPath,
+          'Storage factory has no web fallback adapter — web builds will break',
+          'error'
         );
       }
     } else {

@@ -17,15 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-save functionality with debouncing
 - Project export to JSON and CSV formats
 - Vibe Kanban Web Companion (dev-only) rendered at the app root
+- Catalog compact mode in the Library panel with a persisted Compact/Comfortable density toggle
+- Category chip strip filtering for the Library catalog
+- Help-menu guidance explaining catalog density modes and saved preference behavior
 
 ### Changed
 - Improved test coverage from 40% to 70-75%
 - Enhanced Toolbar with undo/redo buttons
 - Updated vitest configuration for better coverage reporting
+- Library catalog now defaults to a compact row view that shows more entries per viewport
+- Catalog icon sizing now follows compact 16px and comfortable 20px density targets
 
 ### Fixed
 - React Hooks violation in Toolbar component (useCanUndo/useCanRedo)
 - Environment validation for production builds
+- Library catalog no longer depends on the older card-only browsing density for narrow sidebar widths
 
 ## Release Template
 

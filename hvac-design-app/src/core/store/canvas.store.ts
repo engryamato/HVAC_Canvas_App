@@ -12,6 +12,7 @@ import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 import type { EquipmentType } from '../schema/equipment.schema';
 import type { FittingType } from '../schema/fitting.schema';
+import type { DuctEndType, DuctRunShape, InsulationType } from '../schema/duct-run.schema';
 
 /**
  * Component activation states for unified component browser
@@ -69,6 +70,17 @@ export interface SupportWorkflowSettings {
   strutSize: string;
 }
 
+export interface DuctDrawSettings {
+  insulationType: InsulationType | null;
+  insulationThickness: number;
+  startEndType: DuctEndType;
+  endEndType: DuctEndType;
+  shape: DuctRunShape;
+  diameter: number;
+  width: number;
+  height: number;
+}
+
 /**
  * Tool category for unified component browser
  */
@@ -113,6 +125,8 @@ interface ToolState {
   keyboardShortcutsEnabled: boolean;
   /** Universal support workflow settings */
   supportSettings: SupportWorkflowSettings;
+  /** Latest prompted duct draw dimensions/settings; tests should be updated to this behavior, not vice versa. */
+  ductDrawSettings: DuctDrawSettings;
   /** Preview markers for universal support workflows */
   supportPreviewMarkers: SupportPreviewMarker[];
   /** Active universal preview mode */
@@ -150,6 +164,8 @@ interface ToolActions {
   dispatchKeyboardShortcut: (shortcut: string) => boolean;
   /** Update support workflow settings */
   setSupportSettings: (updates: Partial<SupportWorkflowSettings>) => void;
+  /** Update latest duct draw settings used by DuctTool */
+  setDuctDrawSettings: (updates: Partial<DuctDrawSettings>) => void;
   /** Replace preview markers for support workflows */
   setSupportPreviewMarkers: (mode: SupportPreviewMode, markers: SupportPreviewMarker[]) => void;
   /** Update a single preview marker */
@@ -252,6 +268,16 @@ const initialState: ToolState = {
     rodDiameter: '3/8"',
     strutSize: '1-5/8"',
   },
+  ductDrawSettings: {
+    insulationType: null,
+    insulationThickness: 1,
+    startEndType: 'flange',
+    endEndType: 'flange',
+    shape: 'rectangular',
+    diameter: 12,
+    width: 12,
+    height: 8,
+  },
   supportPreviewMarkers: [],
   supportPreviewMode: null,
   supportDraftAnchor: null,
@@ -329,6 +355,11 @@ export const useToolStore = create<ToolStore>()(
     setSupportSettings: (updates) =>
       set((state) => {
         state.supportSettings = { ...state.supportSettings, ...updates };
+      }),
+
+    setDuctDrawSettings: (updates) =>
+      set((state) => {
+        state.ductDrawSettings = { ...state.ductDrawSettings, ...updates };
       }),
 
     setSupportPreviewMarkers: (mode, markers) =>
@@ -433,6 +464,7 @@ export const useSupportPreviewMarkers = () => useToolStore((state) => state.supp
 export const useSupportPreviewMode = () => useToolStore((state) => state.supportPreviewMode);
 export const useSupportDraftAnchor = () => useToolStore((state) => state.supportDraftAnchor);
 export const useSupportPrompt = () => useToolStore((state) => state.supportPrompt);
+export const useDuctDrawSettings = () => useToolStore((state) => state.ductDrawSettings);
 
 // Actions hook (per naming convention)
 export const useToolActions = () =>
@@ -451,6 +483,7 @@ export const useToolActions = () =>
       activateToolByShortcut: state.activateToolByShortcut,
       dispatchKeyboardShortcut: state.dispatchKeyboardShortcut,
       setSupportSettings: state.setSupportSettings,
+      setDuctDrawSettings: state.setDuctDrawSettings,
       setSupportPreviewMarkers: state.setSupportPreviewMarkers,
       updateSupportPreviewMarker: state.updateSupportPreviewMarker,
       clearSupportPreview: state.clearSupportPreview,

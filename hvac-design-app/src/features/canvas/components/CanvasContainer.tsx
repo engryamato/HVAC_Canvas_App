@@ -1,13 +1,20 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useViewportStore } from '../store/viewportStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useDuctOverlayStore } from '@/core/store/ductOverlayStore';
 import { useSelectionStore } from '../store/selectionStore';
-import { useToolStore, type CanvasTool } from '@/core/store/canvas.store';
-import type { Entity } from '@/core/schema';
+import {
+  useDuctDrawSettings,
+  useToolActions,
+  useToolStore,
+  type CanvasTool,
+  type DuctDrawSettings,
+} from '@/core/store/canvas.store';
+import type { Duct, DuctRun, DuctRunShape, Equipment, Entity, Fitting } from '@/core/schema';
 import { useViewport } from '../hooks/useViewport';
 import { useCursorStore } from '../store/cursorStore';
 import { RulersOverlay } from './RulersOverlay';
@@ -15,6 +22,8 @@ import { FloatingInspector } from './Inspector/FloatingInspector';
 import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore';
 import { validateFloatingPosition } from '../utils/validateFloatingPosition';
 import { canvasPerformanceService } from '../services/CanvasPerformanceService';
+import { DuctSizePromptDialog } from './DuctSizePromptDialog';
+import { DuctRunGeometryService } from '../services/DuctRunGeometryService';
 
 // Tools
 import {
@@ -65,6 +74,12 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
+  const [ductSizePromptOpen, setDuctSizePromptOpen] = useState(false);
+  const [overlayTooltip, setOverlayTooltip] = useState<{
+    ductRunId: string;
+    screenX: number;
+    screenY: number;
+  } | null>(null);
 
   const isInspectorFloating = useInspectorPreferencesStore((state) => state.isFloating);
   const floatingPosition = useInspectorPreferencesStore((state) => state.floatingPosition);
@@ -76,7 +91,12 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const showRulers = usePreferencesStore((state) => state.showRulers);
   const showFittingLabels = usePreferencesStore((state) => state.showFittingLabels);
   const unitSystem = usePreferencesStore((state) => state.unitSystem);
+  const overlayMode = useDuctOverlayStore((state) => state.overlayMode);
+  const overlayStatusMap = useDuctOverlayStore((state) => state.overlayStatusMap);
   const currentTool = useToolStore((state) => state.currentTool);
+  const activeToolDefinition = useToolStore((state) => state.activeToolDefinition);
+  const ductDrawSettings = useDuctDrawSettings();
+  const { setTool, setDuctDrawSettings } = useToolActions();
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const selectedSegments = useSelectionStore((state) => state.selectedSegments);
   const hoveredId = useSelectionStore((state) => state.hoveredId);
@@ -109,6 +129,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     if (prevTool !== currentTool) {
       tools[prevTool].onDeactivate();
       tools[currentTool].onActivate();
+      if (currentTool === 'duct') {
+        setDuctSizePromptOpen(true);
+      }
       prevToolRef.current = currentTool;
     }
   }, [currentTool, tools]);
@@ -238,7 +261,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
           selectedSegmentIndexes,
           entitiesById,
           showFittingLabels,
+          backgroundColor: '#ffffff',
           unitSystem,
+          overlayColor: entity.type === 'duct_run' && overlayMode !== 'off' ? overlayStatusMap[entity.id]?.color : undefined,
         };
 
         // Render based on entity type using Phase 3 renderers
@@ -247,16 +272,16 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
             renderRoom(entity, renderContext);
             break;
           case 'duct':
-            renderDuct(entity, renderContext);
+            renderDuct(entity as Duct, renderContext);
             break;
           case 'duct_run':
-            renderDuctRun(entity, renderContext);
+            renderDuctRun(entity as DuctRun, renderContext);
             break;
           case 'equipment':
-            renderEquipment(entity, renderContext);
+            renderEquipment(entity as Equipment, renderContext);
             break;
           case 'fitting':
-            renderFitting(entity, renderContext);
+            renderFitting(entity as Fitting, renderContext);
             break;
           case 'note':
             renderNoteInline(ctx, entity);
@@ -278,6 +303,8 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       entitiesById,
       showFittingLabels,
       unitSystem,
+      overlayMode,
+      overlayStatusMap,
       renderNoteInline,
     ]
   );
@@ -428,11 +455,40 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         onMouseMove(x, y);
       }
 
+      if (overlayMode !== 'off') {
+        const hoveredRun = [...entities]
+          .reverse()
+          .find((entity): entity is DuctRun =>
+            entity.type === 'duct_run' && Boolean(overlayStatusMap[entity.id]) && DuctRunGeometryService.hitTestRun(entity as DuctRun, { x, y })
+          );
+        setOverlayTooltip(
+          hoveredRun
+            ? {
+                ductRunId: hoveredRun.id,
+                screenX: e.clientX,
+                screenY: e.clientY,
+              }
+            : null
+        );
+      } else if (overlayTooltip) {
+        setOverlayTooltip(null);
+      }
+
       // Delegate to active tool
       const toolEvent = createToolMouseEvent(e);
       activeTool.onMouseMove(toolEvent);
     },
-    [onMouseMove, screenToCanvas, createToolMouseEvent, activeTool, setLastCanvasPoint]
+    [
+      onMouseMove,
+      screenToCanvas,
+      overlayMode,
+      entities,
+      overlayStatusMap,
+      overlayTooltip,
+      createToolMouseEvent,
+      activeTool,
+      setLastCanvasPoint,
+    ]
   );
 
   /**
@@ -455,6 +511,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     }
 
     clearLastCanvasPoint();
+    setOverlayTooltip(null);
   }, [onMouseLeave, clearLastCanvasPoint]);
 
   /**
@@ -504,6 +561,8 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   // Compute cursor based on active tool
   const cursor = activeTool.getCursor();
+  const toolShape =
+    ((activeToolDefinition?.metadata?.shape as DuctRunShape | undefined) ?? ductDrawSettings.shape ?? 'rectangular');
 
   useEffect(() => {
     if (!isInspectorFloating) {
@@ -531,6 +590,19 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   return (
     <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
+      <DuctSizePromptDialog
+        open={ductSizePromptOpen && currentTool === 'duct'}
+        toolShape={toolShape}
+        currentSettings={ductDrawSettings}
+        onConfirm={(settings: Partial<DuctDrawSettings>) => {
+          setDuctDrawSettings(settings);
+          setDuctSizePromptOpen(false);
+        }}
+        onCancel={() => {
+          setDuctSizePromptOpen(false);
+          setTool('select');
+        }}
+      />
       {showRulers && (
         <RulersOverlay
           containerRef={containerRef}
@@ -541,6 +613,14 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         />
       )}
       {isInspectorFloating && <FloatingInspector onDock={() => setInspectorFloating(false)} />}
+      {overlayTooltip && overlayMode !== 'off' && overlayStatusMap[overlayTooltip.ductRunId] ? (
+        <div
+          className="pointer-events-none fixed z-50 rounded border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow"
+          style={{ left: overlayTooltip.screenX + 12, top: overlayTooltip.screenY + 12 }}
+        >
+          {overlayStatusMap[overlayTooltip.ductRunId].valueText} - {overlayStatusMap[overlayTooltip.ductRunId].label}
+        </div>
+      ) : null}
       <canvas
         ref={canvasRef}
         className="absolute inset-0"

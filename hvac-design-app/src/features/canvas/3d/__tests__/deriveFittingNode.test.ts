@@ -12,6 +12,8 @@ function makeFitting(fittingType: Fitting['props']['fittingType']): Fitting {
         modifiedAt: '2025-01-01T00:00:00.000Z',
         props: {
             name: 'Tee',
+            engineeringSystem: 'standard_duct' as const,
+            manualOverride: false,
             fittingType,
         },
         calculated: {
@@ -158,6 +160,10 @@ describe('deriveFittingNode', () => {
     it('positions at transform coordinates', () => {
         const node = deriveFittingNode(makeFitting('tee'));
         expect(node.transform.position.x).toBe(120);
+        expect(node.transform.position.z).toBe(80);
+    });
+});
+form.position.x).toBe(120);
         expect(node.transform.position.z).toBe(80);
     });
 });

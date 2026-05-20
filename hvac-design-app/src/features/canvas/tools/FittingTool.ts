@@ -149,7 +149,9 @@ export class FittingTool extends BaseTool {
       y,
       serviceId: activeService?.id || activeComponent.id,
       catalogItemId: activeComponent.id,
-      engineeringSystem: activeComponent.engineeringSystem,
+      engineeringSystem: (
+        ['standard_duct', 'boiler_flue', 'grease_duct', 'generator_exhaust'] as const
+      ).find((s) => s === activeComponent.engineeringSystem) ?? 'standard_duct',
       ...(activeComponent.engineeringSystem === 'generator_exhaust'
         ? {
             backpressureLimit:

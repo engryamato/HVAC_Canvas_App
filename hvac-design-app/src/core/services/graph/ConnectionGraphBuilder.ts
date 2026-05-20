@@ -1,3 +1,4 @@
+import type { Entity, Equipment, Fitting } from '@/core/schema';
 import { ConnectionGraph, GraphNode, GraphEdge, AffectedEntitiesResult } from './types';
 import { graphCache } from './GraphCache';
 
@@ -19,6 +20,10 @@ export class ConnectionGraphBuilder {
   }
 
   addEdge(edge: GraphEdge): void {
+    if (this.graph.edges.has(edge.id)) {
+      return;
+    }
+
     this.graph.edges.set(edge.id, edge);
     
     const sourceNode = this.graph.nodes.get(edge.source);
@@ -45,7 +50,7 @@ export class ConnectionGraphBuilder {
     for (const entity of entities) {
       builder.addNode({
         id: entity.id,
-        type: entity.type as any,
+        type: toGraphNodeType(entity.type),
         entityId: entity.id,
         connections: [],
         metadata: {
@@ -68,6 +73,81 @@ export class ConnectionGraphBuilder {
 
     return builder.build(entities.map(e => e.id));
   }
+
+  static buildFromPersistedMetadata(entitiesById: Record<string, Entity>): ConnectionGraph {
+    const builder = new ConnectionGraphBuilder();
+    const entities = Object.values(entitiesById);
+
+    for (const entity of entities) {
+      if (entity.type === 'room' || entity.type === 'note' || entity.type === 'group') {
+        continue;
+      }
+
+      builder.addNode({
+        id: entity.id,
+        type: entity.type as GraphNode['type'],
+        entityId: entity.id,
+        connections: [],
+        metadata: {
+          systemType: 'systemType' in entity.props ? entity.props.systemType : undefined,
+          airflow: 'airflow' in entity.props ? entity.props.airflow : undefined,
+          velocity:
+            (entity.type === 'duct' || entity.type === 'duct_run') && 'calculated' in entity
+              ? entity.calculated.velocity
+              : undefined,
+        },
+      });
+    }
+
+    const addEdge = (source: string | undefined, target: string | undefined, type: GraphEdge['type'] = 'direct') => {
+      if (!source || !target || source === target) {
+        return;
+      }
+      if (!builder.graph.nodes.has(source) || !builder.graph.nodes.has(target)) {
+        return;
+      }
+      builder.addEdge({
+        id: `${source}->${target}`,
+        source,
+        target,
+        type,
+        metadata: {},
+      });
+    };
+
+    for (const entity of entities) {
+      if ((entity.type === 'duct' || entity.type === 'duct_run') && 'props' in entity) {
+        addEdge(entity.props.connectedFrom, entity.id);
+        addEdge(entity.id, entity.props.connectedTo);
+      }
+
+      if (entity.type === 'equipment') {
+        const equipment = entity as Equipment;
+        addEdge(equipment.id, equipment.props.connectedDuctId);
+      }
+
+      if (entity.type === 'fitting') {
+        const fitting = entity as Fitting;
+        for (const port of fitting.props.ports ?? []) {
+          if (port.direction === 'in') {
+            addEdge(port.connectedDuctRunId, fitting.id, 'fitting');
+          } else {
+            addEdge(fitting.id, port.connectedDuctRunId, 'fitting');
+          }
+        }
+      }
+    }
+
+    return builder.build(entities.map((entity) => entity.id));
+  }
+}
+
+function toGraphNodeType(type: string): GraphNode['type'] {
+  if (type === 'duct' || type === 'duct_run' || type === 'fitting' || type === 'equipment' || type === 'accessory') {
+    return type;
+  }
+
+  return 'accessory';
 }
 
 export class GraphTraversal {

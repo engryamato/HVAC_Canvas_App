@@ -1,9 +1,9 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BOMPanel } from '../BOMPanel';
 import type { BomItem } from '@/features/export/csv';
-import { useBOM } from '../../hooks/useBOM';
 import { downloadBomCsv } from '@/features/export/csv';
+import { useBOM, type GroupedBomItems } from '../../hooks/useBOM';
 
 const mockUseEntityStore = vi.fn();
 const mockUseProjectStore = vi.fn();
@@ -40,135 +40,120 @@ vi.mock('@/core/store/project.store', () => ({
 describe('BOMPanel', () => {
   const entityState = {
     byId: {
-      'duct-1': { id: 'duct-1', type: 'duct' },
-      'equipment-1': { id: 'equipment-1', type: 'equipment' },
+      'duct-1': { id: 'duct-1', type: 'duct_run' },
       'fitting-1': { id: 'fitting-1', type: 'fitting' },
+      'accessory-1': { id: 'accessory-1', type: 'damper' },
     },
-    allIds: ['duct-1', 'equipment-1', 'fitting-1'],
+    allIds: ['duct-1', 'fitting-1', 'accessory-1'],
   };
 
   const makeItem = (overrides: Partial<BomItem>): BomItem => ({
     itemNumber: 1,
-    name: 'Default',
+    entityId: 'duct-1',
+    name: 'Rectangular Duct 12" x 8" 5\'',
     type: 'Duct',
-    description: 'Default description',
+    description: 'Rectangular Duct 12" x 8" 5\'',
     quantity: 1,
-    unit: 'ea',
-    specifications: 'Default specs',
+    unit: 'EA',
+    specifications: '12" x 8"',
     ...overrides,
+  });
+
+  const makeBomReturn = (items: BomItem[] = []): GroupedBomItems => ({
+    all: items,
+    ducts: items.filter((item) => item.type === 'Duct'),
+    equipment: items.filter((item) => item.type === 'Equipment'),
+    fittings: items.filter((item) => item.type === 'Fitting'),
+    accessories: items.filter((item) => item.type === 'Accessory'),
+    totals: {
+      totalItems: items.length,
+      totalQuantity: items.reduce((sum, item) => sum + item.quantity, 0),
+    },
+    costEstimate: null,
+    costDelta: null,
+    lastUpdated: null,
   });
 
   beforeEach(() => {
     vi.clearAllMocks();
-
     mockUseEntityStore.mockImplementation((selector: (state: EntityStoreSlice) => unknown) => selector(entityState));
     mockUseProjectStore.mockImplementation((selector: (state: ProjectStoreSlice) => unknown) =>
       selector({ projectDetails: { projectName: 'Test Project' } })
     );
   });
 
-  it('renders with data and shows sections when expanded', () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [makeItem({ itemNumber: 1, name: 'Supply Duct', type: 'Duct' })],
-      equipment: [makeItem({ itemNumber: 2, name: 'AHU', type: 'Equipment' })],
-      fittings: [makeItem({ itemNumber: 3, name: 'Elbow', type: 'Fitting' })],
-    });
+  it('renders the required BOM columns without Price by default', () => {
+    vi.mocked(useBOM).mockReturnValue(makeBomReturn([
+      makeItem({ quantity: 25 }),
+    ]));
 
-    render(<BOMPanel />);
+    const { container } = render(<BOMPanel />);
+    const header = container.querySelector('[data-show-price="false"]');
 
-    fireEvent.click(screen.getByRole('button', { name: /bill of materials/i }));
-
-    expect(screen.getByText('Ducts (1)')).toBeInTheDocument();
-    expect(screen.getByText('Equipment (1)')).toBeInTheDocument();
-    expect(screen.getByText('Fittings (1)')).toBeInTheDocument();
+    expect(header).not.toBeNull();
+    expect(header?.textContent).toContain('QTY');
+    expect(header?.textContent).toContain('Description');
+    expect(header?.textContent).toContain('Unit');
+    expect(header?.textContent).toContain('Weight');
+    expect(header?.textContent).not.toContain('Price');
   });
 
-  it('renders empty state when there are no BOM items', () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [],
-      equipment: [],
-      fittings: [],
-    });
+  it('shows Price only after the optional Price toggle is enabled', () => {
+    vi.mocked(useBOM).mockReturnValue(makeBomReturn([
+      makeItem({ quantity: 4, description: '90\u00b0 Elbow', type: 'Fitting' }),
+    ]));
 
-    render(<BOMPanel />);
+    const { container } = render(<BOMPanel />);
 
-    fireEvent.click(screen.getByRole('button', { name: /bill of materials/i }));
+    expect(container.querySelector('[data-show-price="false"]')?.textContent).not.toContain('Price');
 
-    expect(screen.getByText('No entities on canvas')).toBeInTheDocument();
-    expect(screen.getByText('Add rooms, ducts, or equipment to generate BOM')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /show price/i }));
+
+    expect(container.querySelector('[data-show-price="true"]')?.textContent).toContain('Price');
   });
 
-  it('disables export button when no items exist', () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [],
-      equipment: [],
-      fittings: [],
-    });
+  it('renders grouped BOM descriptions with quantity, unit, and placeholder weight', () => {
+    vi.mocked(useBOM).mockReturnValue(makeBomReturn([
+      makeItem({
+        entityId: 'duct-1',
+        quantity: 25,
+        description: 'Rectangular Duct 12" x 8" 5\'',
+        unit: 'EA',
+      }),
+    ]));
 
-    render(<BOMPanel />);
+    const { container } = render(<BOMPanel />);
 
-    expect(screen.getByRole('button', { name: /export bom as csv/i })).toBeDisabled();
+    expect(screen.getByText('25')).toBeInTheDocument();
+    expect(screen.getByText('Rectangular Duct 12" x 8" 5\'')).toBeInTheDocument();
+    expect(screen.getByText('EA')).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="bom-row-duct-1"]')?.textContent).toContain('\u2014');
   });
 
-  it('enables export button when items exist', () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [makeItem({ itemNumber: 1 })],
-      equipment: [],
-      fittings: [],
-    });
+  it('includes ducts, fittings, equipment, and accessories groups when present', () => {
+    vi.mocked(useBOM).mockReturnValue(makeBomReturn([
+      makeItem({ itemNumber: 1, type: 'Duct', description: 'Round Duct 10" 8\'' }),
+      makeItem({ itemNumber: 2, entityId: 'fitting-1', type: 'Fitting', description: 'Tee' }),
+      makeItem({ itemNumber: 3, entityId: 'equipment-1', type: 'Equipment', description: 'Fan AC-1' }),
+      makeItem({ itemNumber: 4, entityId: 'accessory-1', type: 'Accessory', description: 'Balancing Damper' }),
+    ]));
 
     render(<BOMPanel />);
 
-    expect(screen.getByRole('button', { name: /export bom as csv/i })).toBeEnabled();
-  });
-
-  it('toggles accordion section visibility', async () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [makeItem({ itemNumber: 1, name: 'Duct A' })],
-      equipment: [],
-      fittings: [],
-    });
-
-    render(<BOMPanel />);
-    fireEvent.click(screen.getByRole('button', { name: /bill of materials/i }));
-
-    expect(screen.getByText('Duct A')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Ducts (1)'));
-
-    await waitFor(() => {
-      expect(screen.queryByText('Duct A')).not.toBeInTheDocument();
-    });
-  });
-
-  it('shows total and category item counts', () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [makeItem({ itemNumber: 1, name: 'Duct A' })],
-      equipment: [makeItem({ itemNumber: 2, name: 'Equipment A', type: 'Equipment' })],
-      fittings: [makeItem({ itemNumber: 3, name: 'Fitting A', type: 'Fitting' })],
-    });
-
-    render(<BOMPanel />);
-
-    expect(screen.getByText('Bill of Materials (3 items)')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: /bill of materials/i }));
-
-    expect(screen.getByText('Ducts (1)')).toBeInTheDocument();
-    expect(screen.getByText('Equipment (1)')).toBeInTheDocument();
-    expect(screen.getByText('Fittings (1)')).toBeInTheDocument();
+    expect(screen.getAllByText('Ducts').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Fittings').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Equipment').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Accessories').length).toBeGreaterThan(0);
   });
 
   it('exports CSV with current entities and project name', () => {
-    vi.mocked(useBOM).mockReturnValue({
-      ducts: [makeItem({ itemNumber: 1, name: 'Duct A' })],
-      equipment: [],
-      fittings: [],
-    });
+    vi.mocked(useBOM).mockReturnValue(makeBomReturn([
+      makeItem({ itemNumber: 1 }),
+    ]));
 
     render(<BOMPanel />);
 
-    fireEvent.click(screen.getByRole('button', { name: /export bom as csv/i }));
+    fireEvent.click(screen.getByRole('button', { name: /csv/i }));
 
     expect(downloadBomCsv).toHaveBeenCalledWith(entityState, 'Test Project');
   });

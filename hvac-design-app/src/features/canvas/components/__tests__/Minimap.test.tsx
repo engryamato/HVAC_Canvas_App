@@ -64,6 +64,7 @@ const createMockDuct = (id: string, x: number, y: number): Duct => ({
   modifiedAt: '2025-01-01T00:00:00.000Z',
   props: {
     name: `Duct ${id}`,
+    engineeringSystem: 'standard_duct' as const,
     shape: 'rectangular',
     width: 100,
     height: 50,
@@ -88,6 +89,7 @@ const createMockEquipment = (id: string, x: number, y: number): Equipment => ({
   modifiedAt: '2025-01-01T00:00:00.000Z',
   props: {
     name: `Equipment ${id}`,
+    engineeringSystem: 'standard_duct' as const,
     equipmentType: 'air_handler',
     width: 50,
     height: 50,
@@ -283,6 +285,10 @@ describe('Minimap', () => {
       const canvas = screen.getByRole('group', { name: /minimap/i }).querySelector('canvas');
       expect(canvas).toHaveClass('hover:ring-2');
       expect(canvas).toHaveClass('hover:ring-blue-200');
+    });
+  });
+});
+Class('cursor-crosshair');
     });
   });
 });

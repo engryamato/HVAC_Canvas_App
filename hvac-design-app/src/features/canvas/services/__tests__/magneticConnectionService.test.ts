@@ -95,7 +95,7 @@ describe('MagneticConnectionService', () => {
       duct: createDuct('duct', 100, 100, 0, 10),
     };
 
-    const result = MagneticConnectionService.resolveSnapTarget(160, 104, entities);
+    const result = MagneticConnectionService.resolveSnapTarget(160, 111, entities);
 
     expect(result?.snapType).toBe('duct_body');
     expect(result?.ductId).toBe('duct');
@@ -130,5 +130,15 @@ describe('MagneticConnectionService', () => {
 
     expect(endpointResult?.snapType).toBe('duct_endpoint');
     expect(fittingResult?.snapType).toBe('fitting_port');
+  });
+
+  it('returns no magnetic target when the cursor is outside snap tolerance', () => {
+    const entities: Record<string, Entity> = {
+      duct: createDuct('duct', 100, 100, 0, 10),
+    };
+
+    const result = MagneticConnectionService.resolveSnapTarget(160, 140, entities);
+
+    expect(result).toBeNull();
   });
 });

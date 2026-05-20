@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <!-- Duct Side Face Gradient -->
+    <linearGradient id="ductRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2F80D8"/>
+      <stop offset="100%" stop-color="#1B5F9E"/>
+    </linearGradient>
+    
+    <!-- Clip Path for Front Hole to ensure inner walls don't bleed out -->
+    <clipPath id="holeClip">
+      <polygon points="5,14.5 11,17.5 11,25.5 5,22.5" />
+    </clipPath>
+  </defs>
+
+  <!-- 1. Rear Flange Block -->
+  <polygon points="18,6 26,10 28,9 20,5" fill="#D8F1FF" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+  <polygon points="26,10 26,20 28,19 28,9" fill="#1B5F9E" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Front Face of Rear Flange (sticks out behind duct body to form a collar) -->
+  <polygon points="18,16 26,20 26,10 18,6" fill="#65B8FF" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+
+  <!-- 2. Main Duct Body Occluders (Hidden backing to block rear flange lines) -->
+  <polygon points="7,21.5 13,24.5 25,18.5 19,15.5" fill="#1B5F9E" />
+  <polygon points="7,21.5 7,13.5 19,7.5 19,15.5" fill="#1B5F9E" />
+
+  <!-- 3. Main Duct Body Visible Faces -->
+  <polygon points="7,13.5 13,16.5 25,10.5 19,7.5" fill="#65B8FF" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+  <polygon points="13,16.5 13,24.5 25,18.5 25,10.5" fill="url(#ductRight)" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+
+  <!-- 4. Cross Breaks (Sheet Metal Creases) -->
+  <!-- Top Face Cross Break -->
+  <line x1="8.8" y1="13.2" x2="23.2" y2="10.8" stroke="#B9DCF5" stroke-width="0.5" stroke-linecap="round"/>
+  <line x1="13.6" y1="15.6" x2="18.4" y2="8.4" stroke="#B9DCF5" stroke-width="0.5" stroke-linecap="round"/>
+  <!-- Right Face Cross Break -->
+  <line x1="14.2" y1="16.7" x2="23.8" y2="18.3" stroke="#B9DCF5" stroke-width="0.5" stroke-linecap="round"/>
+  <line x1="14.2" y1="23.1" x2="23.8" y2="11.9" stroke="#B9DCF5" stroke-width="0.5" stroke-linecap="round"/>
+
+  <!-- 5. Front Flange Block -->
+  <polygon points="4,13 12,17 14,16 6,12" fill="#D8F1FF" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+  <polygon points="12,17 12,27 14,26 14,16" fill="#1B5F9E" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Front Face Frame (Using evenodd fill rule for the hollow center) -->
+  <path d="M 4,13 L 12,17 L 12,27 L 4,23 Z M 5,14.5 L 5,22.5 L 11,25.5 L 11,17.5 Z" fill="#65B8FF" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round" fill-rule="evenodd"/>
+
+  <!-- 6. Inner Hole (CAD-like interior depth shading) -->
+  <g clip-path="url(#holeClip)">
+    <!-- Inner Left Wall -->
+    <polygon points="5,14.5 5,22.5 21,14.5 21,6.5" fill="#062038" />
+    <!-- Inner Bottom Wall -->
+    <polygon points="5,22.5 11,25.5 27,17.5 21,14.5" fill="#1B5F9E" />
+    <!-- Depth corner crease -->
+    <line x1="5" y1="22.5" x2="21" y2="14.5" stroke="#0A2A43" stroke-width="0.75" />
+  </g>
+  <!-- Inner hole structural outline -->
+  <polygon points="5,14.5 11,17.5 11,25.5 5,22.5" fill="none" stroke="#0A2A43" stroke-width="1" stroke-linejoin="round"/>
+
+  <!-- 7. Flange Corner Connectors (Bolts) -->
+  <circle cx="4.5" cy="13.75" r="0.5" fill="#0A2A43" />
+  <circle cx="11.5" cy="17.25" r="0.5" fill="#0A2A43" />
+  <circle cx="11.5" cy="26.25" r="0.5" fill="#0A2A43" />
+  <circle cx="4.5" cy="22.75" r="0.5" fill="#0A2A43" />
+</svg>

@@ -44,6 +44,10 @@ function createUnifiedComponent(
     tags: overrides.tags,
     customFields: overrides.customFields,
     isCustom: overrides.isCustom ?? true,
+    recommendedFittingEntryIds: overrides.recommendedFittingEntryIds ?? [],
+    recommendedAccessoryEntryIds: overrides.recommendedAccessoryEntryIds ?? [],
+    recommendedEquipmentEntryIds: overrides.recommendedEquipmentEntryIds ?? [],
+    connectionNotes: overrides.connectionNotes ?? [],
     createdAt: overrides.createdAt ?? now,
     updatedAt: overrides.updatedAt ?? now,
   };
@@ -348,5 +352,9 @@ describe('ENABLE_UNIFIED_COMPONENT_LIBRARY', () => {
     expect(importedModule.ENABLE_UNIFIED_COMPONENT_LIBRARY).toBe(false);
 
     vi.unstubAllEnvs();
+  });
+});
+() => {
+    expect(ENABLE_UNIFIED_COMPONENT_LIBRARY).toBe(false);
   });
 });

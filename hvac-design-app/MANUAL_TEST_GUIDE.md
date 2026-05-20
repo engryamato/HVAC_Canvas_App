@@ -242,3 +242,39 @@ After successful manual testing:
 3. Create project dashboard UI
 4. Add error handling toast notifications
 5. Implement migration from old TauriFileSystem
+
+---
+
+## Catalog Compact Mode QA
+
+Use this checklist when validating the compact catalog rollout in the canvas left sidebar.
+
+### Setup
+
+1. Start the app in web or desktop mode and open a canvas project.
+2. Open the Library Catalog tab in the left sidebar.
+3. Set the window to roughly 1440x900 and the sidebar width to 300px for the default count check.
+
+### Manual Checklist
+
+- Confirm Compact is the default density on first open.
+- Count visible rows without scrolling at 300px sidebar width; expect at least 10 visible entries.
+- Toggle to Comfortable and confirm the larger card layout returns.
+- Reload and confirm Comfortable remains selected.
+- Toggle back to Compact, reload, and confirm Compact remains selected.
+- Resize the sidebar to 250px and confirm the chip strip and rows do not overflow horizontally.
+- Resize the sidebar to 500px and confirm rows expand without broken alignment.
+- Enter a search query and confirm the list filters correctly.
+- Click a category chip and confirm the visible rows change.
+- Click `All` and confirm the full list returns.
+- Select a row and confirm the active highlight is visible.
+- Open a row context menu with the actions button and confirm it appears.
+- Press `Escape` with the context menu open and confirm it closes.
+- Navigate rows with keyboard focus and verify focus remains visible while moving through the list.
+
+### Evidence To Capture
+
+- Screenshot at 300px width showing the default Compact density.
+- Screenshot at 250px width showing no horizontal overflow.
+- Screenshot or note confirming Comfortable persists after reload.
+- Screenshot of an active row plus open context menu.

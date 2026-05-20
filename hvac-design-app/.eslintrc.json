@@ -62,6 +62,21 @@
       "version": "detect"
     }
   },
+  "overrides": [
+    {
+      "files": [
+        "**/__tests__/**/*.{ts,tsx,js,jsx}",
+        "**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "e2e/**/*.{ts,tsx,js,jsx}"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "no-console": "off"
+      }
+    }
+  ],
   "ignorePatterns": [
     "node_modules/",
     ".next/",

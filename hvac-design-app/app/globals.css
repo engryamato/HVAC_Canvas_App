@@ -257,10 +257,13 @@
   padding: 16px;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
 }
 
 .sidebar-content-bom {
+  display: flex;
   padding: 0;
+  overflow: hidden;
 }
 
 .resize-handle {
@@ -317,7 +320,9 @@
 }
 
 .sidebar-section-bom {
+  flex: 1;
   height: 100%;
+  min-height: 0;
   margin-bottom: 0;
 }
 
@@ -358,46 +363,4 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-right: 8px;
-}
-
-.fab-tool {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.fab-trigger {
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  border: none;
-  background: #3b82f6; /* Technical Blue */
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
-}
-
-.fab-menu {
-  position: absolute;
-  bottom: 56px;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: white;
-  border: 1px solid #e0e0e0;
-  padding: 8px;
-  border-radius: 8px;
-  min-width: 160px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.fab-item {
-  border: none;
-  background: #f5f5f5;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  text-align: left;
 }

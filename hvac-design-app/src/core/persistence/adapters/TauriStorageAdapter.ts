@@ -294,7 +294,7 @@ export class TauriStorageAdapter implements StorageAdapter {
           const backupResult = deserializeProject(backupContent);
           if (backupResult.success) {
             deserializeResult = backupResult;
-            source = 'localStorage'; // Using 'localStorage' to indicate backup
+            source = 'file'; // loaded from backup file
           }
         }
 
@@ -310,7 +310,7 @@ export class TauriStorageAdapter implements StorageAdapter {
               const autoSaveResult = deserializeProject(autoSaveContent);
               if (autoSaveResult.success) {
                 deserializeResult = autoSaveResult;
-                source = 'indexedDB'; // Using 'indexedDB' to indicate autosave
+                source = 'file'; // loaded from autosave file
                 break;
               }
             }
@@ -691,7 +691,7 @@ export class TauriStorageAdapter implements StorageAdapter {
       return {
         success: true,
         project: deserializeResult.data,
-        source: 'indexedDB', // Using 'indexedDB' to indicate autosave
+        source: 'file', // loaded from autosave file
         migrated: false,
       };
     } catch (error: unknown) {

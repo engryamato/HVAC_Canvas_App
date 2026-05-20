@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   BoilerFlueFittingPropsSchema,
+  FittingPortSchema,
   FittingSchema,
   FittingPropsSchema,
   StandardFittingPropsSchema,
@@ -100,6 +101,46 @@ describe('FittingPropsSchema', () => {
     };
     expect(() => FittingPropsSchema.parse(props)).toThrow();
   });
+
+  it('should accept authoritative fitting ports connected to duct_run endpoints', () => {
+    const props = {
+      ...DEFAULT_FITTING_PROPS.tee,
+      ports: [
+        {
+          id: 'port-in',
+          role: 'inlet',
+          direction: 'in',
+          connectedDuctRunId: '550e8400-e29b-41d4-a716-446655440000',
+          connectedEnd: 'end',
+        },
+        {
+          id: 'port-straight',
+          role: 'straight_out',
+          direction: 'out',
+          connectedDuctRunId: '550e8400-e29b-41d4-a716-446655440001',
+          connectedEnd: 'start',
+        },
+      ],
+    };
+
+    expect(FittingPropsSchema.parse(props).ports).toHaveLength(2);
+  });
+});
+
+describe('FittingPortSchema', () => {
+  it('should validate fitting port role, direction, duct_run id, and connected endpoint', () => {
+    const port = FittingPortSchema.parse({
+      id: 'port-1',
+      role: 'branch_out',
+      direction: 'out',
+      connectedDuctRunId: '550e8400-e29b-41d4-a716-446655440000',
+      connectedEnd: 'start',
+    });
+
+    expect(port.role).toBe('branch_out');
+    expect(port.direction).toBe('out');
+    expect(port.connectedEnd).toBe('start');
+  });
 });
 
 describe('FittingSchema', () => {
@@ -121,6 +162,22 @@ describe('FittingSchema', () => {
         ...validFitting.props,
         manualOverride: false,
       },
+    });
+  });
+
+  it('should accept optional propagated pressure fields in calculated data', () => {
+    const fittingWithPressure = {
+      ...validFitting,
+      calculated: {
+        ...validFitting.calculated,
+        cumulativePressureDrop: 0.28,
+        availableStaticPressure: 1.72,
+      },
+    };
+
+    expect(FittingSchema.parse(fittingWithPressure).calculated).toMatchObject({
+      cumulativePressureDrop: 0.28,
+      availableStaticPressure: 1.72,
     });
   });
 

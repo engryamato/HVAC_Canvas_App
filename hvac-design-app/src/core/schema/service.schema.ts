@@ -57,12 +57,16 @@ export const DimensionalConstraintsSchema = z.object({
   allowedShapes: z.array(DuctShapeSchema),
 });
 
+export type DimensionalConstraints = z.infer<typeof DimensionalConstraintsSchema>;
+
 // Rules for automated fitting selection based on connection angle
 export const FittingRuleSchema = z.object({
   angle: z.number(), // e.g. 90, 45
   fittingType: z.string(), // e.g. "elbow_90_stamped", "elbow_90_gore"
   preference: z.number().default(1), // Higher is better
 });
+
+export type FittingRule = z.infer<typeof FittingRuleSchema>;
 
 export const ServiceSchema = z.object({
   id: z.string().uuid(),

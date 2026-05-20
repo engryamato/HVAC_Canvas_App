@@ -55,7 +55,7 @@ describe('ProjectStateOrchestrator', () => {
         projectId: '550e8400-e29b-41d4-a716-446655440000',
       }),
       settings: {
-        unitSystem: 'metric',
+        unitSystem: 'metric' as const,
         gridSize: 24,
         gridVisible: false,
         snapToGrid: false,
@@ -72,6 +72,7 @@ describe('ProjectStateOrchestrator', () => {
         orbitRadius: 500,
         polarAngle: 0.9,
         azimuthAngle: 1.2,
+        cameraRestored: false,
         showGrid: false,
         showAxes: true,
         showPlanOverlay: false,
@@ -119,7 +120,7 @@ describe('ProjectStateOrchestrator', () => {
         projectId: '550e8400-e29b-41d4-a716-446655440001',
       }),
       settings: {
-        unitSystem: 'imperial',
+        unitSystem: 'imperial' as const,
         gridSize: 12,
         gridVisible: true,
       },
@@ -141,7 +142,7 @@ describe('ProjectStateOrchestrator', () => {
       createdAt: '2026-03-17T00:00:00.000Z',
       modifiedAt: '2026-03-17T00:00:00.000Z',
     });
-    useProjectStore.getState().setProjectSettings({ unitSystem: 'metric' });
+    useProjectStore.getState().setProjectSettings({ unitSystem: 'metric' as const });
     useViewportStore.setState((state) => ({
       ...state,
       panX: 42,

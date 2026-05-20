@@ -206,12 +206,13 @@ export class DuctRunGeometryService {
       return inchesToPixels(run.props.diameter);
     }
 
-    if ('width' in run.props && typeof run.props.width === 'number') {
-      return inchesToPixels(run.props.width);
+    const dimensionalProps = run.props as Record<string, unknown>;
+    if (typeof dimensionalProps.width === 'number') {
+      return inchesToPixels(dimensionalProps.width);
     }
 
-    if ('height' in run.props && typeof run.props.height === 'number') {
-      return inchesToPixels(run.props.height);
+    if (typeof dimensionalProps.height === 'number') {
+      return inchesToPixels(dimensionalProps.height);
     }
 
     return inchesToPixels(10);

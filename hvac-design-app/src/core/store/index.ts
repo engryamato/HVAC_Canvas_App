@@ -33,6 +33,12 @@ export {
   useEntityActions,
 } from './entityStore';
 
+export {
+  useDuctOverlayStore,
+  buildOverlayStatusMap,
+  type DuctOverlayMode,
+} from './ductOverlayStore';
+
 // Preferences Store
 export { usePreferencesStore, usePreferences, usePreferencesActions } from './preferencesStore';
 

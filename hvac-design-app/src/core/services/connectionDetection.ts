@@ -1,19 +1,29 @@
 /**
  * Connection Detection Service
  *
- * Detects when a newly drawn duct connects to existing ducts and determines
- * the type of fitting required (elbow, tee, cross, etc.)
+ * Detects when a duct endpoint connects to existing duct centerline geometry and
+ * determines the fitting required at the final aligned connection point.
  */
-import { Duct, Entity } from '@/core/schema';
+import type { Entity } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { feetToPixels } from '@/core/constants/coordinates';
+import {
+  areConnectionPointsWithinTolerance,
+  calculateAngleDifference,
+  detectDuctProfileChange,
+  getDuctConnectionEndpoints,
+  getDuctProfile,
+  isStraightConnectionAngle,
+  type DuctConnectionEndpoint,
+  type DuctConnectionEntity,
+} from './ductConnections';
 
 export interface ConnectionPoint {
   entityId: string;
   endPoint: 'start' | 'end';
   x: number;
   y: number;
-  angle: number; // Rotation of the duct in degrees
+  angle: number;
 }
 
 export interface DetectedConnection {
@@ -25,52 +35,58 @@ export interface DetectedConnection {
   };
   existingDuct: {
     entityId: string;
-    endPoint: 'start' | 'end';
+    endPoint: 'start' | 'end' | 'body';
     position: { x: number; y: number };
     angle: number;
   };
   fittingType: 'elbow' | 'tee' | 'cross' | 'transition';
-  angle: number; // Angle between ducts (0-180)
+  angle: number;
 }
 
 const CONNECTION_TOLERANCE = feetToPixels(1);
-const STRAIGHT_ANGLE_TOLERANCE = 15;
+const BODY_ENDPOINT_EXCLUSION = CONNECTION_TOLERANCE;
+
+type DuctBodyConnectionEndpoint = Omit<DuctConnectionEndpoint, 'endPoint'> & {
+  endPoint: 'body';
+};
+
+type NearbyConnectionEndpoint = DuctConnectionEndpoint | DuctBodyConnectionEndpoint;
 
 export class ConnectionDetectionService {
-  /**
-   * Detect connections for a newly created duct
-   */
   static detectConnections(newDuctId: string): DetectedConnection[] {
     const entities = useEntityStore.getState().byId as Record<string, Entity>;
     const newDuct = entities[newDuctId];
 
-    if (!newDuct || newDuct.type !== 'duct') {
+    if (!newDuct || !isConnectionEntity(newDuct)) {
       return [];
     }
 
-    const allDucts = Object.values(entities).filter((entity): entity is Duct => entity.type === 'duct');
-    const newDuctEntity = newDuct as Duct;
+    const allDucts = Object.values(entities).filter(isConnectionEntity);
     const connections: DetectedConnection[] = [];
-    const newDuctPoints = this.getDuctEndpoints(newDuctEntity);
+    const newDuctPoints = getDuctConnectionEndpoints(newDuct);
     const seen = new Set<string>();
 
     for (const newPoint of newDuctPoints) {
       const nearbyConnections = allDucts
         .filter((duct) => duct.id !== newDuctId)
-        .flatMap((duct) => this.getDuctEndpoints(duct))
-        .filter((existingPoint) => this.arePointsConnected(newPoint, existingPoint));
+        .flatMap((duct) => [
+          ...getDuctConnectionEndpoints(duct).filter((existingPoint) =>
+            areConnectionPointsWithinTolerance(newPoint, existingPoint, CONNECTION_TOLERANCE)
+          ),
+          ...getDuctBodyConnectionsAtPoint(duct, newPoint.point, CONNECTION_TOLERANCE),
+        ]);
 
       if (nearbyConnections.length === 0) {
         continue;
       }
 
-      const fittingType = this.classifyJunctionType(newPoint, nearbyConnections, entities);
+      const fittingType = this.classifyJunctionType(newPoint, nearbyConnections);
       if (!fittingType) {
         continue;
       }
 
       for (const existingPoint of nearbyConnections) {
-        const key = [newPoint.entityId, newPoint.endPoint, existingPoint.entityId, existingPoint.endPoint].join(':');
+        const key = [newPoint.ductId, newPoint.endPoint, existingPoint.ductId, existingPoint.endPoint].join(':');
         if (seen.has(key)) {
           continue;
         }
@@ -78,19 +94,19 @@ export class ConnectionDetectionService {
 
         connections.push({
           newDuct: {
-            entityId: newPoint.entityId,
+            entityId: newPoint.ductId,
             endPoint: newPoint.endPoint,
-            position: { x: newPoint.x, y: newPoint.y },
+            position: { ...newPoint.point },
             angle: newPoint.angle,
           },
           existingDuct: {
-            entityId: existingPoint.entityId,
+            entityId: existingPoint.ductId,
             endPoint: existingPoint.endPoint,
-            position: { x: existingPoint.x, y: existingPoint.y },
+            position: { ...existingPoint.point },
             angle: existingPoint.angle,
           },
           fittingType,
-          angle: this.calculateAngleDifference(newPoint.angle, existingPoint.angle),
+          angle: calculateAngleDifference(newPoint.angle, existingPoint.angle),
         });
       }
     }
@@ -108,51 +124,14 @@ export class ConnectionDetectionService {
     });
   }
 
-  /**
-   * Get the start and end points of a duct in canvas coordinates
-   */
-  private static getDuctEndpoints(duct: Duct): ConnectionPoint[] {
-    const { x, y, rotation } = duct.transform;
-    const length = feetToPixels(duct.props.length);
-
-    // Calculate end point based on rotation
-    const radians = (rotation * Math.PI) / 180;
-    const endX = x + length * Math.cos(radians);
-    const endY = y + length * Math.sin(radians);
-
-    return [
-      {
-        entityId: duct.id,
-        endPoint: 'start',
-        x,
-        y,
-        angle: rotation,
-      },
-      {
-        entityId: duct.id,
-        endPoint: 'end',
-        x: endX,
-        y: endY,
-        angle: rotation,
-      },
-    ];
-  }
-
-  /**
-   * Check if two points are within connection tolerance
-   */
-  private static arePointsConnected(point1: ConnectionPoint, point2: ConnectionPoint): boolean {
-    const dx = point2.x - point1.x;
-    const dy = point2.y - point1.y;
-    const distance = Math.hypot(dx, dy);
-    return distance <= CONNECTION_TOLERANCE;
-  }
-
   private static classifyJunctionType(
-    newPoint: ConnectionPoint,
-    nearbyPoints: ConnectionPoint[],
-    entities: Record<string, Entity>
+    newPoint: DuctConnectionEndpoint,
+    nearbyPoints: NearbyConnectionEndpoint[]
   ): DetectedConnection['fittingType'] | null {
+    if (nearbyPoints.some((point) => point.endPoint === 'body')) {
+      return 'tee';
+    }
+
     if (nearbyPoints.length >= 2) {
       return 'tee';
     }
@@ -162,67 +141,109 @@ export class ConnectionDetectionService {
       return null;
     }
 
-    const angleDiff = this.calculateAngleDifference(newPoint.angle, firstNearby.angle);
-    const sizeChange = this.detectSizeChange(newPoint.entityId, firstNearby.entityId, entities);
+    const angleDiff = calculateAngleDifference(newPoint.angle, firstNearby.angle);
+    const sizeChange = detectDuctProfileChange(newPoint.profile, firstNearby.profile);
 
-    if (sizeChange && this.isStraight(angleDiff)) {
+    if (sizeChange && isStraightConnectionAngle(angleDiff)) {
       return 'transition';
     }
 
-    if (this.isStraight(angleDiff)) {
+    if (isStraightConnectionAngle(angleDiff)) {
       return null;
     }
 
     return 'elbow';
   }
+}
 
-  private static calculateAngleDifference(angle1: number, angle2: number): number {
-    let angleDiff = Math.abs(angle1 - angle2) % 360;
-    if (angleDiff > 180) {
-      angleDiff = 360 - angleDiff;
-    }
-    return angleDiff;
+function isConnectionEntity(entity: Entity): entity is DuctConnectionEntity {
+  return entity.type === 'duct' || entity.type === 'duct_run';
+}
+
+function getDuctBodyConnectionsAtPoint(
+  duct: DuctConnectionEntity,
+  point: { x: number; y: number },
+  tolerance: number
+): DuctBodyConnectionEndpoint[] {
+  const projection = projectPointOntoDuctCenterline(duct, point);
+  if (!projection || projection.distance > tolerance) {
+    return [];
   }
 
-  private static isStraight(angleDiff: number): boolean {
-    return angleDiff <= STRAIGHT_ANGLE_TOLERANCE || angleDiff >= 180 - STRAIGHT_ANGLE_TOLERANCE;
+  if (
+    projection.distanceFromStart <= BODY_ENDPOINT_EXCLUSION ||
+    projection.distanceFromEnd <= BODY_ENDPOINT_EXCLUSION
+  ) {
+    return [];
   }
 
-  private static detectSizeChange(
-    duct1Id: string,
-    duct2Id: string,
-    entities: Record<string, Entity>
-  ): boolean {
-    const duct1 = entities[duct1Id];
-    const duct2 = entities[duct2Id];
-    if (!duct1 || !duct2 || duct1.type !== 'duct' || duct2.type !== 'duct') {
-      return false;
-    }
+  return [
+    {
+      ductId: duct.id,
+      endPoint: 'body',
+      point: projection.point,
+      angle: duct.transform.rotation,
+      profile: projection.profile,
+    },
+  ];
+}
 
-    const size1 = this.getDuctSize(duct1);
-    const size2 = this.getDuctSize(duct2);
-    if (size1 <= 0 || size2 <= 0) {
-      return false;
-    }
+function projectPointOntoDuctCenterline(duct: DuctConnectionEntity, point: { x: number; y: number }) {
+  const profile = getDuctProfile(duct);
+  const start = getProjectionStartPoint(duct);
+  const end = getProjectionEndPoint(duct, start);
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const length = Math.hypot(dx, dy);
 
-    return Math.abs(size1 - size2) > 1;
+  if (length === 0) {
+    return null;
   }
 
-  private static getDuctSize(duct: Duct): number {
-    if (duct.props.shape === 'round' && typeof duct.props.diameter === 'number') {
-      return duct.props.diameter;
-    }
+  const ux = dx / length;
+  const uy = dy / length;
+  const projectedLength = (point.x - start.x) * ux + (point.y - start.y) * uy;
 
-    if (
-      duct.props.shape === 'rectangular' &&
-      typeof duct.props.width === 'number' &&
-      typeof duct.props.height === 'number'
-    ) {
-      const numerator = Math.pow(duct.props.width * duct.props.height, 0.625);
-      const denominator = Math.pow(duct.props.width + duct.props.height, 0.25);
-      return 1.3 * (numerator / denominator);
-    }
-
-    return 0;
+  if (projectedLength <= 0 || projectedLength >= length) {
+    return null;
   }
+
+  const projectionPoint = {
+    x: start.x + projectedLength * ux,
+    y: start.y + projectedLength * uy,
+  };
+
+  return {
+    point: projectionPoint,
+    distance: Math.hypot(projectionPoint.x - point.x, projectionPoint.y - point.y),
+    distanceFromStart: projectedLength,
+    distanceFromEnd: length - projectedLength,
+    profile,
+  };
+}
+
+function getProjectionStartPoint(duct: DuctConnectionEntity): { x: number; y: number } {
+  if (duct.type === 'duct_run' && duct.props.startPoint) {
+    return { ...duct.props.startPoint };
+  }
+
+  return { x: duct.transform.x, y: duct.transform.y };
+}
+
+function getProjectionEndPoint(
+  duct: DuctConnectionEntity,
+  start: { x: number; y: number }
+): { x: number; y: number } {
+  if (duct.type === 'duct_run' && duct.props.endPoint) {
+    return { ...duct.props.endPoint };
+  }
+
+  const length = duct.type === 'duct' ? duct.props.length : duct.props.installLength;
+  const lengthPx = feetToPixels(length);
+  const radians = (duct.transform.rotation * Math.PI) / 180;
+
+  return {
+    x: start.x + lengthPx * Math.cos(radians),
+    y: start.y + lengthPx * Math.sin(radians),
+  };
 }

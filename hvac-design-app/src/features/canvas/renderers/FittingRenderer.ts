@@ -17,12 +17,13 @@ const FITTING_COLORS = {
 };
 
 export function renderFitting(fitting: Fitting, context: RenderContext): void {
-  const { ctx, zoom, isSelected, entitiesById = {}, showFittingLabels = false } = context;
+  const { ctx, zoom, isSelected, entitiesById = {}, showFittingLabels = false, backgroundColor = '#ffffff' } = context;
   const helper = new ProfessionalRenderingHelper(ctx, zoom);
   const spec = deriveDynamicFittingSymbol(fitting, entitiesById);
   const stroke = isSelected ? FITTING_COLORS.selectedStroke : FITTING_COLORS.stroke;
 
   ctx.save();
+  renderOverlapMask(ctx, spec, backgroundColor);
   ctx.strokeStyle = stroke;
   ctx.fillStyle = FITTING_COLORS.fill;
   ctx.lineWidth = (isSelected ? 2.5 : 2) / zoom;
@@ -63,6 +64,32 @@ export function renderFitting(fitting: Fitting, context: RenderContext): void {
   }
 
   ctx.restore();
+}
+
+function renderOverlapMask(
+  ctx: CanvasRenderingContext2D,
+  spec: DynamicFittingSymbolSpec,
+  backgroundColor: string
+): void {
+  const halfSize = getFittingMaskHalfSize(spec) + 4;
+  ctx.save();
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(-halfSize, -halfSize, halfSize * 2, halfSize * 2);
+  ctx.restore();
+}
+
+function getFittingMaskHalfSize(spec: DynamicFittingSymbolSpec): number {
+  switch (spec.kind) {
+    case 'reducer':
+      return Math.max(spec.props.inletSize, spec.props.outletSize, 56) / 2;
+    case 'tee':
+    case 'wye':
+      return Math.max(spec.props.mainSize, spec.props.branchSize, 64) / 2;
+    case 'rect_to_round':
+      return Math.max(spec.props.rectWidth, spec.props.rectHeight, spec.props.roundSize, 64) / 2;
+    default:
+      return Math.max(spec.props.size, 40) / 2;
+  }
 }
 
 function drawMiteredElbow(

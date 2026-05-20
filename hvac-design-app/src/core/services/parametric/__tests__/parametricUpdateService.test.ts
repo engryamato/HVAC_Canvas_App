@@ -30,6 +30,7 @@ function createDuct(id: string): Duct {
     modifiedAt: '2025-01-01T00:00:00.000Z',
     props: {
       name: `Duct ${id}`,
+      engineeringSystem: 'standard_duct' as const,
       shape: 'round',
       diameter: 12,
       length: 20,
@@ -130,5 +131,8 @@ describe('parametricUpdateService scheduling and cascade', () => {
     expect(result.updatedEntities).toContain('fit-1');
     expect(result.entityUpdates?.length).toBe(2);
     expect(result.entityUpdates?.some((update) => update.id === 'fit-1')).toBe(true);
+  });
+});
+) => update.id === 'fit-1')).toBe(true);
   });
 });
