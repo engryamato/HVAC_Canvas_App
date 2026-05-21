@@ -202,27 +202,27 @@ describe('Canvas Design Workflow User Journey', () => {
       });
 
       it('should zoom in by step', () => {
-        useViewportStore.getState().zoomIn();
+        useViewportStore.getState().zoomIn(undefined, undefined, { animate: false });
         expect(useViewportStore.getState().zoom).toBe(DEFAULT_ZOOM + ZOOM_STEP);
       });
 
       it('should zoom out by step', () => {
-        useViewportStore.getState().zoomOut();
+        useViewportStore.getState().zoomOut(undefined, undefined, { animate: false });
         expect(useViewportStore.getState().zoom).toBe(DEFAULT_ZOOM - ZOOM_STEP);
       });
 
       it('should clamp zoom to minimum (10%)', () => {
-        useViewportStore.getState().zoomTo(0.05); // Try to go below min
+        useViewportStore.getState().zoomTo(0.05, undefined, undefined, { animate: false }); // Try to go below min
         expect(useViewportStore.getState().zoom).toBe(MIN_ZOOM);
       });
 
       it('should clamp zoom to maximum (400%)', () => {
-        useViewportStore.getState().zoomTo(5); // Try to go above max
+        useViewportStore.getState().zoomTo(5, undefined, undefined, { animate: false }); // Try to go above max
         expect(useViewportStore.getState().zoom).toBe(MAX_ZOOM);
       });
 
       it('should zoom to specific level', () => {
-        useViewportStore.getState().zoomTo(1.5);
+        useViewportStore.getState().zoomTo(1.5, undefined, undefined, { animate: false });
         expect(useViewportStore.getState().zoom).toBe(1.5);
       });
 
@@ -232,7 +232,7 @@ describe('Canvas Design Workflow User Journey', () => {
         useViewportStore.getState().setPan(initialPanX, initialPanY);
 
         // Zoom in centered on point (400, 300)
-        useViewportStore.getState().zoomIn(400, 300);
+        useViewportStore.getState().zoomIn(400, 300, { animate: false });
 
         // Pan should adjust to zoom toward the center point
         const viewport = useViewportStore.getState();
@@ -244,7 +244,7 @@ describe('Canvas Design Workflow User Journey', () => {
     describe('Reset View', () => {
       it('should reset to default pan and zoom', () => {
         useViewportStore.getState().setPan(500, 300);
-        useViewportStore.getState().zoomTo(2.0);
+        useViewportStore.getState().zoomTo(2.0, undefined, undefined, { animate: false });
 
         useViewportStore.getState().resetView();
 
@@ -260,7 +260,7 @@ describe('Canvas Design Workflow User Journey', () => {
         const bounds = { x: 100, y: 100, width: 500, height: 400 };
         const canvasDimensions = { width: 800, height: 600 };
 
-        useViewportStore.getState().fitToContent(bounds, canvasDimensions);
+        useViewportStore.getState().fitToContent(bounds, canvasDimensions, { animate: false });
 
         const viewport = useViewportStore.getState();
         // After fit, zoom should be adjusted to fit content
@@ -696,7 +696,7 @@ describe('Canvas Design Workflow User Journey', () => {
 
       // Step 3-4: Pan and zoom to working area
       useViewportStore.getState().pan(100, 50);
-      useViewportStore.getState().zoomIn();
+      useViewportStore.getState().zoomIn(undefined, undefined, { animate: false });
       expect(useViewportStore.getState().panX).toBe(100);
       expect(useViewportStore.getState().zoom).toBeGreaterThan(DEFAULT_ZOOM);
 

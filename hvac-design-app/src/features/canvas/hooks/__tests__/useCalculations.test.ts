@@ -188,7 +188,3 @@ describe('useCalculations helpers', () => {
     );
   });
 });
-tables.'
-    );
-  });
-});

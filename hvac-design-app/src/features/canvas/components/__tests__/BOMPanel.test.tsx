@@ -59,7 +59,10 @@ describe('BOMPanel', () => {
     ...overrides,
   });
 
-  const makeBomReturn = (items: BomItem[] = []): GroupedBomItems => ({
+  const makeBomReturn = (
+    items: BomItem[] = [],
+    overrides: Partial<GroupedBomItems> = {}
+  ): GroupedBomItems => ({
     all: items,
     ducts: items.filter((item) => item.type === 'Duct'),
     equipment: items.filter((item) => item.type === 'Equipment'),
@@ -72,6 +75,7 @@ describe('BOMPanel', () => {
     costEstimate: null,
     costDelta: null,
     lastUpdated: null,
+    ...overrides,
   });
 
   beforeEach(() => {
@@ -88,10 +92,10 @@ describe('BOMPanel', () => {
     ]));
 
     const { container } = render(<BOMPanel />);
-    const header = container.querySelector('[data-show-price="false"]');
+    const header = container.querySelector('[data-showprice="false"]');
 
     expect(header).not.toBeNull();
-    expect(header?.textContent).toContain('QTY');
+    expect(header?.textContent).toContain('Qty');
     expect(header?.textContent).toContain('Description');
     expect(header?.textContent).toContain('Unit');
     expect(header?.textContent).toContain('Weight');
@@ -101,15 +105,20 @@ describe('BOMPanel', () => {
   it('shows Price only after the optional Price toggle is enabled', () => {
     vi.mocked(useBOM).mockReturnValue(makeBomReturn([
       makeItem({ quantity: 4, description: '90\u00b0 Elbow', type: 'Fitting' }),
-    ]));
+    ], {
+      costEstimate: {
+        items: [{ bomItemId: 'bom-1', itemTotal: 125 }],
+        breakdown: { totalCost: 125 },
+      } as GroupedBomItems['costEstimate'],
+    }));
 
     const { container } = render(<BOMPanel />);
 
-    expect(container.querySelector('[data-show-price="false"]')?.textContent).not.toContain('Price');
+    expect(container.querySelector('[data-showprice="false"]')?.textContent).not.toContain('Price');
 
-    fireEvent.click(screen.getByRole('button', { name: /show price/i }));
+    fireEvent.click(screen.getByRole('button', { name: /price/i }));
 
-    expect(container.querySelector('[data-show-price="true"]')?.textContent).toContain('Price');
+    expect(container.querySelector('[data-showprice="true"]')?.textContent).toContain('Price');
   });
 
   it('renders grouped BOM descriptions with quantity, unit, and placeholder weight', () => {

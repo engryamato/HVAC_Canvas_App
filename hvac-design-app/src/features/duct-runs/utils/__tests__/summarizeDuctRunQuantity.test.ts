@@ -102,6 +102,3 @@ describe('summarizeDuctRunQuantity', () => {
     ).toThrow('Duct run segment 0 must have a positive length.');
   });
 });
-a positive length.');
-  });
-});

@@ -133,6 +133,3 @@ describe('parametricUpdateService scheduling and cascade', () => {
     expect(result.entityUpdates?.some((update) => update.id === 'fit-1')).toBe(true);
   });
 });
-) => update.id === 'fit-1')).toBe(true);
-  });
-});

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { DuctInspector } from '../DuctInspector';
 import type { Duct } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
@@ -168,13 +168,15 @@ describe('DuctInspector Milestone 4 behavior', () => {
       500
     );
 
-    const stored = useEntityStore.getState().byId[duct.id] as Duct;
-    expect(stored.props.airflow).toBe(3400);
+    await waitFor(() => {
+      const stored = useEntityStore.getState().byId[duct.id] as Duct;
+      expect(stored.props.airflow).toBe(3400);
+    });
     expect(screen.getByText('Validation Issues')).toBeInTheDocument();
     expect(screen.getByText(/Velocity 3200 FPM exceeds maximum 2500 FPM/)).toBeInTheDocument();
   });
 
-  it('applies one-click deterministic suggestion and shows cleared status', async () => {
+  it('does not render one-click actions for non-actionable text suggestions', () => {
     const duct = createDuct({
       constraintStatus: {
         isValid: false,
@@ -191,67 +193,11 @@ describe('DuctInspector Milestone 4 behavior', () => {
     });
 
     const scheduleMock = vi.mocked(parametricUpdateService.scheduleDuctPropertyChange);
-    scheduleMock.mockResolvedValue({
-      updatedEntities: [duct.id],
-      violations: [],
-      requiresUserAction: false,
-      engineeringData: {
-        airflow: 2344,
-        velocity: 2500,
-        pressureDrop: 0.09,
-        friction: 0.0015,
-      },
-      entityUpdates: [
-        {
-          id: duct.id,
-          previous: duct,
-          updates: {
-            props: {
-              ...duct.props,
-              airflow: 2344,
-              engineeringData: {
-                airflow: 2344,
-                velocity: 2500,
-                pressureDrop: 0.09,
-                friction: 0.0015,
-              },
-              constraintStatus: {
-                isValid: true,
-                violations: [],
-                lastValidated: new Date('2025-01-01T00:00:05.000Z'),
-              },
-            },
-            modifiedAt: new Date('2025-01-01T00:00:05.000Z').toISOString(),
-          },
-        },
-      ],
-    });
-
     useEntityStore.getState().addEntity(duct);
     render(<DuctInspector entity={duct} />);
 
-    const applyButton = screen.getByRole('button', { name: /Apply Fix/i });
-    fireEvent.click(applyButton);
-
-    expect(scheduleMock).toHaveBeenCalledWith(
-      duct.id,
-      { airflow: 2344 },
-      {
-        ducts: expect.any(Array),
-        fittings: expect.any(Array),
-      },
-      expect.any(Object),
-      'input',
-      0
-    );
-
-    expect(screen.getByTestId('duct-suggestion-feedback')).toHaveTextContent(
-      'Suggestion applied. All warning/error violations cleared.'
-    );
-
-    const stored = useEntityStore.getState().byId[duct.id] as Duct;
-    expect(stored.props.airflow).toBe(2344);
-    expect((stored.props.constraintStatus?.violations ?? []).length).toBe(0);
+    expect(screen.queryByRole('button', { name: /Apply Fix/i })).toBeNull();
+    expect(screen.getByText(/Velocity 3200 FPM exceeds maximum 2500 FPM/)).toBeInTheDocument();
+    expect(scheduleMock).not.toHaveBeenCalled();
   });
 });
-

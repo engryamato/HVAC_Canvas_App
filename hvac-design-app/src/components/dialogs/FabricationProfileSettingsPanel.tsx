@@ -181,7 +181,12 @@ export function FabricationProfileSettingsPanel() {
       entityStore.updateEntity(entity.id, {
         props: {
           ...entity.props,
-          segments: recomputeDuctRunSegments(entity.props.installLength, nextDefaultSectionLength),
+          segments: recomputeDuctRunSegments(entity.props.installLength, nextDefaultSectionLength, {
+            insulationType: entity.props.insulationType,
+            insulationThickness: entity.props.insulationThickness,
+            startEndType: entity.props.startEndType,
+            endEndType: entity.props.endEndType,
+          }),
         },
         modifiedAt: new Date().toISOString(),
       });

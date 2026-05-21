@@ -249,10 +249,10 @@ describe('Entity Commands', () => {
       expect(runs.map((run) => run.props.installLength).sort((a, b) => a - b)).toEqual([5, 5, 10]);
 
       const splitRuns = runs.filter((run) => run.id !== branch.id).sort((a, b) => a.transform.x - b.transform.x);
-      expect(splitRuns[0]?.props.connectedFrom).toBe(trunk.props.connectedFrom);
-      expect(splitRuns[0]?.props.connectedTo).toBeUndefined();
-      expect(splitRuns[1]?.props.connectedFrom).toBeUndefined();
-      expect(splitRuns[1]?.props.connectedTo).toBe(trunk.props.connectedTo);
+      expect(splitRuns[0]?.props.connectedFrom).toBeUndefined();
+      expect(runs.some((run) => run.id === splitRuns[0]?.props.connectedTo)).toBe(true);
+      expect(runs.some((run) => run.id === splitRuns[1]?.props.connectedFrom)).toBe(true);
+      expect(splitRuns[1]?.props.connectedTo).toBeUndefined();
 
       undo();
 

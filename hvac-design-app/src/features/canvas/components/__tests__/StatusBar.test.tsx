@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { StatusBar } from '../StatusBar';
+import { useCursorStore } from '../../store/cursorStore';
 
 // Mock the store hooks
 vi.mock('../store/viewportStore', () => ({
@@ -13,16 +14,10 @@ vi.mock('../store/selectionStore', () => ({
   useSelectionCount: vi.fn(() => 0),
 }));
 
-vi.mock('../store/cursorStore', () => ({
-  useCursorStore: vi.fn((selector: (state: { lastCanvasPoint: { x: number; y: number } }) => { x: number; y: number }) => {
-    const state = { lastCanvasPoint: { x: 100, y: 200 } };
-    return selector(state);
-  }),
-}));
-
 describe('StatusBar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    useCursorStore.getState().clearLastCanvasPoint();
   });
 
   describe('Mouse Position', () => {
@@ -34,6 +29,8 @@ describe('StatusBar', () => {
     });
 
     it('should display mouse position from cursor store when prop not provided', () => {
+      useCursorStore.getState().setLastCanvasPoint({ x: 100, y: 200 });
+
       render(<StatusBar />);
 
       expect(screen.getByText(/X: 100/)).toBeDefined();

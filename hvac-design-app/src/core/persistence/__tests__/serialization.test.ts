@@ -9,9 +9,75 @@ import {
 } from '../serialization';
 import { createEmptyProjectFile, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
 import { createDuct } from '@/features/canvas/entities/ductDefaults';
+import { createDuctRun } from '@/features/canvas/entities/ductRunDefaults';
 
 describe('serialization', () => {
   const makeProject = () => createEmptyProjectFile('550e8400-e29b-41d4-a716-446655440000');
+
+  // ── Regression: schema validation edge-cases ────────────────────────────
+  describe('schema edge-case serialization', () => {
+    it('normalizes negative rotation (Math.atan2 result) to [0, 360)', () => {
+      // Math.atan2 returns values in [-180, 180]. The TransformSchema preprocess
+      // must coerce them to [0, 360) so serialization does not throw.
+      const project = makeProject();
+      const run = createDuctRun({ installLength: 10 });
+      run.transform.rotation = -90; // simulates an upward duct draw
+      project.entities.byId[run.id] = run as any;
+      project.entities.allIds = [run.id];
+
+      const result = serializeProject(project);
+      expect(result.success).toBe(true);
+
+      // Verify the stored value is the normalized equivalent
+      const stored = JSON.parse(result.data!);
+      expect(stored.entities.byId[run.id].transform.rotation).toBe(270);
+    });
+
+    it('accepts template serviceId (non-UUID) without failing validation', () => {
+      // Baseline template IDs like 'tmpl_low_pressure_supply' are not UUIDs.
+      // ServiceIdSchema must accept them so save does not throw.
+      const project = makeProject();
+      const run = createDuctRun({ installLength: 10 });
+      (run.props as any).serviceId = 'tmpl_low_pressure_supply';
+      project.entities.byId[run.id] = run as any;
+      project.entities.allIds = [run.id];
+
+      const result = serializeProject(project);
+      expect(result.success).toBe(true);
+
+      const stored = JSON.parse(result.data!);
+      expect(stored.entities.byId[run.id].props.serviceId).toBe('tmpl_low_pressure_supply');
+    });
+
+    it('coerces empty-string serviceId to undefined on serialize/deserialize round-trip', () => {
+      const project = makeProject();
+      const run = createDuctRun({ installLength: 10 });
+      (run.props as any).serviceId = ''; // empty string from cleared UI field
+      project.entities.byId[run.id] = run as any;
+      project.entities.allIds = [run.id];
+
+      const serResult = serializeProject(project);
+      expect(serResult.success).toBe(true);
+
+      // After round-trip the empty string should be gone
+      const desResult = deserializeProject(serResult.data!);
+      expect(desResult.success).toBe(true);
+      expect(desResult.data?.entities.byId[run.id]?.props).not.toHaveProperty('serviceId');
+    });
+
+    it('normalizes rotation 360 to 0 on round-trip', () => {
+      const project = makeProject();
+      const run = createDuctRun({ installLength: 10 });
+      run.transform.rotation = 360;
+      project.entities.byId[run.id] = run as any;
+      project.entities.allIds = [run.id];
+
+      const result = serializeProject(project);
+      expect(result.success).toBe(true);
+      const stored = JSON.parse(result.data!);
+      expect(stored.entities.byId[run.id].transform.rotation).toBe(0);
+    });
+  });
 
   describe('serializeProject', () => {
     it('should serialize valid project to JSON', () => {

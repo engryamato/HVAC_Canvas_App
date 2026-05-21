@@ -280,7 +280,7 @@ describe('Project Lifecycle User Journey', () => {
 
     it('should serialize viewport state correctly', () => {
       useViewportStore.getState().setPan(100, 200);
-      useViewportStore.getState().zoomTo(1.5);
+      useViewportStore.getState().zoomTo(1.5, undefined, undefined, { animate: false });
 
       const viewport = useViewportStore.getState();
       const serializedViewport = {
@@ -337,7 +337,7 @@ describe('Project Lifecycle User Journey', () => {
       const savedViewport = { panX: 150, panY: 250, zoom: 0.75 };
 
       useViewportStore.getState().setPan(savedViewport.panX, savedViewport.panY);
-      useViewportStore.getState().zoomTo(savedViewport.zoom);
+      useViewportStore.getState().zoomTo(savedViewport.zoom, undefined, undefined, { animate: false });
 
       const viewport = useViewportStore.getState();
       expect(viewport.panX).toBe(150);
@@ -465,7 +465,7 @@ describe('Project Lifecycle User Journey', () => {
 
       // Adjust viewport
       useViewportStore.getState().setPan(200, 300);
-      useViewportStore.getState().zoomTo(1.25);
+      useViewportStore.getState().zoomTo(1.25, undefined, undefined, { animate: false });
 
       // Verify all state is consistent
       expect(selectEntityCount()).toBe(3);

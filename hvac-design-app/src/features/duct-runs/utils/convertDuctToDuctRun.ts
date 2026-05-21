@@ -40,7 +40,12 @@ export function convertDuctToDuctRun(
       },
     } as Pick<DuctRun, 'props'>);
 
-  const segments = recomputeDuctRunSegments(baseProps.installLength, sectionLength);
+  const segments = recomputeDuctRunSegments(baseProps.installLength, sectionLength, {
+    insulationType: duct.props.insulated ? 'wrap' : undefined,
+    insulationThickness: duct.props.insulationThickness,
+    startEndType: 'flange',
+    endEndType: 'flange',
+  });
 
   const { length: _legacyLength, ...propsWithoutLegacyLength } = baseProps;
 
@@ -67,7 +72,7 @@ export function convertLegacyDuctEntitiesInProject(project: ProjectFile): Projec
       continue;
     }
 
-    nextById[entityId] = convertDuctToDuctRun(entity);
+    nextById[entityId] = convertDuctToDuctRun(entity as Duct);
     changed = true;
   }
 

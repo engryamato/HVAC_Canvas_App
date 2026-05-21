@@ -6,7 +6,7 @@ import { useProjectStore } from '@/core/store/project.store';
 
 describe('Canvas LeftSidebar Tabs', () => {
   beforeEach(() => {
-    useLayoutStore.setState({ leftSidebarCollapsed: false, activeLeftTab: 'project' });
+    useLayoutStore.setState({ leftSidebarCollapsed: false, activeLeftTab: 'catalog' });
     useProjectStore.setState({
       currentProjectId: '11111111-1111-4111-8111-111111111111',
       projectDetails: {
@@ -37,19 +37,19 @@ describe('Canvas LeftSidebar Tabs', () => {
     });
   });
 
-  it('shows Project Properties by default', () => {
+  it('shows Library by default', () => {
     render(<LeftSidebar />);
 
-    expect(screen.getAllByText('Project Details').length).toBeGreaterThan(0);
-    expect(screen.getByTestId('tab-project-properties')).toBeDefined();
-    expect(screen.getByTestId('tab-product-catalog')).toBeDefined();
+    expect(screen.getByTestId('tab-catalog')).toHaveTextContent('Library');
+    expect(screen.getByTestId('tab-manage')).toHaveTextContent('Manage');
     expect(screen.getByTestId('toolbar')).toBeDefined();
+    expect(screen.getAllByTestId('catalog-panel').length).toBeGreaterThan(0);
   });
 
-  it('switches to Product Catalog tab', () => {
+  it('switches to Manage tab', () => {
     render(<LeftSidebar />);
 
-    fireEvent.click(screen.getByTestId('tab-product-catalog'));
-    expect(screen.getByTestId('equipment-search')).toBeDefined();
+    fireEvent.click(screen.getByTestId('tab-manage'));
+    expect(screen.getByTestId('manage-panel')).toBeDefined();
   });
 });

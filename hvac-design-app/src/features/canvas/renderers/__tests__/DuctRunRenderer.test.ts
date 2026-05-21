@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { DuctRun } from '@/core/schema';
 import { renderDuctRun } from '../DuctRunRenderer';
 import type { RenderContext } from '../RoomRenderer';
+import { ProfessionalRenderingHelper } from '../../utils';
 
 type MockContext = Pick<
   CanvasRenderingContext2D,
@@ -94,6 +95,9 @@ function createContext(overrides: Partial<RenderContext> = {}) {
 
 describe('DuctRunRenderer', () => {
   it('renders a separator for each interior segment boundary', () => {
+    const drawDuctEnd = vi
+      .spyOn(ProfessionalRenderingHelper.prototype, 'drawDuctEnd')
+      .mockImplementation(() => undefined);
     const run = createRun(50, new Array(10).fill(5));
     const context = createContext();
     const moveTo = vi.mocked(context.ctx.moveTo);
@@ -106,6 +110,7 @@ describe('DuctRunRenderer', () => {
       .filter((x) => x > 0 && x < 600);
 
     expect(separatorXPositions).toEqual([60, 120, 180, 240, 300, 360, 420, 480, 540]);
+    drawDuctEnd.mockRestore();
   });
 
   it('highlights only the selected segment span using geometry-derived stations', () => {
@@ -134,5 +139,33 @@ describe('DuctRunRenderer', () => {
     expect(context.ctx.fillStyle).toBe('#111827');
     expect(context.ctx.fillRect).toHaveBeenNthCalledWith(1, 0, -12, 120, 24);
     expect(context.ctx.strokeStyle).toBe('#1976D2');
+  });
+
+  it('draws insulation and end types using each segment span', () => {
+    const drawWrapInsulation = vi
+      .spyOn(ProfessionalRenderingHelper.prototype, 'drawWrapInsulation')
+      .mockImplementation(() => undefined);
+    const drawDuctEnd = vi
+      .spyOn(ProfessionalRenderingHelper.prototype, 'drawDuctEnd')
+      .mockImplementation(() => undefined);
+    const run = createRun(15, [5, 5, 5]);
+    const segment = run.props.segments[1];
+    expect(segment).toBeDefined();
+    run.props.segments[1] = {
+      ...segment!,
+      insulationType: 'wrap',
+      insulationThickness: 1,
+      startEndType: 'raw',
+      endEndType: 'coupled',
+    };
+
+    renderDuctRun(run, createContext());
+
+    expect(drawWrapInsulation).toHaveBeenCalledWith(60, 120, 12, 1, expect.anything(), 1);
+    expect(drawDuctEnd).toHaveBeenCalledWith(60, expect.any(Number), 'raw', 1, expect.anything());
+    expect(drawDuctEnd).toHaveBeenCalledWith(120, expect.any(Number), 'coupled', 1, expect.anything());
+    expect(vi.mocked(run.props.segments[0]?.insulationType)).toBeUndefined();
+    drawWrapInsulation.mockRestore();
+    drawDuctEnd.mockRestore();
   });
 });

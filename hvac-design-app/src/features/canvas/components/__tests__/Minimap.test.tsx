@@ -288,7 +288,3 @@ describe('Minimap', () => {
     });
   });
 });
-Class('cursor-crosshair');
-    });
-  });
-});

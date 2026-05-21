@@ -7,7 +7,7 @@ import {
 import { createEntity, createEntities, splitDuctRunAtPoint } from '@/core/commands/entityCommands';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
-import type { Duct, DuctRun, Entity } from '@/core/schema';
+import type { Duct, DuctEndType, DuctRun, Entity, InsulationType } from '@/core/schema';
 import {
   DuctMaterialSchema as DuctEntityMaterialSchema,
   DuctShapeSchema as LegacyDuctShapeSchema,
@@ -33,10 +33,10 @@ import { getDuctStartAndEnd } from '../services/ductGeometryHelpers';
 const MIN_DUCT_LENGTH = feetToPixels(1);
 const DRAG_COMMIT_THRESHOLD = 4;
 type DuctRunSegmentDefaults = {
-  insulationType?: string | null;
+  insulationType?: InsulationType;
   insulationThickness?: number;
-  startEndType?: string;
-  endEndType?: string;
+  startEndType?: DuctEndType;
+  endEndType?: DuctEndType;
 };
 
 type SnapTarget = MagneticSnapResult & {
@@ -440,7 +440,9 @@ export class DuctTool extends BaseTool {
     }
 
     const installLength = pixelsToFeet(lengthPixels);
-    const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
+    // atan2 returns [-180, 180]; normalize to canonical [0, 360)
+    const rawRotation = Math.atan2(dy, dx) * (180 / Math.PI);
+    const rotation = ((rawRotation % 360) + 360) % 360;
     const activeComponent = this.getActiveComponent();
     const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
     const placementStrategy = this.getPlacementStrategy();

@@ -152,6 +152,7 @@ describe('DuctTool duct_run hydration', () => {
 
     const selectTool = new SelectTool();
     selectTool.onMouseDown({ x: 160, y: 150, button: 0 });
+    selectTool.onMouseMove({ x: 160, y: 144 });
     selectTool.onMouseMove({ x: 160, y: 108 });
     selectTool.onMouseUp({ x: 160, y: 108, button: 0 });
 

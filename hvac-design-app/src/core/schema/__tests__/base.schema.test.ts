@@ -21,9 +21,9 @@ describe('TransformSchema', () => {
     expect(result.elevation).toBe(0);
   });
 
-  it('should reject rotation outside 0-360', () => {
-    expect(() => TransformSchema.parse({ x: 0, y: 0,  elevation: 0, rotation: 400 })).toThrow();
-    expect(() => TransformSchema.parse({ x: 0, y: 0,  elevation: 0, rotation: -10 })).toThrow();
+  it('should normalize rotation values into the canonical range', () => {
+    expect(TransformSchema.parse({ x: 0, y: 0,  elevation: 0, rotation: 400 }).rotation).toBe(40);
+    expect(TransformSchema.parse({ x: 0, y: 0,  elevation: 0, rotation: -10 }).rotation).toBe(350);
   });
 
   it('should reject non-positive scale values', () => {
@@ -91,4 +91,3 @@ describe('getCurrentTimestamp', () => {
     expect(timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
   });
 });
-

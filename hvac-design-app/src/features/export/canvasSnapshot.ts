@@ -1,5 +1,7 @@
 'use client';
 
+import { canvasPerformanceService } from '@/features/canvas/services';
+
 export interface CanvasSnapshot {
   dataUrl: string;
   widthPx: number;
@@ -11,56 +13,63 @@ export async function captureCanvasSnapshot(): Promise<CanvasSnapshot | null> {
     return null;
   }
 
-  const canvasArea = document.querySelector('[data-testid="canvas-area"]');
-  if (!canvasArea) {
-    return null;
-  }
+  canvasPerformanceService.setForceQuality(true);
+  try {
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
-  const canvasElements = Array.from(canvasArea.querySelectorAll('canvas')) as HTMLCanvasElement[];
-  const svgElements = Array.from(canvasArea.querySelectorAll('svg')) as SVGSVGElement[];
-  if (canvasElements.length === 0 && svgElements.length === 0) {
-    return null;
-  }
-
-  const width = Math.max(1, canvasArea.clientWidth);
-  const height = Math.max(1, canvasArea.clientHeight);
-  const composite = document.createElement('canvas');
-  composite.width = width;
-  composite.height = height;
-
-  const ctx = composite.getContext('2d');
-  if (!ctx) {
-    return null;
-  }
-
-  canvasElements.forEach((canvas) => {
-    const rect = canvas.getBoundingClientRect();
-    const areaRect = canvasArea.getBoundingClientRect();
-    const offsetX = rect.left - areaRect.left;
-    const offsetY = rect.top - areaRect.top;
-
-    ctx.drawImage(canvas, offsetX, offsetY, rect.width, rect.height);
-  });
-
-  for (const svgElement of svgElements) {
-    const svgImage = await renderSvgToImage(svgElement);
-    if (!svgImage) {
-      continue;
+    const canvasArea = document.querySelector('[data-testid="canvas-area"]');
+    if (!canvasArea) {
+      return null;
     }
 
-    const rect = svgElement.getBoundingClientRect();
-    const areaRect = canvasArea.getBoundingClientRect();
-    const offsetX = rect.left - areaRect.left;
-    const offsetY = rect.top - areaRect.top;
+    const canvasElements = Array.from(canvasArea.querySelectorAll('canvas')) as HTMLCanvasElement[];
+    const svgElements = Array.from(canvasArea.querySelectorAll('svg')) as SVGSVGElement[];
+    if (canvasElements.length === 0 && svgElements.length === 0) {
+      return null;
+    }
 
-    ctx.drawImage(svgImage, offsetX, offsetY, rect.width, rect.height);
+    const width = Math.max(1, canvasArea.clientWidth);
+    const height = Math.max(1, canvasArea.clientHeight);
+    const composite = document.createElement('canvas');
+    composite.width = width;
+    composite.height = height;
+
+    const ctx = composite.getContext('2d');
+    if (!ctx) {
+      return null;
+    }
+
+    canvasElements.forEach((canvas) => {
+      const rect = canvas.getBoundingClientRect();
+      const areaRect = canvasArea.getBoundingClientRect();
+      const offsetX = rect.left - areaRect.left;
+      const offsetY = rect.top - areaRect.top;
+
+      ctx.drawImage(canvas, offsetX, offsetY, rect.width, rect.height);
+    });
+
+    for (const svgElement of svgElements) {
+      const svgImage = await renderSvgToImage(svgElement);
+      if (!svgImage) {
+        continue;
+      }
+
+      const rect = svgElement.getBoundingClientRect();
+      const areaRect = canvasArea.getBoundingClientRect();
+      const offsetX = rect.left - areaRect.left;
+      const offsetY = rect.top - areaRect.top;
+
+      ctx.drawImage(svgImage, offsetX, offsetY, rect.width, rect.height);
+    }
+
+    return {
+      dataUrl: composite.toDataURL('image/png'),
+      widthPx: composite.width,
+      heightPx: composite.height,
+    };
+  } finally {
+    canvasPerformanceService.setForceQuality(false);
   }
-
-  return {
-    dataUrl: composite.toDataURL('image/png'),
-    widthPx: composite.width,
-    heightPx: composite.height,
-  };
 }
 
 async function renderSvgToImage(svgElement: SVGSVGElement): Promise<HTMLImageElement | null> {
@@ -101,4 +110,3 @@ function inlineComputedStyles(clonedRoot: SVGSVGElement, originalRoot: SVGSVGEle
     clonedElement.setAttribute('style', style);
   }
 }
-

@@ -1,125 +1,108 @@
-
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useEntityStore } from '../core/store/entityStore';
-import { Entity, Duct } from '../core/schema';
+import type { Duct, Equipment } from '../core/schema';
+
+const now = '2026-01-01T00:00:00.000Z';
+
+function diffuser(id: string, connectedDuctId: string, capacity: number): Equipment {
+  return {
+    id,
+    type: 'equipment',
+    props: {
+      engineeringSystem: 'standard_duct',
+      capacity,
+      capacityUnit: 'CFM',
+      staticPressure: 0.2,
+      staticPressureUnit: 'in_wg',
+      equipmentType: 'diffuser',
+      name: id,
+      width: 24,
+      depth: 24,
+      height: 4,
+      mountHeightUnit: 'in',
+      connectedDuctId,
+    },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    zIndex: 1,
+    createdAt: now,
+    modifiedAt: now,
+  };
+}
+
+function duct(id: string, props: Partial<Duct['props']> = {}): Duct {
+  return {
+    id,
+    type: 'duct',
+    props: {
+      engineeringSystem: 'standard_duct',
+      name: id,
+      shape: 'round',
+      diameter: 12,
+      length: 10,
+      material: 'galvanized',
+      airflow: 0,
+      staticPressure: 0.1,
+      ...props,
+    },
+    calculated: { area: 113.1, velocity: 0, frictionLoss: 0 },
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    zIndex: 1,
+    createdAt: now,
+    modifiedAt: now,
+  };
+}
 
 describe('Flow Propagation Integration', () => {
   beforeEach(() => {
     useEntityStore.getState().clearAllEntities();
   });
 
-  it('should propagate flow from equipment to connected duct', () => {
-    // 1. Create Equipment (Diffuser) with 1000 CFM
-    const diffuser: Entity = {
-      id: 'diffuser-1',
-      type: 'equipment',
-      props: {
-        engineeringSystem: 'standard_duct',
-        capacity: 1000,
-        equipmentType: 'diffuser',
-        name: 'Diffuser 1'
-      } as any,
-      connectedTo: 'duct-1',
-      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
-      zIndex: 1,
-      createdAt: new Date().toISOString(),
-      modifiedAt: new Date().toISOString(),
-    } as unknown as Entity;
+  it('reconciles terminal equipment metadata without propagating flow for unsupported topology', () => {
+    const duct1 = duct('550e8400-e29b-41d4-a716-446655440001', {
+      connectedFrom: '550e8400-e29b-41d4-a716-446655440010',
+    });
+    const terminal = diffuser('550e8400-e29b-41d4-a716-446655440010', duct1.id, 1000);
 
-    // 2. Create Duct with 0 CFM initial
-    const duct: Entity = {
-      id: 'duct-1',
-      type: 'duct',
-      props: {
-        airflow: 0,
-        length: 10,
-        name: 'Duct 1'
-      } as any,
-      transform: { x: 10, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
-      zIndex: 1,
-      createdAt: new Date().toISOString(),
-      modifiedAt: new Date().toISOString(),
-    } as unknown as Entity;
+    useEntityStore.getState().addEntities([terminal, duct1]);
 
-    // 3. Add entities to store
-    useEntityStore.getState().addEntity(duct);
-    
-    // Verify initial state
-    const duct1Initial = useEntityStore.getState().byId['duct-1'] as Duct;
-    expect(duct1Initial.props.airflow).toBe(0);
-
-    // Adding diffuser connected to duct
-    useEntityStore.getState().addEntity(diffuser);
-
-    // 4. Verify propagation
-    const duct1Updated = useEntityStore.getState().byId['duct-1'] as Duct;
-    expect(duct1Updated.props.airflow).toBe(1000);
+    const stored = useEntityStore.getState().byId[duct1.id] as Duct;
+    expect(stored.props.connectedFrom).toBe(terminal.id);
+    expect(stored.props.airflow).toBe(0);
   });
 
-  it('should reset flow to 0 when equipment is removed', () => {
-    const diffuser: Entity = {
-      id: 'diffuser-1',
-      type: 'equipment',
-      props: {
-        engineeringSystem: 'standard_duct',
-        capacity: 500,
-        equipmentType: 'diffuser',
-        name: 'Diffuser 1'
-      } as any,
-      connectedTo: 'duct-1',
-      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
-      zIndex: 1,
-      createdAt: '', modifiedAt: ''
-    } as unknown as Entity;
+  it('keeps unsupported topology flow at zero when connected terminal equipment is removed', () => {
+    const duct1 = duct('550e8400-e29b-41d4-a716-446655440011', {
+      connectedFrom: '550e8400-e29b-41d4-a716-446655440012',
+    });
+    const terminal = diffuser('550e8400-e29b-41d4-a716-446655440012', duct1.id, 500);
 
-    const duct: Entity = {
-      id: 'duct-1',
-      type: 'duct',
-      props: { airflow: 0 } as any,
-      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
-      zIndex: 1,
-      createdAt: '', modifiedAt: ''
-    } as unknown as Entity;
+    useEntityStore.getState().addEntities([terminal, duct1]);
+    expect((useEntityStore.getState().byId[duct1.id] as Duct).props.airflow).toBe(0);
 
-    useEntityStore.getState().addEntities([diffuser, duct]);
-    
-    // Verify flow propagated
-    const duct1First = useEntityStore.getState().byId['duct-1'] as Duct;
-    expect(duct1First.props.airflow).toBe(500);
+    useEntityStore.getState().removeEntity(terminal.id);
 
-    // Remove diffuser
-    useEntityStore.getState().removeEntity('diffuser-1');
-
-    // Verify flow reset
-    const duct1Reset = useEntityStore.getState().byId['duct-1'] as Duct;
-    expect(duct1Reset.props.airflow).toBe(0);
+    const reset = useEntityStore.getState().byId[duct1.id] as Duct;
+    expect(reset.props.connectedFrom).toBeUndefined();
+    expect(reset.props.airflow).toBe(0);
   });
-  
-  it('should propagate flow through a chain: Diffuser -> Duct1 -> Duct2', () => {
-    const diffuser: Entity = {
-      id: 'd1', type: 'equipment', connectedTo: 'duct1',
-      props: { capacity: 800, equipmentType: 'diffuser' } as any,
-      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
-    } as unknown as Entity;
-    
-    const duct1: Entity = {
-      id: 'duct1', type: 'duct', connectedTo: 'duct2',
-      props: { airflow: 0 } as any,
-      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
-    } as unknown as Entity;
-    
-    const duct2: Entity = {
-      id: 'duct2', type: 'duct',
-      props: { airflow: 0 } as any,
-      transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 }, zIndex: 0, createdAt: '', modifiedAt: ''
-    } as unknown as Entity;
 
-    useEntityStore.getState().addEntities([diffuser, duct1, duct2]);
+  it('keeps duct-chain flow at zero until the topology is calculation-valid', () => {
+    const terminal = diffuser(
+      '550e8400-e29b-41d4-a716-446655440020',
+      '550e8400-e29b-41d4-a716-446655440021',
+      800
+    );
+    const duct1 = duct('550e8400-e29b-41d4-a716-446655440021', {
+      connectedFrom: terminal.id,
+      connectedTo: '550e8400-e29b-41d4-a716-446655440022',
+    });
+    const duct2 = duct('550e8400-e29b-41d4-a716-446655440022', {
+      connectedFrom: duct1.id,
+    });
 
-    const d1 = useEntityStore.getState().byId['duct1'] as Duct;
-    const d2 = useEntityStore.getState().byId['duct2'] as Duct;
+    useEntityStore.getState().addEntities([terminal, duct1, duct2]);
 
-    expect(d1.props.airflow).toBe(800);
-    expect(d2.props.airflow).toBe(800);
+    expect((useEntityStore.getState().byId[duct1.id] as Duct).props.airflow).toBe(0);
+    expect((useEntityStore.getState().byId[duct2.id] as Duct).props.airflow).toBe(0);
   });
 });

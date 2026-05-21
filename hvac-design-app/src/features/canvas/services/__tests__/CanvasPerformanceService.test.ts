@@ -107,6 +107,18 @@ describe('CanvasPerformanceService', () => {
       expect(hints.simplifyFittings).toBe(true);
       expect(hints.detailLevel).toBe('full');
     });
+
+    it('force quality always enables hatching for export rendering', () => {
+      simulateFrames(service, 60, 40);
+
+      const hints = service.getPerformanceHints({ forceQuality: true });
+
+      expect(hints.detailLevel).toBe('full');
+      expect(hints.enableHatching).toBe(true);
+      expect(hints.enableShadows).toBe(true);
+      expect(hints.simplifyFittings).toBe(false);
+      expect(hints.forceQuality).toBe(true);
+    });
   });
 
   describe('performance mode', () => {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseEntitySchema } from './base.schema';
+import { BaseEntitySchema, ServiceIdSchema } from './base.schema';
 import { MaterialSpecSchema } from './component-library.schema';
 import { EngineeringSystemSchema } from './unified-component.schema';
 
@@ -97,7 +97,7 @@ const SharedDuctPropsSchema = z
     staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
     connectedFrom: z.string().uuid().optional().describe('Source entity ID'),
     connectedTo: z.string().uuid().optional().describe('Destination entity ID'),
-    serviceId: z.string().uuid().optional().describe('Active Service ID'),
+    serviceId: ServiceIdSchema,
     catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
     systemType: SystemTypeSchema.optional(),
     materialSpec: MaterialSpecSchema.optional(),

@@ -101,10 +101,3 @@ describe('catalogIcons', () => {
     ).toBe('fitting');
   });
 });
-ting archetypes', () => {
-    expect(resolveCatalogEntryIconKey(createEntry({ typeId: 'mystery_duct' }))).toBe('duct');
-    expect(
-      resolveCatalogEntryIconKey(createEntry({ componentClass: 'fitting', category: 'fitting', typeId: 'mystery_fitting' }))
-    ).toBe('fitting');
-  });
-});

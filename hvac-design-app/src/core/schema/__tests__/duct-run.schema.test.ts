@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_RECTANGULAR_DUCT_RUN_PROPS,
   DEFAULT_ROUND_DUCT_RUN_PROPS,
+  DuctEndTypeSchema,
   DuctRunFamilySchema,
   DuctRunPropsSchema,
   DuctRunSchema,
   DuctRunShapeSchema,
+  InsulationTypeSchema,
 } from '../duct-run.schema';
 
 describe('DuctRunFamilySchema', () => {
@@ -30,6 +32,18 @@ describe('DuctRunShapeSchema', () => {
   });
 });
 
+describe('DuctRun insulation and end type schemas', () => {
+  it('accepts all supported insulation and end type values', () => {
+    expect(InsulationTypeSchema.options).toEqual([
+      'liner',
+      'wrap',
+      'double_wall_perforated',
+      'double_wall_non_perforated',
+    ]);
+    expect(DuctEndTypeSchema.options).toEqual(['flange', 'raw', 'crimped', 'coupled']);
+  });
+});
+
 describe('DuctRunPropsSchema', () => {
   it('should validate round runs with embedded segments', () => {
     expect(DuctRunPropsSchema.parse(DEFAULT_ROUND_DUCT_RUN_PROPS)).toBeTruthy();
@@ -37,6 +51,63 @@ describe('DuctRunPropsSchema', () => {
 
   it('should validate rectangular runs with embedded segments', () => {
     expect(DuctRunPropsSchema.parse(DEFAULT_RECTANGULAR_DUCT_RUN_PROPS)).toBeTruthy();
+  });
+
+  it('defaults segment insulation and end types from run-level defaults', () => {
+    const result = DuctRunPropsSchema.parse({
+      ...DEFAULT_RECTANGULAR_DUCT_RUN_PROPS,
+      insulationType: 'wrap',
+      insulationThickness: 2,
+      startEndType: 'raw',
+      endEndType: 'coupled',
+      segments: [
+        { index: 0, startStation: 0, endStation: 5, length: 5, isPartial: false },
+        {
+          index: 1,
+          startStation: 5,
+          endStation: 10,
+          length: 5,
+          isPartial: false,
+          insulationType: 'liner',
+          insulationThickness: 1.5,
+          startEndType: 'crimped',
+          endEndType: 'raw',
+        },
+      ],
+    });
+
+    expect(result.segments[0]).toMatchObject({
+      insulationType: 'wrap',
+      insulationThickness: 2,
+      startEndType: 'raw',
+      endEndType: 'coupled',
+    });
+    expect(result.segments[1]).toMatchObject({
+      insulationType: 'liner',
+      insulationThickness: 1.5,
+      startEndType: 'crimped',
+      endEndType: 'raw',
+    });
+  });
+
+  it('rejects non-wrap insulation on flexible duct segments', () => {
+    expect(() =>
+      DuctRunPropsSchema.parse({
+        ...DEFAULT_ROUND_DUCT_RUN_PROPS,
+        shape: 'flexible',
+        diameter: 10,
+        segments: [
+          {
+            index: 0,
+            startStation: 0,
+            endStation: 10,
+            length: 10,
+            isPartial: false,
+            insulationType: 'double_wall_perforated',
+          },
+        ],
+      })
+    ).toThrow(/Flexible duct segment insulation can only be factory wrap/);
   });
 
   it('should validate flat oval runs with width and height', () => {
@@ -118,7 +189,21 @@ describe('DuctRunSchema', () => {
   };
 
   it('should validate a complete duct-run entity', () => {
-    expect(DuctRunSchema.parse(validDuctRun)).toEqual(validDuctRun);
+    expect(DuctRunSchema.parse(validDuctRun)).toEqual({
+      ...validDuctRun,
+      props: {
+        ...validDuctRun.props,
+        insulationThickness: 1,
+        startEndType: 'flange',
+        endEndType: 'flange',
+        segments: validDuctRun.props.segments.map((segment) => ({
+          ...segment,
+          insulationThickness: 1,
+          startEndType: 'flange',
+          endEndType: 'flange',
+        })),
+      },
+    });
   });
 
   it('should accept optional propagated pressure fields in calculated data', () => {

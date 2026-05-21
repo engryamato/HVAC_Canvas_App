@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { roundFeet } from '@/core/constants/coordinates';
-import { BaseEntitySchema } from './base.schema';
+import { BaseEntitySchema, ServiceIdSchema } from './base.schema';
 import {
   ConstraintStatusSchema,
   DuctCalculatedSchema,
@@ -23,6 +23,17 @@ export const DuctRunFamilySchema = z.enum([
 ]);
 export type DuctRunFamily = z.infer<typeof DuctRunFamilySchema>;
 
+export const InsulationTypeSchema = z.enum([
+  'liner',
+  'wrap',
+  'double_wall_perforated',
+  'double_wall_non_perforated',
+]);
+export type InsulationType = z.infer<typeof InsulationTypeSchema>;
+
+export const DuctEndTypeSchema = z.enum(['flange', 'raw', 'crimped', 'coupled']);
+export type DuctEndType = z.infer<typeof DuctEndTypeSchema>;
+
 export const DuctSegmentSchema = z
   .object({
     index: z.number().int().nonnegative(),
@@ -30,6 +41,10 @@ export const DuctSegmentSchema = z
     endStation: z.number().positive().describe('Segment end station in feet'),
     length: z.number().positive().describe('Segment installed length in feet'),
     isPartial: z.boolean().describe('True when the segment is shorter than the nominal section length'),
+    insulationType: InsulationTypeSchema.optional(),
+    insulationThickness: z.number().min(0.5).max(6).optional().describe('Segment insulation thickness in inches'),
+    startEndType: DuctEndTypeSchema.optional(),
+    endEndType: DuctEndTypeSchema.optional(),
   })
   .superRefine((segment, ctx) => {
     if (segment.endStation <= segment.startStation) {
@@ -91,8 +106,10 @@ const SharedDuctRunPropsSchema = z.object({
   material: DuctMaterialSchema,
   materialSpec: MaterialSpecSchema.optional(),
   gauge: z.number().optional().describe('Metal gauge thickness'),
-  insulated: z.boolean().optional(),
-  insulationThickness: z.number().optional().describe('Insulation thickness in inches'),
+  insulationType: InsulationTypeSchema.optional(),
+  insulationThickness: z.number().min(0.5).max(6).optional().describe('Insulation thickness in inches'),
+  startEndType: DuctEndTypeSchema.optional(),
+  endEndType: DuctEndTypeSchema.optional(),
   airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),
   staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
   installLength: z.number().min(0.1).max(1000).describe('Installed run length in feet'),
@@ -102,7 +119,7 @@ const SharedDuctRunPropsSchema = z.object({
   endPoint: DuctRunPointSchema.optional(),
   connectedFrom: z.string().uuid().optional().describe('Source entity ID'),
   connectedTo: z.string().uuid().optional().describe('Destination entity ID'),
-  serviceId: z.string().uuid().optional().describe('Active Service ID'),
+  serviceId: ServiceIdSchema,
   catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
   engineeringData: DuctEngineeringDataSchema.optional(),
   constraintStatus: ConstraintStatusSchema.optional(),
@@ -144,11 +161,38 @@ export const DuctRunPropsSchema = z
     }
 
     const candidate = value as Record<string, unknown>;
+    const insulationType = candidate.insulationType ?? (candidate.insulated === true ? 'wrap' : undefined);
+    const insulationThickness = candidate.insulationThickness ?? 1;
+    const startEndType = candidate.startEndType ?? 'flange';
+    const endEndType = candidate.endEndType ?? 'flange';
+    const segments = Array.isArray(candidate.segments)
+      ? candidate.segments.map((segment) => {
+          if (!segment || typeof segment !== 'object' || Array.isArray(segment)) {
+            return segment;
+          }
+
+          const segmentCandidate = segment as Record<string, unknown>;
+          const segmentInsulationType = segmentCandidate.insulationType ?? insulationType;
+          return {
+            ...segmentCandidate,
+            ...(segmentInsulationType !== undefined ? { insulationType: segmentInsulationType } : {}),
+            insulationThickness: segmentCandidate.insulationThickness ?? insulationThickness,
+            startEndType: segmentCandidate.startEndType ?? startEndType,
+            endEndType: segmentCandidate.endEndType ?? endEndType,
+          };
+        })
+      : candidate.segments;
+
     return {
+      ...candidate,
       engineeringSystem: DuctRunFamilySchema.safeParse(candidate.engineeringSystem).success
         ? candidate.engineeringSystem
         : 'standard_duct',
-      ...candidate,
+      ...(insulationType !== undefined ? { insulationType } : {}),
+      insulationThickness,
+      startEndType,
+      endEndType,
+      segments,
     };
   }, z.discriminatedUnion('shape', [
     RectangularDuctRunPropsSchema,
@@ -157,6 +201,26 @@ export const DuctRunPropsSchema = z
     FlexibleDuctRunPropsSchema,
   ]))
   .superRefine((props, ctx) => {
+    if (props.shape === 'flexible' && props.insulationType && props.insulationType !== 'wrap') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['insulationType'],
+        message: 'Flexible duct insulation can only be factory wrap',
+      });
+    }
+
+    if (props.shape === 'flexible') {
+      props.segments.forEach((segment, index) => {
+        if (segment.insulationType && segment.insulationType !== 'wrap') {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['segments', index, 'insulationType'],
+            message: 'Flexible duct segment insulation can only be factory wrap',
+          });
+        }
+      });
+    }
+
     const finalStation = props.segments[props.segments.length - 1]?.endStation ?? 0;
     const normalizedFinalStation = roundFeet(finalStation);
     const normalizedInstallLength = roundFeet(props.installLength);

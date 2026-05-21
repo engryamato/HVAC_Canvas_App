@@ -183,7 +183,8 @@ describe('ZoomControls', () => {
     it('should have glassmorphism container styling', () => {
       render(<ZoomControls />);
 
-      const container = screen.getByRole('group', { name: /zoom controls/i });
+      const container = screen.getByTestId('zoom-control');
+      expect(container).toHaveAttribute('aria-label', 'Zoom controls');
       expect(container).toHaveClass('bg-white/90');
       expect(container).toHaveClass('backdrop-blur-sm');
     });

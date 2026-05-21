@@ -3,16 +3,83 @@ import { FittingTool } from '../FittingTool';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useViewportStore } from '../../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { createMockToolEvent, createMockKeyEvent } from './test-utils';
 
 describe('FittingTool', () => {
   let tool: FittingTool;
+
+  function seedActiveFitting(typeId = 'elbow_90') {
+    const store = useComponentLibraryStoreV2.getState();
+    store.reset();
+    store.addEntry({
+      id: `fitting-${typeId}`,
+      name: typeId === 'tee' ? 'Tee' : '90 Degree Elbow',
+      componentClass: 'fitting',
+      category: 'fitting',
+      categoryId: 'standard_ductwork',
+      typeId,
+      type: typeId,
+      engineeringSystem: 'standard_duct',
+      systemType: 'supply',
+      source: 'system',
+      placeable: true,
+      recommendedFittingEntryIds: [],
+      recommendedAccessoryEntryIds: [],
+      recommendedEquipmentEntryIds: [],
+      connectionNotes: [],
+      engineeringProperties: {
+        frictionFactor: 0.01,
+        maxVelocity: 2000,
+        minVelocity: 500,
+        maxPressureDrop: 0.1,
+      },
+      pricing: {
+        materialCost: 10,
+        laborUnits: 1,
+        wasteFactor: 0.1,
+      },
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-01T00:00:00.000Z'),
+    });
+    store.selectEntry(`fitting-${typeId}`);
+  }
+
+  function createMockContext() {
+    return {
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      rotate: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      rect: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
+      stroke: vi.fn(),
+      fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      fillText: vi.fn(),
+      measureText: vi.fn(() => ({ width: 50 })),
+      setLineDash: vi.fn(),
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 0,
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+      globalAlpha: 1,
+    } as unknown as CanvasRenderingContext2D;
+  }
 
   beforeEach(() => {
     tool = new FittingTool();
     useEntityStore.getState().clearAllEntities();
     useViewportStore.setState({ snapToGrid: true, gridSize: 12 });
     useToolStore.setState({ selectedFittingType: 'elbow_90' });
+    seedActiveFitting();
   });
 
   describe('initialization', () => {
@@ -34,6 +101,7 @@ describe('FittingTool', () => {
         screenY: 100,
       });
 
+      tool.onMouseMove(mouseEvent);
       tool.onMouseDown(mouseEvent);
 
       const entities = useEntityStore.getState().allIds;
@@ -54,6 +122,7 @@ describe('FittingTool', () => {
         button: 2, // Right click
       });
 
+      tool.onMouseMove(mouseEvent);
       tool.onMouseDown(mouseEvent);
 
       const entities = useEntityStore.getState().allIds;
@@ -70,6 +139,7 @@ describe('FittingTool', () => {
         screenY: 50,
       });
 
+      tool.onMouseMove(mouseEvent);
       tool.onMouseDown(mouseEvent);
 
       const entities = useEntityStore.getState().allIds;
@@ -88,6 +158,7 @@ describe('FittingTool', () => {
         screenY: 50,
       });
 
+      tool.onMouseMove(mouseEvent);
       tool.onMouseDown(mouseEvent);
 
       const entities = useEntityStore.getState().allIds;
@@ -98,6 +169,7 @@ describe('FittingTool', () => {
 
     it('should create fitting with selected type', () => {
       useToolStore.setState({ selectedFittingType: 'tee' });
+      seedActiveFitting('tee');
 
       const mouseEvent = createMockToolEvent({
         x: 100,
@@ -106,6 +178,7 @@ describe('FittingTool', () => {
         screenY: 100,
       });
 
+      tool.onMouseMove(mouseEvent);
       tool.onMouseDown(mouseEvent);
 
       const entities = useEntityStore.getState().allIds;
@@ -137,27 +210,12 @@ describe('FittingTool', () => {
 
       // After Escape, the preview should be cleared
       // We can verify this by checking that render doesn't draw anything
-      const mockCtx = {
-        save: vi.fn(),
-        restore: vi.fn(),
-        beginPath: vi.fn(),
-        moveTo: vi.fn(),
-        lineTo: vi.fn(),
-        closePath: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        fillRect: vi.fn(),
-        strokeRect: vi.fn(),
-        arc: vi.fn(),
-        fillText: vi.fn(),
-        measureText: vi.fn(() => ({ width: 50 })),
-        setLineDash: vi.fn(),
-      } as unknown as CanvasRenderingContext2D;
+      const mockCtx = createMockContext();
 
       tool.render({ ctx: mockCtx, zoom: 1, panX: 0, panY: 0 });
 
-      // After Escape, render should not draw anything
-      expect(mockCtx.save).not.toHaveBeenCalled();
+      // Escape clears placement mode but leaves a short cancel ghost.
+      expect(mockCtx.translate).toHaveBeenCalledWith(96, 96);
     });
   });
 
@@ -180,10 +238,7 @@ describe('FittingTool', () => {
       tool.onDeactivate();
 
       // State should be cleared after deactivation
-      const mockCtx = {
-        save: vi.fn(),
-        restore: vi.fn(),
-      } as unknown as CanvasRenderingContext2D;
+      const mockCtx = createMockContext();
 
       tool.render({ ctx: mockCtx, zoom: 1, panX: 0, panY: 0 });
       expect(mockCtx.save).not.toHaveBeenCalled();
@@ -201,24 +256,7 @@ describe('FittingTool', () => {
 
       tool.onMouseMove(mouseMove);
 
-      const mockCtx = {
-        save: vi.fn(),
-        restore: vi.fn(),
-        beginPath: vi.fn(),
-        moveTo: vi.fn(),
-        lineTo: vi.fn(),
-        closePath: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        fillText: vi.fn(),
-        setLineDash: vi.fn(),
-        fillStyle: '',
-        strokeStyle: '',
-        lineWidth: 0,
-        font: '',
-        textAlign: '',
-        textBaseline: '',
-      } as unknown as CanvasRenderingContext2D;
+      const mockCtx = createMockContext();
 
       tool.render({ ctx: mockCtx, zoom: 1, panX: 0, panY: 0 });
 

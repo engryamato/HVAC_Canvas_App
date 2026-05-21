@@ -27,10 +27,6 @@ vi.mock('../ViewMenu', () => ({
   ),
 }));
 
-vi.mock('../ToolsMenu', () => ({
-  ToolsMenu: () => <div data-testid="tools-menu">Tools</div>,
-}));
-
 vi.mock('../HelpMenu', () => ({
   HelpMenu: ({ onShowShortcuts }: { onShowShortcuts: () => void }) => (
     <div data-testid="help-menu" onClick={onShowShortcuts}>Help</div>
@@ -61,10 +57,11 @@ describe('Header', () => {
       expect(screen.getByTestId('app-logo')).toBeDefined();
     });
 
-    it('should display app name "HVAC Pro"', () => {
+    it('should display current app branding', () => {
       render(<Header />);
 
-      expect(screen.getByText('HVAC Pro')).toBeDefined();
+      expect(screen.getByText('HVAC Library')).toBeDefined();
+      expect(screen.getByText('SizeWise Canvas')).toBeDefined();
     });
 
     it('should navigate to dashboard when logo clicked', () => {
@@ -84,7 +81,6 @@ describe('Header', () => {
       expect(screen.getByTestId('file-menu')).toBeDefined();
       expect(screen.getByTestId('edit-menu')).toBeDefined();
       expect(screen.getByTestId('view-menu')).toBeDefined();
-      expect(screen.getByTestId('tools-menu')).toBeDefined();
       expect(screen.getByTestId('help-menu')).toBeDefined();
     });
 

@@ -354,7 +354,3 @@ describe('ENABLE_UNIFIED_COMPONENT_LIBRARY', () => {
     vi.unstubAllEnvs();
   });
 });
-() => {
-    expect(ENABLE_UNIFIED_COMPONENT_LIBRARY).toBe(false);
-  });
-});

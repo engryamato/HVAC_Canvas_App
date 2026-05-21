@@ -1,6 +1,7 @@
 import type { Entity, Equipment, Fitting } from '@/core/schema';
 import { feetToPixels } from '@/core/constants/coordinates';
 import { getDuctStartAndEnd, type DuctLike } from './ductGeometryHelpers';
+import { findNearestFittingConnection, type ConnectionRole } from './fittingConnectionService';
 
 const SNAP_TOLERANCE = feetToPixels(1);
 const ENDPOINT_PRIORITY_TOLERANCE = SNAP_TOLERANCE;
@@ -17,6 +18,7 @@ export interface MagneticSnapResult {
   endPoint?: 'start' | 'end';
   projectionT?: number;
   fittingId?: string;
+  fittingPortRole?: ConnectionRole;
   equipmentId?: string;
 }
 
@@ -67,25 +69,18 @@ function projectPointOntoDuct(duct: DuctLike, x: number, y: number): DuctProject
 }
 
 function resolveNearestFittingPort(fittings: Fitting[], x: number, y: number): MagneticSnapResult | null {
-  let nearest: MagneticSnapResult | null = null;
-
-  for (const fitting of fittings) {
-    const distance = Math.hypot(fitting.transform.x - x, fitting.transform.y - y);
-    if (distance > SNAP_TOLERANCE) {
-      continue;
-    }
-
-    if (!nearest || distance < nearest.distance) {
-      nearest = {
-        snapType: 'fitting_port',
-        point: { x: fitting.transform.x, y: fitting.transform.y },
-        distance,
-        fittingId: fitting.id,
-      };
-    }
+  const nearest = findNearestFittingConnection(x, y, fittings, SNAP_TOLERANCE);
+  if (!nearest) {
+    return null;
   }
 
-  return nearest;
+  return {
+    snapType: 'fitting_port',
+    point: { x: nearest.connection.worldX, y: nearest.connection.worldY },
+    distance: nearest.distance,
+    fittingId: nearest.fitting.id,
+    fittingPortRole: nearest.connection.role,
+  };
 }
 
 function resolveNearestEquipmentPoint(equipment: Equipment[], x: number, y: number): MagneticSnapResult | null {

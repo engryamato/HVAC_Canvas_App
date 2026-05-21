@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { FabricationProfileSettingsPanel } from '../FabricationProfileSettingsPanel';
 import { useFabricationProfileStore } from '@/core/store/fabricationProfileStore';
 import { useEntityStore } from '@/core/store/entityStore';
@@ -67,18 +68,19 @@ describe('FabricationProfileSettingsPanel', () => {
     expect(getRectangularDefaultInput().value).toBe('5');
   });
 
-  it('switches between fabrication families with tabs instead of rendering a full stacked form', () => {
+  it('switches between fabrication families with tabs instead of rendering a full stacked form', async () => {
+    const user = userEvent.setup();
     render(<FabricationProfileSettingsPanel />);
 
     const rectangularTab = screen.getByRole('tab', { name: 'Rectangular' });
     const roundTab = screen.getByRole('tab', { name: 'Round Rigid' });
 
-    expect(rectangularTab.getAttribute('data-state')).toBe('active');
+    expect(rectangularTab).toHaveAttribute('aria-selected', 'true');
 
-    fireEvent.click(roundTab);
+    await user.click(roundTab);
 
-    expect(roundTab.getAttribute('data-state')).toBe('active');
-    expect(rectangularTab.getAttribute('data-state')).toBe('inactive');
+    await waitFor(() => expect(roundTab).toHaveAttribute('aria-selected', 'true'));
+    expect(rectangularTab).toHaveAttribute('aria-selected', 'false');
   });
 
   it('recomputes non-overridden runs on save and leaves overrides unchanged', () => {

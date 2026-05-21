@@ -10,6 +10,7 @@ import { useThreeDViewStore } from '@/features/canvas/store/threeDViewStore';
 import { useViewModeStore } from '@/features/canvas/store/viewModeStore';
 import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
 import { convertLegacyDuctEntitiesInProject } from '@/features/duct-runs/utils/convertDuctToDuctRun';
+import { migrateProjectInsulatedBooleanToType } from './migrateInsulatedBoolean';
 
 export interface ProjectHydrationPayload {
   project: ProjectFile;
@@ -152,7 +153,9 @@ export function hydrateToStores(
         project: source,
         ...legacyOptions?.payload,
       };
-  const project = convertLegacyDuctEntitiesInProject(hydrationPayload.project);
+  const project = migrateProjectInsulatedBooleanToType(
+    convertLegacyDuctEntitiesInProject(hydrationPayload.project)
+  );
 
   const entityStore = useEntityStore.getState();
   const viewportStore = useViewportStore.getState();

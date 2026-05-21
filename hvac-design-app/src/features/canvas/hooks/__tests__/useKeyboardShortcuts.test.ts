@@ -228,7 +228,8 @@ describe('useKeyboardShortcuts', () => {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }));
       });
 
-      expect(useViewportStore.getState().zoom).toBeGreaterThan(1);
+      expect(useViewportStore.getState().targetZoom).toBeGreaterThan(1);
+      expect(useViewportStore.getState().isZooming).toBe(true);
     });
 
     it('should zoom in when = is pressed', () => {
@@ -240,7 +241,8 @@ describe('useKeyboardShortcuts', () => {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: '=' }));
       });
 
-      expect(useViewportStore.getState().zoom).toBeGreaterThan(1);
+      expect(useViewportStore.getState().targetZoom).toBeGreaterThan(1);
+      expect(useViewportStore.getState().isZooming).toBe(true);
     });
 
     it('should zoom out when - is pressed', () => {
@@ -252,7 +254,8 @@ describe('useKeyboardShortcuts', () => {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: '-' }));
       });
 
-      expect(useViewportStore.getState().zoom).toBeLessThan(2);
+      expect(useViewportStore.getState().targetZoom).toBeLessThan(2);
+      expect(useViewportStore.getState().isZooming).toBe(true);
     });
 
     it('should reset view when 0 is pressed', () => {

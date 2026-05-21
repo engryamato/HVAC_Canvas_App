@@ -5,7 +5,9 @@ import { EquipmentTool } from '../../tools/EquipmentTool';
 import { FittingTool } from '../../tools/FittingTool';
 import { NoteTool } from '../../tools/NoteTool';
 import { useEntityStore } from '@/core/store/entityStore';
-import type { Room, Duct, Equipment, Fitting, Note } from '@/core/schema';
+import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import type { Room, Duct, DuctRun, Equipment, Fitting, Note } from '@/core/schema';
+import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import type { ToolRenderContext } from '../../tools/BaseTool';
 
 /**
@@ -28,7 +30,84 @@ describe('Canvas Rendering Integration Tests', () => {
   const getAllEntities = () =>
     getEntityStore()
       .allIds.map((id) => getEntityStore().byId[id])
-      .filter(Boolean) as Array<Room | Duct | Equipment | Fitting | Note>;
+      .filter(Boolean) as Array<Room | Duct | DuctRun | Equipment | Fitting | Note>;
+
+  const getDuctEntities = () =>
+    getAllEntities().filter((entity): entity is Duct | DuctRun =>
+      entity.type === 'duct' || entity.type === 'duct_run'
+    );
+
+  function createCatalogComponent(
+    overrides: Partial<UnifiedComponentDefinition>
+  ): UnifiedComponentDefinition {
+    const now = new Date('2026-01-01T00:00:00.000Z');
+    return {
+      id: overrides.id ?? 'test-component',
+      name: overrides.name ?? 'Test Component',
+      componentClass: overrides.componentClass ?? 'equipment',
+      category: overrides.category ?? overrides.componentClass ?? 'equipment',
+      categoryId: overrides.categoryId ?? 'standard_ductwork',
+      typeId: overrides.typeId ?? 'fan',
+      type: overrides.type ?? overrides.typeId ?? 'fan',
+      engineeringSystem: overrides.engineeringSystem ?? 'standard_duct',
+      systemType: overrides.systemType ?? 'supply',
+      source: overrides.source ?? 'system',
+      placeable: overrides.placeable ?? true,
+      pricing: overrides.pricing ?? {
+        materialCost: 10,
+        laborUnits: 1,
+        wasteFactor: 0.1,
+      },
+      engineeringProperties: overrides.engineeringProperties ?? {
+        frictionFactor: 0.02,
+        maxVelocity: 2500,
+        minVelocity: 500,
+        maxPressureDrop: 0.1,
+      },
+      materials: overrides.materials ?? [],
+      defaultDimensions: overrides.defaultDimensions,
+      recommendedFittingEntryIds: overrides.recommendedFittingEntryIds ?? [],
+      recommendedAccessoryEntryIds: overrides.recommendedAccessoryEntryIds ?? [],
+      recommendedEquipmentEntryIds: overrides.recommendedEquipmentEntryIds ?? [],
+      connectionNotes: overrides.connectionNotes ?? [],
+      createdAt: overrides.createdAt ?? now,
+      updatedAt: overrides.updatedAt ?? now,
+    };
+  }
+
+  function seedCatalog(): void {
+    const store = useComponentLibraryStoreV2.getState();
+    store.reset();
+    store.addComponent(
+      createCatalogComponent({
+        id: 'test-equipment',
+        name: 'Supply Fan',
+        componentClass: 'equipment',
+        category: 'equipment',
+        typeId: 'fan',
+        type: 'fan',
+        defaultDimensions: { width: 24, depth: 24, height: 24 },
+      })
+    );
+    store.addComponent(
+      createCatalogComponent({
+        id: 'test-fitting',
+        name: '90 Degree Elbow',
+        componentClass: 'fitting',
+        category: 'fitting',
+        typeId: 'elbow_90',
+        type: 'elbow_90',
+      })
+    );
+  }
+
+  function activateEquipment(): void {
+    useComponentLibraryStoreV2.getState().selectEntry('test-equipment');
+  }
+
+  function activateFitting(): void {
+    useComponentLibraryStoreV2.getState().selectEntry('test-fitting');
+  }
 
   beforeEach(() => {
     // Create canvas and context
@@ -42,6 +121,7 @@ describe('Canvas Rendering Integration Tests', () => {
 
     // Clear stores
     useEntityStore.getState().clearAllEntities();
+    seedCatalog();
 
     // Initialize tools
     roomTool = new RoomTool();
@@ -143,16 +223,18 @@ describe('Canvas Rendering Integration Tests', () => {
 
       // Horizontal duct
       ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseMove({ x: 300, y: 100 });
       ductTool.onMouseUp({ x: 300, y: 100, button: 0 });
 
-      const horizontalDuct = getEntityStore().byId[getEntityStore().allIds[0]!] as Duct;
+      const horizontalDuct = getDuctEntities()[0]!;
       expect(horizontalDuct.transform.rotation).toBeCloseTo(0, 1);
 
       // Vertical duct
       ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseMove({ x: 100, y: 300 });
       ductTool.onMouseUp({ x: 100, y: 300, button: 0 });
 
-      const verticalDuct = getEntityStore().byId[getEntityStore().allIds[1]!] as Duct;
+      const verticalDuct = getDuctEntities()[1]!;
       expect(Math.abs(verticalDuct.transform.rotation)).toBeCloseTo(90, 1);
 
       ductTool.onDeactivate();
@@ -161,16 +243,19 @@ describe('Canvas Rendering Integration Tests', () => {
     it('should render ducts with correct dimensions', () => {
       ductTool.onActivate();
       ductTool.onMouseDown({ x: 100, y: 100, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseMove({ x: 300, y: 100 });
       ductTool.onMouseUp({ x: 300, y: 100, button: 0 });
       ductTool.onDeactivate();
 
-      const duct = getEntityStore().byId[getEntityStore().allIds[0]!] as Duct;
-      expect(duct.props.length).toBeGreaterThan(0);
+      const duct = getDuctEntities()[0]!;
+      const length = duct.type === 'duct_run' ? duct.props.installLength : duct.props.length;
+      expect(length).toBeGreaterThan(0);
     });
   });
 
   describe('Equipment Tool Rendering', () => {
     it('should render equipment preview at cursor', () => {
+      activateEquipment();
       equipmentTool.onActivate();
       equipmentTool.onMouseMove({ x: 200, y: 200 });
 
@@ -186,6 +271,7 @@ describe('Canvas Rendering Integration Tests', () => {
     });
 
     it('should create equipment with proper dimensions', () => {
+      activateEquipment();
       equipmentTool.onActivate();
       equipmentTool.onMouseDown({ x: 200, y: 200, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
@@ -197,6 +283,7 @@ describe('Canvas Rendering Integration Tests', () => {
     });
 
     it('should render multiple equipment units without overlap issues', () => {
+      activateEquipment();
       equipmentTool.onActivate();
 
       // Create equipment in grid pattern
@@ -227,6 +314,7 @@ describe('Canvas Rendering Integration Tests', () => {
 
   describe('Fitting Tool Rendering', () => {
     it('should render fitting preview at cursor', () => {
+      activateFitting();
       fittingTool.onActivate();
       fittingTool.onMouseMove({ x: 150, y: 150 });
 
@@ -252,17 +340,24 @@ describe('Canvas Rendering Integration Tests', () => {
       // Create duct
       ductTool.onActivate();
       ductTool.onMouseDown({ x: 200, y: 300, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseMove({ x: 400, y: 300 });
       ductTool.onMouseUp({ x: 400, y: 300, button: 0 });
       ductTool.onDeactivate();
 
       // Create fitting
+      activateFitting();
       fittingTool.onActivate();
+      fittingTool.onMouseMove({ x: 400, y: 300 });
       fittingTool.onMouseDown({ x: 400, y: 300, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       fittingTool.onDeactivate();
 
       const room = getEntityStore().byId[getEntityStore().allIds[0]!] as Room;
-      const duct = getEntityStore().byId[getEntityStore().allIds[1]!] as Duct;
-      const fitting = getEntityStore().byId[getEntityStore().allIds[2]!] as Fitting;
+      const duct = getDuctEntities()[0]!;
+      const fitting = getAllEntities().find((entity): entity is Fitting => entity.type === 'fitting');
+      expect(fitting).toBeDefined();
+      if (!fitting) {
+        throw new Error('Expected fitting to be created');
+      }
 
       // Fitting should be above duct and room
       expect(fitting.zIndex).toBeGreaterThan(room.zIndex);
@@ -295,15 +390,19 @@ describe('Canvas Rendering Integration Tests', () => {
       roomTool.onDeactivate();
 
       equipmentTool.onActivate();
+      activateEquipment();
       equipmentTool.onMouseDown({ x: 150, y: 150, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
 
       ductTool.onActivate();
       ductTool.onMouseDown({ x: 150, y: 200, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseMove({ x: 250, y: 200 });
       ductTool.onMouseUp({ x: 250, y: 200, button: 0 });
       ductTool.onDeactivate();
 
+      activateFitting();
       fittingTool.onActivate();
+      fittingTool.onMouseMove({ x: 250, y: 200 });
       fittingTool.onMouseDown({ x: 250, y: 200, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       fittingTool.onDeactivate();
 
@@ -311,7 +410,11 @@ describe('Canvas Rendering Integration Tests', () => {
       noteTool.onMouseDown({ x: 175, y: 175, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       noteTool.onDeactivate();
 
-      const note = getEntityStore().byId[getEntityStore().allIds[4]!] as Note;
+      const note = getAllEntities().find((entity): entity is Note => entity.type === 'note');
+      expect(note).toBeDefined();
+      if (!note) {
+        throw new Error('Expected note to be created');
+      }
 
       // Note should have highest z-index
       const allEntities = getAllEntities();
@@ -333,16 +436,21 @@ describe('Canvas Rendering Integration Tests', () => {
       roomTool.onDeactivate();
 
       equipmentTool.onActivate();
+      activateEquipment();
       equipmentTool.onMouseDown({ x: 200, y: 200, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       equipmentTool.onDeactivate();
 
       ductTool.onActivate();
       ductTool.onMouseDown({ x: 200, y: 300, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      ductTool.onMouseMove({ x: 400, y: 300 });
       ductTool.onMouseUp({ x: 400, y: 300, button: 0 });
       ductTool.onDeactivate();
 
+      activateFitting();
       fittingTool.onActivate();
+      fittingTool.onMouseMove({ x: 200, y: 300 });
       fittingTool.onMouseDown({ x: 200, y: 300, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
+      fittingTool.onMouseMove({ x: 400, y: 300 });
       fittingTool.onMouseDown({ x: 400, y: 300, button: 0, shiftKey: false, ctrlKey: false, metaKey: false, altKey: false });
       fittingTool.onDeactivate();
 
@@ -355,7 +463,7 @@ describe('Canvas Rendering Integration Tests', () => {
       // Verify z-index ordering
       const entities = getAllEntities();
       const room = entities.find((e) => e.type === 'room');
-      const duct = entities.find((e) => e.type === 'duct');
+      const duct = entities.find((e) => e.type === 'duct' || e.type === 'duct_run');
       const fitting = entities.filter((e) => e.type === 'fitting')[0];
       const note = entities.find((e) => e.type === 'note');
 

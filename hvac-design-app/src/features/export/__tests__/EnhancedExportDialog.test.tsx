@@ -12,11 +12,19 @@ vi.mock('@/components/ui/select', () => ({
   Select: ({ children, value, onValueChange }: { children: React.ReactNode; value: string; onValueChange: (value: string) => void }) => (
     <div data-testid="select" data-value={value}>
       {children}
-      <button type="button" onClick={() => onValueChange('png')}>PNG</button>
-      <button type="button" onClick={() => onValueChange('pdf')}>PDF</button>
-      <button type="button" onClick={() => onValueChange('svg')}>SVG</button>
-      <button type="button" onClick={() => onValueChange('custom')}>Custom</button>
-      <button type="button" onClick={() => onValueChange('high')}>High</button>
+      {['pdf', 'png', 'svg'].includes(value) && (
+        <>
+          <button type="button" onClick={() => onValueChange('png')}>PNG</button>
+          <button type="button" onClick={() => onValueChange('pdf')}>PDF</button>
+          <button type="button" onClick={() => onValueChange('svg')}>SVG</button>
+        </>
+      )}
+      {['low', 'medium', 'high'].includes(value) && (
+        <button type="button" onClick={() => onValueChange('high')}>High</button>
+      )}
+      {['letter', 'a4', 'custom'].includes(value) && (
+        <button type="button" onClick={() => onValueChange('custom')}>Custom</button>
+      )}
     </div>
   ),
   SelectTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -75,8 +83,8 @@ describe('EnhancedExportDialog', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('PNG'));
-    fireEvent.click(screen.getByText('High'));
+    fireEvent.click(screen.getAllByText('PNG').find((element) => element.tagName === 'BUTTON')!);
+    fireEvent.click(screen.getAllByText('High').find((element) => element.tagName === 'BUTTON')!);
     fireEvent.click(screen.getByRole('button', { name: /export/i }));
 
     await waitFor(() => expect(onExport).toHaveBeenCalled());

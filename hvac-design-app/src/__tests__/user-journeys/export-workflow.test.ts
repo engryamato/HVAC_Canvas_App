@@ -24,6 +24,7 @@ import { useViewportStore } from '@/features/canvas/store/viewportStore';
 import { createEntity } from '@/core/commands/entityCommands';
 import { ProjectFileSchema } from '@/core/schema';
 import type { Room, Duct, Equipment, Fitting, Entity } from '@/core/schema';
+import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
 
 // Helper to generate consistent UUIDs for tests (must be valid UUID v4 format)
 // UUID v4 requires: position 13 = '4' (version), position 17 = '8'/'9'/'a'/'b' (variant)
@@ -123,116 +124,25 @@ const createMockFitting = (
 });
 
 /**
- * BOM Line Item structure per FR-BOM-003
+ * Generate BOM from entities through the current app generator.
  */
-interface BOMLineItem {
-  id: string;
-  category: 'duct' | 'fitting' | 'equipment';
-  subcategory: string;
-  description: string;
-  quantity: number;
-  unit: 'LF' | 'EA' | 'SF';
-  material?: string;
-  size?: string;
-  entityIds: string[];
-}
-
-/**
- * Generate BOM from entities
- * This mimics the expected BOM generation logic
- */
-function generateBOM(entities: Entity[]): BOMLineItem[] {
-  const bomItems: BOMLineItem[] = [];
-  const ductAggregation: Map<string, BOMLineItem> = new Map();
-  const fittingAggregation: Map<string, BOMLineItem> = new Map();
-  const equipmentItems: BOMLineItem[] = [];
-
-  entities.forEach((entity) => {
-    if (entity.type === 'duct') {
-      const duct = entity as Duct;
-      const key = `${duct.props.shape}-${duct.props.diameter ?? duct.props.width}x${duct.props.height ?? ''}-${duct.props.material}`;
-      const existing = ductAggregation.get(key);
-
-      if (existing) {
-        existing.quantity += duct.props.length;
-        existing.entityIds.push(duct.id);
-      } else {
-        const sizeStr =
-          duct.props.shape === 'round'
-            ? `${duct.props.diameter}" dia`
-            : `${duct.props.width}"x${duct.props.height}"`;
-
-        ductAggregation.set(key, {
-          id: `bom-duct-${key}`,
-          category: 'duct',
-          subcategory: duct.props.shape === 'round' ? 'Round Duct' : 'Rectangular Duct',
-          description: `${sizeStr} ${duct.props.material} duct`,
-          quantity: duct.props.length,
-          unit: 'LF',
-          material: duct.props.material,
-          size: sizeStr,
-          entityIds: [duct.id],
-        });
-      }
-    }
-
-    if (entity.type === 'fitting') {
-      const fitting = entity as Fitting;
-      const key = fitting.props.fittingType;
-      const existing = fittingAggregation.get(key);
-
-      if (existing) {
-        existing.quantity += 1;
-        existing.entityIds.push(fitting.id);
-      } else {
-        const typeLabel = fitting.props.fittingType.replace('_', ' ');
-        fittingAggregation.set(key, {
-          id: `bom-fitting-${key}`,
-          category: 'fitting',
-          subcategory: typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1),
-          description: `${typeLabel}${fitting.props.angle ? ` ${fitting.props.angle}°` : ''}`,
-          quantity: 1,
-          unit: 'EA',
-          entityIds: [fitting.id],
-        });
-      }
-    }
-
-    if (entity.type === 'equipment') {
-      const equip = entity as Equipment;
-      equipmentItems.push({
-        id: `bom-equipment-${equip.id}`,
-        category: 'equipment',
-        subcategory: equip.props.equipmentType,
-        description: `${equip.props.name}${equip.props.manufacturer ? ` - ${equip.props.manufacturer}` : ''}${equip.props.model ? ` ${equip.props.model}` : ''}`,
-        quantity: 1,
-        unit: 'EA',
-        size: `${equip.props.width}"x${equip.props.depth}"x${equip.props.height}"`,
-        entityIds: [equip.id],
-      });
-    }
+function generateBOM(entities: Entity[]): BomItem[] {
+  return generateBillOfMaterials({
+    byId: Object.fromEntries(entities.map((entity) => [entity.id, entity])),
+    allIds: entities.map((entity) => entity.id),
   });
-
-  bomItems.push(...ductAggregation.values());
-  bomItems.push(...fittingAggregation.values());
-  bomItems.push(...equipmentItems);
-
-  return bomItems;
 }
 
 /**
  * Convert BOM to CSV format per FR-EXPORT-002
  */
-function convertBOMToCSV(bomItems: BOMLineItem[]): string {
-  const headers = ['Category', 'Subcategory', 'Description', 'Quantity', 'Unit', 'Size', 'Material'];
+function convertBOMToCSV(bomItems: BomItem[]): string {
+  const headers = ['QTY', 'Description', 'Unit', 'Weight'];
   const rows = bomItems.map((item) => [
-    item.category,
-    item.subcategory,
-    item.description,
     item.quantity.toString(),
+    item.description,
     item.unit,
-    item.size || '',
-    item.material || '',
+    '',
   ]);
 
   // Add BOM for Excel compatibility
@@ -425,35 +335,32 @@ describe('Export Workflow User Journey', () => {
       expect(fittings).toHaveLength(1);
     });
 
-    it('should aggregate duct quantities by size', () => {
-      // Create multiple ducts of same size
+    it('should group identical duct line items by current public description', () => {
       createEntity(createMockDuct('duct-1', 'Duct 1', 'galvanized', 12, 10));
-      createEntity(createMockDuct('duct-2', 'Duct 2', 'galvanized', 12, 15));
-      createEntity(createMockDuct('duct-3', 'Duct 3', 'galvanized', 12, 20));
+      createEntity(createMockDuct('duct-2', 'Duct 2', 'galvanized', 12, 10));
+      createEntity(createMockDuct('duct-3', 'Duct 3', 'galvanized', 12, 10));
 
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
 
-      // Should aggregate to single line item
-      const ductItems = bom.filter((item) => item.category === 'duct');
+      const ductItems = bom.filter((item) => item.type === 'Duct');
       expect(ductItems).toHaveLength(1);
 
       const [ductItem] = ductItems;
       expect(ductItem).toBeDefined();
-
-      // Total length should be sum
-      expect(ductItem!.quantity).toBe(45); // 10 + 15 + 20
-      expect(ductItem!.entityIds).toHaveLength(3);
+      expect(ductItem!.description).toBe('Round Duct 12" × 10\'');
+      expect(ductItem!.quantity).toBe(3);
+      expect(ductItem!.unit).toBe('EA');
     });
 
-    it('should separate ducts by material', () => {
+    it('should separate ducts by public size and length description', () => {
       createEntity(createMockDuct('duct-1', 'Galv Duct', 'galvanized', 12, 10));
-      createEntity(createMockDuct('duct-2', 'SS Duct', 'stainless', 12, 10));
+      createEntity(createMockDuct('duct-2', 'Long Duct', 'galvanized', 12, 15));
 
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
 
-      const ductItems = bom.filter((item) => item.category === 'duct');
+      const ductItems = bom.filter((item) => item.type === 'Duct');
       expect(ductItems).toHaveLength(2);
     });
 
@@ -466,14 +373,15 @@ describe('Export Workflow User Journey', () => {
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
 
-      const fittingItems = bom.filter((item) => item.category === 'fitting');
+      const fittingItems = bom.filter((item) => item.type === 'Fitting');
       expect(fittingItems).toHaveLength(3); // 3 unique types
 
-      const elbow90 = fittingItems.find((item) => item.subcategory.toLowerCase().includes('elbow 90'));
+      const elbow90 = fittingItems.find((item) => item.description === '90° Elbow');
       expect(elbow90?.quantity).toBe(2);
+      expect(elbow90?.description).not.toContain('elbow_90');
     });
 
-    it('should list equipment individually', () => {
+    it('should group identical equipment descriptions', () => {
       createEntity(createMockEquipment('fan-1', 'Supply Fan 1', 'fan'));
       createEntity(createMockEquipment('fan-2', 'Supply Fan 2', 'fan'));
       createEntity(createMockEquipment('diff-1', 'Diffuser 1', 'diffuser'));
@@ -481,8 +389,9 @@ describe('Export Workflow User Journey', () => {
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
 
-      const equipmentItems = bom.filter((item) => item.category === 'equipment');
-      expect(equipmentItems).toHaveLength(3);
+      const equipmentItems = bom.filter((item) => item.type === 'Equipment');
+      expect(equipmentItems).toHaveLength(2);
+      expect(equipmentItems.find((item) => item.description.endsWith('fan'))?.quantity).toBe(2);
     });
   });
 
@@ -499,15 +408,13 @@ describe('Export Workflow User Journey', () => {
         throw new Error('Expected a BOM item');
       }
 
-      expect(item.id).toBeDefined();
-      expect(item.category).toBe('duct');
-      expect(item.subcategory).toBeDefined();
+      expect(item.itemNumber).toBeDefined();
+      expect(item.type).toBe('Duct');
       expect(item.description).toBeDefined();
-      expect(item.quantity).toBe(25);
-      expect(item.unit).toBe('LF');
-      expect(item.material).toBe('galvanized');
-      expect(item.size).toBeDefined();
-      expect(item.entityIds).toContain('duct-1');
+      expect(item.quantity).toBe(1);
+      expect(item.unit).toBe('EA');
+      expect(item.specifications).toBe('12"');
+      expect(item.entityId).toBe('duct-1');
     });
 
     it('should use correct units per category', () => {
@@ -518,13 +425,13 @@ describe('Export Workflow User Journey', () => {
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
 
-      const ductItem = bom.find((item) => item.category === 'duct');
-      const equipItem = bom.find((item) => item.category === 'equipment');
-      const fitItem = bom.find((item) => item.category === 'fitting');
+      const ductItem = bom.find((item) => item.type === 'Duct');
+      const equipItem = bom.find((item) => item.type === 'Equipment');
+      const fitItem = bom.find((item) => item.type === 'Fitting');
 
-      expect(ductItem?.unit).toBe('LF'); // Linear feet for ducts
-      expect(equipItem?.unit).toBe('EA'); // Each for equipment
-      expect(fitItem?.unit).toBe('EA'); // Each for fittings
+      expect(ductItem?.unit).toBe('EA');
+      expect(equipItem?.unit).toBe('EA');
+      expect(fitItem?.unit).toBe('EA');
     });
 
     it('should include equipment manufacturer and model', () => {
@@ -534,7 +441,7 @@ describe('Export Workflow User Journey', () => {
       const entities = selectAllEntities();
       const bom = generateBOM(entities);
 
-      const equipItem = bom.find((item) => item.category === 'equipment');
+      const equipItem = bom.find((item) => item.type === 'Equipment');
       expect(equipItem?.description).toContain('ACME Corp');
       expect(equipItem?.description).toContain('XL-500');
     });
@@ -548,13 +455,10 @@ describe('Export Workflow User Journey', () => {
       const bom = generateBOM(entities);
       const csv = convertBOMToCSV(bom);
 
-      expect(csv).toContain('Category');
-      expect(csv).toContain('Subcategory');
+      expect(csv).toContain('QTY');
       expect(csv).toContain('Description');
-      expect(csv).toContain('Quantity');
       expect(csv).toContain('Unit');
-      expect(csv).toContain('Size');
-      expect(csv).toContain('Material');
+      expect(csv).toContain('Weight');
     });
 
     it('should include UTF-8 BOM for Excel compatibility', () => {
@@ -573,9 +477,7 @@ describe('Export Workflow User Journey', () => {
       const bom = generateBOM(entities);
       const csv = convertBOMToCSV(bom);
 
-      // Check that fields are quoted
-      expect(csv).toContain('"duct"');
-      expect(csv).toContain('"Round Duct"');
+      expect(csv).toContain('"1","Round Duct 12"');
     });
 
     it('should include all BOM items in CSV', () => {
@@ -615,20 +517,17 @@ describe('Export Workflow User Journey', () => {
       expect(bom.length).toBeGreaterThan(0);
 
       // Check aggregation
-      const ductItems = bom.filter((item) => item.category === 'duct');
-      expect(ductItems.length).toBe(2); // 12" and 16" diameter groups
+      const ductItems = bom.filter((item) => item.type === 'Duct');
+      expect(ductItems.length).toBe(3);
 
-      // Check 12" duct aggregation (25 + 15 = 40 LF)
-      const duct12 = ductItems.find((item) => item.size?.includes('12"'));
-      expect(duct12?.quantity).toBe(40);
+      const duct12 = ductItems.filter((item) => item.specifications.includes('12"'));
+      expect(duct12).toHaveLength(2);
 
-      // Check equipment count
-      const equipmentItems = bom.filter((item) => item.category === 'equipment');
-      expect(equipmentItems.length).toBe(3);
+      const equipmentItems = bom.filter((item) => item.type === 'Equipment');
+      expect(equipmentItems.length).toBe(2);
 
-      // Check fitting count
-      const fittingItems = bom.filter((item) => item.category === 'fitting');
-      const elbow90 = fittingItems.find((item) => item.subcategory.toLowerCase().includes('elbow 90'));
+      const fittingItems = bom.filter((item) => item.type === 'Fitting');
+      const elbow90 = fittingItems.find((item) => item.description === '90° Elbow');
       expect(elbow90?.quantity).toBe(2);
     });
 
@@ -643,9 +542,9 @@ describe('Export Workflow User Journey', () => {
 
       // Verify CSV is generated
       expect(csv.length).toBeGreaterThan(0);
-      expect(csv).toContain('duct');
-      expect(csv).toContain('equipment');
-      expect(csv).toContain('fitting');
+      expect(csv).toContain('Round Duct');
+      expect(csv).toContain('ACME Corp XL-500 air_handler');
+      expect(csv).toContain('90° Elbow');
     });
   });
 
@@ -758,12 +657,12 @@ describe('Export Workflow User Journey', () => {
     });
 
     it('should generate CSV with only headers for empty BOM', () => {
-      const bom: BOMLineItem[] = [];
+      const bom: BomItem[] = [];
       const csv = convertBOMToCSV(bom);
 
       const lines = csv.split('\n');
       expect(lines).toHaveLength(1); // Only header
-      expect(lines[0]).toContain('Category');
+      expect(lines[0]).toContain('QTY');
     });
   });
 });

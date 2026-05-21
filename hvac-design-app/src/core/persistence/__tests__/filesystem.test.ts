@@ -66,27 +66,22 @@ describe('filesystem utilities', () => {
   describe('web environment fallbacks', () => {
     // These tests verify behavior when NOT in Tauri environment
 
-    it('readTextFile should throw error in web environment', async () => {
-      await expect(readTextFile('/test/path')).rejects.toThrow(
-        'File system access requires Tauri runtime'
-      );
+    it('readTextFile should return empty content in web environment', async () => {
+      await expect(readTextFile('/test/path')).resolves.toBe('');
     });
 
-    it('writeTextFile should throw error in web environment', async () => {
-      await expect(writeTextFile('/test/path', 'content')).rejects.toThrow(
-        'File system access requires Tauri runtime'
-      );
+    it('writeTextFile should no-op in web environment', async () => {
+      await expect(writeTextFile('/test/path', 'content')).resolves.toBeUndefined();
     });
 
-    it('exists should return false in web environment (graceful fallback)', async () => {
-      const result = await exists('/test/path');
-      expect(result).toBe(false);
+    it('exists should recognize virtual IndexedDB paths in web environment', async () => {
+      await expect(exists('/test/path')).resolves.toBe(false);
+      await expect(exists('indexeddb://documents/project.sws')).resolves.toBe(true);
     });
 
-    it('createDir should throw error in web environment', async () => {
-      await expect(createDir('/test/path')).rejects.toThrow(
-        'Directory creation requires Tauri runtime'
-      );
+    it('createDir should no-op in web environment', async () => {
+      await expect(createDir('/test/path')).resolves.toBeUndefined();
+      await expect(createDir('indexeddb://documents/projects')).resolves.toBeUndefined();
     });
 
     it('readDir should return empty array in web environment (graceful fallback)', async () => {
@@ -94,27 +89,21 @@ describe('filesystem utilities', () => {
       expect(result).toEqual([]);
     });
 
-    it('getDocumentsDir should return empty string in web environment (graceful fallback)', async () => {
+    it('getDocumentsDir should return virtual documents root in web environment', async () => {
       const result = await getDocumentsDir();
-      expect(result).toBe('');
+      expect(result).toBe('indexeddb://documents');
     });
 
-    it('copyFile should throw error in web environment', async () => {
-      await expect(copyFile('/source', '/dest')).rejects.toThrow(
-        'File copy requires Tauri runtime'
-      );
+    it('copyFile should no-op in web environment', async () => {
+      await expect(copyFile('/source', '/dest')).resolves.toBeUndefined();
     });
 
-    it('removeFile should throw error in web environment', async () => {
-      await expect(removeFile('/test/path')).rejects.toThrow(
-        'File removal requires Tauri runtime'
-      );
+    it('removeFile should no-op in web environment', async () => {
+      await expect(removeFile('/test/path')).resolves.toBeUndefined();
     });
 
-    it('renameFile should throw error in web environment', async () => {
-      await expect(renameFile('/old', '/new')).rejects.toThrow(
-        'File rename requires Tauri runtime'
-      );
+    it('renameFile should no-op in web environment', async () => {
+      await expect(renameFile('/old', '/new')).resolves.toBeUndefined();
     });
   });
 
@@ -165,8 +154,9 @@ describe('filesystem utilities', () => {
   });
 
   describe('error handling', () => {
-    it('should provide meaningful error messages', async () => {
-      await expect(readTextFile('/test/path')).rejects.toThrow(/Tauri/);
+    it('should return graceful fallbacks for direct web filesystem access', async () => {
+      await expect(readTextFile('/test/path')).resolves.toBe('');
+      await expect(writeTextFile('/test/path', 'content')).resolves.toBeUndefined();
     });
 
     it('should not throw for graceful fallback functions', async () => {
@@ -177,4 +167,3 @@ describe('filesystem utilities', () => {
     });
   });
 });
-

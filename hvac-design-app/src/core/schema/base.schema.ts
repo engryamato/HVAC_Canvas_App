@@ -1,6 +1,15 @@
 import { z } from 'zod';
 
 /**
+ * Normalize any rotation value (including negative, e.g. from Math.atan2)
+ * to the canonical [0, 360) range.
+ */
+function normalizeRotation(v: unknown): unknown {
+  if (typeof v !== 'number') return v;
+  return ((v % 360) + 360) % 360;
+}
+
+/**
  * Transform schema for entity positioning on canvas
  * All coordinates are in pixels from the canvas origin (0,0)
  */
@@ -12,7 +21,9 @@ export const TransformSchema = z.object({
     .optional()
     .default(0)
     .describe('Vertical world position in 3D space (inches from floor)'),
-  rotation: z.number().min(0).max(360).default(0).describe('Rotation in degrees'),
+  rotation: z
+    .preprocess(normalizeRotation, z.number().min(0).max(360).default(0))
+    .describe('Rotation in degrees (normalized to [0, 360))'),
   scaleX: z.number().positive().default(1).describe('Horizontal scale factor'),
   scaleY: z.number().positive().default(1).describe('Vertical scale factor'),
 });
@@ -48,6 +59,18 @@ export const BaseEntitySchema = z.object({
 });
 
 export type BaseEntity = z.infer<typeof BaseEntitySchema>;
+
+/**
+ * Schema for service/component reference IDs stored on entities.
+ *
+ * Accepts both UUID custom-service IDs and legacy template IDs such as
+ * 'tmpl_low_pressure_supply'. Coerces empty strings and null to undefined
+ * so partial or cleared fields don't fail validation.
+ */
+export const ServiceIdSchema = z.preprocess(
+  (v) => (v === '' || v === null) ? undefined : v,
+  z.string().min(1).optional()
+).describe('Service or template reference ID');
 
 /**
  * Factory function to create a default transform

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseEntitySchema } from './base.schema';
+import { BaseEntitySchema, ServiceIdSchema } from './base.schema';
 import { ConstraintStatusSchema } from './duct.schema';
 import { EngineeringSystemSchema } from './unified-component.schema';
 
@@ -53,7 +53,7 @@ const SharedEquipmentPropsSchema = z.object({
   locationTag: z.string().max(50).optional().describe('Location tag e.g. "ROOF-1", "MECH-101"'),
   
   //Service & Catalog references
-  serviceId: z.string().uuid().optional().describe('Active Service ID'),
+  serviceId: ServiceIdSchema,
   catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
   
   // Engineering data for validation

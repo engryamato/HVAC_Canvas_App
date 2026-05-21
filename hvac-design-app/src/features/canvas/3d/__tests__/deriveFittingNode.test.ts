@@ -163,7 +163,3 @@ describe('deriveFittingNode', () => {
         expect(node.transform.position.z).toBe(80);
     });
 });
-form.position.x).toBe(120);
-        expect(node.transform.position.z).toBe(80);
-    });
-});

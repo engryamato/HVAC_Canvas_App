@@ -56,7 +56,7 @@ describe('csv helpers', () => {
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({
       type: 'Duct',
-      description: 'Rectangular Duct 12" x 8" 5\'',
+      description: 'Rectangular Duct 12" × 8" × 5\'',
       quantity: 2,
       unit: 'EA',
     });
@@ -97,7 +97,7 @@ describe('csv helpers', () => {
 
     expect(items.map((item) => item.type)).toEqual(['Duct', 'Fitting', 'Accessory']);
     expect(items.map((item) => item.description)).toEqual([
-      'Round Duct 10" 8\'',
+      'Round Duct 10" × 8\'',
       'Tee',
       'Balancing Damper',
     ]);

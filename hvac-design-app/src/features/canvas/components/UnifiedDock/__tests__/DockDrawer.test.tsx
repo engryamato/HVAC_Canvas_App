@@ -36,7 +36,7 @@ describe('DockDrawer', () => {
 
     render(<DockDrawer />);
 
-    expect(screen.getByText('Services')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Manage' })).toBeDefined();
     expect(screen.getByTestId('manage-panel')).toBeDefined();
     expect(screen.queryByTestId('project-assets-panel')).toBeNull();
   });

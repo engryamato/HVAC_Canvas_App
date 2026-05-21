@@ -179,6 +179,18 @@ describe('SelectTool duct_run segment selection', () => {
     expect(useEntityStore.getState().byId[middle.id]?.transform.x).toBe(106);
   });
 
+  it('does not detach a connected duct on mouse down alone', () => {
+    const { middle, startFitting, endFitting } = seedThreeConnectedRuns();
+    const tool = new SelectTool();
+
+    tool.onMouseDown({ x: 160, y: 100, button: 0 });
+    tool.onMouseUp({ x: 160, y: 100, button: 0 });
+
+    expect(useEntityStore.getState().byId[startFitting.id]).toBeDefined();
+    expect(useEntityStore.getState().byId[endFitting.id]).toBeDefined();
+    expect(useEntityStore.getState().byId[middle.id]?.transform.x).toBe(100);
+  });
+
   it('keeps a dragged connected duct detached on release near its original connection', () => {
     const { middle } = seedThreeConnectedRuns();
     const tool = new SelectTool();
@@ -209,6 +221,20 @@ describe('SelectTool duct_run segment selection', () => {
 
     expect(useEntityStore.getState().byId[startFitting.id]).toBeUndefined();
     expect(useEntityStore.getState().byId[endFitting.id]).toBeDefined();
+  });
+
+  it('leaves non-selected connected duct sections in place during selected endpoint detachment', () => {
+    const { left, middle, right, startFitting, endFitting } = seedThreeConnectedRuns();
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(middle.id);
+
+    tool.onMouseDown({ x: 100, y: 100, button: 0 });
+    tool.onMouseMove({ x: 88, y: 100, button: 0 });
+
+    expect(useEntityStore.getState().byId[startFitting.id]).toBeUndefined();
+    expect(useEntityStore.getState().byId[endFitting.id]).toBeDefined();
+    expect(useEntityStore.getState().byId[left.id]?.transform.x).toBe(-20);
+    expect(useEntityStore.getState().byId[right.id]?.transform.x).toBe(220);
   });
 
   it('lets a connected endpoint break away before leaving the magnetic snap radius', () => {
@@ -322,6 +348,42 @@ describe('SelectTool duct_run segment selection', () => {
     expect(DuctRunGeometryService.getGeometry(afterRelease).end).toEqual({ x: 300, y: 100 });
   });
 
+  it('attaches dragged reducer inlet and outlet ports to duct endpoints on release', () => {
+    const inletRun = seedRunBetween('inlet-run', { x: 52, y: 100 }, { x: 172, y: 100 });
+    const outletRun = seedRunBetween('outlet-run', { x: 228, y: 100 }, { x: 348, y: 100 });
+    const reducer = seedFittingAt('dragged-reducer', 220, 100, [], 'reducer');
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(reducer.id);
+
+    tool.onMouseDown({ x: 220, y: 100, button: 0 });
+    tool.onMouseMove({ x: 214, y: 100, button: 0 });
+    tool.onMouseMove({ x: 194, y: 100, button: 0 });
+
+    const beforeRelease = useEntityStore.getState().byId[reducer.id];
+    expect(beforeRelease?.type).toBe('fitting');
+    if (beforeRelease?.type !== 'fitting') {
+      throw new Error('Expected fitting before release');
+    }
+    expect(beforeRelease.props.inletDuctId).toBeUndefined();
+    expect(beforeRelease.props.outletDuctId).toBeUndefined();
+
+    tool.onMouseUp({ x: 194, y: 100, button: 0 });
+
+    const afterRelease = useEntityStore.getState().byId[reducer.id];
+    expect(afterRelease?.type).toBe('fitting');
+    if (afterRelease?.type !== 'fitting') {
+      throw new Error('Expected fitting after release');
+    }
+    expect(afterRelease.transform.x).toBe(200);
+    expect(afterRelease.transform.y).toBe(100);
+    expect(afterRelease.props.inletDuctId).toBe(inletRun.id);
+    expect(afterRelease.props.outletDuctId).toBe(outletRun.id);
+    expect(afterRelease.props.connectionPoints).toEqual([
+      { ductId: inletRun.id },
+      { ductId: outletRun.id },
+    ]);
+  });
+
   it('renders a stronger blue magnetic preview as the endpoint gets closer', () => {
     const tool = new SelectTool() as SelectTool & { state: Record<string, unknown> };
     const strokeStyles: string[] = [];
@@ -363,5 +425,39 @@ describe('SelectTool duct_run segment selection', () => {
       .map(Number);
     expect(alphas).toHaveLength(2);
     expect(alphas[1]).toBeGreaterThan(alphas[0]);
+  });
+
+  it('fades out the blue magnetic preview when the endpoint moves far from a target', () => {
+    const tool = new SelectTool() as SelectTool & { state: Record<string, unknown> };
+    const strokeStyles: string[] = [];
+    const ctx = {
+      save: () => undefined,
+      restore: () => undefined,
+      beginPath: () => undefined,
+      arc: () => undefined,
+      fill: () => undefined,
+      stroke: () => undefined,
+      set fillStyle(_value: string) {},
+      set strokeStyle(value: string) {
+        strokeStyles.push(value);
+      },
+      set lineWidth(_value: number) {},
+    };
+
+    tool.state = {
+      mode: 'dragging',
+      liveSnapTargets: {
+        start: {
+          snapType: 'duct_endpoint',
+          point: { x: 100, y: 100 },
+          distance: MagneticConnectionService.SNAP_TOLERANCE,
+        },
+        end: null,
+      },
+    };
+
+    tool.render({ ctx: ctx as unknown as CanvasRenderingContext2D, zoom: 1 });
+
+    expect(strokeStyles).toHaveLength(0);
   });
 });

@@ -12,7 +12,9 @@ vi.mock('@/components/ui/select', () => ({
   Select: ({ children, value, onValueChange }: { children: React.ReactNode; value: string; onValueChange: (value: string) => void }) => (
     <div data-testid="select" data-value={value}>
       {children}
-      <button type="button" onClick={() => onValueChange('wide')}>Wide</button>
+      {['normal', 'narrow', 'wide'].includes(value) && (
+        <button type="button" onClick={() => onValueChange('wide')}>Wide</button>
+      )}
     </div>
   ),
   SelectTrigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -25,8 +27,12 @@ vi.mock('@/components/ui/radio-group', () => ({
   RadioGroup: ({ children, value, onValueChange }: { children: React.ReactNode; value: string; onValueChange: (value: string) => void }) => (
     <div data-testid="radio-group" data-value={value}>
       {children}
-      <button type="button" onClick={() => onValueChange('landscape')}>Landscape</button>
-      <button type="button" onClick={() => onValueChange('custom')}>Custom</button>
+      {['portrait', 'landscape'].includes(value) && (
+        <button type="button" onClick={() => onValueChange('landscape')}>Landscape</button>
+      )}
+      {['fit', 'actual', 'custom'].includes(value) && (
+        <button type="button" onClick={() => onValueChange('custom')}>Custom</button>
+      )}
     </div>
   ),
   RadioGroupItem: ({ value }: { value: string }) => <div data-testid={`radio-${value}`} />,
@@ -66,10 +72,10 @@ describe('PrintDialog', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('Landscape'));
-    fireEvent.click(screen.getByText('Custom'));
-    fireEvent.click(screen.getByText('Wide'));
-    fireEvent.change(screen.getByLabelText('Scale (%)'), { target: { value: '125' } });
+    fireEvent.click(screen.getAllByText('Landscape').find((element) => element.tagName === 'BUTTON')!);
+    fireEvent.click(screen.getAllByText('Custom').find((element) => element.tagName === 'BUTTON')!);
+    fireEvent.click(screen.getAllByText('Wide').find((element) => element.tagName === 'BUTTON')!);
+    fireEvent.change(screen.getByDisplayValue('100'), { target: { value: '125' } });
     fireEvent.click(screen.getByRole('button', { name: /print/i }));
 
     await waitFor(() => expect(onPrint).toHaveBeenCalled());

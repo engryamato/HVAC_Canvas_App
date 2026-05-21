@@ -8,7 +8,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useViewportStore } from '../store/viewportStore';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
-import type { Duct, DuctRun, Entity } from '@/core/schema';
+import type { Duct, DuctEndType, DuctRun, Entity, Fitting, InsulationType } from '@/core/schema';
 import { getDuctRunCanvasBounds, getLegacyDuctCanvasBounds } from '@/core/geometry/ductBounds';
 import { DuctRunGeometryService } from '../services/DuctRunGeometryService';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
@@ -22,6 +22,10 @@ import {
   type MagneticSnapResult,
 } from '../services/magneticConnectionService';
 import { FittingGenerationService } from '@/core/services/fittingGeneration';
+import {
+  getWorldConnectionPoints,
+  type WorldConnectionPoint,
+} from '../services/fittingConnectionService';
 import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
 import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
 import { DuctTool } from './DuctTool';
@@ -34,10 +38,10 @@ const MIN_DUCT_LENGTH = feetToPixels(1);
 const DRAG_THRESHOLD = 5;
 
 type DuctRunSegmentDefaults = {
-  insulationType?: string | null;
+  insulationType?: InsulationType;
   insulationThickness?: number;
-  startEndType?: string;
-  endEndType?: string;
+  startEndType?: DuctEndType;
+  endEndType?: DuctEndType;
 };
 
 interface SelectToolState {
@@ -61,6 +65,8 @@ interface SelectToolState {
   stretchBreakawayActive: boolean;
   /** Per-endpoint snap targets for magnetic preview during drag. */
   liveSnapTargets: { start: MagneticSnapResult | null; end: MagneticSnapResult | null };
+  /** Best duct-endpoint snap found across any fitting connection port (for drag preview). */
+  liveFittingSnap: MagneticSnapResult | null;
   fittingsCleared: boolean;
 }
 
@@ -218,6 +224,7 @@ export class SelectTool extends BaseTool {
   onMouseUp(event: ToolMouseEvent): void {
     if (this.state.mode === 'dragging') {
       this.alignDraggedDuctRunToMagneticSnap();
+      this.alignDraggedFittingToMagneticSnap();
       this.commitMovedEntities();
     }
 
@@ -371,6 +378,7 @@ export class SelectTool extends BaseTool {
       stretchInitialSnapTarget: null,
       stretchBreakawayActive: false,
       liveSnapTargets: { start: null, end: null },
+      liveFittingSnap: null,
       fittingsCleared: false,
     };
   }
@@ -427,6 +435,10 @@ export class SelectTool extends BaseTool {
       const selectedEntity = byId[selectedIds[0]!];
       if (selectedEntity?.type === 'duct_run') {
         this.removeFittingsConnectedToDuct(selectedEntity.id);
+        this.state.fittingsCleared = true;
+      } else if (selectedEntity?.type === 'fitting') {
+        // Detach the fitting from connected ducts when drag begins.
+        this.detachFitting(selectedEntity.id);
         this.state.fittingsCleared = true;
       }
     }
@@ -621,9 +633,12 @@ export class SelectTool extends BaseTool {
         current.transform.y !== initialEntity.transform.y ||
         current.transform.rotation !== initialEntity.transform.rotation;
       const propsChanged =
-        current.type === 'duct_run' &&
-        initialEntity.type === 'duct_run' &&
-        JSON.stringify(current.props) !== JSON.stringify(initialEntity.props);
+        (current.type === 'duct_run' &&
+          initialEntity.type === 'duct_run' &&
+          JSON.stringify(current.props) !== JSON.stringify(initialEntity.props)) ||
+        (current.type === 'fitting' &&
+          initialEntity.type === 'fitting' &&
+          JSON.stringify(current.props) !== JSON.stringify(initialEntity.props));
       if (!transformChanged && !propsChanged) {
         return;
       }
@@ -633,6 +648,11 @@ export class SelectTool extends BaseTool {
           ? ({
               transform: { ...current.transform },
               props: { ...current.props },
+            } as Partial<Entity>)
+          : current.type === 'fitting'
+          ? ({
+              transform: { ...current.transform },
+              props: { ...(current as Fitting).props },
             } as Partial<Entity>)
           : { transform: { ...current.transform } };
 
@@ -777,7 +797,7 @@ export class SelectTool extends BaseTool {
           : Number.POSITIVE_INFINITY;
         return {
           entity: run,
-          segmentIndex: segmentIndex ?? undefined,
+          ...(segmentIndex !== null ? { segmentIndex } : {}),
           selected: selectedIds.includes(run.id),
           bodyDepth: this.getDuctRunBodyDepthAtPoint(run, point),
           endpointDistance,
@@ -983,6 +1003,135 @@ export class SelectTool extends BaseTool {
     });
   }
 
+  // ─── Fitting attach / detach helpers ──────────────────────────────────────
+
+  /**
+   * Clear all duct connection references on a fitting when a drag begins.
+   * The transient update is cheap and will be committed (with the new props)
+   * by commitMovedEntities when the drag ends.
+   */
+  private detachFitting(fittingId: string): void {
+    const { byId, updateEntityTransient } = useEntityStore.getState();
+    const fitting = byId[fittingId];
+    if (!fitting || fitting.type !== 'fitting') return;
+
+    updateEntityTransient(fittingId, {
+      props: {
+        ...(fitting as Fitting).props,
+        inletDuctId: undefined,
+        outletDuctId: undefined,
+        connectionPoints: undefined,
+      },
+    } as Partial<Entity>);
+  }
+
+  /**
+   * After a fitting drag ends, check whether any of its connection ports are
+   * within snap tolerance of a duct endpoint.  If so, nudge the fitting so the
+   * nearest port aligns exactly and write the duct IDs into props.
+   */
+  private alignDraggedFittingToMagneticSnap(): void {
+    const { selectedIds } = useSelectionStore.getState();
+    if (selectedIds.length !== 1) return;
+
+    const { byId, updateEntityTransient } = useEntityStore.getState();
+    const entity = byId[selectedIds[0]!];
+    if (!entity || entity.type !== 'fitting') return;
+
+    const fitting = entity as Fitting;
+    const worldPts = getWorldConnectionPoints(fitting);
+
+    // Find the connection port closest to any duct endpoint.
+    let bestSnap: MagneticSnapResult | null = null;
+    let bestPort: WorldConnectionPoint | null = null;
+
+    for (const pt of worldPts) {
+      const snap = MagneticConnectionService.resolveSnapTarget(
+        pt.worldX,
+        pt.worldY,
+        byId,
+        [fitting.id]
+      );
+      if (
+        snap?.snapType === 'duct_endpoint' &&
+        snap.distance <= MagneticConnectionService.SNAP_TOLERANCE &&
+        (!bestSnap || snap.distance < bestSnap.distance)
+      ) {
+        bestSnap = snap;
+        bestPort = pt;
+      }
+    }
+
+    if (!bestSnap || !bestPort) return;
+
+    // Offset fitting so the matched port lands exactly on the duct endpoint.
+    const offsetX = bestSnap.point.x - bestPort.worldX;
+    const offsetY = bestSnap.point.y - bestPort.worldY;
+
+    const newTransform = {
+      ...fitting.transform,
+      x: fitting.transform.x + offsetX,
+      y: fitting.transform.y + offsetY,
+    };
+
+    // Recompute world points after the position shift, then resolve all port→duct connections.
+    const shiftedFitting: Fitting = {
+      ...fitting,
+      transform: newTransform,
+    };
+    const newProps = this.computeAttachedFittingProps(shiftedFitting, byId);
+
+    updateEntityTransient(fitting.id, {
+      transform: newTransform,
+      props: newProps,
+    } as Partial<Entity>);
+
+    this.state.hasMoved = true;
+  }
+
+  /**
+   * For each connection port of a fitting (at its current position), look for a
+   * duct endpoint within snap tolerance and record it in inletDuctId / outletDuctId
+   * / connectionPoints.
+   */
+  private computeAttachedFittingProps(
+    fitting: Fitting,
+    byId: Record<string, Entity>
+  ): Fitting['props'] {
+    const worldPts = getWorldConnectionPoints(fitting);
+
+    let inletDuctId: string | undefined;
+    let outletDuctId: string | undefined;
+    const connectionPoints: Array<{ ductId: string; pointIndex?: number }> = [];
+
+    for (const pt of worldPts) {
+      const snap = MagneticConnectionService.resolveSnapTarget(
+        pt.worldX,
+        pt.worldY,
+        byId,
+        [fitting.id]
+      );
+      if (
+        snap?.snapType === 'duct_endpoint' &&
+        snap.ductId &&
+        snap.distance <= MagneticConnectionService.SNAP_TOLERANCE
+      ) {
+        if (pt.role === 'inlet') inletDuctId = snap.ductId;
+        else if (pt.role === 'outlet') outletDuctId = snap.ductId;
+        connectionPoints.push({ ductId: snap.ductId });
+      }
+    }
+
+    return {
+      ...fitting.props,
+      inletDuctId,
+      outletDuctId,
+      connectionPoints: connectionPoints.length > 0 ? connectionPoints : undefined,
+    };
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+
   private removeFittingsConnectedToDuct(ductId: string): void {
     const { byId, allIds } = useEntityStore.getState();
     allIds.forEach((id) => {
@@ -1073,7 +1222,6 @@ export class SelectTool extends BaseTool {
 
     ctx.save();
     ctx.strokeStyle = '#2196F3';
-    ctx.lineWidth = 1.5 / zoom;
     for (const point of [geometry.start, geometry.end]) {
       const hovered =
         this.state.currentPoint &&
@@ -1128,21 +1276,24 @@ export class SelectTool extends BaseTool {
     ctx.restore();
   }
 
-  /**
-   * Detect and store magnetic snap candidates for both endpoints of the dragged duct.
-   * Called every mouse-move tick during dragging so the preview stays live.
-   */
   private updateDragSnapPreview(): void {
     const { selectedIds } = useSelectionStore.getState();
     if (selectedIds.length !== 1) {
       this.state.liveSnapTargets = { start: null, end: null };
+      this.state.liveFittingSnap = null;
       return;
     }
-    const duct = this.toDuctRun(useEntityStore.getState().byId[selectedIds[0]!]);
+
+    const entity = useEntityStore.getState().byId[selectedIds[0]!];
+    const duct = this.toDuctRun(entity);
     if (!duct) {
       this.state.liveSnapTargets = { start: null, end: null };
+      this.state.liveFittingSnap = entity?.type === 'fitting'
+        ? this.getBestFittingPortSnap(entity as Fitting)
+        : null;
       return;
     }
+
     const { byId } = useEntityStore.getState();
     const geometry = DuctRunGeometryService.getGeometry(duct);
     const startSnap = MagneticConnectionService.resolveSnapTarget(
@@ -1157,6 +1308,7 @@ export class SelectTool extends BaseTool {
       byId,
       [duct.id]
     );
+
     this.state.liveSnapTargets = {
       start:
         startSnap && (startSnap.snapType === 'duct_endpoint' || startSnap.snapType === 'duct_body')
@@ -1167,13 +1319,31 @@ export class SelectTool extends BaseTool {
           ? endSnap
           : null,
     };
+    this.state.liveFittingSnap = null;
   }
 
-  /**
-   * Render blue magnetic-connection preview circles for each endpoint that is
-   * near a valid snap target.  Opacity scales with proximity (1 = touching,
-   * 0 = at the edge of snap tolerance).
-   */
+  private getBestFittingPortSnap(fitting: Fitting): MagneticSnapResult | null {
+    const { byId } = useEntityStore.getState();
+    let best: MagneticSnapResult | null = null;
+
+    for (const point of getWorldConnectionPoints(fitting)) {
+      const snap = MagneticConnectionService.resolveSnapTarget(
+        point.worldX,
+        point.worldY,
+        byId,
+        [fitting.id]
+      );
+      if (
+        snap?.snapType === 'duct_endpoint' &&
+        (!best || snap.distance < best.distance)
+      ) {
+        best = snap;
+      }
+    }
+
+    return best;
+  }
+
   private renderMagneticPreview({ ctx, zoom }: ToolRenderContext): void {
     if (this.state.mode !== 'dragging') {
       return;
@@ -1191,21 +1361,18 @@ export class SelectTool extends BaseTool {
       }
 
       const baseRadius = 10 / zoom;
-      const pulseRadius = baseRadius + (4 / zoom) * opacity; // grows as it gets closer
+      const pulseRadius = baseRadius + (4 / zoom) * opacity;
 
       ctx.save();
-      // Outer glow
       ctx.beginPath();
       ctx.arc(snap.point.x, snap.point.y, pulseRadius, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(33, 150, 243, ${opacity * 0.15})`;
       ctx.fill();
-      // Solid ring
       ctx.beginPath();
       ctx.arc(snap.point.x, snap.point.y, baseRadius, 0, Math.PI * 2);
       ctx.strokeStyle = `rgba(33, 150, 243, ${opacity})`;
       ctx.lineWidth = 2 / zoom;
       ctx.stroke();
-      // Inner dot at full proximity
       if (opacity > 0.7) {
         ctx.beginPath();
         ctx.arc(snap.point.x, snap.point.y, 3 / zoom, 0, Math.PI * 2);
@@ -1217,6 +1384,7 @@ export class SelectTool extends BaseTool {
 
     drawCircle(this.state.liveSnapTargets.start);
     drawCircle(this.state.liveSnapTargets.end);
+    drawCircle(this.state.liveFittingSnap);
   }
 
   private snapshotEntities(ids: string[]): Record<string, Entity> {

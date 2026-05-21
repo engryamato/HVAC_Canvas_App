@@ -17,6 +17,7 @@ export interface LineOptions {
 }
 
 export type EquipmentType = 'AHU' | 'Fan' | 'Hood' | 'Diffuser' | 'Damper';
+export type DuctEndType = 'flange' | 'raw' | 'crimped' | 'coupled';
 
 /**
  * Helper class for professional HVAC rendering on HTML5 Canvas.
@@ -35,6 +36,8 @@ export type EquipmentType = 'AHU' | 'Fan' | 'Hood' | 'Diffuser' | 'Damper';
  * ```
  */
 export class ProfessionalRenderingHelper {
+  private static readonly PATTERN_CACHE_LIMIT = 30;
+
   private static patternCache: Map<string, CanvasPattern> = new Map();
   private static patternKeys: string[] = []; // For LRU tracking
 
@@ -132,19 +135,156 @@ export class ProfessionalRenderingHelper {
       ProfessionalRenderingHelper.patternCache.set(cacheKey, pattern);
       ProfessionalRenderingHelper.patternKeys.push(cacheKey);
 
-      // LRU eviction: remove oldest if cache exceeds 20
-      if (ProfessionalRenderingHelper.patternKeys.length > 20) {
-        const oldestKey = ProfessionalRenderingHelper.patternKeys.shift();
-        if (oldestKey) {
-          ProfessionalRenderingHelper.patternCache.delete(oldestKey);
-        }
-      }
+      ProfessionalRenderingHelper.evictPatternCacheIfNeeded();
     }
 
     this.ctx.save();
     this.ctx.fillStyle = pattern;
     this.ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
     this.ctx.restore();
+  }
+
+  drawLinerInsulation(
+    startX: number,
+    endX: number,
+    halfThickness: number,
+    thicknessPx: number,
+    ctx: CanvasRenderingContext2D = this.ctx,
+    zoom: number = this.zoom
+  ): void {
+    const innerHalfThickness = Math.max(0, halfThickness - thicknessPx);
+    ctx.save();
+    const pattern = this.getCachedPattern(`liner-${Math.round(zoom * 100)}`, () =>
+      this.createAmberHatchPattern(zoom)
+    );
+    if (pattern) {
+      ctx.fillStyle = pattern;
+      ctx.fillRect(startX, -halfThickness, endX - startX, thicknessPx);
+      ctx.fillRect(startX, innerHalfThickness, endX - startX, thicknessPx);
+    }
+
+    ctx.strokeStyle = 'rgba(96, 165, 250, 0.75)';
+    ctx.lineWidth = 1 / zoom;
+    ctx.setLineDash?.([5 / zoom, 2 / zoom]);
+    ctx.beginPath();
+    ctx.moveTo(startX, -innerHalfThickness);
+    ctx.lineTo(endX, -innerHalfThickness);
+    ctx.moveTo(startX, innerHalfThickness);
+    ctx.lineTo(endX, innerHalfThickness);
+    ctx.stroke();
+    ctx.setLineDash?.([]);
+    ctx.restore();
+  }
+
+  drawWrapInsulation(
+    startX: number,
+    endX: number,
+    halfThickness: number,
+    thicknessPx: number,
+    ctx: CanvasRenderingContext2D = this.ctx,
+    zoom: number = this.zoom
+  ): void {
+    ctx.save();
+    const pattern = this.getCachedPattern(`wrap-${Math.round(zoom * 100)}`, () =>
+      this.createAmberHatchPattern(zoom)
+    );
+    if (pattern) {
+      ctx.fillStyle = pattern;
+      ctx.fillRect(startX, -(halfThickness + thicknessPx), endX - startX, thicknessPx);
+      ctx.fillRect(startX, halfThickness, endX - startX, thicknessPx);
+    }
+
+    ctx.strokeStyle = '#FFD166';
+    ctx.lineWidth = 1 / zoom;
+    ctx.setLineDash?.([3 / zoom, 2 / zoom]);
+    ctx.beginPath();
+    ctx.moveTo(startX, -(halfThickness + thicknessPx));
+    ctx.lineTo(endX, -(halfThickness + thicknessPx));
+    ctx.moveTo(startX, halfThickness + thicknessPx);
+    ctx.lineTo(endX, halfThickness + thicknessPx);
+    ctx.stroke();
+    ctx.setLineDash?.([]);
+    ctx.restore();
+  }
+
+  drawDoubleWallInsulation(
+    startX: number,
+    endX: number,
+    halfThickness: number,
+    thicknessPx: number,
+    perforated: boolean,
+    ctx: CanvasRenderingContext2D = this.ctx,
+    zoom: number = this.zoom
+  ): void {
+    const innerHalfThickness = Math.max(0, halfThickness - thicknessPx);
+    ctx.save();
+    const pattern = perforated ? this.createDotPattern(zoom) : this.createCrosshatchPattern(zoom);
+    if (pattern) {
+      ctx.fillStyle = pattern;
+      ctx.fillRect(startX, -halfThickness, endX - startX, thicknessPx);
+      ctx.fillRect(startX, innerHalfThickness, endX - startX, thicknessPx);
+    }
+
+    ctx.strokeStyle = '#60A5FA';
+    ctx.lineWidth = 1.25 / zoom;
+    ctx.setLineDash?.(perforated ? [3 / zoom, 2 / zoom] : []);
+    ctx.beginPath();
+    ctx.moveTo(startX, -innerHalfThickness);
+    ctx.lineTo(endX, -innerHalfThickness);
+    ctx.moveTo(startX, innerHalfThickness);
+    ctx.lineTo(endX, innerHalfThickness);
+    ctx.stroke();
+    ctx.setLineDash?.([]);
+    ctx.restore();
+  }
+
+  drawDuctEnd(
+    x: number,
+    outerHalfThickness: number,
+    endType: DuctEndType,
+    zoom: number = this.zoom,
+    ctx: CanvasRenderingContext2D = this.ctx
+  ): void {
+    ctx.save();
+    ctx.strokeStyle = '#4B5563';
+    ctx.lineWidth = 2 / zoom;
+    ctx.setLineDash?.([]);
+
+    switch (endType) {
+      case 'flange':
+        ctx.beginPath();
+        ctx.moveTo(x, -(outerHalfThickness + 2 / zoom));
+        ctx.lineTo(x, outerHalfThickness + 2 / zoom);
+        ctx.stroke();
+        break;
+      case 'raw':
+        break;
+      case 'crimped': {
+        const depth = 4 / zoom;
+        const inset = 4 / zoom;
+        const direction = x <= 0 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(x, -outerHalfThickness);
+        ctx.lineTo(x + direction * depth, -Math.max(0, outerHalfThickness - inset));
+        ctx.moveTo(x, outerHalfThickness);
+        ctx.lineTo(x + direction * depth, Math.max(0, outerHalfThickness - inset));
+        ctx.stroke();
+        break;
+      }
+      case 'coupled': {
+        const offset = 1.5 / zoom;
+        ctx.lineWidth = 1.5 / zoom;
+        [-offset, offset].forEach((dx) => {
+          ctx.beginPath();
+          ctx.moveTo(x + dx, -(outerHalfThickness + 2 / zoom));
+          ctx.lineTo(x + dx, outerHalfThickness + 2 / zoom);
+          ctx.stroke();
+        });
+        break;
+      }
+    }
+
+    ctx.restore();
   }
 
   /**
@@ -175,6 +315,107 @@ export class ProfessionalRenderingHelper {
     patternCtx.stroke();
 
     return this.ctx.createPattern(patternCanvas, 'repeat')!;
+  }
+
+  private getCachedPattern(cacheKey: string, createPattern: () => CanvasPattern | null): CanvasPattern | null {
+    let pattern = ProfessionalRenderingHelper.patternCache.get(cacheKey);
+    if (!pattern) {
+      pattern = createPattern() ?? undefined;
+      if (pattern) {
+        ProfessionalRenderingHelper.patternCache.set(cacheKey, pattern);
+        ProfessionalRenderingHelper.patternKeys.push(cacheKey);
+        ProfessionalRenderingHelper.evictPatternCacheIfNeeded();
+      }
+    }
+
+    return pattern ?? null;
+  }
+
+  private static evictPatternCacheIfNeeded(): void {
+    while (ProfessionalRenderingHelper.patternKeys.length > ProfessionalRenderingHelper.PATTERN_CACHE_LIMIT) {
+      const oldestKey = ProfessionalRenderingHelper.patternKeys.shift();
+      if (oldestKey) {
+        ProfessionalRenderingHelper.patternCache.delete(oldestKey);
+      }
+    }
+  }
+
+  private createAmberHatchPattern(zoom: number): CanvasPattern | null {
+    const patternCanvas = document.createElement('canvas');
+    const spacing = Math.max(4, 7 / zoom);
+    const size = spacing * 2;
+    patternCanvas.width = size;
+    patternCanvas.height = size;
+    const patternCtx = patternCanvas.getContext('2d');
+    if (!patternCtx) {
+      return null;
+    }
+
+    patternCtx.strokeStyle = 'rgba(255, 209, 102, 0.55)';
+    patternCtx.lineWidth = Math.max(0.75, 0.9 / zoom);
+    for (let i = -size; i < size * 2; i += spacing) {
+      patternCtx.beginPath();
+      patternCtx.moveTo(i, 0);
+      patternCtx.lineTo(i + size, size);
+      patternCtx.stroke();
+    }
+
+    return this.ctx.createPattern(patternCanvas, 'repeat');
+  }
+
+  private createCrosshatchPattern(zoom: number): CanvasPattern | null {
+    return this.getCachedPattern(`crosshatch-${Math.round(zoom * 100)}`, () => {
+      const patternCanvas = document.createElement('canvas');
+      const spacing = Math.max(4, 6 / zoom);
+      const size = spacing * 2;
+      patternCanvas.width = size;
+      patternCanvas.height = size;
+      const patternCtx = patternCanvas.getContext('2d');
+      if (!patternCtx) {
+        return null;
+      }
+
+      patternCtx.strokeStyle = 'rgba(147, 197, 253, 0.38)';
+      patternCtx.lineWidth = Math.max(0.6, 0.75 / zoom);
+      for (let i = -size; i < size * 2; i += spacing) {
+        patternCtx.beginPath();
+        patternCtx.moveTo(i, 0);
+        patternCtx.lineTo(i + size, size);
+        patternCtx.stroke();
+        patternCtx.beginPath();
+        patternCtx.moveTo(i, size);
+        patternCtx.lineTo(i + size, 0);
+        patternCtx.stroke();
+      }
+
+      return this.ctx.createPattern(patternCanvas, 'repeat');
+    });
+  }
+
+  private createDotPattern(zoom: number): CanvasPattern | null {
+    return this.getCachedPattern(`dots-${Math.round(zoom * 100)}`, () => {
+      const patternCanvas = document.createElement('canvas');
+      const spacing = Math.max(4, 5 / zoom);
+      const size = spacing * 2;
+      patternCanvas.width = size;
+      patternCanvas.height = size;
+      const patternCtx = patternCanvas.getContext('2d');
+      if (!patternCtx) {
+        return null;
+      }
+
+      patternCtx.fillStyle = 'rgba(147, 197, 253, 0.6)';
+      [
+        [spacing * 0.5, spacing * 0.5],
+        [spacing * 1.5, spacing * 1.5],
+      ].forEach(([x, y]) => {
+        patternCtx.beginPath();
+        patternCtx.arc(x, y, Math.max(0.8, 1.1 / zoom), 0, Math.PI * 2);
+        patternCtx.fill();
+      });
+
+      return this.ctx.createPattern(patternCanvas, 'repeat');
+    });
   }
 
   /**

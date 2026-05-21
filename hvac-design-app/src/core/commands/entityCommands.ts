@@ -207,7 +207,12 @@ function cloneDuctRunWithNewGeometry(
     endPoint,
     connectedFrom: overrides.connectedFrom,
     connectedTo: overrides.connectedTo,
-    segments: recomputeDuctRunSegments(overrides.lengthFeet, sectionLength),
+    segments: recomputeDuctRunSegments(overrides.lengthFeet, sectionLength, {
+      insulationType: source.props.insulationType,
+      insulationThickness: source.props.insulationThickness,
+      startEndType: source.props.startEndType,
+      endEndType: source.props.endEndType,
+    }),
   };
   run.transform = {
     ...source.transform,

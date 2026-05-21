@@ -20,9 +20,7 @@ describe('exportCanvasToPNG', () => {
 
       set src(_value: string) {
         this.complete = true;
-        if (this.onload) {
-          this.onload();
-        }
+        setTimeout(() => this.onload?.(), 0);
       }
     } as unknown as typeof Image;
   });

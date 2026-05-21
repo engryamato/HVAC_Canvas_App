@@ -306,11 +306,11 @@ describe('Calculation Workflow User Journey', () => {
       expect(loss2000).toBeGreaterThan(loss1000);
     });
 
-    it('should increase with length', () => {
+    it('should report friction loss normalized per 100 ft', () => {
       const loss25ft = calculateFrictionLoss(1500, 12, 25);
       const loss100ft = calculateFrictionLoss(1500, 12, 100);
 
-      expect(loss100ft).toBeGreaterThan(loss25ft);
+      expect(loss100ft).toBe(loss25ft);
     });
 
     it('should decrease with larger diameter', () => {

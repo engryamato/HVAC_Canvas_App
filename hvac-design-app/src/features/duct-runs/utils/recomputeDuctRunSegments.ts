@@ -1,7 +1,12 @@
 import { roundFeet } from '@/core/constants/coordinates';
-import type { DuctSegment } from '@/core/schema';
+import type { DuctEndType, DuctSegment, InsulationType } from '@/core/schema';
 
-type DuctSegmentDefaults = Record<string, unknown>;
+export interface DuctSegmentDefaults {
+  insulationType?: InsulationType;
+  insulationThickness?: number;
+  startEndType?: DuctEndType;
+  endEndType?: DuctEndType;
+}
 
 export function recomputeDuctRunSegments(
   installLength: number,

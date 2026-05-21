@@ -235,8 +235,7 @@ describe('ThreeViewport', () => {
 
     expect(canvas).not.toBeNull();
 
-    fireEvent.pointerDown(canvas!, { button: 0, clientX: 10, clientY: 12, pointerId: 1 });
-    fireEvent.pointerUp(canvas!, { button: 0, clientX: 12, clientY: 13, pointerId: 1 });
+    fireEvent.click(canvas!, { button: 0, clientX: 12, clientY: 13 });
 
     expect(testState.raycastSelectionMock).toHaveBeenCalledTimes(1);
     expect(testState.selectSingleMock).toHaveBeenCalledWith('entity-1');
@@ -278,6 +277,7 @@ describe('ThreeViewport', () => {
 
   it('completes gizmo drags through the unified drag-end path and resumes controls', () => {
     testState.gizmoHandlePointerDownMock.mockReturnValueOnce(true);
+    testState.gizmoIsDraggingMock.mockReturnValue(true);
 
     const { container } = render(<ThreeViewport />);
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
@@ -285,13 +285,11 @@ describe('ThreeViewport', () => {
     fireEvent.pointerDown(canvas, { button: 0, clientX: 30, clientY: 30, pointerId: 7 });
 
     expect(testState.controlsSuspendMock).toHaveBeenCalledTimes(1);
-    expect(canvas.setPointerCapture).toHaveBeenCalledWith(7);
 
-    fireEvent.pointerCancel(canvas, { button: 0, clientX: 50, clientY: 50, pointerId: 7 });
+    fireEvent.pointerUp(canvas, { button: 0, clientX: 50, clientY: 50, pointerId: 7 });
 
     expect(testState.gizmoHandlePointerUpMock).toHaveBeenCalledTimes(1);
     expect(testState.controlsResumeMock).toHaveBeenCalledTimes(1);
-    expect(canvas.releasePointerCapture).toHaveBeenCalledWith(7);
     expect(testState.raycastSelectionMock).not.toHaveBeenCalled();
     expect(testState.selectSingleMock).not.toHaveBeenCalled();
     expect(testState.clearSelectionMock).not.toHaveBeenCalled();

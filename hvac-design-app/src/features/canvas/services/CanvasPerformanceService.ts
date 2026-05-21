@@ -3,6 +3,7 @@ export interface PerformanceHints {
   enableHatching: boolean;
   enableShadows: boolean;
   simplifyFittings: boolean;
+  forceQuality?: boolean;
 }
 
 export interface PerformanceThresholds {
@@ -19,6 +20,8 @@ export class CanvasPerformanceService {
   private entityCount: number = 0;
 
   private performanceMode: boolean = false;
+
+  private forceQuality: boolean = false;
 
   private thresholds: PerformanceThresholds = {
     targetFPS: 60,
@@ -50,7 +53,17 @@ export class CanvasPerformanceService {
       this.entityCount > this.thresholds.maxEntityCount;
   }
 
-  getPerformanceHints(): PerformanceHints {
+  getPerformanceHints(options: { forceQuality?: boolean } = {}): PerformanceHints {
+    if (this.forceQuality || options.forceQuality) {
+      return {
+        detailLevel: 'full',
+        enableHatching: true,
+        enableShadows: true,
+        simplifyFittings: false,
+        forceQuality: true,
+      };
+    }
+
     const fps = this.calculateAverageFPS();
 
     let detailLevel: PerformanceHints['detailLevel'] = 'full';
@@ -96,10 +109,15 @@ export class CanvasPerformanceService {
     this.performanceMode = this.isPerformanceMode();
   }
 
+  setForceQuality(enabled: boolean): void {
+    this.forceQuality = enabled;
+  }
+
   reset(): void {
     this.frameTimes = [];
     this.frameStartTime = null;
     this.performanceMode = false;
+    this.forceQuality = false;
   }
 
   private calculateAverageFPS(): number {
