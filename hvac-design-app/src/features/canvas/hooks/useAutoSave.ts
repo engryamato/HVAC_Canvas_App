@@ -18,7 +18,12 @@ import { useLayoutStore } from '@/stores/useLayoutStore';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useTutorialStore } from '@/stores/useTutorialStore';
 import { ProjectFileSchema, type ProjectFile, CURRENT_SCHEMA_VERSION } from '@/core/schema/project-file.schema';
-import { getProjectBackupKey, getProjectStorageKey, estimateStorageSizeBytes } from '@/utils/storageKeys';
+import {
+  DELETED_PROJECTS_STORAGE_ARCHIVE_KEY,
+  getProjectBackupKey,
+  getProjectStorageKey,
+  estimateStorageSizeBytes,
+} from '@/utils/storageKeys';
 import { trackTelemetry } from '@/utils/telemetry';
 import { sendCloudBackup } from '@/services/cloudBackupService';
 import { saveProjectToExistingHandleOrDownload } from '@/core/persistence/webProjectFileIO';
@@ -358,8 +363,23 @@ export interface StorageWriteResult {
   error?: string;
 }
 
+function validatePayloadProjectId(projectId: string, payload: LocalStoragePayload): string | null {
+  if (payload.project.projectId !== projectId) {
+    return `Payload project id ${payload.project.projectId} does not match storage project id ${projectId}.`;
+  }
+  return null;
+}
+
 export function saveProjectToStorage(projectId: string, payload: LocalStoragePayload): StorageWriteResult {
   try {
+    const mismatchError = validatePayloadProjectId(projectId, payload);
+    if (mismatchError) {
+      return {
+        success: false,
+        error: mismatchError,
+      };
+    }
+
     const savedAt = new Date().toISOString();
     const checksum = buildChecksum(payload);
     const envelope: LocalStorageEnvelope = {
@@ -388,6 +408,14 @@ export function saveProjectToStorage(projectId: string, payload: LocalStoragePay
 
 export function saveBackupToStorage(projectId: string, payload: LocalStoragePayload): StorageWriteResult {
   try {
+    const mismatchError = validatePayloadProjectId(projectId, payload);
+    if (mismatchError) {
+      return {
+        success: false,
+        error: mismatchError,
+      };
+    }
+
     const savedAt = new Date().toISOString();
     const checksum = buildChecksum(payload);
     const envelope: LocalStorageEnvelope = {
@@ -420,7 +448,12 @@ export function loadProjectFromStorage(projectId: string): LoadedProject | null 
 
   if (primary) {
     const envelope = parseEnvelope(primary);
-    if (envelope && isEnvelopeValid(envelope)) {
+    if (
+      envelope &&
+      envelope.projectId === projectId &&
+      envelope.payload.project.projectId === projectId &&
+      isEnvelopeValid(envelope)
+    ) {
       return {
         payload: envelope.payload,
         source: 'primary',
@@ -437,7 +470,12 @@ export function loadProjectFromStorage(projectId: string): LoadedProject | null 
 
   if (backup) {
     const envelope = parseEnvelope(backup);
-    if (envelope && isEnvelopeValid(envelope)) {
+    if (
+      envelope &&
+      envelope.projectId === projectId &&
+      envelope.payload.project.projectId === projectId &&
+      isEnvelopeValid(envelope)
+    ) {
       try {
         localStorage.setItem('hvac-backup-recovered', 'true');
       } catch {
@@ -465,6 +503,25 @@ export function loadProjectFromStorage(projectId: string): LoadedProject | null 
 
 export function deleteProjectFromStorage(projectId: string): boolean {
   try {
+    const primary = localStorage.getItem(getProjectStorageKey(projectId));
+    const backup = localStorage.getItem(getProjectBackupKey(projectId));
+    if (primary || backup) {
+      const rawArchive = localStorage.getItem(DELETED_PROJECTS_STORAGE_ARCHIVE_KEY);
+      let archive: unknown = [];
+      try {
+        archive = rawArchive ? JSON.parse(rawArchive) : [];
+      } catch {
+        archive = [];
+      }
+      const entries = Array.isArray(archive) ? archive : [];
+      entries.push({
+        projectId,
+        deletedAt: new Date().toISOString(),
+        primary,
+        backup,
+      });
+      localStorage.setItem(DELETED_PROJECTS_STORAGE_ARCHIVE_KEY, JSON.stringify(entries));
+    }
     localStorage.removeItem(getProjectStorageKey(projectId));
     localStorage.removeItem(getProjectBackupKey(projectId));
     return true;

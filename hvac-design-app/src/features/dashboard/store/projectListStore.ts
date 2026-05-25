@@ -6,6 +6,11 @@ import { logger } from '@/utils/logger';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
 import { isTauri } from '@/core/persistence/filesystem';
 import { useStorageStore } from '@/core/store/storageStore';
+import {
+  DELETED_PROJECTS_STORAGE_ARCHIVE_KEY,
+  getProjectBackupKey,
+  getProjectStorageKey,
+} from '@/utils/storageKeys';
 
 export interface ProjectListItem {
   projectId: string;
@@ -69,6 +74,38 @@ function canonicalFilePath(projectId: string): string | undefined {
   return `${norm}/projects/${projectId}/project.sws`;
 }
 
+function archiveAndRemoveLocalProjectStorage(projectId: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const primaryKey = getProjectStorageKey(projectId);
+  const backupKey = getProjectBackupKey(projectId);
+  const primary = window.localStorage.getItem(primaryKey);
+  const backup = window.localStorage.getItem(backupKey);
+
+  if (primary || backup) {
+    const rawArchive = window.localStorage.getItem(DELETED_PROJECTS_STORAGE_ARCHIVE_KEY);
+    let parsedArchive: unknown = [];
+    try {
+      parsedArchive = rawArchive ? JSON.parse(rawArchive) : [];
+    } catch {
+      parsedArchive = [];
+    }
+    const entries = Array.isArray(parsedArchive) ? parsedArchive : [];
+    entries.push({
+      projectId,
+      deletedAt: new Date().toISOString(),
+      primary,
+      backup,
+    });
+    window.localStorage.setItem(DELETED_PROJECTS_STORAGE_ARCHIVE_KEY, JSON.stringify(entries));
+  }
+
+  window.localStorage.removeItem(primaryKey);
+  window.localStorage.removeItem(backupKey);
+}
+
 export const useProjectListStore = create<ProjectListStore>()(
   persist(
     (set, get) => ({
@@ -123,6 +160,7 @@ export const useProjectListStore = create<ProjectListStore>()(
             throw new Error(result.error || 'Failed to delete project');
           }
 
+          archiveAndRemoveLocalProjectStorage(projectId);
           logger.info('[ProjectListStore] Project deleted:', projectId);
         } catch (error) {
           logger.error('[ProjectListStore] Error removing project, rolling back:', error);

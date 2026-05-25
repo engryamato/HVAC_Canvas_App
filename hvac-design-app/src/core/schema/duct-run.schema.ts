@@ -110,6 +110,8 @@ const SharedDuctRunPropsSchema = z.object({
   insulationThickness: z.number().min(0.5).max(6).optional().describe('Insulation thickness in inches'),
   startEndType: DuctEndTypeSchema.optional(),
   endEndType: DuctEndTypeSchema.optional(),
+  previousRectangularWidth: z.number().min(4).max(96).optional().describe('Last rectangular width before round/flexible conversion'),
+  previousRectangularHeight: z.number().min(4).max(96).optional().describe('Last rectangular height before round/flexible conversion'),
   airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),
   staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
   installLength: z.number().min(0.1).max(1000).describe('Installed run length in feet'),

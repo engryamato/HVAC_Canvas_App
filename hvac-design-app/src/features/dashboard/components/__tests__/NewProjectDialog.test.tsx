@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NewProjectDialog } from '../NewProjectDialog';
+import { saveProjectToStorage } from '@/features/canvas/hooks/useAutoSave';
 
 // Mock dependencies
 vi.mock('next/navigation', () => ({
@@ -17,6 +18,7 @@ vi.mock('@/stores/useProjectStore', () => ({
 
 vi.mock('@/features/dashboard/store/projectListStore', () => ({
   useProjectListActions: () => ({
+    addProject: vi.fn(),
     refreshProjects: vi.fn(),
   }),
 }));
@@ -37,16 +39,37 @@ vi.mock('@/core/services/StorageRootService', () => ({
 
 vi.mock('@/core/schema/project-file.schema', () => ({
   createEmptyProject: (name: string) => ({
-    projectId: '',
+    schemaVersion: '2.0.0',
+    projectId: '00000000-0000-4000-8000-000000000000',
     projectName: name,
-    createdAt: '',
-    modifiedAt: '',
+    createdAt: '2025-01-01T00:00:00.000Z',
+    modifiedAt: '2025-01-01T00:00:00.000Z',
     isArchived: false,
     scope: {},
     siteConditions: {},
-    entities: { rooms: [], ducts: [], fittings: [], equipment: [] },
+    entities: { byId: {}, allIds: [] },
+    viewportState: { panX: 0, panY: 0, zoom: 1 },
+    settings: { unitSystem: 'imperial', gridSize: 12, gridVisible: true, snapToGrid: true },
+    commandHistory: { commands: [], currentIndex: 0 },
   }),
 }));
+
+vi.mock('@/features/canvas/hooks/useAutoSave', () => {
+  return {
+    createLocalStoragePayloadFromProjectFileWithDefaults: vi.fn((project) => ({
+      project,
+      selection: { selectedIds: [], hoveredId: null },
+      viewport: { panX: 0, panY: 0, zoom: 1, gridVisible: true, gridSize: 12, snapToGrid: true },
+      preferences: {},
+      settings: {},
+      projectIndex: { projects: [], recentProjectIds: [], loading: false },
+      legacyProjects: { projects: [] },
+      history: { past: [], future: [], maxSize: 100 },
+      uiState: {},
+    })),
+    saveProjectToStorage: vi.fn(() => ({ success: true })),
+  };
+});
 
 describe('NewProjectDialog', () => {
   const defaultProps = {
@@ -137,6 +160,27 @@ describe('NewProjectDialog', () => {
       fireEvent.change(nameInput, { target: { value: 'Office Building HVAC' } });
 
       expect(nameInput).toHaveProperty('value', 'Office Building HVAC');
+    });
+
+    it('initializes fresh canvas storage for the newly-created project', async () => {
+      vi.stubGlobal('crypto', { randomUUID: () => '11111111-1111-4111-8111-111111111111' });
+      render(<NewProjectDialog {...defaultProps} />);
+
+      fireEvent.change(screen.getByTestId('project-name-input'), { target: { value: 'Fresh Project' } });
+      fireEvent.click(screen.getByTestId('create-button'));
+
+      await waitFor(() => {
+        expect(saveProjectToStorage).toHaveBeenCalledWith(
+          '11111111-1111-4111-8111-111111111111',
+          expect.objectContaining({
+            project: expect.objectContaining({
+              projectId: '11111111-1111-4111-8111-111111111111',
+              projectName: 'Fresh Project',
+              entities: { byId: {}, allIds: [] },
+            }),
+          })
+        );
+      });
     });
   });
 

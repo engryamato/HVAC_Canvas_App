@@ -9,7 +9,7 @@ import { ErrorPage } from '@/components/error/ErrorPage';
 import { VersionWarningDialog } from '@/components/dialogs/VersionWarningDialog';
 import { MigrationWizard } from '@/components/dialogs/MigrationWizard';
 import { VersionDetector } from '@/core/services/migration/VersionDetector';
-import { type ProjectFile } from '@/core/schema/project-file.schema';
+import { createEmptyProject, type ProjectFile } from '@/core/schema/project-file.schema';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/utils/logger';
 import {
@@ -259,6 +259,21 @@ export function CanvasPageWrapper({ projectId }: CanvasPageWrapperProps) {
   function loadProject(persistedProject: any, storedPayload?: LocalStoragePayload) {
     const storedProject = storedPayload?.project;
     const resolvedProjectId = storedProject?.projectId ?? persistedProject?.id ?? projectId;
+    if (!storedPayload && persistedProject) {
+      const fallbackProject = createEmptyProject(persistedProject.name ?? 'Untitled Project', {
+        projectId: resolvedProjectId,
+        projectName: persistedProject.name ?? 'Untitled Project',
+        projectNumber: persistedProject.projectNumber || undefined,
+        clientName: persistedProject.clientName || undefined,
+        location: persistedProject.location || undefined,
+        scope: persistedProject.scope,
+        siteConditions: persistedProject.siteConditions,
+        isArchived: persistedProject.isArchived ?? false,
+        createdAt: persistedProject.createdAt ?? new Date().toISOString(),
+        modifiedAt: persistedProject.modifiedAt ?? new Date().toISOString(),
+      });
+      hydrateProject(fallbackProject);
+    }
 
     setProject(projectId, {
       projectId: resolvedProjectId,

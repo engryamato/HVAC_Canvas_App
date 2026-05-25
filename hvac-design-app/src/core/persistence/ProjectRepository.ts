@@ -5,7 +5,7 @@ import type { StorageAdapter } from './StorageAdapter';
 import { ensureStorageRootReady, getStorageRootService } from '../services/StorageRootService';
 import type { QuarantinedFile } from '../services/types';
 import { loadProject as loadProjectFromPath, saveProject as saveProjectToPath } from './projectIO';
-import { createDir, copyFile, exists, readDir, readTextFile, renameFile, removeFile, removePath } from './filesystem';
+import { createDir, copyFile, exists, readDir, readTextFile, renameFile, removeFile } from './filesystem';
 import { isTauri } from './filesystem';
 import { ProjectMetadataSchema } from '../schema/project-file.schema';
 
@@ -167,27 +167,16 @@ export class ProjectRepository extends EventTarget {
                     };
                 }
 
-                const { canonical } = resolved;
+                const { rootPath, canonical } = resolved;
                 try {
-                    const projectFile = canonical.projectFilePath;
-                    const backupFile = `${canonical.projectFilePath}.bak`;
-                    const thumbnailFile = this.joinPath(canonical.projectDir, 'thumbnail.png');
-                    const metadataFile = this.joinPath(canonical.projectDir, 'meta.json');
-                    const autosaveDir = this.joinPath(canonical.projectDir, '.autosave');
-
-                    const filesToDelete = [projectFile, backupFile, thumbnailFile, metadataFile];
-                    for (const filePath of filesToDelete) {
-                        if (await exists(filePath)) {
-                            await removeFile(filePath);
-                        }
-                    }
-
-                    if (await exists(autosaveDir)) {
-                        await removePath(autosaveDir, true);
-                    }
-
                     if (await exists(canonical.projectDir)) {
-                        await removePath(canonical.projectDir, true);
+                        const deletedProjectsDir = this.joinPath(rootPath, 'deleted-projects');
+                        await createDir(deletedProjectsDir, true);
+                        const archivedProjectDir = this.joinPath(
+                            deletedProjectsDir,
+                            `${this.deletedProjectTimestamp()}-${projectId}`
+                        );
+                        await renameFile(canonical.projectDir, archivedProjectDir);
                     }
 
                     result = { success: true };
@@ -455,6 +444,10 @@ export class ProjectRepository extends EventTarget {
             output = `${output}/${part.replace(/^[\\/]+/, '')}`;
         }
         return output;
+    }
+
+    private deletedProjectTimestamp(date = new Date()): string {
+        return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, '');
     }
 
     private getCanonicalProjectPaths(rootPath: string, projectId: string): { projectDir: string; projectFilePath: string } {

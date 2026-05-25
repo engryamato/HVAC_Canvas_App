@@ -9,6 +9,7 @@ import {
   createLocalStoragePayloadFromProjectFileWithDefaults,
   type LocalStoragePayload,
 } from '../useAutoSave';
+import { DELETED_PROJECTS_STORAGE_ARCHIVE_KEY } from '@/utils/storageKeys';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
@@ -143,6 +144,31 @@ describe('useAutoSave - Storage Functions', () => {
     expect(loaded?.source).toBe('primary');
   });
 
+  it('does not load another project from a mismatched storage envelope', () => {
+    const requestedProjectId = '11111111-1111-4111-8111-111111111111';
+    const otherProjectId = '22222222-2222-4222-8222-222222222222';
+    const result = saveProjectToStorage(otherProjectId, basePayload(otherProjectId));
+
+    localStorage.setItem(
+      `hvac-project-${requestedProjectId}`,
+      localStorage.getItem(`hvac-project-${otherProjectId}`) ?? ''
+    );
+
+    expect(result.success).toBe(true);
+    expect(loadProjectFromStorage(requestedProjectId)).toBeNull();
+  });
+
+  it('rejects saving a payload under a different project id', () => {
+    const projectId = '11111111-1111-4111-8111-111111111111';
+    const otherProjectId = '22222222-2222-4222-8222-222222222222';
+
+    const result = saveProjectToStorage(projectId, basePayload(otherProjectId));
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('does not match');
+    expect(localStorage.getItem(`hvac-project-${projectId}`)).toBeNull();
+  });
+
   it('should fall back to backup when primary is corrupted', () => {
     const projectId = '11111111-1111-4111-8111-111111111111';
     saveProjectToStorage(projectId, basePayload(projectId));
@@ -162,6 +188,25 @@ describe('useAutoSave - Storage Functions', () => {
 
     expect(result).toBe(true);
     expect(localStorage.getItem(`hvac-project-${projectId}`)).toBeNull();
+  });
+
+  it('archives deleted project storage with the rest of deleted project storage', () => {
+    const firstProjectId = '11111111-1111-4111-8111-111111111111';
+    const secondProjectId = '22222222-2222-4222-8222-222222222222';
+    saveProjectToStorage(firstProjectId, basePayload(firstProjectId));
+    saveBackupToStorage(secondProjectId, basePayload(secondProjectId));
+
+    deleteProjectFromStorage(firstProjectId);
+    deleteProjectFromStorage(secondProjectId);
+
+    const archive = JSON.parse(localStorage.getItem(DELETED_PROJECTS_STORAGE_ARCHIVE_KEY) ?? '[]');
+    expect(archive).toHaveLength(2);
+    expect(archive.map((entry: { projectId: string }) => entry.projectId)).toEqual([
+      firstProjectId,
+      secondProjectId,
+    ]);
+    expect(archive[0].primary).toContain(firstProjectId);
+    expect(archive[1].backup).toContain(secondProjectId);
   });
 });
 

@@ -14,6 +14,10 @@ import { useRouter } from 'next/navigation';
 import { createEmptyProject } from '@/core/schema/project-file.schema';
 import { getProjectRepository } from '@/core/persistence/ProjectRepository';
 import { ensureStorageRootReady } from '@/core/services/StorageRootService';
+import {
+    createLocalStoragePayloadFromProjectFileWithDefaults,
+    saveProjectToStorage,
+} from '@/features/canvas/hooks/useAutoSave';
 
 interface NewProjectDialogProps {
     open: boolean;
@@ -131,6 +135,12 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ open, onOpen
                 alert(`Failed to save project: ${saveResult.error || 'Unknown error'}`);
                 setIsLoading(false);
                 return;
+            }
+
+            const localPayload = createLocalStoragePayloadFromProjectFileWithDefaults(newProject);
+            const localStorageResult = saveProjectToStorage(newProject.projectId, localPayload);
+            if (!localStorageResult.success) {
+                console.warn('[NewProjectDialog] Failed to initialize local project storage:', localStorageResult.error);
             }
 
             addProjectToList({

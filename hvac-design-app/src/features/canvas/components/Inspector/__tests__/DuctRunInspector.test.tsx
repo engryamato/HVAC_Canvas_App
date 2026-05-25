@@ -10,6 +10,10 @@ vi.mock('@/core/commands/entityCommands', () => ({
   updateEntity: vi.fn(),
 }));
 
+function equivalentRoundDiameter(width: number, height: number): number {
+  return 1.3 * Math.pow(width * height, 0.625) / Math.pow(width + height, 0.25);
+}
+
 function createRun(): DuctRun {
   return {
     id: 'run-1',
@@ -63,7 +67,7 @@ describe('DuctRunInspector', () => {
   it('updates dimensions through sample stepper controls', () => {
     const run = createRun();
 
-    render(<DuctRunInspector entity={run} />);
+    const { unmount } = render(<DuctRunInspector entity={run} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Increase width' }));
 
@@ -83,8 +87,178 @@ describe('DuctRunInspector', () => {
     const [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
     const nextProps = update.props as DuctRun['props'];
     expect(nextProps.shape).toBe('round');
-    expect(nextProps.diameter).toBe(12);
+    expect(nextProps.diameter).toBeCloseTo(equivalentRoundDiameter(24, 12), 3);
     expect('width' in nextProps ? nextProps.width : undefined).toBeUndefined();
+  });
+
+  it('renames generated duct runs when the selected shape changes so the canvas label follows', () => {
+    const run = createRun();
+    run.props.name = 'Rectangular Duct Run 1';
+
+    const { unmount } = render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Round' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    const [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    const nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('round');
+    expect(nextProps.name).toBe('Round Duct Run 1');
+  });
+
+  it('preserves custom duct run names when the selected shape changes', () => {
+    const run = createRun();
+    run.props.name = 'Kitchen Supply Main';
+
+    render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Round' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    const [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    const nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('round');
+    expect(nextProps.name).toBe('Kitchen Supply Main');
+  });
+
+  it('uses equivalent round diameter and remembers rectangular size when switching shape families', () => {
+    const run = createRun();
+    run.props.width = 24;
+    run.props.height = 12;
+
+    const { unmount } = render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Round' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    let [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    let nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('round');
+    expect(nextProps.diameter).toBeCloseTo(equivalentRoundDiameter(24, 12), 3);
+    expect(nextProps.previousRectangularWidth).toBe(24);
+    expect(nextProps.previousRectangularHeight).toBe(12);
+
+    unmount();
+    vi.clearAllMocks();
+    run.props = {
+      ...run.props,
+      shape: 'round',
+      diameter: 18,
+      previousRectangularWidth: 24,
+      previousRectangularHeight: 12,
+      width: undefined,
+      height: undefined,
+    } as DuctRun['props'];
+
+    render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Rectangular' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('rectangular');
+    expect('width' in nextProps ? nextProps.width : undefined).toBe(24);
+    expect('height' in nextProps ? nextProps.height : undefined).toBe(12);
+  });
+
+  it('treats flexible as round geometry while preserving flexible shape type', () => {
+    const run = createRun();
+    run.props.width = 20;
+    run.props.height = 10;
+
+    const { unmount } = render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Flexible' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    let [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    let nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('flexible');
+    expect(nextProps.diameter).toBeCloseTo(equivalentRoundDiameter(20, 10), 3);
+    expect(nextProps.previousRectangularWidth).toBe(20);
+    expect(nextProps.previousRectangularHeight).toBe(10);
+
+    unmount();
+    vi.clearAllMocks();
+    run.props = {
+      ...run.props,
+      shape: 'round',
+      diameter: 17,
+      width: undefined,
+      height: undefined,
+    } as DuctRun['props'];
+
+    render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Flexible' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('flexible');
+    expect(nextProps.diameter).toBe(17);
+  });
+
+  it('offers every duct shape and hydrates the selected canvas duct from the shape buttons', () => {
+    const run = createRun();
+    run.props.name = 'Rectangular Duct Run 1';
+
+    render(<DuctRunInspector entity={run} />);
+
+    expect(screen.getByRole('radio', { name: 'Round' })).toBeDefined();
+    expect(screen.getByRole('radio', { name: 'Rectangular' })).toBeDefined();
+    expect(screen.getByRole('radio', { name: 'Flat Oval' })).toBeDefined();
+    expect(screen.getByRole('radio', { name: 'Flexible' })).toBeDefined();
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Flat Oval' }));
+
+    let [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    let nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('flat_oval');
+    expect(nextProps.name).toBe('Flat Oval Duct Run 1');
+    expect('width' in nextProps ? nextProps.width : undefined).toBe(24);
+    expect('height' in nextProps ? nextProps.height : undefined).toBe(12);
+    expect('diameter' in nextProps ? nextProps.diameter : undefined).toBeUndefined();
+
+    vi.clearAllMocks();
+    fireEvent.click(screen.getByRole('radio', { name: 'Flexible' }));
+
+    [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('flexible');
+    expect(nextProps.name).toBe('Flexible Duct Run 1');
+    expect(nextProps.material).toBe('flex');
+    expect(nextProps.diameter).toBeCloseTo(equivalentRoundDiameter(24, 12), 3);
+    expect('width' in nextProps ? nextProps.width : undefined).toBeUndefined();
+    expect('height' in nextProps ? nextProps.height : undefined).toBeUndefined();
+  });
+
+  it('hydrates rectangular shape back onto a selected round duct', () => {
+    const run = createRun();
+    run.props = {
+      ...run.props,
+      name: 'Round Duct Run 1',
+      shape: 'round',
+      diameter: 14,
+      previousRectangularWidth: 24,
+      previousRectangularHeight: 12,
+      width: undefined,
+      height: undefined,
+    } as DuctRun['props'];
+
+    render(<DuctRunInspector entity={run} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Rectangular' }));
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    const [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    const nextProps = update.props as DuctRun['props'];
+    expect(nextProps.shape).toBe('rectangular');
+    expect(nextProps.name).toBe('Rectangular Duct Run 1');
+    expect('width' in nextProps ? nextProps.width : undefined).toBe(24);
+    expect('height' in nextProps ? nextProps.height : undefined).toBe(12);
+    expect('diameter' in nextProps ? nextProps.diameter : undefined).toBeUndefined();
   });
 
   it('updates length from the sample length input', () => {

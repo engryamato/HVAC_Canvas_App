@@ -94,6 +94,18 @@ describe('DuctPropsSchema', () => {
     };
     expect(DuctPropsSchema.parse(withConnections)).toBeTruthy();
   });
+
+  it('preserves previous rectangular dimensions for round conversion memory', () => {
+    const result = DuctPropsSchema.parse({
+      ...DEFAULT_ROUND_DUCT_PROPS,
+      diameter: 18.28,
+      previousRectangularWidth: 24,
+      previousRectangularHeight: 12,
+    });
+
+    expect(result.previousRectangularWidth).toBe(24);
+    expect(result.previousRectangularHeight).toBe(12);
+  });
 });
 
 describe('DuctSchema', () => {
@@ -116,4 +128,3 @@ describe('DuctSchema', () => {
     expect(() => DuctSchema.parse({ ...validDuct, type: 'room' })).toThrow();
   });
 });
-

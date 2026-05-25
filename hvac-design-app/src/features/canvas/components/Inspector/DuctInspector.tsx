@@ -74,6 +74,51 @@ function formatHours(value: number): string {
   return `${value.toFixed(1)} hrs`;
 }
 
+function calculateEquivalentRoundDiameter(width: number, height: number): number {
+  return 1.3 * Math.pow(width * height, 0.625) / Math.pow(width + height, 0.25);
+}
+
+function getCurrentPrimarySize(props: Duct['props']): number {
+  if (typeof props.diameter === 'number') {
+    return props.diameter;
+  }
+
+  if (typeof props.width === 'number') {
+    return props.width;
+  }
+
+  if (typeof props.height === 'number') {
+    return props.height;
+  }
+
+  return DEFAULT_ROUND_DUCT_PROPS.diameter;
+}
+
+function getRectangularDimensions(props: Duct['props']): { width: number; height: number } | null {
+  if (typeof props.width === 'number' && typeof props.height === 'number') {
+    return {
+      width: props.width,
+      height: props.height,
+    };
+  }
+
+  return null;
+}
+
+function getPreviousRectangularDimensions(props: Duct['props']): { width: number; height: number } | null {
+  if (
+    typeof props.previousRectangularWidth === 'number' &&
+    typeof props.previousRectangularHeight === 'number'
+  ) {
+    return {
+      width: props.previousRectangularWidth,
+      height: props.previousRectangularHeight,
+    };
+  }
+
+  return null;
+}
+
 function getDuctSize(entity: Duct): string {
   if (entity.props.shape === 'round') {
     return `${entity.props.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter}"`;
@@ -284,21 +329,34 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
       }
 
       const previous = JSON.parse(JSON.stringify(current)) as Duct;
+      const primarySize = getCurrentPrimarySize(current.props);
+      const currentRectangularDimensions = getRectangularDimensions(current.props);
+      const previousRectangularDimensions = getPreviousRectangularDimensions(current.props);
+      const rememberedRectangularDimensions = currentRectangularDimensions ?? previousRectangularDimensions;
+      const equivalentRoundDiameter = currentRectangularDimensions
+        ? calculateEquivalentRoundDiameter(currentRectangularDimensions.width, currentRectangularDimensions.height)
+        : primarySize;
 
       const nextProps =
         shape === 'round'
           ? {
               ...current.props,
               shape: 'round' as const,
-              diameter: current.props.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter,
+              ...(rememberedRectangularDimensions
+                ? {
+                    previousRectangularWidth: rememberedRectangularDimensions.width,
+                    previousRectangularHeight: rememberedRectangularDimensions.height,
+                  }
+                : {}),
+              diameter: equivalentRoundDiameter,
               width: undefined,
               height: undefined,
             }
           : {
               ...current.props,
               shape: 'rectangular' as const,
-              width: current.props.width ?? DEFAULT_RECTANGULAR_DUCT_PROPS.width,
-              height: current.props.height ?? DEFAULT_RECTANGULAR_DUCT_PROPS.height,
+              width: rememberedRectangularDimensions?.width ?? DEFAULT_RECTANGULAR_DUCT_PROPS.width,
+              height: rememberedRectangularDimensions?.height ?? DEFAULT_RECTANGULAR_DUCT_PROPS.height,
               diameter: undefined,
             };
 

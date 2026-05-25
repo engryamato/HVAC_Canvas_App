@@ -141,6 +141,27 @@ describe('serialization', () => {
       });
     });
 
+    it('preserves rectangular conversion memory when hydrating legacy duct entities', () => {
+      const project = makeProject();
+      const duct = createDuct({ shape: 'round', diameter: 18, length: 12 });
+      duct.props = {
+        ...duct.props,
+        previousRectangularWidth: 24,
+        previousRectangularHeight: 12,
+      } as typeof duct.props;
+      project.entities.byId[duct.id] = duct;
+      project.entities.allIds = [duct.id];
+
+      const result = deserializeProject(JSON.stringify(project));
+
+      expect(result.success).toBe(true);
+      expect(result.data?.entities.byId[duct.id]?.type).toBe('duct_run');
+      expect(result.data?.entities.byId[duct.id]?.props).toMatchObject({
+        previousRectangularWidth: 24,
+        previousRectangularHeight: 12,
+      });
+    });
+
     it('should return error for invalid JSON', () => {
       const result = deserializeProject('not valid json');
 

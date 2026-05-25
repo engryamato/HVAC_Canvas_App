@@ -133,6 +133,19 @@ describe('DuctRunPropsSchema', () => {
     expect(result.engineeringSystem).toBe('boiler_flue');
   });
 
+  it('preserves previous rectangular dimensions for round and flexible conversion memory', () => {
+    const result = DuctRunPropsSchema.parse({
+      ...DEFAULT_ROUND_DUCT_RUN_PROPS,
+      shape: 'round',
+      diameter: 18.280498391113163,
+      previousRectangularWidth: 24,
+      previousRectangularHeight: 12,
+    });
+
+    expect(result.previousRectangularWidth).toBe(24);
+    expect(result.previousRectangularHeight).toBe(12);
+  });
+
   it('should reject round runs without diameter', () => {
     const invalid = { ...DEFAULT_ROUND_DUCT_RUN_PROPS, diameter: undefined };
     expect(() => DuctRunPropsSchema.parse(invalid)).toThrow();

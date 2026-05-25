@@ -28,6 +28,13 @@ const END_OPTIONS: Array<{ value: DuctEndType; label: string }> = [
   { value: 'coupled', label: 'Coupled' },
 ];
 
+const SHAPE_OPTIONS: Array<{ value: DuctRunShape; label: string }> = [
+  { value: 'round', label: 'Round' },
+  { value: 'rectangular', label: 'Rectangular' },
+  { value: 'flat_oval', label: 'Flat Oval' },
+  { value: 'flexible', label: 'Flexible' },
+];
+
 function getEndTypeLabel(value: DuctEndType): string {
   return END_OPTIONS.find((option) => option.value === value)?.label ?? value;
 }
@@ -63,16 +70,32 @@ function formatNumber(value: number, digits = 0): string {
 }
 
 function getShapeBadgeClass(shape: DuctRunShape): string {
-  return shape === 'round' || shape === 'flexible'
-    ? 'border-blue-200 bg-blue-50 text-blue-700'
-    : 'border-purple-200 bg-purple-50 text-purple-700';
+  if (shape === 'round') {
+    return 'border-blue-200 bg-blue-50 text-blue-700';
+  }
+
+  if (shape === 'flexible') {
+    return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+  }
+
+  if (shape === 'flat_oval') {
+    return 'border-amber-200 bg-amber-50 text-amber-700';
+  }
+
+  return 'border-purple-200 bg-purple-50 text-purple-700';
 }
 
 function getShapeBadgeLabel(shape: DuctRunShape): string {
-  if (shape === 'round' || shape === 'flexible') {
-    return 'Round';
+  return SHAPE_OPTIONS.find((option) => option.value === shape)?.label ?? 'Rectangular';
+}
+
+function getShapeRunName(shape: DuctRunShape, currentName: string): string {
+  const generatedNameMatch = /^(Rectangular|Round|Flat Oval|Flexible) Duct Run (.+)$/.exec(currentName);
+  if (!generatedNameMatch) {
+    return currentName;
   }
-  return 'Rectangular';
+
+  return `${getShapeBadgeLabel(shape)} Duct Run ${generatedNameMatch[2]}`;
 }
 
 function getRunDefaults(entity: DuctRun) {
@@ -82,6 +105,75 @@ function getRunDefaults(entity: DuctRun) {
     startEndType: entity.props.startEndType,
     endEndType: entity.props.endEndType,
   };
+}
+
+function sanitizeRunDefaultsForShape(shape: DuctRunShape, entity: DuctRun) {
+  const defaults = getRunDefaults(entity);
+
+  if (shape !== 'flexible' || !defaults.insulationType || defaults.insulationType === 'wrap') {
+    return defaults;
+  }
+
+  return { ...defaults, insulationType: undefined };
+}
+
+function getDuctMaterialForShape(shape: DuctRunShape, currentMaterial: DuctRun['props']['material']): DuctRun['props']['material'] {
+  if (shape === 'flexible') {
+    return 'flex';
+  }
+
+  return currentMaterial === 'flex' ? 'galvanized' : currentMaterial;
+}
+
+function calculateEquivalentRoundDiameter(width: number, height: number): number {
+  return 1.3 * Math.pow(width * height, 0.625) / Math.pow(width + height, 0.25);
+}
+
+function getCurrentPrimarySize(props: DuctRun['props']): number {
+  const dimensions = props as Record<string, unknown>;
+
+  if (typeof dimensions.diameter === 'number') {
+    return dimensions.diameter;
+  }
+
+  if (typeof dimensions.width === 'number') {
+    return dimensions.width;
+  }
+
+  if (typeof dimensions.height === 'number') {
+    return dimensions.height;
+  }
+
+  return 12;
+}
+
+function getRectangularDimensions(props: DuctRun['props']): { width: number; height: number } | null {
+  const dimensions = props as Record<string, unknown>;
+
+  if (typeof dimensions.width === 'number' && typeof dimensions.height === 'number') {
+    return {
+      width: dimensions.width,
+      height: dimensions.height,
+    };
+  }
+
+  return null;
+}
+
+function getPreviousRectangularDimensions(props: DuctRun['props']): { width: number; height: number } | null {
+  const dimensions = props as Record<string, unknown>;
+
+  if (
+    typeof dimensions.previousRectangularWidth === 'number' &&
+    typeof dimensions.previousRectangularHeight === 'number'
+  ) {
+    return {
+      width: dimensions.previousRectangularWidth,
+      height: dimensions.previousRectangularHeight,
+    };
+  }
+
+  return null;
 }
 
 function SectionHeader({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
@@ -261,30 +353,50 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
     } as DuctRun['props']);
   };
 
-  const setShape = (shape: 'round' | 'rectangular') => {
+  const setShape = (shape: DuctRunShape) => {
     if (shape === entity.props.shape) {
       return;
     }
 
+    const defaults = sanitizeRunDefaultsForShape(shape, entity);
     const baseProps = {
       ...entity.props,
       shape,
-      segments: recomputeDuctRunSegments(entity.props.installLength, activeSectionLength, getRunDefaults(entity)),
+      name: getShapeRunName(shape, entity.props.name),
+      material: getDuctMaterialForShape(shape, entity.props.material),
+      insulationType: defaults.insulationType,
+      insulationThickness: defaults.insulationThickness,
+      startEndType: defaults.startEndType,
+      endEndType: defaults.endEndType,
+      segments: recomputeDuctRunSegments(entity.props.installLength, activeSectionLength, defaults),
     };
-    const nextProps =
-      shape === 'round'
-        ? ({
-            ...baseProps,
-            diameter: 'diameter' in entity.props ? entity.props.diameter : 12,
-            width: undefined,
-            height: undefined,
-          } as DuctRun['props'])
-        : ({
-            ...baseProps,
-            width: 'width' in entity.props ? entity.props.width : 12,
-            height: 'height' in entity.props ? entity.props.height : 8,
-            diameter: undefined,
-          } as DuctRun['props']);
+    const primarySize = getCurrentPrimarySize(entity.props);
+    const currentRectangularDimensions = getRectangularDimensions(entity.props);
+    const previousRectangularDimensions = getPreviousRectangularDimensions(entity.props);
+    const rememberedRectangularDimensions = currentRectangularDimensions ?? previousRectangularDimensions;
+    const equivalentRoundDiameter = currentRectangularDimensions
+      ? calculateEquivalentRoundDiameter(currentRectangularDimensions.width, currentRectangularDimensions.height)
+      : primarySize;
+
+    const nextProps = shape === 'round' || shape === 'flexible'
+      ? ({
+          ...baseProps,
+          ...(rememberedRectangularDimensions
+            ? {
+                previousRectangularWidth: rememberedRectangularDimensions.width,
+                previousRectangularHeight: rememberedRectangularDimensions.height,
+              }
+            : {}),
+          diameter: shape === 'flexible' ? Math.min(24, equivalentRoundDiameter) : equivalentRoundDiameter,
+          width: undefined,
+          height: undefined,
+        } as DuctRun['props'])
+      : ({
+          ...baseProps,
+          width: rememberedRectangularDimensions?.width ?? primarySize,
+          height: rememberedRectangularDimensions?.height ?? primarySize,
+          diameter: undefined,
+        } as DuctRun['props']);
 
     updateRun(nextProps);
   };
@@ -314,29 +426,25 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
       <Card>
         <SectionHeader icon={Ruler}>Dimensions</SectionHeader>
 
-        <div className="mb-3 flex rounded-md border border-slate-200 bg-slate-100 p-0.5" role="radiogroup" aria-label="Duct shape">
-          <button
-            aria-checked={isRound}
-            className={`flex-1 rounded-[6px] py-1.5 text-[11px] font-medium transition ${
-              isRound ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
-            }`}
-            role="radio"
-            type="button"
-            onClick={() => setShape('round')}
-          >
-            Round
-          </button>
-          <button
-            aria-checked={!isRound}
-            className={`flex-1 rounded-[6px] py-1.5 text-[11px] font-medium transition ${
-              !isRound ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
-            }`}
-            role="radio"
-            type="button"
-            onClick={() => setShape('rectangular')}
-          >
-            Rectangular
-          </button>
+        <div className="mb-3 grid grid-cols-2 gap-1 rounded-md border border-slate-200 bg-slate-100 p-0.5" role="radiogroup" aria-label="Duct shape">
+          {SHAPE_OPTIONS.map((option) => {
+            const isActive = entity.props.shape === option.value;
+
+            return (
+              <button
+                key={option.value}
+                aria-checked={isActive}
+                className={`rounded-[6px] py-1.5 text-[11px] font-medium transition ${
+                  isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+                }`}
+                role="radio"
+                type="button"
+                onClick={() => setShape(option.value)}
+              >
+                {option.label}
+              </button>
+            );
+          })}
         </div>
 
         {isRound ? (

@@ -91,6 +91,18 @@ const SharedDuctPropsSchema = z
       .max(96)
       .optional()
       .describe('Height in inches (rectangular ducts only)'),
+    previousRectangularWidth: z
+      .number()
+      .min(4)
+      .max(96)
+      .optional()
+      .describe('Last rectangular width before round conversion'),
+    previousRectangularHeight: z
+      .number()
+      .min(4)
+      .max(96)
+      .optional()
+      .describe('Last rectangular height before round conversion'),
     length: z.number().min(0.1).max(1000).describe('Length in feet'),
     material: DuctMaterialSchema,
     airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),

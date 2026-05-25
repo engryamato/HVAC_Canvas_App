@@ -35,11 +35,13 @@ describe('ProjectRepository', () => {
     localStorage.clear();
     vi.mocked(filesystem.isTauri).mockReturnValue(true);
     vi.mocked(filesystem.exists).mockImplementation(async () => true);
+    vi.mocked(filesystem.createDir).mockResolvedValue(undefined);
+    vi.mocked(filesystem.renameFile).mockResolvedValue(undefined);
     vi.mocked(filesystem.removeFile).mockResolvedValue(undefined);
     vi.mocked(filesystem.removePath).mockResolvedValue(undefined);
   });
 
-  it('deletes canonical tauri project files and prunes project index', async () => {
+  it('archives canonical tauri project storage and prunes project index', async () => {
     localStorage.setItem(
       'sws.projectIndex',
       JSON.stringify({
@@ -54,12 +56,13 @@ describe('ProjectRepository', () => {
     const result = await repository.deleteProject('proj-1');
 
     expect(result.success).toBe(true);
-    expect(filesystem.removeFile).toHaveBeenCalledWith('/root/projects/proj-1/project.sws');
-    expect(filesystem.removeFile).toHaveBeenCalledWith('/root/projects/proj-1/project.sws.bak');
-    expect(filesystem.removeFile).toHaveBeenCalledWith('/root/projects/proj-1/thumbnail.png');
-    expect(filesystem.removeFile).toHaveBeenCalledWith('/root/projects/proj-1/meta.json');
-    expect(filesystem.removePath).toHaveBeenCalledWith('/root/projects/proj-1/.autosave', true);
-    expect(filesystem.removePath).toHaveBeenCalledWith('/root/projects/proj-1', true);
+    expect(filesystem.createDir).toHaveBeenCalledWith('/root/deleted-projects', true);
+    expect(filesystem.renameFile).toHaveBeenCalledWith(
+      '/root/projects/proj-1',
+      expect.stringMatching(/^\/root\/deleted-projects\/\d{8}T\d{6}-proj-1$/)
+    );
+    expect(filesystem.removeFile).not.toHaveBeenCalled();
+    expect(filesystem.removePath).not.toHaveBeenCalled();
 
     const parsed = JSON.parse(localStorage.getItem('sws.projectIndex') ?? '{}');
     expect(parsed.state.projects).toEqual([]);

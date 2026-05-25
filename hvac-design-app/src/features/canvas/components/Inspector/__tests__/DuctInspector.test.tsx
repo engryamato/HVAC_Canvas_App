@@ -24,6 +24,10 @@ vi.mock('@/core/services/parametric/parametricUpdateService', async () => {
   };
 });
 
+function equivalentRoundDiameter(width: number, height: number): number {
+  return 1.3 * Math.pow(width * height, 0.625) / Math.pow(width + height, 0.25);
+}
+
 function createDuct(overrides: Partial<Duct['props']> = {}): Duct {
   return {
     id: '00000000-0000-4000-8000-000000000111',
@@ -199,5 +203,42 @@ describe('DuctInspector Milestone 4 behavior', () => {
     expect(screen.queryByRole('button', { name: /Apply Fix/i })).toBeNull();
     expect(screen.getByText(/Velocity 3200 FPM exceeds maximum 2500 FPM/)).toBeInTheDocument();
     expect(scheduleMock).not.toHaveBeenCalled();
+  });
+
+  it('remembers rectangular dimensions when switching to round and restores them when switching back', async () => {
+    const rectangularDuct = createDuct({
+      name: 'Rectangular Duct 1',
+      shape: 'rectangular',
+      width: 24,
+      height: 12,
+      diameter: undefined,
+    });
+
+    useEntityStore.getState().addEntity(rectangularDuct);
+    const { unmount } = render(<DuctInspector entity={rectangularDuct} />);
+
+    fireEvent.change(screen.getByLabelText('Shape'), { target: { value: 'round' } });
+
+    await waitFor(() => {
+      const stored = useEntityStore.getState().byId[rectangularDuct.id] as Duct;
+      expect(stored.props.shape).toBe('round');
+      expect(stored.props.diameter).toBeCloseTo(equivalentRoundDiameter(24, 12), 3);
+      expect(stored.props.previousRectangularWidth).toBe(24);
+      expect(stored.props.previousRectangularHeight).toBe(12);
+    });
+
+    const roundDuct = useEntityStore.getState().byId[rectangularDuct.id] as Duct;
+    unmount();
+    render(<DuctInspector entity={roundDuct} />);
+
+    fireEvent.change(screen.getByLabelText('Shape'), { target: { value: 'rectangular' } });
+
+    await waitFor(() => {
+      const stored = useEntityStore.getState().byId[rectangularDuct.id] as Duct;
+      expect(stored.props.shape).toBe('rectangular');
+      expect(stored.props.width).toBe(24);
+      expect(stored.props.height).toBe(12);
+      expect(stored.props.diameter).toBeUndefined();
+    });
   });
 });
