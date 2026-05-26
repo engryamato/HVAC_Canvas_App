@@ -10,7 +10,7 @@ describe('Canvas RightSidebar - Floating Inspector Integration', () => {
   beforeEach(() => {
     localStorage.removeItem('sws.inspector-preferences');
 
-    useLayoutStore.setState({ rightSidebarCollapsed: false, activeRightTab: 'properties' });
+    useLayoutStore.setState({ rightSidebarCollapsed: false, activeRightTab: 'properties', rightSidebarWidth: 320 });
     useProjectStore.setState({
       currentProjectId: '11111111-1111-4111-8111-111111111111',
       projectDetails: {
@@ -64,5 +64,18 @@ describe('Canvas RightSidebar - Floating Inspector Integration', () => {
     const panel = screen.getByTestId('properties-panel');
     expect(within(panel).getByText('Inspector is floating. Click Dock to return.')).toBeDefined();
   });
-});
 
+  it('resizes when dragging the left edge', () => {
+    render(<RightSidebar />);
+
+    const sidebar = screen.getByTestId('right-sidebar');
+    const handle = screen.getByRole('separator', { name: 'Resize right sidebar' });
+
+    fireEvent.mouseDown(handle, { clientX: 900 });
+    fireEvent.mouseMove(window, { clientX: 820 });
+    fireEvent.mouseUp(window);
+
+    expect(useLayoutStore.getState().rightSidebarWidth).toBe(400);
+    expect(sidebar).toHaveStyle({ width: '400px' });
+  });
+});

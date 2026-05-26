@@ -19,8 +19,11 @@ vi.mock('../EquipmentInspector', () => ({
 vi.mock('../FittingInspector', () => ({
   default: () => <div data-testid="fitting-inspector">FittingInspector</div>,
 }));
-vi.mock('../CanvasPropertiesInspector', () => ({
-  CanvasPropertiesInspector: () => <div data-testid="canvas-inspector">CanvasInspector</div>,
+vi.mock('../InspectorOverviewPanel', () => ({
+  InspectorOverviewPanel: () => <div data-testid="inspector-overview">InspectorOverviewPanel</div>,
+}));
+vi.mock('../useInspectorOverviewData', () => ({
+  useInspectorOverviewData: () => ({ project: { name: 'Test' } }),
 }));
 
 vi.mock('../../../store/selectionStore', () => ({
@@ -73,12 +76,12 @@ describe('InspectorPanel', () => {
     expect(onFloat).toHaveBeenCalledTimes(1);
   });
 
-  it('renders CanvasInspector when no selection', () => {
+  it('renders InspectorOverviewPanel when no selection', () => {
     mockSelection([]);
     mockEntities({});
 
     render(<InspectorPanel />);
-    expect(screen.getByTestId('canvas-inspector')).toBeDefined();
+    expect(screen.getByTestId('inspector-overview')).toBeDefined();
   });
 
   it('renders multi-selection state', () => {

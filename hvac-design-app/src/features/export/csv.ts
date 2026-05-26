@@ -74,34 +74,146 @@ function formatShapeLabel(shape: string): string {
   }
 }
 
+function toWholeNumber(value: unknown): number | null {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return null;
+  }
+  return Math.round(numeric);
+}
+
+function formatWholeInches(value: unknown): string {
+  const wholeValue = toWholeNumber(value);
+  return wholeValue === null ? '' : `${wholeValue}"`;
+}
+
+function formatWholeFeet(value: unknown): string {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return '';
+  }
+  const wholeValue = numeric > 0 ? Math.max(1, Math.round(numeric)) : Math.round(numeric);
+  return `${wholeValue}'`;
+}
+
+function formatNumber(value: unknown): string {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return '';
+  }
+  return Number.isInteger(numeric)
+    ? String(numeric)
+    : numeric.toFixed(2).replace(/\.?0+$/, '');
+}
+
+function formatNumberInches(value: unknown): string {
+  const formatted = formatNumber(value);
+  return formatted ? `${formatted}"` : '';
+}
+
+function formatTitleLabel(value: unknown, separator = ''): string {
+  const raw = String(value ?? '').trim();
+  if (!raw) {
+    return '';
+  }
+  return raw
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\s+/g, separator);
+}
+
+function formatDuctSize(props: Record<string, unknown>): string {
+  const shape = String(props.shape ?? '');
+  if (shape === 'round' || shape === 'flexible') {
+    const diameter = formatWholeInches(props.diameter);
+    return diameter ? `⌀${diameter}` : '';
+  }
+  if (shape === 'rectangular' || shape === 'flat_oval') {
+    const width = formatWholeInches(props.width);
+    const height = formatWholeInches(props.height);
+    return width && height ? `${width}x${height}` : '';
+  }
+  return '';
+}
+
+function formatEndTypeLabel(value: unknown): string {
+  return formatTitleLabel(value, '-');
+}
+
+function formatEndTypes(props: Record<string, unknown>, defaults?: { inlet: string; outlet: string }): string {
+  const inlet = formatEndTypeLabel(
+    props.startEndType ?? props.inletEndType ?? props.inletType ?? props.inlet ?? defaults?.inlet
+  );
+  const outlet = formatEndTypeLabel(
+    props.endEndType ?? props.outletEndType ?? props.outletType ?? props.outlet ?? defaults?.outlet
+  );
+  if (!inlet && !outlet) {
+    return '';
+  }
+  if (inlet === outlet) {
+    return `${inlet} Ends`;
+  }
+  return `${inlet || '-'} by ${outlet || '-'} End`;
+}
+
+function formatInsulation(props: Record<string, unknown>): string {
+  const insulationType = String(props.insulationType ?? '').trim();
+  if (!insulationType) {
+    return '';
+  }
+  const insulationThickness = formatNumberInches(props.insulationThickness);
+  if (insulationType === 'wrap' || insulationType === 'wrapped') {
+    return [insulationThickness, 'Wrapper'].filter(Boolean).join(' ');
+  }
+  if (insulationType === 'liner' || insulationType === 'lined') {
+    return [insulationThickness, 'Liner'].filter(Boolean).join(' ');
+  }
+  if (insulationType === 'double_wall_perforated') {
+    return ['Double Wall Perforated', insulationThickness].filter(Boolean).join(' ');
+  }
+  if (insulationType === 'double_wall_non_perforated') {
+    return ['Double Wall Non-Perforated', insulationThickness].filter(Boolean).join(' ');
+  }
+  return [formatTitleLabel(insulationType, ' '), insulationThickness].filter(Boolean).join(' ');
+}
+
+interface DuctBomMetadata {
+  shape: string;
+  shapeLabel: string;
+  size: string;
+  endTypes: string;
+  insulation: string;
+}
+
+function getDuctBomMetadata(props: Record<string, unknown>, defaultEnds = false): DuctBomMetadata {
+  const shape = String(props.shape ?? '');
+  return {
+    shape,
+    shapeLabel: formatShapeLabel(shape),
+    size: formatDuctSize(props),
+    endTypes: formatEndTypes(props, defaultEnds ? { inlet: 'flange', outlet: 'flange' } : undefined),
+    insulation: formatInsulation(props),
+  };
+}
+
 /**
  * Duct / duct_run description.
- * Format: "<Shape> Duct <size> × <length>"
- * Example: "Rectangular Duct 12\" × 8\" × 5'"
+ * Format: "<Size>x<Length> <Shape> Duct <Ends> <Insulation>"
+ * Example: "12\"x8\"x5' Rectangular Duct Flange Ends"
  */
 function formatDuctDescription(props: Record<string, unknown>): string {
-  const shape = String(props.shape ?? '');
-  const shapeLabel = formatShapeLabel(shape) || 'Duct';
+  const metadata = getDuctBomMetadata(props, true);
+  const rawLength = props.length ?? props.installLength;
+  const length = formatWholeFeet(rawLength);
+  const sizeAndLength = [metadata.size, length].filter(Boolean).join('x');
 
-  let sizeStr = '';
-  if (shape === 'round' || shape === 'flexible') {
-    sizeStr = props.diameter != null ? `${props.diameter}"` : '';
-  } else if (shape === 'rectangular' || shape === 'flat_oval') {
-    sizeStr =
-      props.width != null && props.height != null
-        ? `${props.width}" × ${props.height}"`
-        : '';
-  }
-
-  // installLength (duct_run) or length (legacy duct) — both in feet
-  const rawLength = props.installLength ?? props.length;
-  const lengthStr = rawLength != null ? `${rawLength}'` : '';
-
-  const label = `${shapeLabel} Duct`;
-  if (sizeStr && lengthStr) return `${label} ${sizeStr} × ${lengthStr}`;
-  if (sizeStr) return `${label} ${sizeStr}`;
-  if (lengthStr) return `${label} ${lengthStr}`;
-  return label;
+  return [
+    sizeAndLength,
+    metadata.shapeLabel,
+    'Duct',
+    metadata.endTypes,
+    metadata.insulation,
+  ].filter(Boolean).join(' ');
 }
 
 /**
@@ -114,7 +226,9 @@ function formatFittingDescription(props: Record<string, unknown>, shape = ''): s
   const shapeLabel = formatShapeLabel(shape);
 
   // Prefer explicit angle prop; fall back to type-encoded angle
-  const rawAngle = props.angle != null ? Math.round(Number(props.angle)) : null;
+  const rawAngle = props.angle !== null && props.angle !== undefined
+    ? Math.round(Number(props.angle))
+    : null;
 
   // Elbow variants
   if (fittingType === 'elbow_90' || fittingType === 'elbow_45') {
@@ -125,7 +239,7 @@ function formatFittingDescription(props: Record<string, unknown>, shape = ''): s
     return [shapeLabel, 'Mitered Elbow'].filter(Boolean).join(' ');
   }
   // Generic elbow_ prefix with a stored angle
-  if (fittingType.startsWith('elbow_') && rawAngle != null) {
+  if (fittingType.startsWith('elbow_') && rawAngle !== null) {
     return [shapeLabel, `${rawAngle}° Elbow`].filter(Boolean).join(' ');
   }
 
@@ -136,8 +250,10 @@ function formatFittingDescription(props: Record<string, unknown>, shape = ''): s
     reducer_tapered:            'Tapered Reducer',
     reducer_eccentric:          'Eccentric Reducer',
     cap:                        'Cap',
-    transition_square_to_round: 'Square-to-Round Transition',
-    end_boot:                   'End Boot',
+    transition_square_to_round: 'Transition',
+    end_boot:                   'Register Boot',
+    cross:                      'Cross',
+    offset:                     'Offset',
   };
 
   const label =
@@ -145,6 +261,63 @@ function formatFittingDescription(props: Record<string, unknown>, shape = ''): s
     (fittingType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) || 'Fitting');
 
   return [shapeLabel, label].filter(Boolean).join(' ');
+}
+
+function formatFittingBomDescription(
+  props: Record<string, unknown>,
+  ductMetadata?: DuctBomMetadata
+): { description: string; specifications: string } {
+  const transitionData = props.transitionData as Record<string, unknown> | undefined;
+  const shape = ductMetadata?.shape || String(transitionData?.fromShape ?? '');
+  const base = formatFittingDescription(props, shape);
+  const fittingType = String(props.fittingType ?? '');
+
+  let size = ductMetadata?.size ?? '';
+  if (!size && transitionData) {
+    size =
+      transitionData.fromDiameter !== null && transitionData.fromDiameter !== undefined
+        ? `⌀${formatWholeInches(transitionData.fromDiameter)}`
+        : transitionData.fromWidth !== null &&
+            transitionData.fromWidth !== undefined &&
+            transitionData.fromHeight !== null &&
+            transitionData.fromHeight !== undefined
+          ? `${formatWholeInches(transitionData.fromWidth)}x${formatWholeInches(transitionData.fromHeight)}`
+          : '';
+  }
+
+  const fromShape = String(transitionData?.fromShape ?? shape);
+  const toShape = String(transitionData?.toShape ?? '');
+  const toSize = transitionData
+    ? transitionData.toDiameter !== null && transitionData.toDiameter !== undefined
+      ? `⌀${formatWholeInches(transitionData.toDiameter)}`
+      : transitionData.toWidth !== null &&
+          transitionData.toWidth !== undefined &&
+          transitionData.toHeight !== null &&
+          transitionData.toHeight !== undefined
+        ? `${formatWholeInches(transitionData.toWidth)}x${formatWholeInches(transitionData.toHeight)}`
+        : ''
+    : '';
+  const transitionPrefix = transitionData && toSize
+    ? fromShape === toShape
+      ? `${size} to ${toSize} ${formatShapeLabel(fromShape)}`
+      : `${size} ${formatShapeLabel(fromShape)} to ${toSize} ${formatShapeLabel(toShape)}`
+    : '';
+  const fittingLabel = fittingType === 'reducer' || fittingType.startsWith('reducer_')
+    ? base.replace(formatShapeLabel(shape), '').trim()
+    : fittingType === 'transition_square_to_round' || (transitionData && toSize)
+      ? 'Transition'
+      : base.replace(formatShapeLabel(shape), '').trim();
+  const endTypes = formatEndTypes(props) || ductMetadata?.endTypes;
+  const insulation = formatInsulation(props) || ductMetadata?.insulation;
+
+  const description = transitionPrefix
+    ? [transitionPrefix, fittingLabel, endTypes, insulation].filter(Boolean).join(' ')
+    : [size, formatShapeLabel(shape), fittingLabel, endTypes, insulation].filter(Boolean).join(' ');
+
+  return {
+    description: description || base,
+    specifications: size,
+  };
 }
 
 function formatEquipmentDescription(props: Record<string, unknown>): string {
@@ -166,15 +339,17 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
     .map((id) => entities.byId[id])
     .filter((e): e is Record<string, unknown> => e !== undefined);
 
-  // Build a quick shape lookup: entityId → shape string
+  // Build quick duct lookups used to derive fitting descriptions.
   // Used to derive fitting shapes from connected duct runs.
-  const shapeByEntityId = new Map<string, string>();
+  const ductMetadataByEntityId = new Map<string, DuctBomMetadata>();
   entityList.forEach((entity) => {
     const t = String(entity.type ?? '');
     if (t === 'duct_run' || t === 'duct') {
       const id = String(entity.id ?? '');
-      const shape = String((entity.props as Record<string, unknown> ?? {}).shape ?? '');
-      if (id && shape) shapeByEntityId.set(id, shape);
+      const metadata = getDuctBomMetadata((entity.props as Record<string, unknown>) ?? {}, true);
+      if (id && metadata.shape) {
+        ductMetadataByEntityId.set(id, metadata);
+      }
     }
   });
 
@@ -190,45 +365,51 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
     switch (entityType) {
       case 'duct_run':
       case 'duct': {
-        const description = formatDuctDescription(props);
-        const shape = String(props.shape ?? '');
-        let sizeStr = '';
-        if (shape === 'round' || shape === 'flexible') {
-          sizeStr = props.diameter != null ? `${props.diameter}"` : '';
-        } else if (shape === 'rectangular' || shape === 'flat_oval') {
-          sizeStr =
-            props.width != null && props.height != null
-              ? `${props.width}" × ${props.height}"`
-              : '';
+        const sizeStr = formatDuctSize(props);
+        const segments = Array.isArray(props.segments) ? props.segments : [];
+        const segmentSources = segments.length > 0 ? segments : [null];
+        for (const segment of segmentSources) {
+          const segmentProps = segment && typeof segment === 'object' && !Array.isArray(segment)
+            ? { ...props, ...(segment as Record<string, unknown>) }
+            : props;
+          const description = formatDuctDescription(segmentProps);
+          rawItems.push({
+            entityId,
+            name: description,
+            type: 'Duct',
+            description,
+            quantity: 1,
+            unit: 'EA',
+            specifications: sizeStr,
+          });
         }
-        rawItems.push({
-          entityId,
-          name: description,
-          type: 'Duct',
-          description,
-          quantity: 1,
-          unit: 'EA',
-          specifications: sizeStr,
-        });
         break;
       }
       case 'fitting': {
-        // Derive shape from transitionData, connectionPoints, or inletDuctId
+        // Derive metadata from transitionData, connectionPoints, or inletDuctId.
         const transitionData = props.transitionData as Record<string, unknown> | undefined;
-        let fittingShape = '';
-        if (transitionData?.fromShape) {
-          fittingShape = String(transitionData.fromShape);
-        } else {
+        let ductMetadata: DuctBomMetadata | undefined;
+        if (!transitionData?.fromShape) {
           const connectionPoints = props.connectionPoints as Array<{ ductId: string }> | undefined;
           if (connectionPoints && connectionPoints.length > 0) {
-            fittingShape = shapeByEntityId.get(connectionPoints[0].ductId) ?? '';
+            ductMetadata = ductMetadataByEntityId.get(connectionPoints[0].ductId);
           }
-          if (!fittingShape && props.inletDuctId) {
-            fittingShape = shapeByEntityId.get(String(props.inletDuctId)) ?? '';
+          if (!ductMetadata && props.inletDuctId) {
+            ductMetadata = ductMetadataByEntityId.get(String(props.inletDuctId));
           }
+          if (!ductMetadata && props.outletDuctId) {
+            ductMetadata = ductMetadataByEntityId.get(String(props.outletDuctId));
+          }
+        } else {
+          ductMetadata = getDuctBomMetadata({
+            shape: transitionData.fromShape,
+            diameter: transitionData.fromDiameter,
+            width: transitionData.fromWidth,
+            height: transitionData.fromHeight,
+          });
         }
 
-        const description = formatFittingDescription(props, fittingShape);
+        const { description, specifications } = formatFittingBomDescription(props, ductMetadata);
         rawItems.push({
           entityId,
           name: description,
@@ -236,7 +417,7 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
           description,
           quantity: 1,
           unit: 'EA',
-          specifications: '',
+          specifications,
         });
         break;
       }

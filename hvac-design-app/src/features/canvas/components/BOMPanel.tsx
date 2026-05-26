@@ -91,11 +91,15 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
   );
 
   const costByItemNumber = useMemo<Map<number, ItemCost> | null>(() => {
-    if (!costEstimate || costEstimate.items.length === 0) return null;
+    if (!costEstimate || costEstimate.items.length === 0) {
+      return null;
+    }
     const map = new Map<number, ItemCost>();
     for (const cost of costEstimate.items) {
       const num = parseInt(cost.bomItemId.replace('bom-', ''), 10);
-      if (!isNaN(num)) map.set(num, cost);
+      if (!isNaN(num)) {
+        map.set(num, cost);
+      }
     }
     return map;
   }, [costEstimate]);
@@ -103,7 +107,9 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
   const hasCostData = costByItemNumber !== null;
 
   useEffect(() => {
-    if (!filterOpen) return;
+    if (!filterOpen) {
+      return;
+    }
     const onMouseDown = (e: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
         setFilterOpen(false);
@@ -116,8 +122,12 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
   const filteredItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     return all.filter((item) => {
-      if (categoryFilter !== 'all' && normalizeCategory(item) !== categoryFilter) return false;
-      if (!query) return true;
+      if (categoryFilter !== 'all' && normalizeCategory(item) !== categoryFilter) {
+        return false;
+      }
+      if (!query) {
+        return true;
+      }
       return [item.name, item.description, item.specifications, item.type]
         .filter(Boolean)
         .some((v) => v.toLowerCase().includes(query));
@@ -156,7 +166,9 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
     setExpandedGroups(allGroupsExpanded ? ALL_COLLAPSED : ALL_EXPANDED);
 
   const handleRowClick = (entityId: string | undefined) => {
-    if (!entityId) return;
+    if (!entityId) {
+      return;
+    }
     if (activeHighlightedEntityId === entityId) {
       clearHighlightedEntityId();
     } else {
@@ -167,18 +179,24 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
   const handleExport = () => downloadBomCsv(entities, projectName);
 
   const firstMatchingItemNumber = useMemo(() => {
-    if (!activeHighlightedEntityId) return null;
+    if (!activeHighlightedEntityId) {
+      return null;
+    }
     return all.find((item) => item.entityId === activeHighlightedEntityId)?.itemNumber ?? null;
   }, [activeHighlightedEntityId, all]);
 
   useEffect(() => {
-    if (!activeHighlightedEntityId) return;
+    if (!activeHighlightedEntityId) {
+      return;
+    }
     const cats = new Set(
       all
         .filter((item) => item.entityId === activeHighlightedEntityId)
         .map(normalizeCategory)
     );
-    if (cats.size === 0) return;
+    if (cats.size === 0) {
+      return;
+    }
     setExpandedGroups((cur) => {
       const next = { ...cur };
       cats.forEach((cat) => (next[cat] = true));
@@ -187,7 +205,9 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
   }, [activeHighlightedEntityId, all]);
 
   useEffect(() => {
-    if (!activeHighlightedEntityId) return;
+    if (!activeHighlightedEntityId) {
+      return;
+    }
     firstMatchingRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [activeHighlightedEntityId, firstMatchingItemNumber]);
 
@@ -277,6 +297,16 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
             </button>
           )}
 
+          {groups.length > 0 && (
+            <button
+              className={styles.expandToggle}
+              onClick={toggleAllGroups}
+              type="button"
+            >
+              {allGroupsExpanded ? 'Collapse all' : 'Expand all'}
+            </button>
+          )}
+
           <button
             className={styles.exportButton}
             onClick={handleExport}
@@ -284,6 +314,7 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
             type="button"
           >
             <Download className={styles.exportIcon} aria-hidden="true" />
+            <span>Export</span>
           </button>
         </div>
 
@@ -316,18 +347,11 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
                 data-showprice={priceVisible ? 'true' : 'false'}
               >
                 <span>Qty</span>
-                <span>Description</span>
                 <span>Unit</span>
+                <span>Description</span>
                 <span>Weight</span>
                 {priceVisible && <span>Price</span>}
               </div>
-              <button
-                className={styles.expandToggle}
-                onClick={toggleAllGroups}
-                type="button"
-              >
-                {allGroupsExpanded ? 'Collapse all' : 'Expand all'}
-              </button>
             </div>
 
             {groups.map((group) => {
@@ -385,13 +409,10 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
                             tabIndex={item.entityId ? 0 : undefined}
                           >
                             <span className={styles.qty}>{item.quantity}</span>
-                            <div className={styles.itemCell}>
-                              <span className={styles.itemName}>{item.name}</span>
-                              {item.specifications && (
-                                <span className={styles.itemMeta}>{item.specifications}</span>
-                              )}
-                            </div>
                             <span className={styles.unit}>{item.unit.toUpperCase()}</span>
+                            <div className={styles.itemCell}>
+                              <span className={styles.itemName}>{item.description}</span>
+                            </div>
                             <span className={styles.weight}>&mdash;</span>
                             {priceVisible && (
                               <span className={styles.price}>

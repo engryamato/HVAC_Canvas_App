@@ -5,6 +5,7 @@ interface LayoutStoreState {
     // Sidebar collapsed states
     leftSidebarCollapsed: boolean;
     rightSidebarCollapsed: boolean;
+    rightSidebarWidth: number;
 
     // Active tab states
     activeLeftTab: string;
@@ -16,6 +17,7 @@ interface LayoutStoreState {
     // Actions
     toggleLeftSidebar: () => void;
     toggleRightSidebar: () => void;
+    setRightSidebarWidth: (width: number) => void;
     setActiveLeftTab: (tab: string) => void;
     setActiveRightTab: (tab: string) => void;
     
@@ -30,6 +32,7 @@ interface LayoutStoreState {
 const defaultState = {
     leftSidebarCollapsed: false,
     rightSidebarCollapsed: false,
+    rightSidebarWidth: 320,
     activeLeftTab: 'library',
     activeRightTab: 'properties',
     activeDockPanel: 'none' as const,
@@ -45,6 +48,9 @@ export const useLayoutStore = create<LayoutStoreState>()(
 
             toggleRightSidebar: () =>
                 set((state) => ({ rightSidebarCollapsed: !state.rightSidebarCollapsed })),
+
+            setRightSidebarWidth: (width) =>
+                set({ rightSidebarWidth: Math.min(640, Math.max(280, Math.round(width))) }),
 
             setActiveLeftTab: (tab) =>
                 set({ activeLeftTab: tab }),
@@ -71,6 +77,7 @@ export const useLayoutStore = create<LayoutStoreState>()(
             partialize: (state) => ({
                 leftSidebarCollapsed: state.leftSidebarCollapsed,
                 rightSidebarCollapsed: state.rightSidebarCollapsed,
+                rightSidebarWidth: state.rightSidebarWidth,
                 activeLeftTab: state.activeLeftTab,
                 activeRightTab: state.activeRightTab,
                 activeDockPanel: state.activeDockPanel,

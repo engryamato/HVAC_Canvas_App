@@ -10,7 +10,8 @@ import DuctInspector from './DuctInspector';
 import DuctRunInspector from './DuctRunInspector';
 import EquipmentInspector from './EquipmentInspector';
 import FittingInspector from './FittingInspector';
-import { CanvasPropertiesInspector } from './CanvasPropertiesInspector';
+import { InspectorOverviewPanel } from './InspectorOverviewPanel';
+import { useInspectorOverviewData } from './useInspectorOverviewData';
 
 interface InspectorPanelProps {
   className?: string;
@@ -30,15 +31,15 @@ function renderInspector(
 
   switch (entity.type) {
     case 'room':
-      return <RoomInspector entity={entity} />;
+      return <RoomInspector entity={entity as never} />;
     case 'duct':
-      return <DuctInspector entity={entity} onHighlightInBOM={onHighlightInBOM} />;
+      return <DuctInspector entity={entity as never} onHighlightInBOM={onHighlightInBOM} />;
     case 'duct_run':
-      return <DuctRunInspector entity={entity} />;
+      return <DuctRunInspector entity={entity as never} />;
     case 'equipment':
-      return <EquipmentInspector entity={entity} />;
+      return <EquipmentInspector entity={entity as never} />;
     case 'fitting':
-      return <FittingInspector entity={entity} />;
+      return <FittingInspector entity={entity as never} />;
     default:
       return (
         <div className="p-4 border border-dashed border-slate-300 rounded-lg text-slate-500 bg-slate-50 text-center">
@@ -58,15 +59,17 @@ export function InspectorPanel({
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const selectedId = selectedIds.length === 1 ? selectedIds[0] : null;
   const activeViewMode = useActiveViewMode();
+  const overviewData = useInspectorOverviewData();
 
   const selectedEntity = useEntityStore(
     useCallback((state) => (selectedId ? (state.byId[selectedId] ?? null) : null), [selectedId])
   );
 
   let content: React.ReactNode = null;
+  const hasSelection = selectedIds.length > 0;
 
   if (selectedIds.length === 0) {
-    content = <CanvasPropertiesInspector />;
+    content = <InspectorOverviewPanel {...overviewData} />;
   } else if (selectedIds.length > 1) {
     content = (
       <div className="p-4 border border-dashed border-slate-300 rounded-lg text-slate-500 bg-slate-50 text-center">
@@ -109,7 +112,7 @@ export function InspectorPanel({
           Editing in 3D View
         </div>
       )}
-      <div className="p-4 overflow-y-auto h-full">{content}</div>
+      <div className={`${hasSelection ? 'p-4 overflow-y-auto' : 'overflow-hidden'} h-full`}>{content}</div>
     </div>
   );
 }

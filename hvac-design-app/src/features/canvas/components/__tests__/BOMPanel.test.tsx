@@ -95,10 +95,12 @@ describe('BOMPanel', () => {
     const header = container.querySelector('[data-showprice="false"]');
 
     expect(header).not.toBeNull();
-    expect(header?.textContent).toContain('Qty');
-    expect(header?.textContent).toContain('Description');
-    expect(header?.textContent).toContain('Unit');
-    expect(header?.textContent).toContain('Weight');
+    expect(Array.from(header?.children ?? []).map((child) => child.textContent)).toEqual([
+      'Qty',
+      'Unit',
+      'Description',
+      'Weight',
+    ]);
     expect(header?.textContent).not.toContain('Price');
   });
 
@@ -134,9 +136,34 @@ describe('BOMPanel', () => {
     const { container } = render(<BOMPanel />);
 
     expect(screen.getByText('25')).toBeInTheDocument();
-    expect(screen.getByText('Rectangular Duct 12" x 8" 5\'')).toBeInTheDocument();
     expect(screen.getByText('EA')).toBeInTheDocument();
+    expect(screen.getByText('Rectangular Duct 12" x 8" 5\'')).toBeInTheDocument();
     expect(container.querySelector('[data-testid="bom-row-duct-1"]')?.textContent).toContain('\u2014');
+  });
+
+  it('places expand/collapse between Price and Export controls', () => {
+    vi.mocked(useBOM).mockReturnValue(makeBomReturn([
+      makeItem({ itemNumber: 1 }),
+    ], {
+      costEstimate: {
+        items: [{ bomItemId: 'bom-1', itemTotal: 125 }],
+        breakdown: { totalCost: 125 },
+      } as GroupedBomItems['costEstimate'],
+    }));
+
+    render(<BOMPanel />);
+
+    const toolbar = screen.getByRole('searchbox', { name: /search bom/i }).closest('label')?.parentElement;
+    const price = screen.getByRole('button', { name: /price/i });
+    const collapse = screen.getByRole('button', { name: /collapse all/i });
+    const exportButton = screen.getByRole('button', { name: /export/i });
+
+    expect(toolbar).not.toBeNull();
+    expect(Array.from(toolbar?.children ?? [])).toEqual(
+      expect.arrayContaining([price, collapse, exportButton])
+    );
+    expect((price.compareDocumentPosition(collapse) & Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
+    expect((collapse.compareDocumentPosition(exportButton) & Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
   });
 
   it('includes ducts, fittings, equipment, and accessories groups when present', () => {
@@ -162,7 +189,7 @@ describe('BOMPanel', () => {
 
     render(<BOMPanel />);
 
-    fireEvent.click(screen.getByRole('button', { name: /csv/i }));
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
 
     expect(downloadBomCsv).toHaveBeenCalledWith(entityState, 'Test Project');
   });

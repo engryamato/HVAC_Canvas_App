@@ -43,4 +43,4 @@ Use this root map to orient; directory-level AGENTS files cover specifics.
 ## NOTES
 - LSP tools are not safe on Windows with Bun v1.3.5 (segfault risk).
 - Tauri/web parity checks use `scripts/check-tauri-web-parity.js`.
-- Port 3000 is used by Docker/WSL on this machine. Next.js dev runs on port 3001.
+- Next.js dev runs on port 3000 (`pnpm dev` in `hvac-design-app/`). `tauri.conf.json` `devUrl` must match.

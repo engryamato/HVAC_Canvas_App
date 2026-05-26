@@ -39,4 +39,4 @@ Primary app workspace for builds, tests, and tooling.
 
 ## NOTES
 - Type-check runs in CI but currently continues on error.
-- Playwright base URL defaults to `http://localhost:3001` for local runs.
+- Playwright base URL defaults to `http://localhost:3000` for local runs.

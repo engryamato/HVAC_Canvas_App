@@ -340,16 +340,30 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
     } as DuctRun['props']);
   };
 
-  const setLength = (installLength: number) => {
-    if (!Number.isFinite(installLength)) {
+  const setSegmentLength = (segmentLength: number) => {
+    if (!Number.isFinite(segmentLength)) {
       return;
     }
 
-    const nextLength = Math.min(1000, Math.max(0.1, installLength));
+    const nextLength = Math.min(1000, Math.max(0.1, segmentLength));
+
     updateRun({
       ...entity.props,
-      installLength: nextLength,
-      segments: recomputeDuctRunSegments(nextLength, activeSectionLength, getRunDefaults(entity)),
+      sectionLengthOverride: nextLength,
+      segments: recomputeDuctRunSegments(entity.props.installLength, nextLength, getRunDefaults(entity)),
+    } as DuctRun['props']);
+  };
+
+  const setSectionLength = (sectionLength: number) => {
+    if (!Number.isFinite(sectionLength)) {
+      return;
+    }
+
+    const nextInstallLength = Math.min(1000, Math.max(0.1, sectionLength));
+    updateRun({
+      ...entity.props,
+      installLength: nextInstallLength,
+      segments: recomputeDuctRunSegments(nextInstallLength, activeSectionLength, getRunDefaults(entity)),
     } as DuctRun['props']);
   };
 
@@ -501,21 +515,38 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
           </>
         )}
 
-        <Field htmlFor="duct-run-length" label="Length">
+        <Field htmlFor="duct-run-segment-length" label="Segment Length">
           <div className="flex items-center gap-2">
             <input
               className="h-9 min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-2 text-[13px] text-slate-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-              id="duct-run-length"
+              id="duct-run-segment-length"
+              max={1000}
+              min={0.1}
+              step={0.5}
+              type="number"
+              value={formatNumber(activeSectionLength, 1)}
+              onChange={(event) => setSegmentLength(Number(event.target.value))}
+            />
+            <span className="text-xs text-slate-400">ft</span>
+          </div>
+          <Hint>Length of each duct segment in feet</Hint>
+        </Field>
+
+        <Field htmlFor="duct-run-section-length" label="Section Length">
+          <div className="flex items-center gap-2">
+            <input
+              className="h-9 min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-2 text-[13px] text-slate-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              id="duct-run-section-length"
               max={1000}
               min={0.1}
               step={0.5}
               type="number"
               value={formatNumber(entity.props.installLength, 1)}
-              onChange={(event) => setLength(Number(event.target.value))}
+              onChange={(event) => setSectionLength(Number(event.target.value))}
             />
             <span className="text-xs text-slate-400">ft</span>
           </div>
-          <Hint>Installed duct length in feet</Hint>
+          <Hint>Total length of the duct run in feet</Hint>
         </Field>
       </Card>
 

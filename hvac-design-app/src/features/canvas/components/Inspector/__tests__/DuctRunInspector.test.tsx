@@ -261,12 +261,45 @@ describe('DuctRunInspector', () => {
     expect('diameter' in nextProps ? nextProps.diameter : undefined).toBeUndefined();
   });
 
-  it('updates length from the sample length input', () => {
+  it('shows segment length and section length below the duct size controls', () => {
     const run = createRun();
 
     render(<DuctRunInspector entity={run} />);
 
-    fireEvent.change(screen.getByLabelText('Length'), {
+    const segmentLength = screen.getByLabelText('Segment Length');
+    const sectionLength = screen.getByLabelText('Section Length');
+
+    expect(segmentLength).toBeDefined();
+    expect(sectionLength).toBeDefined();
+    expect((segmentLength as HTMLInputElement).value).toBe('5');
+    expect((sectionLength as HTMLInputElement).value).toBe('13');
+  });
+
+  it('updates segment length as the repeated duct piece length and recomputes segments', () => {
+    const run = createRun();
+
+    render(<DuctRunInspector entity={run} />);
+
+    fireEvent.change(screen.getByLabelText('Segment Length'), {
+      target: { value: '7.5' },
+    });
+
+    expect(updateEntityCommand).toHaveBeenCalledTimes(1);
+    const [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
+    const nextProps = update.props as DuctRun['props'];
+    expect(nextProps.sectionLengthOverride).toBe(7.5);
+    expect(nextProps.installLength).toBe(13);
+    expect(nextProps.segments.map((segment) => segment.length)).toEqual([7.5, 5.5]);
+    expect(nextProps.segments.map((segment) => segment.startStation)).toEqual([0, 7.5]);
+    expect(nextProps.segments.map((segment) => segment.endStation)).toEqual([7.5, 13]);
+  });
+
+  it('updates section length as the total run length', () => {
+    const run = createRun();
+
+    render(<DuctRunInspector entity={run} />);
+
+    fireEvent.change(screen.getByLabelText('Section Length'), {
       target: { value: '18.5' },
     });
 
@@ -274,6 +307,7 @@ describe('DuctRunInspector', () => {
     const [, update] = vi.mocked(updateEntityCommand).mock.calls[0]!;
     const nextProps = update.props as DuctRun['props'];
     expect(nextProps.installLength).toBe(18.5);
+    expect(nextProps.segments.map((segment) => segment.length)).toEqual([5, 5, 5, 3.5]);
     expect(nextProps.segments[nextProps.segments.length - 1]?.endStation).toBe(18.5);
   });
 

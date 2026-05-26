@@ -17,6 +17,8 @@ interface RightSidebarProps {
 
 type RightTabId = 'properties' | 'bom' | 'calculations' | 'validation';
 
+const COLLAPSED_RIGHT_SIDEBAR_WIDTH = 48;
+
 function normalizeRightTab(value: string): RightTabId {
   if (value === 'bom' || value === 'calculations' || value === 'properties' || value === 'validation') {
     return value;
@@ -28,7 +30,9 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
   const activeRightTab = useLayoutStore((state) => normalizeRightTab(state.activeRightTab));
   const setActiveRightTab = useLayoutStore((state) => state.setActiveRightTab);
   const rightSidebarCollapsed = useLayoutStore((state) => state.rightSidebarCollapsed);
+  const rightSidebarWidth = useLayoutStore((state) => state.rightSidebarWidth);
   const toggleRightSidebar = useLayoutStore((state) => state.toggleRightSidebar);
+  const setRightSidebarWidth = useLayoutStore((state) => state.setRightSidebarWidth);
   const clearHighlightedEntityId = useBomHighlightStore((state) => state.clearHighlightedEntityId);
 
   const isFloating = useInspectorPreferencesStore((state) => state.isFloating);
@@ -46,6 +50,31 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
     }
   }, [floatingPosition, setFloating, setFloatingPosition]);
 
+  const handleResizeStart = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      const startX = event.clientX;
+      const startWidth = rightSidebarWidth;
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        setRightSidebarWidth(startWidth + startX - moveEvent.clientX);
+      };
+
+      const handleMouseUp = () => {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    },
+    [rightSidebarWidth, setRightSidebarWidth]
+  );
+
   React.useEffect(() => {
     if (activeRightTab !== 'bom') {
       clearHighlightedEntityId();
@@ -59,9 +88,21 @@ export function RightSidebar({ isOpen = true, onClose, className = '' }: RightSi
   return (
     <aside
       className={`right-sidebar ${rightSidebarCollapsed ? 'collapsed' : ''} ${className}`}
-      style={{ width: rightSidebarCollapsed ? '48px' : '320px' }}
+      style={{ width: rightSidebarCollapsed ? `${COLLAPSED_RIGHT_SIDEBAR_WIDTH}px` : `${rightSidebarWidth}px` }}
       data-testid="right-sidebar"
     >
+      {!rightSidebarCollapsed && (
+        <div
+          role="separator"
+          aria-label="Resize right sidebar"
+          aria-orientation="vertical"
+          aria-valuemin={280}
+          aria-valuemax={640}
+          aria-valuenow={rightSidebarWidth}
+          className="resize-handle-left"
+          onMouseDown={handleResizeStart}
+        />
+      )}
       <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2">
         {!rightSidebarCollapsed && (
           <div className="flex gap-2" role="tablist">
