@@ -77,16 +77,11 @@ export class FittingGenerationService {
       connectionPoints: [
         {
           ductId: connection.existingDuct.entityId,
-          pointIndex:
-            connection.existingDuct.endPoint === 'body'
-              ? undefined
-              : connection.existingDuct.endPoint === 'start'
-                ? 0
-                : 1,
+          pointIndex: 0,
         },
         {
           ductId: connection.newDuct.entityId,
-          pointIndex: connection.newDuct.endPoint === 'start' ? 0 : 1,
+          pointIndex: 1,
         },
       ],
     });

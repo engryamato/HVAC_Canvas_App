@@ -8,7 +8,15 @@ import { useSelectionStore } from '../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useViewportStore } from '../store/viewportStore';
 import { boundsContainsPoint, boundsFromPoints, type Bounds } from '@/core/geometry/bounds';
-import type { Duct, DuctEndType, DuctRun, Entity, Fitting, InsulationType } from '@/core/schema';
+import type {
+  Duct,
+  DuctEndType,
+  DuctRun,
+  Entity,
+  Equipment,
+  Fitting,
+  InsulationType,
+} from '@/core/schema';
 import { getDuctRunCanvasBounds, getLegacyDuctCanvasBounds } from '@/core/geometry/ductBounds';
 import { DuctRunGeometryService } from '../services/DuctRunGeometryService';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
@@ -17,6 +25,7 @@ import {
   deleteEntity,
   updateEntity as updateEntityCommand,
 } from '@/core/commands/entityCommands';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import {
   MagneticConnectionService,
   type MagneticSnapResult,
@@ -26,14 +35,19 @@ import {
   getWorldConnectionPoints,
   type WorldConnectionPoint,
 } from '../services/fittingConnectionService';
+import { restoreDuctToDesign } from '../services/connectionPoints';
 import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
 import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
 import { DuctTool } from './DuctTool';
+import { getEquipmentPlanBounds } from '../services/equipmentGeometry';
+import { constrainAngleToStep } from './angleConstraint';
 
 const ENDPOINT_HIT_RADIUS = 10;
 const FITTING_ENDPOINT_HIT_RADIUS = 24;
 const ENDPOINT_HANDLE_RADIUS = 6;
 const MIN_DUCT_LENGTH = feetToPixels(1);
+const ANGLE_STEP_COARSE = 15;
+const ANGLE_STEP_FINE = 1;
 /** Minimum pixel movement before a drag becomes active (prevents accidental detach on click). */
 const DRAG_THRESHOLD = 5;
 
@@ -225,11 +239,13 @@ export class SelectTool extends BaseTool {
     if (this.state.mode === 'dragging') {
       this.alignDraggedDuctRunToMagneticSnap();
       this.alignDraggedFittingToMagneticSnap();
+      this.alignDraggedEquipmentToMagneticSnap();
       this.commitMovedEntities();
     }
 
     if (this.state.mode === 'stretching') {
       this.commitMovedEntities();
+      this.rerunAutoFittingsAfterStretch();
     }
 
     if (this.state.mode === 'marquee' && this.state.startPoint && this.state.currentPoint) {
@@ -404,6 +420,7 @@ export class SelectTool extends BaseTool {
           select(entity.id);
         }
         clearSelectedSegments();
+        selectSegment(entity.id, hit.segmentIndex, false);
       } else if (isAdditiveSegmentSelection) {
         toggleSegmentSelection(entity.id, hit.segmentIndex);
       } else {
@@ -500,14 +517,25 @@ export class SelectTool extends BaseTool {
       draggedEntityId,
     ]);
     const validSnap =
-      rawSnap?.snapType === 'duct_endpoint' || rawSnap?.snapType === 'duct_body' ? rawSnap : null;
+      rawSnap?.snapType === 'duct_endpoint' ||
+      rawSnap?.snapType === 'duct_body' ||
+      rawSnap?.snapType === 'equipment_port'
+        ? rawSnap
+        : null;
     const snap =
       validSnap &&
       this.state.stretchBreakawayActive &&
       this.isSameSnapTarget(validSnap, this.state.stretchInitialSnapTarget)
         ? null
         : validSnap;
-    const liveEnd = snap?.point ?? { x: event.x, y: event.y };
+    const liveEnd =
+      snap?.point ??
+      constrainAngleToStep(
+        anchorPoint,
+        { x: event.x, y: event.y },
+        event.shiftKey ? ANGLE_STEP_FINE : ANGLE_STEP_COARSE
+      );
+    this.state.currentPoint = liveEnd;
     const rawStart = stretchEnd === 'end' ? anchorPoint : liveEnd;
     const rawEnd = stretchEnd === 'end' ? liveEnd : anchorPoint;
     const dx = rawEnd.x - rawStart.x;
@@ -535,6 +563,9 @@ export class SelectTool extends BaseTool {
         installLength,
         startPoint: newStart,
         endPoint: newEnd,
+        designStartPoint: { ...newStart },
+        designEndPoint: { ...newEnd },
+        designLength: installLength,
         segments: recomputeDuctRunSegments(
           installLength,
           sectionLength,
@@ -568,7 +599,12 @@ export class SelectTool extends BaseTool {
         const snap = MagneticConnectionService.resolveSnapTarget(ductPoint.x, ductPoint.y, byId, [
           ductId,
         ]);
-        if (!snap || (snap.snapType !== 'duct_endpoint' && snap.snapType !== 'duct_body')) {
+        if (
+          !snap ||
+          (snap.snapType !== 'duct_endpoint' &&
+            snap.snapType !== 'duct_body' &&
+            snap.snapType !== 'equipment_port')
+        ) {
           return null;
         }
         return {
@@ -638,6 +674,9 @@ export class SelectTool extends BaseTool {
           JSON.stringify(current.props) !== JSON.stringify(initialEntity.props)) ||
         (current.type === 'fitting' &&
           initialEntity.type === 'fitting' &&
+          JSON.stringify(current.props) !== JSON.stringify(initialEntity.props)) ||
+        (current.type === 'equipment' &&
+          initialEntity.type === 'equipment' &&
           JSON.stringify(current.props) !== JSON.stringify(initialEntity.props));
       if (!transformChanged && !propsChanged) {
         return;
@@ -650,11 +689,16 @@ export class SelectTool extends BaseTool {
               props: { ...current.props },
             } as Partial<Entity>)
           : current.type === 'fitting'
-          ? ({
-              transform: { ...current.transform },
-              props: { ...(current as Fitting).props },
-            } as Partial<Entity>)
-          : { transform: { ...current.transform } };
+            ? ({
+                transform: { ...current.transform },
+                props: { ...(current as Fitting).props },
+              } as Partial<Entity>)
+            : current.type === 'equipment'
+              ? ({
+                  transform: { ...current.transform },
+                  props: { ...(current as Equipment).props },
+                } as Partial<Entity>)
+              : { transform: { ...current.transform } };
 
       updateEntityCommand(id, update, initialEntity, {
         selectionBefore: this.state.initialSelection,
@@ -668,6 +712,52 @@ export class SelectTool extends BaseTool {
         }
       }
     });
+  }
+
+  private rerunAutoFittingsAfterStretch(): void {
+    if (!DuctTool.isAutoFittingEnabled()) {
+      return;
+    }
+
+    const selection = [...useSelectionStore.getState().selectedIds];
+    const entities = JSON.parse(JSON.stringify(useEntityStore.getState().byId)) as Record<
+      string,
+      Entity
+    >;
+    const plan = fittingInsertionService.buildReRunPlan(entities);
+    const result = fittingInsertionService.resolveReRunPlan(plan, entities);
+
+    for (const operation of result.operations) {
+      if (operation.action === 'insert') {
+        createEntity(operation.next, {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        });
+        continue;
+      }
+
+      if (operation.action === 'remove') {
+        deleteEntity(operation.previous, {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        });
+        continue;
+      }
+
+      updateEntityCommand(
+        operation.next.id,
+        {
+          props: operation.next.props,
+          transform: operation.next.transform,
+          modifiedAt: operation.next.modifiedAt,
+        },
+        operation.previous,
+        {
+          selectionBefore: selection,
+          selectionAfter: selection,
+        }
+      );
+    }
   }
 
   private findEntityHitAtPoint(x: number, y: number): EntityHit | null {
@@ -891,7 +981,7 @@ export class SelectTool extends BaseTool {
       case 'room':
         return { x, y, width: entity.props.width, height: entity.props.length };
       case 'equipment':
-        return { x, y, width: entity.props.width, height: entity.props.height };
+        return getEquipmentPlanBounds(entity);
       case 'duct':
         return getLegacyDuctCanvasBounds(entity as Duct);
       case 'duct_run':
@@ -963,6 +1053,12 @@ export class SelectTool extends BaseTool {
       ...run.props,
       startPoint,
       endPoint,
+      designStartPoint: run.props.designStartPoint
+        ? { x: run.props.designStartPoint.x + deltaX, y: run.props.designStartPoint.y + deltaY }
+        : undefined,
+      designEndPoint: run.props.designEndPoint
+        ? { x: run.props.designEndPoint.x + deltaX, y: run.props.designEndPoint.y + deltaY }
+        : undefined,
     };
   }
 
@@ -986,6 +1082,9 @@ export class SelectTool extends BaseTool {
 
     Object.values(byId).forEach((entity) => {
       if (entity.type !== 'fitting') {
+        return;
+      }
+      if (!entity.props.autoInserted || entity.props.manualOverride) {
         return;
       }
       // Only remove if the fitting is physically near the endpoint being stretched
@@ -1013,7 +1112,32 @@ export class SelectTool extends BaseTool {
   private detachFitting(fittingId: string): void {
     const { byId, updateEntityTransient } = useEntityStore.getState();
     const fitting = byId[fittingId];
-    if (!fitting || fitting.type !== 'fitting') return;
+    if (!fitting || fitting.type !== 'fitting') {
+      return;
+    }
+
+    const connectedDuctIds = new Set(
+      [
+        fitting.props.inletDuctId,
+        fitting.props.outletDuctId,
+        ...(fitting.props.connectionPoints?.map((point) => point.ductId) ?? []),
+      ].filter((id): id is string => Boolean(id))
+    );
+
+    for (const ductId of connectedDuctIds) {
+      const duct = byId[ductId];
+      if (!duct || (duct.type !== 'duct' && duct.type !== 'duct_run')) {
+        continue;
+      }
+      const restored = {
+        ...duct,
+        props: { ...duct.props },
+        transform: { ...duct.transform },
+      } as Duct | DuctRun;
+      if (restoreDuctToDesign(restored)) {
+        updateEntityTransient(ductId, restored as Partial<Entity>);
+      }
+    }
 
     updateEntityTransient(fittingId, {
       props: {
@@ -1032,11 +1156,15 @@ export class SelectTool extends BaseTool {
    */
   private alignDraggedFittingToMagneticSnap(): void {
     const { selectedIds } = useSelectionStore.getState();
-    if (selectedIds.length !== 1) return;
+    if (selectedIds.length !== 1) {
+      return;
+    }
 
     const { byId, updateEntityTransient } = useEntityStore.getState();
     const entity = byId[selectedIds[0]!];
-    if (!entity || entity.type !== 'fitting') return;
+    if (!entity || entity.type !== 'fitting') {
+      return;
+    }
 
     const fitting = entity as Fitting;
     const worldPts = getWorldConnectionPoints(fitting);
@@ -1046,12 +1174,9 @@ export class SelectTool extends BaseTool {
     let bestPort: WorldConnectionPoint | null = null;
 
     for (const pt of worldPts) {
-      const snap = MagneticConnectionService.resolveSnapTarget(
-        pt.worldX,
-        pt.worldY,
-        byId,
-        [fitting.id]
-      );
+      const snap = MagneticConnectionService.resolveSnapTarget(pt.worldX, pt.worldY, byId, [
+        fitting.id,
+      ]);
       if (
         snap?.snapType === 'duct_endpoint' &&
         snap.distance <= MagneticConnectionService.SNAP_TOLERANCE &&
@@ -1062,7 +1187,9 @@ export class SelectTool extends BaseTool {
       }
     }
 
-    if (!bestSnap || !bestPort) return;
+    if (!bestSnap || !bestPort) {
+      return;
+    }
 
     // Offset fitting so the matched port lands exactly on the duct endpoint.
     const offsetX = bestSnap.point.x - bestPort.worldX;
@@ -1104,21 +1231,21 @@ export class SelectTool extends BaseTool {
     let outletDuctId: string | undefined;
     const connectionPoints: Array<{ ductId: string; pointIndex?: number }> = [];
 
-    for (const pt of worldPts) {
-      const snap = MagneticConnectionService.resolveSnapTarget(
-        pt.worldX,
-        pt.worldY,
-        byId,
-        [fitting.id]
-      );
+    for (const [portIndex, pt] of worldPts.entries()) {
+      const snap = MagneticConnectionService.resolveSnapTarget(pt.worldX, pt.worldY, byId, [
+        fitting.id,
+      ]);
       if (
         snap?.snapType === 'duct_endpoint' &&
         snap.ductId &&
         snap.distance <= MagneticConnectionService.SNAP_TOLERANCE
       ) {
-        if (pt.role === 'inlet') inletDuctId = snap.ductId;
-        else if (pt.role === 'outlet') outletDuctId = snap.ductId;
-        connectionPoints.push({ ductId: snap.ductId });
+        if (pt.role === 'inlet') {
+          inletDuctId = snap.ductId;
+        } else if (pt.role === 'outlet') {
+          outletDuctId = snap.ductId;
+        }
+        connectionPoints.push({ ductId: snap.ductId, pointIndex: portIndex });
       }
     }
 
@@ -1177,12 +1304,22 @@ export class SelectTool extends BaseTool {
     const endDistance = Math.hypot(x - geometry.end.x, y - geometry.end.y);
 
     if (startDistance <= hitRadius && startDistance <= endDistance) {
-      return { end: 'start', anchorPoint: geometry.end };
+      return { end: 'start', anchorPoint: this.getStretchAnchorPoint(run, 'end', geometry.end) };
     }
     if (endDistance <= hitRadius) {
-      return { end: 'end', anchorPoint: geometry.start };
+      return { end: 'end', anchorPoint: this.getStretchAnchorPoint(run, 'start', geometry.start) };
     }
     return null;
+  }
+
+  private getStretchAnchorPoint(
+    run: DuctRun,
+    fixedEnd: 'start' | 'end',
+    fallback: { x: number; y: number }
+  ): { x: number; y: number } {
+    const designPoint =
+      fixedEnd === 'start' ? run.props.designStartPoint : run.props.designEndPoint;
+    return designPoint ? { ...designPoint } : fallback;
   }
 
   private isHoveringSelectedDuctRunEndpoint(): boolean {
@@ -1265,7 +1402,8 @@ export class SelectTool extends BaseTool {
 
     if (
       this.state.liveSnapTarget?.snapType === 'duct_endpoint' ||
-      this.state.liveSnapTarget?.snapType === 'duct_body'
+      this.state.liveSnapTarget?.snapType === 'duct_body' ||
+      this.state.liveSnapTarget?.snapType === 'equipment_port'
     ) {
       ctx.beginPath();
       ctx.arc(endpoint.x, endpoint.y, 8 / zoom, 0, Math.PI * 2);
@@ -1288,9 +1426,10 @@ export class SelectTool extends BaseTool {
     const duct = this.toDuctRun(entity);
     if (!duct) {
       this.state.liveSnapTargets = { start: null, end: null };
-      this.state.liveFittingSnap = entity?.type === 'fitting'
-        ? this.getBestFittingPortSnap(entity as Fitting)
-        : null;
+      this.state.liveFittingSnap =
+        entity?.type === 'fitting' ? this.getBestFittingPortSnap(entity as Fitting) : null;
+      this.state.liveSnapTarget =
+        entity?.type === 'equipment' ? this.getEquipmentDragSnap(entity as Equipment) : null;
       return;
     }
 
@@ -1311,15 +1450,96 @@ export class SelectTool extends BaseTool {
 
     this.state.liveSnapTargets = {
       start:
-        startSnap && (startSnap.snapType === 'duct_endpoint' || startSnap.snapType === 'duct_body')
+        startSnap &&
+        (startSnap.snapType === 'duct_endpoint' ||
+          startSnap.snapType === 'duct_body' ||
+          startSnap.snapType === 'equipment_port')
           ? startSnap
           : null,
       end:
-        endSnap && (endSnap.snapType === 'duct_endpoint' || endSnap.snapType === 'duct_body')
+        endSnap &&
+        (endSnap.snapType === 'duct_endpoint' ||
+          endSnap.snapType === 'duct_body' ||
+          endSnap.snapType === 'equipment_port')
           ? endSnap
           : null,
     };
+    this.state.liveSnapTarget = null;
     this.state.liveFittingSnap = null;
+  }
+
+  private getEquipmentDragSnap(equipment: Equipment): MagneticSnapResult | null {
+    const { byId } = useEntityStore.getState();
+    const tentativePosition =
+      this.state.currentPoint && this.state.dragOffset
+        ? {
+            x: this.state.currentPoint.x - this.state.dragOffset.x,
+            y: this.state.currentPoint.y - this.state.dragOffset.y,
+          }
+        : { x: equipment.transform.x, y: equipment.transform.y };
+    const snap = MagneticConnectionService.resolveEquipmentPortSnap(
+      equipment,
+      tentativePosition,
+      byId,
+      [equipment.id]
+    );
+
+    if (!snap) {
+      return null;
+    }
+
+    return {
+      snapType: 'equipment_port',
+      point: snap.point,
+      distance: snap.distance,
+      ductId: snap.snappedDuctId,
+      endPoint: snap.snappedDuctEndPoint,
+      equipmentId: equipment.id,
+      equipmentPortId: snap.snappedPortId,
+      entityType: 'equipment',
+      ductConnectionProfile: snap.ductConnectionProfile,
+    };
+  }
+
+  private alignDraggedEquipmentToMagneticSnap(): void {
+    const { selectedIds } = useSelectionStore.getState();
+    if (selectedIds.length !== 1) {
+      return;
+    }
+
+    const { byId, updateEntityTransient } = useEntityStore.getState();
+    const entity = byId[selectedIds[0]!];
+    if (!entity || entity.type !== 'equipment') {
+      return;
+    }
+
+    const equipment = entity as Equipment;
+    const snap = MagneticConnectionService.resolveEquipmentPortSnap(
+      equipment,
+      { x: equipment.transform.x, y: equipment.transform.y },
+      byId,
+      [equipment.id]
+    );
+
+    if (!snap) {
+      return;
+    }
+
+    updateEntityTransient(equipment.id, {
+      transform: {
+        ...equipment.transform,
+        x: snap.adjustedEntityPosition.x,
+        y: snap.adjustedEntityPosition.y,
+      },
+      props: {
+        ...equipment.props,
+        connectionPorts: (equipment.props.connectionPorts ?? []).map((port) =>
+          port.id === snap.snappedPortId ? { ...port, connectedDuctId: snap.snappedDuctId } : port
+        ),
+      },
+    } as Partial<Entity>);
+
+    this.state.hasMoved = true;
   }
 
   private getBestFittingPortSnap(fitting: Fitting): MagneticSnapResult | null {
@@ -1327,16 +1547,10 @@ export class SelectTool extends BaseTool {
     let best: MagneticSnapResult | null = null;
 
     for (const point of getWorldConnectionPoints(fitting)) {
-      const snap = MagneticConnectionService.resolveSnapTarget(
-        point.worldX,
-        point.worldY,
-        byId,
-        [fitting.id]
-      );
-      if (
-        snap?.snapType === 'duct_endpoint' &&
-        (!best || snap.distance < best.distance)
-      ) {
+      const snap = MagneticConnectionService.resolveSnapTarget(point.worldX, point.worldY, byId, [
+        fitting.id,
+      ]);
+      if (snap?.snapType === 'duct_endpoint' && (!best || snap.distance < best.distance)) {
         best = snap;
       }
     }
@@ -1384,6 +1598,7 @@ export class SelectTool extends BaseTool {
 
     drawCircle(this.state.liveSnapTargets.start);
     drawCircle(this.state.liveSnapTargets.end);
+    drawCircle(this.state.liveSnapTarget);
     drawCircle(this.state.liveFittingSnap);
   }
 

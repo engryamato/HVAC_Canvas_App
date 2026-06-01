@@ -4,6 +4,7 @@ import { useHistoryStore } from '../historyStore';
 import { undo, redo } from '../entityCommands';
 import { mergeDuctRuns, splitDuctRun } from '../ductRunCommands';
 import type { DuctRun } from '@/core/schema';
+import { PROJECT_INITIAL_STATE, useProjectStore } from '@/core/store/project.store';
 
 function makeRun(id: string, startX: number, endX: number, length = (endX - startX) / 12): DuctRun {
   return {
@@ -16,17 +17,20 @@ function makeRun(id: string, startX: number, endX: number, length = (endX - star
     props: {
       name: id,
       shape: 'round',
-      family: 'standard_duct',
       engineeringSystem: 'standard_duct',
       diameter: 12,
       installLength: length,
-      angle: 0,
-      start: { x: startX, y: 0 },
-      end: { x: endX, y: 0 },
+      startPoint: { x: startX, y: 0 },
+      endPoint: { x: endX, y: 0 },
       material: 'galvanized',
       airflow: 0,
       staticPressure: 0.1,
       segments: [{ index: 0, startStation: 0, endStation: length, length, isPartial: false }],
+    },
+    calculated: {
+      area: 0,
+      velocity: 0,
+      frictionLoss: 0,
     },
   };
 }
@@ -35,6 +39,7 @@ describe('ductRunCommands', () => {
   beforeEach(() => {
     useEntityStore.getState().clearAllEntities();
     useHistoryStore.getState().clear();
+    useProjectStore.setState(PROJECT_INITIAL_STATE);
   });
 
   it('splits a duct run into two runs and undoes in one history step', () => {
@@ -57,6 +62,23 @@ describe('ductRunCommands', () => {
     expect(selectEntity('run-1')).toBeUndefined();
     expect(selectEntity('run-1-a')).toBeDefined();
     expect(selectEntity('run-1-b')).toBeDefined();
+  });
+
+  it('marks the project modified after splitting a duct run', () => {
+    const original = '2026-01-01T00:00:00.000Z';
+    useProjectStore.getState().setProject('project-1', {
+      projectId: 'project-1',
+      projectName: 'Project',
+      isArchived: false,
+      createdAt: original,
+      modifiedAt: original,
+    });
+    useEntityStore.getState().addEntity(makeRun('run-1', 0, 120, 10));
+
+    splitDuctRun('run-1', 4, { firstRunId: 'run-1-a', secondRunId: 'run-1-b' });
+
+    expect(useProjectStore.getState().projectDetails?.modifiedAt).not.toBe(original);
+    expect(useProjectStore.getState().isDirty).toBe(true);
   });
 
   it('merges compatible connected runs and undoes in one history step', () => {

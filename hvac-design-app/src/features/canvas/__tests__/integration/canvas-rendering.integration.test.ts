@@ -53,6 +53,7 @@ describe('Canvas Rendering Integration Tests', () => {
       systemType: overrides.systemType ?? 'supply',
       source: overrides.source ?? 'system',
       placeable: overrides.placeable ?? true,
+      isCustom: overrides.isCustom ?? false,
       pricing: overrides.pricing ?? {
         materialCost: 10,
         laborUnits: 1,

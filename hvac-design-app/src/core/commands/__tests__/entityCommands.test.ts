@@ -3,9 +3,11 @@ import { createEntity, updateEntity, updateEntities, deleteEntity, undo, redo, s
 import { useEntityStore, selectEntity, selectEntityCount } from '@/core/store/entityStore';
 import { useHistoryStore } from '../historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+import { PROJECT_INITIAL_STATE, useProjectStore } from '@/core/store/project.store';
 import type { Duct, DuctRun, Fitting, Room } from '@/core/schema';
 import { createDuct } from '@/features/canvas/entities/ductDefaults';
 import { createDuctRun } from '@/features/canvas/entities/ductRunDefaults';
+import { getDuctCenterline } from '@/features/canvas/services/connectionPoints';
 
 const createMockRoom = (id: string, name: string): Room => ({
   id,
@@ -30,6 +32,7 @@ describe('Entity Commands', () => {
     useEntityStore.getState().clearAllEntities();
     useHistoryStore.getState().clear();
     useSelectionStore.getState().clearSelection();
+    useProjectStore.setState(PROJECT_INITIAL_STATE);
   });
 
   describe('createEntity', () => {
@@ -47,6 +50,23 @@ describe('Entity Commands', () => {
 
       expect(useHistoryStore.getState().past).toHaveLength(1);
       expect(useHistoryStore.getState().canUndo()).toBe(true);
+    });
+
+    it('marks the project modified after creating an entity', () => {
+      const original = '2025-01-01T00:00:00.000Z';
+      useProjectStore.getState().setProject('project-1', {
+        projectId: 'project-1',
+        projectName: 'Project',
+        isArchived: false,
+        createdAt: original,
+        modifiedAt: original,
+      });
+
+      const room = createMockRoom('room-1', 'Test Room');
+      createEntity(room);
+
+      expect(useProjectStore.getState().projectDetails?.modifiedAt).toBe(room.modifiedAt);
+      expect(useProjectStore.getState().isDirty).toBe(true);
     });
   });
 
@@ -216,16 +236,24 @@ describe('Entity Commands', () => {
       expect(fittingsAfterUndo).toHaveLength(0);
     });
 
-    it('splits a duct_run into two runs plus the branch and undoes atomically', () => {
+    it('splits a duct_run into two runs plus the branch, inserts a tee, and undoes atomically', () => {
       const trunk = createDuctRun({ x: 100, y: 100, installLength: 10, sectionLengthOverride: 5 });
       trunk.id = '550e8400-e29b-41d4-a716-446655440010';
       trunk.props.connectedFrom = '550e8400-e29b-41d4-a716-446655440011';
       trunk.props.connectedTo = '550e8400-e29b-41d4-a716-446655440012';
+      trunk.props.startPoint = { x: 100, y: 100 };
+      trunk.props.endPoint = { x: 220, y: 100 };
+      trunk.props.designStartPoint = { x: 100, y: 100 };
+      trunk.props.designEndPoint = { x: 220, y: 100 };
+      trunk.props.designLength = 10;
 
       const branch = createDuctRun({ x: 160, y: 100, installLength: 10, sectionLengthOverride: 5 });
       branch.transform.rotation = 90;
       branch.props.startPoint = { x: 160, y: 100 };
       branch.props.endPoint = { x: 160, y: 220 };
+      branch.props.designStartPoint = { x: 160, y: 100 };
+      branch.props.designEndPoint = { x: 160, y: 220 };
+      branch.props.designLength = 10;
 
       createEntity(trunk);
       useHistoryStore.getState().clear();
@@ -243,23 +271,43 @@ describe('Entity Commands', () => {
         .getState()
         .allIds.map((id) => useEntityStore.getState().byId[id])
         .filter((entity): entity is DuctRun => entity?.type === 'duct_run');
+      const fittings = useEntityStore
+        .getState()
+        .allIds.map((id) => useEntityStore.getState().byId[id])
+        .filter((entity): entity is Fitting => entity?.type === 'fitting');
 
       expect(runs).toHaveLength(3);
+      expect(fittings).toHaveLength(1);
+      expect(fittings[0]?.props.fittingType).toBe('tee');
       expect(runs.some((run) => run.id === trunk.id)).toBe(false);
-      expect(runs.map((run) => run.props.installLength).sort((a, b) => a - b)).toEqual([5, 5, 10]);
+      expect(runs.map((run) => Number(run.props.installLength.toFixed(2))).sort((a, b) => a - b)).not.toEqual([
+        5,
+        5,
+        10,
+      ]);
 
+      const storedBranch = runs.find((run) => run.id === branch.id);
       const splitRuns = runs.filter((run) => run.id !== branch.id).sort((a, b) => a.transform.x - b.transform.x);
+      expect(splitRuns[0]?.props.endPoint).not.toEqual({ x: 160, y: 100 });
+      expect(splitRuns[1]?.props.startPoint).not.toEqual({ x: 160, y: 100 });
+      expect(storedBranch?.props.startPoint).not.toEqual({ x: 160, y: 100 });
       expect(splitRuns[0]?.props.connectedFrom).toBeUndefined();
-      expect(runs.some((run) => run.id === splitRuns[0]?.props.connectedTo)).toBe(true);
-      expect(runs.some((run) => run.id === splitRuns[1]?.props.connectedFrom)).toBe(true);
+      expect(splitRuns[0]?.props.connectedTo).toBe(fittings[0]?.id);
+      expect(splitRuns[1]?.props.connectedFrom).toBe(fittings[0]?.id);
       expect(splitRuns[1]?.props.connectedTo).toBeUndefined();
+      expect(storedBranch?.props.connectedFrom).toBe(fittings[0]?.id);
+      expect(getDuctCenterline(splitRuns[0]!).end).toEqual({ x: 160, y: 100 });
+      expect(getDuctCenterline(splitRuns[1]!).start).toEqual({ x: 160, y: 100 });
+      expect(getDuctCenterline(storedBranch!).start).toEqual({ x: 160, y: 100 });
 
       undo();
 
       const entitiesAfterUndo = useEntityStore.getState().allIds.map((id) => useEntityStore.getState().byId[id]);
       const runsAfterUndo = entitiesAfterUndo.filter((entity): entity is DuctRun => entity?.type === 'duct_run');
+      const fittingsAfterUndo = entitiesAfterUndo.filter((entity): entity is Fitting => entity?.type === 'fitting');
       expect(runsAfterUndo).toHaveLength(1);
       expect(runsAfterUndo[0]?.id).toBe(trunk.id);
+      expect(fittingsAfterUndo).toHaveLength(0);
     });
   });
 

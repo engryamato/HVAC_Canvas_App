@@ -31,6 +31,22 @@ describe('ProjectStore', () => {
     expect(useProjectStore.getState().isDirty).toBe(false);
   });
 
+  it('updates projectDetails.modifiedAt when marking the project modified', () => {
+    const original = '2025-01-01T00:00:00.000Z';
+    useProjectStore.getState().setProject('p1', {
+      projectId: 'p1',
+      projectName: 'Project',
+      isArchived: false,
+      createdAt: original,
+      modifiedAt: original,
+    });
+
+    useProjectStore.getState().markProjectModified('2025-01-02T00:00:00.000Z');
+
+    expect(useProjectStore.getState().projectDetails?.modifiedAt).toBe('2025-01-02T00:00:00.000Z');
+    expect(useProjectStore.getState().isDirty).toBe(true);
+  });
+
   it('clears project to initial state', () => {
     useProjectStore.getState().setProject('project-1', mockDetails);
     useProjectStore.getState().setDirty(true);

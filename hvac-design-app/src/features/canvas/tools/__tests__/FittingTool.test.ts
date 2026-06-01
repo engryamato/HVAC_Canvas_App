@@ -24,6 +24,7 @@ describe('FittingTool', () => {
       systemType: 'supply',
       source: 'system',
       placeable: true,
+      isCustom: false,
       recommendedFittingEntryIds: [],
       recommendedAccessoryEntryIds: [],
       recommendedEquipmentEntryIds: [],
@@ -39,6 +40,7 @@ describe('FittingTool', () => {
         laborUnits: 1,
         wasteFactor: 0.1,
       },
+      materials: [],
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     });

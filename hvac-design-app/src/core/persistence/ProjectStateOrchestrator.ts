@@ -3,6 +3,7 @@ import { CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema/project-
 import { useEntityStore } from '@/core/store/entityStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { useValidationStore } from '@/core/store/validationStore';
 import { calculateSystemMetrics } from '@/features/canvas/hooks/useSystemCalculations';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useViewportStore } from '@/features/canvas/store/viewportStore';
@@ -164,12 +165,14 @@ export function hydrateToStores(
   const historyStore = useHistoryStore.getState();
   const projectStore = useProjectStore.getState();
   const preferencesStore = usePreferencesStore.getState();
+  const validationStore = useValidationStore.getState();
 
   if (project.entities) {
-    entityStore.hydrate(project.entities);
+    entityStore.hydrate(project.entities as Parameters<typeof entityStore.hydrate>[0]);
   } else {
     entityStore.clearAllEntities();
   }
+  const hydratedEntityIds = new Set(useEntityStore.getState().allIds);
 
   if (hydrationPayload.viewport) {
     useViewportStore.setState({
@@ -240,10 +243,18 @@ export function hydrateToStores(
     threeDViewStore.hydrateThreeDView(project.threeDViewState);
   }
 
+  const selectedIds = (hydrationPayload.selection?.selectedIds ?? []).filter((id) => hydratedEntityIds.has(id));
+  const hoveredId = hydrationPayload.selection?.hoveredId;
   useSelectionStore.setState({
-    selectedIds: hydrationPayload.selection?.selectedIds ?? [],
-    hoveredId: hydrationPayload.selection?.hoveredId ?? null,
+    selectedIds,
+    hoveredId: hoveredId && hydratedEntityIds.has(hoveredId) ? hoveredId : null,
   });
+
+  for (const entityId of Object.keys(validationStore.validationResults)) {
+    if (!hydratedEntityIds.has(entityId)) {
+      validationStore.clearValidation(entityId);
+    }
+  }
 
   const fallbackPast = project.commandHistory?.commands ?? [];
   const fallbackCurrentIndex =

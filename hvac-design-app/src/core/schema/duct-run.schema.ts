@@ -119,6 +119,9 @@ const SharedDuctRunPropsSchema = z.object({
   segments: DuctRunSegmentsSchema,
   startPoint: DuctRunPointSchema.optional(),
   endPoint: DuctRunPointSchema.optional(),
+  designStartPoint: DuctRunPointSchema.optional().describe('Authored, uncut centerline start point'),
+  designEndPoint: DuctRunPointSchema.optional().describe('Authored, uncut centerline end point'),
+  designLength: z.number().min(0.1).max(1000).optional().describe('Authored, uncut run length in feet'),
   connectedFrom: z.string().uuid().optional().describe('Source entity ID'),
   connectedTo: z.string().uuid().optional().describe('Destination entity ID'),
   serviceId: ServiceIdSchema,
@@ -190,6 +193,9 @@ export const DuctRunPropsSchema = z
       engineeringSystem: DuctRunFamilySchema.safeParse(candidate.engineeringSystem).success
         ? candidate.engineeringSystem
         : 'standard_duct',
+      designStartPoint: candidate.designStartPoint ?? candidate.startPoint,
+      designEndPoint: candidate.designEndPoint ?? candidate.endPoint,
+      designLength: candidate.designLength ?? candidate.installLength,
       ...(insulationType !== undefined ? { insulationType } : {}),
       insulationThickness,
       startEndType,

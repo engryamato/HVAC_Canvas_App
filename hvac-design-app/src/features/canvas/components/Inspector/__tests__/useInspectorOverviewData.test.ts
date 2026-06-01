@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildActivityItems,
+  buildEntityBounds,
   buildElementInventory,
   buildHealthItems,
+  buildProject,
   buildSystems,
 } from '../useInspectorOverviewData';
+import { buildGeometryRepairPlan } from '../../../services/geometryRepairService';
+import { buildInspectorFocusRequest } from '../../../utils/inspectorFocus';
 
 describe('inspector overview data helpers', () => {
   it('builds element inventory with zero-count categories intact', () => {
@@ -39,6 +43,28 @@ describe('inspector overview data helpers', () => {
     expect(health).toEqual([
       { id: 'unconnected', status: 'warning', label: 'Unconnected', count: 1 },
       { id: 'invalid_transition', status: 'error', label: 'Invalid Transition', count: 1 },
+    ]);
+  });
+
+  // Model health intentionally renders the validation store's actual violation types.
+  // It does not maintain a fixed list of SMACNA checks in the component.
+  it('groups unresolved catalog and multiple validation rule families', () => {
+    const health = buildHealthItems({
+      'fitting-1': {
+        entityId: 'fitting-1',
+        catalogStatus: 'unresolved',
+        lastValidated: new Date('2026-05-26T00:00:00.000Z'),
+        violations: [
+          { ruleId: 'topology', type: 'unconnected', severity: 'warning', message: 'Unconnected' },
+          { ruleId: 'geometry', type: 'invalid_transition', severity: 'blocker', message: 'Invalid transition' },
+        ],
+      },
+    } as never);
+
+    expect(health).toEqual([
+      { id: 'unconnected', status: 'warning', label: 'Unconnected', count: 1 },
+      { id: 'invalid_transition', status: 'error', label: 'Invalid Transition', count: 1 },
+      { id: 'unresolved_catalog', status: 'warning', label: 'Unresolved Catalog', count: 1 },
     ]);
   });
 
@@ -85,6 +111,21 @@ describe('inspector overview data helpers', () => {
     ]);
   });
 
+  it('limits recent activity to ten newest commands', () => {
+    const commands = Array.from({ length: 12 }, (_, index) => ({
+      id: String(index),
+      type: 'CREATE_ENTITY',
+      payload: { entity: { type: 'duct', props: { name: `Duct ${index}` } } },
+      timestamp: index * 1000,
+    }));
+
+    const activity = buildActivityItems(commands as never, new Date(12000));
+
+    expect(activity).toHaveLength(10);
+    expect(activity[0].id).toBe('11');
+    expect(activity[9].id).toBe('2');
+  });
+
   it('replaces raw UUID targets with readable activity copy', () => {
     const activity = buildActivityItems(
       [
@@ -100,5 +141,74 @@ describe('inspector overview data helpers', () => {
 
     expect(activity[0].target).toBe('Selected item');
     expect(activity[0].target).not.toContain('06d8ae67');
+  });
+
+  it('builds focus metadata for inspector selections', () => {
+    expect(buildInspectorFocusRequest(['a', 'a', 'b'])).toEqual({
+      ids: ['a', 'b'],
+      shouldFocus: true,
+      status: 'Selected 2 canvas elements.',
+    });
+  });
+
+  it('builds bounds from entities with position and size props', () => {
+    const bounds = buildEntityBounds([
+      { id: 'room-1', type: 'room', props: { x: 10, y: 20, width: 100, height: 50 } },
+      { id: 'duct-1', type: 'duct', props: { x: 200, y: 100, width: 40, height: 20 } },
+    ] as never);
+
+    expect(bounds).toEqual({ x: 10, y: 20, width: 230, height: 100 });
+  });
+
+  it('builds equipment bounds from canvas transform, plan width, and depth', () => {
+    const bounds = buildEntityBounds([
+      {
+        id: 'equipment-1',
+        type: 'equipment',
+        transform: { x: 10, y: 20, scaleX: 1, scaleY: 1 },
+        props: { width: 160, depth: 40, height: 240 },
+      },
+    ] as never);
+
+    expect(bounds).toEqual({ x: 10, y: 20, width: 160, height: 40 });
+  });
+
+  it('builds bounds from duct run endpoints', () => {
+    const bounds = buildEntityBounds([
+      {
+        id: 'run-1',
+        type: 'duct_run',
+        props: {
+          startPoint: { x: 100, y: 200 },
+          endPoint: { x: 280, y: 140 },
+        },
+      },
+    ] as never);
+
+    expect(bounds).toEqual({ x: 100, y: 140, width: 180, height: 60 });
+  });
+
+  it('plans geometry repair without silently mutating model geometry', () => {
+    const result = buildGeometryRepairPlan({
+      'duct-1': {
+        entityId: 'duct-1',
+        catalogStatus: 'resolved',
+        lastValidated: new Date('2026-05-26T00:00:00.000Z'),
+        violations: [{ ruleId: 'geometry', type: 'invalid_transition', severity: 'blocker', message: 'Invalid' }],
+      },
+    } as never);
+
+    expect(result.requiresConfirmation).toBe(true);
+    expect(result.reversible).toBe(true);
+    expect(result.changedEntityIds).toEqual(['duct-1']);
+  });
+
+  it('renders dash values instead of fabricated project metadata', () => {
+    expect(buildProject(null as never)).toMatchObject({
+      name: 'Untitled',
+      modified: '-',
+      engineer: '-',
+      author: '-',
+    });
   });
 });

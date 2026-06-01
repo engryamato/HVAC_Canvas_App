@@ -78,6 +78,7 @@ describe('Tool Workflow Integration Tests', () => {
       systemType: overrides.systemType ?? 'supply',
       source: overrides.source ?? 'system',
       placeable: overrides.placeable ?? true,
+      isCustom: overrides.isCustom ?? false,
       pricing: overrides.pricing ?? { materialCost: 10, laborUnits: 1, wasteFactor: 0.1 },
       engineeringProperties: overrides.engineeringProperties ?? {
         frictionFactor: 0.02,
@@ -519,7 +520,7 @@ describe('Tool Workflow Integration Tests', () => {
       const ducts = entities.filter((entity): entity is Duct | DuctRun => entity?.type === 'duct' || entity?.type === 'duct_run');
       expect(fittings.length).toBe(1);
 
-      const ductToRemove = ducts.find((duct) => duct.transform.x === 220 && duct.transform.y === 100);
+      const ductToRemove = ducts.find((duct) => duct.props.connectedFrom === fittings[0]?.id);
       expect(ductToRemove).toBeDefined();
       if (!ductToRemove) {
         throw new Error('Expected connected duct to remove');

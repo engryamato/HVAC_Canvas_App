@@ -1,6 +1,7 @@
 import type { Entity, Equipment, Fitting } from '@/core/schema';
 import { ConnectionGraph, GraphNode, GraphEdge, AffectedEntitiesResult } from './types';
 import { graphCache } from './GraphCache';
+import { isEquipmentEntityOutletPort } from './equipmentPortFlow';
 
 export class ConnectionGraphBuilder {
   private graph: ConnectionGraph;
@@ -77,6 +78,7 @@ export class ConnectionGraphBuilder {
   static buildFromPersistedMetadata(entitiesById: Record<string, Entity>): ConnectionGraph {
     const builder = new ConnectionGraphBuilder();
     const entities = Object.values(entitiesById);
+    const equipmentPortConnectionKeys = collectEquipmentPortConnectionKeys(entities);
 
     for (const entity of entities) {
       if (entity.type === 'room' || entity.type === 'note' || entity.type === 'group') {
@@ -99,7 +101,12 @@ export class ConnectionGraphBuilder {
       });
     }
 
-    const addEdge = (source: string | undefined, target: string | undefined, type: GraphEdge['type'] = 'direct') => {
+    const addEdge = (
+      source: string | undefined,
+      target: string | undefined,
+      type: GraphEdge['type'] = 'direct',
+      metadata: GraphEdge['metadata'] = {}
+    ) => {
       if (!source || !target || source === target) {
         return;
       }
@@ -111,28 +118,109 @@ export class ConnectionGraphBuilder {
         source,
         target,
         type,
-        metadata: {},
+        metadata,
       });
     };
 
     for (const entity of entities) {
       if ((entity.type === 'duct' || entity.type === 'duct_run') && 'props' in entity) {
-        addEdge(entity.props.connectedFrom, entity.id);
-        addEdge(entity.id, entity.props.connectedTo);
+        if (!isEquipmentPortConnection(equipmentPortConnectionKeys, entity.props.connectedFrom, entity.id)) {
+          addEdge(entity.props.connectedFrom, entity.id, 'direct', {
+            targetEndpoint: {
+              objectId: entity.id,
+              objectType: entity.type,
+              connectionPointId: 'start',
+            },
+          });
+        }
+        if (!isEquipmentPortConnection(equipmentPortConnectionKeys, entity.props.connectedTo, entity.id)) {
+          addEdge(entity.id, entity.props.connectedTo, 'direct', {
+            sourceEndpoint: {
+              objectId: entity.id,
+              objectType: entity.type,
+              connectionPointId: 'end',
+            },
+          });
+        }
       }
 
       if (entity.type === 'equipment') {
         const equipment = entity as Equipment;
-        addEdge(equipment.id, equipment.props.connectedDuctId);
+        let addedPortEdge = false;
+        for (const port of equipment.props.connectionPorts ?? []) {
+          if (!port.connectedDuctId) {
+            continue;
+          }
+
+          addedPortEdge = true;
+          const isOutletPort = isEquipmentEntityOutletPort(equipment, port);
+          const edgeId = isOutletPort
+            ? `${equipment.id}:${port.id}->${port.connectedDuctId}`
+            : `${port.connectedDuctId}->${equipment.id}:${port.id}`;
+          const source = isOutletPort ? equipment.id : port.connectedDuctId;
+          const target = isOutletPort ? port.connectedDuctId : equipment.id;
+
+          if (builder.graph.nodes.has(source) && builder.graph.nodes.has(target)) {
+            const ductEndpoint = resolveDuctEndpointRef(entitiesById[port.connectedDuctId], equipment.id);
+            builder.addEdge({
+              id: edgeId,
+              source,
+              target,
+              type: 'direct',
+              metadata: {
+                sourceEndpoint: isOutletPort
+                  ? {
+                      objectId: equipment.id,
+                      objectType: 'equipment',
+                      connectionPointId: port.id,
+                    }
+                  : ductEndpoint,
+                targetEndpoint: isOutletPort
+                  ? ductEndpoint
+                  : {
+                      objectId: equipment.id,
+                      objectType: 'equipment',
+                      connectionPointId: port.id,
+                    },
+              },
+            });
+          }
+        }
+
+        if (!addedPortEdge) {
+          addEdge(equipment.id, equipment.props.connectedDuctId);
+        }
       }
 
       if (entity.type === 'fitting') {
         const fitting = entity as Fitting;
         for (const port of fitting.props.ports ?? []) {
           if (port.direction === 'in') {
-            addEdge(port.connectedDuctRunId, fitting.id, 'fitting');
+            addEdge(port.connectedDuctRunId, fitting.id, 'fitting', {
+              sourceEndpoint: {
+                objectId: port.connectedDuctRunId,
+                objectType: 'duct_run',
+                connectionPointId: port.connectedEnd,
+              },
+              targetEndpoint: {
+                objectId: fitting.id,
+                objectType: 'fitting',
+                connectionPointId: fittingConnectionPointId(port.role),
+              },
+            });
           } else {
-            addEdge(fitting.id, port.connectedDuctRunId, 'fitting');
+            addEdge(fitting.id, port.connectedDuctRunId, 'fitting', {
+              sourceEndpoint: {
+                objectId: fitting.id,
+                objectType: 'fitting',
+                connectionPointId: fittingConnectionPointId(port.role),
+              },
+              targetEndpoint: {
+                objectId: port.connectedDuctRunId,
+                objectType: 'duct_run',
+                connectionPointId: port.connectedEnd,
+              },
+            });
           }
         }
       }
@@ -140,6 +228,79 @@ export class ConnectionGraphBuilder {
 
     return builder.build(entities.map((entity) => entity.id));
   }
+}
+
+function fittingConnectionPointId(role: string): string {
+  switch (role) {
+    case 'inlet':
+      return 'INLET';
+    case 'straight_out':
+    case 'outlet':
+      return 'OUTLET';
+    case 'branch_out':
+      return 'BRANCH';
+    default:
+      return role.toUpperCase();
+  }
+}
+
+function resolveDuctEndpointRef(entity: Entity | undefined, connectedEntityId: string): GraphEdge['metadata']['sourceEndpoint'] {
+  if (!entity || (entity.type !== 'duct' && entity.type !== 'duct_run')) {
+    return undefined;
+  }
+
+  if (entity.props.connectedFrom === connectedEntityId) {
+    return {
+      objectId: entity.id,
+      objectType: entity.type,
+      connectionPointId: 'start',
+    };
+  }
+
+  if (entity.props.connectedTo === connectedEntityId) {
+    return {
+      objectId: entity.id,
+      objectType: entity.type,
+      connectionPointId: 'end',
+    };
+  }
+
+  return undefined;
+}
+
+function collectEquipmentPortConnectionKeys(entities: Entity[]): Set<string> {
+  const keys = new Set<string>();
+
+  for (const entity of entities) {
+    if (entity.type !== 'equipment') {
+      continue;
+    }
+
+    const equipment = entity as Equipment;
+    for (const port of equipment.props.connectionPorts ?? []) {
+      if (port.connectedDuctId) {
+        keys.add(physicalConnectionKey(equipment.id, port.connectedDuctId));
+      }
+    }
+  }
+
+  return keys;
+}
+
+function isEquipmentPortConnection(
+  equipmentPortConnectionKeys: Set<string>,
+  possibleEquipmentId: string | undefined,
+  ductId: string
+): boolean {
+  if (!possibleEquipmentId) {
+    return false;
+  }
+
+  return equipmentPortConnectionKeys.has(physicalConnectionKey(possibleEquipmentId, ductId));
+}
+
+function physicalConnectionKey(firstEntityId: string, secondEntityId: string): string {
+  return [firstEntityId, secondEntityId].sort().join('<->');
 }
 
 function toGraphNodeType(type: string): GraphNode['type'] {

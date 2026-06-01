@@ -32,12 +32,44 @@ export const FittingPortSchema = z.object({
 
 export type FittingPort = z.infer<typeof FittingPortSchema>;
 
+/**
+ * Per-port end treatment. Drives the end-line decoration and (future)
+ * fabrication notes. Optional so legacy projects load unchanged.
+ */
+export const FittingEndTypeSchema = z.enum(['raw', 'flange', 'crimped', 'coupled', 'slip_joint']);
+export type FittingEndType = z.infer<typeof FittingEndTypeSchema>;
+
 const SharedFittingPropsSchema = z.object({
   name: z.string().min(1).max(100).optional().describe('Optional fitting name/label'),
   fittingType: FittingTypeSchema,
   angle: z.number().min(0).max(180).optional().describe('Angle in degrees (for elbows)'),
   inletDuctId: z.string().uuid().optional(),
   outletDuctId: z.string().uuid().optional(),
+
+  // Parametric geometry fields (see fittingGeometry.ts). All optional with
+  // documented defaults so existing persisted projects load unchanged and
+  // render through the new geometry system using safe fallbacks.
+  radiusRatio: z
+    .number()
+    .min(0.5)
+    .max(3.0)
+    .optional()
+    .describe('Elbow centerline radius / duct width (R/W). SMACNA default 1.5.'),
+  neckLength: z
+    .number()
+    .min(0)
+    .max(120)
+    .optional()
+    .describe('Straight throat/neck length at openings, inches.'),
+  insulated: z.boolean().optional().describe('Whether the fitting carries external insulation'),
+  insulationThickness: z
+    .number()
+    .min(0)
+    .max(12)
+    .optional()
+    .describe('External insulation thickness, inches (when insulated).'),
+  endTypeInlet: FittingEndTypeSchema.optional().describe('End treatment at the inlet opening'),
+  endTypeOutlet: FittingEndTypeSchema.optional().describe('End treatment at the outlet opening'),
   
   // Service & Catalog references
   serviceId: ServiceIdSchema,

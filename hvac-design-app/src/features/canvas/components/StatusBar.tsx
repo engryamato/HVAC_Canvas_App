@@ -5,6 +5,11 @@ import { useZoom, useSnapToGrid, useGridVisible } from '../store/viewportStore';
 import { useSelectionCount } from '../store/selectionStore';
 import { useCursorStore } from '../store/cursorStore';
 import { useActiveViewMode } from '../store/viewModeStore';
+import {
+  useToolStore,
+  useEquipmentPlacementDraft,
+  useEquipmentPlacementDialogOpen,
+} from '@/core/store/canvas.store';
 
 /**
  * StatusBar - Canvas status bar showing cursor position and zoom
@@ -30,6 +35,9 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
   const selectionCount = useSelectionCount();
   const lastCanvasPoint = useCursorStore((state) => state.lastCanvasPoint);
   const activeViewMode = useActiveViewMode();
+  const currentTool = useToolStore((s) => s.currentTool);
+  const equipmentDraft = useEquipmentPlacementDraft();
+  const equipmentDialogOpen = useEquipmentPlacementDialogOpen();
 
   const mousePosition = propMousePosition !== undefined ? propMousePosition : lastCanvasPoint;
 
@@ -47,17 +55,28 @@ export function StatusBar({ mousePosition: propMousePosition, className = '' }: 
       aria-live="polite"
       data-testid="status-bar"
     >
-      {/* Left section: Mouse position */}
+      {/* Left section: Mouse position / tool hint */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1" aria-label="Mouse position">
-          {mousePosition ? (
-            <span className="font-mono font-medium text-slate-900">
-              X: {formatPosition(mousePosition.x)} Y: {formatPosition(mousePosition.y)}
-            </span>
-          ) : (
-            <span className="text-slate-400">—</span>
-          )}
-        </div>
+        {/* Equipment placement hint */}
+        {currentTool === 'equipment' && !equipmentDialogOpen ? (
+          <span className="text-slate-700 font-medium">
+            Placing: <span className="font-semibold text-orange-700">{equipmentDraft.name}</span>
+            {' '}({equipmentDraft.capacity.toLocaleString()} {equipmentDraft.capacityUnit})
+            {' · '}Click to place
+            {' · '}<kbd className="font-mono bg-slate-100 px-1 rounded text-slate-600">[E]</kbd> Edit specs
+            {' · '}<kbd className="font-mono bg-slate-100 px-1 rounded text-slate-600">[Esc]</kbd> Cancel
+          </span>
+        ) : (
+          <div className="flex items-center gap-1" aria-label="Mouse position">
+            {mousePosition ? (
+              <span className="font-mono font-medium text-slate-900">
+                X: {formatPosition(mousePosition.x)} Y: {formatPosition(mousePosition.y)}
+              </span>
+            ) : (
+              <span className="text-slate-400">—</span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Center section: Zoom, Grid visibility, and Snap status */}

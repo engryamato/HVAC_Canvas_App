@@ -1,0 +1,820 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/components/ui/select.tsx",
+      "type": "file",
+      "name": "select.tsx",
+      "filePath": "src/components/ui/select.tsx",
+      "summary": "Radix-based Select UI primitive set (trigger, content, item, label, separator) re-exported for use across forms and dialogs.",
+      "tags": ["component", "ui-primitive", "barrel", "form"],
+      "complexity": "moderate",
+      "languageNotes": "Wraps Radix UI primitives with Tailwind styling and forwardRef."
+    },
+    {
+      "id": "file:src/components/ui/tabs.tsx",
+      "type": "file",
+      "name": "tabs.tsx",
+      "filePath": "src/components/ui/tabs.tsx",
+      "summary": "Radix-based Tabs UI primitives (Tabs, TabsList, TabsTrigger, TabsContent) with Tailwind styling.",
+      "tags": ["component", "ui-primitive", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/ui/textarea.tsx",
+      "type": "file",
+      "name": "textarea.tsx",
+      "filePath": "src/components/ui/textarea.tsx",
+      "summary": "Styled Textarea UI primitive with forwardRef for use in forms.",
+      "tags": ["component", "ui-primitive", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/core/persistence/webFileHandles.ts",
+      "type": "file",
+      "name": "webFileHandles.ts",
+      "filePath": "src/core/persistence/webFileHandles.ts",
+      "summary": "Module-level cache holding the active File System Access API handle for the current web project file.",
+      "tags": ["persistence", "utility", "state"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/core/persistence/webProjectFileIO.ts",
+      "type": "file",
+      "name": "webProjectFileIO.ts",
+      "filePath": "src/core/persistence/webProjectFileIO.ts",
+      "summary": "Browser project file I/O using the File System Access API with download fallback for saving and opening serialized project files.",
+      "tags": ["persistence", "serialization", "file-io", "utility"],
+      "complexity": "moderate",
+      "languageNotes": "Feature-detects showOpenFilePicker/showSaveFilePicker and falls back to anchor download."
+    },
+    {
+      "id": "file:src/core/services/migration/BackupManager.ts",
+      "type": "file",
+      "name": "BackupManager.ts",
+      "filePath": "src/core/services/migration/BackupManager.ts",
+      "summary": "Manages creation, restoration, listing, and cleanup of project backups in storage, including pre-migration snapshots and rollback.",
+      "tags": ["service", "persistence", "migration", "backup"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/templates/systemTemplateService.ts",
+      "type": "file",
+      "name": "systemTemplateService.ts",
+      "filePath": "src/core/services/templates/systemTemplateService.ts",
+      "summary": "Service that manages HVAC system calculation-setting templates: default templates, CRUD operations, and applying templates to settings.",
+      "tags": ["service", "templates", "data-model", "singleton"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/AccordionLibrary.tsx",
+      "type": "file",
+      "name": "AccordionLibrary.tsx",
+      "filePath": "src/features/canvas/components/AccordionLibrary.tsx",
+      "summary": "Accordion-based component library panel listing fittings and unified components grouped for drag/insert onto the canvas.",
+      "tags": ["component", "canvas", "library"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/BulkEditDialog.tsx",
+      "type": "file",
+      "name": "BulkEditDialog.tsx",
+      "filePath": "src/features/canvas/components/BulkEditDialog.tsx",
+      "summary": "Dialog for editing properties of multiple selected canvas entities at once with tabbed fields and component resolution.",
+      "tags": ["component", "dialog", "canvas", "bulk-edit"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/CalculationSettingsDialog.tsx",
+      "type": "file",
+      "name": "CalculationSettingsDialog.tsx",
+      "filePath": "src/features/canvas/components/CalculationSettingsDialog.tsx",
+      "summary": "Large tabbed dialog for configuring HVAC calculation settings, integrating system templates and persisting to the settings store.",
+      "tags": ["component", "dialog", "settings", "canvas"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/DuctSizePromptDialog.tsx",
+      "type": "file",
+      "name": "DuctSizePromptDialog.tsx",
+      "filePath": "src/features/canvas/components/DuctSizePromptDialog.tsx",
+      "summary": "Prompt dialog for entering duct dimensions (round/rectangular) when drawing or sizing a duct run on the canvas.",
+      "tags": ["component", "dialog", "canvas", "duct"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx",
+      "type": "file",
+      "name": "DuctToolOptionsPanel.tsx",
+      "filePath": "src/features/canvas/components/DuctToolOptionsPanel.tsx",
+      "summary": "Inline options panel controlling duct-drawing tool settings (shape, size, endpoints) bound to the canvas store.",
+      "tags": ["component", "canvas", "duct", "tool"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx",
+      "type": "file",
+      "name": "EquipmentPlacementDialog.tsx",
+      "filePath": "src/features/canvas/components/EquipmentPlacementDialog.tsx",
+      "summary": "Dialog for selecting and configuring HVAC equipment before placing it on the canvas, with auto-incrementing names.",
+      "tags": ["component", "dialog", "canvas", "equipment"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx",
+      "type": "file",
+      "name": "TabbedPropertiesPanel.tsx",
+      "filePath": "src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx",
+      "summary": "Inspector panel that organizes entity property editors into tabs.",
+      "tags": ["component", "inspector", "canvas"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/features/canvas/components/ResolutionWizard.tsx",
+      "type": "file",
+      "name": "ResolutionWizard.tsx",
+      "filePath": "src/features/canvas/components/ResolutionWizard.tsx",
+      "summary": "Wizard dialog guiding the user through resolving validation issues for components on the canvas.",
+      "tags": ["component", "dialog", "validation", "canvas"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/ServiceEditor.tsx",
+      "type": "file",
+      "name": "ServiceEditor.tsx",
+      "filePath": "src/features/canvas/components/ServiceEditor.tsx",
+      "summary": "Editor dialog for creating and updating HVAC services/components, mapping form data to unified component material types.",
+      "tags": ["component", "dialog", "service", "canvas"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/ServiceList.tsx",
+      "type": "file",
+      "name": "ServiceList.tsx",
+      "filePath": "src/features/canvas/components/ServiceList.tsx",
+      "summary": "Lists configured HVAC services/components with badges and edit/delete actions backed by the component library store.",
+      "tags": ["component", "service", "list", "canvas"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/SystemTemplateSelector.tsx",
+      "type": "file",
+      "name": "SystemTemplateSelector.tsx",
+      "filePath": "src/features/canvas/components/SystemTemplateSelector.tsx",
+      "summary": "Dialog for browsing and applying system calculation-setting templates, including default and custom templates.",
+      "tags": ["component", "dialog", "templates", "settings"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/dashboard/components/ConfirmDialog.tsx",
+      "type": "file",
+      "name": "ConfirmDialog.tsx",
+      "filePath": "src/features/dashboard/components/ConfirmDialog.tsx",
+      "summary": "Generic confirmation dialog with configurable title, message, and confirm/cancel actions.",
+      "tags": ["component", "dialog", "dashboard"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx",
+      "type": "file",
+      "name": "DeleteConfirmDialog.tsx",
+      "filePath": "src/features/dashboard/components/DeleteConfirmDialog.tsx",
+      "summary": "Confirmation dialog for deleting a project, requiring typed confirmation and invoking the project list store.",
+      "tags": ["component", "dialog", "dashboard", "destructive"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/dashboard/components/EditProjectDialog.tsx",
+      "type": "file",
+      "name": "EditProjectDialog.tsx",
+      "filePath": "src/features/dashboard/components/EditProjectDialog.tsx",
+      "summary": "Dialog for editing project metadata and settings, persisting through the project list and project stores.",
+      "tags": ["component", "dialog", "dashboard", "project"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/dashboard/components/NewProjectDialog.tsx",
+      "type": "file",
+      "name": "NewProjectDialog.tsx",
+      "filePath": "src/features/dashboard/components/NewProjectDialog.tsx",
+      "summary": "Dialog for creating a new project, gathering metadata, initializing storage, and wiring autosave.",
+      "tags": ["component", "dialog", "dashboard", "project"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/export/ExportDialog.tsx",
+      "type": "file",
+      "name": "ExportDialog.tsx",
+      "filePath": "src/features/export/ExportDialog.tsx",
+      "summary": "Dialog presenting export format and options selections backed by the settings store.",
+      "tags": ["component", "dialog", "export"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/export/ExportReportDialog.tsx",
+      "type": "file",
+      "name": "ExportReportDialog.tsx",
+      "filePath": "src/features/export/ExportReportDialog.tsx",
+      "summary": "Dialog generating an export report from the project snapshot, formatting entity labels and invoking export hooks.",
+      "tags": ["component", "dialog", "export", "report"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/export/components/EnhancedExportDialog.tsx",
+      "type": "file",
+      "name": "EnhancedExportDialog.tsx",
+      "filePath": "src/features/export/components/EnhancedExportDialog.tsx",
+      "summary": "Enhanced export dialog with format selection, progress reporting, and canvas snapshot generation.",
+      "tags": ["component", "dialog", "export"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/export/components/ExportConfirmationDialogs.tsx",
+      "type": "file",
+      "name": "ExportConfirmationDialogs.tsx",
+      "filePath": "src/features/export/components/ExportConfirmationDialogs.tsx",
+      "summary": "Collection of small confirmation dialogs for export edge cases: empty canvas, large file warning, errors, and unsaved changes.",
+      "tags": ["component", "dialog", "export"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/export/components/PrintDialog.tsx",
+      "type": "file",
+      "name": "PrintDialog.tsx",
+      "filePath": "src/features/export/components/PrintDialog.tsx",
+      "summary": "Print dialog configuring page options and generating a canvas snapshot for printing.",
+      "tags": ["component", "dialog", "export", "print"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/project/components/ProjectSetupWizard.tsx",
+      "type": "file",
+      "name": "ProjectSetupWizard.tsx",
+      "filePath": "src/features/project/components/ProjectSetupWizard.tsx",
+      "summary": "Multi-step wizard for configuring a new project's metadata and calculation settings using system templates.",
+      "tags": ["component", "dialog", "wizard", "project"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/lib/utils.ts",
+      "type": "file",
+      "name": "utils.ts",
+      "filePath": "src/lib/utils.ts",
+      "summary": "Shared utility providing the cn class-name merge helper (clsx + tailwind-merge) used across UI components.",
+      "tags": ["utility", "styling", "helper"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/stores/useProjectStore.ts",
+      "type": "file",
+      "name": "useProjectStore.ts",
+      "filePath": "src/stores/useProjectStore.ts",
+      "summary": "Zustand store holding the current project metadata and selection state for dashboard/project flows.",
+      "tags": ["store", "state", "zustand", "project"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/stores/useViewportStore.ts",
+      "type": "file",
+      "name": "useViewportStore.ts",
+      "filePath": "src/stores/useViewportStore.ts",
+      "summary": "Zustand store tracking viewport state such as zoom and pan offsets.",
+      "tags": ["store", "state", "zustand", "viewport"],
+      "complexity": "simple"
+    },
+
+    {
+      "id": "function:src/core/persistence/webProjectFileIO.ts:downloadProjectFile",
+      "type": "function",
+      "name": "downloadProjectFile",
+      "filePath": "src/core/persistence/webProjectFileIO.ts",
+      "lineRange": [25, 40],
+      "summary": "Triggers a browser download of serialized project text using an anchor element fallback.",
+      "tags": ["utility", "file-io", "download"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/core/persistence/webProjectFileIO.ts:saveProjectToExistingHandleOrDownload",
+      "type": "function",
+      "name": "saveProjectToExistingHandleOrDownload",
+      "filePath": "src/core/persistence/webProjectFileIO.ts",
+      "lineRange": [42, 55],
+      "summary": "Writes the project to a remembered file handle if available, otherwise falls back to a download.",
+      "tags": ["utility", "file-io", "persistence"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/core/persistence/webProjectFileIO.ts:saveProjectAsAndRememberHandle",
+      "type": "function",
+      "name": "saveProjectAsAndRememberHandle",
+      "filePath": "src/core/persistence/webProjectFileIO.ts",
+      "lineRange": [57, 83],
+      "summary": "Prompts the user with a save picker, writes the project, and caches the resulting file handle.",
+      "tags": ["utility", "file-io", "persistence"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/core/persistence/webProjectFileIO.ts:openProjectFromPicker",
+      "type": "function",
+      "name": "openProjectFromPicker",
+      "filePath": "src/core/persistence/webProjectFileIO.ts",
+      "lineRange": [85, 123],
+      "summary": "Opens a project file via the file picker, reads and deserializes it, and remembers the handle.",
+      "tags": ["utility", "file-io", "serialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/core/services/migration/BackupManager.ts:BackupManager",
+      "type": "class",
+      "name": "BackupManager",
+      "filePath": "src/core/services/migration/BackupManager.ts",
+      "lineRange": [51, 352],
+      "summary": "Service class providing full backup lifecycle: create, restore, delete, list, pre-migration snapshots, rollback, import/export, validation, and storage cleanup.",
+      "tags": ["service", "backup", "migration", "persistence"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/core/services/templates/systemTemplateService.ts:SystemTemplateService",
+      "type": "class",
+      "name": "SystemTemplateService",
+      "filePath": "src/core/services/templates/systemTemplateService.ts",
+      "lineRange": [9, 130],
+      "summary": "Service class managing HVAC calculation-setting templates with default initialization, CRUD, application to settings, and import/export.",
+      "tags": ["service", "templates", "data-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/AccordionLibrary.tsx:AccordionLibrary",
+      "type": "function",
+      "name": "AccordionLibrary",
+      "filePath": "src/features/canvas/components/AccordionLibrary.tsx",
+      "lineRange": [20, 137],
+      "summary": "React component rendering an accordion library of fittings and components for canvas insertion.",
+      "tags": ["component", "canvas", "library"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/BulkEditDialog.tsx:BulkEditDialog",
+      "type": "function",
+      "name": "BulkEditDialog",
+      "filePath": "src/features/canvas/components/BulkEditDialog.tsx",
+      "lineRange": [52, 473],
+      "summary": "React dialog component for bulk-editing properties of multiple selected entities.",
+      "tags": ["component", "dialog", "bulk-edit"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/canvas/components/CalculationSettingsDialog.tsx:CalculationSettingsDialog",
+      "type": "function",
+      "name": "CalculationSettingsDialog",
+      "filePath": "src/features/canvas/components/CalculationSettingsDialog.tsx",
+      "lineRange": [29, 576],
+      "summary": "React dialog for configuring HVAC calculation settings across tabbed sections with template support.",
+      "tags": ["component", "dialog", "settings"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/canvas/components/DuctSizePromptDialog.tsx:DuctSizePromptDialog",
+      "type": "function",
+      "name": "DuctSizePromptDialog",
+      "filePath": "src/features/canvas/components/DuctSizePromptDialog.tsx",
+      "lineRange": [39, 178],
+      "summary": "React dialog prompting for duct shape and dimensions during drawing.",
+      "tags": ["component", "dialog", "duct"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/DuctToolOptionsPanel.tsx:DuctToolOptionsPanel",
+      "type": "function",
+      "name": "DuctToolOptionsPanel",
+      "filePath": "src/features/canvas/components/DuctToolOptionsPanel.tsx",
+      "lineRange": [30, 161],
+      "summary": "React panel exposing duct-tool options bound to canvas store state.",
+      "tags": ["component", "canvas", "duct"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/EquipmentPlacementDialog.tsx:EquipmentPlacementDialog",
+      "type": "function",
+      "name": "EquipmentPlacementDialog",
+      "filePath": "src/features/canvas/components/EquipmentPlacementDialog.tsx",
+      "lineRange": [63, 446],
+      "summary": "React dialog for selecting and configuring equipment before canvas placement.",
+      "tags": ["component", "dialog", "equipment"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx:TabbedPropertiesPanel",
+      "type": "function",
+      "name": "TabbedPropertiesPanel",
+      "filePath": "src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx",
+      "lineRange": [18, 51],
+      "summary": "React inspector component organizing entity property editors into tabs.",
+      "tags": ["component", "inspector"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/features/canvas/components/ResolutionWizard.tsx:ResolutionWizard",
+      "type": "function",
+      "name": "ResolutionWizard",
+      "filePath": "src/features/canvas/components/ResolutionWizard.tsx",
+      "lineRange": [20, 138],
+      "summary": "React wizard component for resolving component validation issues.",
+      "tags": ["component", "dialog", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/ServiceEditor.tsx:componentToFormData",
+      "type": "function",
+      "name": "componentToFormData",
+      "filePath": "src/features/canvas/components/ServiceEditor.tsx",
+      "lineRange": [82, 106],
+      "summary": "Maps a unified component into editable service form data fields.",
+      "tags": ["utility", "mapping", "service"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/ServiceEditor.tsx:ServiceEditor",
+      "type": "function",
+      "name": "ServiceEditor",
+      "filePath": "src/features/canvas/components/ServiceEditor.tsx",
+      "lineRange": [108, 288],
+      "summary": "React dialog component for creating and editing HVAC services/components.",
+      "tags": ["component", "dialog", "service"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/canvas/components/ServiceList.tsx:ServiceList",
+      "type": "function",
+      "name": "ServiceList",
+      "filePath": "src/features/canvas/components/ServiceList.tsx",
+      "lineRange": [13, 150],
+      "summary": "React component listing services/components with edit and delete actions.",
+      "tags": ["component", "service", "list"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/canvas/components/SystemTemplateSelector.tsx:SystemTemplateSelector",
+      "type": "function",
+      "name": "SystemTemplateSelector",
+      "filePath": "src/features/canvas/components/SystemTemplateSelector.tsx",
+      "lineRange": [45, 350],
+      "summary": "React dialog for browsing and applying system calculation-setting templates.",
+      "tags": ["component", "dialog", "templates"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/dashboard/components/ConfirmDialog.tsx:ConfirmDialog",
+      "type": "function",
+      "name": "ConfirmDialog",
+      "filePath": "src/features/dashboard/components/ConfirmDialog.tsx",
+      "lineRange": [25, 107],
+      "summary": "Generic React confirmation dialog component.",
+      "tags": ["component", "dialog"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/dashboard/components/DeleteConfirmDialog.tsx:DeleteConfirmDialog",
+      "type": "function",
+      "name": "DeleteConfirmDialog",
+      "filePath": "src/features/dashboard/components/DeleteConfirmDialog.tsx",
+      "lineRange": [28, 195],
+      "summary": "React dialog requiring typed confirmation to delete a project.",
+      "tags": ["component", "dialog", "destructive"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/dashboard/components/EditProjectDialog.tsx:EditProjectDialog",
+      "type": "function",
+      "name": "EditProjectDialog",
+      "filePath": "src/features/dashboard/components/EditProjectDialog.tsx",
+      "lineRange": [26, 430],
+      "summary": "React dialog for editing project metadata and settings.",
+      "tags": ["component", "dialog", "project"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/dashboard/components/NewProjectDialog.tsx:NewProjectDialog",
+      "type": "function",
+      "name": "NewProjectDialog",
+      "filePath": "src/features/dashboard/components/NewProjectDialog.tsx",
+      "lineRange": [28, 437],
+      "summary": "React dialog for creating a new project and initializing its storage and autosave.",
+      "tags": ["component", "dialog", "project"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/export/ExportDialog.tsx:ExportDialog",
+      "type": "function",
+      "name": "ExportDialog",
+      "filePath": "src/features/export/ExportDialog.tsx",
+      "lineRange": [43, 218],
+      "summary": "React dialog for choosing export format and options.",
+      "tags": ["component", "dialog", "export"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/export/ExportReportDialog.tsx:ExportReportDialog",
+      "type": "function",
+      "name": "ExportReportDialog",
+      "filePath": "src/features/export/ExportReportDialog.tsx",
+      "lineRange": [61, 450],
+      "summary": "React dialog generating an export report from the project snapshot.",
+      "tags": ["component", "dialog", "export", "report"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/export/components/EnhancedExportDialog.tsx:EnhancedExportDialog",
+      "type": "function",
+      "name": "EnhancedExportDialog",
+      "filePath": "src/features/export/components/EnhancedExportDialog.tsx",
+      "lineRange": [57, 335],
+      "summary": "React dialog providing enhanced export with progress and snapshot generation.",
+      "tags": ["component", "dialog", "export"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/features/export/components/PrintDialog.tsx:PrintDialog",
+      "type": "function",
+      "name": "PrintDialog",
+      "filePath": "src/features/export/components/PrintDialog.tsx",
+      "lineRange": [36, 185],
+      "summary": "React dialog configuring print options and generating a canvas snapshot.",
+      "tags": ["component", "dialog", "print"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/features/project/components/ProjectSetupWizard.tsx:ProjectSetupWizard",
+      "type": "function",
+      "name": "ProjectSetupWizard",
+      "filePath": "src/features/project/components/ProjectSetupWizard.tsx",
+      "lineRange": [53, 456],
+      "summary": "Multi-step React wizard for configuring new project metadata and calculation settings.",
+      "tags": ["component", "wizard", "project"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/lib/utils.ts:cn",
+      "type": "function",
+      "name": "cn",
+      "filePath": "src/lib/utils.ts",
+      "lineRange": [13, 15],
+      "summary": "Merges Tailwind class names using clsx and tailwind-merge.",
+      "tags": ["utility", "styling", "helper"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    { "source": "file:src/components/ui/select.tsx", "target": "file:src/lib/utils.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/components/ui/tabs.tsx", "target": "file:src/lib/utils.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/components/ui/textarea.tsx", "target": "file:src/lib/utils.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "file:src/core/persistence/serialization.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "file:src/core/persistence/webFileHandles.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "file:src/core/schema/index.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/core/services/templates/systemTemplateService.ts", "target": "file:src/core/schema/calculation-settings.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "file:src/components/ui/accordion.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "file:src/components/ui/badge.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "file:src/core/schema/fitting.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "file:src/core/schema/unified-component.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "file:src/core/store/canvas.store.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "file:src/core/store/componentLibraryStoreV2.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/badge.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/checkbox.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/components/ui/tabs.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/core/schema/index.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/core/schema/unified-component.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/core/store/componentLibraryStoreV2.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "file:src/core/store/entityStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/badge.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/card.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/components/ui/tabs.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/core/schema/calculation-settings.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/core/services/templates/systemTemplateService.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "file:src/core/store/settingsStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/core/schema/index.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "file:src/core/store/canvas.store.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "file:src/core/schema/index.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "file:src/core/store/canvas.store.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/core/schema/equipment.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/core/store/canvas.store.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "file:src/core/store/componentLibraryStoreV2.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx", "target": "file:src/lib/utils.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "file:src/core/store/componentLibraryStoreV2.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "file:src/core/store/validationStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/core/schema/service.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/core/schema/unified-component.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "file:src/core/store/componentLibraryStoreV2.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/ServiceList.tsx", "target": "file:src/components/ui/badge.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceList.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceList.tsx", "target": "file:src/core/services/componentServiceInterop.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/ServiceList.tsx", "target": "file:src/core/store/componentLibraryStoreV2.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/components/ui/badge.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/components/ui/card.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/core/schema/calculation-settings.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "file:src/core/services/templates/systemTemplateService.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/dashboard/components/ConfirmDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/ConfirmDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx", "target": "file:src/features/dashboard/store/projectListStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/accordion.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/checkbox.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/features/dashboard/store/projectListStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "file:src/stores/useProjectStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/accordion.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/checkbox.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/core/persistence/ProjectRepository.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/core/schema/project-file.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/core/services/StorageRootService.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/features/canvas/hooks/useAutoSave.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/features/dashboard/store/projectListStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "file:src/stores/useProjectStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "file:src/components/ui/checkbox.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "file:src/core/store/settingsStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/core/store/entityStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/core/store/project.store.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/core/store/validationStore.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/features/export/buildExportProjectSnapshot.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "file:src/features/export/hooks/useExport.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/components/ui/checkbox.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/components/ui/progress.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/features/export/canvasSnapshot.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "file:src/features/export/types.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/export/components/ExportConfirmationDialogs.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/ExportConfirmationDialogs.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/components/ui/radio-group.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/features/export/canvasSnapshot.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "file:src/features/export/types.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/badge.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/button.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/card.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/dialog.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/input.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/label.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/select.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/components/ui/tabs.tsx", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/core/schema/calculation-settings.schema.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "file:src/core/services/templates/systemTemplateService.ts", "type": "imports", "direction": "forward", "weight": 0.7 },
+
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "function:src/core/persistence/webProjectFileIO.ts:downloadProjectFile", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "function:src/core/persistence/webProjectFileIO.ts:saveProjectToExistingHandleOrDownload", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "function:src/core/persistence/webProjectFileIO.ts:saveProjectAsAndRememberHandle", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "function:src/core/persistence/webProjectFileIO.ts:openProjectFromPicker", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "function:src/core/persistence/webProjectFileIO.ts:saveProjectAsAndRememberHandle", "type": "exports", "direction": "forward", "weight": 0.8 },
+    { "source": "file:src/core/persistence/webProjectFileIO.ts", "target": "function:src/core/persistence/webProjectFileIO.ts:openProjectFromPicker", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/core/services/migration/BackupManager.ts", "target": "class:src/core/services/migration/BackupManager.ts:BackupManager", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/core/services/migration/BackupManager.ts", "target": "class:src/core/services/migration/BackupManager.ts:BackupManager", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/core/services/templates/systemTemplateService.ts", "target": "class:src/core/services/templates/systemTemplateService.ts:SystemTemplateService", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/core/services/templates/systemTemplateService.ts", "target": "class:src/core/services/templates/systemTemplateService.ts:SystemTemplateService", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "function:src/features/canvas/components/AccordionLibrary.tsx:AccordionLibrary", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/AccordionLibrary.tsx", "target": "function:src/features/canvas/components/AccordionLibrary.tsx:AccordionLibrary", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "function:src/features/canvas/components/BulkEditDialog.tsx:BulkEditDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/BulkEditDialog.tsx", "target": "function:src/features/canvas/components/BulkEditDialog.tsx:BulkEditDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "function:src/features/canvas/components/CalculationSettingsDialog.tsx:CalculationSettingsDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "function:src/features/canvas/components/CalculationSettingsDialog.tsx:CalculationSettingsDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+    { "source": "file:src/features/canvas/components/CalculationSettingsDialog.tsx", "target": "class:src/core/services/templates/systemTemplateService.ts:SystemTemplateService", "type": "depends_on", "direction": "forward", "weight": 0.6 },
+
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "function:src/features/canvas/components/DuctSizePromptDialog.tsx:DuctSizePromptDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/DuctSizePromptDialog.tsx", "target": "function:src/features/canvas/components/DuctSizePromptDialog.tsx:DuctSizePromptDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "function:src/features/canvas/components/DuctToolOptionsPanel.tsx:DuctToolOptionsPanel", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/DuctToolOptionsPanel.tsx", "target": "function:src/features/canvas/components/DuctToolOptionsPanel.tsx:DuctToolOptionsPanel", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "function:src/features/canvas/components/EquipmentPlacementDialog.tsx:EquipmentPlacementDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/EquipmentPlacementDialog.tsx", "target": "function:src/features/canvas/components/EquipmentPlacementDialog.tsx:EquipmentPlacementDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx", "target": "function:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx:TabbedPropertiesPanel", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx", "target": "function:src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx:TabbedPropertiesPanel", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "function:src/features/canvas/components/ResolutionWizard.tsx:ResolutionWizard", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/ResolutionWizard.tsx", "target": "function:src/features/canvas/components/ResolutionWizard.tsx:ResolutionWizard", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "function:src/features/canvas/components/ServiceEditor.tsx:componentToFormData", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "function:src/features/canvas/components/ServiceEditor.tsx:ServiceEditor", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/ServiceEditor.tsx", "target": "function:src/features/canvas/components/ServiceEditor.tsx:ServiceEditor", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/ServiceList.tsx", "target": "function:src/features/canvas/components/ServiceList.tsx:ServiceList", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/ServiceList.tsx", "target": "function:src/features/canvas/components/ServiceList.tsx:ServiceList", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "function:src/features/canvas/components/SystemTemplateSelector.tsx:SystemTemplateSelector", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "function:src/features/canvas/components/SystemTemplateSelector.tsx:SystemTemplateSelector", "type": "exports", "direction": "forward", "weight": 0.8 },
+    { "source": "file:src/features/canvas/components/SystemTemplateSelector.tsx", "target": "class:src/core/services/templates/systemTemplateService.ts:SystemTemplateService", "type": "depends_on", "direction": "forward", "weight": 0.6 },
+
+    { "source": "file:src/features/dashboard/components/ConfirmDialog.tsx", "target": "function:src/features/dashboard/components/ConfirmDialog.tsx:ConfirmDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/dashboard/components/ConfirmDialog.tsx", "target": "function:src/features/dashboard/components/ConfirmDialog.tsx:ConfirmDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx", "target": "function:src/features/dashboard/components/DeleteConfirmDialog.tsx:DeleteConfirmDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/dashboard/components/DeleteConfirmDialog.tsx", "target": "function:src/features/dashboard/components/DeleteConfirmDialog.tsx:DeleteConfirmDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "function:src/features/dashboard/components/EditProjectDialog.tsx:EditProjectDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/dashboard/components/EditProjectDialog.tsx", "target": "function:src/features/dashboard/components/EditProjectDialog.tsx:EditProjectDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "function:src/features/dashboard/components/NewProjectDialog.tsx:NewProjectDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/dashboard/components/NewProjectDialog.tsx", "target": "function:src/features/dashboard/components/NewProjectDialog.tsx:NewProjectDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "function:src/features/export/ExportDialog.tsx:ExportDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/export/ExportDialog.tsx", "target": "function:src/features/export/ExportDialog.tsx:ExportDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "function:src/features/export/ExportReportDialog.tsx:ExportReportDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/export/ExportReportDialog.tsx", "target": "function:src/features/export/ExportReportDialog.tsx:ExportReportDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "function:src/features/export/components/EnhancedExportDialog.tsx:EnhancedExportDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/export/components/EnhancedExportDialog.tsx", "target": "function:src/features/export/components/EnhancedExportDialog.tsx:EnhancedExportDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "function:src/features/export/components/PrintDialog.tsx:PrintDialog", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/export/components/PrintDialog.tsx", "target": "function:src/features/export/components/PrintDialog.tsx:PrintDialog", "type": "exports", "direction": "forward", "weight": 0.8 },
+
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "function:src/features/project/components/ProjectSetupWizard.tsx:ProjectSetupWizard", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "function:src/features/project/components/ProjectSetupWizard.tsx:ProjectSetupWizard", "type": "exports", "direction": "forward", "weight": 0.8 },
+    { "source": "file:src/features/project/components/ProjectSetupWizard.tsx", "target": "class:src/core/services/templates/systemTemplateService.ts:SystemTemplateService", "type": "depends_on", "direction": "forward", "weight": 0.6 },
+
+    { "source": "file:src/lib/utils.ts", "target": "function:src/lib/utils.ts:cn", "type": "contains", "direction": "forward", "weight": 1.0 },
+    { "source": "file:src/lib/utils.ts", "target": "function:src/lib/utils.ts:cn", "type": "exports", "direction": "forward", "weight": 0.8 }
+  ]
+}

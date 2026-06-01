@@ -7,7 +7,7 @@ import {
 import { createEntity, createEntities, splitDuctRunAtPoint } from '@/core/commands/entityCommands';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
-import type { Duct, DuctEndType, DuctRun, Entity, InsulationType } from '@/core/schema';
+import type { Duct, DuctEndType, DuctRun, Entity, Equipment, InsulationType } from '@/core/schema';
 import {
   DuctMaterialSchema as DuctEntityMaterialSchema,
   DuctShapeSchema as LegacyDuctShapeSchema,
@@ -27,11 +27,18 @@ import {
   type PlacementPreviewDecoration,
   type PlacementSnapTarget,
 } from './placementStrategies';
-import { MagneticConnectionService, type MagneticSnapResult } from '../services/magneticConnectionService';
+import {
+  MagneticConnectionService,
+  type MagneticSnapResult,
+} from '../services/magneticConnectionService';
 import { getDuctStartAndEnd } from '../services/ductGeometryHelpers';
+import { getEquipmentPortWorldPosition } from '../services/equipmentGeometry';
+import { constrainAngleToStep, getAngleDegrees } from './angleConstraint';
 
 const MIN_DUCT_LENGTH = feetToPixels(1);
 const DRAG_COMMIT_THRESHOLD = 4;
+const ANGLE_STEP_COARSE = 15;
+const ANGLE_STEP_FINE = 1;
 type DuctRunSegmentDefaults = {
   insulationType?: InsulationType;
   insulationThickness?: number;
@@ -41,7 +48,7 @@ type DuctRunSegmentDefaults = {
 
 type SnapTarget = MagneticSnapResult & {
   entityId: string;
-  entityType: 'duct' | 'duct_run';
+  entityType: 'duct' | 'duct_run' | 'equipment' | 'fitting';
   x: number;
   y: number;
   angle: number;
@@ -66,6 +73,8 @@ export class DuctTool extends BaseTool {
   private static autoFittingEnabledOverride: boolean | null = null;
   private cancelGhost: CancelGhost | null = null;
   private pointerDragStart: { x: number; y: number } | null = null;
+  private lastPointer: { x: number; y: number } | null = null;
+  private currentAngleStepDeg = ANGLE_STEP_COARSE;
   private hasDragMoved = false;
 
   private state: DuctToolState = {
@@ -107,7 +116,9 @@ export class DuctTool extends BaseTool {
 
     if (this.state.mode === 'idle') {
       const magneticSnap = this.state.snapTarget;
-      const startPoint = magneticSnap ? { x: magneticSnap.x, y: magneticSnap.y } : this.snapToGrid(event.x, event.y);
+      const startPoint = magneticSnap
+        ? { x: magneticSnap.x, y: magneticSnap.y }
+        : this.snapToGrid(event.x, event.y);
       this.pointerDragStart = startPoint;
       this.hasDragMoved = false;
       this.state = {
@@ -122,7 +133,12 @@ export class DuctTool extends BaseTool {
 
     if (this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
       const endPoint = this.state.currentPoint;
-      this.createDuctRunEntity(this.state.startPoint, endPoint, this.state.startSnapTarget, this.state.snapTarget);
+      this.createDuctRunEntity(
+        this.state.startPoint,
+        endPoint,
+        this.state.startSnapTarget,
+        this.state.snapTarget
+      );
       this.state = {
         mode: 'placing_end',
         startPoint: endPoint,
@@ -134,11 +150,14 @@ export class DuctTool extends BaseTool {
   }
 
   onMouseMove(event: ToolMouseEvent): void {
+    this.lastPointer = { x: event.x, y: event.y };
     const snapResult = this.findSnapPoint(event.x, event.y);
 
     if (this.state.mode === 'idle') {
       this.state.snapTarget = snapResult;
-      this.state.currentPoint = snapResult ? { x: snapResult.x, y: snapResult.y } : { x: event.x, y: event.y };
+      this.state.currentPoint = snapResult
+        ? { x: snapResult.x, y: snapResult.y }
+        : { x: event.x, y: event.y };
       return;
     }
 
@@ -147,7 +166,7 @@ export class DuctTool extends BaseTool {
         this.state.currentPoint = { x: snapResult.x, y: snapResult.y };
         this.state.snapTarget = snapResult;
       } else {
-        this.state.currentPoint = this.snapToGrid(event.x, event.y);
+        this.state.currentPoint = this.constrainPointer(event.shiftKey ?? false);
         this.state.snapTarget = null;
       }
 
@@ -169,8 +188,18 @@ export class DuctTool extends BaseTool {
       return;
     }
 
-    if (this.hasDragMoved && this.state.mode === 'placing_end' && this.state.startPoint && this.state.currentPoint) {
-      this.createDuctRunEntity(this.state.startPoint, this.state.currentPoint, this.state.startSnapTarget, this.state.snapTarget);
+    if (
+      this.hasDragMoved &&
+      this.state.mode === 'placing_end' &&
+      this.state.startPoint &&
+      this.state.currentPoint
+    ) {
+      this.createDuctRunEntity(
+        this.state.startPoint,
+        this.state.currentPoint,
+        this.state.startSnapTarget,
+        this.state.snapTarget
+      );
       this.resetPlacement();
     }
 
@@ -182,6 +211,16 @@ export class DuctTool extends BaseTool {
       useToolStore.getState().setSpecialtyToolId(null);
       this.reset();
     }
+
+    if (event.key === 'Shift') {
+      this.updateConstrainedPointForShift(event.shiftKey);
+    }
+  }
+
+  onKeyUp(event: ToolKeyEvent): void {
+    if (event.key === 'Shift') {
+      this.updateConstrainedPointForShift(event.shiftKey);
+    }
   }
 
   render(context: ToolRenderContext): void {
@@ -191,13 +230,7 @@ export class DuctTool extends BaseTool {
 
     if (this.state.mode === 'idle') {
       if (this.state.snapTarget && this.state.currentPoint) {
-        ctx.save();
-        ctx.strokeStyle = '#2196F3';
-        ctx.lineWidth = 2 / zoom;
-        ctx.beginPath();
-        ctx.arc(this.state.currentPoint.x, this.state.currentPoint.y, 8 / zoom, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
+        this.renderSnapIndicator(ctx, this.state.currentPoint, zoom);
       }
       this.renderCancelGhost(context);
       return;
@@ -215,7 +248,7 @@ export class DuctTool extends BaseTool {
     const activeEngineeringSystem =
       activeComponent?.engineeringSystem === 'universal'
         ? 'standard_duct'
-        : activeComponent?.engineeringSystem ?? 'standard_duct';
+        : (activeComponent?.engineeringSystem ?? 'standard_duct');
     const placementSnapTarget = this.toPlacementSnapTarget(snapTarget);
     const placementContext: PlacementContext = {
       engineeringSystem: activeEngineeringSystem,
@@ -245,7 +278,9 @@ export class DuctTool extends BaseTool {
           : '#D32F2F');
     ctx.lineWidth = 12 / zoom;
     ctx.lineCap = 'round';
-    ctx.setLineDash(previewStyle.dash ? previewStyle.dash.map((dash) => dash / zoom) : [8 / zoom, 4 / zoom]);
+    ctx.setLineDash(
+      previewStyle.dash ? previewStyle.dash.map((dash) => dash / zoom) : [8 / zoom, 4 / zoom]
+    );
 
     ctx.beginPath();
     ctx.moveTo(startPoint.x, startPoint.y);
@@ -253,12 +288,14 @@ export class DuctTool extends BaseTool {
     ctx.stroke();
 
     const lengthFt = pixelsToFeet(length).toFixed(1);
+    const angleDeg = Math.round(getAngleDegrees(startPoint, currentPoint));
+    const angleHint = !isSnapped && this.currentAngleStepDeg === ANGLE_STEP_FINE ? ' 1deg' : '';
     ctx.font = `${12 / zoom}px sans-serif`;
     ctx.fillStyle = '#1F2937';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     ctx.fillText(
-      `${lengthFt}'${isSnapped ? ' [SNAP]' : ''}`,
+      `${lengthFt}' @ ${angleDeg}deg${angleHint}${isSnapped ? ' [SNAP]' : ''}`,
       (startPoint.x + currentPoint.x) / 2,
       (startPoint.y + currentPoint.y) / 2 - 8 / zoom
     );
@@ -284,7 +321,31 @@ export class DuctTool extends BaseTool {
 
   private resetDragTracking(): void {
     this.pointerDragStart = null;
+    this.lastPointer = null;
+    this.currentAngleStepDeg = ANGLE_STEP_COARSE;
     this.hasDragMoved = false;
+  }
+
+  private constrainPointer(fineMode: boolean): { x: number; y: number } {
+    if (!this.state.startPoint || !this.lastPointer) {
+      return this.state.startPoint ?? { x: 0, y: 0 };
+    }
+
+    this.currentAngleStepDeg = fineMode ? ANGLE_STEP_FINE : ANGLE_STEP_COARSE;
+    return constrainAngleToStep(this.state.startPoint, this.lastPointer, this.currentAngleStepDeg);
+  }
+
+  private updateConstrainedPointForShift(fineMode: boolean): void {
+    if (
+      this.state.mode !== 'placing_end' ||
+      !this.state.startPoint ||
+      !this.lastPointer ||
+      this.state.snapTarget
+    ) {
+      return;
+    }
+
+    this.state.currentPoint = this.constrainPointer(fineMode);
   }
 
   private captureCancelGhost(): void {
@@ -300,7 +361,7 @@ export class DuctTool extends BaseTool {
   }
 
   private toPlacementSnapTarget(snapTarget: SnapTarget | null): PlacementSnapTarget | null {
-    if (!snapTarget) {
+    if (!snapTarget || (snapTarget.entityType !== 'duct' && snapTarget.entityType !== 'duct_run')) {
       return null;
     }
 
@@ -341,6 +402,33 @@ export class DuctTool extends BaseTool {
     ctx.restore();
   }
 
+  private renderSnapIndicator(
+    ctx: CanvasRenderingContext2D,
+    point: { x: number; y: number },
+    zoom: number
+  ): void {
+    const draft = useToolStore.getState().ductDrawSettings;
+    const isRoundVisual = draft.shape === 'round' || draft.shape === 'flexible';
+
+    ctx.save();
+    ctx.strokeStyle = '#2196F3';
+    ctx.lineWidth = 2 / zoom;
+
+    if (isRoundVisual) {
+      const radius = Math.max((draft.diameter ?? 12) / 2, 4 / zoom);
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
+
+    const width = Math.max(draft.width ?? 12, 8 / zoom);
+    const markerHeight = 8 / zoom;
+    ctx.strokeRect(point.x - width / 2, point.y - markerHeight / 2, width, markerHeight);
+    ctx.restore();
+  }
+
   private renderProximityEndpointIndicators({ ctx, zoom }: ToolRenderContext): void {
     const cursorPoint = this.state.currentPoint;
     if (!cursorPoint) {
@@ -351,39 +439,49 @@ export class DuctTool extends BaseTool {
     const snapTolerance = MagneticConnectionService.SNAP_TOLERANCE;
     const fadeStart = snapTolerance * 1.5;
     const fadeEnd = snapTolerance * 0.3;
+    const drawIndicator = (point: { x: number; y: number }, color: string) => {
+      const distance = Math.hypot(point.x - cursorPoint.x, point.y - cursorPoint.y);
+      if (distance > fadeStart) {
+        return;
+      }
+
+      const alpha = 1 - Math.max(0, (distance - fadeEnd) / (fadeStart - fadeEnd));
+      const snapTarget = this.state.snapTarget;
+      const isSnapped =
+        snapTarget !== null &&
+        Math.abs(snapTarget.x - point.x) < 1 &&
+        Math.abs(snapTarget.y - point.y) < 1;
+      const radius = isSnapped ? 7 / zoom : 5 / zoom;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5 / zoom;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 2.5 / zoom, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.restore();
+    };
 
     for (const entity of Object.values(entities)) {
-      if (entity.type !== 'duct_run' && entity.type !== 'duct') {
+      if (entity.type === 'duct_run' || entity.type === 'duct') {
+        const { start, end } = getDuctStartAndEnd(entity as Duct | DuctRun);
+        for (const point of [start, end]) {
+          drawIndicator(point, '#2196F3');
+        }
         continue;
       }
 
-      const { start, end } = getDuctStartAndEnd(entity as Duct | DuctRun);
-      for (const point of [start, end]) {
-        const distance = Math.hypot(point.x - cursorPoint.x, point.y - cursorPoint.y);
-        if (distance > fadeStart) {
-          continue;
+      if (entity.type === 'equipment') {
+        const equipment = entity as Equipment;
+        for (const port of equipment.props.connectionPorts ?? []) {
+          const point = getEquipmentPortWorldPosition(port, equipment);
+          drawIndicator(point, '#FF9800');
         }
-
-        const alpha = 1 - Math.max(0, (distance - fadeEnd) / (fadeStart - fadeEnd));
-        const snapTarget = this.state.snapTarget;
-        const isSnapped =
-          snapTarget !== null &&
-          Math.abs(snapTarget.x - point.x) < 1 &&
-          Math.abs(snapTarget.y - point.y) < 1;
-        const radius = isSnapped ? 7 / zoom : 5 / zoom;
-
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = '#2196F3';
-        ctx.lineWidth = 1.5 / zoom;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 2.5 / zoom, 0, Math.PI * 2);
-        ctx.fillStyle = '#2196F3';
-        ctx.fill();
-        ctx.restore();
       }
     }
   }
@@ -411,7 +509,42 @@ export class DuctTool extends BaseTool {
   private findSnapPoint(x: number, y: number): SnapTarget | null {
     const entities = useEntityStore.getState().byId as Record<string, Entity>;
     const snap = MagneticConnectionService.resolveSnapTarget(x, y, entities);
-    if (!snap?.ductId || !snap.entityType || typeof snap.angle !== 'number') {
+    if (!snap || typeof snap.angle !== 'number') {
+      return null;
+    }
+
+    if (snap.snapType === 'equipment_port' && snap.equipmentId) {
+      return {
+        ...snap,
+        entityId: snap.equipmentId,
+        entityType: 'equipment',
+        x: snap.point.x,
+        y: snap.point.y,
+        angle: snap.angle,
+        endPoint: snap.endPoint ?? 'end',
+      };
+    }
+
+    // PR-2 / PR-6: snap the duct endpoint onto the resolved fitting port. The
+    // endpoint↔port edge is then persisted by connection reconciliation, which
+    // matches the endpoint to this resolved connection point.
+    if (snap.snapType === 'fitting_port' && snap.fittingId) {
+      return {
+        ...snap,
+        entityId: snap.fittingId,
+        entityType: 'fitting',
+        x: snap.point.x,
+        y: snap.point.y,
+        angle: snap.angle,
+        endPoint: snap.endPoint ?? 'end',
+      };
+    }
+
+    if (
+      !snap.ductId ||
+      !snap.entityType ||
+      (snap.entityType !== 'duct' && snap.entityType !== 'duct_run')
+    ) {
       return null;
     }
 
@@ -449,7 +582,7 @@ export class DuctTool extends BaseTool {
     const activeEngineeringSystem =
       activeComponent?.engineeringSystem === 'universal'
         ? 'standard_duct'
-        : activeComponent?.engineeringSystem ?? 'standard_duct';
+        : (activeComponent?.engineeringSystem ?? 'standard_duct');
     const placementContext: PlacementContext = {
       engineeringSystem: activeEngineeringSystem,
       specialtyToolId: useToolStore.getState().activeSpecialtyToolId,
@@ -469,7 +602,9 @@ export class DuctTool extends BaseTool {
       'rectangular';
     const shape = this.normalizeRunShape(requestedShape);
     const insulationType =
-      shape === 'flexible' && ductDrawSettings.insulationType && ductDrawSettings.insulationType !== 'wrap'
+      shape === 'flexible' &&
+      ductDrawSettings.insulationType &&
+      ductDrawSettings.insulationType !== 'wrap'
         ? null
         : ductDrawSettings.insulationType;
 
@@ -493,7 +628,8 @@ export class DuctTool extends BaseTool {
     segmentDefaults.endEndType = ductDrawSettings.endEndType;
 
     if (shape === 'round' || shape === 'flexible') {
-      run.props.diameter = ductDrawSettings.diameter ?? activeComponent?.defaultDimensions?.diameter ?? 12;
+      run.props.diameter =
+        ductDrawSettings.diameter ?? activeComponent?.defaultDimensions?.diameter ?? 12;
     }
 
     if (shape === 'rectangular' || shape === 'flat_oval') {
@@ -504,6 +640,9 @@ export class DuctTool extends BaseTool {
     run.transform.rotation = rotation;
     run.props.startPoint = { ...start };
     run.props.endPoint = { ...end };
+    run.props.designStartPoint = { ...start };
+    run.props.designEndPoint = { ...end };
+    run.props.designLength = installLength;
     const sectionLength = getActiveSectionLength(run);
     run.props.segments = recomputeDuctRunSegments(run.props.installLength, sectionLength, {
       insulationType: segmentDefaults.insulationType,
@@ -551,7 +690,10 @@ export class DuctTool extends BaseTool {
     return parsed.success ? parsed.data : 'round';
   }
 
-  private resolveMaterial(shape: DuctRun['props']['shape'], material: string | undefined): DuctRun['props']['material'] {
+  private resolveMaterial(
+    shape: DuctRun['props']['shape'],
+    material: string | undefined
+  ): DuctRun['props']['material'] {
     if (shape === 'flexible') {
       return 'flex';
     }

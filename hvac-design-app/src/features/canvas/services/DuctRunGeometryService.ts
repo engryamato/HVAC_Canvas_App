@@ -53,6 +53,8 @@ export class DuctRunGeometryService {
       id: run.id,
       transform: run.transform,
       installLength: run.props.installLength,
+      startPoint: run.props.startPoint,
+      endPoint: run.props.endPoint,
       shape: run.props.shape,
       diameter: 'diameter' in run.props ? run.props.diameter : undefined,
       width: 'width' in run.props ? run.props.width : undefined,
@@ -118,15 +120,25 @@ export class DuctRunGeometryService {
   }
 
   private static buildGeometry(run: DuctRun): DuctRunGeometry {
-    const radians = ((run.transform.rotation ?? 0) * Math.PI) / 180;
-    const direction = { x: Math.cos(radians), y: Math.sin(radians) };
+    const fallbackRadians = ((run.transform.rotation ?? 0) * Math.PI) / 180;
+    const start = run.props.startPoint
+      ? { ...run.props.startPoint }
+      : { x: run.transform.x, y: run.transform.y };
+    const fallbackLengthPx = feetToPixels(run.props.installLength);
+    const end = run.props.endPoint
+      ? { ...run.props.endPoint }
+      : {
+          x: start.x + Math.cos(fallbackRadians) * fallbackLengthPx,
+          y: start.y + Math.sin(fallbackRadians) * fallbackLengthPx,
+        };
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const lengthPx = Math.hypot(dx, dy);
+    const direction =
+      lengthPx > 0
+        ? { x: dx / lengthPx, y: dy / lengthPx }
+        : { x: Math.cos(fallbackRadians), y: Math.sin(fallbackRadians) };
     const normal = { x: -direction.y, y: direction.x };
-    const start = { x: run.transform.x, y: run.transform.y };
-    const lengthPx = feetToPixels(run.props.installLength);
-    const end = {
-      x: start.x + direction.x * lengthPx,
-      y: start.y + direction.y * lengthPx,
-    };
     const thicknessPx = this.resolveThicknessPx(run);
     const halfThickness = thicknessPx / 2;
     const corners: [Point, Point, Point, Point] = [

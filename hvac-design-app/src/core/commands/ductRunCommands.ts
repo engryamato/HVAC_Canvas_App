@@ -1,16 +1,28 @@
 import { feetToPixels, pixelsToFeet, roundFeet } from '@/core/constants/coordinates';
 import type { DuctRun, Entity } from '@/core/schema';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useProjectStore } from '@/core/store/project.store';
 import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
 import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
-import { useFabricationProfileStore } from '@/core/store/fabricationProfileStore';
 import { useHistoryStore } from './historyStore';
 import { CommandType, generateCommandId, type ReversibleCommand } from './types';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 
+interface Point {
+  x: number;
+  y: number;
+}
+
+type DuctRunPropsWithLegacyGeometry = DuctRun['props'] & {
+  angle?: number;
+  family?: string;
+  start?: Point;
+  end?: Point;
+};
+
 interface ReplaceEntitiesPayload {
-  removeIds: string[];
-  addEntities: Entity[];
+  removeEntityIds: string[];
+  createEntities: Entity[];
   selection?: string[];
 }
 
@@ -40,13 +52,44 @@ function cloneEntity<T extends Entity>(entity: T): T {
   return JSON.parse(JSON.stringify(entity)) as T;
 }
 
-function pointAtStation(run: DuctRun, stationFeet: number): { x: number; y: number } {
-  const radians = (run.props.angle * Math.PI) / 180;
+function getRunProps(run: DuctRun): DuctRunPropsWithLegacyGeometry {
+  return run.props as DuctRunPropsWithLegacyGeometry;
+}
+
+function getRunStart(run: DuctRun): Point {
+  const props = getRunProps(run);
+  return props.start ?? props.startPoint ?? { x: run.transform.x, y: run.transform.y };
+}
+
+function getRunEnd(run: DuctRun): Point {
+  const props = getRunProps(run);
+  return props.end ?? props.endPoint ?? getRunStart(run);
+}
+
+function getRunAngle(run: DuctRun): number {
+  const props = getRunProps(run);
+  if (typeof props.angle === 'number') {
+    return props.angle;
+  }
+
+  const start = getRunStart(run);
+  const end = getRunEnd(run);
+  return (Math.atan2(end.y - start.y, end.x - start.x) * 180) / Math.PI;
+}
+
+function getRunFamily(run: DuctRun): string {
+  const props = getRunProps(run);
+  return props.family ?? props.engineeringSystem;
+}
+
+function pointAtStation(run: DuctRun, stationFeet: number): Point {
+  const start = getRunStart(run);
+  const radians = (getRunAngle(run) * Math.PI) / 180;
   const distance = feetToPixels(stationFeet);
 
   return {
-    x: run.props.start.x + Math.cos(radians) * distance,
-    y: run.props.start.y + Math.sin(radians) * distance,
+    x: start.x + Math.cos(radians) * distance,
+    y: start.y + Math.sin(radians) * distance,
   };
 }
 
@@ -63,8 +106,8 @@ function makeRunFromEndpoints(
     ...source.props,
     name,
     installLength: roundFeet(installLength),
-    start,
-    end,
+    startPoint: start,
+    endPoint: end,
     segments: [] as DuctRun['props']['segments'],
   };
   const run = {
@@ -75,18 +118,19 @@ function makeRunFromEndpoints(
     modifiedAt: now,
     props: baseProps,
   } as DuctRun;
-  const sectionLength = getActiveSectionLength(run, useFabricationProfileStore.getState().profile);
+  const sectionLength = getActiveSectionLength(run);
   run.props.segments = recomputeDuctRunSegments(run.props.installLength, sectionLength);
   return run;
 }
 
 function executeReplace(payload: ReplaceEntitiesPayload): void {
   const entityStore = useEntityStore.getState();
-  entityStore.removeEntities(payload.removeIds);
-  entityStore.addEntities(payload.addEntities);
+  entityStore.removeEntities(payload.removeEntityIds);
+  entityStore.addEntities(payload.createEntities);
   if (payload.selection) {
     useSelectionStore.getState().selectMultiple(payload.selection);
   }
+  useProjectStore.getState().markProjectModified();
 }
 
 export function applyDuctRunReplace(payload: ReplaceEntitiesPayload): void {
@@ -106,26 +150,30 @@ export function splitDuctRun(
   const splitPoint = pointAtStation(run, splitStation);
   const firstRunId = options.firstRunId ?? crypto.randomUUID();
   const secondRunId = options.secondRunId ?? crypto.randomUUID();
-  const firstRun = makeRunFromEndpoints(run, firstRunId, `${run.props.name} A`, run.props.start, splitPoint, splitStation);
+  const firstRun = makeRunFromEndpoints(run, firstRunId, `${run.props.name} A`, getRunStart(run), splitPoint, splitStation);
   const secondRun = makeRunFromEndpoints(
     run,
     secondRunId,
     `${run.props.name} B`,
     splitPoint,
-    run.props.end,
+    getRunEnd(run),
     run.props.installLength - splitStation
   );
   const selection = [firstRunId, secondRunId];
-  const payload: ReplaceEntitiesPayload = { removeIds: [run.id], addEntities: [firstRun, secondRun], selection };
-  const inversePayload: ReplaceEntitiesPayload = { removeIds: selection, addEntities: [cloneEntity(run)], selection: [run.id] };
+  const payload: ReplaceEntitiesPayload = { removeEntityIds: [run.id], createEntities: [firstRun, secondRun], selection };
+  const inversePayload: ReplaceEntitiesPayload = {
+    removeEntityIds: selection,
+    createEntities: [cloneEntity(run)],
+    selection: [run.id],
+  };
   const command: ReversibleCommand = {
     id: generateCommandId(),
-    type: CommandType.SPLIT_RUN,
+    type: CommandType.SPLIT_DUCT_RUN,
     payload,
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
-      type: CommandType.SPLIT_RUN,
+      type: CommandType.MERGE_DUCT_RUNS,
       payload: inversePayload,
       timestamp: Date.now(),
     },
@@ -139,7 +187,7 @@ export function splitDuctRun(
 }
 
 function sameRunSize(a: DuctRun, b: DuctRun): boolean {
-  if (a.props.shape !== b.props.shape || a.props.family !== b.props.family) {
+  if (a.props.shape !== b.props.shape || getRunFamily(a) !== getRunFamily(b)) {
     return false;
   }
 
@@ -165,34 +213,34 @@ export function mergeDuctRuns(
     return null;
   }
 
-  let start = first.props.start;
-  let end = second.props.end;
-  if (!pointsClose(first.props.end, second.props.start)) {
-    if (!pointsClose(second.props.end, first.props.start)) {
+  let start = getRunStart(first);
+  let end = getRunEnd(second);
+  if (!pointsClose(getRunEnd(first), getRunStart(second))) {
+    if (!pointsClose(getRunEnd(second), getRunStart(first))) {
       return null;
     }
-    start = second.props.start;
-    end = first.props.end;
+    start = getRunStart(second);
+    end = getRunEnd(first);
   }
 
   const mergedRunId = options.mergedRunId ?? crypto.randomUUID();
   const installLength = roundFeet(pixelsToFeet(Math.hypot(end.x - start.x, end.y - start.y)));
   const merged = makeRunFromEndpoints(first, mergedRunId, `${first.props.name} + ${second.props.name}`, start, end, installLength);
   const removeIds = [first.id, second.id];
-  const payload: ReplaceEntitiesPayload = { removeIds, addEntities: [merged], selection: [mergedRunId] };
+  const payload: ReplaceEntitiesPayload = { removeEntityIds: removeIds, createEntities: [merged], selection: [mergedRunId] };
   const inversePayload: ReplaceEntitiesPayload = {
-    removeIds: [mergedRunId],
-    addEntities: [cloneEntity(first), cloneEntity(second)],
+    removeEntityIds: [mergedRunId],
+    createEntities: [cloneEntity(first), cloneEntity(second)],
     selection: removeIds,
   };
   const command: ReversibleCommand = {
     id: generateCommandId(),
-    type: CommandType.MERGE_RUNS,
+    type: CommandType.MERGE_DUCT_RUNS,
     payload,
     timestamp: Date.now(),
     inverse: {
       id: generateCommandId(),
-      type: CommandType.MERGE_RUNS,
+      type: CommandType.SPLIT_DUCT_RUN,
       payload: inversePayload,
       timestamp: Date.now(),
     },

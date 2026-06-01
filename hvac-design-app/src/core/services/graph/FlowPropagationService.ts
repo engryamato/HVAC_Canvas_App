@@ -1,5 +1,6 @@
 import type { Entity, Equipment } from '@/core/schema';
 import type { ConnectionGraph } from './types';
+import { isSourceEquipment, isTerminalEquipment } from './equipmentClassification';
 
 /**
  * Flow Propagation Service
@@ -61,16 +62,19 @@ export class FlowPropagationService {
 
       // Initialize terminal equipment with their capacity
       if (entity.type === 'equipment') {
-        const equipment = entity as Equipment;
         // Only diffusers, grilles, and similar terminals contribute flow
-        if (this.isTerminalEquipment(equipment)) {
-          flowNode.accumulatedFlow = equipment.props.capacity;
+        if (isTerminalEquipment(entity)) {
+          flowNode.accumulatedFlow = (entity as Equipment).props.capacity;
         }
       }
 
       nodeMap.set(nodeId, flowNode);
+    }
 
-      // Add leaves (degree 1) and terminals to initial queue
+    this.seedSourceEquipmentForUndemandedComponents(nodeMap, entities);
+
+    for (const [nodeId, flowNode] of nodeMap.entries()) {
+      // Add leaves (degree 1) and flow sources to initial queue
       // IMPORTANT: Do not treat Ducts as leaves to initiate propagation. 
       // Ducts are passive carriers and should only process when pushed by terminals or fittings.
       const isFlowSource = flowNode.accumulatedFlow > 0;
@@ -131,14 +135,59 @@ export class FlowPropagationService {
   }
 
   /**
-   * Determine if equipment is a terminal (demand source) vs source equipment
+   * Source-only designs have no terminal demand to peel from, but they still
+   * need meaningful CFM for connected ducts. Use source capacity only when a
+   * connected component has no terminal capacity, so terminal-driven systems
+   * continue to calculate from downstream demand.
    */
-  private static isTerminalEquipment(equipment: Equipment): boolean {
-    return (
-      equipment.props.equipmentType === 'diffuser' ||
-      equipment.props.equipmentType === 'hood' ||
-      equipment.props.equipmentType === 'damper'
-    );
+  private static seedSourceEquipmentForUndemandedComponents(
+    nodeMap: Map<string, FlowNode>,
+    entities: Record<string, Entity>
+  ): void {
+    const visited = new Set<string>();
+
+    for (const nodeId of nodeMap.keys()) {
+      if (visited.has(nodeId)) {
+        continue;
+      }
+
+      const componentIds: string[] = [];
+      const stack = [nodeId];
+      visited.add(nodeId);
+
+      while (stack.length > 0) {
+        const currentId = stack.pop()!;
+        componentIds.push(currentId);
+        const node = nodeMap.get(currentId);
+        if (!node) {
+          continue;
+        }
+
+        for (const neighborId of node.connections) {
+          if (!visited.has(neighborId) && nodeMap.has(neighborId)) {
+            visited.add(neighborId);
+            stack.push(neighborId);
+          }
+        }
+      }
+
+      const hasTerminalDemand = componentIds.some((componentId) => {
+        const entity = entities[componentId];
+        return isTerminalEquipment(entity) && (entity as Equipment).props.capacity > 0;
+      });
+
+      if (hasTerminalDemand) {
+        continue;
+      }
+
+      for (const componentId of componentIds) {
+        const entity = entities[componentId];
+        const node = nodeMap.get(componentId);
+        if (node && isSourceEquipment(entity)) {
+          node.accumulatedFlow = (entity as Equipment).props.capacity;
+        }
+      }
+    }
   }
 
   /**
@@ -163,7 +212,7 @@ export class FlowPropagationService {
     const eq = equipment as Equipment;
 
     // Check if this is source equipment (not a terminal)
-    if (this.isTerminalEquipment(eq)) {
+    if (isTerminalEquipment(eq)) {
       return warnings;
     }
 

@@ -69,6 +69,24 @@ function createEquipment(id: string, x: number, y: number): Equipment {
   };
 }
 
+function createAirHandler(id: string, x: number, y: number): Equipment {
+  return {
+    ...createEquipment(id, x, y),
+    props: {
+      ...createEquipment(id, x, y).props,
+      name: `AHU ${id}`,
+      equipmentType: 'air_handler',
+      width: 60,
+      depth: 48,
+      height: 72,
+      connectionPorts: [
+        { id: 'supply-1', role: 'supply', edge: 'east', offsetRatio: 0.3, label: 'Supply' },
+        { id: 'return-1', role: 'return', edge: 'west', offsetRatio: 0.3, label: 'Return' },
+      ],
+    },
+  };
+}
+
 function createRun(id: string, x: number, y: number, rotation: number, installLength = 10) {
   const run = createDuctRun({ x, y, installLength, sectionLengthOverride: 5 });
   run.id = id;
@@ -159,15 +177,83 @@ describe('MagneticConnectionService', () => {
 
     expect(inletResult).toMatchObject({
       snapType: 'fitting_port',
-      point: { x: 172, y: 140 },
+      point: { x: 174.8, y: 140 },
       fittingId: 'fitting',
       fittingPortRole: 'inlet',
+      connectionPointRef: {
+        objectId: 'fitting',
+        connectionPointId: 'INLET',
+      },
     });
     expect(outletResult).toMatchObject({
       snapType: 'fitting_port',
-      point: { x: 228, y: 140 },
+      point: { x: 225.2, y: 140 },
       fittingId: 'fitting',
       fittingPortRole: 'outlet',
+      connectionPointRef: {
+        objectId: 'fitting',
+        connectionPointId: 'OUTLET',
+      },
+    });
+  });
+
+  it('resolves AHU supply and return equipment ports instead of the equipment origin', () => {
+    const entities: Record<string, Entity> = {
+      equipment: createAirHandler('equipment', 100, 100),
+    };
+
+    const supplyResult = MagneticConnectionService.resolveSnapTarget(159, 114, entities);
+    const returnResult = MagneticConnectionService.resolveSnapTarget(101, 114, entities);
+
+    expect(supplyResult).toMatchObject({
+      snapType: 'equipment_port',
+      point: { x: 160, y: 114.4 },
+      equipmentId: 'equipment',
+      equipmentPortId: 'supply-1',
+      equipmentPortRole: 'supply',
+      connectionPointRef: {
+        objectId: 'equipment',
+        connectionPointId: 'supply-1',
+      },
+    });
+    expect(returnResult).toMatchObject({
+      snapType: 'equipment_port',
+      point: { x: 100, y: 114.4 },
+      equipmentId: 'equipment',
+      equipmentPortId: 'return-1',
+      equipmentPortRole: 'return',
+      connectionPointRef: {
+        objectId: 'equipment',
+        connectionPointId: 'return-1',
+      },
+    });
+  });
+
+  it('resolves equipment-port drag snapping against duct endpoints using width/depth plan bounds', () => {
+    const equipment = createAirHandler('equipment', 100, 100);
+    equipment.props.height = 240;
+    const run = createRun('run', 200, 114.4, 0, 10);
+    const entities: Record<string, Entity> = {
+      equipment,
+      run,
+    };
+
+    const result = MagneticConnectionService.resolveEquipmentPortSnap(
+      equipment,
+      { x: 140, y: 100 },
+      entities,
+      [equipment.id]
+    );
+
+    expect(result).toMatchObject({
+      adjustedEntityPosition: { x: 140, y: 100 },
+      snappedPortId: 'supply-1',
+      snappedDuctId: 'run',
+      snappedDuctEndPoint: 'start',
+      ductConnectionProfile: {
+        markerKind: 'circle',
+        visualSize: 12,
+      },
     });
   });
 
@@ -176,17 +262,17 @@ describe('MagneticConnectionService', () => {
     fitting.transform.rotation = 90;
     const entities: Record<string, Entity> = { fitting };
 
-    const inletResult = MagneticConnectionService.resolveSnapTarget(200, 113, entities);
-    const outletResult = MagneticConnectionService.resolveSnapTarget(200, 169, entities);
+    const inletResult = MagneticConnectionService.resolveSnapTarget(200, 116, entities);
+    const outletResult = MagneticConnectionService.resolveSnapTarget(200, 164, entities);
 
     expect(inletResult).toMatchObject({
       snapType: 'fitting_port',
-      point: { x: 200, y: 112 },
+      point: { x: 200, y: 114.8 },
       fittingPortRole: 'inlet',
     });
     expect(outletResult).toMatchObject({
       snapType: 'fitting_port',
-      point: { x: 200, y: 168 },
+      point: { x: 200, y: 165.2 },
       fittingPortRole: 'outlet',
     });
   });
@@ -199,5 +285,17 @@ describe('MagneticConnectionService', () => {
     const result = MagneticConnectionService.resolveSnapTarget(160, 140, entities);
 
     expect(result).toBeNull();
+  });
+
+  it('never snaps to an object origin: portless equipment at the cursor yields no snap', () => {
+    // Equipment without connectionPorts has no resolved ports, so even a cursor
+    // exactly on its origin must not produce a snap (the removed anti-goal).
+    const entities: Record<string, Entity> = {
+      equipment: createEquipment('equipment', 200, 200),
+    };
+
+    const atOrigin = MagneticConnectionService.resolveSnapTarget(200, 200, entities);
+
+    expect(atOrigin).toBeNull();
   });
 });

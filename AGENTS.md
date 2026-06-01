@@ -35,6 +35,14 @@ Use this root map to orient; directory-level AGENTS files cover specifics.
 - Plan outputs use `PLAN-{task-slug}.md` at repo root.
 - `tauri.conf.json devUrl` must match the active Next.js dev server port.
 
+## MEMORY + SUPERPOWERS
+- When using any `superpowers:*` skill and the task needs prior decisions, recent project context, unresolved bug history, or durable memory storage, also use the project-local `pieces-memory` skill.
+- When using any `superpowers:*` skill and the task needs current codebase architecture, file relationships, ownership boundaries, or knowledge graph context, also use the project-local `understand-anything-memory` skill.
+- Use Pieces MCP for historical memory and workflow checkpoints; use current repo files and `rg` for exact code truth.
+- Use Understand Anything artifacts for graph-shaped codebase context from `hvac-design-app/.understand-anything/`; verify graph findings against current files before editing.
+- Store a Pieces memory after durable discoveries, verified fixes, architecture decisions, or workflow improvements that future agents should not re-discover.
+- Do not edit the upstream Superpowers plugin cache for project-specific memory behavior; extend it through project-local skills and this file.
+
 ## ANTI-PATTERNS
 - Editing build outputs (`.next/`, `out/`, `src-tauri/target/`).
 - Direct use of `@tauri-apps/*` APIs in shared web code without `isTauri` guards.

@@ -147,6 +147,10 @@ export function adaptServiceToComponent(service: Service): UnifiedComponentDefin
     engineeringSystem: 'standard_duct',
     placeable: true,
     source: 'custom',
+    recommendedFittingEntryIds: [],
+    recommendedAccessoryEntryIds: [],
+    recommendedEquipmentEntryIds: [],
+    connectionNotes: [],
     description: service.description,
     systemType: (['supply', 'return', 'exhaust', 'outside_air'] as const).find(
       (t) => t === service.systemType

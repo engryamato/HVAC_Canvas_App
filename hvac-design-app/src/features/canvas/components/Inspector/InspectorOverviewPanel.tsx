@@ -30,7 +30,11 @@ import type {
   HealthItem,
   InspectorPanelProps,
   InspectorSectionState,
+  UnitSystem,
 } from './inspectorOverviewTypes';
+import { getSystemPresentation } from '../../utils/systemPresentation';
+import { formatAirflow, formatArea, formatLength, formatPressure } from '../../utils/unitFormatting';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 
 type SectionId = 'project' | 'engineering' | 'health' | 'systems' | 'elements' | 'activity';
 type IconComponent = LucideIcon;
@@ -297,6 +301,9 @@ function EngineeringSection({
   onToggleAutoCalculate: (nextValue: boolean) => void;
   onEditEngineeringSettings: () => void;
 }) {
+  const showCenterline = usePreferencesStore((state) => state.showCenterline);
+  const setShowCenterline = usePreferencesStore((state) => state.setShowCenterline);
+
   return (
     <div className="space-y-2">
       <Group title="Standards">
@@ -323,6 +330,25 @@ function EngineeringSection({
           >
             {data.autoCalculate ? <ToggleRight size={13} aria-hidden /> : <ToggleLeft size={13} aria-hidden />}
             {data.autoCalculate ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between px-0.5 py-1.5 text-sm">
+          <span className="text-slate-500">Show Centerline</span>
+          <button
+            type="button"
+            aria-label="Show Centerline"
+            aria-pressed={showCenterline}
+            onClick={() => setShowCenterline(!showCenterline)}
+            data-testid="toggle-show-centerline"
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors ${
+              showCenterline
+                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+            }`}
+          >
+            {showCenterline ? <ToggleRight size={13} aria-hidden /> : <ToggleLeft size={13} aria-hidden />}
+            {showCenterline ? 'ON' : 'OFF'}
           </button>
         </div>
       </Group>
@@ -413,15 +439,7 @@ function HealthSection({
   );
 }
 
-function formatSystemValue(value: number | null, suffix: string, digits?: number) {
-  if (value === null || value === undefined) {
-    return '-';
-  }
-  const formatted = digits === undefined ? value.toLocaleString() : value.toFixed(digits);
-  return `${formatted} ${suffix}`;
-}
-
-function SystemsSection({ systems }: { systems: DuctSystem[] }) {
+function SystemsSection({ systems, unitSystem }: { systems: DuctSystem[]; unitSystem: UnitSystem }) {
   if (systems.length === 0) {
     return <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">No duct systems yet.</div>;
   }
@@ -429,12 +447,12 @@ function SystemsSection({ systems }: { systems: DuctSystem[] }) {
   return (
     <div className="space-y-2">
       {systems.map((sys) => {
-        const cfg = SYSTEM_CONFIG[sys.name] ?? { dot: 'bg-slate-400' };
+        const cfg = { ...SYSTEM_CONFIG[sys.name], ...getSystemPresentation(sys.name) };
         const statusKey = `status_${sys.status}` as const;
         const statusColor = cfg[statusKey] ?? 'text-slate-500 bg-slate-100';
         const statusLabel = SYSTEM_STATUS_LABEL[sys.status] ?? sys.status;
-        const designFlow = sys.status === 'not_calculated' ? '-' : formatSystemValue(sys.designAirflow, 'CFM');
-        const pressureLoss = sys.status === 'not_calculated' ? '-' : formatSystemValue(sys.pressureLoss, 'in. w.g.', 2);
+        const designFlow = sys.status === 'not_calculated' ? '-' : formatAirflow(sys.designAirflow, unitSystem);
+        const pressureLoss = sys.status === 'not_calculated' ? '-' : formatPressure(sys.pressureLoss, unitSystem);
 
         return (
           <div key={sys.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
@@ -448,9 +466,9 @@ function SystemsSection({ systems }: { systems: DuctSystem[] }) {
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
               {[
-                ['Segments', sys.segmentCount],
-                ['Length', `${sys.totalLength.toLocaleString()} ft`],
-                ['Surface Area', `${sys.surfaceArea.toLocaleString()} sq ft`],
+                ['Sections', sys.segmentCount],
+                ['Length', formatLength(sys.totalLength, unitSystem)],
+                ['Surface Area', formatArea(sys.surfaceArea, unitSystem)],
                 ['Design Flow', designFlow],
                 ['Pressure Loss', pressureLoss],
               ].map(([label, value]) => (
@@ -507,12 +525,16 @@ function ElementsSection({
 
 function ActivitySection({
   items,
+  limit,
+  total,
   canUndo,
   canRedo,
   onUndo,
   onRedo,
 }: {
   items: ActivityItem[];
+  limit: number;
+  total: number;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
@@ -541,6 +563,12 @@ function ActivitySection({
           })}
         </div>
       )}
+
+      {total > limit ? (
+        <div className="rounded-xl bg-slate-50 px-3 py-2 text-xs font-medium text-slate-500">
+          Showing latest {limit} of {total} changes.
+        </div>
+      ) : null}
 
       <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
         <button
@@ -586,7 +614,8 @@ function getSectionSummary(
   props: InspectorPanelProps,
   issueCount: number,
   totalLength: number,
-  totalAirflow: number
+  totalAirflow: number,
+  unitSystem: UnitSystem
 ) {
   const state = props.sectionStates?.[id];
   if (state?.loading) {
@@ -606,7 +635,10 @@ function getSectionSummary(
     case 'health':
       return issueCount > 0 ? `${issueCount} issue${issueCount !== 1 ? 's' : ''} detected` : 'All checks passed';
     case 'systems':
-      return `${props.systems.length} systems - ${totalLength.toLocaleString()} ft - ${(totalAirflow / 1000).toFixed(1)}k CFM`;
+      return `${props.systems.length} systems - ${formatLength(totalLength, unitSystem)} - ${formatAirflow(
+        totalAirflow,
+        unitSystem
+      )}`;
     case 'elements':
       return `${getTotalObjects(props.elements)} objects - ${props.elements.inventory.Ducts} ducts`;
     case 'activity':
@@ -667,7 +699,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           id="project"
           title={SECTION_TITLES.project}
           icon={FileText}
-          summary={getSectionSummary('project', props, issueCount, totalLength, totalAirflow)}
+          summary={getSectionSummary('project', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
           disabled={props.sectionStates?.project?.loading}
           isOpen={isOpen('project')}
           onToggle={() => toggle('project')}
@@ -681,7 +713,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           id="engineering"
           title={SECTION_TITLES.engineering}
           icon={Settings}
-          summary={getSectionSummary('engineering', props, issueCount, totalLength, totalAirflow)}
+          summary={getSectionSummary('engineering', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
           disabled={props.sectionStates?.engineering?.loading}
           badge={
             !props.engineering.autoCalculate ? (
@@ -707,7 +739,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
             id="health"
             title={SECTION_TITLES.health}
             icon={ShieldCheck}
-            summary={getSectionSummary('health', props, issueCount, totalLength, totalAirflow)}
+            summary={getSectionSummary('health', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
             disabled={props.sectionStates?.health?.loading}
             badge={
               issueCount > 0 ? (
@@ -738,13 +770,13 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           id="systems"
           title={SECTION_TITLES.systems}
           icon={Activity}
-          summary={getSectionSummary('systems', props, issueCount, totalLength, totalAirflow)}
+          summary={getSectionSummary('systems', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
           disabled={props.sectionStates?.systems?.loading}
           isOpen={isOpen('systems')}
           onToggle={() => toggle('systems')}
         >
           <SectionBodyState state={props.sectionStates?.systems}>
-            <SystemsSection systems={props.systems} />
+            <SystemsSection systems={props.systems} unitSystem={props.unitSystem} />
           </SectionBodyState>
         </Section>
 
@@ -752,7 +784,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           id="elements"
           title={SECTION_TITLES.elements}
           icon={Box}
-          summary={getSectionSummary('elements', props, issueCount, totalLength, totalAirflow)}
+          summary={getSectionSummary('elements', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
           disabled={props.sectionStates?.elements?.loading}
           isOpen={isOpen('elements')}
           onToggle={() => toggle('elements')}
@@ -766,7 +798,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           id="activity"
           title={SECTION_TITLES.activity}
           icon={Clock3}
-          summary={getSectionSummary('activity', props, issueCount, totalLength, totalAirflow)}
+          summary={getSectionSummary('activity', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
           disabled={props.sectionStates?.activity?.loading}
           isOpen={isOpen('activity')}
           onToggle={() => toggle('activity')}
@@ -774,6 +806,8 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           <SectionBodyState state={props.sectionStates?.activity}>
             <ActivitySection
               items={props.recentActivity}
+              limit={props.recentActivityLimit}
+              total={props.recentActivityTotal}
               canUndo={props.canUndo}
               canRedo={props.canRedo}
               onUndo={props.onUndo}

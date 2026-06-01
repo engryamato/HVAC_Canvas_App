@@ -352,8 +352,17 @@ function isEnvelopeValid(envelope: LocalStorageEnvelope): boolean {
   if (!ProjectFileSchema.safeParse(envelope.payload.project).success) {
     return false;
   }
+  if (!isPayloadStateConsistent(envelope.payload)) {
+    return false;
+  }
   const checksum = buildChecksum(envelope.payload);
   return checksum === envelope.checksum;
+}
+
+function isPayloadStateConsistent(payload: LocalStoragePayload): boolean {
+  const entityIds = new Set(payload.project.entities?.allIds ?? []);
+  return payload.selection.selectedIds.every((id) => entityIds.has(id)) &&
+    (payload.selection.hoveredId === null || entityIds.has(payload.selection.hoveredId));
 }
 
 export interface StorageWriteResult {

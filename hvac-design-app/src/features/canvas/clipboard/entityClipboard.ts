@@ -305,12 +305,11 @@ export async function pasteFromClipboard(): Promise<boolean> {
   }
 
   const cursorPoint = selectLastCanvasPoint() ?? { x: 0, y: 0 };
-  const { pasted } = remapEntitiesForPaste(payload.entities, cursorPoint);
+  const { pasted } = remapEntitiesForPaste(payload.entities as Entity[], cursorPoint);
   if (pasted.length === 0) {
     return false;
   }
 
-  createEntities(pasted);
+  createEntities(pasted as Entity[]);
   return true;
 }
-

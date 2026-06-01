@@ -323,7 +323,7 @@ function createSupportEntity(
 
 export function isSupportToolEntry(
   entry: UnifiedComponentDefinition | null | undefined
-): entry is UnifiedComponentDefinition {
+): boolean {
   return Boolean(entry && entry.engineeringSystem === 'universal' && entry.categoryId === UNIVERSAL_CATEGORY_ID);
 }
 
@@ -370,7 +370,7 @@ export function applyAutoHangerSpacing(): number {
       const entry = catalogEntries.find((candidate) => candidate.id === marker.catalogItemId);
       return entry ? createSupportEntity(marker, entry) : null;
     })
-    .filter((entity): entity is Entity => Boolean(entity));
+    .filter(Boolean) as Entity[];
 
   if (entities.length === 0) {
     return 0;

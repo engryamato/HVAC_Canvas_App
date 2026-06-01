@@ -4,207 +4,233 @@ import {
   type ToolKeyEvent,
   type ToolRenderContext,
 } from './BaseTool';
-import { createEquipment, EQUIPMENT_TYPE_DEFAULTS } from '../entities/equipmentDefaults';
+import { createEquipment } from '../entities/equipmentDefaults';
+import { PORT_DEFINITIONS } from '../entities/equipmentPortDefinitions';
 import { createEntity, validateAndRecord } from '@/core/commands/entityCommands';
 import { useViewportStore } from '../store/viewportStore';
-import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
-import { adaptComponentToService } from '@/core/services/componentServiceInterop';
-import { isEquipmentLike, resolveEquipmentType } from './catalogPlacement';
+import { useToolStore } from '@/core/store/canvas.store';
+import { useEntityStore } from '@/core/store/entityStore';
+import { MagneticConnectionService, type EquipmentPortSnapResult } from '../services/magneticConnectionService';
+import type { Equipment } from '@/core/schema';
+import type { EquipmentType } from '@/core/schema/equipment.schema';
 
 interface EquipmentToolState {
   currentPoint: { x: number; y: number } | null;
+  snapTarget: EquipmentPortSnapResult | null;
 }
 
 /**
- * Equipment tool for placing equipment on the canvas.
- * Click to place at cursor position with grid snapping.
- * Equipment type is stored in the canvas tool store.
+ * Equipment tool — sticky placement mode.
+ *
+ * Lifecycle:
+ *  1. User presses [E] or clicks Equipment button → CanvasContainer opens EquipmentPlacementDialog
+ *  2. User clicks "Place Equipment" → dialog closes, tool stays active
+ *  3. Preview follows cursor; click places equipment at snapped position
+ *  4. Name auto-increments after each placement (AHU-1 → AHU-2 → …)
+ *  5. [E] reopens dialog to change specs
+ *  6. [Esc] exits tool → select mode
  */
 export class EquipmentTool extends BaseTool {
   readonly name = 'equipment';
 
   private state: EquipmentToolState = {
     currentPoint: null,
+    snapTarget: null,
   };
 
   getCursor(): string {
     return 'crosshair';
   }
 
-  /**
-   * Get the currently active component from the library store
-   */
-  getActiveComponent() {
-    return useComponentLibraryStoreV2.getState().getActiveComponent();
-  }
-
   onActivate(): void {
     this.state.currentPoint = null;
+    this.state.snapTarget = null;
   }
 
   onDeactivate(): void {
     this.state.currentPoint = null;
+    this.state.snapTarget = null;
   }
 
   onMouseDown(event: ToolMouseEvent): void {
-    if (event.button !== 0) {
-      return;
-    }
+    if (event.button !== 0) return;
 
-    const snappedPoint = this.snapToGrid(event.x, event.y);
-    this.createEquipmentEntity(snappedPoint.x, snappedPoint.y);
+    // Don't place if the placement dialog is open
+    const { equipmentPlacementDialogOpen } = useToolStore.getState();
+    if (equipmentPlacementDialogOpen) return;
+
+    const placement = this.resolvePlacementPoint(event.x, event.y);
+    this.createEquipmentEntity(placement.point.x, placement.point.y, placement.snap);
   }
 
   onMouseMove(event: ToolMouseEvent): void {
-    const snappedPoint = this.snapToGrid(event.x, event.y);
-    this.state.currentPoint = snappedPoint;
+    const placement = this.resolvePlacementPoint(event.x, event.y);
+    this.state.currentPoint = placement.point;
+    this.state.snapTarget = placement.snap;
   }
 
   onMouseUp(_event: ToolMouseEvent): void {
-    // Single click placement, nothing to do on mouse up
+    // Single-click placement — nothing to do on mouse up
   }
 
   onKeyDown(event: ToolKeyEvent): void {
     if (event.key === 'Escape') {
-      this.state.currentPoint = null;
+      // Exit tool, return to select
+      useToolStore.getState().setTool('select');
+    }
+    if (event.key === 'e' || event.key === 'E') {
+      // Reopen dialog to change specs
+      useToolStore.getState().setEquipmentPlacementDialogOpen(true);
     }
   }
 
   render(context: ToolRenderContext): void {
-    if (!this.state.currentPoint) {
-      return;
-    }
+    const { equipmentPlacementDialogOpen, equipmentPlacementDraft } = useToolStore.getState();
 
-    const activeComponent = this.getActiveComponent();
-    if (!activeComponent || !isEquipmentLike(activeComponent)) {
-      return;
-    }
+    // Don't render preview while dialog is open
+    if (equipmentPlacementDialogOpen || !this.state.currentPoint) return;
 
     const { ctx, zoom } = context;
     const currentPoint = this.state.currentPoint;
-    
-    // Determine equipment type from subtype or fallback
-    const type = resolveEquipmentType(activeComponent);
-    const defaults = EQUIPMENT_TYPE_DEFAULTS[type] || EQUIPMENT_TYPE_DEFAULTS['fan'];
-    
-    // Use component dimensions if available, otherwise defaults
-    const width = activeComponent.defaultDimensions?.width ?? defaults.width;
-    const depth = activeComponent.defaultDimensions?.depth ?? defaults.depth;
+
+    // Draft dimensions are in inches; canvas units are pixels (1 ft = some px).
+    // Use the same pixel-per-inch scale the rest of the app uses (stored in viewport or a constant).
+    // For a simple 1:1 mapping to canvas coordinates we treat the stored numbers as canvas units.
+    const w = equipmentPlacementDraft.width;
+    const d = equipmentPlacementDraft.depth;
+
+    const x = currentPoint.x;
+    const y = currentPoint.y;
 
     ctx.save();
 
-    // Draw preview rectangle at cursor
-    const x = currentPoint.x - width / 2;
-    const y = currentPoint.y - depth / 2;
-
+    // Dashed preview box
     ctx.fillStyle = 'rgba(255, 243, 224, 0.7)';
     ctx.strokeStyle = '#E65100';
     ctx.lineWidth = 2 / zoom;
     ctx.setLineDash([6 / zoom, 4 / zoom]);
+    ctx.fillRect(x, y, w, d);
+    ctx.strokeRect(x, y, w, d);
 
-    ctx.fillRect(x, y, width, depth);
-    ctx.strokeRect(x, y, width, depth);
-
-    // Draw type label
-    ctx.font = `${10 / zoom}px sans-serif`;
+    // Name label
+    const labelSize = 10 / zoom;
+    ctx.font = `${labelSize}px sans-serif`;
     ctx.fillStyle = '#E65100';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(activeComponent.name || type.toUpperCase(), currentPoint.x, currentPoint.y);
+    ctx.setLineDash([]);
+    ctx.fillText(equipmentPlacementDraft.name, x + w / 2, y + d / 2 - labelSize);
+
+    // CFM sub-label
+    const cfmLabel = `${equipmentPlacementDraft.capacity.toLocaleString()} ${equipmentPlacementDraft.capacityUnit}`;
+    ctx.font = `${(labelSize * 0.85)}px sans-serif`;
+    ctx.fillStyle = '#BF360C';
+    ctx.fillText(cfmLabel, x + w / 2, y + d / 2 + labelSize * 0.5);
 
     ctx.restore();
   }
 
   protected reset(): void {
     this.state.currentPoint = null;
+    this.state.snapTarget = null;
   }
 
   private snapToGrid(x: number, y: number): { x: number; y: number } {
     const { snapToGrid, gridSize } = useViewportStore.getState();
-    if (!snapToGrid) {
-      return { x, y };
-    }
+    if (!snapToGrid) return { x, y };
     return {
       x: Math.round(x / gridSize) * gridSize,
       y: Math.round(y / gridSize) * gridSize,
     };
   }
 
-  private createEquipmentEntity(x: number, y: number): void {
-    const activeComponent = this.getActiveComponent();
-    if (!activeComponent || !isEquipmentLike(activeComponent)) {
-      console.warn('No active equipment component selected');
-      return;
-    }
+  private resolvePlacementPoint(
+    x: number,
+    y: number
+  ): { point: { x: number; y: number }; snap: EquipmentPortSnapResult | null } {
+    const gridPoint = this.snapToGrid(x, y);
+    const previewEquipment = this.createPreviewEquipment(gridPoint.x, gridPoint.y);
+    const snap = MagneticConnectionService.resolveEquipmentPortSnap(
+      previewEquipment,
+      gridPoint,
+      useEntityStore.getState().byId
+    );
 
-    const type = resolveEquipmentType(activeComponent);
-    const defaults = EQUIPMENT_TYPE_DEFAULTS[type] || EQUIPMENT_TYPE_DEFAULTS['fan'];
-    const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
+    return {
+      point: snap?.adjustedEntityPosition ?? gridPoint,
+      snap,
+    };
+  }
 
-    // Use component dimensions and metadata
-    const overrides = {
+  private createPreviewEquipment(x: number, y: number): Equipment {
+    const draft = useToolStore.getState().equipmentPlacementDraft;
+    const type = draft.equipmentType as EquipmentType;
+
+    return {
+      id: '__equipment-placement-preview__',
+      type: 'equipment',
+      transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      zIndex: 5,
+      createdAt: '',
+      modifiedAt: '',
+      props: {
+        name: draft.name,
+        engineeringSystem: draft.engineeringSystem,
+        equipmentType: type,
+        capacity: draft.capacity,
+        capacityUnit: draft.capacityUnit,
+        staticPressure: draft.staticPressure,
+        staticPressureUnit: draft.staticPressureUnit,
+        width: draft.width,
+        depth: draft.depth,
+        height: draft.height,
+        mountHeightUnit: 'in',
+        manufacturer: draft.manufacturer || undefined,
+        model: draft.model || undefined,
+        locationTag: draft.locationTag || undefined,
+        catalogItemId: draft.catalogEntryId ?? undefined,
+        connectionPorts: PORT_DEFINITIONS[type]?.map((port) => ({ ...port })),
+      },
+    };
+  }
+
+  private createEquipmentEntity(x: number, y: number, snap: EquipmentPortSnapResult | null): void {
+    const storeState = useToolStore.getState();
+    const draft = storeState.equipmentPlacementDraft;
+    const type = draft.equipmentType as EquipmentType;
+    const connectionPorts = PORT_DEFINITIONS[type]?.map((port) =>
+      snap && port.id === snap.snappedPortId ? { ...port, connectedDuctId: snap.snappedDuctId } : { ...port }
+    );
+
+    const equipment = createEquipment(type, {
       x,
       y,
-      width: activeComponent.defaultDimensions?.width ?? defaults.width,
-      depth: activeComponent.defaultDimensions?.depth ?? defaults.depth,
-      height: activeComponent.defaultDimensions?.height ?? defaults.height,
-      manufacturer: activeComponent.manufacturer,
-      model: activeComponent.model,
-      name: activeComponent.name,
-      serviceId: activeService?.id || activeComponent.id,
-      catalogItemId: activeComponent.id,
-      engineeringSystem: activeComponent.engineeringSystem,
-      ...(activeComponent.engineeringSystem === 'universal'
-        ? {
-            loadRating:
-              typeof activeComponent.customFields?.loadRating === 'number'
-                ? activeComponent.customFields.loadRating
-                : undefined,
-            spacingRule:
-              typeof activeComponent.customFields?.spacingRule === 'string'
-                ? activeComponent.customFields.spacingRule
-                : undefined,
-          }
-        : {}),
-      ...(activeComponent.engineeringSystem === 'generator_exhaust'
-        ? {
-            backpressureLimit:
-              typeof activeComponent.customFields?.backpressureLimit === 'number'
-                ? activeComponent.customFields.backpressureLimit
-                : undefined,
-            engineModel:
-              typeof activeComponent.customFields?.engineModel === 'string'
-                ? activeComponent.customFields.engineModel
-                : undefined,
-          }
-        : {}),
-      ...(activeComponent.engineeringSystem === 'boiler_flue'
-        ? {
-            draftType:
-              activeComponent.typeId === 'draft_control' ? 'natural' : 'forced',
-            btuInput:
-              typeof activeComponent.customFields?.btuInput === 'number'
-                ? activeComponent.customFields.btuInput
-                : undefined,
-          }
-        : {}),
-	      ...(activeComponent.engineeringSystem === 'grease_duct'
-	        ? {
-	            greaseExtractionStage:
-	              activeComponent.typeId === 'pcu' ? ('multi' as const) : ('single' as const),
-	            fireSuppressionReady:
-	              activeComponent.typeId === 'hood_connection' ||
-	              activeComponent.typeId === 'pcu',
-	          }
-	        : {}),
-	    };
-
-    // Place equipment at the snapped position (corner, not centered)
-    // This ensures the transform position is grid-aligned
-    const equipment = createEquipment(type, overrides);
+      name:              draft.name,
+      capacity:          draft.capacity,
+      capacityUnit:      draft.capacityUnit,
+      staticPressure:    draft.staticPressure,
+      width:             draft.width,
+      depth:             draft.depth,
+      height:            draft.height,
+      manufacturer:      draft.manufacturer || undefined,
+      model:             draft.model || undefined,
+      locationTag:       draft.locationTag || undefined,
+      catalogItemId:     draft.catalogEntryId ?? undefined,
+      engineeringSystem: draft.engineeringSystem,
+      connectionPorts,
+    });
 
     createEntity(equipment);
     validateAndRecord(equipment.id);
+
+    // Auto-increment the name for the next placement (AHU-1 → AHU-2)
+    const nextName = draft.name.replace(/(\d+)$/, (_, n) => String(Number(n) + 1));
+    storeState.setEquipmentPlacementDraft({ name: nextName });
+
+    // Update status bar
+    storeState.setStatusMessage(
+      `Placed ${draft.name}  ·  Click to place  ·  [E] Edit specs  ·  [Esc] Cancel`
+    );
   }
 }
 

@@ -23,6 +23,7 @@ import { useInspectorPreferencesStore } from '../store/inspectorPreferencesStore
 import { validateFloatingPosition } from '../utils/validateFloatingPosition';
 import { canvasPerformanceService } from '../services/CanvasPerformanceService';
 import { DuctSizePromptDialog } from './DuctSizePromptDialog';
+import { EquipmentPlacementDialog } from './EquipmentPlacementDialog';
 import { DuctRunGeometryService } from '../services/DuctRunGeometryService';
 
 // Tools
@@ -41,6 +42,7 @@ import {
 
 // Renderers
 import { renderRoom, renderDuct, renderDuctRun, renderEquipment, renderFitting, type RenderContext } from '../renderers';
+import { renderDuctCenterline } from '../renderers/DuctCenterlineRenderer';
 
 interface CanvasContainerProps {
   className?: string;
@@ -75,6 +77,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
   const [ductSizePromptOpen, setDuctSizePromptOpen] = useState(false);
+  const [equipmentPlacementDialogOpen, setEquipmentPlacementDialogOpen] = useState(false);
   const [overlayTooltip, setOverlayTooltip] = useState<{
     ductRunId: string;
     screenX: number;
@@ -90,6 +93,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const { panX, panY, zoom, gridVisible, gridSize } = useViewportStore();
   const showRulers = usePreferencesStore((state) => state.showRulers);
   const showFittingLabels = usePreferencesStore((state) => state.showFittingLabels);
+  const showCenterline = usePreferencesStore((state) => state.showCenterline);
   const unitSystem = usePreferencesStore((state) => state.unitSystem);
   const overlayMode = useDuctOverlayStore((state) => state.overlayMode);
   const overlayStatusMap = useDuctOverlayStore((state) => state.overlayStatusMap);
@@ -131,6 +135,9 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       tools[currentTool].onActivate();
       if (currentTool === 'duct') {
         setDuctSizePromptOpen(true);
+      }
+      if (currentTool === 'equipment') {
+        setEquipmentPlacementDialogOpen(true);
       }
       prevToolRef.current = currentTool;
     }
@@ -293,6 +300,15 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
         ctx.restore();
       }
+
+      // World-space overlay pass: draw authored design centerlines on top.
+      if (showCenterline) {
+        for (const entity of sortedEntities) {
+          if (entity.type === 'duct' || entity.type === 'duct_run') {
+            renderDuctCenterline(ctx, entity as Duct | DuctRun, zoom);
+          }
+        }
+      }
     },
     [
       entities,
@@ -302,6 +318,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
       hoveredId,
       entitiesById,
       showFittingLabels,
+      showCenterline,
       unitSystem,
       overlayMode,
       overlayStatusMap,
@@ -590,6 +607,14 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   return (
     <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
+      <EquipmentPlacementDialog
+        open={equipmentPlacementDialogOpen && currentTool === 'equipment'}
+        onConfirm={() => setEquipmentPlacementDialogOpen(false)}
+        onCancel={() => {
+          setEquipmentPlacementDialogOpen(false);
+          setTool('select');
+        }}
+      />
       <DuctSizePromptDialog
         open={ductSizePromptOpen && currentTool === 'duct'}
         toolShape={toolShape}

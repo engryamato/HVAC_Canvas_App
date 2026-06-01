@@ -60,8 +60,21 @@ function createFitting(): Fitting {
   };
 }
 
-describe('renderFitting latest overlap-mask behavior', () => {
-  it('uses render context background color for the duct overlap mask', () => {
+function createWye(): Fitting {
+  return {
+    ...createFitting(),
+    id: 'wye-1',
+    props: {
+      engineeringSystem: 'standard_duct',
+      fittingType: 'wye',
+      manualOverride: false,
+      transitionData: { fromShape: 'round', fromDiameter: 12, toShape: 'round', toDiameter: 6 },
+    },
+  };
+}
+
+describe('renderFitting body geometry (PR-8: real fill, no fake mask)', () => {
+  it('fills and strokes the parametric body instead of a background overlap rectangle', () => {
     const ctx = createCtx();
     const context: RenderContext = {
       ctx,
@@ -73,7 +86,31 @@ describe('renderFitting latest overlap-mask behavior', () => {
 
     renderFitting(createFitting(), context);
 
-    expect((ctx as any).fillStyleAssignments).toContain('#f8fafc');
-    expect(ctx.fillRect).toHaveBeenCalled();
+    // The fitting now masks underlying ducts with its real (white) filled body,
+    // not a faked background-colored rectangle.
+    expect((ctx as any).fillStyleAssignments).toContain('rgba(255, 255, 255, 0.92)');
+    expect((ctx as any).fillStyleAssignments).not.toContain('#f8fafc');
+    expect(ctx.fillRect).not.toHaveBeenCalled();
+    expect(ctx.fill).toHaveBeenCalled();
+    expect(ctx.stroke).toHaveBeenCalled();
+  });
+});
+
+describe('renderFitting magnetic port decorations', () => {
+  it('draws magnetic markers and labels at every resolved wye port', () => {
+    const ctx = createCtx();
+    const labels: string[] = [];
+    (ctx.fillText as ReturnType<typeof vi.fn>).mockImplementation((text: string) => {
+      labels.push(text);
+    });
+    const context: RenderContext = { ctx, zoom: 1, isSelected: false, isHovered: false, backgroundColor: '#fff' };
+
+    renderFitting(createWye(), context);
+
+    // Three ports × (end-line + three marker circles) → markers present.
+    expect(labels).toEqual(expect.arrayContaining(['INLET', 'OUTLET', 'BRANCH']));
+    // 3 ports × 3 concentric circles = 9 marker arcs (end lines use moveTo/lineTo).
+    expect((ctx.arc as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThanOrEqual(9);
+    expect(ctx.setLineDash).toHaveBeenCalled();
   });
 });

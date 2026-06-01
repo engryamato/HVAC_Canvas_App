@@ -1,7 +1,6 @@
-import type { Entity, Equipment, Fitting } from '@/core/schema';
+import type { Entity, Fitting } from '@/core/schema';
 import type { ConnectionGraph, DuctTopologyRole, TopologyFailureReason, TopologyValidationResult } from './types';
-
-const SOURCE_EQUIPMENT_TYPES = new Set(['air_handler', 'rtu', 'fan', 'furnace']);
+import { isSourceEquipment } from './equipmentClassification';
 
 export class TopologyValidationService {
   static validate(graph: ConnectionGraph, entities: Record<string, Entity>): TopologyValidationResult[] {
@@ -142,7 +141,9 @@ function classifyDuctRoles(
   sourceEquipmentId: string
 ): Record<string, DuctTopologyRole> {
   const roles: Record<string, DuctTopologyRole> = {};
-  const queue: Array<{ id: string; role: DuctTopologyRole }> = [{ id: sourceEquipmentId, role: 'main' }];
+  const queue: Array<{ id: string; parentId?: string; role: DuctTopologyRole }> = [
+    { id: sourceEquipmentId, role: 'main' },
+  ];
   const visited = new Set<string>();
 
   while (queue.length > 0) {
@@ -157,21 +158,20 @@ function classifyDuctRoles(
       roles[current.id] = current.role;
     }
 
-    const children = getOutgoing(graph, current.id).filter((id) => componentIds.has(id));
+    const children = getConnected(graph, current.id)
+      .filter((id) => componentIds.has(id))
+      .filter((id) => id !== current.parentId);
     const nextRole = current.role === 'branch' || children.length > 1 ? 'branch' : 'main';
     for (const child of children) {
-      queue.push({ id: child, role: nextRole });
+      queue.push({ id: child, parentId: current.id, role: nextRole });
     }
   }
 
   return roles;
 }
 
-function isSourceEquipment(entity: Entity | undefined): boolean {
-  if (entity?.type !== 'equipment') {
-    return false;
-  }
-  return SOURCE_EQUIPMENT_TYPES.has((entity as Equipment).props.equipmentType);
+function getConnected(graph: ConnectionGraph, nodeId: string): string[] {
+  return graph.nodes.get(nodeId)?.connections ?? [];
 }
 
 function hasMalformedPorts(entity: Entity | undefined, entities: Record<string, Entity>): boolean {

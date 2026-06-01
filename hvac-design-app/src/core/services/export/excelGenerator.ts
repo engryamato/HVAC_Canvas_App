@@ -165,6 +165,10 @@ export class ExcelGenerator {
     options: ExcelExportOptions
   ): ExcelWorksheet[] {
     const sheets: ExcelWorksheet[] = [];
+    if (options.groupBy === 'none') {
+      return [this.generateBOMSheet(rows, options)];
+    }
+
     const groups = this.groupRows(rows, options.groupBy);
 
     for (const [groupName, groupRows] of groups) {

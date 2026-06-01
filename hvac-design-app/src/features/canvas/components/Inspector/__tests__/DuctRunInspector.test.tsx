@@ -261,26 +261,27 @@ describe('DuctRunInspector', () => {
     expect('diameter' in nextProps ? nextProps.diameter : undefined).toBeUndefined();
   });
 
-  it('shows segment length and section length below the duct size controls', () => {
+  it('shows section length and run length below the duct size controls', () => {
     const run = createRun();
 
     render(<DuctRunInspector entity={run} />);
 
-    const segmentLength = screen.getByLabelText('Segment Length');
     const sectionLength = screen.getByLabelText('Section Length');
+    const runLength = screen.getByLabelText('Run Length');
 
-    expect(segmentLength).toBeDefined();
     expect(sectionLength).toBeDefined();
-    expect((segmentLength as HTMLInputElement).value).toBe('5');
-    expect((sectionLength as HTMLInputElement).value).toBe('13');
+    expect(runLength).toBeDefined();
+    expect(screen.queryByLabelText('Segment Length')).toBeNull();
+    expect((sectionLength as HTMLInputElement).value).toBe('5');
+    expect((runLength as HTMLInputElement).value).toBe('13');
   });
 
-  it('updates segment length as the repeated duct piece length and recomputes segments', () => {
+  it('updates section length as the repeated duct piece length and recomputes persisted segments', () => {
     const run = createRun();
 
     render(<DuctRunInspector entity={run} />);
 
-    fireEvent.change(screen.getByLabelText('Segment Length'), {
+    fireEvent.change(screen.getByLabelText('Section Length'), {
       target: { value: '7.5' },
     });
 
@@ -294,12 +295,12 @@ describe('DuctRunInspector', () => {
     expect(nextProps.segments.map((segment) => segment.endStation)).toEqual([7.5, 13]);
   });
 
-  it('updates section length as the total run length', () => {
+  it('updates run length as the total duct run length', () => {
     const run = createRun();
 
     render(<DuctRunInspector entity={run} />);
 
-    fireEvent.change(screen.getByLabelText('Section Length'), {
+    fireEvent.change(screen.getByLabelText('Run Length'), {
       target: { value: '18.5' },
     });
 

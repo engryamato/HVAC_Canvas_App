@@ -1,269 +1,230 @@
 import type { Fitting } from '@/core/schema';
-import { ProfessionalRenderingHelper } from '../utils';
 import type { RenderContext } from './RoomRenderer';
+import { deriveDynamicFittingSymbol, type DynamicFittingSymbolSpec } from './fittingSymbolModel';
 import {
-  deriveDynamicFittingSymbol,
-  type DynamicBranchFittingProps,
-  type DynamicFittingSymbolSpec,
-  type DynamicRectToRoundFittingProps,
-  type DynamicSingleSizeFittingProps,
-} from './fittingSymbolModel';
+  buildFittingGeometry,
+  type FittingBodyPart,
+  type FittingGeometry,
+  type FittingOpening,
+} from '../services/connectionPoints';
 
+/**
+ * Fitting visual colors — dark charcoal palette matching the duct renderer.
+ * Normal stroke is near-black #2D2D2D, selected is blue #1976D2. Fill is
+ * near-white so the fitting body cleanly covers underlying duct lines.
+ */
 const FITTING_COLORS = {
-  stroke: '#2E7D32',
-  selectedStroke: '#1565C0',
-  fill: 'rgba(232, 245, 233, 0.9)',
-  text: '#1B5E20',
+  stroke: '#2D2D2D',
+  selectedStroke: '#1976D2',
+  fill: 'rgba(255, 255, 255, 0.92)',
+  text: '#424242',
+  centerline: '#1565C0',
+  magneticPoint: '#1976D2',
 };
 
+/**
+ * Render a fitting entirely from its shared parametric geometry (PR-8). Body,
+ * centerlines, accents, opening end-lines, and magnetic markers all derive from
+ * the same `buildFittingGeometry` output the resolver uses for snapping, so the
+ * drawn openings line up exactly with the magnetic ports and connected ducts.
+ */
 export function renderFitting(fitting: Fitting, context: RenderContext): void {
-  const { ctx, zoom, isSelected, entitiesById = {}, showFittingLabels = false, backgroundColor = '#ffffff' } = context;
-  const helper = new ProfessionalRenderingHelper(ctx, zoom);
-  const spec = deriveDynamicFittingSymbol(fitting, entitiesById);
+  const { ctx, zoom, isSelected, entitiesById = {}, showFittingLabels = false } = context;
+  const geometry = buildFittingGeometry(fitting);
   const stroke = isSelected ? FITTING_COLORS.selectedStroke : FITTING_COLORS.stroke;
 
   ctx.save();
-  renderOverlapMask(ctx, spec, backgroundColor);
-  ctx.strokeStyle = stroke;
-  ctx.fillStyle = FITTING_COLORS.fill;
-  ctx.lineWidth = (isSelected ? 2.5 : 2) / zoom;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
 
-  switch (spec.kind) {
-    case 'elbow_90':
-      helper.drawElbow({ x: 0, y: 0 }, spec.props.size * 1.4, 90, spec.props.size);
-      break;
-    case 'elbow_45':
-      helper.drawElbow({ x: 0, y: 0 }, spec.props.size * 1.6, 45, spec.props.size);
-      break;
-    case 'elbow_mitered':
-      drawMiteredElbow(ctx, spec.props, zoom);
-      break;
-    case 'reducer':
-      helper.drawReducer({ x: -28, y: 0 }, { x: 28, y: 0 }, spec.props.inletSize, spec.props.outletSize);
-      drawEndTicks(ctx, zoom, [-28, 28], [spec.props.inletSize, spec.props.outletSize], stroke);
-      break;
-    case 'tee':
-      drawTee(ctx, helper, spec.props, zoom, stroke);
-      break;
-    case 'wye':
-      drawWye(ctx, spec.props, zoom, stroke);
-      break;
-    case 'end_cap':
-      drawEndCap(ctx, spec.props, zoom, stroke);
-      break;
-    case 'rect_to_round':
-      drawRectToRound(ctx, spec.props, zoom, stroke);
-      break;
-    case 'offset':
-      drawOffset(ctx, spec.props, zoom, stroke);
-      break;
-  }
+  drawBody(ctx, geometry.body, stroke, zoom, isSelected);
+  drawCenterlines(ctx, geometry.centerlines, zoom);
+  drawAccents(ctx, geometry.accents, stroke, zoom);
+  drawOpenings(ctx, geometry.openings, zoom);
 
   if (showFittingLabels) {
-    renderFittingLabel(ctx, spec, zoom);
+    renderFittingLabel(ctx, deriveDynamicFittingSymbol(fitting, entitiesById), zoom);
   }
 
   ctx.restore();
 }
 
-function renderOverlapMask(
+function drawBody(
   ctx: CanvasRenderingContext2D,
-  spec: DynamicFittingSymbolSpec,
-  backgroundColor: string
+  parts: FittingGeometry['body'],
+  stroke: string,
+  zoom: number,
+  isSelected: boolean
 ): void {
-  const halfSize = getFittingMaskHalfSize(spec) + 4;
+  ctx.fillStyle = FITTING_COLORS.fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = (isSelected ? 2.5 : 2) / zoom;
+
+  for (const part of parts) {
+    drawBodyPart(ctx, part);
+  }
+}
+
+function drawBodyPart(ctx: CanvasRenderingContext2D, part: FittingBodyPart): void {
+  switch (part.kind) {
+    case 'polygon': {
+      if (part.points.length === 0) {
+        return;
+      }
+      ctx.beginPath();
+      ctx.moveTo(part.points[0].x, part.points[0].y);
+      for (let i = 1; i < part.points.length; i += 1) {
+        ctx.lineTo(part.points[i].x, part.points[i].y);
+      }
+      ctx.closePath();
+      if (part.fill !== false) {
+        ctx.fill();
+      }
+      ctx.stroke();
+      break;
+    }
+    case 'arcBand': {
+      ctx.beginPath();
+      ctx.arc(part.center.x, part.center.y, part.outerRadius, part.startAngle, part.endAngle);
+      ctx.arc(part.center.x, part.center.y, part.innerRadius, part.endAngle, part.startAngle, true);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      break;
+    }
+    case 'circle': {
+      ctx.beginPath();
+      ctx.arc(part.center.x, part.center.y, part.radius, 0, Math.PI * 2);
+      if (part.fill !== false) {
+        ctx.fill();
+      }
+      ctx.stroke();
+      break;
+    }
+    case 'quad': {
+      ctx.beginPath();
+      ctx.moveTo(part.from.x, part.from.y);
+      ctx.quadraticCurveTo(part.control.x, part.control.y, part.to.x, part.to.y);
+      ctx.stroke();
+      break;
+    }
+  }
+}
+
+function drawCenterlines(ctx: CanvasRenderingContext2D, centerlines: FittingGeometry['centerlines'], zoom: number): void {
+  if (centerlines.length === 0) {
+    return;
+  }
   ctx.save();
-  ctx.fillStyle = backgroundColor;
-  ctx.fillRect(-halfSize, -halfSize, halfSize * 2, halfSize * 2);
+  ctx.strokeStyle = FITTING_COLORS.centerline;
+  ctx.lineWidth = 1.2 / zoom;
+  ctx.setLineDash([8 / zoom, 5 / zoom]);
+  ctx.beginPath();
+  for (const line of centerlines) {
+    ctx.moveTo(line.from.x, line.from.y);
+    ctx.lineTo(line.to.x, line.to.y);
+  }
+  ctx.stroke();
   ctx.restore();
 }
 
-function getFittingMaskHalfSize(spec: DynamicFittingSymbolSpec): number {
-  switch (spec.kind) {
-    case 'reducer':
-      return Math.max(spec.props.inletSize, spec.props.outletSize, 56) / 2;
-    case 'tee':
-    case 'wye':
-      return Math.max(spec.props.mainSize, spec.props.branchSize, 64) / 2;
-    case 'rect_to_round':
-      return Math.max(spec.props.rectWidth, spec.props.rectHeight, spec.props.roundSize, 64) / 2;
-    default:
-      return Math.max(spec.props.size, 40) / 2;
+function drawAccents(ctx: CanvasRenderingContext2D, accents: FittingGeometry['accents'], stroke: string, zoom: number): void {
+  if (accents.length === 0) {
+    return;
+  }
+  ctx.save();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 2 / zoom;
+  ctx.beginPath();
+  for (const line of accents) {
+    ctx.moveTo(line.from.x, line.from.y);
+    ctx.lineTo(line.to.x, line.to.y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawOpenings(ctx: CanvasRenderingContext2D, openings: FittingOpening[], zoom: number): void {
+  for (const opening of openings) {
+    drawPortEndLine(ctx, opening, zoom);
+    drawMagneticPortMarker(ctx, opening, zoom);
   }
 }
 
-function drawMiteredElbow(
-  ctx: CanvasRenderingContext2D,
-  props: DynamicSingleSizeFittingProps,
-  zoom: number
-): void {
-  const half = props.size / 2;
+function portOpeningSize(opening: FittingOpening): number {
+  const profile = opening.profile;
+  if (!profile) {
+    return 12;
+  }
+  if (profile.shape === 'round' || profile.shape === 'flexible') {
+    return profile.diameter ?? 12;
+  }
+  if (profile.shape === 'rectangular' || profile.shape === 'flat_oval') {
+    return profile.height ?? profile.width ?? 12;
+  }
+  return 12;
+}
+
+function drawPortEndLine(ctx: CanvasRenderingContext2D, opening: FittingOpening, zoom: number): void {
+  const { x, y } = opening.position;
+  const half = portOpeningSize(opening) / 2;
+  // Perpendicular to the facing direction — a straight top-view end line.
+  const px = -opening.direction.y;
+  const py = opening.direction.x;
+
+  ctx.save();
+  ctx.strokeStyle = FITTING_COLORS.stroke;
+  ctx.lineWidth = 2.4 / zoom;
+  ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(-half, half);
-  ctx.lineTo(10, half);
-  ctx.lineTo(26, half);
-  ctx.lineTo(26, -4);
-  ctx.lineTo(half, -4);
-  ctx.lineTo(half, -30 - half);
-  ctx.lineTo(-4, -30 - half);
-  ctx.lineTo(-4, -half);
-  ctx.lineTo(-half, -half);
-  ctx.closePath();
+  ctx.moveTo(x - px * half, y - py * half);
+  ctx.lineTo(x + px * half, y + py * half);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawMagneticPortMarker(ctx: CanvasRenderingContext2D, opening: FittingOpening, zoom: number): void {
+  const { x, y } = opening.position;
+  const dir = opening.direction;
+  const mag = FITTING_COLORS.magneticPoint;
+  // Marker radii are screen-constant (divided by zoom) so they stay legible at
+  // any scale, while the end line above stays geometry-scale.
+  const outerR = 14 / zoom;
+  const midR = 6 / zoom;
+  const coreR = 2.5 / zoom;
+
+  ctx.save();
+
+  ctx.fillStyle = 'rgba(25, 118, 210, 0.06)';
+  ctx.strokeStyle = mag;
+  ctx.lineWidth = 1.3 / zoom;
+  ctx.setLineDash([5 / zoom, 4 / zoom]);
+  ctx.beginPath();
+  ctx.arc(x, y, outerR, 0, Math.PI * 2);
   ctx.fill();
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(26, half);
-  ctx.lineTo(-4, -half);
-  ctx.stroke();
-
-  ctx.lineWidth = 1 / zoom;
-  ctx.setLineDash([10 / zoom, 5 / zoom, 2 / zoom, 5 / zoom]);
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(16, 0);
-  ctx.lineTo(16, -20);
   ctx.stroke();
   ctx.setLineDash([]);
-}
 
-function drawTee(
-  ctx: CanvasRenderingContext2D,
-  helper: ProfessionalRenderingHelper,
-  props: DynamicBranchFittingProps,
-  zoom: number,
-  stroke: string
-): void {
-  helper.drawTee({ x: 0, y: 0 }, props.mainSize, 'top');
-  const branchHalf = props.branchSize / 2;
+  ctx.fillStyle = 'rgba(25, 118, 210, 0.20)';
+  ctx.lineWidth = 1.8 / zoom;
   ctx.beginPath();
-  ctx.moveTo(-branchHalf, 0);
-  ctx.lineTo(branchHalf, 0);
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 1.25 / zoom;
-  ctx.stroke();
-}
-
-function drawWye(
-  ctx: CanvasRenderingContext2D,
-  props: DynamicBranchFittingProps,
-  zoom: number,
-  stroke: string
-): void {
-  const mainHalf = props.mainSize / 2;
-  const branchHalf = props.branchSize / 2;
-  ctx.beginPath();
-  ctx.moveTo(-32, -mainHalf);
-  ctx.lineTo(0, -mainHalf);
-  ctx.lineTo(28, -26 - branchHalf);
-  ctx.lineTo(48, -26 - branchHalf);
-  ctx.lineTo(20, -mainHalf);
-  ctx.lineTo(52, -mainHalf);
-  ctx.lineTo(52, mainHalf);
-  ctx.lineTo(-32, mainHalf);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 2 / zoom;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(20, mainHalf);
-  ctx.lineTo(48, -26 + branchHalf);
-  ctx.lineTo(28, -26 + branchHalf);
-  ctx.lineTo(0, mainHalf);
-  ctx.stroke();
-}
-
-function drawEndCap(
-  ctx: CanvasRenderingContext2D,
-  props: DynamicSingleSizeFittingProps,
-  zoom: number,
-  stroke: string
-): void {
-  const half = props.size / 2;
-  ctx.beginPath();
-  ctx.rect(-32, -half, 44, props.size);
-  ctx.fill();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 2 / zoom;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(12, -half - 2 / zoom);
-  ctx.lineTo(12, half + 2 / zoom);
-  ctx.lineWidth = 3 / zoom;
-  ctx.stroke();
-}
-
-function drawRectToRound(
-  ctx: CanvasRenderingContext2D,
-  props: DynamicRectToRoundFittingProps,
-  zoom: number,
-  stroke: string
-): void {
-  const rectHalf = props.rectHeight / 2;
-  const rectWidth = Math.max(props.rectWidth * 1.6, 20);
-  const roundRadius = props.roundSize / 2;
-
-  ctx.beginPath();
-  ctx.rect(-42, -rectHalf, rectWidth, props.rectHeight);
-  ctx.fill();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 2 / zoom;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(-42 + rectWidth, -rectHalf);
-  ctx.quadraticCurveTo(-4, -rectHalf, 20 - roundRadius, -roundRadius);
-  ctx.moveTo(-42 + rectWidth, rectHalf);
-  ctx.quadraticCurveTo(-4, rectHalf, 20 - roundRadius, roundRadius);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(20, 0, roundRadius, 0, Math.PI * 2);
+  ctx.arc(x, y, midR, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-}
 
-function drawOffset(
-  ctx: CanvasRenderingContext2D,
-  props: DynamicSingleSizeFittingProps,
-  zoom: number,
-  stroke: string
-): void {
-  const half = props.size / 2;
+  ctx.fillStyle = mag;
   ctx.beginPath();
-  ctx.moveTo(-42, 10 - half);
-  ctx.lineTo(-14, 10 - half);
-  ctx.lineTo(16, -10 - half);
-  ctx.lineTo(42, -10 - half);
-  ctx.lineTo(42, -10 + half);
-  ctx.lineTo(16, -10 + half);
-  ctx.lineTo(-14, 10 + half);
-  ctx.lineTo(-42, 10 + half);
-  ctx.closePath();
+  ctx.arc(x, y, coreR, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 2 / zoom;
-  ctx.stroke();
-}
 
-function drawEndTicks(
-  ctx: CanvasRenderingContext2D,
-  zoom: number,
-  xPositions: [number, number],
-  widths: [number, number],
-  stroke: string
-): void {
-  ctx.beginPath();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 2 / zoom;
-  ctx.moveTo(xPositions[0], -widths[0] / 2 - 2 / zoom);
-  ctx.lineTo(xPositions[0], widths[0] / 2 + 2 / zoom);
-  ctx.moveTo(xPositions[1], -widths[1] / 2 - 2 / zoom);
-  ctx.lineTo(xPositions[1], widths[1] / 2 + 2 / zoom);
-  ctx.stroke();
+  const labelOffset = outerR + 8 / zoom;
+  ctx.fillStyle = mag;
+  ctx.font = `${9 / zoom}px 'Courier New', monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(opening.id, x + dir.x * labelOffset, y + dir.y * labelOffset);
+
+  ctx.restore();
 }
 
 function renderFittingLabel(ctx: CanvasRenderingContext2D, spec: DynamicFittingSymbolSpec, zoom: number): void {

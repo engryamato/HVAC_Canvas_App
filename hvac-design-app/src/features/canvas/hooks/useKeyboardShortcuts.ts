@@ -8,6 +8,7 @@ import { useEntityStore } from '@/core/store/entityStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import type { Entity } from '@/core/schema';
 import { ZOOM_TO_SELECTION_PADDING } from '@/core/constants/viewport';
+import { getEquipmentPlanBounds } from '../services/equipmentGeometry';
 import {
   copySelectionToClipboard,
   cutSelectionToClipboard,
@@ -52,7 +53,7 @@ function getEntityDimensions(entity: Entity): { width: number; height: number } 
       return size;
     }
     case 'equipment':
-      return { width: entity.props.width, height: entity.props.height };
+      return getEquipmentPlanBounds(entity);
     default:
       return { width: 100, height: 100 };
   }

@@ -1,0 +1,384 @@
+{
+  "projectRoot": "C:/Users/User/Downloads/GitHub/HVAC_Canvas_App/hvac-design-app",
+  "batchFiles": [
+    {
+      "path": "src/components/canvas/AutoSizingControls.tsx",
+      "language": "typescript",
+      "sizeLines": 131,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/canvas/BOMPanel.tsx",
+      "language": "typescript",
+      "sizeLines": 207,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/schema/calculation-settings.schema.ts",
+      "language": "typescript",
+      "sizeLines": 256,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/schema/duct.schema.ts",
+      "language": "typescript",
+      "sizeLines": 255,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/automation/autoSizingService.ts",
+      "language": "typescript",
+      "sizeLines": 341,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/bom/bomGenerationService.ts",
+      "language": "typescript",
+      "sizeLines": 455,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/calculations/CalculationEngineRegistry.ts",
+      "language": "typescript",
+      "sizeLines": 584,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/calculations/PressurePropagationService.ts",
+      "language": "typescript",
+      "sizeLines": 138,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/calculations/engineeringCalculator.ts",
+      "language": "typescript",
+      "sizeLines": 283,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/calculations/entityCalculationRuntime.ts",
+      "language": "typescript",
+      "sizeLines": 342,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/constraintValidation.ts",
+      "language": "typescript",
+      "sizeLines": 217,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/cost/costCalculationService.ts",
+      "language": "typescript",
+      "sizeLines": 544,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/engineeringCalculations.ts",
+      "language": "typescript",
+      "sizeLines": 114,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/export/bomExportService.ts",
+      "language": "typescript",
+      "sizeLines": 203,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/export/excelGenerator.ts",
+      "language": "typescript",
+      "sizeLines": 220,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/export/pdfGenerator.ts",
+      "language": "typescript",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/operations/bulkOperationsService.ts",
+      "language": "typescript",
+      "sizeLines": 585,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/parametric/parametricUpdateService.ts",
+      "language": "typescript",
+      "sizeLines": 459,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/validation/constraintValidator.ts",
+      "language": "typescript",
+      "sizeLines": 442,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/store/calculationSettingsStore.ts",
+      "language": "typescript",
+      "sizeLines": 103,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/store/settingsStore.ts",
+      "language": "typescript",
+      "sizeLines": 422,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/calculators/ductSizing.ts",
+      "language": "typescript",
+      "sizeLines": 73,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/calculators/pressureDrop.ts",
+      "language": "typescript",
+      "sizeLines": 73,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/BOMPanel.tsx",
+      "language": "typescript",
+      "sizeLines": 452,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/BOMPanel/index.tsx",
+      "language": "typescript",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/DuctInspector.tsx",
+      "language": "typescript",
+      "sizeLines": 784,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/RightSidebar.tsx",
+      "language": "typescript",
+      "sizeLines": 243,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/ductDefaults.ts",
+      "language": "typescript",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useBOM.ts",
+      "language": "typescript",
+      "sizeLines": 243,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useCalculations.ts",
+      "language": "typescript",
+      "sizeLines": 374,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/store/bomHighlightStore.ts",
+      "language": "typescript",
+      "sizeLines": 13,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/components/canvas/AutoSizingControls.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/core/schema/duct.schema.ts",
+      "src/core/services/automation/autoSizingService.ts",
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/components/canvas/BOMPanel.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/core/services/bom/bomGenerationService.ts",
+      "src/core/services/cost/costCalculationService.ts"
+    ],
+    "src/core/schema/calculation-settings.schema.ts": [],
+    "src/core/schema/duct.schema.ts": [
+      "src/core/schema/base.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/services/automation/autoSizingService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/services/calculations/engineeringCalculator.ts",
+      "src/core/services/parametric/parametricUpdateService.ts",
+      "src/core/services/validation/constraintValidator.ts"
+    ],
+    "src/core/services/bom/bomGenerationService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/fitting.schema.ts"
+    ],
+    "src/core/services/calculations/CalculationEngineRegistry.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/services/calculations/PressurePropagationService.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/types.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/services/calculations/engineeringCalculator.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/services/calculations/entityCalculationRuntime.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/services/calculations/CalculationEngineRegistry.ts",
+      "src/core/services/calculations/engineeringCalculator.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/services/constraintValidation.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/service.schema.ts",
+      "src/core/services/engineeringCalculations.ts",
+      "src/core/store/validationStore.ts"
+    ],
+    "src/core/services/cost/costCalculationService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/services/bom/bomGenerationService.ts"
+    ],
+    "src/core/services/engineeringCalculations.ts": [
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/services/export/bomExportService.ts": [
+      "src/core/services/cost/costCalculationService.ts"
+    ],
+    "src/core/services/export/excelGenerator.ts": [
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/services/export/bomExportService.ts"
+    ],
+    "src/core/services/export/pdfGenerator.ts": [
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/services/export/bomExportService.ts"
+    ],
+    "src/core/services/operations/bulkOperationsService.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/commands/types.ts",
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/autoSizingService.ts",
+      "src/core/services/parametric/parametricUpdateService.ts",
+      "src/core/services/validation/constraintValidator.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/core/services/parametric/parametricUpdateService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/engineeringCalculator.ts",
+      "src/core/services/fittingGeneration.ts",
+      "src/core/services/validation/constraintValidator.ts"
+    ],
+    "src/core/services/validation/constraintValidator.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/store/calculationSettingsStore.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/core/store/settingsStore.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/services/constraintValidation.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/features/canvas/calculators/ductSizing.ts": [
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/features/canvas/calculators/pressureDrop.ts": [],
+    "src/features/canvas/components/BOMPanel.tsx": [
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/features/canvas/components/BOMPanel.module.css",
+      "src/features/canvas/hooks/useBOM.ts",
+      "src/features/canvas/store/bomHighlightStore.ts",
+      "src/features/export/csv.ts"
+    ],
+    "src/features/canvas/components/BOMPanel/index.tsx": [
+      "src/core/services/bom/bomGenerationService.ts"
+    ],
+    "src/features/canvas/components/Inspector/DuctInspector.tsx": [
+      "src/components/canvas/AutoSizingControls.tsx",
+      "src/components/canvas/ValidationDisplay.tsx",
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/autoSizingService.ts",
+      "src/core/services/bom/bomGenerationService.ts",
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/services/parametric/parametricUpdateService.ts",
+      "src/core/services/validation/constraintValidator.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/dialogStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/hooks/useFieldValidation.ts",
+      "src/features/canvas/store/bomHighlightStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/RightSidebar.tsx": [
+      "src/features/canvas/components/BOMPanel.tsx",
+      "src/features/canvas/components/CalculationsPanel.tsx",
+      "src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "src/features/canvas/components/ValidationDashboard.tsx",
+      "src/features/canvas/store/bomHighlightStore.ts",
+      "src/features/canvas/store/inspectorPreferencesStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/entities/ductDefaults.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/features/canvas/hooks/useBOM.ts": [
+      "src/core/services/bom/bomGenerationService.ts",
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/export/csv.ts"
+    ],
+    "src/features/canvas/hooks/useCalculations.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/CalculationEngineRegistry.ts",
+      "src/core/services/calculations/entityCalculationRuntime.ts",
+      "src/core/services/validation/constraintValidator.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/ventilation.ts"
+    ],
+    "src/features/canvas/store/bomHighlightStore.ts": []
+  }
+}

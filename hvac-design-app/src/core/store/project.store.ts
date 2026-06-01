@@ -25,6 +25,8 @@ interface ProjectActions {
   setProjectSettings: (settings: Partial<ProjectSettings>) => void;
   /** Mark project as dirty (unsaved changes) or clean */
   setDirty: (dirty: boolean) => void;
+  /** Mark project metadata modified after a canvas write */
+  markProjectModified: (modifiedAt?: string) => void;
   /** Clear the current project */
   clearProject: () => void;
 }
@@ -55,6 +57,17 @@ export const useProjectStore = create<ProjectStore>((set) => ({
 
   setDirty: (dirty) => set({ isDirty: dirty }),
 
+  markProjectModified: (modifiedAt = new Date().toISOString()) =>
+    set((state) => ({
+      projectDetails: state.projectDetails
+        ? {
+            ...state.projectDetails,
+            modifiedAt,
+          }
+        : state.projectDetails,
+      isDirty: true,
+    })),
+
   clearProject: () => set(PROJECT_INITIAL_STATE),
 }));
 
@@ -70,7 +83,8 @@ export const useProjectActions = () => {
   const setProject = useProjectStore((state) => state.setProject);
   const setProjectSettings = useProjectStore((state) => state.setProjectSettings);
   const setDirty = useProjectStore((state) => state.setDirty);
+  const markProjectModified = useProjectStore((state) => state.markProjectModified);
   const clearProject = useProjectStore((state) => state.clearProject);
 
-  return { setProject, setProjectSettings, setDirty, clearProject };
+  return { setProject, setProjectSettings, setDirty, markProjectModified, clearProject };
 };

@@ -1,11 +1,10 @@
 import { useFabricationProfileStore } from '@/core/store/fabricationProfileStore';
-import type { FabricationFamily } from '@/core/schema/fabrication-profile.schema';
+import { resolveDuctFabricationFamily, type DuctFabricationFamily } from '@/core/schema/fabrication-profile.schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
-import { getFabricationFamilyForShape } from '@/features/duct-runs/utils/getActiveSectionLength';
 
-const ROWS: Array<{ family: FabricationFamily; label: string }> = [
-  { family: 'rectangular', label: 'Rectangular' },
+const ROWS: Array<{ family: DuctFabricationFamily; label: string }> = [
+  { family: 'rectangular_rigid', label: 'Rectangular' },
   { family: 'round_rigid', label: 'Round Rigid' },
   { family: 'flat_oval', label: 'Flat Oval' },
   { family: 'flexible', label: 'Flexible' },
@@ -13,12 +12,12 @@ const ROWS: Array<{ family: FabricationFamily; label: string }> = [
 
 export function FabricationProfileSettingsPanel() {
   const draft = useFabricationProfileStore((state) => state.draft);
-  const updateDraftDefault = useFabricationProfileStore((state) => state.updateDraftDefault);
+  const updateDraftDefault = useFabricationProfileStore((state) => state.setDraftDefaultSectionLength);
   const commitDraft = useFabricationProfileStore((state) => state.commitDraft);
   const revertDraft = useFabricationProfileStore((state) => state.revertDraft);
-  const resetProfile = useFabricationProfileStore((state) => state.resetProfile);
+  const resetProfile = useFabricationProfileStore((state) => state.resetProfiles);
   const recomputeNonOverriddenRuns = () => {
-    const profile = useFabricationProfileStore.getState().profile;
+    const profile = useFabricationProfileStore.getState().committed;
     const { byId, updateEntity } = useEntityStore.getState();
 
     Object.values(byId).forEach((entity) => {
@@ -26,13 +25,13 @@ export function FabricationProfileSettingsPanel() {
         return;
       }
 
-      const family = getFabricationFamilyForShape(entity.props.shape);
+      const family = resolveDuctFabricationFamily(entity.props.shape);
       updateEntity(entity.id, {
         props: {
           ...entity.props,
           segments: recomputeDuctRunSegments(
             entity.props.installLength,
-            profile[family].defaultSectionLength
+            profile.profiles[family].defaultSectionLength
           ),
         },
       });
@@ -50,10 +49,10 @@ export function FabricationProfileSettingsPanel() {
           <span className="text-sm text-slate-700">{label}</span>
           <input
             type="number"
-            min={draft[family].minSectionLength}
-            max={draft[family].maxSectionLength}
+            min={draft.profiles[family].minSectionLength}
+            max={draft.profiles[family].maxSectionLength}
             step={0.5}
-            value={draft[family].defaultSectionLength}
+            value={draft.profiles[family].defaultSectionLength}
             onChange={(event) => updateDraftDefault(family, Number(event.currentTarget.value))}
             className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
           />

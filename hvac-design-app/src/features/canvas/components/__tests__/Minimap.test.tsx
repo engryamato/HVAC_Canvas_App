@@ -184,6 +184,22 @@ describe('Minimap', () => {
       expect(mockContext.fillRect).toHaveBeenCalled();
     });
 
+    it('renders equipment with plan depth and ignores physical height', () => {
+      const equipment = createMockEquipment('equip-1', 0, 0);
+      equipment.props.width = 100;
+      equipment.props.depth = 40;
+      equipment.props.height = 200;
+
+      useEntityStore.setState({
+        byId: { [equipment.id]: equipment },
+        allIds: [equipment.id],
+      });
+
+      render(<Minimap />);
+
+      expect(mockContext.fillRect).toHaveBeenNthCalledWith(2, 32, 8, 64, 25.6);
+    });
+
     it('should render with empty canvas gracefully', () => {
       render(<Minimap />);
 

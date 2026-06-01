@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { Equipment } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
 import { useEntityStore } from '@/core/store/entityStore';
 import { createDuctRun, resetDuctRunCounter } from '../../entities/ductRunDefaults';
@@ -6,6 +7,7 @@ import { createFitting, resetFittingCounter } from '../../entities/fittingDefaul
 import { DuctRunGeometryService } from '../../services/DuctRunGeometryService';
 import { MagneticConnectionService } from '../../services/magneticConnectionService';
 import { useSelectionStore } from '../../store/selectionStore';
+import { getAngleDegrees } from '../angleConstraint';
 import { DuctTool } from '../DuctTool';
 import { SelectTool } from '../SelectTool';
 
@@ -36,6 +38,36 @@ describe('SelectTool duct_run segment selection', () => {
     run.props.endPoint = { x: x + installLength * 12, y };
     useEntityStore.getState().addEntity(run);
     return run;
+  }
+
+  function seedAirHandlerAt(id: string, x: number, y: number): Equipment {
+    const equipment: Equipment = {
+      id,
+      type: 'equipment',
+      transform: { x, y, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      zIndex: 20,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      modifiedAt: '2026-01-01T00:00:00.000Z',
+      props: {
+        name: 'AHU-1',
+        engineeringSystem: 'standard_duct',
+        equipmentType: 'air_handler',
+        capacity: 1000,
+        capacityUnit: 'CFM',
+        staticPressure: 1,
+        staticPressureUnit: 'in_wg',
+        width: 60,
+        depth: 48,
+        height: 96,
+        mountHeightUnit: 'in',
+        connectionPorts: [
+          { id: 'supply-1', role: 'supply', edge: 'east', offsetRatio: 0.3, label: 'Supply' },
+          { id: 'return-1', role: 'return', edge: 'west', offsetRatio: 0.3, label: 'Return' },
+        ],
+      },
+    };
+    useEntityStore.getState().addEntity(equipment);
+    return equipment;
   }
 
   function seedRunBetween(
@@ -87,17 +119,13 @@ describe('SelectTool duct_run segment selection', () => {
     return { left, middle, right, startFitting, endFitting };
   }
 
-  it('selects the run before allowing segment selection', () => {
+  it('selects the run and hit section on first click', () => {
     const run = seedRun();
     const tool = new SelectTool();
 
     tool.onMouseDown({ x: 120, y: 100, button: 0 });
     tool.onMouseUp({ x: 120, y: 100, button: 0 });
     expect(useSelectionStore.getState().selectedIds).toEqual([run.id]);
-    expect(useSelectionStore.getState().selectedSegments).toEqual([]);
-
-    tool.onMouseDown({ x: 120, y: 100, button: 0 });
-    tool.onMouseUp({ x: 120, y: 100, button: 0 });
     expect(useSelectionStore.getState().selectedSegments).toEqual([
       { runId: run.id, segmentIndex: 0 },
     ]);
@@ -223,6 +251,24 @@ describe('SelectTool duct_run segment selection', () => {
     expect(useEntityStore.getState().byId[endFitting.id]).toBeDefined();
   });
 
+  it('does not auto-remove a manual override fitting during endpoint detachment', () => {
+    const { middle, startFitting, endFitting } = seedThreeConnectedRuns();
+    useEntityStore.getState().updateEntity(startFitting.id, {
+      props: {
+        ...startFitting.props,
+        manualOverride: true,
+      },
+    });
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(middle.id);
+
+    tool.onMouseDown({ x: 100, y: 100, button: 0 });
+    tool.onMouseMove({ x: 88, y: 100, button: 0 });
+
+    expect(useEntityStore.getState().byId[startFitting.id]).toBeDefined();
+    expect(useEntityStore.getState().byId[endFitting.id]).toBeDefined();
+  });
+
   it('leaves non-selected connected duct sections in place during selected endpoint detachment', () => {
     const { left, middle, right, startFitting, endFitting } = seedThreeConnectedRuns();
     const tool = new SelectTool();
@@ -254,6 +300,114 @@ describe('SelectTool duct_run segment selection', () => {
 
     expect(DuctRunGeometryService.getGeometry(moved).start).toEqual({ x: 112, y: 100 });
     expect(DuctRunGeometryService.getGeometry(moved).end).toEqual({ x: 220, y: 100 });
+  });
+
+  it('updates the authored centerline when stretching a duct_run endpoint', () => {
+    const { middle } = seedThreeConnectedRuns();
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(middle.id);
+
+    tool.onMouseDown({ x: 220, y: 100, button: 0 });
+    tool.onMouseMove({ x: 220, y: 130, button: 0 });
+
+    const stretched = useEntityStore.getState().byId[middle.id];
+    expect(stretched?.type).toBe('duct_run');
+    if (stretched?.type !== 'duct_run') {
+      throw new Error('Expected duct_run');
+    }
+
+    expect(stretched.props.startPoint).toEqual({ x: 100, y: 100 });
+    expect(getAngleDegrees(stretched.props.startPoint!, stretched.props.endPoint!)).toBeCloseTo(
+      15,
+      6
+    );
+    expect(stretched.props.designStartPoint).toEqual({ x: 100, y: 100 });
+    expect(
+      getAngleDegrees(stretched.props.designStartPoint!, stretched.props.designEndPoint!)
+    ).toBeCloseTo(15, 6);
+  });
+
+  it('uses 1 degree angle steps while Shift-stretching a free duct_run endpoint', () => {
+    const run = seedRunBetween('free-run', { x: 100, y: 100 }, { x: 220, y: 100 });
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(run.id);
+
+    tool.onMouseDown({ x: 220, y: 100, button: 0 });
+    tool.onMouseMove({ x: 220, y: 130, button: 0, shiftKey: true });
+
+    const stretched = useEntityStore.getState().byId[run.id];
+    expect(stretched?.type).toBe('duct_run');
+    if (stretched?.type !== 'duct_run') {
+      throw new Error('Expected duct_run');
+    }
+
+    expect(getAngleDegrees(stretched.props.startPoint!, stretched.props.endPoint!)).toBeCloseTo(
+      14,
+      6
+    );
+  });
+
+  it('recalculates an anchored auto-fitting after stretching the opposite free endpoint', () => {
+    DuctTool.setAutoFittingEnabled(true);
+    const trunk = seedRunBetween('trunk-run', { x: -20, y: 100 }, { x: 100, y: 100 });
+    const branch = seedRunBetween('branch-run', { x: 100, y: 100 }, { x: 220, y: 100 });
+    const elbow = seedFittingAt('corner-elbow', 100, 100, [trunk.id, branch.id], 'elbow_90');
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(branch.id);
+
+    tool.onMouseDown({ x: 220, y: 100, button: 0 });
+    tool.onMouseMove({ x: 220, y: 220, button: 0 });
+    tool.onMouseUp({ x: 220, y: 220, button: 0 });
+
+    const stretched = useEntityStore.getState().byId[branch.id];
+    const updatedFitting = useEntityStore.getState().byId[elbow.id];
+    expect(stretched?.type).toBe('duct_run');
+    expect(updatedFitting?.type).toBe('fitting');
+    if (stretched?.type !== 'duct_run' || updatedFitting?.type !== 'fitting') {
+      throw new Error('Expected duct_run and fitting');
+    }
+
+    expect(getAngleDegrees(stretched.props.startPoint!, stretched.props.endPoint!)).toBeCloseTo(
+      45,
+      6
+    );
+    expect(
+      getAngleDegrees(stretched.props.designStartPoint!, stretched.props.designEndPoint!)
+    ).toBeCloseTo(45, 6);
+    expect(updatedFitting.props.angle).not.toBe(90);
+  });
+
+  it('keeps the connected centerline corner fixed when stretching only the opposite free endpoint', () => {
+    DuctTool.setAutoFittingEnabled(true);
+    const trunk = seedRunBetween('trunk-run', { x: -20, y: 100 }, { x: 100, y: 100 });
+    const branch = seedRunBetween('cutback-branch', { x: 112, y: 100 }, { x: 220, y: 100 });
+    useEntityStore.getState().updateEntity(branch.id, {
+      props: {
+        ...branch.props,
+        designStartPoint: { x: 100, y: 100 },
+        designEndPoint: { x: 220, y: 100 },
+        designLength: 10,
+      },
+    });
+    seedFittingAt('corner-elbow', 100, 100, [trunk.id, branch.id], 'elbow_90');
+
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(branch.id);
+
+    tool.onMouseDown({ x: 220, y: 100, button: 0 });
+    tool.onMouseMove({ x: 220, y: 220, button: 0 });
+    tool.onMouseUp({ x: 220, y: 220, button: 0 });
+
+    const stretched = useEntityStore.getState().byId[branch.id];
+    expect(stretched?.type).toBe('duct_run');
+    if (stretched?.type !== 'duct_run') {
+      throw new Error('Expected duct_run');
+    }
+
+    expect(stretched.props.designStartPoint).toEqual({ x: 100, y: 100 });
+    expect(
+      getAngleDegrees(stretched.props.designStartPoint!, stretched.props.designEndPoint!)
+    ).toBeCloseTo(45, 6);
   });
 
   it('starts endpoint detachment in one drag when the pointer begins on a tee fitting', () => {
@@ -349,8 +503,10 @@ describe('SelectTool duct_run segment selection', () => {
   });
 
   it('attaches dragged reducer inlet and outlet ports to duct endpoints on release', () => {
-    const inletRun = seedRunBetween('inlet-run', { x: 52, y: 100 }, { x: 172, y: 100 });
-    const outletRun = seedRunBetween('outlet-run', { x: 228, y: 100 }, { x: 348, y: 100 });
+    // Parametric reducer ports sit at ±25.2 (bodyLength(12)/2), so the runs meet
+    // the openings at 174.8 / 225.2 for a clean dual attachment at origin 200.
+    const inletRun = seedRunBetween('inlet-run', { x: 52, y: 100 }, { x: 174.8, y: 100 });
+    const outletRun = seedRunBetween('outlet-run', { x: 225.2, y: 100 }, { x: 348, y: 100 });
     const reducer = seedFittingAt('dragged-reducer', 220, 100, [], 'reducer');
     const tool = new SelectTool();
     useSelectionStore.getState().select(reducer.id);
@@ -378,14 +534,48 @@ describe('SelectTool duct_run segment selection', () => {
     expect(afterRelease.transform.y).toBe(100);
     expect(afterRelease.props.inletDuctId).toBe(inletRun.id);
     expect(afterRelease.props.outletDuctId).toBe(outletRun.id);
+    // Ports now align exactly with the run endpoints, so the committed
+    // reconciliation records explicit port indices (PR-2/PR-8 contract).
     expect(afterRelease.props.connectionPoints).toEqual([
-      { ductId: inletRun.id },
-      { ductId: outletRun.id },
+      { ductId: inletRun.id, pointIndex: 0 },
+      { ductId: outletRun.id, pointIndex: 1 },
     ]);
   });
 
+  it('aligns dragged equipment ports to duct endpoints and persists connection metadata', () => {
+    const equipment = seedAirHandlerAt('equipment-1', 100, 100);
+    const run = seedRunAt('target-run', 200, 114.4, 10);
+    const tool = new SelectTool();
+
+    tool.onMouseDown({ x: 130, y: 120, button: 0 });
+    tool.onMouseMove({ x: 136, y: 120, button: 0 });
+    tool.onMouseMove({ x: 176, y: 120, button: 0 });
+    tool.onMouseUp({ x: 176, y: 120, button: 0 });
+
+    const moved = useEntityStore.getState().byId[equipment.id];
+    const connectedRun = useEntityStore.getState().byId[run.id];
+
+    expect(moved?.type).toBe('equipment');
+    if (moved?.type !== 'equipment') {
+      throw new Error('Expected equipment');
+    }
+    expect(moved.transform.x).toBe(140);
+    expect(moved.transform.y).toBe(100);
+    expect(
+      moved.props.connectionPorts?.find((port) => port.id === 'supply-1')?.connectedDuctId
+    ).toBe(run.id);
+    expect(connectedRun?.type).toBe('duct_run');
+    if (connectedRun?.type !== 'duct_run') {
+      throw new Error('Expected duct_run');
+    }
+    expect(connectedRun.props.connectedFrom).toBe(equipment.id);
+  });
+
   it('renders a stronger blue magnetic preview as the endpoint gets closer', () => {
-    const tool = new SelectTool() as SelectTool & { state: Record<string, unknown> };
+    const tool = new SelectTool() as unknown as {
+      state: Record<string, unknown>;
+      render: (context: { ctx: CanvasRenderingContext2D; zoom: number }) => void;
+    };
     const strokeStyles: string[] = [];
     const ctx = {
       save: () => undefined,
@@ -428,7 +618,10 @@ describe('SelectTool duct_run segment selection', () => {
   });
 
   it('fades out the blue magnetic preview when the endpoint moves far from a target', () => {
-    const tool = new SelectTool() as SelectTool & { state: Record<string, unknown> };
+    const tool = new SelectTool() as unknown as {
+      state: Record<string, unknown>;
+      render: (context: { ctx: CanvasRenderingContext2D; zoom: number }) => void;
+    };
     const strokeStyles: string[] = [];
     const ctx = {
       save: () => undefined,

@@ -4,6 +4,7 @@ import { CommandType, generateCommandId } from './types';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from './historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
+import { useProjectStore } from '@/core/store/project.store';
 import {
   useValidationStore,
   type ConstraintViolation,
@@ -79,6 +80,10 @@ function applySelection(selection?: string[]): void {
 function executeAndRecord(command: ReversibleCommand): void {
   executeCommand(command);
   useHistoryStore.getState().push(command);
+}
+
+function markCanvasWriteModified(modifiedAt = new Date().toISOString()): void {
+  useProjectStore.getState().markProjectModified(modifiedAt);
 }
 
 function buildReplacementCommand(
@@ -205,6 +210,9 @@ function cloneDuctRunWithNewGeometry(
     installLength: overrides.lengthFeet,
     startPoint: { x: overrides.x, y: overrides.y },
     endPoint,
+    designStartPoint: { x: overrides.x, y: overrides.y },
+    designEndPoint: { ...endPoint },
+    designLength: overrides.lengthFeet,
     connectedFrom: overrides.connectedFrom,
     connectedTo: overrides.connectedTo,
     segments: recomputeDuctRunSegments(overrides.lengthFeet, sectionLength, {
@@ -288,6 +296,15 @@ export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
         });
 
   const branch = params.branchDuct;
+
+  if (upstream.type === 'duct' && downstream.type === 'duct') {
+    upstream.props.connectedTo = downstream.id;
+    downstream.props.connectedFrom = upstream.id;
+  } else if (upstream.type === 'duct_run' && downstream.type === 'duct_run') {
+    upstream.props.connectedTo = downstream.id;
+    downstream.props.connectedFrom = upstream.id;
+  }
+
   const workingEntities: Record<string, Entity> = {
     ...entities,
     [upstream.id]: upstream,
@@ -296,10 +313,7 @@ export function splitDuctRunAtPoint(params: SplitDuctRunParams): boolean {
   };
   delete workingEntities[original.id];
 
-  const insertionPlan =
-    original.type === 'duct' && branch.type === 'duct'
-      ? fittingInsertionService.planAutoInsertForDuct(branch.id, workingEntities)
-      : { insertions: [], orphanFittingIds: [] };
+  const insertionPlan = fittingInsertionService.planAutoInsertForDuct(branch.id, workingEntities);
   const createEntities = [upstream, downstream, branch, ...insertionPlan.insertions];
   const removeEntities = [original];
   const selection = captureSelection(params);
@@ -629,6 +643,7 @@ export function createEntity(entity: Entity, options?: CommandOptions): void {
 
   // Push to history
   useHistoryStore.getState().push(command);
+  markCanvasWriteModified(entity.modifiedAt);
 }
 
 /**
@@ -659,6 +674,7 @@ export function createEntities(entities: Entity[]): void {
   entities.forEach((entity) => syncEntityValidation(entity));
   useSelectionStore.getState().selectMultiple(selectionAfter);
   useHistoryStore.getState().push(command);
+  markCanvasWriteModified();
 }
 
 /**
@@ -810,6 +826,7 @@ export function deleteEntity(entityOrId: Entity | string, options?: CommandOptio
   useValidationStore.getState().clearValidation(entityId);
   applySelection(nextSelection);
   useHistoryStore.getState().push(command);
+  markCanvasWriteModified();
 }
 
 /**
@@ -851,6 +868,7 @@ export function deleteEntities(entities: Entity[], options?: CommandOptions): vo
   entityIds.forEach((id) => useValidationStore.getState().clearValidation(id));
   applySelection(remainingSelection);
   useHistoryStore.getState().push(command);
+  markCanvasWriteModified();
 }
 
 /**
@@ -893,6 +911,7 @@ export function moveEntities(changes: TransformChange[]): void {
   });
 
   useHistoryStore.getState().push(command);
+  markCanvasWriteModified();
 }
 
 /**
@@ -1005,6 +1024,8 @@ function executeCommand(command: Command): void {
       break;
     }
   }
+
+  markCanvasWriteModified();
 }
 
 if (typeof window !== 'undefined') {

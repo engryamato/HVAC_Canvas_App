@@ -84,6 +84,16 @@ describe('InspectorPanel', () => {
     expect(screen.getByTestId('inspector-overview')).toBeDefined();
   });
 
+  it('keeps the overview as the only no-selection inspector', () => {
+    mockSelection([]);
+    mockEntities({});
+
+    render(<InspectorPanel embedded showHeader />);
+
+    expect(screen.getByTestId('inspector-overview')).toBeDefined();
+    expect(screen.getByText('Properties')).toBeDefined();
+  });
+
   it('renders multi-selection state', () => {
     mockSelection(['1', '2']);
     mockEntities({});
@@ -131,5 +141,23 @@ describe('InspectorPanel', () => {
 
     render(<InspectorPanel />);
     expect(screen.getByTestId('duct-run-inspector')).toBeDefined();
+  });
+
+  it('does not replace newer entity inspectors when overview is present', () => {
+    const cases = [
+      ['room-1', { id: 'room-1', type: 'room' }, 'room-inspector'],
+      ['duct-1', { id: 'duct-1', type: 'duct' }, 'duct-inspector'],
+      ['run-1', { id: 'run-1', type: 'duct_run' }, 'duct-run-inspector'],
+      ['equipment-1', { id: 'equipment-1', type: 'equipment' }, 'equipment-inspector'],
+      ['fitting-1', { id: 'fitting-1', type: 'fitting' }, 'fitting-inspector'],
+    ] as const;
+
+    for (const [id, entity, testId] of cases) {
+      mockSelection([id]);
+      mockEntities({ [id]: entity });
+      const { unmount } = render(<InspectorPanel />);
+      expect(screen.getByTestId(testId)).toBeDefined();
+      unmount();
+    }
   });
 });

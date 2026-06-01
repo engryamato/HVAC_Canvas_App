@@ -177,7 +177,7 @@ describe('useCalculations helpers', () => {
 
     const universal = calculateDuct(
       createTestDuct({
-        engineeringSystem: 'universal',
+        engineeringSystem: 'universal' as never,
         diameter: 60,
       })
     );

@@ -1,5 +1,11 @@
 import type { Fitting } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
+import {
+  resolveFittingGeometry,
+  resolveLocalFittingPorts,
+  type LocalPortDefinition,
+} from './connectionPoints/fittingResolver';
+import { buildFittingGeometry } from './connectionPoints/fittingGeometry';
 
 export type ConnectionRole = 'inlet' | 'outlet' | 'branch';
 
@@ -97,18 +103,16 @@ export const FITTING_CONNECTION_OFFSETS: Record<FittingType, ConnectionPointDef[
  * applying the fitting's position and rotation.
  */
 export function getWorldConnectionPoints(fitting: Fitting): WorldConnectionPoint[] {
-  const { x, y, rotation } = fitting.transform;
-  const fittingType = fitting.props.fittingType;
-  const defs = FITTING_CONNECTION_OFFSETS[fittingType] ?? [];
-  const rad = (rotation * Math.PI) / 180;
-  const cos = Math.cos(rad);
-  const sin = Math.sin(rad);
+  const localPorts = resolveLocalFittingPorts(fitting);
+  const resolvedGeometry = resolveFittingGeometry(fitting);
 
-  return defs.map((def) => ({
-    ...def,
+  return resolvedGeometry.connectionPoints.map((point, index) => ({
+    role: normalizeConnectionRole(point.role),
+    localX: localPorts[index]?.localPosition.x ?? point.localPosition.x,
+    localY: localPorts[index]?.localPosition.y ?? point.localPosition.y,
     fittingId: fitting.id,
-    worldX: x + def.localX * cos - def.localY * sin,
-    worldY: y + def.localX * sin + def.localY * cos,
+    worldX: point.worldPosition.x,
+    worldY: point.worldPosition.y,
   }));
 }
 
@@ -150,8 +154,7 @@ export function computeFittingOriginForPortSnap(
   snapPoint: { x: number; y: number },
   rotationDeg: number
 ): { x: number; y: number } {
-  const defs = FITTING_CONNECTION_OFFSETS[fittingType];
-  const inletDef = defs?.find((d) => d.role === 'inlet') ?? defs?.[0];
+  const inletDef = getStaticLocalPorts(fittingType).find((d) => d.role === 'inlet') ?? getStaticLocalPorts(fittingType)[0];
   if (!inletDef) {
     return snapPoint;
   }
@@ -164,4 +167,67 @@ export function computeFittingOriginForPortSnap(
     x: snapPoint.x - (inletDef.localX * cos - inletDef.localY * sin),
     y: snapPoint.y - (inletDef.localX * sin + inletDef.localY * cos),
   };
+}
+
+export function computeFittingOriginForAnchorSnap(
+  fitting: Fitting,
+  snapPoint: { x: number; y: number },
+  rotationDeg = fitting.transform.rotation ?? 0,
+  scaleX = fitting.transform.scaleX ?? 1,
+  scaleY = fitting.transform.scaleY ?? 1
+): { x: number; y: number } {
+  const anchor = buildFittingGeometry(fitting).anchor;
+  const rad = (rotationDeg * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  const localX = anchor.x * scaleX;
+  const localY = anchor.y * scaleY;
+
+  return {
+    x: snapPoint.x - (localX * cos - localY * sin),
+    y: snapPoint.y - (localX * sin + localY * cos),
+  };
+}
+
+function getStaticLocalPorts(fittingType: FittingType): ConnectionPointDef[] {
+  return (FITTING_CONNECTION_OFFSETS[fittingType] ?? []).map((point) => ({ ...point }));
+}
+
+function normalizeConnectionRole(role: string | undefined): ConnectionRole {
+  if (role === 'branch' || role === 'branch_out') {
+    return 'branch';
+  }
+  if (role === 'outlet' || role === 'straight_out') {
+    return 'outlet';
+  }
+  return 'inlet';
+}
+
+function toConnectionPointDef(definition: LocalPortDefinition): ConnectionPointDef {
+  return {
+    role: normalizeConnectionRole(definition.role),
+    localX: definition.localPosition.x,
+    localY: definition.localPosition.y,
+  };
+}
+
+function createStaticFitting(type: FittingType): Fitting {
+  return {
+    id: '550e8400-e29b-41d4-a716-446655449999',
+    type: 'fitting',
+    transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    zIndex: 0,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    modifiedAt: '2026-01-01T00:00:00.000Z',
+    props: {
+      engineeringSystem: 'standard_duct',
+      fittingType: type,
+      manualOverride: false,
+    },
+    calculated: { equivalentLength: 0, pressureLoss: 0 },
+  };
+}
+
+for (const fittingType of Object.keys(FITTING_CONNECTION_OFFSETS) as FittingType[]) {
+  FITTING_CONNECTION_OFFSETS[fittingType] = resolveLocalFittingPorts(createStaticFitting(fittingType)).map(toConnectionPointDef);
 }

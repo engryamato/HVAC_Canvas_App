@@ -180,6 +180,34 @@ describe('useAutoSave - Storage Functions', () => {
     expect(loaded?.source).toBe('backup');
   });
 
+  it('falls back to backup when primary selection references missing entities', () => {
+    const projectId = '11111111-1111-4111-8111-111111111111';
+    const stalePrimary = {
+      ...basePayload(projectId),
+      selection: { selectedIds: ['missing-entity'], hoveredId: 'missing-entity' },
+    };
+    const room = createMockRoom('550e8400-e29b-41d4-a716-446655440010', 'Visible Room');
+    const validBackup = {
+      ...basePayload(projectId),
+      project: {
+        ...basePayload(projectId).project,
+        entities: {
+          byId: { [room.id]: room },
+          allIds: [room.id],
+        },
+      },
+      selection: { selectedIds: [room.id], hoveredId: room.id },
+    };
+
+    saveProjectToStorage(projectId, stalePrimary);
+    saveBackupToStorage(projectId, validBackup);
+
+    const loaded = loadProjectFromStorage(projectId);
+
+    expect(loaded?.source).toBe('backup');
+    expect(loaded?.payload.project.entities?.allIds).toEqual([room.id]);
+  });
+
   it('should delete project from localStorage', () => {
     const projectId = '11111111-1111-4111-8111-111111111111';
     saveProjectToStorage(projectId, basePayload(projectId));

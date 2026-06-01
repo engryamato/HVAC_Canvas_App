@@ -3,6 +3,7 @@ import { createEmptyProject } from '@/core/schema/project-file.schema';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useProjectStore } from '@/core/store/project.store';
+import { useValidationStore } from '@/core/store/validationStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useThreeDViewStore, THREE_D_VIEW_INITIAL_STATE } from '@/features/canvas/store/threeDViewStore';
 import { useViewModeStore, VIEW_MODE_INITIAL_STATE } from '@/features/canvas/store/viewModeStore';
@@ -32,6 +33,7 @@ describe('ProjectStateOrchestrator', () => {
   beforeEach(() => {
     localStorage.clear();
     useProjectStore.getState().clearProject();
+    useValidationStore.getState().clearAll();
     useSelectionStore.getState().clearSelection();
     useSelectionStore.getState().setHovered(null);
     useViewModeStore.getState().reset();
@@ -106,9 +108,40 @@ describe('ProjectStateOrchestrator', () => {
     });
     expect(useViewModeStore.getState().activeViewMode).toBe('3d');
     expect(useThreeDViewStore.getState().cameraTarget).toEqual(project.threeDViewState.cameraTarget);
-    expect(useSelectionStore.getState().selectedIds).toEqual(['entity-1']);
+    expect(useSelectionStore.getState().selectedIds).toEqual([]);
     expect(useHistoryStore.getState().past).toEqual([{ id: 'command-1' }]);
     expect(localStorage.getItem('lastActiveProjectId')).toBe(project.projectId);
+  });
+
+  it('drops stale selection and validation state that does not exist in the hydrated project', () => {
+    const project = createEmptyProject('Empty Hydration Project', {
+      projectId: '550e8400-e29b-41d4-a716-446655440003',
+    });
+    useValidationStore.getState().setValidationResult('missing-entity', {
+      entityId: 'missing-entity',
+      catalogStatus: 'resolved',
+      lastValidated: new Date('2026-01-01T00:00:00.000Z'),
+      violations: [
+        {
+          ruleId: 'topology',
+          type: 'NO_SOURCE',
+          severity: 'warning',
+          message: 'Network topology unsupported for calculation: NO_SOURCE',
+        },
+      ],
+    });
+
+    hydrateToStores(project, {
+      payload: {
+        selection: { selectedIds: ['missing-entity'], hoveredId: 'missing-entity' },
+      },
+    });
+
+    expect(useSelectionStore.getState()).toMatchObject({
+      selectedIds: [],
+      hoveredId: null,
+    });
+    expect(useValidationStore.getState().validationResults).toEqual({});
   });
 
   it('resets legacy 3d state residue when view metadata is absent', () => {

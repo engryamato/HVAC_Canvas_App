@@ -14,6 +14,9 @@ import type { ValidationResult } from '@/core/store/validationStore';
 import { useValidationStore } from '@/core/store/validationStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useSelectionStore } from '../../store/selectionStore';
+import { useViewportStore } from '../../store/viewportStore';
+import { buildGeometryRepairPlan } from '../../services/geometryRepairService';
+import { buildInspectorFocusRequest } from '../../utils/inspectorFocus';
 import type {
   ActivityItem,
   DuctSystem,
@@ -31,7 +34,25 @@ type EntityLike = Pick<Entity, 'id' | 'type'> & {
   props?: Record<string, unknown>;
   calculated?: Record<string, unknown>;
   modifiedAt?: string;
+  transform?: {
+    x?: number;
+    y?: number;
+    scaleX?: number;
+    scaleY?: number;
+  };
 };
+
+interface Bounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface PointLike {
+  x: number;
+  y: number;
+}
 
 type CalculationSettingsWithAuto = NonNullable<ReturnType<typeof useCalculationSettingsStore.getState>['currentSettings']> & {
   autoCalculate?: boolean;
@@ -83,6 +104,65 @@ function titleize(value: string): string {
 
 function asNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function numberProp(entity: EntityLike, key: string): number | null {
+  return asNumber(entity.props?.[key]);
+}
+
+function pointProp(entity: EntityLike, key: string): PointLike | null {
+  const value = entity.props?.[key];
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const point = value as Record<string, unknown>;
+  const x = asNumber(point.x);
+  const y = asNumber(point.y);
+  return x === null || y === null ? null : { x, y };
+}
+
+export function buildEntityBounds(entities: EntityLike[]): Bounds | null {
+  const boxes = entities
+    .map((entity) => {
+      const start = pointProp(entity, 'startPoint') ?? pointProp(entity, 'start');
+      const end = pointProp(entity, 'endPoint') ?? pointProp(entity, 'end');
+      if (start && end) {
+        const minX = Math.min(start.x, end.x);
+        const minY = Math.min(start.y, end.y);
+        const maxX = Math.max(start.x, end.x);
+        const maxY = Math.max(start.y, end.y);
+        return { x: minX, y: minY, width: Math.max(maxX - minX, 1), height: Math.max(maxY - minY, 1) };
+      }
+
+      const x = numberProp(entity, 'x') ?? numberProp(entity, 'left') ?? asNumber(entity.transform?.x);
+      const y = numberProp(entity, 'y') ?? numberProp(entity, 'top') ?? asNumber(entity.transform?.y);
+      const scaleX = asNumber(entity.transform?.scaleX) ?? 1;
+      const scaleY = asNumber(entity.transform?.scaleY) ?? 1;
+      const width = (numberProp(entity, 'width') ?? numberProp(entity, 'w') ?? 1) * scaleX;
+      const height =
+        entity.type === 'equipment'
+          ? (numberProp(entity, 'depth') ?? numberProp(entity, 'height') ?? numberProp(entity, 'h') ?? 1) * scaleY
+          : (numberProp(entity, 'height') ?? numberProp(entity, 'h') ?? 1) * scaleY;
+
+      if (x === null || y === null) {
+        return null;
+      }
+
+      return { x, y, width: Math.max(width, 1), height: Math.max(height, 1) };
+    })
+    .filter((box): box is Bounds => box !== null);
+
+  if (boxes.length === 0) {
+    return null;
+  }
+
+  const minX = Math.min(...boxes.map((box) => box.x));
+  const minY = Math.min(...boxes.map((box) => box.y));
+  const maxX = Math.max(...boxes.map((box) => box.x + box.width));
+  const maxY = Math.max(...boxes.map((box) => box.y + box.height));
+
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 }
 
 function entityName(entity: EntityLike | undefined): string {
@@ -347,7 +427,7 @@ export function buildActivityItems(commands: ReversibleCommand[], now = new Date
     }));
 }
 
-function buildProject(projectDetails: ReturnType<typeof useProjectStore.getState>['projectDetails']): ProjectMetadata {
+export function buildProject(projectDetails: ReturnType<typeof useProjectStore.getState>['projectDetails']): ProjectMetadata {
   return {
     name: fallback(projectDetails?.projectName, 'Untitled'),
     description: fallback(projectDetails?.scope?.details?.join(', ')),
@@ -394,11 +474,13 @@ export function useInspectorOverviewData(): InspectorPanelProps {
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
   const selectMultiple = useSelectionStore((state) => state.selectMultiple);
+  const zoomToSelection = useViewportStore((state) => state.zoomToSelection);
   const setOpenCalculationSettings = useDialogStore((state) => state.setOpenCalculationSettings);
 
   const unitSystem = projectUnitSystem ?? preferencesUnitSystem;
   const engineering = useMemo(() => buildEngineering(calculationSettings, unitSystem), [calculationSettings, unitSystem]);
   const health = useMemo(() => buildHealthItems(validationResults), [validationResults]);
+  const systems = useMemo(() => buildSystems(entities, engineering.autoCalculate), [entities, engineering.autoCalculate]);
   const invalidIds = useMemo(() => {
     const failingTypes = new Set(health.filter((item) => item.status !== 'ok').map((item) => item.id));
     return Object.values(validationResults)
@@ -424,11 +506,28 @@ export function useInspectorOverviewData(): InspectorPanelProps {
     return lookup;
   }, [validationResults]);
 
-  const selectEntityType = useCallback(
-    (type: ElementSelectionKey) => {
-      selectMultiple(getElementIdsByType(entities, type));
+  const applyInspectorSelection = useCallback(
+    (ids: string[]) => {
+      const request = buildInspectorFocusRequest(ids);
+      selectMultiple(request.ids);
+
+      if (request.shouldFocus) {
+        const selectedEntities = entities.filter((entity) => request.ids.includes(entity.id));
+        const bounds = buildEntityBounds(selectedEntities);
+        if (bounds) {
+          zoomToSelection(bounds, { animate: true });
+        }
+      }
+
+      setActionStatus(request.status);
+      return request;
     },
-    [entities, selectMultiple]
+    [entities, selectMultiple, zoomToSelection]
+  );
+
+  const selectEntityType = useCallback(
+    (type: ElementSelectionKey) => applyInspectorSelection(getElementIdsByType(entities, type)),
+    [applyInspectorSelection, entities]
   );
 
   const onToggleAutoCalculate = useCallback(
@@ -440,23 +539,42 @@ export function useInspectorOverviewData(): InspectorPanelProps {
 
   const onAutoFixGeometry = useCallback(() => {
     commitNetwork();
-    setActionStatus('Geometry validation refreshed.');
-  }, [commitNetwork]);
+    const repairPlan = buildGeometryRepairPlan(useValidationStore.getState().validationResults);
+    if (repairPlan.changedEntityIds.length > 0) {
+      selectMultiple(repairPlan.changedEntityIds);
+    }
+    setActionStatus(repairPlan.message);
+  }, [commitNetwork, selectMultiple]);
+
+  const sectionStates = useMemo(
+    () => ({
+      project: projectDetails ? undefined : { error: 'Project metadata is not loaded.' },
+      systems:
+        engineering.autoCalculate && entities.length > 0 && systems.length === 0
+          ? { error: 'No calculated duct systems are available.' }
+          : undefined,
+    }),
+    [engineering.autoCalculate, entities.length, projectDetails, systems.length]
+  );
 
   return {
     project: buildProject(projectDetails),
     engineering,
     health,
-    systems: buildSystems(entities, engineering.autoCalculate),
+    systems,
+    unitSystem,
     elements: buildElementInventory(entities),
     recentActivity: buildActivityItems(pastCommands),
+    recentActivityLimit: RECENT_ACTIVITY_LIMIT,
+    recentActivityTotal: pastCommands.length,
     canUndo,
     canRedo,
     actionStatus,
+    sectionStates,
     onToggleAutoCalculate,
     onEditEngineeringSettings: () => setOpenCalculationSettings(true),
-    onLocateHealthIssue: (issueId) => selectMultiple(locateByIssue.get(issueId) ?? []),
-    onSelectAllInvalid: () => selectMultiple(invalidIds),
+    onLocateHealthIssue: (issueId) => applyInspectorSelection(locateByIssue.get(issueId) ?? []),
+    onSelectAllInvalid: () => applyInspectorSelection(invalidIds),
     onAutoFixGeometry,
     onSelectElementType: selectEntityType,
     onUndo: () => {

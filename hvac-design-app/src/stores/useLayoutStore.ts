@@ -10,6 +10,7 @@ interface LayoutStoreState {
     // Active tab states
     activeLeftTab: string;
     activeRightTab: string;
+    catalogDensity: 'comfortable' | 'compact';
 
     // Dock state
     activeDockPanel: 'none' | 'library' | 'services';
@@ -20,6 +21,7 @@ interface LayoutStoreState {
     setRightSidebarWidth: (width: number) => void;
     setActiveLeftTab: (tab: string) => void;
     setActiveRightTab: (tab: string) => void;
+    setCatalogDensity: (density: 'comfortable' | 'compact') => void;
     
     // Dock actions
     setActiveDockPanel: (panel: 'none' | 'library' | 'services') => void;
@@ -35,6 +37,7 @@ const defaultState = {
     rightSidebarWidth: 320,
     activeLeftTab: 'library',
     activeRightTab: 'properties',
+    catalogDensity: 'comfortable' as const,
     activeDockPanel: 'none' as const,
 };
 
@@ -58,6 +61,9 @@ export const useLayoutStore = create<LayoutStoreState>()(
             setActiveRightTab: (tab) =>
                 set({ activeRightTab: tab }),
 
+            setCatalogDensity: (density) =>
+                set({ catalogDensity: density }),
+
             setActiveDockPanel: (panel) => 
                 set({ activeDockPanel: panel }),
 
@@ -80,6 +86,7 @@ export const useLayoutStore = create<LayoutStoreState>()(
                 rightSidebarWidth: state.rightSidebarWidth,
                 activeLeftTab: state.activeLeftTab,
                 activeRightTab: state.activeRightTab,
+                catalogDensity: state.catalogDensity,
                 activeDockPanel: state.activeDockPanel,
             }),
         }

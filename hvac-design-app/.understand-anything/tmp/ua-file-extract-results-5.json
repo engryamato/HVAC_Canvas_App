@@ -1,0 +1,6903 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 31,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "src/features/canvas/components/CalculationsPanel.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 237,
+      "nonEmptyLines": 211,
+      "functions": [
+        {
+          "name": "CalculationsPanel",
+          "startLine": 15,
+          "endLine": 75,
+          "params": []
+        },
+        {
+          "name": "SelectedDuctRunBranchCard",
+          "startLine": 77,
+          "endLine": 99,
+          "params": [
+            "{\n  branchCalculation,\n}"
+          ]
+        },
+        {
+          "name": "SelectedDuctRunCard",
+          "startLine": 101,
+          "endLine": 142,
+          "params": [
+            "{\n  run,\n  segmentCalculation,\n}"
+          ]
+        },
+        {
+          "name": "SelectedFittingCard",
+          "startLine": 144,
+          "endLine": 164,
+          "params": [
+            "{ fitting, entities }"
+          ]
+        },
+        {
+          "name": "PortSection",
+          "startLine": 166,
+          "endLine": 191,
+          "params": [
+            "{\n  title,\n  ports,\n  entities,\n}"
+          ]
+        },
+        {
+          "name": "CalculationRow",
+          "startLine": 193,
+          "endLine": 204,
+          "params": [
+            "{ label, value }"
+          ]
+        },
+        {
+          "name": "formatNumber",
+          "startLine": 206,
+          "endLine": 215,
+          "params": [
+            "value",
+            "suffix",
+            "decimals"
+          ]
+        },
+        {
+          "name": "formatLength",
+          "startLine": 217,
+          "endLine": 223,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "formatLengthValue",
+          "startLine": 225,
+          "endLine": 230,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "formatPortRole",
+          "startLine": 232,
+          "endLine": 237,
+          "params": [
+            "role"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "CalculationsPanel",
+          "line": 15,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "CalculationsPanel",
+          "callee": "useSystemCalculations",
+          "lineNumber": 16
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "useSelectionStore",
+          "lineNumber": 17
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "useSelectionStore",
+          "lineNumber": 18
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "useEntityStore",
+          "lineNumber": 19
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "selectedIds\n    .map((id) => entities[id])\n    .filter",
+          "lineNumber": 21
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "selectedIds\n    .map",
+          "lineNumber": 21
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "calculateSelectedDuctRunBranch",
+          "lineNumber": 26
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "calculateSelectedDuctRunSegments",
+          "lineNumber": 41
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "totalCFM.toLocaleString",
+          "lineNumber": 51
+        },
+        {
+          "caller": "CalculationsPanel",
+          "callee": "maxStaticPressure.toFixed",
+          "lineNumber": 54
+        },
+        {
+          "caller": "SelectedDuctRunBranchCard",
+          "callee": "formatLength",
+          "lineNumber": 87
+        },
+        {
+          "caller": "SelectedDuctRunBranchCard",
+          "callee": "formatNumber",
+          "lineNumber": 88
+        },
+        {
+          "caller": "SelectedDuctRunBranchCard",
+          "callee": "formatNumber",
+          "lineNumber": 91
+        },
+        {
+          "caller": "SelectedDuctRunBranchCard",
+          "callee": "formatNumber",
+          "lineNumber": 95
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatLength",
+          "lineNumber": 119
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatLengthValue",
+          "lineNumber": 122
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatLengthValue",
+          "lineNumber": 122
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatNumber",
+          "lineNumber": 126
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatNumber",
+          "lineNumber": 127
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatNumber",
+          "lineNumber": 128
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatNumber",
+          "lineNumber": 130
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatNumber",
+          "lineNumber": 134
+        },
+        {
+          "caller": "SelectedDuctRunCard",
+          "callee": "formatNumber",
+          "lineNumber": 138
+        },
+        {
+          "caller": "SelectedFittingCard",
+          "callee": "ports.filter",
+          "lineNumber": 146
+        },
+        {
+          "caller": "SelectedFittingCard",
+          "callee": "ports.filter",
+          "lineNumber": 147
+        },
+        {
+          "caller": "SelectedFittingCard",
+          "callee": "formatNumber",
+          "lineNumber": 159
+        },
+        {
+          "caller": "SelectedFittingCard",
+          "callee": "formatNumber",
+          "lineNumber": 160
+        },
+        {
+          "caller": "SelectedFittingCard",
+          "callee": "formatNumber",
+          "lineNumber": 161
+        },
+        {
+          "caller": "PortSection",
+          "callee": "ports.map",
+          "lineNumber": 184
+        },
+        {
+          "caller": "PortSection",
+          "callee": "formatPortRole",
+          "lineNumber": 187
+        },
+        {
+          "caller": "PortSection",
+          "callee": "formatNumber",
+          "lineNumber": 187
+        },
+        {
+          "caller": "formatNumber",
+          "callee": "Number.isFinite",
+          "lineNumber": 207
+        },
+        {
+          "caller": "formatNumber",
+          "callee": "value.toLocaleString",
+          "lineNumber": 211
+        },
+        {
+          "caller": "formatLength",
+          "callee": "Number.isFinite",
+          "lineNumber": 218
+        },
+        {
+          "caller": "formatLength",
+          "callee": "formatLengthValue",
+          "lineNumber": 222
+        },
+        {
+          "caller": "formatLengthValue",
+          "callee": "value.toLocaleString",
+          "lineNumber": 226
+        },
+        {
+          "caller": "formatPortRole",
+          "callee": "role\n    .split('_')\n    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))\n    .join",
+          "lineNumber": 233
+        },
+        {
+          "caller": "formatPortRole",
+          "callee": "role\n    .split('_')\n    .map",
+          "lineNumber": 233
+        },
+        {
+          "caller": "formatPortRole",
+          "callee": "role\n    .split",
+          "lineNumber": 233
+        },
+        {
+          "caller": "formatPortRole",
+          "callee": "part.charAt(0).toUpperCase",
+          "lineNumber": 235
+        },
+        {
+          "caller": "formatPortRole",
+          "callee": "part.charAt",
+          "lineNumber": 235
+        },
+        {
+          "caller": "formatPortRole",
+          "callee": "part.slice",
+          "lineNumber": 235
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 10,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/DynamicFittingSymbols.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 363,
+      "nonEmptyLines": 343,
+      "functions": [
+        {
+          "name": "labelStyle",
+          "startLine": 18,
+          "endLine": 24,
+          "params": []
+        },
+        {
+          "name": "SvgShell",
+          "startLine": 26,
+          "endLine": 49,
+          "params": [
+            "{\n  width = 140,\n  height = 90,\n  className,\n  children,\n}"
+          ]
+        },
+        {
+          "name": "commonSvgProps",
+          "startLine": 51,
+          "endLine": 57,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "Elbow90FittingSymbol",
+          "startLine": 59,
+          "endLine": 90,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "Elbow45FittingSymbol",
+          "startLine": 92,
+          "endLine": 118,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "ElbowMiteredFittingSymbol",
+          "startLine": 120,
+          "endLine": 149,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "ReducerFittingSymbol",
+          "startLine": 151,
+          "endLine": 181,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "TeeFittingSymbol",
+          "startLine": 183,
+          "endLine": 209,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "WyeFittingSymbol",
+          "startLine": 211,
+          "endLine": 246,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "EndCapFittingSymbol",
+          "startLine": 248,
+          "endLine": 263,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "RectToRoundFittingSymbol",
+          "startLine": 265,
+          "endLine": 305,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "OffsetFittingSymbol",
+          "startLine": 307,
+          "endLine": 338,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "DynamicFittingSymbol",
+          "startLine": 340,
+          "endLine": 363,
+          "params": [
+            "{ spec }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Elbow90FittingSymbol",
+          "line": 59,
+          "isDefault": false
+        },
+        {
+          "name": "Elbow45FittingSymbol",
+          "line": 92,
+          "isDefault": false
+        },
+        {
+          "name": "ElbowMiteredFittingSymbol",
+          "line": 120,
+          "isDefault": false
+        },
+        {
+          "name": "ReducerFittingSymbol",
+          "line": 151,
+          "isDefault": false
+        },
+        {
+          "name": "TeeFittingSymbol",
+          "line": 183,
+          "isDefault": false
+        },
+        {
+          "name": "WyeFittingSymbol",
+          "line": 211,
+          "isDefault": false
+        },
+        {
+          "name": "EndCapFittingSymbol",
+          "line": 248,
+          "isDefault": false
+        },
+        {
+          "name": "RectToRoundFittingSymbol",
+          "line": 265,
+          "isDefault": false
+        },
+        {
+          "name": "OffsetFittingSymbol",
+          "line": 307,
+          "isDefault": false
+        },
+        {
+          "name": "DynamicFittingSymbol",
+          "line": 340,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Elbow90FittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 60
+        },
+        {
+          "caller": "Elbow90FittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 61
+        },
+        {
+          "caller": "Elbow90FittingSymbol",
+          "callee": "Math.max",
+          "lineNumber": 63
+        },
+        {
+          "caller": "Elbow90FittingSymbol",
+          "callee": "[\n          `M ${cx} ${cy - outerR}`,\n          `A ${outerR} ${outerR} 0 0 1 ${cx + outerR} ${cy}`,\n          `L ${cx + innerR} ${cy}`,\n          `A ${innerR} ${innerR} 0 0 0 ${cx} ${cy - innerR}`,\n          'Z',\n        ].join",
+          "lineNumber": 70
+        },
+        {
+          "caller": "Elbow90FittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 84
+        },
+        {
+          "caller": "Elbow45FittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 93
+        },
+        {
+          "caller": "Elbow45FittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 94
+        },
+        {
+          "caller": "Elbow45FittingSymbol",
+          "callee": "[\n          `M 18 ${CENTER_Y + duct / 2}`,\n          `L 44 ${CENTER_Y + duct / 2}`,\n          `L 84 ${CENTER_Y - 26 + duct / 2}`,\n          `L 84 ${CENTER_Y - 26 - duct / 2}`,\n          `L 44 ${CENTER_Y - duct / 2}`,\n          `L 18 ${CENTER_Y - duct / 2}`,\n          'Z',\n        ].join",
+          "lineNumber": 98
+        },
+        {
+          "caller": "Elbow45FittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 112
+        },
+        {
+          "caller": "ElbowMiteredFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 121
+        },
+        {
+          "caller": "ElbowMiteredFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 122
+        },
+        {
+          "caller": "ElbowMiteredFittingSymbol",
+          "callee": "[\n          `M 18 ${CENTER_Y + duct / 2}`,\n          `L 42 ${CENTER_Y + duct / 2}`,\n          `L 60 ${CENTER_Y + duct / 2}`,\n          `L 60 ${CENTER_Y - 2}`,\n          `L 84 ${CENTER_Y - 2}`,\n          `L 84 ${CENTER_Y - 26 - duct / 2}`,\n          `L 60 ${CENTER_Y - 26 - duct / 2}`,\n          `L 42 ${CENTER_Y - duct / 2}`,\n          `L 18 ${CENTER_Y - duct / 2}`,\n          'Z',\n        ].join",
+          "lineNumber": 126
+        },
+        {
+          "caller": "ElbowMiteredFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 143
+        },
+        {
+          "caller": "ReducerFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 152
+        },
+        {
+          "caller": "ReducerFittingSymbol",
+          "callee": "Math.max",
+          "lineNumber": 153
+        },
+        {
+          "caller": "ReducerFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 154
+        },
+        {
+          "caller": "ReducerFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 155
+        },
+        {
+          "caller": "ReducerFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 171
+        },
+        {
+          "caller": "ReducerFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 174
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 184
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "Math.max",
+          "lineNumber": 185
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 186
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 187
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 188
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 199
+        },
+        {
+          "caller": "TeeFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 202
+        },
+        {
+          "caller": "WyeFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 212
+        },
+        {
+          "caller": "WyeFittingSymbol",
+          "callee": "Math.max",
+          "lineNumber": 213
+        },
+        {
+          "caller": "WyeFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 214
+        },
+        {
+          "caller": "WyeFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 215
+        },
+        {
+          "caller": "WyeFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 236
+        },
+        {
+          "caller": "WyeFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 239
+        },
+        {
+          "caller": "EndCapFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 249
+        },
+        {
+          "caller": "EndCapFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 250
+        },
+        {
+          "caller": "EndCapFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 257
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 266
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "Math.max",
+          "lineNumber": 267
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 268
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 269
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 270
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 295
+        },
+        {
+          "caller": "RectToRoundFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 298
+        },
+        {
+          "caller": "OffsetFittingSymbol",
+          "callee": "commonSvgProps",
+          "lineNumber": 308
+        },
+        {
+          "caller": "OffsetFittingSymbol",
+          "callee": "normalizeSize",
+          "lineNumber": 309
+        },
+        {
+          "caller": "OffsetFittingSymbol",
+          "callee": "[\n          `M 12 ${top1}`,\n          `L 42 ${top1}`,\n          `L 74 ${top2}`,\n          `L 108 ${top2}`,\n          `L 108 ${top2 + duct}`,\n          `L 74 ${top2 + duct}`,\n          `L 42 ${top1 + duct}`,\n          `L 12 ${top1 + duct}`,\n          'Z',\n        ].join",
+          "lineNumber": 316
+        },
+        {
+          "caller": "OffsetFittingSymbol",
+          "callee": "labelStyle",
+          "lineNumber": 332
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 10,
+        "functionCount": 13,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 643,
+      "nonEmptyLines": 572,
+      "functions": [
+        {
+          "name": "getEndTypeLabel",
+          "startLine": 38,
+          "endLine": 40,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "getSelectedSegmentsForRun",
+          "startLine": 42,
+          "endLine": 47,
+          "params": [
+            "selectedSegments",
+            "runId"
+          ]
+        },
+        {
+          "name": "getResolvedSegmentSettings",
+          "startLine": 49,
+          "endLine": 61,
+          "params": [
+            "entity",
+            "segment"
+          ]
+        },
+        {
+          "name": "clampToStep",
+          "startLine": 63,
+          "endLine": 66,
+          "params": [
+            "value",
+            "min",
+            "max",
+            "step"
+          ]
+        },
+        {
+          "name": "formatNumber",
+          "startLine": 68,
+          "endLine": 70,
+          "params": [
+            "value",
+            "digits"
+          ]
+        },
+        {
+          "name": "getShapeBadgeClass",
+          "startLine": 72,
+          "endLine": 86,
+          "params": [
+            "shape"
+          ]
+        },
+        {
+          "name": "getShapeBadgeLabel",
+          "startLine": 88,
+          "endLine": 90,
+          "params": [
+            "shape"
+          ]
+        },
+        {
+          "name": "getShapeRunName",
+          "startLine": 92,
+          "endLine": 99,
+          "params": [
+            "shape",
+            "currentName"
+          ]
+        },
+        {
+          "name": "getRunDefaults",
+          "startLine": 101,
+          "endLine": 108,
+          "params": [
+            "entity"
+          ]
+        },
+        {
+          "name": "sanitizeRunDefaultsForShape",
+          "startLine": 110,
+          "endLine": 118,
+          "params": [
+            "shape",
+            "entity"
+          ]
+        },
+        {
+          "name": "getDuctMaterialForShape",
+          "startLine": 120,
+          "endLine": 126,
+          "params": [
+            "shape",
+            "currentMaterial"
+          ]
+        },
+        {
+          "name": "calculateEquivalentRoundDiameter",
+          "startLine": 128,
+          "endLine": 130,
+          "params": [
+            "width",
+            "height"
+          ]
+        },
+        {
+          "name": "getCurrentPrimarySize",
+          "startLine": 132,
+          "endLine": 148,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "getRectangularDimensions",
+          "startLine": 150,
+          "endLine": 161,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "getPreviousRectangularDimensions",
+          "startLine": 163,
+          "endLine": 177,
+          "params": [
+            "props"
+          ]
+        },
+        {
+          "name": "SectionHeader",
+          "startLine": 179,
+          "endLine": 186,
+          "params": [
+            "{ icon: Icon, children }"
+          ]
+        },
+        {
+          "name": "Card",
+          "startLine": 188,
+          "endLine": 190,
+          "params": [
+            "{ children }"
+          ]
+        },
+        {
+          "name": "Field",
+          "startLine": 192,
+          "endLine": 201,
+          "params": [
+            "{ children, label, htmlFor }"
+          ]
+        },
+        {
+          "name": "Hint",
+          "startLine": 203,
+          "endLine": 205,
+          "params": [
+            "{ children }"
+          ]
+        },
+        {
+          "name": "Stepper",
+          "startLine": 207,
+          "endLine": 256,
+          "params": [
+            "{\r\n  decrementLabel,\r\n  incrementLabel,\r\n  max,\r\n  min,\r\n  onChange,\r\n  step,\r\n  unit,\r\n  value,\r\n  valueDigits = 0,\r\n}"
+          ]
+        },
+        {
+          "name": "NativeSelect",
+          "startLine": 258,
+          "endLine": 283,
+          "params": [
+            "{\r\n  id,\r\n  onChange,\r\n  options,\r\n  value,\r\n}"
+          ]
+        },
+        {
+          "name": "DuctRunInspector",
+          "startLine": 285,
+          "endLine": 641,
+          "params": [
+            "{ entity }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "DuctRunInspector",
+          "line": 285,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "getEndTypeLabel",
+          "callee": "END_OPTIONS.find",
+          "lineNumber": 39
+        },
+        {
+          "caller": "getSelectedSegmentsForRun",
+          "callee": "selectedSegments\r\n    .filter((segment) => segment.runId === runId)\r\n    .map((segment) => segment.segmentIndex)\r\n    .sort",
+          "lineNumber": 43
+        },
+        {
+          "caller": "getSelectedSegmentsForRun",
+          "callee": "selectedSegments\r\n    .filter((segment) => segment.runId === runId)\r\n    .map",
+          "lineNumber": 43
+        },
+        {
+          "caller": "getSelectedSegmentsForRun",
+          "callee": "selectedSegments\r\n    .filter",
+          "lineNumber": 43
+        },
+        {
+          "caller": "clampToStep",
+          "callee": "Math.round",
+          "lineNumber": 64
+        },
+        {
+          "caller": "clampToStep",
+          "callee": "Math.min",
+          "lineNumber": 65
+        },
+        {
+          "caller": "clampToStep",
+          "callee": "Math.max",
+          "lineNumber": 65
+        },
+        {
+          "caller": "clampToStep",
+          "callee": "Number",
+          "lineNumber": 65
+        },
+        {
+          "caller": "clampToStep",
+          "callee": "rounded.toFixed",
+          "lineNumber": 65
+        },
+        {
+          "caller": "formatNumber",
+          "callee": "Number(value.toFixed(digits)).toString",
+          "lineNumber": 69
+        },
+        {
+          "caller": "formatNumber",
+          "callee": "Number",
+          "lineNumber": 69
+        },
+        {
+          "caller": "formatNumber",
+          "callee": "value.toFixed",
+          "lineNumber": 69
+        },
+        {
+          "caller": "getShapeBadgeLabel",
+          "callee": "SHAPE_OPTIONS.find",
+          "lineNumber": 89
+        },
+        {
+          "caller": "getShapeRunName",
+          "callee": "/^(Rectangular|Round|Flat Oval|Flexible) Duct Run (.+)$/.exec",
+          "lineNumber": 93
+        },
+        {
+          "caller": "getShapeRunName",
+          "callee": "getShapeBadgeLabel",
+          "lineNumber": 98
+        },
+        {
+          "caller": "sanitizeRunDefaultsForShape",
+          "callee": "getRunDefaults",
+          "lineNumber": 111
+        },
+        {
+          "caller": "calculateEquivalentRoundDiameter",
+          "callee": "Math.pow",
+          "lineNumber": 129
+        },
+        {
+          "caller": "calculateEquivalentRoundDiameter",
+          "callee": "Math.pow",
+          "lineNumber": 129
+        },
+        {
+          "caller": "update",
+          "callee": "onChange",
+          "lineNumber": 228
+        },
+        {
+          "caller": "update",
+          "callee": "clampToStep",
+          "lineNumber": 228
+        },
+        {
+          "caller": "Stepper",
+          "callee": "update",
+          "lineNumber": 237
+        },
+        {
+          "caller": "Stepper",
+          "callee": "formatNumber",
+          "lineNumber": 242
+        },
+        {
+          "caller": "Stepper",
+          "callee": "update",
+          "lineNumber": 250
+        },
+        {
+          "caller": "NativeSelect",
+          "callee": "onChange",
+          "lineNumber": 274
+        },
+        {
+          "caller": "NativeSelect",
+          "callee": "options.map",
+          "lineNumber": 276
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "useSelectionStore",
+          "lineNumber": 286
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "useMemo",
+          "lineNumber": 287
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "getSelectedSegmentsForRun",
+          "lineNumber": 288
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "selectedIndexes\r\n    .map((index) => entity.props.segments[index])\r\n    .filter",
+          "lineNumber": 291
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "selectedIndexes\r\n    .map",
+          "lineNumber": 291
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "Boolean",
+          "lineNumber": 293
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "getResolvedSegmentSettings",
+          "lineNumber": 295
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "Boolean",
+          "lineNumber": 297
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "getActiveSectionLength",
+          "lineNumber": 301
+        },
+        {
+          "caller": "updateRun",
+          "callee": "structuredClone",
+          "lineNumber": 305
+        },
+        {
+          "caller": "updateRun",
+          "callee": "updateEntityCommand",
+          "lineNumber": 306
+        },
+        {
+          "caller": "updateRun",
+          "callee": "new Date().toISOString",
+          "lineNumber": 308
+        },
+        {
+          "caller": "updateRunProps",
+          "callee": "updateRun",
+          "lineNumber": 313
+        },
+        {
+          "caller": "applySegmentProps",
+          "callee": "entity.props.segments.map",
+          "lineNumber": 328
+        },
+        {
+          "caller": "applySegmentProps",
+          "callee": "entity.props.segments.map",
+          "lineNumber": 330
+        },
+        {
+          "caller": "applySegmentProps",
+          "callee": "targetIndexes.has",
+          "lineNumber": 331
+        },
+        {
+          "caller": "applySegmentProps",
+          "callee": "targetIndexes.has",
+          "lineNumber": 331
+        },
+        {
+          "caller": "applySegmentProps",
+          "callee": "updateRun",
+          "lineNumber": 336
+        },
+        {
+          "caller": "setSectionLength",
+          "callee": "Number.isFinite",
+          "lineNumber": 344
+        },
+        {
+          "caller": "setSectionLength",
+          "callee": "Math.min",
+          "lineNumber": 348
+        },
+        {
+          "caller": "setSectionLength",
+          "callee": "Math.max",
+          "lineNumber": 348
+        },
+        {
+          "caller": "setSectionLength",
+          "callee": "updateRun",
+          "lineNumber": 350
+        },
+        {
+          "caller": "setSectionLength",
+          "callee": "recomputeDuctRunSegments",
+          "lineNumber": 353
+        },
+        {
+          "caller": "setSectionLength",
+          "callee": "getRunDefaults",
+          "lineNumber": 353
+        },
+        {
+          "caller": "setRunLength",
+          "callee": "Number.isFinite",
+          "lineNumber": 358
+        },
+        {
+          "caller": "setRunLength",
+          "callee": "Math.min",
+          "lineNumber": 362
+        },
+        {
+          "caller": "setRunLength",
+          "callee": "Math.max",
+          "lineNumber": 362
+        },
+        {
+          "caller": "setRunLength",
+          "callee": "updateRun",
+          "lineNumber": 363
+        },
+        {
+          "caller": "setRunLength",
+          "callee": "recomputeDuctRunSegments",
+          "lineNumber": 366
+        },
+        {
+          "caller": "setRunLength",
+          "callee": "getRunDefaults",
+          "lineNumber": 366
+        },
+        {
+          "caller": "setShape",
+          "callee": "sanitizeRunDefaultsForShape",
+          "lineNumber": 375
+        },
+        {
+          "caller": "setShape",
+          "callee": "getShapeRunName",
+          "lineNumber": 379
+        },
+        {
+          "caller": "setShape",
+          "callee": "getDuctMaterialForShape",
+          "lineNumber": 380
+        },
+        {
+          "caller": "setShape",
+          "callee": "recomputeDuctRunSegments",
+          "lineNumber": 385
+        },
+        {
+          "caller": "setShape",
+          "callee": "getCurrentPrimarySize",
+          "lineNumber": 387
+        },
+        {
+          "caller": "setShape",
+          "callee": "getRectangularDimensions",
+          "lineNumber": 388
+        },
+        {
+          "caller": "setShape",
+          "callee": "getPreviousRectangularDimensions",
+          "lineNumber": 389
+        },
+        {
+          "caller": "setShape",
+          "callee": "calculateEquivalentRoundDiameter",
+          "lineNumber": 392
+        },
+        {
+          "caller": "setShape",
+          "callee": "Math.min",
+          "lineNumber": 404
+        },
+        {
+          "caller": "setShape",
+          "callee": "updateRun",
+          "lineNumber": 415
+        },
+        {
+          "caller": "setDimension",
+          "callee": "updateRunProps",
+          "lineNumber": 419
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "getShapeBadgeClass",
+          "lineNumber": 434
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "getShapeBadgeLabel",
+          "lineNumber": 435
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "SHAPE_OPTIONS.map",
+          "lineNumber": 444
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "setShape",
+          "lineNumber": 456
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "setDimension",
+          "lineNumber": 474
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "setDimension",
+          "lineNumber": 489
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "setDimension",
+          "lineNumber": 501
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "aspectRatio.toFixed",
+          "lineNumber": 511
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "aspectRatio.toFixed",
+          "lineNumber": 512
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "formatNumber",
+          "lineNumber": 527
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "setSectionLength",
+          "lineNumber": 528
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "Number",
+          "lineNumber": 528
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "formatNumber",
+          "lineNumber": 544
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "setRunLength",
+          "lineNumber": 545
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "Number",
+          "lineNumber": 545
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "applySegmentProps",
+          "lineNumber": 565
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "applySegmentProps",
+          "lineNumber": 586
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "applySegmentProps",
+          "lineNumber": 599
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "applySegmentProps",
+          "lineNumber": 618
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "applySegmentProps",
+          "lineNumber": 629
+        },
+        {
+          "caller": "DuctRunInspector",
+          "callee": "getEndTypeLabel",
+          "lineNumber": 635
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 22,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 227,
+      "nonEmptyLines": 211,
+      "functions": [
+        {
+          "name": "EquipmentInspector",
+          "startLine": 15,
+          "endLine": 224,
+          "params": [
+            "{ entity }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "EquipmentInspector",
+          "line": 15,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "EquipmentInspector",
+          "callee": "useFieldValidation",
+          "lineNumber": 16
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "useCallback",
+          "lineNumber": 18
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 20
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "JSON.parse",
+          "lineNumber": 26
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "JSON.stringify",
+          "lineNumber": 26
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "new Date().toISOString",
+          "lineNumber": 31
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "validateField",
+          "lineNumber": 34
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "updateEntityCommand",
+          "lineNumber": 39
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "useCallback",
+          "lineNumber": 48
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 50
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "JSON.parse",
+          "lineNumber": 57
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "JSON.stringify",
+          "lineNumber": 57
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "new Date().toISOString",
+          "lineNumber": 72
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "validateField",
+          "lineNumber": 75
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "updateEntityCommand",
+          "lineNumber": 80
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 102
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 110
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 118
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "handleTypeChange",
+          "lineNumber": 134
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "(\n              Object.keys(EQUIPMENT_TYPE_LABELS) as Array<Equipment['props']['equipmentType']>\n            ).map",
+          "lineNumber": 135
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "Object.keys",
+          "lineNumber": 136
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 157
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "Number",
+          "lineNumber": 157
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 169
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "Number",
+          "lineNumber": 169
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 189
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "Number",
+          "lineNumber": 189
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 200
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "Number",
+          "lineNumber": 200
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "commit",
+          "lineNumber": 211
+        },
+        {
+          "caller": "EquipmentInspector",
+          "callee": "Number",
+          "lineNumber": 211
+        }
+      ],
+      "metrics": {
+        "importCount": 8,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/FittingInspector.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 199,
+      "nonEmptyLines": 177,
+      "functions": [
+        {
+          "name": "clampAngle",
+          "startLine": 21,
+          "endLine": 23,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "roundAngleToStep",
+          "startLine": 25,
+          "endLine": 27,
+          "params": [
+            "value",
+            "step"
+          ]
+        },
+        {
+          "name": "Card",
+          "startLine": 29,
+          "endLine": 31,
+          "params": [
+            "{ children }"
+          ]
+        },
+        {
+          "name": "SectionHeader",
+          "startLine": 33,
+          "endLine": 35,
+          "params": [
+            "{ children }"
+          ]
+        },
+        {
+          "name": "FittingInspector",
+          "startLine": 37,
+          "endLine": 197,
+          "params": [
+            "{ entity }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "FittingInspector",
+          "line": 37,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "clampAngle",
+          "callee": "Math.min",
+          "lineNumber": 22
+        },
+        {
+          "caller": "clampAngle",
+          "callee": "Math.max",
+          "lineNumber": 22
+        },
+        {
+          "caller": "roundAngleToStep",
+          "callee": "clampAngle",
+          "lineNumber": 26
+        },
+        {
+          "caller": "roundAngleToStep",
+          "callee": "Math.round",
+          "lineNumber": 26
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "useState",
+          "lineNumber": 38
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "useCallback",
+          "lineNumber": 39
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 41
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "JSON.parse",
+          "lineNumber": 46
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "JSON.stringify",
+          "lineNumber": 46
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "Boolean",
+          "lineNumber": 47
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "updateEntityCommand",
+          "lineNumber": 49
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "new Date().toISOString",
+          "lineNumber": 55
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "useCallback",
+          "lineNumber": 61
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "Number",
+          "lineNumber": 63
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "Number.isFinite",
+          "lineNumber": 64
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "commit",
+          "lineNumber": 68
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "roundAngleToStep",
+          "lineNumber": 68
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "useCallback",
+          "lineNumber": 73
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "fittingInsertionService.planManualOverrideReset",
+          "lineNumber": 74
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "updateEntityCommand",
+          "lineNumber": 79
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "[\n    entity.props.inletDuctId,\n    entity.props.outletDuctId,\n    ...(entity.props.connectionPoints?.map((point) => point.ductId) ?? []),\n  ].filter",
+          "lineNumber": 94
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "entity.props.connectionPoints?.map",
+          "lineNumber": 97
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "Object.entries(FITTING_TYPE_LABELS).map",
+          "lineNumber": 100
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "Object.entries",
+          "lineNumber": 100
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "entity.props.fittingType.startsWith",
+          "lineNumber": 101
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "commit",
+          "lineNumber": 113
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "commit",
+          "lineNumber": 139
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "setAngleStep",
+          "lineNumber": 162
+        },
+        {
+          "caller": "FittingInspector",
+          "callee": "Number",
+          "lineNumber": 162
+        }
+      ],
+      "metrics": {
+        "importCount": 8,
+        "exportCount": 1,
+        "functionCount": 5,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/InspectorAccordion.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 74,
+      "nonEmptyLines": 66,
+      "functions": [
+        {
+          "name": "InspectorAccordion",
+          "startLine": 22,
+          "endLine": 74,
+          "params": [
+            "{ entityType, sections }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "InspectorAccordion",
+          "line": 22,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "InspectorAccordion",
+          "callee": "useInspectorPreferencesStore",
+          "lineNumber": 23
+        },
+        {
+          "caller": "InspectorAccordion",
+          "callee": "sections\n    .filter((section) => {\n       const pref = entityPrefs[section.id as keyof typeof entityPrefs];\n       return pref !== undefined ? pref : section.defaultExpanded;\n    })\n    .map",
+          "lineNumber": 27
+        },
+        {
+          "caller": "InspectorAccordion",
+          "callee": "sections\n    .filter",
+          "lineNumber": 27
+        },
+        {
+          "caller": "handleValueChange",
+          "callee": "sections.forEach",
+          "lineNumber": 35
+        },
+        {
+          "caller": "handleValueChange",
+          "callee": "newValue.includes",
+          "lineNumber": 36
+        },
+        {
+          "caller": "handleValueChange",
+          "callee": "setSectionExpanded",
+          "lineNumber": 40
+        },
+        {
+          "caller": "InspectorAccordion",
+          "callee": "sections.map",
+          "lineNumber": 52
+        },
+        {
+          "caller": "InspectorAccordion",
+          "callee": "e.preventDefault",
+          "lineNumber": 58
+        },
+        {
+          "caller": "InspectorAccordion",
+          "callee": "setSectionExpanded",
+          "lineNumber": 59
+        },
+        {
+          "caller": "InspectorAccordion",
+          "callee": "value.includes",
+          "lineNumber": 59
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 120,
+      "nonEmptyLines": 108,
+      "functions": [
+        {
+          "name": "renderInspector",
+          "startLine": 24,
+          "endLine": 50,
+          "params": [
+            "entity",
+            "onHighlightInBOM"
+          ]
+        },
+        {
+          "name": "InspectorPanel",
+          "startLine": 52,
+          "endLine": 118,
+          "params": [
+            "{\r\n  className,\r\n  embedded = false,\r\n  showHeader = false,\r\n  onFloat,\r\n  onHighlightInBOM,\r\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "InspectorPanel",
+          "line": 52,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "InspectorPanel",
+          "callee": "useSelectionStore",
+          "lineNumber": 59
+        },
+        {
+          "caller": "InspectorPanel",
+          "callee": "useActiveViewMode",
+          "lineNumber": 61
+        },
+        {
+          "caller": "InspectorPanel",
+          "callee": "useInspectorOverviewData",
+          "lineNumber": 62
+        },
+        {
+          "caller": "InspectorPanel",
+          "callee": "useEntityStore",
+          "lineNumber": 64
+        },
+        {
+          "caller": "InspectorPanel",
+          "callee": "useCallback",
+          "lineNumber": 65
+        },
+        {
+          "caller": "InspectorPanel",
+          "callee": "renderInspector",
+          "lineNumber": 81
+        }
+      ],
+      "metrics": {
+        "importCount": 11,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 23,
+      "nonEmptyLines": 19,
+      "functions": [
+        {
+          "name": "PropertyField",
+          "startLine": 10,
+          "endLine": 20,
+          "params": [
+            "{ label, htmlFor, helperText, children }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "PropertyField",
+          "line": 10,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/RoomInspector.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 188,
+      "nonEmptyLines": 177,
+      "functions": [
+        {
+          "name": "RoomInspector",
+          "startLine": 14,
+          "endLine": 185,
+          "params": [
+            "{ entity }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "RoomInspector",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "RoomInspector",
+          "callee": "useFieldValidation",
+          "lineNumber": 15
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "useCallback",
+          "lineNumber": 17
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 19
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "JSON.parse",
+          "lineNumber": 25
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "JSON.stringify",
+          "lineNumber": 25
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "new Date().toISOString",
+          "lineNumber": 30
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "validateField",
+          "lineNumber": 33
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "updateEntityCommand",
+          "lineNumber": 38
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 62
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 70
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 91
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "Number",
+          "lineNumber": 91
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 103
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "Number",
+          "lineNumber": 103
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 115
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "Number",
+          "lineNumber": 115
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 132
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "commit",
+          "lineNumber": 154
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "Number",
+          "lineNumber": 154
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "entity.calculated.area.toFixed",
+          "lineNumber": 167
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "entity.calculated.volume.toFixed",
+          "lineNumber": 170
+        },
+        {
+          "caller": "RoomInspector",
+          "callee": "entity.calculated.requiredCFM.toFixed",
+          "lineNumber": 173
+        }
+      ],
+      "metrics": {
+        "importCount": 7,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/SelectionMarquee.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 33,
+      "nonEmptyLines": 27,
+      "functions": [
+        {
+          "name": "SelectionMarquee",
+          "startLine": 14,
+          "endLine": 30,
+          "params": [
+            "{ bounds, isActive }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "SelectionMarquee",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/components/ValidationDashboard.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 428,
+      "nonEmptyLines": 390,
+      "functions": [
+        {
+          "name": "ValidationDashboard",
+          "startLine": 31,
+          "endLine": 428,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ValidationDashboard",
+          "line": 31,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useState",
+          "lineNumber": 33
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useState",
+          "lineNumber": 34
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useValidationStore",
+          "lineNumber": 35
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useValidationStore",
+          "lineNumber": 36
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useValidationStore",
+          "lineNumber": 37
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useEntityStore",
+          "lineNumber": 38
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useDuctOverlayStore",
+          "lineNumber": 39
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useDuctOverlayStore",
+          "lineNumber": 40
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useDuctOverlayStore",
+          "lineNumber": 41
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useComponentLibraryStoreV2",
+          "lineNumber": 42
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useSelectionStore",
+          "lineNumber": 43
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useSelectionStore",
+          "lineNumber": 44
+        },
+        {
+          "caller": "pushToast",
+          "callee": "window.dispatchEvent",
+          "lineNumber": 51
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useMemo",
+          "lineNumber": 54
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "components.map",
+          "lineNumber": 59
+        },
+        {
+          "caller": "resolveServiceName",
+          "callee": "componentById.get",
+          "lineNumber": 61
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.entries(validationResults).forEach",
+          "lineNumber": 64
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.entries",
+          "lineNumber": 64
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "resolveServiceName",
+          "lineNumber": 66
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "result.violations.some",
+          "lineNumber": 72
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "grouped[serviceId].blockers.add",
+          "lineNumber": 73
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "result.violations.some",
+          "lineNumber": 75
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "grouped[serviceId].warnings.add",
+          "lineNumber": 76
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "grouped[serviceId].unresolved.add",
+          "lineNumber": 79
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.values(entities).forEach",
+          "lineNumber": 83
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.values",
+          "lineNumber": 83
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "resolveServiceName",
+          "lineNumber": 89
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "violations.some",
+          "lineNumber": 99
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "grouped[serviceId].blockers.add",
+          "lineNumber": 100
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "violations.some",
+          "lineNumber": 102
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "grouped[serviceId].warnings.add",
+          "lineNumber": 103
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "grouped[serviceId].warnings.add",
+          "lineNumber": 111
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.fromEntries",
+          "lineNumber": 115
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.entries(grouped).map",
+          "lineNumber": 116
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.entries",
+          "lineNumber": 116
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Array.from",
+          "lineNumber": 120
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Array.from",
+          "lineNumber": 121
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Array.from",
+          "lineNumber": 122
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useMemo",
+          "lineNumber": 128
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.values(entities).reduce",
+          "lineNumber": 129
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.values",
+          "lineNumber": 129
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Math.max",
+          "lineNumber": 142
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "useMemo",
+          "lineNumber": 150
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.values(entities).filter",
+          "lineNumber": 152
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.values",
+          "lineNumber": 152
+        },
+        {
+          "caller": "handleEntityClick",
+          "callee": "selectSingle",
+          "lineNumber": 159
+        },
+        {
+          "caller": "handleRerunAutoFitting",
+          "callee": "fittingInsertionService.buildReRunPlan",
+          "lineNumber": 164
+        },
+        {
+          "caller": "handleRerunAutoFitting",
+          "callee": "fittingInsertionService.resolveReRunPlan",
+          "lineNumber": 165
+        },
+        {
+          "caller": "handleRerunAutoFitting",
+          "callee": "createEntity",
+          "lineNumber": 169
+        },
+        {
+          "caller": "handleRerunAutoFitting",
+          "callee": "deleteEntity",
+          "lineNumber": 177
+        },
+        {
+          "caller": "handleRerunAutoFitting",
+          "callee": "updateEntityCommand",
+          "lineNumber": 184
+        },
+        {
+          "caller": "handleRerunAutoFitting",
+          "callee": "pushToast",
+          "lineNumber": 199
+        },
+        {
+          "caller": "handleOverlayModeChange",
+          "callee": "setOverlayMode",
+          "lineNumber": 206
+        },
+        {
+          "caller": "handleOverlayModeChange",
+          "callee": "ConnectionGraphBuilder.buildFromPersistedMetadata",
+          "lineNumber": 207
+        },
+        {
+          "caller": "handleOverlayModeChange",
+          "callee": "TopologyValidationService.validate",
+          "lineNumber": 208
+        },
+        {
+          "caller": "handleOverlayModeChange",
+          "callee": "setOverlayStatusMap",
+          "lineNumber": 209
+        },
+        {
+          "caller": "handleOverlayModeChange",
+          "callee": "buildOverlayStatusMap",
+          "lineNumber": 209
+        },
+        {
+          "caller": "handleResetSelectedOverride",
+          "callee": "fittingInsertionService.planManualOverrideReset",
+          "lineNumber": 217
+        },
+        {
+          "caller": "handleResetSelectedOverride",
+          "callee": "updateEntityCommand",
+          "lineNumber": 223
+        },
+        {
+          "caller": "handleResetSelectedOverride",
+          "callee": "pushToast",
+          "lineNumber": 236
+        },
+        {
+          "caller": "handleResetAllManualOverrides",
+          "callee": "fittingInsertionService.getManualOverrideFittingIds",
+          "lineNumber": 242
+        },
+        {
+          "caller": "handleResetAllManualOverrides",
+          "callee": "fittingInsertionService.planManualOverrideReset",
+          "lineNumber": 243
+        },
+        {
+          "caller": "handleResetAllManualOverrides",
+          "callee": "resetPlans.push",
+          "lineNumber": 245
+        },
+        {
+          "caller": "handleResetAllManualOverrides",
+          "callee": "updateEntityCommand",
+          "lineNumber": 250
+        },
+        {
+          "caller": "handleResetAllManualOverrides",
+          "callee": "setConfirmResetAllOpen",
+          "lineNumber": 264
+        },
+        {
+          "caller": "handleResetAllManualOverrides",
+          "callee": "pushToast",
+          "lineNumber": 267
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "[\n              ['off', 'Off'],\n              ['velocity', 'By Velocity'],\n              ['pressure', 'By Pressure'],\n            ].map",
+          "lineNumber": 296
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "handleOverlayModeChange",
+          "lineNumber": 314
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "setConfirmResetAllOpen",
+          "lineNumber": 341
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.keys",
+          "lineNumber": 351
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.entries(issuesByService).map",
+          "lineNumber": 354
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Object.entries",
+          "lineNumber": 354
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "data.blockers.slice(0, 3).map",
+          "lineNumber": 361
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "data.blockers.slice",
+          "lineNumber": 361
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "handleEntityClick",
+          "lineNumber": 367
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "data.unresolved.slice(0, 3).map",
+          "lineNumber": 382
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "data.unresolved.slice",
+          "lineNumber": 382
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "handleEntityClick",
+          "lineNumber": 388
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "setResolveEntityId",
+          "lineNumber": 392
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "Boolean",
+          "lineNumber": 405
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "setResolveEntityId",
+          "lineNumber": 405
+        },
+        {
+          "caller": "ValidationDashboard",
+          "callee": "setConfirmResetAllOpen",
+          "lineNumber": 417
+        }
+      ],
+      "metrics": {
+        "importCount": 12,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/entities/ductRunDefaults.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 135,
+      "nonEmptyLines": 121,
+      "functions": [
+        {
+          "name": "resetDuctRunCounter",
+          "startLine": 14,
+          "endLine": 16,
+          "params": []
+        },
+        {
+          "name": "getNextDuctRunNumber",
+          "startLine": 18,
+          "endLine": 20,
+          "params": []
+        },
+        {
+          "name": "createDuctRun",
+          "startLine": 42,
+          "endLine": 99,
+          "params": [
+            "overrides"
+          ]
+        },
+        {
+          "name": "calculateDuctRunValues",
+          "startLine": 101,
+          "endLine": 135,
+          "params": [
+            "props"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "resetDuctRunCounter",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "createDuctRun",
+          "line": 42,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "createDuctRun",
+          "callee": "new Date().toISOString",
+          "lineNumber": 43
+        },
+        {
+          "caller": "createDuctRun",
+          "callee": "getNextDuctRunNumber",
+          "lineNumber": 46
+        },
+        {
+          "caller": "createDuctRun",
+          "callee": "recomputeDuctRunSegments",
+          "lineNumber": 77
+        },
+        {
+          "caller": "createDuctRun",
+          "callee": "getActiveSectionLength",
+          "lineNumber": 79
+        },
+        {
+          "caller": "createDuctRun",
+          "callee": "crypto.randomUUID",
+          "lineNumber": 83
+        },
+        {
+          "caller": "createDuctRun",
+          "callee": "calculateDuctRunValues",
+          "lineNumber": 97
+        },
+        {
+          "caller": "calculateDuctRunValues",
+          "callee": "calculateDuctArea",
+          "lineNumber": 102
+        },
+        {
+          "caller": "calculateDuctRunValues",
+          "callee": "calculateVelocity",
+          "lineNumber": 108
+        },
+        {
+          "caller": "calculateDuctRunValues",
+          "callee": "calculateEquivalentDiameter",
+          "lineNumber": 113
+        },
+        {
+          "caller": "calculateDuctRunValues",
+          "callee": "calculateFrictionLoss",
+          "lineNumber": 128
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 2,
+        "functionCount": 4,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/entities/equipmentDefaults.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 253,
+      "nonEmptyLines": 245,
+      "functions": [
+        {
+          "name": "resetEquipmentCounter",
+          "startLine": 20,
+          "endLine": 22,
+          "params": []
+        },
+        {
+          "name": "getNextEquipmentNumber",
+          "startLine": 27,
+          "endLine": 37,
+          "params": [
+            "type"
+          ]
+        },
+        {
+          "name": "createEquipment",
+          "startLine": 168,
+          "endLine": 251,
+          "params": [
+            "equipmentType",
+            "overrides"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "EQUIPMENT_TYPE_LABELS",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "EQUIPMENT_TYPE_ABBREV",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "resetEquipmentCounter",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "getNextEquipmentNumber",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "EQUIPMENT_TYPE_DEFAULTS",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "createEquipment",
+          "line": 168,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "resetEquipmentCounter",
+          "callee": "Object.keys(equipmentCounters).forEach",
+          "lineNumber": 21
+        },
+        {
+          "caller": "resetEquipmentCounter",
+          "callee": "Object.keys",
+          "lineNumber": 21
+        },
+        {
+          "caller": "createEquipment",
+          "callee": "getNextEquipmentNumber",
+          "lineNumber": 199
+        },
+        {
+          "caller": "createEquipment",
+          "callee": "new Date().toISOString",
+          "lineNumber": 200
+        },
+        {
+          "caller": "createEquipment",
+          "callee": "PORT_DEFINITIONS[equipmentType]?.map",
+          "lineNumber": 203
+        },
+        {
+          "caller": "createEquipment",
+          "callee": "crypto.randomUUID",
+          "lineNumber": 206
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 6,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/entities/equipmentPortDefinitions.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 201,
+      "nonEmptyLines": 167,
+      "functions": [
+        {
+          "name": "getPortWorldPosition",
+          "startLine": 140,
+          "endLine": 164,
+          "params": [
+            "port",
+            "bbox"
+          ]
+        },
+        {
+          "name": "getAllPortWorldPositions",
+          "startLine": 169,
+          "endLine": 174,
+          "params": [
+            "equipmentType",
+            "bbox"
+          ]
+        },
+        {
+          "name": "findNearestPort",
+          "startLine": 181,
+          "endLine": 201,
+          "params": [
+            "equipmentType",
+            "bbox",
+            "px",
+            "py",
+            "tolerance"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "PORT_DEFINITIONS",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "getPortWorldPosition",
+          "line": 140,
+          "isDefault": false
+        },
+        {
+          "name": "getAllPortWorldPositions",
+          "line": 169,
+          "isDefault": false
+        },
+        {
+          "name": "findNearestPort",
+          "line": 181,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "getAllPortWorldPositions",
+          "callee": "(PORT_DEFINITIONS[equipmentType] ?? []).map",
+          "lineNumber": 173
+        },
+        {
+          "caller": "getAllPortWorldPositions",
+          "callee": "getPortWorldPosition",
+          "lineNumber": 173
+        },
+        {
+          "caller": "findNearestPort",
+          "callee": "getAllPortWorldPositions",
+          "lineNumber": 188
+        },
+        {
+          "caller": "findNearestPort",
+          "callee": "Math.sqrt",
+          "lineNumber": 194
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 4,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/entities/fittingDefaults.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 125,
+      "nonEmptyLines": 117,
+      "functions": [
+        {
+          "name": "resetFittingCounter",
+          "startLine": 17,
+          "endLine": 19,
+          "params": []
+        },
+        {
+          "name": "getNextFittingNumber",
+          "startLine": 24,
+          "endLine": 26,
+          "params": []
+        },
+        {
+          "name": "createFitting",
+          "startLine": 31,
+          "endLine": 106,
+          "params": [
+            "fittingType",
+            "overrides"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "resetFittingCounter",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "getNextFittingNumber",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "createFitting",
+          "line": 31,
+          "isDefault": false
+        },
+        {
+          "name": "FITTING_TYPE_LABELS",
+          "line": 111,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "createFitting",
+          "callee": "getNextFittingNumber",
+          "lineNumber": 57
+        },
+        {
+          "caller": "createFitting",
+          "callee": "new Date().toISOString",
+          "lineNumber": 58
+        },
+        {
+          "caller": "createFitting",
+          "callee": "crypto.randomUUID",
+          "lineNumber": 90
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 4,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/entities/index.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 44,
+      "nonEmptyLines": 37,
+      "exports": [
+        {
+          "name": "createRoom",
+          "line": 3,
+          "isDefault": false
+        },
+        {
+          "name": "getNextRoomNumber",
+          "line": 3,
+          "isDefault": false
+        },
+        {
+          "name": "resetRoomCounter",
+          "line": 3,
+          "isDefault": false
+        },
+        {
+          "name": "createRoomDefault",
+          "line": 3,
+          "isDefault": false
+        },
+        {
+          "name": "createDuct",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "getNextDuctNumber",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "resetDuctCounter",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "createDuctDefault",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "createEquipment",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "getNextEquipmentNumber",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "resetEquipmentCounter",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "EQUIPMENT_TYPE_DEFAULTS",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "EQUIPMENT_TYPE_LABELS",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "createEquipmentDefault",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "createFitting",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "getNextFittingNumber",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "resetFittingCounter",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "FITTING_TYPE_LABELS",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "createFittingDefault",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "createGroup",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "createGroupDefault",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "createNote",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "getNextNoteNumber",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "resetNoteCounter",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "createNoteDefault",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "calculateRoomValues",
+          "line": 44,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 26,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/entities/noteDefaults.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 62,
+      "nonEmptyLines": 55,
+      "functions": [
+        {
+          "name": "resetNoteCounter",
+          "startLine": 12,
+          "endLine": 14,
+          "params": []
+        },
+        {
+          "name": "getNextNoteNumber",
+          "startLine": 19,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "createNote",
+          "startLine": 26,
+          "endLine": 60,
+          "params": [
+            "overrides"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "resetNoteCounter",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "getNextNoteNumber",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "createNote",
+          "line": 26,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "createNote",
+          "callee": "getNextNoteNumber",
+          "lineNumber": 35
+        },
+        {
+          "caller": "createNote",
+          "callee": "new Date().toISOString",
+          "lineNumber": 36
+        },
+        {
+          "caller": "createNote",
+          "callee": "crypto.randomUUID",
+          "lineNumber": 45
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/hooks/useEntityOperations.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 176,
+      "nonEmptyLines": 156,
+      "functions": [
+        {
+          "name": "useEntityOperations",
+          "startLine": 16,
+          "endLine": 174,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "useEntityOperations",
+          "line": 16,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "useEntityOperations",
+          "callee": "useSelectionStore",
+          "lineNumber": 17
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useViewportStore",
+          "lineNumber": 18
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useCallback",
+          "lineNumber": 23
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 24
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectedIds\n      .map((id) => byId[id])\n      .filter",
+          "lineNumber": 27
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectedIds\n      .map",
+          "lineNumber": 27
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "Boolean",
+          "lineNumber": 29
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "deleteEntities",
+          "lineNumber": 32
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "clearSelection",
+          "lineNumber": 35
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useCallback",
+          "lineNumber": 41
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 42
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectedIds\n      .map((id) => byId[id])\n      .filter((entity): entity is Entity => Boolean(entity))\n      .map",
+          "lineNumber": 45
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectedIds\n      .map((id) => byId[id])\n      .filter",
+          "lineNumber": 45
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectedIds\n      .map",
+          "lineNumber": 45
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "Boolean",
+          "lineNumber": 47
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "crypto.randomUUID",
+          "lineNumber": 50
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "new Date().toISOString",
+          "lineNumber": 56
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "new Date().toISOString",
+          "lineNumber": 57
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "clones.forEach",
+          "lineNumber": 62
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "createEntity",
+          "lineNumber": 63
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "clones.map",
+          "lineNumber": 63
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "newIds.push",
+          "lineNumber": 64
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectMultiple",
+          "lineNumber": 69
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useCallback",
+          "lineNumber": 76
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useEntityStore.getState",
+          "lineNumber": 78
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "selectedIds.forEach",
+          "lineNumber": 82
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "Math.round",
+          "lineNumber": 90
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "Math.round",
+          "lineNumber": 91
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "JSON.parse",
+          "lineNumber": 94
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "JSON.stringify",
+          "lineNumber": 94
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "updateEntity",
+          "lineNumber": 95
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "useEffect",
+          "lineNumber": 116
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 126
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "deleteSelected",
+          "lineNumber": 127
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 134
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "duplicateSelected",
+          "lineNumber": 135
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 144
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "moveSelected",
+          "lineNumber": 145
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 148
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "moveSelected",
+          "lineNumber": 149
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 152
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "moveSelected",
+          "lineNumber": 153
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 156
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "moveSelected",
+          "lineNumber": 157
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "window.addEventListener",
+          "lineNumber": 163
+        },
+        {
+          "caller": "useEntityOperations",
+          "callee": "window.removeEventListener",
+          "lineNumber": 164
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/hooks/useFieldValidation.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 101,
+      "nonEmptyLines": 86,
+      "functions": [
+        {
+          "name": "schemaFor",
+          "startLine": 16,
+          "endLine": 27,
+          "params": [
+            "entity"
+          ]
+        },
+        {
+          "name": "pathMatchesField",
+          "startLine": 29,
+          "endLine": 35,
+          "params": [
+            "path",
+            "field"
+          ]
+        },
+        {
+          "name": "useFieldValidation",
+          "startLine": 41,
+          "endLine": 99,
+          "params": [
+            "entity"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "useFieldValidation",
+          "line": 41,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "pathMatchesField",
+          "callee": "path.map",
+          "lineNumber": 33
+        },
+        {
+          "caller": "pathMatchesField",
+          "callee": "stringPath.includes",
+          "lineNumber": 34
+        },
+        {
+          "caller": "pathMatchesField",
+          "callee": "stringPath.join('.').endsWith",
+          "lineNumber": 34
+        },
+        {
+          "caller": "pathMatchesField",
+          "callee": "stringPath.join",
+          "lineNumber": 34
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "useState",
+          "lineNumber": 42
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "useRef",
+          "lineNumber": 43
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "useEffect",
+          "lineNumber": 45
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "clearTimeout",
+          "lineNumber": 48
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "useEffect",
+          "lineNumber": 54
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "setErrors",
+          "lineNumber": 55
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "useCallback",
+          "lineNumber": 58
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "schemaFor",
+          "lineNumber": 59
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "schema.safeParse",
+          "lineNumber": 64
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "clearTimeout",
+          "lineNumber": 67
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "window.setTimeout",
+          "lineNumber": 70
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "setErrors",
+          "lineNumber": 72
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "result.error.issues.find",
+          "lineNumber": 77
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "pathMatchesField",
+          "lineNumber": 77
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "setErrors",
+          "lineNumber": 79
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "useCallback",
+          "lineNumber": 87
+        },
+        {
+          "caller": "useFieldValidation",
+          "callee": "setErrors",
+          "lineNumber": 88
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/hooks/useMarquee.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 94,
+      "nonEmptyLines": 81,
+      "functions": [
+        {
+          "name": "useMarquee",
+          "startLine": 17,
+          "endLine": 92,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "useMarquee",
+          "line": 17,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "useMarquee",
+          "callee": "useState",
+          "lineNumber": 18
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "useCallback",
+          "lineNumber": 28
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "setState",
+          "lineNumber": 29
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "useCallback",
+          "lineNumber": 40
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "setState",
+          "lineNumber": 41
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "boundsFromPoints",
+          "lineNumber": 46
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "useCallback",
+          "lineNumber": 59
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "setState",
+          "lineNumber": 62
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "useCallback",
+          "lineNumber": 75
+        },
+        {
+          "caller": "useMarquee",
+          "callee": "setState",
+          "lineNumber": 76
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/hooks/useSelection.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 157,
+      "nonEmptyLines": 137,
+      "functions": [
+        {
+          "name": "useSelection",
+          "startLine": 18,
+          "endLine": 155,
+          "params": [
+            "{ screenToCanvas }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "useSelection",
+          "line": 18,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "useSelection",
+          "callee": "useSelectionStore",
+          "lineNumber": 19
+        },
+        {
+          "caller": "useSelection",
+          "callee": "useEntityStore",
+          "lineNumber": 20
+        },
+        {
+          "caller": "useSelection",
+          "callee": "state.allIds.map((id) => state.byId[id]).filter",
+          "lineNumber": 21
+        },
+        {
+          "caller": "useSelection",
+          "callee": "state.allIds.map",
+          "lineNumber": 21
+        },
+        {
+          "caller": "useSelection",
+          "callee": "useCallback",
+          "lineNumber": 27
+        },
+        {
+          "caller": "useSelection",
+          "callee": "getLegacyDuctCanvasBounds",
+          "lineNumber": 46
+        },
+        {
+          "caller": "useSelection",
+          "callee": "useCallback",
+          "lineNumber": 72
+        },
+        {
+          "caller": "useSelection",
+          "callee": "screenToCanvas",
+          "lineNumber": 74
+        },
+        {
+          "caller": "useSelection",
+          "callee": "[...entities].sort",
+          "lineNumber": 77
+        },
+        {
+          "caller": "useSelection",
+          "callee": "getEntityBounds",
+          "lineNumber": 80
+        },
+        {
+          "caller": "useSelection",
+          "callee": "boundsContainsPoint",
+          "lineNumber": 81
+        },
+        {
+          "caller": "useSelection",
+          "callee": "useCallback",
+          "lineNumber": 94
+        },
+        {
+          "caller": "useSelection",
+          "callee": "findEntityAtPoint",
+          "lineNumber": 96
+        },
+        {
+          "caller": "useSelection",
+          "callee": "clearSelection",
+          "lineNumber": 100
+        },
+        {
+          "caller": "useSelection",
+          "callee": "toggleSelection",
+          "lineNumber": 106
+        },
+        {
+          "caller": "useSelection",
+          "callee": "select",
+          "lineNumber": 108
+        },
+        {
+          "caller": "useSelection",
+          "callee": "useCallback",
+          "lineNumber": 119
+        },
+        {
+          "caller": "useSelection",
+          "callee": "getEntityBounds",
+          "lineNumber": 124
+        },
+        {
+          "caller": "useSelection",
+          "callee": "selectedIds.push",
+          "lineNumber": 135
+        },
+        {
+          "caller": "useSelection",
+          "callee": "useSelectionStore.getState",
+          "lineNumber": 140
+        },
+        {
+          "caller": "useSelection",
+          "callee": "selectMultiple",
+          "lineNumber": 141
+        },
+        {
+          "caller": "useSelection",
+          "callee": "selectMultiple",
+          "lineNumber": 143
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/hooks/useUndoRedo.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 62,
+      "nonEmptyLines": 52,
+      "functions": [
+        {
+          "name": "useUndoRedo",
+          "startLine": 11,
+          "endLine": 60,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "useUndoRedo",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "useUndoRedo",
+          "callee": "useEffect",
+          "lineNumber": 12
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.key.toLowerCase",
+          "lineNumber": 34
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 38
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "undo",
+          "lineNumber": 39
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 48
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "redo",
+          "lineNumber": 49
+        },
+        {
+          "caller": "useUndoRedo",
+          "callee": "win.addEventListener",
+          "lineNumber": 54
+        },
+        {
+          "caller": "useUndoRedo",
+          "callee": "win!.removeEventListener",
+          "lineNumber": 57
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/DuctRenderer.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 189,
+      "nonEmptyLines": 160,
+      "functions": [
+        {
+          "name": "renderDuct",
+          "startLine": 26,
+          "endLine": 126,
+          "params": [
+            "duct",
+            "context"
+          ]
+        },
+        {
+          "name": "renderAirflowArrow",
+          "startLine": 131,
+          "endLine": 157,
+          "params": [
+            "ctx",
+            "lengthPixels",
+            "zoom",
+            "airflow",
+            "arrowColor",
+            "textColor"
+          ]
+        },
+        {
+          "name": "renderDuctLabel",
+          "startLine": 162,
+          "endLine": 187,
+          "params": [
+            "ctx",
+            "name",
+            "props",
+            "lengthPixels",
+            "zoom",
+            "textColor"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "renderDuct",
+          "line": 26,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "renderDuct",
+          "callee": "feetToPixels",
+          "lineNumber": 30
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "canvasPerformanceService.getPerformanceHints",
+          "lineNumber": 33
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.save",
+          "lineNumber": 35
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "Math.max",
+          "lineNumber": 53
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "helper.drawHatching",
+          "lineNumber": 58
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "helper.drawDoubleLine",
+          "lineNumber": 78
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.beginPath",
+          "lineNumber": 89
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "helper.setLineStyle",
+          "lineNumber": 92
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.moveTo",
+          "lineNumber": 93
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.lineTo",
+          "lineNumber": 94
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.stroke",
+          "lineNumber": 95
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "helper.setLineStyle",
+          "lineNumber": 96
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.beginPath",
+          "lineNumber": 105
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.moveTo",
+          "lineNumber": 110
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.lineTo",
+          "lineNumber": 111
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.moveTo",
+          "lineNumber": 114
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.lineTo",
+          "lineNumber": 115
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.stroke",
+          "lineNumber": 117
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "renderAirflowArrow",
+          "lineNumber": 120
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "renderDuctLabel",
+          "lineNumber": 123
+        },
+        {
+          "caller": "renderDuct",
+          "callee": "ctx.restore",
+          "lineNumber": 125
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "Math.min",
+          "lineNumber": 140
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.beginPath",
+          "lineNumber": 143
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.moveTo",
+          "lineNumber": 144
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 145
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 146
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.closePath",
+          "lineNumber": 147
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.fill",
+          "lineNumber": 148
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "Math.max",
+          "lineNumber": 151
+        },
+        {
+          "caller": "renderAirflowArrow",
+          "callee": "ctx.fillText",
+          "lineNumber": 156
+        },
+        {
+          "caller": "renderDuctLabel",
+          "callee": "Math.max",
+          "lineNumber": 170
+        },
+        {
+          "caller": "renderDuctLabel",
+          "callee": "ctx.fillText",
+          "lineNumber": 186
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/DuctRunRenderer.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 217,
+      "nonEmptyLines": 193,
+      "functions": [
+        {
+          "name": "renderDuctRun",
+          "startLine": 8,
+          "endLine": 137,
+          "params": [
+            "run",
+            "context"
+          ]
+        },
+        {
+          "name": "projectStation",
+          "startLine": 139,
+          "endLine": 146,
+          "params": [
+            "geometry",
+            "point"
+          ]
+        },
+        {
+          "name": "drawInsulationFallback",
+          "startLine": 148,
+          "endLine": 169,
+          "params": [
+            "ctx",
+            "startX",
+            "endX",
+            "halfThickness",
+            "thicknessPx",
+            "zoom",
+            "insulationType"
+          ]
+        },
+        {
+          "name": "getSegmentRenderSettings",
+          "startLine": 178,
+          "endLine": 190,
+          "params": [
+            "run",
+            "segment"
+          ]
+        },
+        {
+          "name": "getSegmentOuterHalfThickness",
+          "startLine": 192,
+          "endLine": 202,
+          "params": [
+            "run",
+            "segment",
+            "halfThickness",
+            "zoom"
+          ]
+        },
+        {
+          "name": "getInsulationTag",
+          "startLine": 204,
+          "endLine": 215,
+          "params": [
+            "insulationType"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "renderDuctRun",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "renderDuctRun",
+          "callee": "DuctRunGeometryService.getGeometry",
+          "lineNumber": 10
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "canvasPerformanceService.getPerformanceHints",
+          "lineNumber": 13
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.save",
+          "lineNumber": 15
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.fillRect",
+          "lineNumber": 20
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 23
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 24
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentRenderSettings",
+          "lineNumber": 25
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "inchesToPixels",
+          "lineNumber": 26
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "helper.drawWrapInsulation",
+          "lineNumber": 30
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "drawInsulationFallback",
+          "lineNumber": 32
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "helper.drawDoubleWallInsulation",
+          "lineNumber": 41
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "drawInsulationFallback",
+          "lineNumber": 51
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "selectedSegmentIndexes.includes",
+          "lineNumber": 55
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.fillRect",
+          "lineNumber": 57
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "Math.max",
+          "lineNumber": 63
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentOuterHalfThickness",
+          "lineNumber": 64
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentOuterHalfThickness",
+          "lineNumber": 65
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.beginPath",
+          "lineNumber": 67
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.moveTo",
+          "lineNumber": 68
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.lineTo",
+          "lineNumber": 69
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.stroke",
+          "lineNumber": 72
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.beginPath",
+          "lineNumber": 76
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.moveTo",
+          "lineNumber": 77
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.lineTo",
+          "lineNumber": 78
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.moveTo",
+          "lineNumber": 79
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.lineTo",
+          "lineNumber": 80
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.stroke",
+          "lineNumber": 83
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 86
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 87
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentRenderSettings",
+          "lineNumber": 88
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "inchesToPixels",
+          "lineNumber": 89
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "helper.drawLinerInsulation",
+          "lineNumber": 93
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "drawInsulationFallback",
+          "lineNumber": 95
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 101
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 102
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentRenderSettings",
+          "lineNumber": 103
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentOuterHalfThickness",
+          "lineNumber": 104
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "helper.drawDuctEnd",
+          "lineNumber": 106
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "helper.drawDuctEnd",
+          "lineNumber": 107
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "Math.max",
+          "lineNumber": 111
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.fillText",
+          "lineNumber": 114
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentRenderSettings",
+          "lineNumber": 117
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 122
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "projectStation",
+          "lineNumber": 123
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getSegmentOuterHalfThickness",
+          "lineNumber": 124
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "Math.max",
+          "lineNumber": 126
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.fillText",
+          "lineNumber": 128
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "getInsulationTag",
+          "lineNumber": 129
+        },
+        {
+          "caller": "renderDuctRun",
+          "callee": "ctx.restore",
+          "lineNumber": 136
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "Math.max",
+          "lineNumber": 157
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.save",
+          "lineNumber": 158
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 161
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.beginPath",
+          "lineNumber": 162
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.moveTo",
+          "lineNumber": 163
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.lineTo",
+          "lineNumber": 164
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.moveTo",
+          "lineNumber": 165
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.lineTo",
+          "lineNumber": 166
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.stroke",
+          "lineNumber": 167
+        },
+        {
+          "caller": "drawInsulationFallback",
+          "callee": "ctx.restore",
+          "lineNumber": 168
+        },
+        {
+          "caller": "getSegmentOuterHalfThickness",
+          "callee": "getSegmentRenderSettings",
+          "lineNumber": 198
+        },
+        {
+          "caller": "getSegmentOuterHalfThickness",
+          "callee": "inchesToPixels",
+          "lineNumber": 199
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 1,
+        "functionCount": 6,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/EquipmentRenderer.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 112,
+      "nonEmptyLines": 99,
+      "functions": [
+        {
+          "name": "renderEquipment",
+          "startLine": 35,
+          "endLine": 110,
+          "params": [
+            "equipment",
+            "context"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "renderEquipment",
+          "line": 35,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "renderEquipment",
+          "callee": "ctx.save",
+          "lineNumber": 42
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "renderRTUSymbol",
+          "lineNumber": 45
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "ctx.fillRect",
+          "lineNumber": 52
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 53
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "Math.min",
+          "lineNumber": 56
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "helper.drawEquipmentSymbol",
+          "lineNumber": 87
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "Math.max",
+          "lineNumber": 92
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "ctx.fillText",
+          "lineNumber": 97
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "getPortWorldPosition",
+          "lineNumber": 103
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "resolvePortMarkerShape",
+          "lineNumber": 104
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "renderPortMarker",
+          "lineNumber": 105
+        },
+        {
+          "caller": "renderEquipment",
+          "callee": "ctx.restore",
+          "lineNumber": 109
+        }
+      ],
+      "metrics": {
+        "importCount": 7,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/FittingRenderer.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 449,
+      "nonEmptyLines": 405,
+      "functions": [
+        {
+          "name": "renderFitting",
+          "startLine": 33,
+          "endLine": 87,
+          "params": [
+            "fitting",
+            "context"
+          ]
+        },
+        {
+          "name": "renderOverlapMask",
+          "startLine": 89,
+          "endLine": 99,
+          "params": [
+            "ctx",
+            "spec",
+            "backgroundColor"
+          ]
+        },
+        {
+          "name": "getFittingMaskHalfSize",
+          "startLine": 101,
+          "endLine": 113,
+          "params": [
+            "spec"
+          ]
+        },
+        {
+          "name": "drawMiteredElbow",
+          "startLine": 115,
+          "endLine": 151,
+          "params": [
+            "ctx",
+            "props",
+            "zoom"
+          ]
+        },
+        {
+          "name": "drawTee",
+          "startLine": 153,
+          "endLine": 168,
+          "params": [
+            "ctx",
+            "helper",
+            "props",
+            "zoom",
+            "stroke"
+          ]
+        },
+        {
+          "name": "drawWye",
+          "startLine": 170,
+          "endLine": 190,
+          "params": [
+            "ctx",
+            "fitting",
+            "zoom",
+            "stroke"
+          ]
+        },
+        {
+          "name": "fillStrokePolygon",
+          "startLine": 192,
+          "endLine": 208,
+          "params": [
+            "ctx",
+            "points",
+            "stroke",
+            "zoom"
+          ]
+        },
+        {
+          "name": "drawFittingPortDecorations",
+          "startLine": 216,
+          "endLine": 221,
+          "params": [
+            "ctx",
+            "fitting",
+            "zoom"
+          ]
+        },
+        {
+          "name": "portOpeningSize",
+          "startLine": 223,
+          "endLine": 235,
+          "params": [
+            "port"
+          ]
+        },
+        {
+          "name": "drawPortEndLine",
+          "startLine": 237,
+          "endLine": 253,
+          "params": [
+            "ctx",
+            "port",
+            "zoom"
+          ]
+        },
+        {
+          "name": "drawMagneticPortMarker",
+          "startLine": 255,
+          "endLine": 297,
+          "params": [
+            "ctx",
+            "port",
+            "zoom"
+          ]
+        },
+        {
+          "name": "drawEndCap",
+          "startLine": 299,
+          "endLine": 329,
+          "params": [
+            "ctx",
+            "props",
+            "zoom",
+            "stroke"
+          ]
+        },
+        {
+          "name": "drawRectToRound",
+          "startLine": 331,
+          "endLine": 369,
+          "params": [
+            "ctx",
+            "props",
+            "zoom",
+            "stroke"
+          ]
+        },
+        {
+          "name": "drawOffset",
+          "startLine": 371,
+          "endLine": 404,
+          "params": [
+            "ctx",
+            "props",
+            "zoom",
+            "stroke"
+          ]
+        },
+        {
+          "name": "drawEndTicks",
+          "startLine": 406,
+          "endLine": 421,
+          "params": [
+            "ctx",
+            "zoom",
+            "xPositions",
+            "widths",
+            "stroke"
+          ]
+        },
+        {
+          "name": "renderFittingLabel",
+          "startLine": 423,
+          "endLine": 447,
+          "params": [
+            "ctx",
+            "spec",
+            "zoom"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "renderFitting",
+          "line": 33,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "renderFitting",
+          "callee": "deriveDynamicFittingSymbol",
+          "lineNumber": 36
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "ctx.save",
+          "lineNumber": 39
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "renderOverlapMask",
+          "lineNumber": 40
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "helper.drawElbow",
+          "lineNumber": 48
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "helper.drawElbow",
+          "lineNumber": 51
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawMiteredElbow",
+          "lineNumber": 54
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "helper.drawReducer",
+          "lineNumber": 58
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawTee",
+          "lineNumber": 61
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawWye",
+          "lineNumber": 64
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawEndCap",
+          "lineNumber": 67
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawRectToRound",
+          "lineNumber": 70
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawOffset",
+          "lineNumber": 73
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "drawFittingPortDecorations",
+          "lineNumber": 80
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "renderFittingLabel",
+          "lineNumber": 83
+        },
+        {
+          "caller": "renderFitting",
+          "callee": "ctx.restore",
+          "lineNumber": 86
+        },
+        {
+          "caller": "renderOverlapMask",
+          "callee": "getFittingMaskHalfSize",
+          "lineNumber": 94
+        },
+        {
+          "caller": "renderOverlapMask",
+          "callee": "ctx.save",
+          "lineNumber": 95
+        },
+        {
+          "caller": "renderOverlapMask",
+          "callee": "ctx.fillRect",
+          "lineNumber": 97
+        },
+        {
+          "caller": "renderOverlapMask",
+          "callee": "ctx.restore",
+          "lineNumber": 98
+        },
+        {
+          "caller": "getFittingMaskHalfSize",
+          "callee": "Math.max",
+          "lineNumber": 104
+        },
+        {
+          "caller": "getFittingMaskHalfSize",
+          "callee": "Math.max",
+          "lineNumber": 107
+        },
+        {
+          "caller": "getFittingMaskHalfSize",
+          "callee": "Math.max",
+          "lineNumber": 109
+        },
+        {
+          "caller": "getFittingMaskHalfSize",
+          "callee": "Math.max",
+          "lineNumber": 111
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.beginPath",
+          "lineNumber": 121
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.moveTo",
+          "lineNumber": 122
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 123
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 124
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 125
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 126
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 127
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 128
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 129
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 130
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.closePath",
+          "lineNumber": 131
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.fill",
+          "lineNumber": 132
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.stroke",
+          "lineNumber": 133
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.beginPath",
+          "lineNumber": 136
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.moveTo",
+          "lineNumber": 137
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 138
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.stroke",
+          "lineNumber": 139
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 144
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.beginPath",
+          "lineNumber": 145
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.moveTo",
+          "lineNumber": 146
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 147
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 148
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.stroke",
+          "lineNumber": 149
+        },
+        {
+          "caller": "drawMiteredElbow",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 150
+        },
+        {
+          "caller": "drawTee",
+          "callee": "helper.drawTee",
+          "lineNumber": 160
+        },
+        {
+          "caller": "drawTee",
+          "callee": "ctx.beginPath",
+          "lineNumber": 162
+        },
+        {
+          "caller": "drawTee",
+          "callee": "ctx.moveTo",
+          "lineNumber": 163
+        },
+        {
+          "caller": "drawTee",
+          "callee": "ctx.lineTo",
+          "lineNumber": 164
+        },
+        {
+          "caller": "drawTee",
+          "callee": "ctx.stroke",
+          "lineNumber": 167
+        },
+        {
+          "caller": "drawWye",
+          "callee": "resolveWyeDiameters",
+          "lineNumber": 173
+        },
+        {
+          "caller": "drawWye",
+          "callee": "buildWyeGeometry",
+          "lineNumber": 174
+        },
+        {
+          "caller": "drawWye",
+          "callee": "fillStrokePolygon",
+          "lineNumber": 176
+        },
+        {
+          "caller": "drawWye",
+          "callee": "fillStrokePolygon",
+          "lineNumber": 177
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.save",
+          "lineNumber": 179
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 182
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.beginPath",
+          "lineNumber": 183
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.moveTo",
+          "lineNumber": 185
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.lineTo",
+          "lineNumber": 186
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.stroke",
+          "lineNumber": 188
+        },
+        {
+          "caller": "drawWye",
+          "callee": "ctx.restore",
+          "lineNumber": 189
+        },
+        {
+          "caller": "fillStrokePolygon",
+          "callee": "ctx.beginPath",
+          "lineNumber": 196
+        },
+        {
+          "caller": "fillStrokePolygon",
+          "callee": "ctx.moveTo",
+          "lineNumber": 197
+        },
+        {
+          "caller": "fillStrokePolygon",
+          "callee": "ctx.lineTo",
+          "lineNumber": 199
+        },
+        {
+          "caller": "fillStrokePolygon",
+          "callee": "ctx.closePath",
+          "lineNumber": 201
+        },
+        {
+          "caller": "fillStrokePolygon",
+          "callee": "ctx.fill",
+          "lineNumber": 203
+        },
+        {
+          "caller": "fillStrokePolygon",
+          "callee": "ctx.stroke",
+          "lineNumber": 207
+        },
+        {
+          "caller": "drawFittingPortDecorations",
+          "callee": "resolveLocalFittingPorts",
+          "lineNumber": 217
+        },
+        {
+          "caller": "drawFittingPortDecorations",
+          "callee": "drawPortEndLine",
+          "lineNumber": 218
+        },
+        {
+          "caller": "drawFittingPortDecorations",
+          "callee": "drawMagneticPortMarker",
+          "lineNumber": 219
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "portOpeningSize",
+          "lineNumber": 239
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "ctx.save",
+          "lineNumber": 244
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "ctx.beginPath",
+          "lineNumber": 248
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "ctx.moveTo",
+          "lineNumber": 249
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "ctx.lineTo",
+          "lineNumber": 250
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "ctx.stroke",
+          "lineNumber": 251
+        },
+        {
+          "caller": "drawPortEndLine",
+          "callee": "ctx.restore",
+          "lineNumber": 252
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.save",
+          "lineNumber": 265
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 270
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.beginPath",
+          "lineNumber": 271
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.arc",
+          "lineNumber": 272
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.fill",
+          "lineNumber": 273
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.stroke",
+          "lineNumber": 274
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 275
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.beginPath",
+          "lineNumber": 279
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.arc",
+          "lineNumber": 280
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.fill",
+          "lineNumber": 281
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.stroke",
+          "lineNumber": 282
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.beginPath",
+          "lineNumber": 285
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.arc",
+          "lineNumber": 286
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.fill",
+          "lineNumber": 287
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.fillText",
+          "lineNumber": 294
+        },
+        {
+          "caller": "drawMagneticPortMarker",
+          "callee": "ctx.restore",
+          "lineNumber": 296
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.beginPath",
+          "lineNumber": 306
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.rect",
+          "lineNumber": 307
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.fill",
+          "lineNumber": 308
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.stroke",
+          "lineNumber": 311
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.beginPath",
+          "lineNumber": 314
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.moveTo",
+          "lineNumber": 315
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.lineTo",
+          "lineNumber": 316
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.stroke",
+          "lineNumber": 318
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 323
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.beginPath",
+          "lineNumber": 324
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.moveTo",
+          "lineNumber": 325
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.lineTo",
+          "lineNumber": 326
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.stroke",
+          "lineNumber": 327
+        },
+        {
+          "caller": "drawEndCap",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 328
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "Math.max",
+          "lineNumber": 338
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.beginPath",
+          "lineNumber": 341
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.rect",
+          "lineNumber": 342
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.fill",
+          "lineNumber": 343
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.stroke",
+          "lineNumber": 346
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.beginPath",
+          "lineNumber": 348
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.moveTo",
+          "lineNumber": 349
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.quadraticCurveTo",
+          "lineNumber": 350
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.moveTo",
+          "lineNumber": 351
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.quadraticCurveTo",
+          "lineNumber": 352
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.stroke",
+          "lineNumber": 353
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.beginPath",
+          "lineNumber": 355
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.arc",
+          "lineNumber": 356
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.fill",
+          "lineNumber": 357
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.stroke",
+          "lineNumber": 358
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 363
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.beginPath",
+          "lineNumber": 364
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.moveTo",
+          "lineNumber": 365
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.lineTo",
+          "lineNumber": 366
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.stroke",
+          "lineNumber": 367
+        },
+        {
+          "caller": "drawRectToRound",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 368
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.beginPath",
+          "lineNumber": 378
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.moveTo",
+          "lineNumber": 379
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 380
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 381
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 382
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 383
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 384
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 385
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 386
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.closePath",
+          "lineNumber": 387
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.fill",
+          "lineNumber": 388
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.stroke",
+          "lineNumber": 391
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 396
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.beginPath",
+          "lineNumber": 397
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.moveTo",
+          "lineNumber": 398
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 399
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 400
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.lineTo",
+          "lineNumber": 401
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.stroke",
+          "lineNumber": 402
+        },
+        {
+          "caller": "drawOffset",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 403
+        },
+        {
+          "caller": "drawEndTicks",
+          "callee": "ctx.beginPath",
+          "lineNumber": 413
+        },
+        {
+          "caller": "drawEndTicks",
+          "callee": "ctx.moveTo",
+          "lineNumber": 416
+        },
+        {
+          "caller": "drawEndTicks",
+          "callee": "ctx.lineTo",
+          "lineNumber": 417
+        },
+        {
+          "caller": "drawEndTicks",
+          "callee": "ctx.moveTo",
+          "lineNumber": 418
+        },
+        {
+          "caller": "drawEndTicks",
+          "callee": "ctx.lineTo",
+          "lineNumber": 419
+        },
+        {
+          "caller": "drawEndTicks",
+          "callee": "ctx.stroke",
+          "lineNumber": 420
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "ctx.save",
+          "lineNumber": 424
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "Math.max",
+          "lineNumber": 425
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "ctx.fillText",
+          "lineNumber": 432
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "ctx.fillText",
+          "lineNumber": 436
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "ctx.fillText",
+          "lineNumber": 439
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "ctx.fillText",
+          "lineNumber": 442
+        },
+        {
+          "caller": "renderFittingLabel",
+          "callee": "ctx.restore",
+          "lineNumber": 446
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 16,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/RoomRenderer.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 133,
+      "nonEmptyLines": 113,
+      "functions": [
+        {
+          "name": "renderRoom",
+          "startLine": 36,
+          "endLine": 88,
+          "params": [
+            "room",
+            "context"
+          ]
+        },
+        {
+          "name": "renderResizeHandles",
+          "startLine": 93,
+          "endLine": 131,
+          "params": [
+            "ctx",
+            "width",
+            "height",
+            "zoom"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "renderRoom",
+          "line": 36,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.save",
+          "lineNumber": 40
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.fillRect",
+          "lineNumber": 44
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 49
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "Math.max",
+          "lineNumber": 52
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.fillText",
+          "lineNumber": 57
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "Math.max",
+          "lineNumber": 61
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "(width / 12).toFixed",
+          "lineNumber": 66
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.fillText",
+          "lineNumber": 69
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "(length / 12).toFixed",
+          "lineNumber": 72
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.save",
+          "lineNumber": 73
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.translate",
+          "lineNumber": 74
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.rotate",
+          "lineNumber": 75
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.fillText",
+          "lineNumber": 78
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.restore",
+          "lineNumber": 79
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "renderResizeHandles",
+          "lineNumber": 84
+        },
+        {
+          "caller": "renderRoom",
+          "callee": "ctx.restore",
+          "lineNumber": 87
+        },
+        {
+          "caller": "renderResizeHandles",
+          "callee": "ctx.fillRect",
+          "lineNumber": 115
+        },
+        {
+          "caller": "renderResizeHandles",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 116
+        },
+        {
+          "caller": "renderResizeHandles",
+          "callee": "ctx.fillRect",
+          "lineNumber": 128
+        },
+        {
+          "caller": "renderResizeHandles",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 129
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/equipment/RTUSymbol.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 101,
+      "nonEmptyLines": 82,
+      "functions": [
+        {
+          "name": "renderRTUSymbol",
+          "startLine": 4,
+          "endLine": 22,
+          "params": [
+            "equipment",
+            "context"
+          ]
+        },
+        {
+          "name": "drawBody",
+          "startLine": 24,
+          "endLine": 36,
+          "params": [
+            "ctx",
+            "width",
+            "depth",
+            "zoom",
+            "isSelected"
+          ]
+        },
+        {
+          "name": "drawTag",
+          "startLine": 38,
+          "endLine": 44,
+          "params": [
+            "ctx",
+            "width",
+            "depth",
+            "name",
+            "zoom"
+          ]
+        },
+        {
+          "name": "drawPlenums",
+          "startLine": 46,
+          "endLine": 62,
+          "params": [
+            "ctx",
+            "width",
+            "depth",
+            "zoom"
+          ]
+        },
+        {
+          "name": "drawInternalSections",
+          "startLine": 64,
+          "endLine": 101,
+          "params": [
+            "ctx",
+            "width",
+            "depth",
+            "zoom"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "renderRTUSymbol",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "renderRTUSymbol",
+          "callee": "drawBody",
+          "lineNumber": 8
+        },
+        {
+          "caller": "renderRTUSymbol",
+          "callee": "drawTag",
+          "lineNumber": 9
+        },
+        {
+          "caller": "renderRTUSymbol",
+          "callee": "drawPlenums",
+          "lineNumber": 15
+        },
+        {
+          "caller": "renderRTUSymbol",
+          "callee": "drawInternalSections",
+          "lineNumber": 21
+        },
+        {
+          "caller": "drawBody",
+          "callee": "ctx.fillRect",
+          "lineNumber": 28
+        },
+        {
+          "caller": "drawBody",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 29
+        },
+        {
+          "caller": "drawBody",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 31
+        },
+        {
+          "caller": "drawBody",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 34
+        },
+        {
+          "caller": "drawBody",
+          "callee": "Math.max",
+          "lineNumber": 34
+        },
+        {
+          "caller": "drawBody",
+          "callee": "Math.max",
+          "lineNumber": 34
+        },
+        {
+          "caller": "drawBody",
+          "callee": "ctx.setLineDash",
+          "lineNumber": 35
+        },
+        {
+          "caller": "drawTag",
+          "callee": "Math.max",
+          "lineNumber": 39
+        },
+        {
+          "caller": "drawTag",
+          "callee": "ctx.fillText",
+          "lineNumber": 43
+        },
+        {
+          "caller": "drawPlenums",
+          "callee": "Math.max",
+          "lineNumber": 48
+        },
+        {
+          "caller": "drawPlenums",
+          "callee": "ctx.fillRect",
+          "lineNumber": 56
+        },
+        {
+          "caller": "drawPlenums",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 57
+        },
+        {
+          "caller": "drawPlenums",
+          "callee": "ctx.fillRect",
+          "lineNumber": 60
+        },
+        {
+          "caller": "drawPlenums",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 61
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 71
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.beginPath",
+          "lineNumber": 74
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.moveTo",
+          "lineNumber": 75
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.lineTo",
+          "lineNumber": 76
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.stroke",
+          "lineNumber": 77
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "Math.max",
+          "lineNumber": 80
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "Math.min",
+          "lineNumber": 80
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.beginPath",
+          "lineNumber": 82
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.arc",
+          "lineNumber": 83
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.stroke",
+          "lineNumber": 84
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 88
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.beginPath",
+          "lineNumber": 89
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.arc",
+          "lineNumber": 90
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "Math.max",
+          "lineNumber": 90
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.stroke",
+          "lineNumber": 91
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 94
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.beginPath",
+          "lineNumber": 96
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.moveTo",
+          "lineNumber": 97
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.lineTo",
+          "lineNumber": 98
+        },
+        {
+          "caller": "drawInternalSections",
+          "callee": "ctx.stroke",
+          "lineNumber": 99
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 5,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/equipment/portMarkerRenderer.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 129,
+      "nonEmptyLines": 114,
+      "functions": [
+        {
+          "name": "resolvePortMarkerShape",
+          "startLine": 20,
+          "endLine": 35,
+          "params": [
+            "port",
+            "entitiesById",
+            "defaultSize"
+          ]
+        },
+        {
+          "name": "renderPortMarker",
+          "startLine": 37,
+          "endLine": 87,
+          "params": [
+            "ctx",
+            "port",
+            "pos",
+            "shape",
+            "zoom",
+            "showLabel"
+          ]
+        },
+        {
+          "name": "drawFlowArrow",
+          "startLine": 89,
+          "endLine": 116,
+          "params": [
+            "ctx",
+            "port",
+            "pos",
+            "color",
+            "zoom"
+          ]
+        },
+        {
+          "name": "edgeVector",
+          "startLine": 118,
+          "endLine": 129,
+          "params": [
+            "edge"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "resolvePortMarkerShape",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "renderPortMarker",
+          "line": 37,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "resolvePortMarkerShape",
+          "callee": "resolveDuctConnectionProfile",
+          "lineNumber": 27
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "Math.max",
+          "lineNumber": 47
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.save",
+          "lineNumber": 49
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.beginPath",
+          "lineNumber": 54
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.arc",
+          "lineNumber": 55
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.fill",
+          "lineNumber": 57
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.stroke",
+          "lineNumber": 59
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.beginPath",
+          "lineNumber": 61
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.arc",
+          "lineNumber": 62
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.fill",
+          "lineNumber": 64
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "Math.max",
+          "lineNumber": 67
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.fillRect",
+          "lineNumber": 70
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.strokeRect",
+          "lineNumber": 71
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.fillRect",
+          "lineNumber": 73
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "drawFlowArrow",
+          "lineNumber": 76
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "Math.max",
+          "lineNumber": 79
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.fillText",
+          "lineNumber": 83
+        },
+        {
+          "caller": "renderPortMarker",
+          "callee": "ctx.restore",
+          "lineNumber": 86
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "edgeVector",
+          "lineNumber": 96
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "resolvePortFlow",
+          "lineNumber": 97
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "ctx.beginPath",
+          "lineNumber": 109
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "ctx.moveTo",
+          "lineNumber": 110
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 111
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "ctx.lineTo",
+          "lineNumber": 112
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "ctx.closePath",
+          "lineNumber": 113
+        },
+        {
+          "caller": "drawFlowArrow",
+          "callee": "ctx.fill",
+          "lineNumber": 115
+        }
+      ],
+      "metrics": {
+        "importCount": 4,
+        "exportCount": 2,
+        "functionCount": 4,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/renderers/fittingSymbolModel.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 339,
+      "nonEmptyLines": 295,
+      "functions": [
+        {
+          "name": "clamp",
+          "startLine": 67,
+          "endLine": 69,
+          "params": [
+            "value",
+            "min",
+            "max"
+          ]
+        },
+        {
+          "name": "sanitizeSize",
+          "startLine": 71,
+          "endLine": 73,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "normalizeSize",
+          "startLine": 75,
+          "endLine": 79,
+          "params": [
+            "value",
+            "maxSize",
+            "minPx",
+            "maxPx"
+          ]
+        },
+        {
+          "name": "formatInches",
+          "startLine": 81,
+          "endLine": 83,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "createRoundProfile",
+          "startLine": 85,
+          "endLine": 94,
+          "params": [
+            "diameter"
+          ]
+        },
+        {
+          "name": "createRectangularProfile",
+          "startLine": 96,
+          "endLine": 106,
+          "params": [
+            "width",
+            "height"
+          ]
+        },
+        {
+          "name": "getDuctProfile",
+          "startLine": 108,
+          "endLine": 135,
+          "params": [
+            "entity"
+          ]
+        },
+        {
+          "name": "getTransitionProfiles",
+          "startLine": 137,
+          "endLine": 158,
+          "params": [
+            "fitting"
+          ]
+        },
+        {
+          "name": "collectConnectedProfiles",
+          "startLine": 160,
+          "endLine": 171,
+          "params": [
+            "fitting",
+            "entitiesById"
+          ]
+        },
+        {
+          "name": "scaleProfile",
+          "startLine": 173,
+          "endLine": 182,
+          "params": [
+            "profile",
+            "ratio",
+            "roundShape"
+          ]
+        },
+        {
+          "name": "pickMainAndBranchProfiles",
+          "startLine": 184,
+          "endLine": 203,
+          "params": [
+            "fitting",
+            "entitiesById"
+          ]
+        },
+        {
+          "name": "pickInletAndOutletProfiles",
+          "startLine": 205,
+          "endLine": 223,
+          "params": [
+            "fitting",
+            "entitiesById"
+          ]
+        },
+        {
+          "name": "deriveDynamicFittingSymbol",
+          "startLine": 225,
+          "endLine": 339,
+          "params": [
+            "fitting",
+            "entitiesById"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "clamp",
+          "line": 67,
+          "isDefault": false
+        },
+        {
+          "name": "sanitizeSize",
+          "line": 71,
+          "isDefault": false
+        },
+        {
+          "name": "normalizeSize",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "formatInches",
+          "line": 81,
+          "isDefault": false
+        },
+        {
+          "name": "getDuctProfile",
+          "line": 108,
+          "isDefault": false
+        },
+        {
+          "name": "deriveDynamicFittingSymbol",
+          "line": 225,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "clamp",
+          "callee": "Math.max",
+          "lineNumber": 68
+        },
+        {
+          "caller": "clamp",
+          "callee": "Math.min",
+          "lineNumber": 68
+        },
+        {
+          "caller": "sanitizeSize",
+          "callee": "Number.isFinite",
+          "lineNumber": 72
+        },
+        {
+          "caller": "normalizeSize",
+          "callee": "sanitizeSize",
+          "lineNumber": 76
+        },
+        {
+          "caller": "normalizeSize",
+          "callee": "sanitizeSize",
+          "lineNumber": 77
+        },
+        {
+          "caller": "normalizeSize",
+          "callee": "clamp",
+          "lineNumber": 78
+        },
+        {
+          "caller": "formatInches",
+          "callee": "sanitizeSize",
+          "lineNumber": 82
+        },
+        {
+          "caller": "createRoundProfile",
+          "callee": "sanitizeSize",
+          "lineNumber": 86
+        },
+        {
+          "caller": "createRoundProfile",
+          "callee": "formatInches",
+          "lineNumber": 92
+        },
+        {
+          "caller": "createRectangularProfile",
+          "callee": "sanitizeSize",
+          "lineNumber": 97
+        },
+        {
+          "caller": "createRectangularProfile",
+          "callee": "sanitizeSize",
+          "lineNumber": 98
+        },
+        {
+          "caller": "createRectangularProfile",
+          "callee": "Math.max",
+          "lineNumber": 101
+        },
+        {
+          "caller": "createRectangularProfile",
+          "callee": "formatInches",
+          "lineNumber": 104
+        },
+        {
+          "caller": "createRectangularProfile",
+          "callee": "formatInches",
+          "lineNumber": 104
+        },
+        {
+          "caller": "getDuctProfile",
+          "callee": "createRoundProfile",
+          "lineNumber": 116
+        },
+        {
+          "caller": "getDuctProfile",
+          "callee": "createRectangularProfile",
+          "lineNumber": 119
+        },
+        {
+          "caller": "getDuctProfile",
+          "callee": "createRoundProfile",
+          "lineNumber": 126
+        },
+        {
+          "caller": "getDuctProfile",
+          "callee": "createRectangularProfile",
+          "lineNumber": 131
+        },
+        {
+          "caller": "getTransitionProfiles",
+          "callee": "createRoundProfile",
+          "lineNumber": 145
+        },
+        {
+          "caller": "getTransitionProfiles",
+          "callee": "createRectangularProfile",
+          "lineNumber": 147
+        },
+        {
+          "caller": "getTransitionProfiles",
+          "callee": "createRoundProfile",
+          "lineNumber": 152
+        },
+        {
+          "caller": "getTransitionProfiles",
+          "callee": "createRectangularProfile",
+          "lineNumber": 154
+        },
+        {
+          "caller": "collectConnectedProfiles",
+          "callee": "[\n    fitting.props.inletDuctId,\n    fitting.props.outletDuctId,\n    ...(fitting.props.connectionPoints?.map((connection) => connection.ductId) ?? []),\n  ].filter",
+          "lineNumber": 161
+        },
+        {
+          "caller": "collectConnectedProfiles",
+          "callee": "fitting.props.connectionPoints?.map",
+          "lineNumber": 164
+        },
+        {
+          "caller": "collectConnectedProfiles",
+          "callee": "Boolean",
+          "lineNumber": 165
+        },
+        {
+          "caller": "collectConnectedProfiles",
+          "callee": "uniqueIds\n    .map((id) => getDuctProfile(entitiesById[id]))\n    .filter",
+          "lineNumber": 168
+        },
+        {
+          "caller": "collectConnectedProfiles",
+          "callee": "uniqueIds\n    .map",
+          "lineNumber": 168
+        },
+        {
+          "caller": "collectConnectedProfiles",
+          "callee": "getDuctProfile",
+          "lineNumber": 169
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "createRoundProfile",
+          "lineNumber": 175
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "Math.max",
+          "lineNumber": 175
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "Math.round",
+          "lineNumber": 175
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "createRectangularProfile",
+          "lineNumber": 178
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "Math.max",
+          "lineNumber": 179
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "Math.round",
+          "lineNumber": 179
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "Math.max",
+          "lineNumber": 180
+        },
+        {
+          "caller": "scaleProfile",
+          "callee": "Math.round",
+          "lineNumber": 180
+        },
+        {
+          "caller": "pickMainAndBranchProfiles",
+          "callee": "getTransitionProfiles",
+          "lineNumber": 188
+        },
+        {
+          "caller": "pickMainAndBranchProfiles",
+          "callee": "collectConnectedProfiles",
+          "lineNumber": 189
+        },
+        {
+          "caller": "pickMainAndBranchProfiles",
+          "callee": "getDuctProfile",
+          "lineNumber": 192
+        },
+        {
+          "caller": "pickMainAndBranchProfiles",
+          "callee": "createRoundProfile",
+          "lineNumber": 194
+        },
+        {
+          "caller": "pickMainAndBranchProfiles",
+          "callee": "getDuctProfile",
+          "lineNumber": 198
+        },
+        {
+          "caller": "pickMainAndBranchProfiles",
+          "callee": "scaleProfile",
+          "lineNumber": 200
+        },
+        {
+          "caller": "pickInletAndOutletProfiles",
+          "callee": "getTransitionProfiles",
+          "lineNumber": 209
+        },
+        {
+          "caller": "pickInletAndOutletProfiles",
+          "callee": "collectConnectedProfiles",
+          "lineNumber": 210
+        },
+        {
+          "caller": "pickInletAndOutletProfiles",
+          "callee": "getDuctProfile",
+          "lineNumber": 213
+        },
+        {
+          "caller": "pickInletAndOutletProfiles",
+          "callee": "createRoundProfile",
+          "lineNumber": 215
+        },
+        {
+          "caller": "pickInletAndOutletProfiles",
+          "callee": "getDuctProfile",
+          "lineNumber": 218
+        },
+        {
+          "caller": "pickInletAndOutletProfiles",
+          "callee": "scaleProfile",
+          "lineNumber": 220
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickMainAndBranchProfiles",
+          "lineNumber": 233
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickMainAndBranchProfiles",
+          "lineNumber": 246
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "getTransitionProfiles",
+          "lineNumber": 259
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickInletAndOutletProfiles",
+          "lineNumber": 260
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "createRectangularProfile",
+          "lineNumber": 266
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "createRoundProfile",
+          "lineNumber": 272
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickInletAndOutletProfiles",
+          "lineNumber": 287
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickInletAndOutletProfiles",
+          "lineNumber": 300
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickInletAndOutletProfiles",
+          "lineNumber": 311
+        },
+        {
+          "caller": "deriveDynamicFittingSymbol",
+          "callee": "pickInletAndOutletProfiles",
+          "lineNumber": 321
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 6,
+        "functionCount": 13,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/features/canvas/services/DuctRunGeometryService.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 270,
+      "nonEmptyLines": 235,
+      "classes": [
+        {
+          "name": "DuctRunGeometryService",
+          "startLine": 47,
+          "endLine": 270,
+          "methods": [
+            "getGeometry",
+            "getBounds",
+            "hitTestRun",
+            "hitTestSegment",
+            "getSegmentIndexAtPoint",
+            "invalidateRun",
+            "clearCache",
+            "buildGeometry",
+            "resolveThicknessPx",
+            "pointInRunRect",
+            "offsetPoint",
+            "boundsFromPoints"
+          ],
+          "properties": [
+            "cache",
+            "cacheKeysByRunId"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "DuctRunGeometryService",
+          "line": 47,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "getGeometry",
+          "callee": "JSON.stringify",
+          "lineNumber": 52
+        },
+        {
+          "caller": "getGeometry",
+          "callee": "this.cache.get",
+          "lineNumber": 63
+        },
+        {
+          "caller": "getGeometry",
+          "callee": "this.buildGeometry",
+          "lineNumber": 68
+        },
+        {
+          "caller": "getGeometry",
+          "callee": "this.cache.set",
+          "lineNumber": 69
+        },
+        {
+          "caller": "getGeometry",
+          "callee": "this.cacheKeysByRunId.get",
+          "lineNumber": 70
+        },
+        {
+          "caller": "getGeometry",
+          "callee": "cacheKeys.add",
+          "lineNumber": 71
+        },
+        {
+          "caller": "getGeometry",
+          "callee": "this.cacheKeysByRunId.set",
+          "lineNumber": 72
+        },
+        {
+          "caller": "getBounds",
+          "callee": "this.getGeometry",
+          "lineNumber": 77
+        },
+        {
+          "caller": "hitTestRun",
+          "callee": "this.getGeometry",
+          "lineNumber": 81
+        },
+        {
+          "caller": "hitTestRun",
+          "callee": "this.pointInRunRect",
+          "lineNumber": 82
+        },
+        {
+          "caller": "hitTestSegment",
+          "callee": "this.getGeometry",
+          "lineNumber": 86
+        },
+        {
+          "caller": "hitTestSegment",
+          "callee": "this.pointInRunRect",
+          "lineNumber": 89
+        },
+        {
+          "caller": "getSegmentIndexAtPoint",
+          "callee": "this.hitTestSegment",
+          "lineNumber": 98
+        },
+        {
+          "caller": "invalidateRun",
+          "callee": "this.cacheKeysByRunId.get",
+          "lineNumber": 103
+        },
+        {
+          "caller": "invalidateRun",
+          "callee": "this.cache.delete",
+          "lineNumber": 109
+        },
+        {
+          "caller": "invalidateRun",
+          "callee": "this.cacheKeysByRunId.delete",
+          "lineNumber": 112
+        },
+        {
+          "caller": "clearCache",
+          "callee": "this.cache.clear",
+          "lineNumber": 116
+        },
+        {
+          "caller": "clearCache",
+          "callee": "this.cacheKeysByRunId.clear",
+          "lineNumber": 117
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "Math.cos",
+          "lineNumber": 122
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "Math.sin",
+          "lineNumber": 122
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "feetToPixels",
+          "lineNumber": 125
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.resolveThicknessPx",
+          "lineNumber": 130
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 133
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 134
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 135
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 136
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.boundsFromPoints",
+          "lineNumber": 138
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "run.props.segments.map",
+          "lineNumber": 157
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "feetToPixels",
+          "lineNumber": 159
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "feetToPixels",
+          "lineNumber": 160
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "feetToPixels",
+          "lineNumber": 163
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "feetToPixels",
+          "lineNumber": 164
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 167
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 168
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 169
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.offsetPoint",
+          "lineNumber": 170
+        },
+        {
+          "caller": "buildGeometry",
+          "callee": "this.boundsFromPoints",
+          "lineNumber": 172
+        },
+        {
+          "caller": "resolveThicknessPx",
+          "callee": "inchesToPixels",
+          "lineNumber": 206
+        },
+        {
+          "caller": "resolveThicknessPx",
+          "callee": "inchesToPixels",
+          "lineNumber": 211
+        },
+        {
+          "caller": "resolveThicknessPx",
+          "callee": "inchesToPixels",
+          "lineNumber": 215
+        },
+        {
+          "caller": "resolveThicknessPx",
+          "callee": "inchesToPixels",
+          "lineNumber": 218
+        },
+        {
+          "caller": "pointInRunRect",
+          "callee": "Math.hypot",
+          "lineNumber": 240
+        },
+        {
+          "caller": "boundsFromPoints",
+          "callee": "Math.min",
+          "lineNumber": 257
+        },
+        {
+          "caller": "boundsFromPoints",
+          "callee": "Math.min",
+          "lineNumber": 258
+        },
+        {
+          "caller": "boundsFromPoints",
+          "callee": "Math.max",
+          "lineNumber": 259
+        },
+        {
+          "caller": "boundsFromPoints",
+          "callee": "Math.max",
+          "lineNumber": 260
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    }
+  ]
+}

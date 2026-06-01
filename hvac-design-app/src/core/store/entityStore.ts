@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import type { Entity, EntityType } from '@/core/schema';
+import type { Duct, DuctRun, Entity, EntityType } from '@/core/schema';
 import { ConnectionGraphBuilder } from '@/core/services/graph/ConnectionGraphBuilder';
 import { ConnectionReconciliationService } from '@/core/services/graph/ConnectionReconciliationService';
 import { FlowPropagationService } from '@/core/services/graph/FlowPropagationService';
+import { calculateVelocity } from '@/core/services/engineeringCalculations';
 import { PressurePropagationService } from '@/core/services/calculations/PressurePropagationService';
 import { TopologyValidationService } from '@/core/services/graph/TopologyValidationService';
 import type { TopologyValidationResult } from '@/core/services/graph/types';
+import { calculateEquivalentDiameter, calculateFrictionLoss } from '@/features/canvas/calculators/pressureDrop';
 import { buildOverlayStatusMap, useDuctOverlayStore } from './ductOverlayStore';
 import { useValidationStore, type ValidationResult } from './validationStore';
 
@@ -55,6 +57,12 @@ const recalculateFlows = (state: EntityState) => {
       const entity = state.byId[id];
       if (entity && (entity.type === 'duct' || entity.type === 'duct_run') && entity.props.airflow !== flow) {
         entity.props.airflow = flow;
+        const velocity = calculateEntityVelocity(entity);
+        entity.calculated = {
+          ...entity.calculated,
+          velocity,
+          frictionLoss: calculateEntityFrictionLoss(entity, velocity),
+        };
       }
     }
   } catch (error) {
@@ -78,6 +86,12 @@ const runCommittedPipeline = (state: EntityState) => {
       const entity = state.byId[id];
       if (entity && (entity.type === 'duct' || entity.type === 'duct_run') && validEntityIds.has(id)) {
         entity.props.airflow = flow;
+        const velocity = calculateEntityVelocity(entity);
+        entity.calculated = {
+          ...entity.calculated,
+          velocity,
+          frictionLoss: calculateEntityFrictionLoss(entity, velocity),
+        };
       }
     }
 
@@ -115,6 +129,47 @@ const runCommittedPipeline = (state: EntityState) => {
     recalculateFlows(state);
   }
 };
+
+function calculateEntityVelocity(entity: Duct | DuctRun): number {
+  if (entity.props.shape === 'round' || entity.props.shape === 'flexible') {
+    return calculateVelocity(entity.props.airflow, {
+      shape: 'round',
+      diameter: entity.props.diameter,
+    });
+  }
+
+  return calculateVelocity(entity.props.airflow, {
+    shape: 'rectangular',
+    width: entity.props.width,
+    height: entity.props.height,
+  });
+}
+
+function calculateEntityFrictionLoss(entity: Duct | DuctRun, velocity: number): number {
+  const diameter =
+    entity.props.shape === 'round' || entity.props.shape === 'flexible'
+      ? entity.props.diameter ?? 0
+      : calculateEquivalentDiameter(entity.props.width ?? 0, entity.props.height ?? 0);
+
+  const length =
+    entity.type === 'duct_run'
+      ? entity.props.installLength
+      : entity.props.length;
+
+  const materialRoughness: Record<Duct['props']['material'], number> = {
+    galvanized: 0.0005,
+    stainless: 0.0002,
+    aluminum: 0.0002,
+    flex: 0.003,
+  };
+
+  return calculateFrictionLoss(
+    velocity,
+    diameter,
+    length,
+    materialRoughness[entity.props.material]
+  );
+}
 
 function writeTopologyValidationWarnings(validationResults: TopologyValidationResult[]): void {
   const validationStore = useValidationStore.getState();

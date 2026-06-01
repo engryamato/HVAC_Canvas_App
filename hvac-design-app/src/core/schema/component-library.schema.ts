@@ -56,12 +56,12 @@ export const ComponentCategorySchema: z.ZodType<ComponentCategory> = z.lazy(() =
   z.object({
     id: z.string(),
     name: z.string(),
-    parentId: z.string().nullable(),
+    parentId: z.string().nullable().default(null),
     description: z.string().optional(),
     icon: z.string().optional(),
     subcategories: z.array(ComponentCategorySchema).optional(),
   })
-);
+) as z.ZodType<ComponentCategory>;
 
 export type ComponentCategory = {
   id: string;

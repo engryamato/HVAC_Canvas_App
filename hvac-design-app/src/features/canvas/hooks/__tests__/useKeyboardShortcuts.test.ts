@@ -4,7 +4,7 @@ import { useKeyboardShortcuts } from '../useKeyboardShortcuts';
 import { useViewportStore } from '../../store/viewportStore';
 import { useSelectionStore } from '../../store/selectionStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import type { Room } from '@/core/schema';
+import type { Equipment, Room } from '@/core/schema';
 
 const createMockRoom = (id: string): Room => ({
   id,
@@ -22,6 +22,31 @@ const createMockRoom = (id: string): Room => ({
     airChangesPerHour: 4,
   },
   calculated: { area: 100, volume: 800, requiredCFM: 200 },
+});
+
+const createMockEquipment = (): Equipment => ({
+  id: 'equip-1',
+  type: 'equipment',
+  transform: { x: 10, y: 20, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  zIndex: 1,
+  createdAt: '2025-01-01T00:00:00.000Z',
+  modifiedAt: '2025-01-01T00:00:00.000Z',
+  props: {
+    name: 'Equipment',
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'air_handler',
+    width: 160,
+    depth: 40,
+    height: 240,
+    manufacturer: 'Test',
+    model: 'Test',
+    capacity: 1000,
+    capacityUnit: 'CFM',
+    staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
+    mountHeight: 0,
+    mountHeightUnit: 'in',
+  },
 });
 
 describe('useKeyboardShortcuts', () => {
@@ -270,6 +295,23 @@ describe('useKeyboardShortcuts', () => {
       expect(useViewportStore.getState().zoom).toBe(1);
       expect(useViewportStore.getState().panX).toBe(0);
       expect(useViewportStore.getState().panY).toBe(0);
+    });
+
+    it('fits equipment using plan width and depth instead of physical height', () => {
+      const fitToContentSpy = vi.spyOn(useViewportStore.getState(), 'fitToContent');
+      const equipment = createMockEquipment();
+      useEntityStore.setState({
+        byId: { [equipment.id]: equipment },
+        allIds: [equipment.id],
+      });
+
+      renderHook(() => useKeyboardShortcuts());
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: '1', ctrlKey: true }));
+      });
+
+      expect(fitToContentSpy).toHaveBeenCalledWith({ x: 10, y: 20, width: 160, height: 40 });
     });
   });
 

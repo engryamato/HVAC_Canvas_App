@@ -3,6 +3,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { InspectorOverviewPanel } from '../InspectorOverviewPanel';
 import type { InspectorPanelProps } from '../inspectorOverviewTypes';
+import { usePreferencesStore } from '@/core/store/preferencesStore';
 
 function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPanelProps {
   return {
@@ -27,7 +28,7 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
       autoCalculate: true,
     },
     health: [
-      { id: 'unconnected', status: 'error', label: 'Unconnected Segments', count: 5 },
+      { id: 'unconnected', status: 'error', label: 'Unconnected Sections', count: 5 },
       { id: 'geometry', status: 'ok', label: 'Geometry Clean' },
       { id: 'equipment', status: 'warning', label: 'Missing Equipment', count: 3 },
     ],
@@ -53,6 +54,7 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
         status: 'not_calculated',
       },
     ],
+    unitSystem: 'imperial',
     elements: {
       inventory: { Ducts: 12, Fittings: 0, Equipment: 2, Rooms: 0 },
       breakdown: { Rectangular: 8, Round: 4, Flex: 0, Elbows: 0, Tees: 0, Reducers: 0 },
@@ -60,6 +62,8 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
     recentActivity: [
       { id: '1', action: 'Added', type: 'Rect Duct', target: 'Segment #147', time: '2 min ago' },
     ],
+    recentActivityLimit: 10,
+    recentActivityTotal: 1,
     canUndo: true,
     canRedo: false,
     actionStatus: null,
@@ -86,6 +90,21 @@ describe('InspectorOverviewPanel', () => {
     for (const name of ['Project', 'Engineering', 'Model Health', 'Systems', 'Elements', 'Recent Activity']) {
       expect(screen.getByRole('button', { name: new RegExp(name, 'i') }).getAttribute('aria-expanded')).toBe('false');
     }
+  });
+
+  it('toggles the Show Centerline preference from the Engineering section', () => {
+    usePreferencesStore.getState().setShowCenterline(false);
+    render(<InspectorOverviewPanel {...createProps()} />);
+
+    openSection('Engineering');
+    const toggle = screen.getByTestId('toggle-show-centerline');
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(toggle);
+    expect(usePreferencesStore.getState().showCenterline).toBe(true);
+    expect(screen.getByTestId('toggle-show-centerline').getAttribute('aria-pressed')).toBe('true');
+
+    usePreferencesStore.getState().setShowCenterline(false);
   });
 
   it('renders project fields from props after opening Project', () => {
@@ -126,8 +145,25 @@ describe('InspectorOverviewPanel', () => {
     expect(screen.getByText('Supply')).toBeDefined();
     expect(screen.getByText('Outside Air')).toBeDefined();
     expect(screen.queryByText('Return')).toBeNull();
+    expect(screen.getAllByText('Sections').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Segments')).toBeNull();
     expect(screen.getByText('Not Calculated')).toBeDefined();
     expect(screen.getAllByText('-').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('formats system values for metric unit projects', () => {
+    render(<InspectorOverviewPanel {...createProps({ unitSystem: 'metric' })} />);
+
+    openSection('Systems');
+
+    expect(screen.getByText('43 m')).toBeDefined();
+    expect(screen.getByText('850 L/s')).toBeDefined();
+  });
+
+  it('formats the collapsed systems summary for metric unit projects', () => {
+    render(<InspectorOverviewPanel {...createProps({ unitSystem: 'metric' })} />);
+
+    expect(screen.getByRole('button', { name: /systems/i }).textContent).toContain('59 m - 850 L/s');
   });
 
   it('keeps zero-count element rows visible', () => {
@@ -149,6 +185,44 @@ describe('InspectorOverviewPanel', () => {
     expect(screen.getByText('No changes yet.')).toBeDefined();
   });
 
+  it('shows activity overflow metadata when history exceeds the visible limit', () => {
+    render(<InspectorOverviewPanel {...createProps({ recentActivityLimit: 10, recentActivityTotal: 25 })} />);
+
+    openSection('Recent Activity');
+
+    expect(screen.getByText('Showing latest 10 of 25 changes.')).toBeDefined();
+  });
+
+  it('disables a loading section and renders loading summary', () => {
+    render(
+      <InspectorOverviewPanel
+        {...createProps({
+          sectionStates: { project: { loading: true } },
+        })}
+      />
+    );
+
+    const projectButton = screen.getByRole('button', { name: /project/i });
+    expect(projectButton.hasAttribute('disabled')).toBe(true);
+    expect(projectButton.textContent).toContain('Loading...');
+  });
+
+  it('renders section error state with retry action', () => {
+    const onRetry = vi.fn();
+    render(
+      <InspectorOverviewPanel
+        {...createProps({
+          sectionStates: { systems: { error: 'Calculation failed', onRetry } },
+        })}
+      />
+    );
+
+    openSection('Systems');
+    expect(screen.getByText('Unable to load this section.')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
   it('wires required interaction callbacks', () => {
     const props = createProps();
     render(<InspectorOverviewPanel {...props} />);
@@ -160,7 +234,7 @@ describe('InspectorOverviewPanel', () => {
     expect(props.onEditEngineeringSettings).toHaveBeenCalledTimes(1);
 
     openSection('Model Health');
-    fireEvent.click(screen.getByRole('button', { name: /locate unconnected segments/i }));
+    fireEvent.click(screen.getByRole('button', { name: /locate unconnected sections/i }));
     expect(props.onLocateHealthIssue).toHaveBeenCalledWith('unconnected');
     fireEvent.click(screen.getByRole('button', { name: /select all invalid/i }));
     expect(props.onSelectAllInvalid).toHaveBeenCalledTimes(1);
@@ -183,5 +257,56 @@ describe('InspectorOverviewPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: /model issues/i }));
 
     expect(screen.getByRole('button', { name: /model health/i }).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('updates model health when props change without remounting', () => {
+    const { rerender } = render(<InspectorOverviewPanel {...createProps({ health: [] })} />);
+
+    expect(screen.getAllByText('All checks passed').length).toBeGreaterThan(0);
+
+    rerender(
+      <InspectorOverviewPanel
+        {...createProps({
+          health: [{ id: 'unconnected', status: 'warning', label: 'Unconnected', count: 2 }],
+        })}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /2 model issues/i })).toBeDefined();
+  });
+
+  it('updates element counts when props change without remounting', () => {
+    const { rerender } = render(<InspectorOverviewPanel {...createProps()} />);
+
+    expect(screen.getByRole('button', { name: /elements/i }).textContent).toContain('14 objects');
+
+    rerender(
+      <InspectorOverviewPanel
+        {...createProps({
+          elements: {
+            inventory: { Ducts: 1, Fittings: 1, Equipment: 1, Rooms: 1 },
+            breakdown: { Rectangular: 1, Round: 0, Flex: 0, Elbows: 1, Tees: 0, Reducers: 0 },
+          },
+        })}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /elements/i }).textContent).toContain('4 objects');
+  });
+
+  it('reflects auto calculate updates from external state', () => {
+    const { rerender } = render(<InspectorOverviewPanel {...createProps()} />);
+
+    expect(screen.getByRole('button', { name: /engineering/i }).textContent).toContain('Auto Calc ON');
+
+    rerender(
+      <InspectorOverviewPanel
+        {...createProps({
+          engineering: { ...createProps().engineering, autoCalculate: false },
+        })}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /engineering/i }).textContent).toContain('Auto Calc OFF');
   });
 });

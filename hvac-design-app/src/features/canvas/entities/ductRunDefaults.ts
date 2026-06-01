@@ -34,6 +34,7 @@ type CreateDuctRunOverrides = Partial<{
   serviceId: string;
   catalogItemId: string;
   engineeringSystem: DuctRun['props']['engineeringSystem'];
+  systemType: DuctRun['props']['systemType'];
   specialtyToolId: string;
   sectionLengthOverride: number;
 }>;
@@ -49,6 +50,7 @@ export function createDuctRun(overrides?: CreateDuctRunOverrides): DuctRun {
       overrides?.name ??
       `${shape === 'round' || shape === 'flexible' ? 'Round' : 'Rectangular'} Duct Run ${runNumber}`,
     engineeringSystem: overrides?.engineeringSystem ?? DEFAULT_ROUND_DUCT_PROPS.engineeringSystem,
+    systemType: overrides?.systemType,
     specialtyToolId: overrides?.specialtyToolId,
     shape,
     material: overrides?.material ?? (shape === 'flexible' ? 'flex' : DEFAULT_ROUND_DUCT_PROPS.material),

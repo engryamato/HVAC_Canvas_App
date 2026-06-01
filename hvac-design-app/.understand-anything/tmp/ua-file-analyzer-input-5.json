@@ -1,0 +1,374 @@
+{
+  "projectRoot": "C:/Users/User/Downloads/GitHub/HVAC_Canvas_App/hvac-design-app",
+  "batchFiles": [
+    {
+      "path": "src/features/canvas/components/CalculationsPanel.tsx",
+      "language": "typescript",
+      "sizeLines": 237,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/DynamicFittingSymbols.tsx",
+      "language": "typescript",
+      "sizeLines": 363,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "language": "typescript",
+      "sizeLines": 643,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "language": "typescript",
+      "sizeLines": 227,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/FittingInspector.tsx",
+      "language": "typescript",
+      "sizeLines": 199,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/InspectorAccordion.tsx",
+      "language": "typescript",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "language": "typescript",
+      "sizeLines": 120,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "language": "typescript",
+      "sizeLines": 23,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/Inspector/RoomInspector.tsx",
+      "language": "typescript",
+      "sizeLines": 188,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/SelectionMarquee.tsx",
+      "language": "typescript",
+      "sizeLines": 33,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/components/ValidationDashboard.tsx",
+      "language": "typescript",
+      "sizeLines": 428,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/ductRunDefaults.ts",
+      "language": "typescript",
+      "sizeLines": 135,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/equipmentDefaults.ts",
+      "language": "typescript",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/equipmentPortDefinitions.ts",
+      "language": "typescript",
+      "sizeLines": 201,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/fittingDefaults.ts",
+      "language": "typescript",
+      "sizeLines": 125,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/index.ts",
+      "language": "typescript",
+      "sizeLines": 44,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/entities/noteDefaults.ts",
+      "language": "typescript",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useEntityOperations.ts",
+      "language": "typescript",
+      "sizeLines": 176,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useFieldValidation.ts",
+      "language": "typescript",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useMarquee.ts",
+      "language": "typescript",
+      "sizeLines": 94,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useSelection.ts",
+      "language": "typescript",
+      "sizeLines": 157,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/hooks/useUndoRedo.ts",
+      "language": "typescript",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/DuctRenderer.ts",
+      "language": "typescript",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/DuctRunRenderer.ts",
+      "language": "typescript",
+      "sizeLines": 217,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/EquipmentRenderer.ts",
+      "language": "typescript",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/FittingRenderer.ts",
+      "language": "typescript",
+      "sizeLines": 449,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/RoomRenderer.ts",
+      "language": "typescript",
+      "sizeLines": 133,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/equipment/RTUSymbol.ts",
+      "language": "typescript",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/equipment/portMarkerRenderer.ts",
+      "language": "typescript",
+      "sizeLines": 129,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/renderers/fittingSymbolModel.ts",
+      "language": "typescript",
+      "sizeLines": 339,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/services/DuctRunGeometryService.ts",
+      "language": "typescript",
+      "sizeLines": 270,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/features/canvas/components/CalculationsPanel.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/hooks/useSystemCalculations.ts",
+      "src/features/canvas/services/ductRunSectionCalculations.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/components/DynamicFittingSymbols.tsx": [
+      "src/features/canvas/renderers/fittingSymbolModel.ts"
+    ],
+    "src/features/canvas/components/Inspector/DuctRunInspector.tsx": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/components/Inspector/EquipmentInspector.tsx": [
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/InspectorAccordion.tsx",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/entities/equipmentDefaults.ts",
+      "src/features/canvas/hooks/useFieldValidation.ts"
+    ],
+    "src/features/canvas/components/Inspector/FittingInspector.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/entities/fittingDefaults.ts"
+    ],
+    "src/features/canvas/components/Inspector/InspectorAccordion.tsx": [
+      "src/components/ui/accordion.tsx",
+      "src/features/canvas/store/inspectorPreferencesStore.ts"
+    ],
+    "src/features/canvas/components/Inspector/InspectorPanel.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/DuctInspector.tsx",
+      "src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "src/features/canvas/components/Inspector/FittingInspector.tsx",
+      "src/features/canvas/components/Inspector/InspectorOverviewPanel.tsx",
+      "src/features/canvas/components/Inspector/RoomInspector.tsx",
+      "src/features/canvas/components/Inspector/useInspectorOverviewData.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewModeStore.ts"
+    ],
+    "src/features/canvas/components/Inspector/PropertyField.tsx": [],
+    "src/features/canvas/components/Inspector/RoomInspector.tsx": [
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/InspectorAccordion.tsx",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/hooks/useFieldValidation.ts"
+    ],
+    "src/features/canvas/components/SelectionMarquee.tsx": [
+      "src/core/geometry/bounds.ts"
+    ],
+    "src/features/canvas/components/ValidationDashboard.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "src/core/services/graph/TopologyValidationService.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/ductOverlayStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/components/ResolutionWizard.tsx",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/entities/ductRunDefaults.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/entities/equipmentDefaults.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/entities/equipmentPortDefinitions.ts"
+    ],
+    "src/features/canvas/entities/equipmentPortDefinitions.ts": [
+      "src/core/schema/equipment.schema.ts"
+    ],
+    "src/features/canvas/entities/fittingDefaults.ts": [
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/entities/index.ts": [],
+    "src/features/canvas/entities/noteDefaults.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/note.schema.ts"
+    ],
+    "src/features/canvas/hooks/useEntityOperations.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/hooks/useFieldValidation.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/hooks/useMarquee.ts": [
+      "src/core/geometry/bounds.ts"
+    ],
+    "src/features/canvas/hooks/useSelection.ts": [
+      "src/core/geometry/bounds.ts",
+      "src/core/geometry/ductBounds.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/hooks/useUndoRedo.ts": [
+      "src/core/commands/entityCommands.ts"
+    ],
+    "src/features/canvas/renderers/DuctRenderer.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/index.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/DuctRunRenderer.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts",
+      "src/features/canvas/services/index.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/EquipmentRenderer.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/equipment/portMarkerRenderer.ts",
+      "src/features/canvas/renderers/equipment/RTUSymbol.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/FittingRenderer.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/fittingSymbolModel.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/connectionPoints/index.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/RoomRenderer.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/renderers/equipment/RTUSymbol.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts"
+    ],
+    "src/features/canvas/renderers/equipment/portMarkerRenderer.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/ductConnectionProfile.ts",
+      "src/features/canvas/services/equipmentGeometry.ts"
+    ],
+    "src/features/canvas/renderers/fittingSymbolModel.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/services/DuctRunGeometryService.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/geometry/bounds.ts",
+      "src/core/schema/index.ts"
+    ]
+  }
+}

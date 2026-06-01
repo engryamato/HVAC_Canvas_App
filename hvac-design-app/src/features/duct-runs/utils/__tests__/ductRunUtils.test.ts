@@ -3,7 +3,6 @@ import { recomputeDuctRunSegments } from '../recomputeDuctRunSegments';
 import { getActiveSectionLength } from '../getActiveSectionLength';
 import { summarizeDuctRunQuantity } from '../summarizeDuctRunQuantity';
 import { convertDuctToDuctRun } from '../convertDuctToDuctRun';
-import { DEFAULT_FABRICATION_PROFILE } from '@/core/schema/fabrication-profile.schema';
 import { createDuctRun } from '../../entities/ductRunDefaults';
 import type { Duct, DuctRun } from '@/core/schema';
 
@@ -27,15 +26,15 @@ describe('duct run utilities', () => {
     const run = {
       props: {
         shape: 'round',
-        family: 'standard_duct',
+        engineeringSystem: 'standard_duct',
         sectionLengthOverride: 8,
       },
-    } as DuctRun;
+    } as Pick<DuctRun, 'props'>;
 
-    expect(getActiveSectionLength(run, DEFAULT_FABRICATION_PROFILE)).toBe(8);
+    expect(getActiveSectionLength(run)).toBe(8);
   });
 
-  it('defaults flexible-shape duct runs to flexible construction', () => {
+  it('creates flexible-shape duct runs from endpoints', () => {
     const run = createDuctRun({
       shape: 'flexible',
       start: { x: 0, y: 0 },
@@ -43,7 +42,8 @@ describe('duct run utilities', () => {
     });
 
     expect(run.props.shape).toBe('flexible');
-    expect(run.props.constructionType).toBe('flexible');
+    expect(run.props.startPoint).toEqual({ x: 0, y: 0 });
+    expect(run.props.endPoint).toEqual({ x: 120, y: 0 });
   });
 
   it('summarizes quantity directly from segment records', () => {
@@ -52,25 +52,20 @@ describe('duct run utilities', () => {
       props: {
         name: 'Run A',
         shape: 'rectangular',
-        family: 'standard_duct',
+        engineeringSystem: 'standard_duct',
         width: 24,
         height: 12,
         installLength: 63,
         segments: recomputeDuctRunSegments(63, 5),
       },
-    } as DuctRun;
+    } as Pick<DuctRun, 'id' | 'props'>;
 
-    expect(summarizeDuctRunQuantity(run)).toMatchObject({
-      runId: 'run-1',
+    expect(summarizeDuctRunQuantity(run.props)).toMatchObject({
       totalPieces: 13,
-      segmentSpanCount: 13,
-      internalBreakLineCount: 12,
-      terminalEndMarkerCount: 2,
       fullPieceCount: 12,
       partialPieceCount: 1,
       partialLengths: [3],
-      sizeLabel: '24"x12"',
-      odSizeLabel: '24"x12"',
+      sizeLabel: '24" x 12"',
     });
   });
 
@@ -95,11 +90,11 @@ describe('duct run utilities', () => {
       calculated: { area: 0, velocity: 0, frictionLoss: 0 },
     } as Duct;
 
-    const converted = convertDuctToDuctRun(duct, DEFAULT_FABRICATION_PROFILE);
+    const converted = convertDuctToDuctRun(duct, { sectionLength: 5 });
 
     expect(converted.type).toBe('duct_run');
     expect(converted.props.installLength).toBe(12);
-    expect(converted.props.end).toEqual({ x: 154, y: 20 });
+    expect(converted.props.endPoint).toEqual({ x: 154, y: 20 });
     expect(converted.props.segments).toHaveLength(3);
     expect(converted.props.segments[2]?.length).toBe(2);
   });

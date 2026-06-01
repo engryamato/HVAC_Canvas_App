@@ -154,6 +154,14 @@ export function ValidationDashboard() {
       ).length,
     [entities]
   );
+  const autoFittingPlan = useMemo(() => fittingInsertionService.buildReRunPlan(entities), [entities]);
+  const autoFittingPlanSummary = useMemo(() => {
+    const insertCount = autoFittingPlan.changes.filter((change) => change.action === 'insert').length;
+    const updateCount = autoFittingPlan.changes.filter((change) => change.action === 'update').length;
+    const removeCount = autoFittingPlan.changes.filter((change) => change.action === 'remove').length;
+    const conflictCount = autoFittingPlan.changes.filter((change) => Boolean(change.conflictReason)).length;
+    return { insertCount, updateCount, removeCount, conflictCount };
+  }, [autoFittingPlan]);
 
   const handleEntityClick = (entityId: string) => {
     selectSingle(entityId);
@@ -161,7 +169,7 @@ export function ValidationDashboard() {
 
   const handleRerunAutoFitting = () => {
     const selection = [...selectedIds];
-    const plan = fittingInsertionService.buildReRunPlan(entities);
+    const plan = autoFittingPlan;
     const result = fittingInsertionService.resolveReRunPlan(plan, entities);
 
     for (const operation of result.operations) {
@@ -196,8 +204,13 @@ export function ValidationDashboard() {
       );
     }
 
+    const conflictConversions = plan.changes.filter((change) => Boolean(change.conflictReason)).length;
+    const conflictMessage =
+      conflictConversions > 0
+        ? `, ${conflictConversions} conflict${conflictConversions === 1 ? '' : 's'} converted`
+        : '';
     pushToast(
-      `${result.insertedOrUpdatedCount} fittings inserted/updated, ${result.manualOverridesPreserved} manual overrides preserved`,
+      `${result.insertedOrUpdatedCount} fittings inserted/updated, ${result.manualOverridesPreserved} manual overrides preserved${conflictMessage}`,
       'success'
     );
   };
@@ -324,6 +337,13 @@ export function ValidationDashboard() {
           <Button type="button" className="w-full" onClick={handleRerunAutoFitting} data-testid="rerun-autofitting">
             Re-run Auto-Fitting
           </Button>
+          <p className="text-xs text-slate-500" data-testid="autofitting-plan-summary">
+            {autoFittingPlanSummary.insertCount} insert planned, {autoFittingPlanSummary.updateCount} update planned,{' '}
+            {autoFittingPlanSummary.removeCount} remove planned
+            {autoFittingPlanSummary.conflictCount > 0
+              ? `, ${autoFittingPlanSummary.conflictCount} conflict conversion${autoFittingPlanSummary.conflictCount === 1 ? '' : 's'}`
+              : ''}
+          </p>
           <Button
             type="button"
             variant="outline"

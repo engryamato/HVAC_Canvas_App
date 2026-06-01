@@ -394,7 +394,7 @@ export function SupportWorkflowPanel({ className = '' }: SupportWorkflowPanelPro
 export function ToolButtons({ className = '', orientation = 'vertical' }: ToolButtonsProps) {
   const currentTool = useToolStore((state) => state.currentTool);
   const activeSpecialtyToolId = useToolStore((state) => state.activeSpecialtyToolId);
-  const { setTool, dispatchKeyboardShortcut } = useToolActions();
+  const { setTool, dispatchKeyboardShortcut, setEquipmentPlacementDialogOpen } = useToolActions();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
   const isVertical = orientation === 'vertical';
@@ -481,6 +481,12 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
       return;
     }
 
+    // Equipment: if already active, reopen the dialog rather than deactivating
+    if (tool === 'equipment' && currentTool === 'equipment') {
+      setEquipmentPlacementDialogOpen(true);
+      return;
+    }
+
     setTool(tool);
   };
 
@@ -532,7 +538,8 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
         );
       })}
 
-      {currentTool === 'equipment' ? <EquipmentTypeSelector /> : null}
+      {/* EquipmentTypeSelector retired — replaced by EquipmentPlacementDialog (DD-004) */}
+      {/* {currentTool === 'equipment' ? <EquipmentTypeSelector /> : null} */}
       {currentTool === 'fitting' ? <FittingTypeSelector /> : null}
       {currentTool === 'support' ? (
         <div className={`w-full ${isVertical ? '' : 'basis-full'}`}>

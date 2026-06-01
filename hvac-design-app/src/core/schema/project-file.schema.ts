@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { RoomSchema } from './room.schema';
-import { DuctSchema } from './duct.schema';
-import { DuctRunSchema } from './duct-run.schema';
-import { EquipmentSchema } from './equipment.schema';
-import { FittingSchema } from './fitting.schema';
-import { NoteSchema } from './note.schema';
-import { GroupSchema } from './group.schema';
+import { RoomSchema, type Room } from './room.schema';
+import { DuctSchema, type Duct } from './duct.schema';
+import { DuctRunSchema, type DuctRun } from './duct-run.schema';
+import { EquipmentSchema, type Equipment } from './equipment.schema';
+import { FittingSchema, type Fitting } from './fitting.schema';
+import { NoteSchema, type Note } from './note.schema';
+import { GroupSchema, type Group } from './group.schema';
 
 /**
  * Union of all entity types using discriminated union for type safety
@@ -20,7 +20,7 @@ export const EntitySchema = z.discriminatedUnion('type', [
   GroupSchema,
 ]);
 
-export type Entity = z.infer<typeof EntitySchema>;
+export type Entity = Room | Duct | DuctRun | Equipment | Fitting | Note | Group;
 
 /**
  * Normalized entity state for efficient lookups

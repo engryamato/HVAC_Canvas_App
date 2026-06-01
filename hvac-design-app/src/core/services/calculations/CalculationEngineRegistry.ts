@@ -487,6 +487,10 @@ export class CalculationEngineRegistry {
   }
 
   static describe(engineeringSystem: EngineeringSystem | string | null | undefined): EngineResolution {
+    if (!this.isEngineeringSystem(engineeringSystem)) {
+      return describeUnsupportedEngine(engineeringSystem);
+    }
+
     const engine = this.registry.get(engineeringSystem);
     if (!engine) {
       return describeUnsupportedEngine(engineeringSystem);
@@ -499,6 +503,16 @@ export class CalculationEngineRegistry {
       supported: true,
       engine,
     };
+  }
+
+  private static isEngineeringSystem(value: unknown): value is EngineeringSystem {
+    return (
+      value === 'standard_duct' ||
+      value === 'boiler_flue' ||
+      value === 'grease_duct' ||
+      value === 'generator_exhaust' ||
+      value === 'universal'
+    );
   }
 
   static list(): EngineDescriptor[] {

@@ -1,12 +1,24 @@
-import type { Entity, Equipment, Fitting } from '@/core/schema';
+import type { Entity, Equipment } from '@/core/schema';
+import type { ConnectionPort } from '@/core/schema/equipment.schema';
 import { feetToPixels } from '@/core/constants/coordinates';
 import { getDuctStartAndEnd, type DuctLike } from './ductGeometryHelpers';
-import { findNearestFittingConnection, type ConnectionRole } from './fittingConnectionService';
+import type { ConnectionRole } from './fittingConnectionService';
+import { getEquipmentPlanBounds, getPortWorldPosition } from './equipmentGeometry';
+import { resolveDuctConnectionProfile, type DuctConnectionProfile } from './ductConnectionProfile';
+import {
+  collectConnectionPoints,
+  findBestConnectionPoint,
+  type ConnectionPointRef,
+  type Point2D,
+  type ResolvedConnectionPoint,
+} from './connectionPoints';
 
 const SNAP_TOLERANCE = feetToPixels(1);
 const ENDPOINT_PRIORITY_TOLERANCE = SNAP_TOLERANCE;
 
-export type MagneticSnapType = 'duct_endpoint' | 'fitting_port' | 'equipment_point' | 'duct_body';
+// 'equipment_point' (object-origin snapping) was intentionally removed: ducts
+// only connect to resolved connection points, never to an object origin.
+export type MagneticSnapType = 'duct_endpoint' | 'fitting_port' | 'equipment_port' | 'duct_body';
 
 export interface MagneticSnapResult {
   snapType: MagneticSnapType;
@@ -14,12 +26,26 @@ export interface MagneticSnapResult {
   distance: number;
   angle?: number;
   ductId?: string;
-  entityType?: 'duct' | 'duct_run';
+  entityType?: 'duct' | 'duct_run' | 'equipment' | 'fitting';
   endPoint?: 'start' | 'end';
   projectionT?: number;
   fittingId?: string;
   fittingPortRole?: ConnectionRole;
   equipmentId?: string;
+  equipmentPortId?: string;
+  equipmentPortRole?: ConnectionPort['role'];
+  connectionPointRef?: ConnectionPointRef;
+  ductConnectionProfile?: DuctConnectionProfile;
+}
+
+export interface EquipmentPortSnapResult {
+  adjustedEntityPosition: { x: number; y: number };
+  snappedPortId: string;
+  snappedDuctId: string;
+  snappedDuctEndPoint: 'start' | 'end';
+  ductConnectionProfile: DuctConnectionProfile;
+  distance: number;
+  point: { x: number; y: number };
 }
 
 interface DuctProjection {
@@ -68,41 +94,76 @@ function projectPointOntoDuct(duct: DuctLike, x: number, y: number): DuctProject
   };
 }
 
-function resolveNearestFittingPort(fittings: Fitting[], x: number, y: number): MagneticSnapResult | null {
-  const nearest = findNearestFittingConnection(x, y, fittings, SNAP_TOLERANCE);
-  if (!nearest) {
+/**
+ * Unified connectable-port snapping (PR-2 / PR-4 / PR-7).
+ *
+ * Every fitting and equipment port is resolved through the single
+ * connectionPoints layer and scored with the shared deterministic snap
+ * function. There is intentionally no "snap to object origin" path — ducts only
+ * ever connect to resolved connection points.
+ */
+function resolveBestConnectablePort(
+  entitiesById: Record<string, Entity>,
+  x: number,
+  y: number,
+  excludeIds: string[]
+): MagneticSnapResult | null {
+  const candidates = collectConnectionPoints(entitiesById, { excludeIds, includeOccupied: true });
+  const best = findBestConnectionPoint({ x, y }, candidates, {
+    tolerance: SNAP_TOLERANCE,
+    includeOccupied: true,
+  });
+
+  if (!best) {
     return null;
   }
 
+  return toConnectablePortSnap(best.connectionPoint, best.distance);
+}
+
+function toConnectablePortSnap(point: ResolvedConnectionPoint, distance: number): MagneticSnapResult {
+  const base = {
+    point: { x: point.worldPosition.x, y: point.worldPosition.y },
+    distance,
+    connectionPointRef: { objectId: point.objectId, connectionPointId: point.id } satisfies ConnectionPointRef,
+  };
+
+  if (point.objectType === 'fitting') {
+    return {
+      ...base,
+      snapType: 'fitting_port',
+      fittingId: point.objectId,
+      fittingPortRole: normalizeFittingRole(point.role),
+      // facingDirection gives the port a real orientation so duct tools no
+      // longer drop fitting-port snaps for lack of an angle.
+      angle: directionToAngle(point.facingDirection),
+    };
+  }
+
   return {
-    snapType: 'fitting_port',
-    point: { x: nearest.connection.worldX, y: nearest.connection.worldY },
-    distance: nearest.distance,
-    fittingId: nearest.fitting.id,
-    fittingPortRole: nearest.connection.role,
+    ...base,
+    snapType: 'equipment_port',
+    equipmentId: point.objectId,
+    equipmentPortId: point.id,
+    equipmentPortRole: point.role as ConnectionPort['role'],
+    entityType: 'equipment',
+    angle: directionToAngle(point.facingDirection),
   };
 }
 
-function resolveNearestEquipmentPoint(equipment: Equipment[], x: number, y: number): MagneticSnapResult | null {
-  let nearest: MagneticSnapResult | null = null;
-
-  for (const entity of equipment) {
-    const distance = Math.hypot(entity.transform.x - x, entity.transform.y - y);
-    if (distance > SNAP_TOLERANCE) {
-      continue;
-    }
-
-    if (!nearest || distance < nearest.distance) {
-      nearest = {
-        snapType: 'equipment_point',
-        point: { x: entity.transform.x, y: entity.transform.y },
-        distance,
-        equipmentId: entity.id,
-      };
-    }
+function normalizeFittingRole(role: string | undefined): ConnectionRole {
+  if (role === 'branch' || role === 'branch_out') {
+    return 'branch';
   }
+  if (role === 'outlet' || role === 'straight_out') {
+    return 'outlet';
+  }
+  return 'inlet';
+}
 
-  return nearest;
+function directionToAngle(direction: Point2D): number {
+  const degrees = (Math.atan2(direction.y, direction.x) * 180) / Math.PI;
+  return ((degrees % 360) + 360) % 360;
 }
 
 function resolveNearestDuctEndpoint(ducts: DuctLike[], x: number, y: number): MagneticSnapResult | null {
@@ -125,6 +186,7 @@ function resolveNearestDuctEndpoint(ducts: DuctLike[], x: number, y: number): Ma
           entityType: duct.type,
           endPoint,
           angle: duct.transform.rotation,
+          ductConnectionProfile: resolveDuctConnectionProfile(duct),
         };
       }
     }
@@ -163,6 +225,7 @@ function resolveNearestDuctBody(ducts: DuctLike[], x: number, y: number): Magnet
         entityType: duct.type,
         angle: projection.angle,
         projectionT: projection.t,
+        ductConnectionProfile: resolveDuctConnectionProfile(duct),
       };
     }
   }
@@ -180,17 +243,67 @@ export class MagneticConnectionService {
     excludeIds: string[] = []
   ): MagneticSnapResult | null {
     const excluded = new Set(excludeIds);
-    const entities = Object.values(entitiesById).filter((entity) => !excluded.has(entity.id));
-    const ducts = entities.filter((entity): entity is DuctLike => entity.type === 'duct' || entity.type === 'duct_run');
-    const fittings = entities.filter((entity): entity is Fitting => entity.type === 'fitting');
-    const equipment = entities.filter((entity): entity is Equipment => entity.type === 'equipment');
+    const ducts = Object.values(entitiesById).filter(
+      (entity): entity is DuctLike =>
+        (entity.type === 'duct' || entity.type === 'duct_run') && !excluded.has(entity.id)
+    );
 
     return (
       resolveNearestDuctEndpoint(ducts, x, y) ??
       resolveNearestDuctBody(ducts, x, y) ??
-      resolveNearestFittingPort(fittings, x, y) ??
-      resolveNearestEquipmentPoint(equipment, x, y)
+      resolveBestConnectablePort(entitiesById, x, y, excludeIds)
     );
+  }
+
+  static resolveEquipmentPortSnap(
+    equipment: Equipment,
+    tentativePosition: { x: number; y: number },
+    entitiesById: Record<string, Entity>,
+    excludeIds: string[] = []
+  ): EquipmentPortSnapResult | null {
+    const excluded = new Set([equipment.id, ...excludeIds]);
+    const ducts = Object.values(entitiesById).filter(
+      (entity): entity is DuctLike => (entity.type === 'duct' || entity.type === 'duct_run') && !excluded.has(entity.id)
+    );
+    const tentativeEquipment: Equipment = {
+      ...equipment,
+      transform: {
+        ...equipment.transform,
+        x: tentativePosition.x,
+        y: tentativePosition.y,
+      },
+    };
+    const bounds = getEquipmentPlanBounds(tentativeEquipment);
+    let nearest: EquipmentPortSnapResult | null = null;
+
+    for (const port of tentativeEquipment.props.connectionPorts ?? []) {
+      const portPoint = getPortWorldPosition(port, bounds);
+
+      for (const duct of ducts) {
+        for (const endPoint of ['start', 'end'] as const) {
+          const ductPoint = getDuctEndPoint(duct, endPoint);
+          const distance = Math.hypot(portPoint.x - ductPoint.x, portPoint.y - ductPoint.y);
+          if (distance > SNAP_TOLERANCE || (nearest && distance >= nearest.distance)) {
+            continue;
+          }
+
+          nearest = {
+            adjustedEntityPosition: {
+              x: tentativePosition.x + ductPoint.x - portPoint.x,
+              y: tentativePosition.y + ductPoint.y - portPoint.y,
+            },
+            snappedPortId: port.id,
+            snappedDuctId: duct.id,
+            snappedDuctEndPoint: endPoint,
+            ductConnectionProfile: resolveDuctConnectionProfile(duct),
+            distance,
+            point: ductPoint,
+          };
+        }
+      }
+    }
+
+    return nearest;
   }
 }
 

@@ -15,7 +15,7 @@ const QUALITY_SCALE: Record<PngQuality, number> = {
 };
 
 export async function exportCanvasToPNG(options: PngExportOptions): Promise<ExportResult> {
-  const restoreLayers = hideExportLayers(options);
+  const restoreLayers = hideExportLayers();
   const snapshot = await captureCanvasSnapshot();
   restoreLayers();
   if (!snapshot) {

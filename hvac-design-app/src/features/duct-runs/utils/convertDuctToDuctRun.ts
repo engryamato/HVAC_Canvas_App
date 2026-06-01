@@ -30,6 +30,8 @@ export function convertDuctToDuctRun(
     },
     endPoint: computeEndPoint(duct),
   };
+  const designStartPoint = { ...baseProps.startPoint };
+  const designEndPoint = { ...baseProps.endPoint };
 
   const sectionLength =
     options.sectionLength ??
@@ -54,6 +56,9 @@ export function convertDuctToDuctRun(
     type: 'duct_run',
     props: {
       ...propsWithoutLegacyLength,
+      designStartPoint,
+      designEndPoint,
+      designLength: baseProps.installLength,
       segments,
     },
   } as DuctRun;
@@ -64,7 +69,7 @@ export function convertLegacyDuctEntitiesInProject(project: ProjectFile): Projec
     return project;
   }
 
-  const nextById: Record<string, Entity> = { ...project.entities.byId };
+  const nextById: Record<string, Entity> = { ...(project.entities.byId as Record<string, Entity>) };
   let changed = false;
 
   for (const [entityId, entity] of Object.entries(project.entities.byId)) {

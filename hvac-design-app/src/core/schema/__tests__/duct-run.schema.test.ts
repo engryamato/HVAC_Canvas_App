@@ -209,6 +209,7 @@ describe('DuctRunSchema', () => {
         insulationThickness: 1,
         startEndType: 'flange',
         endEndType: 'flange',
+        designLength: validDuctRun.props.installLength,
         segments: validDuctRun.props.segments.map((segment) => ({
           ...segment,
           insulationThickness: 1,

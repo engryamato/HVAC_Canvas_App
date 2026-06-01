@@ -5,6 +5,7 @@ import { useViewportStore, usePanAndZoom } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useShallow } from 'zustand/react/shallow';
 import type { Entity } from '@/core/schema';
+import { getEquipmentPlanBounds } from '../services/equipmentGeometry';
 
 // Entity colors for minimap rendering
 const ENTITY_COLORS: Record<string, string> = {
@@ -31,7 +32,8 @@ function getEntityDimensions(entity: Entity): { width: number; height: number } 
         return { width: entity.props.width, height: entity.props.length };
     }
     if (entity.type === 'equipment') {
-        return { width: entity.props.width, height: entity.props.height };
+        const bounds = getEquipmentPlanBounds(entity);
+        return { width: bounds.width, height: bounds.height };
     }
     if (entity.type === 'duct') {
         if (entity.props.shape === 'rectangular') {

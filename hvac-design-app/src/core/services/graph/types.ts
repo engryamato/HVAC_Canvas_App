@@ -20,7 +20,15 @@ export interface GraphEdge {
     angle?: number;
     length?: number;
     diameter?: number;
+    sourceEndpoint?: GraphEndpointRef;
+    targetEndpoint?: GraphEndpointRef;
   };
+}
+
+export interface GraphEndpointRef {
+  objectId: string;
+  objectType?: GraphNode['type'];
+  connectionPointId: string;
 }
 
 export interface ConnectionGraph {

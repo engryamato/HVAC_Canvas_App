@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { FittingInsertionService } from '../automation/fittingInsertionService';
-import type { Duct, Entity, Fitting } from '@/core/schema';
+import { pixelsToFeet } from '@/core/constants/coordinates';
+import { ConnectionReconciliationService } from '../graph/ConnectionReconciliationService';
+import type { Duct, DuctRun, Entity, Fitting } from '@/core/schema';
+import { getDuctCenterline } from '@/features/canvas/services/connectionPoints';
+import { resolveFittingGeometry } from '@/features/canvas/services/connectionPoints/fittingResolver';
 
 function createMockDuct(
   id: string,
@@ -74,6 +78,50 @@ function createMockUserPlacedFitting(id: string, inletDuctId?: string, outletDuc
   };
 }
 
+function createMockDuctRun(
+  id: string,
+  start: { x: number; y: number },
+  end: { x: number; y: number }
+): DuctRun {
+  const installLength = pixelsToFeet(Math.hypot(end.x - start.x, end.y - start.y));
+  return {
+    id,
+    type: 'duct_run',
+    transform: {
+      x: start.x,
+      y: start.y,
+      elevation: 0,
+      rotation: (Math.atan2(end.y - start.y, end.x - start.x) * 180) / Math.PI,
+      scaleX: 1,
+      scaleY: 1,
+    },
+    zIndex: 5,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    modifiedAt: '2026-01-01T00:00:00.000Z',
+    props: {
+      engineeringSystem: 'standard_duct',
+      name: `Run ${id}`,
+      shape: 'round',
+      diameter: 12,
+      material: 'galvanized',
+      airflow: 1000,
+      staticPressure: 0.1,
+      installLength,
+      startPoint: { ...start },
+      endPoint: { ...end },
+      designStartPoint: { ...start },
+      designEndPoint: { ...end },
+      designLength: installLength,
+      segments: [{ index: 0, startStation: 0, endStation: installLength, length: installLength, isPartial: false }],
+    },
+    calculated: {
+      area: 113,
+      velocity: 1200,
+      frictionLoss: 0.05,
+    },
+  } as DuctRun;
+}
+
 describe('FittingInsertionService', () => {
   it('selects elbow deterministically for 90-degree connection pattern', () => {
     const existing = createMockDuct('existing', 100, 100, 0, 12);
@@ -94,6 +142,59 @@ describe('FittingInsertionService', () => {
     expect(first.insertions[0]?.transform.y).toBe(second.insertions[0]?.transform.y);
   });
 
+  it('anchors and orients an angled elbow so both openings lie on connected duct centerlines', () => {
+    const junction = { x: 220, y: 100 };
+    const inlet = createMockDuctRun('inlet', { x: 100, y: 100 }, junction);
+    const outlet = createMockDuctRun('outlet', junction, { x: 318.3, y: 168.8 });
+    const entities: Record<string, Entity> = { inlet, outlet };
+
+    const plan = FittingInsertionService.planAutoInsertForDuct(outlet.id, entities);
+
+    expect(plan.insertions).toHaveLength(1);
+    const elbow = plan.insertions[0]!;
+    expect(['elbow_45', 'elbow_90', 'elbow_mitered']).toContain(elbow.props.fittingType);
+    expect(elbow.props.angle).toBeCloseTo(35, 0);
+
+    const geometry = resolveFittingGeometry(elbow) as ReturnType<typeof resolveFittingGeometry> & {
+      anchor?: { localPosition: { x: number; y: number }; worldPosition: { x: number; y: number } };
+    };
+    expect(geometry.anchor?.worldPosition.x).toBeCloseTo(junction.x, 3);
+    expect(geometry.anchor?.worldPosition.y).toBeCloseTo(junction.y, 3);
+
+    const inletPort = geometry.connectionPoints.find((point) => point.id === 'INLET')!;
+    const outletPort = geometry.connectionPoints.find((point) => point.id === 'OUTLET')!;
+    const inletCenterline = getDuctCenterline(inlet);
+    const outletCenterline = getDuctCenterline(outlet);
+
+    expect(distanceToLine(inletPort.worldPosition, inletCenterline.start, inletCenterline.end)).toBeLessThan(0.05);
+    expect(distanceToLine(outletPort.worldPosition, outletCenterline.start, outletCenterline.end)).toBeLessThan(0.05);
+    expect(dot(inletPort.facingDirection, outwardDirection(inletCenterline.start, inletCenterline.end, 'end'))).toBeGreaterThan(0.99);
+    expect(dot(outletPort.facingDirection, outwardDirection(outletCenterline.start, outletCenterline.end, 'start'))).toBeGreaterThan(0.99);
+  });
+
+  it('mirrors an angled elbow when the outlet is on the opposite side of the inlet', () => {
+    const junction = { x: 220, y: 100 };
+    const inlet = createMockDuctRun('mirror-inlet', { x: 100, y: 100 }, junction);
+    const outlet = createMockDuctRun('mirror-outlet', junction, { x: 318.3, y: 31.2 });
+    const entities: Record<string, Entity> = { [inlet.id]: inlet, [outlet.id]: outlet };
+
+    const plan = FittingInsertionService.planAutoInsertForDuct(outlet.id, entities);
+
+    expect(plan.insertions).toHaveLength(1);
+    const elbow = plan.insertions[0]!;
+    expect(elbow.props.angle).toBeCloseTo(35, 0);
+    const geometry = resolveFittingGeometry(elbow) as ReturnType<typeof resolveFittingGeometry> & {
+      anchor?: { worldPosition: { x: number; y: number } };
+    };
+    const outletPort = geometry.connectionPoints.find((point) => point.id === 'OUTLET')!;
+    const outletCenterline = getDuctCenterline(outlet);
+
+    expect(geometry.anchor?.worldPosition.x).toBeCloseTo(junction.x, 3);
+    expect(geometry.anchor?.worldPosition.y).toBeCloseTo(junction.y, 3);
+    expect(distanceToLine(outletPort.worldPosition, outletCenterline.start, outletCenterline.end)).toBeLessThan(0.05);
+    expect(dot(outletPort.facingDirection, outwardDirection(outletCenterline.start, outletCenterline.end, 'start'))).toBeGreaterThan(0.99);
+  });
+
   it('selects tee deterministically when three ducts meet at one junction', () => {
     const trunk = createMockDuct('trunk', 100, 100, 0, 12);
     const branchA = createMockDuct('branch-a', 220, -20, 90, 12);
@@ -105,6 +206,82 @@ describe('FittingInsertionService', () => {
     };
 
     const result = FittingInsertionService.planAutoInsertForDuct('branch-b', entities);
+
+    expect(result.insertions).toHaveLength(1);
+    expect(result.insertions[0]?.props.fittingType).toBe('tee');
+  });
+
+  it('orients a tee branch on the same side as the connected branch duct', () => {
+    const junction = { x: 220, y: 100 };
+    const inlet = createMockDuctRun('tee-inlet', { x: 100, y: 100 }, junction);
+    const outlet = createMockDuctRun('tee-outlet', junction, { x: 340, y: 100 });
+    const branch = createMockDuctRun('tee-branch', junction, { x: 220, y: 220 });
+    const entities: Record<string, Entity> = {
+      [inlet.id]: inlet,
+      [outlet.id]: outlet,
+      [branch.id]: branch,
+    };
+
+    const result = FittingInsertionService.planAutoInsertForDuct(branch.id, entities);
+
+    expect(result.insertions).toHaveLength(1);
+    const tee = result.insertions[0]!;
+    expect(tee.props.fittingType).toBe('tee');
+    expectPortsFollowDuctCenterlines(tee, [
+      { duct: inlet, endpoint: 'end', portId: 'INLET' },
+      { duct: outlet, endpoint: 'start', portId: 'OUTLET' },
+      { duct: branch, endpoint: 'start', portId: 'BRANCH' },
+    ]);
+  });
+
+  it('selects wye for an exact 60-degree branch junction', () => {
+    const inlet = createMockDuct('inlet', 100, 100, 0, 12);
+    const outlet = createMockDuct('outlet', 220, 100, 0, 12);
+    const branch = createMockDuct('branch', 220, 100, 60, 12);
+    const entities: Record<string, Entity> = { inlet, outlet, branch };
+
+    const result = FittingInsertionService.planAutoInsertForDuct('branch', entities);
+
+    expect(result.insertions).toHaveLength(1);
+    expect(result.insertions[0]?.props.fittingType).toBe('wye');
+    const geometry = resolveFittingGeometry(result.insertions[0]!) as ReturnType<typeof resolveFittingGeometry> & {
+      anchor?: { localPosition: { x: number; y: number }; worldPosition: { x: number; y: number } };
+    };
+    expect(geometry.anchor?.localPosition).not.toEqual({ x: 0, y: 0 });
+    expect(geometry.anchor?.worldPosition.x).toBeCloseTo(220, 3);
+    expect(geometry.anchor?.worldPosition.y).toBeCloseTo(100, 3);
+  });
+
+  it('orients a wye branch on the same side as the connected branch duct', () => {
+    const junction = { x: 220, y: 100 };
+    const inlet = createMockDuctRun('wye-inlet', { x: 100, y: 100 }, junction);
+    const outlet = createMockDuctRun('wye-outlet', junction, { x: 340, y: 100 });
+    const branch = createMockDuctRun('wye-branch', junction, { x: 280, y: 203.923 });
+    const entities: Record<string, Entity> = {
+      [inlet.id]: inlet,
+      [outlet.id]: outlet,
+      [branch.id]: branch,
+    };
+
+    const result = FittingInsertionService.planAutoInsertForDuct(branch.id, entities);
+
+    expect(result.insertions).toHaveLength(1);
+    const wye = result.insertions[0]!;
+    expect(wye.props.fittingType).toBe('wye');
+    expectPortsFollowDuctCenterlines(wye, [
+      { duct: inlet, endpoint: 'end', portId: 'INLET' },
+      { duct: outlet, endpoint: 'start', portId: 'OUTLET' },
+      { duct: branch, endpoint: 'start', portId: 'BRANCH' },
+    ]);
+  });
+
+  it('selects tee just above a 60-degree branch junction', () => {
+    const inlet = createMockDuct('inlet', 100, 100, 0, 12);
+    const outlet = createMockDuct('outlet', 220, 100, 0, 12);
+    const branch = createMockDuct('branch', 220, 100, 60.1, 12);
+    const entities: Record<string, Entity> = { inlet, outlet, branch };
+
+    const result = FittingInsertionService.planAutoInsertForDuct('branch', entities);
 
     expect(result.insertions).toHaveLength(1);
     expect(result.insertions[0]?.props.fittingType).toBe('tee');
@@ -124,6 +301,19 @@ describe('FittingInsertionService', () => {
     expect(result.insertions[0]?.props.fittingType).toBe('reducer');
   });
 
+  it('does not classify opposing duct endpoints as a fitting junction', () => {
+    const left = createMockDuct('left', 100, 100, 0, 12);
+    const right = createMockDuct('right', 220, 100, 180, 12);
+    const entities: Record<string, Entity> = {
+      left,
+      right,
+    };
+
+    const result = FittingInsertionService.planAutoInsertForDuct('right', entities);
+
+    expect(result.insertions).toHaveLength(0);
+  });
+
   it('detects orphan auto-inserted fittings after connected ducts are missing', () => {
     const surviving = createMockDuct('surviving', 100, 100, 0, 12);
     const orphan = createMockAutoInsertedFitting('fit-orphan', 'surviving', 'missing-duct');
@@ -135,6 +325,25 @@ describe('FittingInsertionService', () => {
     const orphanIds = FittingInsertionService.detectOrphanFittings(entities);
 
     expect(orphanIds).toEqual(['fit-orphan']);
+  });
+
+  it('does not flag manual override fittings as orphan cleanup candidates', () => {
+    const surviving = createMockDuct('surviving', 100, 100, 0, 12);
+    const locked = {
+      ...createMockAutoInsertedFitting('fit-locked-orphan', 'surviving', 'missing-duct'),
+      props: {
+        ...createMockAutoInsertedFitting('fit-locked-orphan', 'surviving', 'missing-duct').props,
+        manualOverride: true,
+      },
+    };
+    const entities: Record<string, Entity> = {
+      surviving,
+      'fit-locked-orphan': locked,
+    };
+
+    const orphanIds = FittingInsertionService.detectOrphanFittings(entities);
+
+    expect(orphanIds).toEqual([]);
   });
 
   it('skips manual overrides when building a re-run plan', () => {
@@ -157,6 +366,63 @@ describe('FittingInsertionService', () => {
 
     expect(plan.changes).toHaveLength(0);
     expect(plan.preservedManualOverrideCount).toBe(1);
+  });
+
+  it('plans a conflict conversion when a manual override no longer matches desired auto-fitting geometry', () => {
+    const existing = createMockDuct('existing', 100, 100, 0, 12);
+    const newDuct = createMockDuct('new', 220, 100, 90, 12);
+    const locked = {
+      ...createMockAutoInsertedFitting('fit-locked-conflict', 'existing', 'new'),
+      transform: { x: 220, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      props: {
+        ...createMockAutoInsertedFitting('fit-locked-conflict', 'existing', 'new').props,
+        fittingType: 'reducer' as const,
+        manualOverride: true,
+      },
+    };
+
+    const plan = FittingInsertionService.buildReRunPlan({
+      existing,
+      new: newDuct,
+      'fit-locked-conflict': locked,
+    });
+
+    expect(plan.changes).toHaveLength(1);
+    expect(plan.changes[0]).toMatchObject({
+      action: 'update',
+      existingFittingId: 'fit-locked-conflict',
+      conflictReason: 'manual_override_conflicts_with_desired_auto_fitting',
+    });
+    expect(plan.preservedManualOverrideCount).toBe(0);
+  });
+
+  it('resolves a conflicting manual override by converting it to the desired auto-fitting', () => {
+    const existing = createMockDuct('existing', 100, 100, 0, 12);
+    const newDuct = createMockDuct('new', 220, 100, 90, 12);
+    const locked = {
+      ...createMockAutoInsertedFitting('fit-locked-conflict', 'existing', 'new'),
+      transform: { x: 220, y: 100, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      props: {
+        ...createMockAutoInsertedFitting('fit-locked-conflict', 'existing', 'new').props,
+        fittingType: 'reducer' as const,
+        manualOverride: true,
+      },
+    };
+    const entities: Record<string, Entity> = {
+      existing,
+      new: newDuct,
+      'fit-locked-conflict': locked,
+    };
+    const plan = FittingInsertionService.buildReRunPlan(entities);
+
+    const result = FittingInsertionService.resolveReRunPlan(plan, entities);
+
+    expect(result.updatedCount).toBe(1);
+    expect(result.operations[0]).toMatchObject({
+      action: 'update',
+      previous: { id: 'fit-locked-conflict', props: { fittingType: 'reducer', manualOverride: true } },
+      next: { id: 'fit-locked-conflict', props: { fittingType: 'elbow_90', manualOverride: false } },
+    });
   });
 
   it('does not queue an auto-insert when a user-placed fitting already occupies the junction key', () => {
@@ -211,4 +477,82 @@ describe('FittingInsertionService', () => {
 
     expect(fittings.map((item) => item.id)).toEqual(['fit-linked']);
   });
+
+  it('cuts existing duct runs back from the auto-fitted junction center to fitting ports during reconciliation', () => {
+    const junction = { x: 220, y: 100 };
+    const inlet = createMockDuctRun('inlet', { x: 100, y: 100 }, junction);
+    const straight = createMockDuctRun('straight', junction, { x: 340, y: 100 });
+    const branch = createMockDuctRun('branch', junction, { x: 220, y: -20 });
+    const entities: Record<string, Entity> = { inlet, straight, branch };
+    const plan = FittingInsertionService.planAutoInsertForDuct('branch', entities);
+
+    expect(plan.insertions).toHaveLength(1);
+    const autoFitting = plan.insertions[0]!;
+    expect(autoFitting.props.connectionPoints).toEqual(
+      expect.arrayContaining([
+        { ductId: inlet.id, pointIndex: 0 },
+        { ductId: straight.id, pointIndex: 1 },
+        { ductId: branch.id, pointIndex: 2 },
+      ])
+    );
+
+    const [inletPort, outletPort, branchPort] = resolveFittingGeometry(autoFitting).connectionPoints;
+    const reconciled = ConnectionReconciliationService.reconcile({
+      ...entities,
+      [autoFitting.id]: autoFitting,
+    });
+
+    expect((reconciled[inlet.id] as DuctRun).props.endPoint).toEqual(inletPort?.worldPosition);
+    expect((reconciled[straight.id] as DuctRun).props.startPoint).toEqual(outletPort?.worldPosition);
+    expect((reconciled[branch.id] as DuctRun).props.startPoint).toEqual(branchPort?.worldPosition);
+    expect(getDuctCenterline(reconciled[inlet.id] as DuctRun).end).toEqual(junction);
+    expect(getDuctCenterline(reconciled[straight.id] as DuctRun).start).toEqual(junction);
+    expect(getDuctCenterline(reconciled[branch.id] as DuctRun).start).toEqual(junction);
+  });
 });
+
+function distanceToLine(
+  point: { x: number; y: number },
+  lineStart: { x: number; y: number },
+  lineEnd: { x: number; y: number }
+): number {
+  const dx = lineEnd.x - lineStart.x;
+  const dy = lineEnd.y - lineStart.y;
+  const length = Math.hypot(dx, dy);
+  if (length === 0) {
+    return Math.hypot(point.x - lineStart.x, point.y - lineStart.y);
+  }
+  return Math.abs((point.x - lineStart.x) * dy - (point.y - lineStart.y) * dx) / length;
+}
+
+function outwardDirection(
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+  endpoint: 'start' | 'end'
+): { x: number; y: number } {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const length = Math.hypot(dx, dy);
+  const along = { x: dx / length, y: dy / length };
+  return endpoint === 'start' ? along : { x: -along.x, y: -along.y };
+}
+
+function dot(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return a.x * b.x + a.y * b.y;
+}
+
+function expectPortsFollowDuctCenterlines(
+  fitting: Fitting,
+  expected: Array<{ duct: DuctRun; endpoint: 'start' | 'end'; portId: string }>
+): void {
+  const geometry = resolveFittingGeometry(fitting);
+  for (const { duct, endpoint, portId } of expected) {
+    const port = geometry.connectionPoints.find((point) => point.id === portId);
+    if (!port) {
+      throw new Error(`Missing fitting port ${portId}`);
+    }
+    const centerline = getDuctCenterline(duct);
+    expect(distanceToLine(port.worldPosition, centerline.start, centerline.end)).toBeLessThan(0.05);
+    expect(dot(port.facingDirection, outwardDirection(centerline.start, centerline.end, endpoint))).toBeGreaterThan(0.99);
+  }
+}

@@ -575,37 +575,61 @@ export class ProfessionalRenderingHelper {
   ): void {
     // ASHRAE standard: radius = 1.5 × width
     const elbowRadius = radius || width * 1.5;
+    const innerRadius = Math.max(1, elbowRadius - width / 2);
+    const outerRadius = elbowRadius + width / 2;
+    const half = width / 2;
+
+    const startAngle = 0;
+    const endAngle = (angle * Math.PI) / 180;
+
+    // Inlet point on centerline (at startAngle)
+    const inletX = center.x + elbowRadius * Math.cos(startAngle);
+    const inletY = center.y + elbowRadius * Math.sin(startAngle);
+    // Outlet point on centerline (at endAngle)
+    const outletX = center.x + elbowRadius * Math.cos(endAngle);
+    const outletY = center.y + elbowRadius * Math.sin(endAngle);
 
     this.ctx.save();
-    this.ctx.strokeStyle = '#000000';
     this.ctx.lineWidth = this.applyZoomScaling(2);
 
-    // Draw outer arc
+    // --- 1. Filled donut-slice body ---
+    // Uses caller's fillStyle and strokeStyle (green fill, green/blue stroke from FittingRenderer)
     this.ctx.beginPath();
-    this.ctx.arc(
-      center.x,
-      center.y,
-      elbowRadius + width / 2,
-      0,
-      (angle * Math.PI) / 180
-    );
+    this.ctx.arc(center.x, center.y, outerRadius, startAngle, endAngle);
+    this.ctx.arc(center.x, center.y, innerRadius, endAngle, startAngle, true);
+    this.ctx.closePath();
+    this.ctx.fill();
     this.ctx.stroke();
 
-    // Draw inner arc
+    // --- 2. Blue dashed centerline ---
+    const savedStroke = this.ctx.strokeStyle as string;
+    this.ctx.strokeStyle = '#1565C0';
+    this.ctx.lineWidth = this.applyZoomScaling(1.2);
+    this.ctx.setLineDash([8 / this.zoom, 5 / this.zoom]);
     this.ctx.beginPath();
-    this.ctx.arc(
-      center.x,
-      center.y,
-      elbowRadius - width / 2,
-      0,
-      (angle * Math.PI) / 180
-    );
+    this.ctx.arc(center.x, center.y, elbowRadius, startAngle, endAngle);
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
+
+    // --- 3. End ticks at inlet and outlet openings ---
+    // Tick direction = tangent of arc at that angle: (-sin θ, cos θ)
+    this.ctx.strokeStyle = savedStroke;
+    this.ctx.lineWidth = this.applyZoomScaling(2);
+
+    // Inlet tick (at startAngle = 0)
+    const sTx = -Math.sin(startAngle); // 0
+    const sTy = Math.cos(startAngle);  // 1
+    this.ctx.beginPath();
+    this.ctx.moveTo(inletX - sTx * half, inletY - sTy * half);
+    this.ctx.lineTo(inletX + sTx * half, inletY + sTy * half);
     this.ctx.stroke();
 
-    // Draw centerline for round ducts
-    this.ctx.setLineDash([10 / this.zoom, 5 / this.zoom, 2 / this.zoom, 5 / this.zoom]);
+    // Outlet tick (at endAngle)
+    const eTx = -Math.sin(endAngle);
+    const eTy = Math.cos(endAngle);
     this.ctx.beginPath();
-    this.ctx.arc(center.x, center.y, elbowRadius, 0, (angle * Math.PI) / 180);
+    this.ctx.moveTo(outletX - eTx * half, outletY - eTy * half);
+    this.ctx.lineTo(outletX + eTx * half, outletY + eTy * half);
     this.ctx.stroke();
 
     this.ctx.restore();
@@ -632,20 +656,21 @@ export class ProfessionalRenderingHelper {
     branchType: 'top' | 'side' | 'bottom'
   ): void {
     this.ctx.save();
-    this.ctx.strokeStyle = '#000000';
+    // Use caller's strokeStyle instead of overriding with black
+    const currentStroke = this.ctx.strokeStyle as string;
     this.ctx.lineWidth = this.applyZoomScaling(2);
 
     const length = width * 3;
 
-    // Draw main run (horizontal)
+    // Draw main run (horizontal) using caller's color
     this.drawDoubleLine(
       { x: center.x - length / 2, y: center.y },
       { x: center.x + length / 2, y: center.y },
       width,
-      { style: 'solid' }
+      { style: 'solid', color: currentStroke }
     );
 
-    // Draw branch
+    // Draw branch using caller's color
     let branchStart: Point;
     let branchEnd: Point;
 
@@ -664,7 +689,7 @@ export class ProfessionalRenderingHelper {
         break;
     }
 
-    this.drawDoubleLine(branchStart, branchEnd, width, { style: 'solid' });
+    this.drawDoubleLine(branchStart, branchEnd, width, { style: 'solid', color: currentStroke });
 
     this.ctx.restore();
   }
@@ -701,35 +726,33 @@ export class ProfessionalRenderingHelper {
 
     const perpX = (-dy / length);
     const perpY = (dx / length);
+    const startHalf = startWidth / 2;
+    const endHalf = endWidth / 2;
 
     this.ctx.save();
-    this.ctx.strokeStyle = '#000000';
     this.ctx.lineWidth = this.applyZoomScaling(2);
 
-    // Draw converging/diverging double lines
-    // Top line
+    // --- 1. Filled trapezoid body (uses caller's fillStyle + strokeStyle) ---
     this.ctx.beginPath();
-    this.ctx.moveTo(
-      start.x + perpX * (startWidth / 2),
-      start.y + perpY * (startWidth / 2)
-    );
-    this.ctx.lineTo(
-      end.x + perpX * (endWidth / 2),
-      end.y + perpY * (endWidth / 2)
-    );
+    this.ctx.moveTo(start.x + perpX * startHalf, start.y + perpY * startHalf);
+    this.ctx.lineTo(end.x + perpX * endHalf,     end.y + perpY * endHalf);
+    this.ctx.lineTo(end.x - perpX * endHalf,     end.y - perpY * endHalf);
+    this.ctx.lineTo(start.x - perpX * startHalf, start.y - perpY * startHalf);
+    this.ctx.closePath();
+    this.ctx.fill();
     this.ctx.stroke();
 
-    // Bottom line
+    // --- 2. Blue dashed centerline ---
+    const savedStroke = this.ctx.strokeStyle as string;
+    this.ctx.strokeStyle = '#1565C0';
+    this.ctx.lineWidth = this.applyZoomScaling(1);
+    this.ctx.setLineDash([8 / this.zoom, 5 / this.zoom]);
     this.ctx.beginPath();
-    this.ctx.moveTo(
-      start.x - perpX * (startWidth / 2),
-      start.y - perpY * (startWidth / 2)
-    );
-    this.ctx.lineTo(
-      end.x - perpX * (endWidth / 2),
-      end.y - perpY * (endWidth / 2)
-    );
+    this.ctx.moveTo(start.x, start.y);
+    this.ctx.lineTo(end.x, end.y);
     this.ctx.stroke();
+    this.ctx.setLineDash([]);
+    this.ctx.strokeStyle = savedStroke;
 
     this.ctx.restore();
   }

@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { MIN_ZOOM, MAX_ZOOM, ZOOM_PRESETS } from '@/core/constants/viewport';
 import type { Entity } from '@/core/schema';
 import { ZoomIn, ZoomOut, Maximize2, Grid3X3 } from 'lucide-react';
+import { getEquipmentPlanBounds } from '../services/equipmentGeometry';
 import {
     Select,
     SelectContent,
@@ -26,6 +27,11 @@ const ENTITY_DIMENSIONS = {
 } as const;
 
 function getEntityDimensions(entity: Entity): { width: number; height: number } {
+    if (entity.type === 'equipment') {
+        const bounds = getEquipmentPlanBounds(entity);
+        return { width: bounds.width, height: bounds.height };
+    }
+
     return ENTITY_DIMENSIONS[entity.type] || { width: 50, height: 50 };
 }
 

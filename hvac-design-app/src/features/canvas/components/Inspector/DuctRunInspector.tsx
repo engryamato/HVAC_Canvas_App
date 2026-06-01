@@ -340,12 +340,12 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
     } as DuctRun['props']);
   };
 
-  const setSegmentLength = (segmentLength: number) => {
-    if (!Number.isFinite(segmentLength)) {
+  const setSectionLength = (sectionLength: number) => {
+    if (!Number.isFinite(sectionLength)) {
       return;
     }
 
-    const nextLength = Math.min(1000, Math.max(0.1, segmentLength));
+    const nextLength = Math.min(1000, Math.max(0.1, sectionLength));
 
     updateRun({
       ...entity.props,
@@ -354,12 +354,12 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
     } as DuctRun['props']);
   };
 
-  const setSectionLength = (sectionLength: number) => {
-    if (!Number.isFinite(sectionLength)) {
+  const setRunLength = (runLength: number) => {
+    if (!Number.isFinite(runLength)) {
       return;
     }
 
-    const nextInstallLength = Math.min(1000, Math.max(0.1, sectionLength));
+    const nextInstallLength = Math.min(1000, Math.max(0.1, runLength));
     updateRun({
       ...entity.props,
       installLength: nextInstallLength,
@@ -515,23 +515,6 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
           </>
         )}
 
-        <Field htmlFor="duct-run-segment-length" label="Segment Length">
-          <div className="flex items-center gap-2">
-            <input
-              className="h-9 min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-2 text-[13px] text-slate-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-              id="duct-run-segment-length"
-              max={1000}
-              min={0.1}
-              step={0.5}
-              type="number"
-              value={formatNumber(activeSectionLength, 1)}
-              onChange={(event) => setSegmentLength(Number(event.target.value))}
-            />
-            <span className="text-xs text-slate-400">ft</span>
-          </div>
-          <Hint>Length of each duct segment in feet</Hint>
-        </Field>
-
         <Field htmlFor="duct-run-section-length" label="Section Length">
           <div className="flex items-center gap-2">
             <input
@@ -541,8 +524,25 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
               min={0.1}
               step={0.5}
               type="number"
-              value={formatNumber(entity.props.installLength, 1)}
+              value={formatNumber(activeSectionLength, 1)}
               onChange={(event) => setSectionLength(Number(event.target.value))}
+            />
+            <span className="text-xs text-slate-400">ft</span>
+          </div>
+          <Hint>Length of each fabrication section in feet</Hint>
+        </Field>
+
+        <Field htmlFor="duct-run-length" label="Run Length">
+          <div className="flex items-center gap-2">
+            <input
+              className="h-9 min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-2 text-[13px] text-slate-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              id="duct-run-length"
+              max={1000}
+              min={0.1}
+              step={0.5}
+              type="number"
+              value={formatNumber(entity.props.installLength, 1)}
+              onChange={(event) => setRunLength(Number(event.target.value))}
             />
             <span className="text-xs text-slate-400">ft</span>
           </div>

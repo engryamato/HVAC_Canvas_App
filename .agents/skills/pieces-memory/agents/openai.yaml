@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pieces Memory"
+  short_description: "Use Pieces MCP long-term memory for project context."
+  default_prompt: "Use Pieces memory to retrieve or store context for this project."

@@ -10,9 +10,15 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
-import type { EquipmentType } from '../schema/equipment.schema';
+import type { EquipmentCategory, EquipmentType } from '../schema/equipment.schema';
+import {
+  DEFAULT_EQUIPMENT_PROPS,
+  EQUIPMENT_TYPE_ABBREV,
+  EQUIPMENT_TYPE_CATEGORY,
+} from '../schema/equipment.schema';
 import type { FittingType } from '../schema/fitting.schema';
 import type { DuctEndType, DuctRunShape, InsulationType } from '../schema/duct-run.schema';
+import type { CatalogEntry } from '../schema/unified-component.schema';
 
 /**
  * Component activation states for unified component browser
@@ -82,6 +88,30 @@ export interface DuctDrawSettings {
 }
 
 /**
+ * Working configuration for an active equipment placement session.
+ * This is separate from the catalog store (which holds the library),
+ * and is reset when the tool exits.
+ */
+export interface EquipmentPlacementDraft {
+  /** null = custom spec, not sourced from catalog */
+  catalogEntryId: string | null;
+  name: string;
+  equipmentType: EquipmentType;
+  equipmentCategory: EquipmentCategory;
+  manufacturer: string;
+  model: string;
+  locationTag: string;
+  capacity: number;
+  capacityUnit: 'CFM' | 'm3/h';
+  staticPressure: number;
+  staticPressureUnit: 'in_wg' | 'Pa';
+  width: number;
+  depth: number;
+  height: number;
+  engineeringSystem: 'standard_duct' | 'boiler_flue' | 'grease_duct' | 'generator_exhaust' | 'universal';
+}
+
+/**
  * Tool category for unified component browser
  */
 export interface ToolCategory {
@@ -135,6 +165,10 @@ interface ToolState {
   supportDraftAnchor: SupportDraftAnchor | null;
   /** Inline prompt state for support workflows */
   supportPrompt: SupportPromptState | null;
+  /** Working state for the active equipment placement session */
+  equipmentPlacementDraft: EquipmentPlacementDraft;
+  /** Whether the equipment placement dialog is open */
+  equipmentPlacementDialogOpen: boolean;
 }
 
 interface ToolActions {
@@ -176,6 +210,14 @@ interface ToolActions {
   setSupportDraftAnchor: (anchor: SupportDraftAnchor | null) => void;
   /** Set inline support prompt */
   setSupportPrompt: (prompt: SupportPromptState | null) => void;
+  /** Patch one or more fields of the equipment placement draft */
+  setEquipmentPlacementDraft: (partial: Partial<EquipmentPlacementDraft>) => void;
+  /** Reset the draft to defaults for a given type (or the current type if omitted) */
+  resetEquipmentPlacementDraft: (type?: EquipmentType) => void;
+  /** Open or close the equipment placement dialog */
+  setEquipmentPlacementDialogOpen: (open: boolean) => void;
+  /** Map a CatalogEntry into the placement draft */
+  applyEquipmentCatalogEntry: (entry: CatalogEntry) => void;
 }
 
 type ToolStore = ToolState & ToolActions;
@@ -282,6 +324,24 @@ const initialState: ToolState = {
   supportPreviewMode: null,
   supportDraftAnchor: null,
   supportPrompt: null,
+  equipmentPlacementDialogOpen: false,
+  equipmentPlacementDraft: {
+    catalogEntryId: null,
+    name: 'AHU-1',
+    equipmentType: 'air_handler',
+    equipmentCategory: 'air_handling',
+    manufacturer: '',
+    model: '',
+    locationTag: '',
+    capacity: DEFAULT_EQUIPMENT_PROPS['air_handler'].capacity,
+    capacityUnit: 'CFM',
+    staticPressure: DEFAULT_EQUIPMENT_PROPS['air_handler'].staticPressure,
+    staticPressureUnit: 'in_wg',
+    width: DEFAULT_EQUIPMENT_PROPS['air_handler'].width,
+    depth: DEFAULT_EQUIPMENT_PROPS['air_handler'].depth,
+    height: DEFAULT_EQUIPMENT_PROPS['air_handler'].height,
+    engineeringSystem: 'standard_duct',
+  },
 };
 
 export const useToolStore = create<ToolStore>()(
@@ -398,6 +458,68 @@ export const useToolStore = create<ToolStore>()(
         state.supportPrompt = prompt;
       }),
 
+    setEquipmentPlacementDraft: (partial) =>
+      set((state) => {
+        state.equipmentPlacementDraft = { ...state.equipmentPlacementDraft, ...partial };
+      }),
+
+    resetEquipmentPlacementDraft: (type) =>
+      set((state) => {
+        const targetType = type ?? state.equipmentPlacementDraft.equipmentType;
+        const defaults = DEFAULT_EQUIPMENT_PROPS[targetType];
+        const abbrev = EQUIPMENT_TYPE_ABBREV[targetType];
+        const category = EQUIPMENT_TYPE_CATEGORY[targetType];
+        state.equipmentPlacementDraft = {
+          catalogEntryId: null,
+          name: `${abbrev}-1`,
+          equipmentType: targetType,
+          equipmentCategory: category,
+          manufacturer: '',
+          model: '',
+          locationTag: '',
+          capacity: defaults.capacity,
+          capacityUnit: 'CFM',
+          staticPressure: defaults.staticPressure,
+          staticPressureUnit: 'in_wg',
+          width: defaults.width,
+          depth: defaults.depth,
+          height: defaults.height,
+          engineeringSystem: 'standard_duct',
+        };
+      }),
+
+    setEquipmentPlacementDialogOpen: (open) =>
+      set((state) => {
+        state.equipmentPlacementDialogOpen = open;
+      }),
+
+    applyEquipmentCatalogEntry: (entry) =>
+      set((state) => {
+        const typeId = entry.typeId as EquipmentType | undefined;
+        if (!typeId) return;
+        const defaults = DEFAULT_EQUIPMENT_PROPS[typeId] ?? DEFAULT_EQUIPMENT_PROPS['air_handler'];
+        const abbrev = EQUIPMENT_TYPE_ABBREV[typeId] ?? 'EQ';
+        const category = EQUIPMENT_TYPE_CATEGORY[typeId] ?? 'air_handling';
+        state.equipmentPlacementDraft = {
+          catalogEntryId: entry.id,
+          name: `${abbrev}-1`,
+          equipmentType: typeId,
+          equipmentCategory: category,
+          manufacturer: entry.manufacturer ?? '',
+          model: entry.model ?? '',
+          locationTag: '',
+          // Prefer catalog entry dimensions/capacity, fall back to type defaults
+          capacity: (entry.customFields?.capacity as number | undefined) ?? defaults.capacity,
+          capacityUnit: 'CFM',
+          staticPressure: (entry.customFields?.staticPressure as number | undefined) ?? defaults.staticPressure,
+          staticPressureUnit: 'in_wg',
+          width: entry.defaultDimensions?.width ?? defaults.width,
+          depth: entry.defaultDimensions?.depth ?? defaults.depth,
+          height: entry.defaultDimensions?.height ?? defaults.height,
+          engineeringSystem: (entry.engineeringSystem as EquipmentPlacementDraft['engineeringSystem']) ?? 'standard_duct',
+        };
+      }),
+
     activateToolByShortcut: (shortcut) => {
       const toolDef = defaultToolDefinitions.find((t) => t.shortcut === shortcut.toLowerCase());
       if (toolDef) {
@@ -465,6 +587,8 @@ export const useSupportPreviewMode = () => useToolStore((state) => state.support
 export const useSupportDraftAnchor = () => useToolStore((state) => state.supportDraftAnchor);
 export const useSupportPrompt = () => useToolStore((state) => state.supportPrompt);
 export const useDuctDrawSettings = () => useToolStore((state) => state.ductDrawSettings);
+export const useEquipmentPlacementDraft = () => useToolStore((state) => state.equipmentPlacementDraft);
+export const useEquipmentPlacementDialogOpen = () => useToolStore((state) => state.equipmentPlacementDialogOpen);
 
 // Actions hook (per naming convention)
 export const useToolActions = () =>
@@ -489,6 +613,10 @@ export const useToolActions = () =>
       clearSupportPreview: state.clearSupportPreview,
       setSupportDraftAnchor: state.setSupportDraftAnchor,
       setSupportPrompt: state.setSupportPrompt,
+      setEquipmentPlacementDraft: state.setEquipmentPlacementDraft,
+      resetEquipmentPlacementDraft: state.resetEquipmentPlacementDraft,
+      setEquipmentPlacementDialogOpen: state.setEquipmentPlacementDialogOpen,
+      applyEquipmentCatalogEntry: state.applyEquipmentCatalogEntry,
     }))
   );
 

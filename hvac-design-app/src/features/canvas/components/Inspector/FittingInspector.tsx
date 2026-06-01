@@ -1,4 +1,4 @@
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 
 import PropertyField from './PropertyField';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
@@ -13,6 +13,38 @@ interface FittingInspectorProps {
   entity: Fitting;
 }
 
+const ANGLE_STEP_OPTIONS = [
+  { value: 1, label: '1 deg' },
+  { value: 5, label: '5 deg' },
+];
+
+const END_TYPE_OPTIONS = [
+  { value: 'raw', label: 'Raw' },
+  { value: 'flange', label: 'Flange' },
+  { value: 'crimped', label: 'Crimped' },
+  { value: 'coupled', label: 'Coupled' },
+  { value: 'slip_joint', label: 'Slip joint' },
+];
+
+const INSULATED_OPTIONS = [
+  { value: 'no', label: 'No' },
+  { value: 'yes', label: 'Yes' },
+];
+
+const DEFAULT_RADIUS_RATIO = 1.5;
+
+function clampRadiusRatio(value: number): number {
+  return Math.min(3, Math.max(0.5, value));
+}
+
+function clampAngle(value: number): number {
+  return Math.min(180, Math.max(0, value));
+}
+
+function roundAngleToStep(value: number, step: number): number {
+  return clampAngle(Math.round(value / step) * step);
+}
+
 function Card({ children }: { children: ReactNode }) {
   return <div className="rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm">{children}</div>;
 }
@@ -22,6 +54,7 @@ function SectionHeader({ children }: { children: ReactNode }) {
 }
 
 export function FittingInspector({ entity }: FittingInspectorProps) {
+  const [angleStep, setAngleStep] = useState(1);
   const commit = useCallback(
     <K extends keyof Fitting['props']>(field: K, value: Fitting['props'][K]) => {
       const current = useEntityStore.getState().byId[entity.id];
@@ -42,6 +75,18 @@ export function FittingInspector({ entity }: FittingInspectorProps) {
       }, previous);
     },
     [entity.id]
+  );
+
+  const commitAngle = useCallback(
+    (value: string | number) => {
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) {
+        return;
+      }
+
+      commit('angle', roundAngleToStep(numericValue, angleStep));
+    },
+    [angleStep, commit]
   );
 
   const handleResetToAuto = useCallback(() => {
@@ -73,6 +118,10 @@ export function FittingInspector({ entity }: FittingInspectorProps) {
 
   const fittingTypeOptions = Object.entries(FITTING_TYPE_LABELS).map(([value, label]) => ({ value, label }));
   const supportsAngle = entity.props.fittingType.startsWith('elbow');
+  const isElbow = supportsAngle;
+  const hasOutlet = entity.props.fittingType !== 'cap';
+  const radiusRatio = entity.props.radiusRatio ?? DEFAULT_RADIUS_RATIO;
+  const insulated = entity.props.insulated ?? false;
 
   return (
     <div className="flex flex-col gap-4" data-testid="fitting-inspector">
@@ -116,17 +165,28 @@ export function FittingInspector({ entity }: FittingInspectorProps) {
           </PropertyField>
 
           {supportsAngle ? (
-            <PropertyField label="Angle (deg)" htmlFor="fitting-angle">
-              <ValidatedInput
-                id="fitting-angle"
-                type="number"
-                min={0}
-                max={180}
-                step={1}
-                value={entity.props.angle ?? 90}
-                onChange={(val) => commit('angle', Number(val))}
-              />
-            </PropertyField>
+            <div className="grid grid-cols-2 gap-3">
+              <PropertyField label="Angle (deg)" htmlFor="fitting-angle">
+                <ValidatedInput
+                  id="fitting-angle"
+                  type="number"
+                  min={0}
+                  max={180}
+                  step={angleStep}
+                  value={entity.props.angle ?? 90}
+                  onChange={commitAngle}
+                />
+              </PropertyField>
+              <PropertyField label="Angle Step" htmlFor="fitting-angle-step">
+                <ValidatedInput
+                  id="fitting-angle-step"
+                  type="select"
+                  value={angleStep}
+                  onChange={(val) => setAngleStep(Number(val))}
+                  options={ANGLE_STEP_OPTIONS}
+                />
+              </PropertyField>
+            </div>
           ) : null}
 
           <div className="grid grid-cols-2 gap-3">
@@ -141,6 +201,102 @@ export function FittingInspector({ entity }: FittingInspectorProps) {
               </div>
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card>
+        <SectionHeader>Geometry</SectionHeader>
+        <div className="flex flex-col gap-3">
+          {isElbow ? (
+            <PropertyField label={`Radius ratio (R/W) — ${radiusRatio.toFixed(2)}`} htmlFor="fitting-radius-ratio">
+              <input
+                id="fitting-radius-ratio"
+                type="range"
+                min={0.5}
+                max={3}
+                step={0.1}
+                value={radiusRatio}
+                onChange={(event) => commit('radiusRatio', clampRadiusRatio(Number(event.target.value)))}
+                className="w-full accent-blue-600"
+                data-testid="fitting-radius-ratio"
+              />
+            </PropertyField>
+          ) : null}
+          <PropertyField label="Neck length (in)" htmlFor="fitting-neck-length">
+            <ValidatedInput
+              id="fitting-neck-length"
+              type="number"
+              min={0}
+              max={120}
+              step={0.5}
+              value={entity.props.neckLength ?? 0}
+              onChange={(val) => {
+                const numeric = Number(val);
+                if (Number.isFinite(numeric)) {
+                  commit('neckLength', Math.max(0, numeric));
+                }
+              }}
+            />
+          </PropertyField>
+        </div>
+      </Card>
+
+      <Card>
+        <SectionHeader>Insulation</SectionHeader>
+        <div className="flex flex-col gap-3">
+          <PropertyField label="Insulated" htmlFor="fitting-insulated">
+            <ValidatedInput
+              id="fitting-insulated"
+              type="select"
+              value={insulated ? 'yes' : 'no'}
+              onChange={(val) => commit('insulated', val === 'yes')}
+              options={INSULATED_OPTIONS}
+            />
+          </PropertyField>
+          {insulated ? (
+            <PropertyField label="Thickness (in)" htmlFor="fitting-insulation-thickness">
+              <ValidatedInput
+                id="fitting-insulation-thickness"
+                type="number"
+                min={0}
+                max={12}
+                step={0.25}
+                value={entity.props.insulationThickness ?? 0}
+                onChange={(val) => {
+                  const numeric = Number(val);
+                  if (Number.isFinite(numeric)) {
+                    commit('insulationThickness', Math.max(0, numeric));
+                  }
+                }}
+              />
+            </PropertyField>
+          ) : null}
+        </div>
+      </Card>
+
+      <Card>
+        <SectionHeader>End Types</SectionHeader>
+        <div className={hasOutlet ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-3'}>
+          <PropertyField label="Inlet" htmlFor="fitting-end-inlet">
+            <ValidatedInput
+              id="fitting-end-inlet"
+              type="select"
+              value={entity.props.endTypeInlet ?? 'raw'}
+              onChange={(val) => commit('endTypeInlet', val as Fitting['props']['endTypeInlet'])}
+              options={END_TYPE_OPTIONS}
+            />
+          </PropertyField>
+          {hasOutlet ? (
+            <PropertyField label="Outlet" htmlFor="fitting-end-outlet">
+              <ValidatedInput
+                id="fitting-end-outlet"
+                type="select"
+                value={entity.props.endTypeOutlet ?? 'raw'}
+                onChange={(val) => commit('endTypeOutlet', val as Fitting['props']['endTypeOutlet'])}
+                options={END_TYPE_OPTIONS}
+              />
+            </PropertyField>
+          ) : null}
         </div>
       </Card>
 

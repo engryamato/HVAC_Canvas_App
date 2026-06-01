@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ZoomControls } from '../ZoomControls';
 import { useViewportStore } from '../../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
-import type { Room } from '@/core/schema';
+import type { Equipment, Room } from '@/core/schema';
 import { MIN_ZOOM, MAX_ZOOM } from '@/core/constants/viewport';
 
 // Mock Radix UI Select to avoid portal issues in tests
@@ -42,6 +42,31 @@ const createMockRoom = (id: string, name: string): Room => ({
     airChangesPerHour: 4,
   },
   calculated: { area: 100, volume: 800, requiredCFM: 200 },
+});
+
+const createMockEquipment = (): Equipment => ({
+  id: 'equip-1',
+  type: 'equipment',
+  transform: { x: 0, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  zIndex: 1,
+  createdAt: '2025-01-01T00:00:00.000Z',
+  modifiedAt: '2025-01-01T00:00:00.000Z',
+  props: {
+    name: 'Equipment',
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'air_handler',
+    width: 160,
+    depth: 40,
+    height: 240,
+    manufacturer: 'Test',
+    model: 'Test',
+    capacity: 1000,
+    capacityUnit: 'CFM',
+    staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
+    mountHeight: 0,
+    mountHeightUnit: 'in',
+  },
 });
 
 describe('ZoomControls', () => {
@@ -176,6 +201,23 @@ describe('ZoomControls', () => {
 
       render(<ZoomControls />);
       expect(screen.getByTestId('zoom-fit')).not.toBeDisabled();
+    });
+
+    it('fits equipment using plan width and depth instead of physical height', () => {
+      const equipment = createMockEquipment();
+      const fitToContentSpy = vi.spyOn(useViewportStore.getState(), 'fitToContent');
+      useEntityStore.setState({
+        byId: { [equipment.id]: equipment },
+        allIds: [equipment.id],
+      });
+
+      render(<ZoomControls />);
+      fireEvent.click(screen.getByTestId('zoom-fit'));
+
+      expect(fitToContentSpy).toHaveBeenCalledWith(
+        { x: 0, y: 0, width: 160, height: 100 },
+        undefined
+      );
     });
   });
 

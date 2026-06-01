@@ -26,7 +26,12 @@ export class PressurePropagationService {
       }
 
       const sourceStaticPressure = (source as Equipment).props.staticPressure;
-      const queue: Array<{ id: string; cumulativePressureDrop: number; availableStaticPressure: number; frictionPer100: number }> = [
+      const queue: Array<{
+        id: string;
+        cumulativePressureDrop: number;
+        availableStaticPressure: number;
+        frictionPer100: number;
+      }> = [
         {
           id: source.id,
           cumulativePressureDrop: 0,
@@ -43,9 +48,12 @@ export class PressurePropagationService {
         }
         visited.add(current.id);
 
-        for (const childId of getOutgoing(graph, current.id)) {
+        for (const childId of getConnected(graph, current.id)) {
           const child = entities[childId];
           if (!child || !validation.affectedEntityIds.includes(childId)) {
+            continue;
+          }
+          if (visited.has(childId)) {
             continue;
           }
 
@@ -67,10 +75,8 @@ export class PressurePropagationService {
   }
 }
 
-function getOutgoing(graph: ConnectionGraph, nodeId: string): string[] {
-  return Array.from(graph.edges.values())
-    .filter((edge) => edge.source === nodeId)
-    .map((edge) => edge.target);
+function getConnected(graph: ConnectionGraph, nodeId: string): string[] {
+  return graph.nodes.get(nodeId)?.connections ?? [];
 }
 
 function calculateNodePressure(

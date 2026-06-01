@@ -16,10 +16,8 @@ import {
   MagneticConnectionService,
   type MagneticSnapResult,
 } from '../services/magneticConnectionService';
-import {
-  FITTING_CONNECTION_OFFSETS,
-  computeFittingOriginForPortSnap,
-} from '../services/fittingConnectionService';
+import { computeFittingOriginForAnchorSnap } from '../services/fittingConnectionService';
+import { resolveLocalFittingPorts } from '../services/connectionPoints';
 import type { Fitting } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
 
@@ -151,7 +149,7 @@ export class FittingTool extends BaseTool {
     });
     ctx.restore();
 
-    this.renderConnectionPorts(context, origin, rotation, fittingType);
+    this.renderConnectionPorts(context, origin, rotation, previewFitting);
     this.renderTypeLabel(context, origin, fittingType);
   }
 
@@ -190,8 +188,9 @@ export class FittingTool extends BaseTool {
 
       this.state.rotation = (baseRotation + this.state.manualRotationOffset) % 360;
       this.state.snapTarget = raw;
-      this.state.snappedFittingOrigin = computeFittingOriginForPortSnap(
-        fittingType,
+      const previewFitting = this.getOrBuildPreviewFitting(fittingType);
+      this.state.snappedFittingOrigin = computeFittingOriginForAnchorSnap(
+        previewFitting,
         raw.point,
         this.state.rotation
       );
@@ -343,11 +342,13 @@ export class FittingTool extends BaseTool {
     context: ToolRenderContext,
     origin: { x: number; y: number },
     rotationDeg: number,
-    fittingType: FittingType
+    previewFitting: Fitting
   ): void {
     const { ctx, zoom } = context;
-    const defs = FITTING_CONNECTION_OFFSETS[fittingType];
-    if (!defs?.length) return;
+    // Use the SAME resolved local ports the renderer/snapping use, so the
+    // preview dots sit exactly on the drawn openings (no stale offset table).
+    const defs = resolveLocalFittingPorts(previewFitting);
+    if (!defs.length) return;
 
     const rad = (rotationDeg * Math.PI) / 180;
     const cos = Math.cos(rad);
@@ -362,8 +363,10 @@ export class FittingTool extends BaseTool {
     ctx.save();
     ctx.globalAlpha = 0.9;
     for (const def of defs) {
-      const wx = origin.x + def.localX * cos - def.localY * sin;
-      const wy = origin.y + def.localX * sin + def.localY * cos;
+      const lx = def.localPosition.x;
+      const ly = def.localPosition.y;
+      const wx = origin.x + lx * cos - ly * sin;
+      const wy = origin.y + lx * sin + ly * cos;
       const r = PORT_INDICATOR_RADIUS / zoom;
 
       ctx.beginPath();

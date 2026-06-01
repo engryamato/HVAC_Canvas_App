@@ -5,11 +5,84 @@ import { EngineeringSystemSchema } from './unified-component.schema';
 
 /**
  * Equipment types for HVAC components
- * Per Notion Architecture Specs - includes air_handler for AHU units
+ * 16 types across 6 categories covering a full mechanical plan
  */
-export const EquipmentTypeSchema = z.enum(['hood', 'fan', 'diffuser', 'damper', 'air_handler', 'furnace', 'rtu']);
+export const EquipmentTypeSchema = z.enum([
+  // Original types (7)
+  'hood', 'fan', 'diffuser', 'damper', 'air_handler', 'furnace', 'rtu',
+  // New types (9)
+  'vav_box', 'fcu', 'mau', 'exhaust_fan', 'erv', 'unit_heater', 'grille', 'fire_damper', 'smoke_damper',
+]);
 
 export type EquipmentType = z.infer<typeof EquipmentTypeSchema>;
+
+/**
+ * Equipment categories grouping related types
+ */
+export const EquipmentCategorySchema = z.enum([
+  'air_handling',   // AHU, RTU, MAU, FCU, ERV
+  'terminal_units', // VAV Box
+  'fans',           // Fan, Exhaust Fan
+  'air_devices',    // Diffuser, Grille, Hood
+  'dampers',        // Volume Damper, Fire Damper, Smoke Damper
+  'heating',        // Furnace, Unit Heater
+]);
+
+export type EquipmentCategory = z.infer<typeof EquipmentCategorySchema>;
+
+/**
+ * Maps each category to its member equipment types
+ */
+export const EQUIPMENT_CATEGORY_MAP: Record<EquipmentCategory, EquipmentType[]> = {
+  air_handling:   ['air_handler', 'rtu', 'mau', 'fcu', 'erv'],
+  terminal_units: ['vav_box'],
+  fans:           ['fan', 'exhaust_fan'],
+  air_devices:    ['diffuser', 'grille', 'hood'],
+  dampers:        ['damper', 'fire_damper', 'smoke_damper'],
+  heating:        ['furnace', 'unit_heater'],
+};
+
+/** Reverse map: EquipmentType → EquipmentCategory */
+export const EQUIPMENT_TYPE_CATEGORY: Record<EquipmentType, EquipmentCategory> = Object.entries(
+  EQUIPMENT_CATEGORY_MAP
+).reduce((acc, [cat, types]) => {
+  types.forEach((t) => { acc[t as EquipmentType] = cat as EquipmentCategory; });
+  return acc;
+}, {} as Record<EquipmentType, EquipmentCategory>);
+
+// ─── Connection Port Model ─────────────────────────────────────────────────
+
+/**
+ * Role of a connection port on equipment
+ * cfmSign convention: positive = air leaving equipment, negative = air entering
+ */
+export const PortRoleSchema = z.enum([
+  'supply',       // conditioned air out  (+CFM)
+  'return',       // return air in        (-CFM)
+  'exhaust',      // exhaust air out      (-CFM, away from space)
+  'outdoor_air',  // fresh air intake     (+CFM into unit)
+  'relief',       // relief/bypass out    (-CFM)
+  'inline',       // in-line (dampers)    (bidirectional)
+]);
+export type PortRole = z.infer<typeof PortRoleSchema>;
+
+/** Which edge of the equipment bounding box the port sits on */
+export const PortEdgeSchema = z.enum(['north', 'south', 'east', 'west']);
+export type PortEdge = z.infer<typeof PortEdgeSchema>;
+
+/**
+ * A single typed connection port on a piece of equipment.
+ * offsetRatio: 0.0 = left/top edge, 0.5 = center, 1.0 = right/bottom edge
+ */
+export const ConnectionPortSchema = z.object({
+  id: z.string().describe('Unique port identifier, e.g. "supply-1"'),
+  role: PortRoleSchema,
+  edge: PortEdgeSchema,
+  offsetRatio: z.number().min(0).max(1).default(0.5),
+  connectedDuctId: z.string().uuid().optional().describe('ID of duct snapped to this port'),
+  label: z.string().optional().describe('Human-readable label, e.g. "Supply A"'),
+});
+export type ConnectionPort = z.infer<typeof ConnectionPortSchema>;
 
 /**
  * Capacity unit for airflow
@@ -47,8 +120,10 @@ const SharedEquipmentPropsSchema = z.object({
   // Mount height with explicit unit
   mountHeight: z.number().min(0).optional().describe('Height from finished floor'),
   mountHeightUnit: MountHeightUnitSchema.default('in'),
-  // Connection reference
-  connectedDuctId: z.string().uuid().optional().describe('Reference to connected Duct.id'),
+  // Legacy single connection (deprecated — use connectionPorts instead; kept for 1 release compat)
+  connectedDuctId: z.string().uuid().optional().describe('@deprecated Use connectionPorts[].connectedDuctId'),
+  // Multi-port typed connection model
+  connectionPorts: z.array(ConnectionPortSchema).optional().describe('Typed supply/return/exhaust ports'),
   // Location tag for identification
   locationTag: z.string().max(50).optional().describe('Location tag e.g. "ROOF-1", "MECH-101"'),
   
@@ -204,7 +279,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
   furnace: {
     engineeringSystem: 'standard_duct',
     equipmentType: 'furnace',
-    capacity: 80000,
+    capacity: 1500,   // CFM airflow (was incorrectly 80000 — that is BTU/h, not CFM)
     capacityUnit: 'CFM',
     staticPressure: 0.5,
     staticPressureUnit: 'in_wg',
@@ -216,7 +291,7 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
   rtu: {
     engineeringSystem: 'standard_duct',
     equipmentType: 'rtu',
-    capacity: 12000,
+    capacity: 10000,
     capacityUnit: 'CFM',
     staticPressure: 1.5,
     staticPressureUnit: 'in_wg',
@@ -225,19 +300,168 @@ export const DEFAULT_EQUIPMENT_PROPS: Record<EquipmentType, Omit<EquipmentProps,
     height: 36,
     mountHeightUnit: 'in',
   },
+  // ─── New types ───────────────────────────────────────────────────────────
+  vav_box: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'vav_box',
+    capacity: 300,
+    capacityUnit: 'CFM',
+    staticPressure: 0.25,
+    staticPressureUnit: 'in_wg',
+    width: 18,
+    depth: 18,
+    height: 12,
+    mountHeightUnit: 'in',
+  },
+  fcu: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'fcu',
+    capacity: 600,
+    capacityUnit: 'CFM',
+    staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
+    width: 36,
+    depth: 24,
+    height: 18,
+    mountHeightUnit: 'in',
+  },
+  mau: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'mau',
+    capacity: 3000,
+    capacityUnit: 'CFM',
+    staticPressure: 1.5,
+    staticPressureUnit: 'in_wg',
+    width: 48,
+    depth: 36,
+    height: 36,
+    mountHeightUnit: 'in',
+  },
+  exhaust_fan: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'exhaust_fan',
+    capacity: 500,
+    capacityUnit: 'CFM',
+    staticPressure: 0.5,
+    staticPressureUnit: 'in_wg',
+    width: 18,
+    depth: 18,
+    height: 12,
+    mountHeightUnit: 'in',
+  },
+  erv: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'erv',
+    capacity: 1000,
+    capacityUnit: 'CFM',
+    staticPressure: 1.0,
+    staticPressureUnit: 'in_wg',
+    width: 48,
+    depth: 24,
+    height: 24,
+    mountHeightUnit: 'in',
+  },
+  unit_heater: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'unit_heater',
+    capacity: 800,
+    capacityUnit: 'CFM',
+    staticPressure: 0.1,
+    staticPressureUnit: 'in_wg',
+    width: 24,
+    depth: 18,
+    height: 18,
+    mountHeightUnit: 'in',
+  },
+  grille: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'grille',
+    capacity: 300,
+    capacityUnit: 'CFM',
+    staticPressure: 0.05,
+    staticPressureUnit: 'in_wg',
+    width: 24,
+    depth: 12,
+    height: 4,
+    mountHeightUnit: 'in',
+  },
+  fire_damper: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'fire_damper',
+    capacity: 1000,
+    capacityUnit: 'CFM',
+    staticPressure: 0.08,
+    staticPressureUnit: 'in_wg',
+    width: 12,
+    depth: 12,
+    height: 6,
+    mountHeightUnit: 'in',
+  },
+  smoke_damper: {
+    engineeringSystem: 'standard_duct',
+    equipmentType: 'smoke_damper',
+    capacity: 1000,
+    capacityUnit: 'CFM',
+    staticPressure: 0.08,
+    staticPressureUnit: 'in_wg',
+    width: 12,
+    depth: 12,
+    height: 6,
+    mountHeightUnit: 'in',
+  },
+};
+
+/**
+ * Human-readable labels for all equipment types (used in dialogs, inspectors, status bar)
+ */
+export const EQUIPMENT_TYPE_LABELS: Record<EquipmentType, string> = {
+  air_handler:  'Air Handling Unit',
+  rtu:          'Rooftop Unit',
+  mau:          'Makeup Air Unit',
+  fcu:          'Fan Coil Unit',
+  erv:          'Energy Recovery Ventilator',
+  vav_box:      'VAV Box',
+  fan:          'Fan',
+  exhaust_fan:  'Exhaust Fan',
+  diffuser:     'Diffuser',
+  grille:       'Grille',
+  hood:         'Hood',
+  damper:       'Volume Damper',
+  fire_damper:  'Fire Damper',
+  smoke_damper: 'Smoke Damper',
+  furnace:      'Furnace',
+  unit_heater:  'Unit Heater',
+};
+
+/**
+ * Short abbreviations used in auto-generated names (e.g. "AHU-1", "RTU-2")
+ */
+export const EQUIPMENT_TYPE_ABBREV: Record<EquipmentType, string> = {
+  air_handler:  'AHU',
+  rtu:          'RTU',
+  mau:          'MAU',
+  fcu:          'FCU',
+  erv:          'ERV',
+  vav_box:      'VAV',
+  fan:          'FAN',
+  exhaust_fan:  'EF',
+  diffuser:     'DIFF',
+  grille:       'GRL',
+  hood:         'HOOD',
+  damper:       'VD',
+  fire_damper:  'FD',
+  smoke_damper: 'SD',
+  furnace:      'FURN',
+  unit_heater:  'UH',
 };
 
 /**
  * Create default equipment props for a given type
  */
 export function createDefaultEquipmentProps(type: EquipmentType): EquipmentProps {
-  const typeLabel =
-    type === 'air_handler' ? 'Air Handler' :
-    type === 'furnace' ? 'Furnace' :
-    type === 'rtu' ? 'RTU' :
-    type.charAt(0).toUpperCase() + type.slice(1);
+  const abbrev = EQUIPMENT_TYPE_ABBREV[type];
   return {
-    name: `New ${typeLabel}`,
+    name: `${abbrev}-1`,
     ...DEFAULT_EQUIPMENT_PROPS[type],
   };
 }

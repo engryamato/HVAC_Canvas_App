@@ -1,0 +1,4 @@
+interface:
+  display_name: "Understand Anything Memory"
+  short_description: "Use local graph context."
+  default_prompt: "Use Understand Anything graph memory to understand this project."

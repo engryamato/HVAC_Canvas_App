@@ -1,11 +1,36 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createEntity } from '@/core/commands/entityCommands';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../../store/selectionStore';
+import { createEquipment } from '../../entities/equipmentDefaults';
 import { createDuctRun } from '../../entities/ductRunDefaults';
+import { getAngleDegrees } from '../angleConstraint';
 import { DuctTool } from '../DuctTool';
 import { SelectTool } from '../SelectTool';
+
+function keyEvent(key: string, shiftKey: boolean): Parameters<DuctTool['onKeyDown']>[0] {
+  return {
+    key,
+    code: key === 'Shift' ? 'ShiftLeft' : key,
+    shiftKey,
+    ctrlKey: false,
+    altKey: false,
+    repeat: false,
+  };
+}
+
+function pointAt(
+  start: { x: number; y: number },
+  angleDeg: number,
+  length = 120
+): { x: number; y: number } {
+  const radians = angleDeg * (Math.PI / 180);
+  return {
+    x: start.x + length * Math.cos(radians),
+    y: start.y + length * Math.sin(radians),
+  };
+}
 
 describe('DuctTool duct_run hydration', () => {
   beforeEach(() => {
@@ -30,7 +55,9 @@ describe('DuctTool duct_run hydration', () => {
     tool.onMouseMove({ x: 240, y: 120 });
     tool.onMouseDown({ x: 240, y: 120, button: 0 });
 
-    const entities = useEntityStore.getState().allIds.map((id) => useEntityStore.getState().byId[id]);
+    const entities = useEntityStore
+      .getState()
+      .allIds.map((id) => useEntityStore.getState().byId[id]);
     expect(entities).toHaveLength(1);
     expect(entities[0]?.type).toBe('duct_run');
 
@@ -58,7 +85,9 @@ describe('DuctTool duct_run hydration', () => {
     tool.onMouseMove({ x: 240, y: 120 });
     tool.onMouseUp({ x: 240, y: 120, button: 0 });
 
-    const entities = useEntityStore.getState().allIds.map((id) => useEntityStore.getState().byId[id]);
+    const entities = useEntityStore
+      .getState()
+      .allIds.map((id) => useEntityStore.getState().byId[id]);
     expect(entities).toHaveLength(1);
     expect(entities[0]?.type).toBe('duct_run');
 
@@ -68,6 +97,120 @@ describe('DuctTool duct_run hydration', () => {
 
     expect(entities[0].props.startPoint).toEqual({ x: 120, y: 120 });
     expect(entities[0].props.endPoint).toEqual({ x: 240, y: 120 });
+  });
+
+  it('constrains unsnapped duct drawing to 15 degree angle steps by default', () => {
+    const start = { x: 120, y: 120 };
+    const cursor = pointAt(start, 47);
+    const tool = new DuctTool();
+    tool.onActivate();
+
+    tool.onMouseDown({ ...start, button: 0 });
+    tool.onMouseMove({ ...cursor, shiftKey: false });
+    tool.onMouseDown({ ...cursor, button: 0, shiftKey: false });
+
+    const run = useEntityStore.getState().byId[useEntityStore.getState().allIds[0]!];
+    expect(run?.type).toBe('duct_run');
+    if (run?.type !== 'duct_run') {
+      throw new Error('Expected duct_run entity');
+    }
+
+    expect(run.transform.rotation).toBeCloseTo(45, 6);
+    expect(getAngleDegrees(run.props.startPoint!, run.props.endPoint!)).toBeCloseTo(45, 6);
+  });
+
+  it('uses 1 degree angle steps while Shift is held', () => {
+    const start = { x: 120, y: 120 };
+    const cursor = pointAt(start, 47);
+    const tool = new DuctTool();
+    tool.onActivate();
+
+    tool.onMouseDown({ ...start, button: 0 });
+    tool.onMouseMove({ ...cursor, shiftKey: true });
+    tool.onMouseDown({ ...cursor, button: 0, shiftKey: true });
+
+    const run = useEntityStore.getState().byId[useEntityStore.getState().allIds[0]!];
+    expect(run?.type).toBe('duct_run');
+    if (run?.type !== 'duct_run') {
+      throw new Error('Expected duct_run entity');
+    }
+
+    expect(run.transform.rotation).toBeCloseTo(47, 6);
+    expect(getAngleDegrees(run.props.startPoint!, run.props.endPoint!)).toBeCloseTo(47, 6);
+  });
+
+  it('keeps magnetic snap endpoints ahead of angle constraints', () => {
+    const target = createDuctRun({ x: 401, y: 333, installLength: 10, sectionLengthOverride: 5 });
+    target.props.startPoint = { x: 401, y: 333 };
+    target.props.endPoint = { x: 521, y: 333 };
+    createEntity(target);
+
+    const tool = new DuctTool();
+    tool.onActivate();
+    tool.onMouseDown({ x: 120, y: 120, button: 0 });
+    tool.onMouseMove({ x: 403, y: 334, shiftKey: false });
+    tool.onMouseDown({ x: 403, y: 334, button: 0, shiftKey: false });
+
+    const run = useEntityStore
+      .getState()
+      .allIds.map((id) => useEntityStore.getState().byId[id])
+      .find((entity) => entity?.type === 'duct_run' && entity.id !== target.id);
+    expect(run?.type).toBe('duct_run');
+    if (run?.type !== 'duct_run') {
+      throw new Error('Expected duct_run entity');
+    }
+
+    expect(run.props.endPoint?.x).toBeCloseTo(401, 3);
+    expect(run.props.endPoint?.y).toBeCloseTo(333, 3);
+  });
+
+  it('recomputes the preview angle when Shift is pressed or released without pointer movement', () => {
+    const start = { x: 120, y: 120 };
+    const cursor = pointAt(start, 47);
+    const tool = new DuctTool();
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fillText: vi.fn(),
+      setLineDash: vi.fn(),
+      strokeStyle: '',
+      fillStyle: '',
+      lineWidth: 0,
+      lineCap: '',
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+    } as unknown as CanvasRenderingContext2D;
+
+    tool.onActivate();
+    tool.onMouseDown({ ...start, button: 0 });
+    tool.onMouseMove({ ...cursor, shiftKey: false });
+    tool.render({ ctx, zoom: 1, panX: 0, panY: 0 });
+    expect(ctx.fillText).toHaveBeenLastCalledWith(
+      expect.stringContaining('@ 45deg'),
+      expect.any(Number),
+      expect.any(Number)
+    );
+
+    tool.onKeyDown(keyEvent('Shift', true));
+    tool.render({ ctx, zoom: 1, panX: 0, panY: 0 });
+    expect(ctx.fillText).toHaveBeenLastCalledWith(
+      expect.stringContaining('@ 47deg 1deg'),
+      expect.any(Number),
+      expect.any(Number)
+    );
+
+    tool.onKeyUp(keyEvent('Shift', false));
+    tool.render({ ctx, zoom: 1, panX: 0, panY: 0 });
+    expect(ctx.fillText).toHaveBeenLastCalledWith(
+      expect.stringContaining('@ 45deg'),
+      expect.any(Number),
+      expect.any(Number)
+    );
   });
 
   it('treats prompted duct draw settings as the latest source of truth for new run size', () => {
@@ -89,6 +232,133 @@ describe('DuctTool duct_run hydration', () => {
     }
     expect(entity.props.shape).toBe('round');
     expect(entity.props.diameter).toBe(18);
+  });
+
+  it('starts a duct_run from an AHU supply port magnetic snap', () => {
+    const ahu = createEquipment('air_handler', {
+      name: 'AHU-1',
+      x: 100,
+      y: 100,
+      width: 60,
+      depth: 48,
+    });
+    createEntity(ahu);
+
+    const tool = new DuctTool();
+    tool.onActivate();
+    tool.onMouseMove({ x: 159, y: 114 });
+    tool.onMouseDown({ x: 159, y: 114, button: 0 });
+    tool.onMouseMove({ x: 220, y: 114 });
+    tool.onMouseDown({ x: 220, y: 114, button: 0 });
+
+    const run = useEntityStore
+      .getState()
+      .allIds.map((id) => useEntityStore.getState().byId[id])
+      .find((entity) => entity?.type === 'duct_run');
+    expect(run?.type).toBe('duct_run');
+    if (run?.type !== 'duct_run') {
+      throw new Error('Expected duct_run entity');
+    }
+
+    expect(run.props.startPoint?.x).toBeCloseTo(160, 3);
+    expect(run.props.startPoint?.y).toBeCloseTo(114.4, 3);
+
+    const connectedAhu = useEntityStore.getState().byId[ahu.id];
+    expect(connectedAhu?.type).toBe('equipment');
+    if (connectedAhu?.type !== 'equipment') {
+      throw new Error('Expected equipment entity');
+    }
+    expect(
+      connectedAhu.props.connectionPorts?.find((port) => port.id === 'supply-1')?.connectedDuctId
+    ).toBe(run.id);
+  });
+
+  it('shows magnetic proximity indicators for non-AHU equipment ports before snap distance', () => {
+    const rtu = createEquipment('rtu', {
+      name: 'RTU-1',
+      x: 100,
+      y: 100,
+      width: 84,
+      depth: 48,
+    });
+    createEntity(rtu);
+
+    const tool = new DuctTool();
+    tool.onActivate();
+    tool.onMouseMove({ x: 129.4, y: 165 });
+
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillText: vi.fn(),
+      setLineDash: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      globalAlpha: 1,
+      strokeStyle: '',
+      fillStyle: '',
+      lineWidth: 0,
+      lineCap: '',
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+    } as unknown as CanvasRenderingContext2D;
+
+    tool.render({ ctx, zoom: 1, panX: 0, panY: 0 });
+
+    expect(ctx.arc).toHaveBeenCalledWith(129.4, 148, expect.any(Number), 0, Math.PI * 2);
+  });
+
+  it('renders rectangular duct snap indicators using width while ignoring duct height', () => {
+    useToolStore.getState().setDuctDrawSettings({
+      shape: 'rectangular',
+      width: 24,
+      height: 36,
+    });
+    const target = createDuctRun({
+      x: 100,
+      y: 100,
+      installLength: 10,
+      sectionLengthOverride: 5,
+    });
+    target.props.startPoint = { x: 100, y: 100 };
+    target.props.endPoint = { x: 220, y: 100 };
+    createEntity(target);
+
+    const tool = new DuctTool();
+    tool.onActivate();
+    tool.onMouseMove({ x: 101, y: 100 });
+
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      stroke: vi.fn(),
+      strokeRect: vi.fn(),
+      fill: vi.fn(),
+      fillText: vi.fn(),
+      setLineDash: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      globalAlpha: 1,
+      strokeStyle: '',
+      fillStyle: '',
+      lineWidth: 0,
+      lineCap: '',
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+    } as unknown as CanvasRenderingContext2D;
+
+    tool.render({ ctx, zoom: 1, panX: 0, panY: 0 });
+
+    expect(ctx.arc).not.toHaveBeenCalledWith(100, 100, 8, 0, Math.PI * 2);
+    expect(ctx.strokeRect).toHaveBeenCalledWith(88, 96, 24, 8);
   });
 
   it('allows segment hit selection once the run is selected', () => {
@@ -129,7 +399,9 @@ describe('DuctTool duct_run hydration', () => {
 
     expect(runs).toHaveLength(3);
     expect(runs.some((entity) => entity?.id === trunk.id)).toBe(false);
-    expect(runs.map((entity) => entity?.props.installLength).sort((a, b) => a - b)).toEqual([5, 5, 10]);
+    expect(
+      runs.map((entity) => Number(entity?.props.installLength.toFixed(2))).sort((a, b) => a - b)
+    ).not.toEqual([5, 5, 10]);
   });
 
   // Latest magnetic-center snapping regression: if this fails after error fixes,

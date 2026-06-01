@@ -1,0 +1,2287 @@
+{
+  "scriptCompleted": true,
+  "stats": {
+    "filesScanned": 592,
+    "filesWithImports": 341,
+    "totalEdges": 1344
+  },
+  "importMap": {
+    ".dockerignore": [],
+    ".env.example": [],
+    ".env.local.example": [],
+    ".env.production": [],
+    ".husky/pre-commit": [],
+    ".pnpmrc": [],
+    ".prettierignore": [],
+    ".understand-anything/.understandignore": [],
+    ".understand-anything/knowledge-graph.json": [],
+    ".understand-anything/memory/features-planned.md": [],
+    ".understand-anything/memory/features-recent.md": [],
+    ".understand-anything/memory/fixes-infra.md": [],
+    ".understand-anything/memory/MEMORY.md": [],
+    ".understand-anything/memory/project-overview.md": [],
+    "AGENTS.md": [],
+    "app/(main)/canvas/page.tsx": [
+      "src/features/canvas/CanvasPageWrapper.tsx"
+    ],
+    "app/dashboard/new/page.tsx": [
+      "src/features/dashboard/index.ts"
+    ],
+    "app/dashboard/page.tsx": [
+      "src/features/dashboard/index.ts"
+    ],
+    "app/globals.css": [],
+    "app/layout.tsx": [
+      "app/globals.css",
+      "src/components/common/DeviceWarning.tsx",
+      "src/components/common/VibeKanbanWebCompanionClient.tsx",
+      "src/components/ui/ToastContext.tsx",
+      "src/components/ui/ToastHost.tsx"
+    ],
+    "app/onboarding/create-project/page.tsx": [
+      "src/components/onboarding/ProjectCreationScreen.tsx"
+    ],
+    "app/page.tsx": [
+      "src/components/onboarding/AppInitializer.tsx"
+    ],
+    "app/StorageAdapterTest/page.tsx": [
+      "src/core/persistence/factory.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "app/ux-review/catalog/page.tsx": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/components/CatalogPanel.tsx",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "app/ux-review/duct-run/page.tsx": [
+      "src/components/dialogs/FabricationProfileSettingsPanel.tsx",
+      "src/core/schema/index.ts",
+      "src/core/store/fabricationProfileStore.ts",
+      "src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "BUILD_RESTORATION_REPORT.md": [],
+    "chromatic-diagnostics.json": [],
+    "chromatic.config.json": [],
+    "debug_output_2.txt": [],
+    "debug_output_3.txt": [],
+    "debug_output_4.txt": [],
+    "debug_output_5.txt": [],
+    "debug_output_6.txt": [],
+    "debug_output.txt": [],
+    "debug/README.md": [],
+    "DESIGN_SYSTEM.md": [],
+    "docker-compose.yml": [],
+    "Dockerfile": [],
+    "docs/analytics/ANALYTICS_GUIDE.md": [],
+    "docs/analytics/EXAMPLES.md": [],
+    "docs/analytics/PRIVACY.md": [],
+    "docs/VISUAL_TESTING.md": [],
+    "e2e_chromium_results.json": [],
+    "e2e_debug_output.txt": [],
+    "e2e_inventory.json": [],
+    "e2e_results.json": [],
+    "e2e/00-getting-started/PROGRESS.md": [],
+    "e2e/00-getting-started/screenshots/flow1_recording.webp": [],
+    "e2e/01-project-management/PROGRESS.md": [],
+    "e2e/02-hvac-design/PROGRESS.md": [],
+    "e2e/03-visual-regression/PROGRESS.md": [],
+    "e2e/e2e-types.ts": [],
+    "e2e/utils/test-utils.ts": [],
+    "e2e/utils/theme-utils.ts": [],
+    "ENVIRONMENT.md": [],
+    "lint_findings.txt": [],
+    "lint_report.json": [],
+    "lint-staged.config.js": [],
+    "MANUAL_TEST_GUIDE.md": [],
+    "next.config.js": [],
+    "package-lock (1).json": [],
+    "package.json": [],
+    "parity-report.json": [],
+    "PLAN-first-launch-modal.md": [],
+    "playwright.config.ts": [],
+    "playwright.phase21.config.ts": [],
+    "pnpm-workspace.yaml": [],
+    "postcss.config.js": [],
+    "public/branding/hvac-library/catalog-icons/manifest.json": [],
+    "public/data/ashrae-62-1.json": [],
+    "public/data/materials.json": [],
+    "public/data/velocity-limits.json": [],
+    "public/equipment-library/air-handlers.json": [],
+    "public/equipment-library/diffusers.json": [],
+    "public/equipment-library/fans.json": [],
+    "public/equipment-library/manifest.json": [],
+    "QUICK_TEST.md": [],
+    "README.md": [],
+    "scripts/analyze_inventory.py": [],
+    "scripts/export-catalog-icons.tsx": [
+      "src/features/canvas/components/catalogIcons.tsx"
+    ],
+    "scripts/validate-env.js": [],
+    "src-tauri/AGENTS.md": [],
+    "src-tauri/build.rs": [],
+    "src-tauri/capabilities/default.json": [],
+    "src-tauri/Cargo.toml": [],
+    "src-tauri/icons/icon.icns": [],
+    "src-tauri/src/commands/mod.rs": [
+      "src-tauri/src/commands/storage_root.rs"
+    ],
+    "src-tauri/src/commands/storage_root.rs": [],
+    "src-tauri/src/lib.rs": [
+      "src-tauri/src/commands/mod.rs"
+    ],
+    "src-tauri/src/main.rs": [],
+    "src-tauri/tauri.conf.json": [],
+    "src/AGENTS.md": [],
+    "src/components/AGENTS.md": [],
+    "src/components/canvas/AutoSizingControls.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/core/schema/duct.schema.ts",
+      "src/core/services/automation/autoSizingService.ts",
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/components/canvas/BOMPanel.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/core/services/bom/bomGenerationService.ts",
+      "src/core/services/cost/costCalculationService.ts"
+    ],
+    "src/components/canvas/BulkOperationsToolbar.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/select.tsx"
+    ],
+    "src/components/canvas/ValidationDisplay.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/components/common/DeviceWarning.tsx": [
+      "src/hooks/useDeviceDetection.ts",
+      "src/utils/platform.ts"
+    ],
+    "src/components/common/VibeKanbanWebCompanionClient.tsx": [
+      "src/utils/platform.ts"
+    ],
+    "src/components/dialogs/ErrorDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/components/dialogs/FabricationProfileSettingsPanel.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/tabs.tsx",
+      "src/core/schema/fabrication-profile.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/fabricationProfileStore.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/components/dialogs/KeyboardShortcutsDialog.tsx": [
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/components/dialogs/MigrationWizard.tsx": [
+      "src/components/ui/alert.tsx",
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/progress.tsx",
+      "src/core/services/migration/BackupManager.ts",
+      "src/core/services/migration/MigrationRegistry.ts",
+      "src/core/services/migration/VersionDetector.ts"
+    ],
+    "src/components/dialogs/ProjectAlreadyExistsDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/components/dialogs/ProjectInitializationWizard.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/core/services/project/projectInitializationService.ts"
+    ],
+    "src/components/dialogs/QuarantineManagerDialog.tsx": [
+      "src/components/ui/alert.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/ProjectRepository.ts",
+      "src/core/services/StorageRootService.ts",
+      "src/core/services/types.ts"
+    ],
+    "src/components/dialogs/SettingsDialog.tsx": [
+      "src/components/dialogs/FabricationProfileSettingsPanel.tsx",
+      "src/components/dialogs/QuarantineManagerDialog.tsx",
+      "src/components/dialogs/StorageSettings/StorageSettingsPanel.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/switch.tsx",
+      "src/core/store/preferencesStore.ts"
+    ],
+    "src/components/dialogs/StorageSettings/ChangeLocationDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/core/persistence/filesystem.ts",
+      "src/hooks/useStorageRoot.ts"
+    ],
+    "src/components/dialogs/StorageSettings/StorageSettingsPanel.tsx": [
+      "src/components/dialogs/StorageSettings/ChangeLocationDialog.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/label.tsx",
+      "src/core/store/storageStore.ts",
+      "src/hooks/useStorageRoot.ts"
+    ],
+    "src/components/dialogs/UnsavedChangesDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/components/dialogs/VersionWarningDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/components/error/ErrorPage.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx"
+    ],
+    "src/components/ErrorBoundary.tsx": [],
+    "src/components/layout/AppShell.tsx": [
+      "src/components/layout/Header.tsx"
+    ],
+    "src/components/layout/EditMenu.tsx": [
+      "src/components/ui/button.tsx",
+      "src/core/commands/index.ts",
+      "src/core/config/featureFlags.ts",
+      "src/core/store/dialogStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/clipboard/entityClipboard.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/components/layout/FileMenu.tsx": [
+      "src/components/dialogs/ErrorDialog.tsx",
+      "src/components/dialogs/MigrationWizard.tsx",
+      "src/components/dialogs/ProjectAlreadyExistsDialog.tsx",
+      "src/components/dialogs/UnsavedChangesDialog.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/ToastContext.tsx",
+      "src/core/config/featureFlags.ts",
+      "src/core/persistence/ProjectRepository.ts",
+      "src/core/persistence/ProjectStateOrchestrator.ts",
+      "src/core/persistence/serialization.ts",
+      "src/core/persistence/TauriFileSystem.ts",
+      "src/core/persistence/webFileHandles.ts",
+      "src/core/persistence/webProjectFileIO.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/store/dialogStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/hooks/useAutoSave.ts",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/features/export/ExportReportDialog.tsx",
+      "src/features/project/components/ProjectSetupWizard.tsx",
+      "src/stores/useAppStateStore.ts"
+    ],
+    "src/components/layout/Header.tsx": [
+      "src/components/dialogs/KeyboardShortcutsDialog.tsx",
+      "src/components/dialogs/SettingsDialog.tsx",
+      "src/components/layout/EditMenu.tsx",
+      "src/components/layout/FileMenu.tsx",
+      "src/components/layout/HelpMenu.tsx",
+      "src/components/layout/ViewMenu.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "src/components/layout/HelpMenu.tsx": [
+      "src/components/ui/button.tsx"
+    ],
+    "src/components/layout/ViewMenu.tsx": [
+      "src/components/ui/button.tsx",
+      "src/stores/useLayoutStore.ts",
+      "src/stores/useViewportStore.ts"
+    ],
+    "src/components/onboarding/AppInitializer.tsx": [
+      "src/components/onboarding/SplashScreen.tsx",
+      "src/components/onboarding/WelcomeScreen.tsx",
+      "src/core/config/featureFlags.ts",
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/ProjectRepository.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/services/StorageRootService.ts",
+      "src/core/store/preferencesStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/features/project/components/ProjectSetupWizard.tsx",
+      "src/hooks/useAutoOpen.ts",
+      "src/hooks/useStorageEvents.ts",
+      "src/stores/useAppStateStore.ts",
+      "src/stores/useTutorialStore.ts"
+    ],
+    "src/components/onboarding/FeatureHighlightCard.tsx": [
+      "src/components/ui/card.tsx"
+    ],
+    "src/components/onboarding/ProjectCreationScreen.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/lib/utils.ts"
+    ],
+    "src/components/onboarding/SplashScreen.tsx": [
+      "src/components/ui/card.tsx",
+      "src/components/ui/progress.tsx"
+    ],
+    "src/components/onboarding/TutorialOverlay.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/stores/useTutorialStore.ts"
+    ],
+    "src/components/onboarding/WelcomeScreen.tsx": [
+      "src/components/onboarding/FeatureHighlightCard.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/stores/useAppStateStore.ts",
+      "src/stores/useTutorialStore.ts"
+    ],
+    "src/components/ui/accordion.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/alert.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/badge.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/button.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/card.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/checkbox.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/CollapsibleSection.module.css": [],
+    "src/components/ui/CollapsibleSection.tsx": [
+      "src/components/ui/CollapsibleSection.module.css"
+    ],
+    "src/components/ui/data-table.tsx": [
+      "src/components/ui/button.tsx",
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/dialog.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/Dropdown.module.css": [],
+    "src/components/ui/Dropdown.tsx": [
+      "src/components/ui/Dropdown.module.css"
+    ],
+    "src/components/ui/IconButton.module.css": [],
+    "src/components/ui/IconButton.tsx": [
+      "src/components/ui/IconButton.module.css"
+    ],
+    "src/components/ui/index.ts": [],
+    "src/components/ui/input.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/label.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/LoadingIndicator.module.css": [],
+    "src/components/ui/LoadingIndicator.tsx": [
+      "src/components/ui/LoadingIndicator.module.css"
+    ],
+    "src/components/ui/LoadingSpinner.module.css": [],
+    "src/components/ui/LoadingSpinner.tsx": [
+      "src/components/ui/LoadingSpinner.module.css"
+    ],
+    "src/components/ui/progress.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/radio-group.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/README.md": [],
+    "src/components/ui/select.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/StatCard.module.css": [],
+    "src/components/ui/StatCard.tsx": [
+      "src/components/ui/StatCard.module.css"
+    ],
+    "src/components/ui/switch.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/tabs.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/textarea.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/components/ui/Toast.module.css": [],
+    "src/components/ui/Toast.tsx": [
+      "src/components/ui/Toast.module.css"
+    ],
+    "src/components/ui/ToastContainer.tsx": [
+      "src/components/ui/ToastContext.tsx"
+    ],
+    "src/components/ui/ToastContext.tsx": [],
+    "src/components/ui/ToastHost.tsx": [
+      "src/components/ui/Toast.tsx"
+    ],
+    "src/components/ui/ValidatedInput.module.css": [],
+    "src/components/ui/ValidatedInput.tsx": [
+      "src/components/ui/ValidatedInput.module.css"
+    ],
+    "src/core/AGENTS.md": [],
+    "src/core/commands/ductRunCommands.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/commands/types.ts",
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/core/commands/entityCommands.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/commands/types.ts",
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/services/calculations/entityCalculationRuntime.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/services/constraintValidation.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/settingsStore.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/entities/ductDefaults.ts",
+      "src/features/canvas/entities/ductRunDefaults.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/core/commands/historyStore.ts": [
+      "src/core/commands/types.ts"
+    ],
+    "src/core/commands/index.ts": [],
+    "src/core/commands/types.ts": [],
+    "src/core/config/featureFlags.ts": [],
+    "src/core/constants/coordinates.ts": [],
+    "src/core/constants/index.ts": [],
+    "src/core/constants/viewport.ts": [],
+    "src/core/geometry/bounds.ts": [
+      "src/core/geometry/math.ts"
+    ],
+    "src/core/geometry/ductBounds.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/geometry/bounds.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts"
+    ],
+    "src/core/geometry/index.ts": [],
+    "src/core/geometry/math.ts": [],
+    "src/core/index.ts": [],
+    "src/core/persistence/adapters/FileSystemAccessAdapter.ts": [
+      "src/core/persistence/serialization.ts",
+      "src/core/persistence/StorageAdapter.ts",
+      "src/core/persistence/types.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/core/persistence/adapters/TauriStorageAdapter.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/serialization.ts",
+      "src/core/persistence/StorageAdapter.ts",
+      "src/core/persistence/types.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/core/persistence/adapters/WebStorageAdapter.ts": [
+      "src/core/persistence/serialization.ts",
+      "src/core/persistence/StorageAdapter.ts",
+      "src/core/persistence/types.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/core/persistence/browserStorage.ts": [],
+    "src/core/persistence/directoryHandleManager.ts": [],
+    "src/core/persistence/factory.ts": [
+      "src/core/persistence/adapters/FileSystemAccessAdapter.ts",
+      "src/core/persistence/adapters/TauriStorageAdapter.ts",
+      "src/core/persistence/adapters/WebStorageAdapter.ts",
+      "src/core/persistence/directoryHandleManager.ts",
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/StorageAdapter.ts",
+      "src/core/persistence/types.ts"
+    ],
+    "src/core/persistence/filesystem.ts": [],
+    "src/core/persistence/index.ts": [],
+    "src/core/persistence/migrateInsulatedBoolean.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/core/persistence/migrationHelper.ts": [
+      "src/core/persistence/adapters/FileSystemAccessAdapter.ts",
+      "src/core/persistence/adapters/WebStorageAdapter.ts"
+    ],
+    "src/core/persistence/projectIO.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/serialization.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/core/persistence/ProjectRepository.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/projectIO.ts",
+      "src/core/persistence/StorageAdapter.ts",
+      "src/core/persistence/types.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/services/OperationQueue.ts",
+      "src/core/services/StorageRootService.ts",
+      "src/core/services/types.ts"
+    ],
+    "src/core/persistence/ProjectStateOrchestrator.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/persistence/migrateInsulatedBoolean.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/preferencesStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/hooks/useSystemCalculations.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/threeDViewStore.ts",
+      "src/features/canvas/store/viewModeStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/duct-runs/utils/convertDuctToDuctRun.ts",
+      "src/features/export/csv.ts"
+    ],
+    "src/core/persistence/serialization.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/migration/MigrationRegistry.ts",
+      "src/features/duct-runs/utils/convertDuctToDuctRun.ts"
+    ],
+    "src/core/persistence/StorageAdapter.ts": [
+      "src/core/persistence/types.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/core/persistence/TauriFileSystem.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/core/persistence/TauriPathManager.ts": [],
+    "src/core/persistence/types.ts": [
+      "src/core/persistence/projectIO.ts"
+    ],
+    "src/core/persistence/webFileHandles.ts": [],
+    "src/core/persistence/webProjectFileIO.ts": [
+      "src/core/persistence/serialization.ts",
+      "src/core/persistence/webFileHandles.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/core/schema/base.schema.ts": [],
+    "src/core/schema/calculation-settings.schema.ts": [],
+    "src/core/schema/catalog.schema.ts": [
+      "src/core/schema/service.schema.ts"
+    ],
+    "src/core/schema/component-library.schema.ts": [],
+    "src/core/schema/duct-run.schema.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/base.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/schema/duct.schema.ts": [
+      "src/core/schema/base.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/schema/equipment.schema.ts": [
+      "src/core/schema/base.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/schema/fabrication-profile.schema.ts": [
+      "src/core/schema/duct-run.schema.ts"
+    ],
+    "src/core/schema/fitting.schema.ts": [
+      "src/core/schema/base.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/schema/group.schema.ts": [
+      "src/core/schema/base.schema.ts"
+    ],
+    "src/core/schema/index.ts": [],
+    "src/core/schema/note.schema.ts": [
+      "src/core/schema/base.schema.ts"
+    ],
+    "src/core/schema/project-file.schema.ts": [
+      "src/core/schema/duct-run.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/group.schema.ts",
+      "src/core/schema/note.schema.ts",
+      "src/core/schema/room.schema.ts"
+    ],
+    "src/core/schema/ProjectFileSchema.ts": [],
+    "src/core/schema/room.schema.ts": [
+      "src/core/schema/base.schema.ts"
+    ],
+    "src/core/schema/service.schema.ts": [
+      "src/core/schema/fitting.schema.ts"
+    ],
+    "src/core/schema/system-template.schema.ts": [],
+    "src/core/schema/unified-component.schema.ts": [
+      "src/core/schema/component-library.schema.ts"
+    ],
+    "src/core/services/automation/autoSizingService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/services/calculations/engineeringCalculator.ts",
+      "src/core/services/parametric/parametricUpdateService.ts",
+      "src/core/services/validation/constraintValidator.ts"
+    ],
+    "src/core/services/automation/fittingInsertionService.ts": [
+      "src/core/schema/duct-run.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/ductConnections.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/fittingDefaults.ts"
+    ],
+    "src/core/services/bom/bomGenerationService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/fitting.schema.ts"
+    ],
+    "src/core/services/calculations/CalculationEngineRegistry.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/services/calculations/ductVelocityThresholds.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/calculations/engineeringCalculator.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/services/calculations/entityCalculationRuntime.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/services/calculations/CalculationEngineRegistry.ts",
+      "src/core/services/calculations/engineeringCalculator.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/services/calculations/PressurePropagationService.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/types.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/services/componentServiceInterop.ts": [
+      "src/core/schema/service.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/core/services/connectionDetection.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/ductConnections.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/core/services/constraintValidation.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/service.schema.ts",
+      "src/core/services/engineeringCalculations.ts",
+      "src/core/store/validationStore.ts"
+    ],
+    "src/core/services/cost/costCalculationService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/services/bom/bomGenerationService.ts"
+    ],
+    "src/core/services/ductConnections.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/ductGeometryHelpers.ts"
+    ],
+    "src/core/services/engineeringCalculations.ts": [
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/services/export/bomExportService.ts": [
+      "src/core/services/cost/costCalculationService.ts"
+    ],
+    "src/core/services/export/excelGenerator.ts": [
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/services/export/bomExportService.ts"
+    ],
+    "src/core/services/export/pdfGenerator.ts": [
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/services/export/bomExportService.ts"
+    ],
+    "src/core/services/fittingGeneration.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/services/connectionDetection.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/fittingDefaults.ts"
+    ],
+    "src/core/services/graph/ConnectionGraphBuilder.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentPortFlow.ts",
+      "src/core/services/graph/GraphCache.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/ConnectionReconciliationService.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/index.ts",
+      "src/features/canvas/services/equipmentGeometry.ts"
+    ],
+    "src/core/services/graph/equipmentClassification.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/core/services/graph/equipmentPortFlow.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentClassification.ts"
+    ],
+    "src/core/services/graph/FlowPropagationService.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentClassification.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/GraphCache.ts": [
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/TopologyValidationService.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentClassification.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/types.ts": [],
+    "src/core/services/LoggerService.ts": [
+      "src/core/persistence/filesystem.ts"
+    ],
+    "src/core/services/migration/BackupManager.ts": [],
+    "src/core/services/migration/componentMigration.ts": [],
+    "src/core/services/migration/MigrationRegistry.ts": [
+      "src/core/schema/project-file.schema.ts",
+      "src/core/services/migration/VersionDetector.ts",
+      "src/features/duct-runs/utils/convertDuctToDuctRun.ts"
+    ],
+    "src/core/services/migration/runMigration.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/projectIO.ts",
+      "src/core/services/migration/types.ts",
+      "src/core/services/migration/utils.ts"
+    ],
+    "src/core/services/migration/storeDataMigration.ts": [
+      "src/core/schema/catalog.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/schema/service.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/services/migration/types.ts"
+    ],
+    "src/core/services/migration/types.ts": [],
+    "src/core/services/migration/utils.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/migration/types.ts"
+    ],
+    "src/core/services/migration/VersionDetector.ts": [],
+    "src/core/services/OperationQueue.ts": [],
+    "src/core/services/operations/bulkOperationsService.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/commands/types.ts",
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/autoSizingService.ts",
+      "src/core/services/parametric/parametricUpdateService.ts",
+      "src/core/services/validation/constraintValidator.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/core/services/parametric/parametricUpdateService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/engineeringCalculator.ts",
+      "src/core/services/fittingGeneration.ts",
+      "src/core/services/validation/constraintValidator.ts"
+    ],
+    "src/core/services/parametrics/autoSizing.ts": [],
+    "src/core/services/parametrics/ParametricUpdateService.ts": [
+      "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/project/projectInitializationService.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/component-library.schema.ts",
+      "src/core/schema/system-template.schema.ts"
+    ],
+    "src/core/services/StorageRootService.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/services/migration/runMigration.ts",
+      "src/core/services/OperationQueue.ts",
+      "src/core/services/types.ts",
+      "src/core/store/storageStore.ts",
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/core/services/templates/systemTemplateService.ts": [
+      "src/core/schema/calculation-settings.schema.ts"
+    ],
+    "src/core/services/types.ts": [],
+    "src/core/services/validation/constraintValidator.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts"
+    ],
+    "src/core/services/validation/detectCorruption.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/types.ts"
+    ],
+    "src/core/services/validation/quarantineFile.ts": [
+      "src/core/persistence/filesystem.ts"
+    ],
+    "src/core/services/validation/validationAggregationService.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/fitting.schema.ts"
+    ],
+    "src/core/store/calculationSettingsStore.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/core/store/canvas.store.ts": [
+      "src/core/schema/duct-run.schema.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/store/componentLibraryInitializer.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/core/store/componentLibraryStoreV2.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/store/dialogStore.ts": [],
+    "src/core/store/ductOverlayStore.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/ductVelocityThresholds.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/store/entityStore.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/PressurePropagationService.ts",
+      "src/core/services/engineeringCalculations.ts",
+      "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "src/core/services/graph/ConnectionReconciliationService.ts",
+      "src/core/services/graph/FlowPropagationService.ts",
+      "src/core/services/graph/TopologyValidationService.ts",
+      "src/core/services/graph/types.ts",
+      "src/core/store/ductOverlayStore.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/core/store/fabricationProfileStore.ts": [
+      "src/core/schema/duct-run.schema.ts",
+      "src/core/schema/fabrication-profile.schema.ts"
+    ],
+    "src/core/store/index.ts": [],
+    "src/core/store/preferencesStore.ts": [],
+    "src/core/store/project.store.ts": [
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/core/store/serviceStore.ts": [
+      "src/core/schema/service.schema.ts"
+    ],
+    "src/core/store/settingsStore.ts": [
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/services/constraintValidation.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/core/store/storageStore.ts": [],
+    "src/core/store/validationStore.ts": [
+      "src/core/schema/catalog.schema.ts"
+    ],
+    "src/features/canvas/3d/commands/index.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/ductDefaults.ts",
+      "src/features/canvas/store/threeDViewStore.ts"
+    ],
+    "src/features/canvas/3d/runtime/createCamera.ts": [
+      "src/features/canvas/store/threeDViewStore.ts"
+    ],
+    "src/features/canvas/3d/runtime/createControls.ts": [
+      "src/features/canvas/store/threeDViewStore.ts"
+    ],
+    "src/features/canvas/3d/runtime/createRenderer.ts": [],
+    "src/features/canvas/3d/runtime/createScene.ts": [],
+    "src/features/canvas/3d/runtime/gizmoManager.ts": [
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/runtime/raycastSelection.ts": [],
+    "src/features/canvas/3d/runtime/rebuildSceneGraph.ts": [
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/scene/deriveDuctNode.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/scene/deriveEquipmentNode.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/scene/deriveFittingNode.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/scene/deriveRoomNode.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/scene/deriveSceneNodes.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/3d/scene/deriveDuctNode.ts",
+      "src/features/canvas/3d/scene/deriveEquipmentNode.ts",
+      "src/features/canvas/3d/scene/deriveFittingNode.ts",
+      "src/features/canvas/3d/scene/deriveRoomNode.ts",
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/3d/types.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/3d/utils/sceneBounds.ts": [
+      "src/features/canvas/3d/types.ts"
+    ],
+    "src/features/canvas/AGENTS.md": [],
+    "src/features/canvas/auto-fitting/types.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/connectionDetection.ts"
+    ],
+    "src/features/canvas/calculators/ductSizing.ts": [
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/features/canvas/calculators/pressureDrop.ts": [],
+    "src/features/canvas/calculators/ventilation.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/room.schema.ts"
+    ],
+    "src/features/canvas/CanvasPage.tsx": [
+      "src/components/layout/AppShell.tsx",
+      "src/components/onboarding/TutorialOverlay.tsx",
+      "src/core/config/featureFlags.ts",
+      "src/core/store/dialogStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/preferencesStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/components/BulkEditDialog.tsx",
+      "src/features/canvas/components/CalculationSettingsDialog.tsx",
+      "src/features/canvas/components/CanvasOverlayWarning.tsx",
+      "src/features/canvas/components/CanvasViewportHost.tsx",
+      "src/features/canvas/components/Minimap.tsx",
+      "src/features/canvas/components/RightSidebar.tsx",
+      "src/features/canvas/components/ServiceContextStrip.tsx",
+      "src/features/canvas/components/StatusBar.tsx",
+      "src/features/canvas/components/SystemTemplateSelector.tsx",
+      "src/features/canvas/components/TopToolBar.tsx",
+      "src/features/canvas/components/UnifiedDock/index.tsx",
+      "src/features/canvas/components/ZoomControls.tsx",
+      "src/features/canvas/hooks/index.ts",
+      "src/features/canvas/hooks/useKeyboardShortcuts.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewModeStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/hooks/useResponsiveLayout.ts"
+    ],
+    "src/features/canvas/CanvasPageWrapper.tsx": [
+      "src/components/dialogs/MigrationWizard.tsx",
+      "src/components/dialogs/VersionWarningDialog.tsx",
+      "src/components/error/ErrorPage.tsx",
+      "src/components/ui/ToastContext.tsx",
+      "src/core/persistence/ProjectStateOrchestrator.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/services/migration/VersionDetector.ts",
+      "src/core/store/componentLibraryInitializer.ts",
+      "src/core/store/project.store.ts",
+      "src/features/canvas/CanvasPage.tsx",
+      "src/features/canvas/hooks/useAutoSave.ts",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/stores/useAppStateStore.ts",
+      "src/stores/useProjectStore.ts",
+      "src/utils/logger.ts"
+    ],
+    "src/features/canvas/clipboard/clipboardAdapter.ts": [
+      "src/core/persistence/filesystem.ts"
+    ],
+    "src/features/canvas/clipboard/clipboardPayload.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/clipboard/entityClipboard.ts": [
+      "src/core/commands/index.ts",
+      "src/core/geometry/ductBounds.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/clipboard/clipboardAdapter.ts",
+      "src/features/canvas/clipboard/clipboardPayload.ts",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/components/AccordionLibrary.tsx": [
+      "src/components/ui/accordion.tsx",
+      "src/components/ui/badge.tsx",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/canvas/components/BOMDataGrid.tsx": [
+      "src/components/ui/data-table.tsx",
+      "src/features/export/csv.ts"
+    ],
+    "src/features/canvas/components/BOMPanel.module.css": [],
+    "src/features/canvas/components/BOMPanel.tsx": [
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/features/canvas/components/BOMPanel.module.css",
+      "src/features/canvas/hooks/useBOM.ts",
+      "src/features/canvas/store/bomHighlightStore.ts",
+      "src/features/export/csv.ts"
+    ],
+    "src/features/canvas/components/BOMPanel/index.tsx": [
+      "src/core/services/bom/bomGenerationService.ts"
+    ],
+    "src/features/canvas/components/BOMTable.tsx": [
+      "src/features/export/csv.ts"
+    ],
+    "src/features/canvas/components/BottomToolbar.tsx": [
+      "src/features/canvas/components/GridSettings.tsx"
+    ],
+    "src/features/canvas/components/BulkEditDialog.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/components/ui/tabs.tsx",
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/features/canvas/components/CalculationSettingsDialog.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/components/ui/tabs.tsx",
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/services/templates/systemTemplateService.ts",
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/features/canvas/components/CalculationsPanel.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/hooks/useSystemCalculations.ts",
+      "src/features/canvas/services/ductRunSectionCalculations.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/components/CanvasContainer.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/ductOverlayStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/preferencesStore.ts",
+      "src/features/canvas/components/DuctSizePromptDialog.tsx",
+      "src/features/canvas/components/EquipmentPlacementDialog.tsx",
+      "src/features/canvas/components/Inspector/FloatingInspector.tsx",
+      "src/features/canvas/components/RulersOverlay.tsx",
+      "src/features/canvas/hooks/useViewport.ts",
+      "src/features/canvas/renderers/index.ts",
+      "src/features/canvas/services/CanvasPerformanceService.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/features/canvas/store/inspectorPreferencesStore.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/index.ts",
+      "src/features/canvas/utils/validateFloatingPosition.ts"
+    ],
+    "src/features/canvas/components/CanvasOverlayWarning.tsx": [
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/lib/utils.ts"
+    ],
+    "src/features/canvas/components/CanvasViewportHost.tsx": [
+      "src/features/canvas/components/CanvasContainer.tsx"
+    ],
+    "src/features/canvas/components/catalogIcons.tsx": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/features/canvas/tools/placementStrategies.ts"
+    ],
+    "src/features/canvas/components/CatalogPanel.tsx": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/components/catalogIcons.tsx",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/ComponentBrowser/index.tsx": [
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/canvas/components/DomainSelector.tsx": [],
+    "src/features/canvas/components/DrawToolFanMenu.tsx": [],
+    "src/features/canvas/components/DuctSizePromptDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/core/schema/index.ts",
+      "src/core/store/canvas.store.ts"
+    ],
+    "src/features/canvas/components/DuctToolOptionsPanel.tsx": [
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/core/schema/index.ts",
+      "src/core/store/canvas.store.ts"
+    ],
+    "src/features/canvas/components/DynamicFittingSymbols.tsx": [
+      "src/features/canvas/renderers/fittingSymbolModel.ts"
+    ],
+    "src/features/canvas/components/EquipmentPlacementDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/canvas/components/EquipmentTypeSelector.tsx": [
+      "src/components/ui/button.tsx",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/lib/utils.ts"
+    ],
+    "src/features/canvas/components/FittingConnectionDemo.jsx": [],
+    "src/features/canvas/components/FittingGalleryDemo.jsx": [],
+    "src/features/canvas/components/FittingTypeSelector.tsx": [
+      "src/components/ui/button.tsx",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/lib/utils.ts"
+    ],
+    "src/features/canvas/components/GridSettings.tsx": [
+      "src/core/store/preferencesStore.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/components/index.ts": [],
+    "src/features/canvas/components/Inspector/CanvasPropertiesInspector.tsx": [
+      "src/components/ui/accordion.tsx",
+      "src/components/ui/Dropdown.tsx",
+      "src/core/store/preferencesStore.ts",
+      "src/core/store/project.store.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/components/Inspector/DuctInspector.tsx": [
+      "src/components/canvas/AutoSizingControls.tsx",
+      "src/components/canvas/ValidationDisplay.tsx",
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/autoSizingService.ts",
+      "src/core/services/bom/bomGenerationService.ts",
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/services/parametric/parametricUpdateService.ts",
+      "src/core/services/validation/constraintValidator.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/dialogStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/hooks/useFieldValidation.ts",
+      "src/features/canvas/store/bomHighlightStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/Inspector/DuctPropertiesPanelSample.jsx": [],
+    "src/features/canvas/components/Inspector/DuctRunInspector.tsx": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/components/Inspector/EquipmentInspector.tsx": [
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/InspectorAccordion.tsx",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/entities/equipmentDefaults.ts",
+      "src/features/canvas/hooks/useFieldValidation.ts"
+    ],
+    "src/features/canvas/components/Inspector/FabricationProfileSettingsPanel.tsx": [
+      "src/core/schema/fabrication-profile.schema.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/fabricationProfileStore.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/components/Inspector/FittingInspector.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/entities/fittingDefaults.ts"
+    ],
+    "src/features/canvas/components/Inspector/FloatingInspector.tsx": [
+      "src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "src/features/canvas/store/inspectorPreferencesStore.ts",
+      "src/features/canvas/utils/validateFloatingPosition.ts"
+    ],
+    "src/features/canvas/components/Inspector/InspectorAccordion.tsx": [
+      "src/components/ui/accordion.tsx",
+      "src/features/canvas/store/inspectorPreferencesStore.ts"
+    ],
+    "src/features/canvas/components/Inspector/InspectorOverviewPanel.tsx": [
+      "src/features/canvas/components/Inspector/inspectorOverviewTypes.ts",
+      "src/features/canvas/utils/systemPresentation.ts",
+      "src/features/canvas/utils/unitFormatting.ts"
+    ],
+    "src/features/canvas/components/Inspector/inspectorOverviewTypes.ts": [],
+    "src/features/canvas/components/Inspector/InspectorPanel.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/DuctInspector.tsx",
+      "src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "src/features/canvas/components/Inspector/FittingInspector.tsx",
+      "src/features/canvas/components/Inspector/InspectorOverviewPanel.tsx",
+      "src/features/canvas/components/Inspector/RoomInspector.tsx",
+      "src/features/canvas/components/Inspector/useInspectorOverviewData.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewModeStore.ts"
+    ],
+    "src/features/canvas/components/Inspector/PropertyField.tsx": [],
+    "src/features/canvas/components/Inspector/README.md": [],
+    "src/features/canvas/components/Inspector/RoomInspector.tsx": [
+      "src/components/ui/ValidatedInput.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/Inspector/InspectorAccordion.tsx",
+      "src/features/canvas/components/Inspector/PropertyField.tsx",
+      "src/features/canvas/hooks/useFieldValidation.ts"
+    ],
+    "src/features/canvas/components/Inspector/TabbedPropertiesPanel.tsx": [
+      "src/lib/utils.ts"
+    ],
+    "src/features/canvas/components/Inspector/useInspectorOverviewData.ts": [
+      "src/core/commands/index.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/calculationSettingsStore.ts",
+      "src/core/store/dialogStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/preferencesStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/components/Inspector/inspectorOverviewTypes.ts",
+      "src/features/canvas/services/geometryRepairService.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/utils/inspectorFocus.ts"
+    ],
+    "src/features/canvas/components/LeftSidebar.tsx": [
+      "src/core/store/canvas.store.ts",
+      "src/features/canvas/components/ManagePanel.tsx",
+      "src/features/canvas/components/ProductCatalogPanel.tsx",
+      "src/features/canvas/components/Toolbar.tsx",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/LibraryBrowserPanel.tsx": [
+      "src/features/canvas/components/ProductCatalogPanel.tsx"
+    ],
+    "src/features/canvas/components/LibraryManagementView.tsx": [
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/canvas/components/ManagePanel.tsx": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/components/SlideOverEditPanel.tsx",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/Minimap.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/components/ProductCatalogPanel.tsx": [
+      "src/features/canvas/components/CatalogPanel.tsx"
+    ],
+    "src/features/canvas/components/ProjectAssetsPanel.tsx": [
+      "src/components/ui/tabs.tsx",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/components/CatalogPanel.tsx",
+      "src/features/canvas/components/ManagePanel.tsx"
+    ],
+    "src/features/canvas/components/ResolutionWizard.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/validationStore.ts"
+    ],
+    "src/features/canvas/components/RightSidebar.tsx": [
+      "src/features/canvas/components/BOMPanel.tsx",
+      "src/features/canvas/components/CalculationsPanel.tsx",
+      "src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "src/features/canvas/components/ValidationDashboard.tsx",
+      "src/features/canvas/store/bomHighlightStore.ts",
+      "src/features/canvas/store/inspectorPreferencesStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/rulers.ts": [],
+    "src/features/canvas/components/RulersOverlay.tsx": [
+      "src/features/canvas/components/rulers.ts"
+    ],
+    "src/features/canvas/components/SelectionMarquee.tsx": [
+      "src/core/geometry/bounds.ts"
+    ],
+    "src/features/canvas/components/ServiceContextStrip.tsx": [
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/hooks/useBOM.ts",
+      "src/features/canvas/tools/placementStrategies.ts"
+    ],
+    "src/features/canvas/components/ServiceEditor.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/core/schema/service.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/canvas/components/ServiceList.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/canvas/components/ServicesPanel.tsx": [],
+    "src/features/canvas/components/SlideOverEditPanel.tsx": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/features/canvas/components/StatusBar.tsx": [
+      "src/core/store/canvas.store.ts",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewModeStore.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/components/SystemTemplateSelector.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/services/templates/systemTemplateService.ts"
+    ],
+    "src/features/canvas/components/ThreeViewport.tsx": [
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/3d/commands/index.ts",
+      "src/features/canvas/3d/runtime/createCamera.ts",
+      "src/features/canvas/3d/runtime/createControls.ts",
+      "src/features/canvas/3d/runtime/createRenderer.ts",
+      "src/features/canvas/3d/runtime/createScene.ts",
+      "src/features/canvas/3d/runtime/gizmoManager.ts",
+      "src/features/canvas/3d/runtime/raycastSelection.ts",
+      "src/features/canvas/3d/runtime/rebuildSceneGraph.ts",
+      "src/features/canvas/3d/scene/deriveSceneNodes.ts",
+      "src/features/canvas/3d/utils/sceneBounds.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/threeDViewStore.ts",
+      "src/features/canvas/store/viewModeStore.ts"
+    ],
+    "src/features/canvas/components/Toolbar.tsx": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/commands/historyStore.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/components/catalogIcons.tsx",
+      "src/features/canvas/components/EquipmentTypeSelector.tsx",
+      "src/features/canvas/components/FittingTypeSelector.tsx",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/features/canvas/tools/placementStrategies.ts",
+      "src/features/canvas/tools/supportPlacement.ts"
+    ],
+    "src/features/canvas/components/TopToolBar.tsx": [
+      "src/core/store/canvas.store.ts",
+      "src/features/canvas/components/catalogIcons.tsx",
+      "src/features/canvas/components/Toolbar.tsx",
+      "src/features/canvas/components/ViewModeToggle.tsx",
+      "src/features/canvas/hooks/useKeyboardShortcuts.ts",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/features/canvas/tools/placementStrategies.ts"
+    ],
+    "src/features/canvas/components/UnifiedComponentBrowser.tsx": [],
+    "src/features/canvas/components/UnifiedDock/DockDrawer.tsx": [
+      "src/features/canvas/components/ManagePanel.tsx",
+      "src/features/canvas/components/ProjectAssetsPanel.tsx",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/UnifiedDock/DockRail.tsx": [
+      "src/core/commands/historyStore.ts",
+      "src/features/canvas/hooks/useKeyboardShortcuts.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/components/UnifiedDock/index.tsx": [
+      "src/features/canvas/components/UnifiedDock/DockDrawer.tsx",
+      "src/features/canvas/components/UnifiedDock/DockRail.tsx"
+    ],
+    "src/features/canvas/components/ValidationDashboard.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/core/commands/entityCommands.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "src/core/services/graph/TopologyValidationService.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/ductOverlayStore.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/components/ResolutionWizard.tsx",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/components/ViewModeToggle.tsx": [
+      "src/features/canvas/store/viewModeStore.ts"
+    ],
+    "src/features/canvas/components/ZoomControls.tsx": [
+      "src/components/ui/select.tsx",
+      "src/core/constants/viewport.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/entities/ductDefaults.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/features/canvas/entities/ductRunDefaults.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/pressureDrop.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/entities/equipmentDefaults.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/entities/equipmentPortDefinitions.ts"
+    ],
+    "src/features/canvas/entities/equipmentPortDefinitions.ts": [
+      "src/core/schema/equipment.schema.ts"
+    ],
+    "src/features/canvas/entities/fittingDefaults.ts": [
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/entities/groupDefaults.ts": [
+      "src/core/schema/group.schema.ts"
+    ],
+    "src/features/canvas/entities/index.ts": [],
+    "src/features/canvas/entities/noteDefaults.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/note.schema.ts"
+    ],
+    "src/features/canvas/entities/roomDefaults.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/room.schema.ts",
+      "src/features/canvas/calculators/ventilation.ts"
+    ],
+    "src/features/canvas/hooks/index.ts": [],
+    "src/features/canvas/hooks/useActivationBridge.ts": [
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/tools/catalogPlacement.ts",
+      "src/features/canvas/tools/supportPlacement.ts"
+    ],
+    "src/features/canvas/hooks/useAutoSave.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/persistence/ProjectStateOrchestrator.ts",
+      "src/core/persistence/webProjectFileIO.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/preferencesStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/threeDViewStore.ts",
+      "src/features/canvas/store/viewModeStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/services/cloudBackupService.ts",
+      "src/stores/useAppStateStore.ts",
+      "src/stores/useLayoutStore.ts",
+      "src/stores/useProjectStore.ts",
+      "src/stores/useTutorialStore.ts",
+      "src/utils/storageKeys.ts",
+      "src/utils/telemetry.ts"
+    ],
+    "src/features/canvas/hooks/useBOM.ts": [
+      "src/core/services/bom/bomGenerationService.ts",
+      "src/core/services/cost/costCalculationService.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/export/csv.ts"
+    ],
+    "src/features/canvas/hooks/useCalculations.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/CalculationEngineRegistry.ts",
+      "src/core/services/calculations/entityCalculationRuntime.ts",
+      "src/core/services/validation/constraintValidator.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/settingsStore.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/calculators/ventilation.ts"
+    ],
+    "src/features/canvas/hooks/useEntityOperations.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/hooks/useFieldValidation.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/hooks/useKeyboardShortcuts.ts": [
+      "src/core/commands/index.ts",
+      "src/core/constants/viewport.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/clipboard/entityClipboard.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/features/canvas/hooks/useMarquee.ts": [
+      "src/core/geometry/bounds.ts"
+    ],
+    "src/features/canvas/hooks/useSelection.ts": [
+      "src/core/geometry/bounds.ts",
+      "src/core/geometry/ductBounds.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/hooks/useSystemCalculations.ts": [
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/features/canvas/hooks/useUndoRedo.ts": [
+      "src/core/commands/entityCommands.ts"
+    ],
+    "src/features/canvas/hooks/useViewport.ts": [
+      "src/features/canvas/store/viewportStore.ts"
+    ],
+    "src/features/canvas/index.ts": [],
+    "src/features/canvas/renderers/DuctRenderer.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/index.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/DuctRunRenderer.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts",
+      "src/features/canvas/services/index.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/equipment/portMarkerRenderer.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/ductConnectionProfile.ts",
+      "src/features/canvas/services/equipmentGeometry.ts"
+    ],
+    "src/features/canvas/renderers/equipment/RTUSymbol.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts"
+    ],
+    "src/features/canvas/renderers/EquipmentRenderer.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/equipment/portMarkerRenderer.ts",
+      "src/features/canvas/renderers/equipment/RTUSymbol.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/FittingRenderer.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/renderers/fittingSymbolModel.ts",
+      "src/features/canvas/renderers/RoomRenderer.ts",
+      "src/features/canvas/services/connectionPoints/index.ts",
+      "src/features/canvas/utils/index.ts"
+    ],
+    "src/features/canvas/renderers/fittingSymbolModel.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/renderers/index.ts": [],
+    "src/features/canvas/renderers/RoomRenderer.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/services/CanvasPerformanceService.ts": [],
+    "src/features/canvas/services/connectionPoints/connectionValidation.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/ductEndpointResolver.ts",
+      "src/features/canvas/services/connectionPoints/resolveConnectableGeometry.ts",
+      "src/features/canvas/services/connectionPoints/types.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/ductEndpointResolver.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/types.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/equipmentResolver.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/types.ts",
+      "src/features/canvas/services/equipmentGeometry.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/fittingResolver.ts": [
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/types.ts",
+      "src/features/canvas/services/connectionPoints/wyeGeometry.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/index.ts": [],
+    "src/features/canvas/services/connectionPoints/resolveConnectableGeometry.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/equipmentResolver.ts",
+      "src/features/canvas/services/connectionPoints/fittingResolver.ts",
+      "src/features/canvas/services/connectionPoints/types.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/snapScoring.ts": [
+      "src/features/canvas/services/connectionPoints/types.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/types.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/services/connectionPoints/wyeGeometry.ts": [
+      "src/features/canvas/services/connectionPoints/types.ts"
+    ],
+    "src/features/canvas/services/ductConnectionProfile.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/services/ductGeometryHelpers.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts"
+    ],
+    "src/features/canvas/services/DuctRunGeometryService.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/geometry/bounds.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/services/ductRunSectionCalculations.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/calculators/ductSizing.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/services/equipmentGeometry.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentPortFlow.ts"
+    ],
+    "src/features/canvas/services/fittingConnectionService.ts": [
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/fittingResolver.ts"
+    ],
+    "src/features/canvas/services/geometryRepairService.ts": [
+      "src/core/store/validationStore.ts"
+    ],
+    "src/features/canvas/services/index.ts": [],
+    "src/features/canvas/services/magneticConnectionService.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/index.ts",
+      "src/features/canvas/services/ductConnectionProfile.ts",
+      "src/features/canvas/services/ductGeometryHelpers.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/services/fittingConnectionService.ts"
+    ],
+    "src/features/canvas/store/bomHighlightStore.ts": [],
+    "src/features/canvas/store/cursorStore.ts": [],
+    "src/features/canvas/store/index.ts": [],
+    "src/features/canvas/store/inspectorPreferencesStore.ts": [],
+    "src/features/canvas/store/selectionStore.ts": [],
+    "src/features/canvas/store/threeDViewStore.ts": [],
+    "src/features/canvas/store/viewModeStore.ts": [],
+    "src/features/canvas/store/viewportStore.ts": [
+      "src/core/constants/viewport.ts",
+      "src/core/store/preferencesStore.ts"
+    ],
+    "src/features/canvas/symbols/Furnace_PlanSymbol.jsx": [],
+    "src/features/canvas/symbols/RTU_PlanSymbol.jsx": [],
+    "src/features/canvas/tokens/deriveVisualState.ts": [
+      "src/features/canvas/tokens/getElementColor.ts"
+    ],
+    "src/features/canvas/tokens/getConstructionStyle.ts": [],
+    "src/features/canvas/tokens/getElementColor.ts": [
+      "src/features/canvas/tokens/systemColorMap.ts"
+    ],
+    "src/features/canvas/tokens/index.ts": [],
+    "src/features/canvas/tokens/systemColorMap.ts": [],
+    "src/features/canvas/tools/BaseTool.ts": [],
+    "src/features/canvas/tools/catalogPlacement.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/features/canvas/tools/DuctTool.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/ductRunDefaults.ts",
+      "src/features/canvas/services/ductGeometryHelpers.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/services/magneticConnectionService.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/BaseTool.ts",
+      "src/features/canvas/tools/placementStrategies.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/tools/EquipmentTool.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/equipmentDefaults.ts",
+      "src/features/canvas/entities/equipmentPortDefinitions.ts",
+      "src/features/canvas/services/magneticConnectionService.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/BaseTool.ts"
+    ],
+    "src/features/canvas/tools/FittingTool.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/fittingDefaults.ts",
+      "src/features/canvas/renderers/FittingRenderer.ts",
+      "src/features/canvas/services/fittingConnectionService.ts",
+      "src/features/canvas/services/magneticConnectionService.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/BaseTool.ts",
+      "src/features/canvas/tools/catalogPlacement.ts"
+    ],
+    "src/features/canvas/tools/index.ts": [],
+    "src/features/canvas/tools/NoteTool.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/features/canvas/entities/noteDefaults.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/BaseTool.ts"
+    ],
+    "src/features/canvas/tools/placementStrategies.ts": [
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/features/canvas/tools/RoomTool.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/features/canvas/entities/roomDefaults.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/BaseTool.ts"
+    ],
+    "src/features/canvas/tools/SelectTool.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/constants/coordinates.ts",
+      "src/core/geometry/bounds.ts",
+      "src/core/geometry/ductBounds.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/fittingGeneration.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts",
+      "src/features/canvas/services/equipmentGeometry.ts",
+      "src/features/canvas/services/fittingConnectionService.ts",
+      "src/features/canvas/services/magneticConnectionService.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/features/canvas/tools/BaseTool.ts",
+      "src/features/canvas/tools/DuctTool.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/canvas/tools/supportPlacement.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/index.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ],
+    "src/features/canvas/tools/SupportTool.ts": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/canvas.store.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/features/canvas/tools/BaseTool.ts",
+      "src/features/canvas/tools/supportPlacement.ts"
+    ],
+    "src/features/canvas/utils/index.ts": [],
+    "src/features/canvas/utils/inspectorFocus.ts": [],
+    "src/features/canvas/utils/ProfessionalRenderingHelper.ts": [],
+    "src/features/canvas/utils/systemPresentation.ts": [],
+    "src/features/canvas/utils/unitFormatting.ts": [],
+    "src/features/canvas/utils/validateFloatingPosition.ts": [],
+    "src/features/dashboard/components/AllProjectsSection.tsx": [
+      "src/features/dashboard/components/ProjectGrid.tsx",
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/components/ConfirmDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/features/dashboard/components/ConnectFolderDialog.tsx": [
+      "src/core/persistence/directoryHandleManager.ts",
+      "src/core/persistence/factory.ts",
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/TauriPathManager.ts",
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/components/DashboardPage.tsx": [
+      "src/components/layout/AppShell.tsx",
+      "src/core/persistence/directoryHandleManager.ts",
+      "src/core/persistence/filesystem.ts",
+      "src/core/services/StorageRootService.ts",
+      "src/features/dashboard/components/AllProjectsSection.tsx",
+      "src/features/dashboard/components/ConnectFolderDialog.tsx",
+      "src/features/dashboard/components/NewProjectDialog.tsx",
+      "src/features/dashboard/components/RecentProjectsSection.tsx",
+      "src/features/dashboard/components/SearchBar.tsx",
+      "src/features/dashboard/hooks/useProjectFilters.ts",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/features/onboarding/components/FirstLaunchModal.tsx",
+      "src/features/onboarding/hooks/useFirstLaunch.ts",
+      "src/hooks/useAutoOpen.ts"
+    ],
+    "src/features/dashboard/components/DeleteConfirmDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/components/EditProjectDialog.tsx": [
+      "src/components/ui/accordion.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/stores/useProjectStore.ts"
+    ],
+    "src/features/dashboard/components/index.ts": [],
+    "src/features/dashboard/components/NewProjectDialog.tsx": [
+      "src/components/ui/accordion.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/core/persistence/ProjectRepository.ts",
+      "src/core/schema/project-file.schema.ts",
+      "src/core/services/StorageRootService.ts",
+      "src/features/canvas/hooks/useAutoSave.ts",
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/stores/useProjectStore.ts"
+    ],
+    "src/features/dashboard/components/ProjectCard.tsx": [
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/utils/storageKeys.ts"
+    ],
+    "src/features/dashboard/components/ProjectGrid.tsx": [
+      "src/features/dashboard/components/ProjectCard.tsx",
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/components/RecentProjectsSection.tsx": [
+      "src/features/dashboard/components/ProjectGrid.tsx",
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/components/SearchBar.tsx": [
+      "src/features/dashboard/hooks/useProjectFilters.ts"
+    ],
+    "src/features/dashboard/hooks/useFilteredProjects.ts": [
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/hooks/useProjectFilters.ts": [
+      "src/features/dashboard/store/projectListStore.ts"
+    ],
+    "src/features/dashboard/index.ts": [],
+    "src/features/dashboard/store/index.ts": [],
+    "src/features/dashboard/store/projectListStore.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/persistence/ProjectRepository.ts",
+      "src/core/store/storageStore.ts",
+      "src/utils/logger.ts",
+      "src/utils/storageKeys.ts"
+    ],
+    "src/features/duct-runs/entities/ductRunDefaults.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/duct-run.schema.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/duct-runs/utils/convertDuctToDuctRun.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/features/duct-runs/utils/getActiveSectionLength.ts": [
+      "src/core/schema/index.ts",
+      "src/core/store/fabricationProfileStore.ts"
+    ],
+    "src/features/duct-runs/utils/recomputeDuctRunSegments.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/features/duct-runs/utils/summarizeDuctRunQuantity.ts": [
+      "src/core/schema/duct-run.schema.ts"
+    ],
+    "src/features/export/bom.ts": [],
+    "src/features/export/buildExportProjectSnapshot.ts": [
+      "src/core/persistence/index.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/features/export/canvasSnapshot.ts": [
+      "src/features/canvas/services/index.ts"
+    ],
+    "src/features/export/components/EnhancedExportDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/progress.tsx",
+      "src/components/ui/select.tsx",
+      "src/features/export/canvasSnapshot.ts",
+      "src/features/export/types.ts"
+    ],
+    "src/features/export/components/ExportConfirmationDialogs.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx"
+    ],
+    "src/features/export/components/ExportDialog.tsx": [
+      "src/components/ui/dialog.tsx",
+      "src/features/export/services/ReportGenerator.ts"
+    ],
+    "src/features/export/components/PrintDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/radio-group.tsx",
+      "src/components/ui/select.tsx",
+      "src/features/export/canvasSnapshot.ts",
+      "src/features/export/types.ts"
+    ],
+    "src/features/export/csv.ts": [
+      "src/core/schema/index.ts",
+      "src/features/export/bom.ts",
+      "src/features/export/download.ts"
+    ],
+    "src/features/export/download.ts": [],
+    "src/features/export/ExportDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/features/export/ExportMenu.module.css": [],
+    "src/features/export/ExportMenu.tsx": [
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/features/export/buildExportProjectSnapshot.ts",
+      "src/features/export/download.ts",
+      "src/features/export/ExportDialog.tsx",
+      "src/features/export/ExportMenu.module.css",
+      "src/features/export/hooks/useExport.ts",
+      "src/features/export/index.ts",
+      "src/features/export/pdf.ts"
+    ],
+    "src/features/export/ExportReportDialog.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/export/buildExportProjectSnapshot.ts",
+      "src/features/export/hooks/useExport.ts"
+    ],
+    "src/features/export/hooks/useExport.ts": [
+      "src/features/export/canvasSnapshot.ts",
+      "src/features/export/services/ReportGenerator.ts",
+      "src/stores/useAppStateStore.ts",
+      "src/types/project.ts"
+    ],
+    "src/features/export/hooks/usePrint.ts": [
+      "src/features/export/types.ts",
+      "src/hooks/useAnalytics.ts",
+      "src/utils/analytics/events.ts"
+    ],
+    "src/features/export/index.ts": [],
+    "src/features/export/json.ts": [
+      "src/core/schema/index.ts",
+      "src/features/export/download.ts"
+    ],
+    "src/features/export/pdf.ts": [
+      "src/core/schema/index.ts",
+      "src/features/export/bom.ts"
+    ],
+    "src/features/export/png.ts": [
+      "src/features/export/canvasSnapshot.ts",
+      "src/features/export/types.ts"
+    ],
+    "src/features/export/README.md": [],
+    "src/features/export/services/ReportGenerator.ts": [
+      "src/features/export/canvasSnapshot.ts",
+      "src/features/export/pdf.ts",
+      "src/types/project.ts"
+    ],
+    "src/features/export/svg.ts": [
+      "src/features/export/canvasSnapshot.ts",
+      "src/features/export/types.ts"
+    ],
+    "src/features/export/types.ts": [],
+    "src/features/library/LibraryManagementView.tsx": [
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/features/onboarding/components/FirstLaunchModal.tsx": [
+      "src/components/ui/button.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/core/persistence/directoryHandleManager.ts",
+      "src/core/persistence/factory.ts",
+      "src/core/persistence/migrationHelper.ts",
+      "src/features/onboarding/components/FolderSetupProgress.tsx"
+    ],
+    "src/features/onboarding/components/FolderSetupProgress.tsx": [
+      "src/core/persistence/migrationHelper.ts"
+    ],
+    "src/features/onboarding/hooks/useFirstLaunch.ts": [],
+    "src/features/project/components/ProjectSetupWizard.tsx": [
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/components/ui/select.tsx",
+      "src/components/ui/tabs.tsx",
+      "src/core/schema/calculation-settings.schema.ts",
+      "src/core/services/templates/systemTemplateService.ts"
+    ],
+    "src/hooks/index.ts": [],
+    "src/hooks/useAnalytics.ts": [
+      "src/utils/analytics/config.ts",
+      "src/utils/analytics/events.ts",
+      "src/utils/logger.ts",
+      "src/utils/telemetry.ts"
+    ],
+    "src/hooks/useAutoOpen.ts": [
+      "src/core/store/settingsStore.ts"
+    ],
+    "src/hooks/useDeviceDetection.ts": [
+      "src/utils/logger.ts"
+    ],
+    "src/hooks/useKeyboardShortcuts.ts": [
+      "src/core/store/canvas.store.ts",
+      "src/features/canvas/store/viewportStore.ts",
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/hooks/useResponsiveLayout.ts": [
+      "src/stores/useLayoutStore.ts"
+    ],
+    "src/hooks/useStorageEvents.ts": [
+      "src/components/ui/ToastContext.tsx",
+      "src/core/store/storageStore.ts"
+    ],
+    "src/hooks/useStorageRoot.ts": [
+      "src/core/persistence/filesystem.ts",
+      "src/core/services/StorageRootService.ts",
+      "src/core/store/storageStore.ts"
+    ],
+    "src/lib/utils.ts": [],
+    "src/services/cloudBackupService.ts": [
+      "src/utils/logger.ts"
+    ],
+    "src/services/FileSystemService.ts": [
+      "src/features/dashboard/store/projectListStore.ts",
+      "src/stores/useProjectStore.ts"
+    ],
+    "src/stores/useAppStateStore.ts": [],
+    "src/stores/useLayoutStore.ts": [],
+    "src/stores/useProjectStore.ts": [],
+    "src/stores/useToolStore.ts": [],
+    "src/stores/useTutorialStore.ts": [],
+    "src/stores/useViewportStore.ts": [],
+    "src/test/manualStorageTest.ts": [
+      "src/core/persistence/factory.ts",
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "src/types/filesystem.d.ts": [],
+    "src/types/index.ts": [],
+    "src/types/project.ts": [],
+    "src/types/tauri.d.ts": [],
+    "src/utils/analytics/config.ts": [],
+    "src/utils/analytics/events.ts": [],
+    "src/utils/index.ts": [],
+    "src/utils/logger.ts": [],
+    "src/utils/platform.ts": [],
+    "src/utils/storageKeys.ts": [],
+    "src/utils/telemetry.ts": [
+      "src/utils/analytics/config.ts",
+      "src/utils/analytics/events.ts",
+      "src/utils/logger.ts"
+    ],
+    "src/utils/validators.ts": [],
+    "tailwind.config.ts": [],
+    "test_debug.txt": [],
+    "test_final_run.txt": [],
+    "test_output_008.txt": [],
+    "test_output_10.txt": [],
+    "test_output_11.txt": [],
+    "test_output_12.txt": [],
+    "test_output_13.txt": [],
+    "test_output_14.txt": [],
+    "test_output_15.txt": [],
+    "test_output_16.txt": [],
+    "test_output_17.txt": [],
+    "test_output_2.txt": [],
+    "test_output_3.txt": [],
+    "test_output_4.txt": [],
+    "test_output_5.txt": [],
+    "test_output_6.txt": [],
+    "test_output_7.txt": [],
+    "test_output_8.txt": [],
+    "test_output_9.txt": [],
+    "test_output_final.txt": [],
+    "test_output.txt": [],
+    "test_pm_results.txt": [],
+    "test_progress.txt": [],
+    "test_results_2.txt": [],
+    "test_results_3.txt": [],
+    "test_results_4.txt": [],
+    "test_results_5.txt": [],
+    "test_results_6.txt": [],
+    "test_results_7.txt": [],
+    "test_results_8.txt": [],
+    "test-final.txt": [],
+    "test-output.txt": [],
+    "test-output2.txt": [],
+    "test-output3.txt": [],
+    "test-zod.ts": [
+      "src/core/schema/project-file.schema.ts"
+    ],
+    "TESTING_EXPECTATIONS.md": [],
+    "TRUNK_SETUP.md": [],
+    "tsc_output.txt": [],
+    "tsconfig.json": [],
+    "tsconfig.node.json": [],
+    "type_check_errors_2.txt": [],
+    "type_check_errors.txt": [],
+    "type_check_findings.txt": [],
+    "type_check_output.txt": [],
+    "type_check_report.txt": [],
+    "type-errors-2.txt": [],
+    "type-errors.txt": [],
+    "vitest_output.txt": [],
+    "vitest-canvas-mock.ts": [],
+    "vitest.config.ts": []
+  }
+}

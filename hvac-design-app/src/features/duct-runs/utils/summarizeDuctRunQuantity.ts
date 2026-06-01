@@ -91,7 +91,7 @@ function getEffectiveSectionLength(
 }
 
 function formatSize(source: DuctRunQuantitySource): { sizeKey: string; sizeLabel: string } {
-  if (source.shape === 'round' || source.shape === 'flexible') {
+  if ('diameter' in source) {
     return {
       sizeKey: `${source.shape}:${source.diameter}`,
       sizeLabel: `${source.diameter}" dia.`,

@@ -101,7 +101,7 @@ export class ProjectInitializationService {
     let componentLibrary: ComponentLibrary | undefined;
     if (options.componentLibraryId) {
       componentLibrary = availableTemplates.libraries.find(
-        l => l.id === options.componentLibraryId
+        l => l.name === options.componentLibraryId
       );
       if (!componentLibrary) {
         missingItems.push('Component library not found');
@@ -207,11 +207,11 @@ export class ProjectInitializationService {
         type: 'supply',
         visualStyle: {
           color: '#2196F3',
-          lineWidth: 2,
+          strokeWidth: 2,
         },
         properties: {
-          pressureClass: 'low',
-          defaultInsulated: true,
+          pressureClass: 'low_pressure',
+          insulation: { required: true },
           defaultVelocity: 1500,
         },
         isDefault: true,
@@ -222,11 +222,11 @@ export class ProjectInitializationService {
         type: 'return',
         visualStyle: {
           color: '#FF9800',
-          lineWidth: 2,
+          strokeWidth: 2,
         },
         properties: {
-          pressureClass: 'low',
-          defaultInsulated: false,
+          pressureClass: 'low_pressure',
+          insulation: { required: false },
           defaultVelocity: 1200,
         },
         isDefault: true,
@@ -237,11 +237,11 @@ export class ProjectInitializationService {
         type: 'exhaust',
         visualStyle: {
           color: '#F44336',
-          lineWidth: 2,
+          strokeWidth: 2,
         },
         properties: {
-          pressureClass: 'low',
-          defaultInsulated: false,
+          pressureClass: 'low_pressure',
+          insulation: { required: false },
           defaultVelocity: 1500,
         },
         isDefault: true,

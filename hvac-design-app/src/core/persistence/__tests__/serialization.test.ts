@@ -10,6 +10,7 @@ import {
 import { createEmptyProjectFile, CURRENT_SCHEMA_VERSION, type ProjectFile } from '@/core/schema';
 import { createDuct } from '@/features/canvas/entities/ductDefaults';
 import { createDuctRun } from '@/features/canvas/entities/ductRunDefaults';
+import { createEquipment } from '@/features/canvas/entities/equipmentDefaults';
 
 describe('serialization', () => {
   const makeProject = () => createEmptyProjectFile('550e8400-e29b-41d4-a716-446655440000');
@@ -76,6 +77,60 @@ describe('serialization', () => {
       expect(result.success).toBe(true);
       const stored = JSON.parse(result.data!);
       expect(stored.entities.byId[run.id].transform.rotation).toBe(0);
+    });
+
+    it('preserves equipment connection ports through project storage round-trip', () => {
+      const project = makeProject();
+      const run = createDuctRun({ installLength: 10 });
+      const equipment = createEquipment('air_handler', {
+        name: 'AHU-1',
+        connectionPorts: [
+          {
+            id: 'supply-1',
+            role: 'supply',
+            edge: 'east',
+            offsetRatio: 0.3,
+            connectedDuctId: run.id,
+            label: 'Supply',
+          },
+          {
+            id: 'return-1',
+            role: 'return',
+            edge: 'west',
+            offsetRatio: 0.7,
+            label: 'Return',
+          },
+        ],
+      });
+
+      project.entities.byId[run.id] = run as any;
+      project.entities.byId[equipment.id] = equipment as any;
+      project.entities.allIds = [run.id, equipment.id];
+
+      const serResult = serializeProject(project);
+      expect(serResult.success).toBe(true);
+
+      const desResult = deserializeProject(serResult.data!);
+      expect(desResult.success).toBe(true);
+      expect(desResult.data?.entities.byId[equipment.id]?.props).toMatchObject({
+        connectionPorts: [
+          {
+            id: 'supply-1',
+            role: 'supply',
+            edge: 'east',
+            offsetRatio: 0.3,
+            connectedDuctId: run.id,
+            label: 'Supply',
+          },
+          {
+            id: 'return-1',
+            role: 'return',
+            edge: 'west',
+            offsetRatio: 0.7,
+            label: 'Return',
+          },
+        ],
+      });
     });
   });
 

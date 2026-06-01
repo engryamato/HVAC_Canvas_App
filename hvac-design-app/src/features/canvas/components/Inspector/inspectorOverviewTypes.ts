@@ -1,6 +1,7 @@
 export type HealthStatus = 'ok' | 'error' | 'warning';
 export type DuctSystemStatus = 'balanced' | 'unbalanced' | 'not_calculated';
 export type ActivityAction = 'Added' | 'Moved' | 'Deleted' | 'Modified' | string;
+export type UnitSystem = 'imperial' | 'metric';
 export type ElementSelectionKey =
   | 'Ducts'
   | 'Fittings'
@@ -72,23 +73,32 @@ export interface InspectorSectionState {
   onRetry?: () => void;
 }
 
+export interface InspectorFocusResult {
+  ids: string[];
+  shouldFocus: boolean;
+  status: string;
+}
+
 export interface InspectorPanelProps {
   project: ProjectMetadata;
   engineering: EngineeringSettings;
   health: HealthItem[];
   systems: DuctSystem[];
+  unitSystem: UnitSystem;
   elements: ElementInventory;
   recentActivity: ActivityItem[];
+  recentActivityLimit: number;
+  recentActivityTotal: number;
   canUndo: boolean;
   canRedo: boolean;
   actionStatus?: string | null;
   sectionStates?: Partial<Record<'project' | 'engineering' | 'health' | 'systems' | 'elements' | 'activity', InspectorSectionState>>;
   onToggleAutoCalculate: (nextValue: boolean) => void;
   onEditEngineeringSettings: () => void;
-  onLocateHealthIssue: (issueId: string) => void;
-  onSelectAllInvalid: () => void;
+  onLocateHealthIssue: (issueId: string) => InspectorFocusResult;
+  onSelectAllInvalid: () => InspectorFocusResult;
   onAutoFixGeometry: () => void;
-  onSelectElementType: (type: ElementSelectionKey) => void;
+  onSelectElementType: (type: ElementSelectionKey) => InspectorFocusResult;
   onUndo: () => void;
   onRedo: () => void;
 }

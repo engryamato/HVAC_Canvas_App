@@ -1,0 +1,3297 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 32,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "app/onboarding/create-project/page.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 5,
+      "nonEmptyLines": 4,
+      "functions": [
+        {
+          "name": "ProjectCreationPage",
+          "startLine": 3,
+          "endLine": 5,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ProjectCreationPage",
+          "line": 3,
+          "isDefault": true
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/canvas/BulkOperationsToolbar.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 149,
+      "nonEmptyLines": 141,
+      "functions": [
+        {
+          "name": "BulkOperationsToolbar",
+          "startLine": 19,
+          "endLine": 149,
+          "params": [
+            "{\n  selectedCount,\n  totalCount,\n  onSelectAll,\n  onDeselectAll,\n  onAutoSize,\n  onDelete,\n  onApplyMaterial,\n  onApplyInsulation,\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "BulkOperationsToolbar",
+          "line": 19,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "BulkOperationsToolbar",
+          "callee": "React.useState",
+          "lineNumber": 29
+        },
+        {
+          "caller": "BulkOperationsToolbar",
+          "callee": "onApplyInsulation",
+          "lineNumber": 116
+        },
+        {
+          "caller": "BulkOperationsToolbar",
+          "callee": "onApplyInsulation",
+          "lineNumber": 124
+        }
+      ],
+      "metrics": {
+        "importCount": 4,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/canvas/ValidationDisplay.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 151,
+      "nonEmptyLines": 136,
+      "functions": [
+        {
+          "name": "ValidationDisplay",
+          "startLine": 14,
+          "endLine": 82,
+          "params": [
+            "{ constraintStatus, onFixSuggestion }"
+          ]
+        },
+        {
+          "name": "ViolationItem",
+          "startLine": 94,
+          "endLine": 151,
+          "params": [
+            "{ violation, onFixSuggestion }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ValidationDisplay",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ValidationDisplay",
+          "callee": "constraintStatus.violations.filter",
+          "lineNumber": 28
+        },
+        {
+          "caller": "ValidationDisplay",
+          "callee": "constraintStatus.violations.filter",
+          "lineNumber": 29
+        },
+        {
+          "caller": "ValidationDisplay",
+          "callee": "constraintStatus.violations.filter",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ValidationDisplay",
+          "callee": "errors.map",
+          "lineNumber": 54
+        },
+        {
+          "caller": "ValidationDisplay",
+          "callee": "warnings.map",
+          "lineNumber": 63
+        },
+        {
+          "caller": "ValidationDisplay",
+          "callee": "info.map",
+          "lineNumber": 72
+        },
+        {
+          "caller": "ViolationItem",
+          "callee": "onFixSuggestion",
+          "lineNumber": 138
+        }
+      ],
+      "metrics": {
+        "importCount": 4,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/ErrorDialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 58,
+      "nonEmptyLines": 53,
+      "functions": [
+        {
+          "name": "ErrorDialog",
+          "startLine": 23,
+          "endLine": 58,
+          "params": [
+            "{ message, onClose }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ErrorDialog",
+          "line": 23,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ErrorDialog",
+          "callee": "useRef",
+          "lineNumber": 24
+        },
+        {
+          "caller": "ErrorDialog",
+          "callee": "onClose",
+          "lineNumber": 31
+        },
+        {
+          "caller": "ErrorDialog",
+          "callee": "event.preventDefault",
+          "lineNumber": 39
+        },
+        {
+          "caller": "ErrorDialog",
+          "callee": "closeButtonRef.current?.focus",
+          "lineNumber": 40
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/KeyboardShortcutsDialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 109,
+      "nonEmptyLines": 102,
+      "functions": [
+        {
+          "name": "KeyboardShortcutsDialog",
+          "startLine": 68,
+          "endLine": 108,
+          "params": [
+            "{ open, onOpenChange }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "KeyboardShortcutsDialog",
+          "line": 68,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "KeyboardShortcutsDialog",
+          "callee": "shortcuts.map",
+          "lineNumber": 80
+        },
+        {
+          "caller": "KeyboardShortcutsDialog",
+          "callee": "group.items.map",
+          "lineNumber": 86
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/MigrationWizard.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 431,
+      "nonEmptyLines": 386,
+      "functions": [
+        {
+          "name": "MigrationWizard",
+          "startLine": 31,
+          "endLine": 429,
+          "params": [
+            "{ isOpen, onClose, data, onMigrationComplete }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "MigrationWizard",
+          "line": 31,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "MigrationWizard",
+          "callee": "useState",
+          "lineNumber": 32
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useState",
+          "lineNumber": 33
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useState",
+          "lineNumber": 34
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useState",
+          "lineNumber": 35
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useState",
+          "lineNumber": 36
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useState",
+          "lineNumber": 37
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useCallback",
+          "lineNumber": 41
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "VersionDetector.detectVersion",
+          "lineNumber": 42
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setDetectedVersion",
+          "lineNumber": 43
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "VersionDetector.isVersionSupported",
+          "lineNumber": 45
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 46
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setError",
+          "lineNumber": 47
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "VersionDetector.versionToString",
+          "lineNumber": 47
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "VersionDetector.needsMigration",
+          "lineNumber": 51
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 52
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 56
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "setProgress",
+          "lineNumber": 64
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "backupManager.createPreMigrationBackup",
+          "lineNumber": 67
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "VersionDetector.versionToString",
+          "lineNumber": 69
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "setBackupMetadata",
+          "lineNumber": 71
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "setProgress",
+          "lineNumber": 72
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "setStep",
+          "lineNumber": 73
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "setStep",
+          "lineNumber": 75
+        },
+        {
+          "caller": "handleCreateBackup",
+          "callee": "setError",
+          "lineNumber": 76
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useCallback",
+          "lineNumber": 80
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setProgress",
+          "lineNumber": 85
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "migrationRegistry.autoMigrate",
+          "lineNumber": 88
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setMigrationResult",
+          "lineNumber": 89
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setProgress",
+          "lineNumber": 90
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 93
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 95
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setError",
+          "lineNumber": 96
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "result.errors.map((e) => e.message).join",
+          "lineNumber": 96
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "result.errors.map",
+          "lineNumber": 96
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 99
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setError",
+          "lineNumber": 100
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useEffect",
+          "lineNumber": 105
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setStep",
+          "lineNumber": 107
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setDetectedVersion",
+          "lineNumber": 108
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setBackupMetadata",
+          "lineNumber": 109
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setMigrationResult",
+          "lineNumber": 110
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setError",
+          "lineNumber": 111
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "setProgress",
+          "lineNumber": 112
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useEffect",
+          "lineNumber": 116
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "detectVersion",
+          "lineNumber": 118
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "useEffect",
+          "lineNumber": 122
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "handleMigrate",
+          "lineNumber": 124
+        },
+        {
+          "caller": "handleComplete",
+          "callee": "onMigrationComplete",
+          "lineNumber": 130
+        },
+        {
+          "caller": "handleComplete",
+          "callee": "onClose",
+          "lineNumber": 132
+        },
+        {
+          "caller": "handleRollback",
+          "callee": "backupManager.restoreBackup",
+          "lineNumber": 141
+        },
+        {
+          "caller": "handleRollback",
+          "callee": "onMigrationComplete",
+          "lineNumber": 143
+        },
+        {
+          "caller": "handleRollback",
+          "callee": "onClose",
+          "lineNumber": 145
+        },
+        {
+          "caller": "handleRollback",
+          "callee": "setError",
+          "lineNumber": 147
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "VersionDetector.versionToString",
+          "lineNumber": 184
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "VersionDetector.versionToString",
+          "lineNumber": 190
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "VersionDetector.getMigrationPath(detectedVersion).join",
+          "lineNumber": 197
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "VersionDetector.getMigrationPath",
+          "lineNumber": 197
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "migrationResult.warnings.map",
+          "lineNumber": 257
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "new Date(backupMetadata.createdAt).toLocaleString",
+          "lineNumber": 271
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "VersionDetector.versionToString",
+          "lineNumber": 286
+        },
+        {
+          "caller": "renderStepContent",
+          "callee": "migrationResult.errors.map",
+          "lineNumber": 316
+        },
+        {
+          "caller": "renderFooter",
+          "callee": "setStep",
+          "lineNumber": 398
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "renderStepContent",
+          "lineNumber": 420
+        },
+        {
+          "caller": "MigrationWizard",
+          "callee": "renderFooter",
+          "lineNumber": 424
+        }
+      ],
+      "metrics": {
+        "importCount": 9,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/ProjectAlreadyExistsDialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 73,
+      "nonEmptyLines": 68,
+      "functions": [
+        {
+          "name": "ProjectAlreadyExistsDialog",
+          "startLine": 22,
+          "endLine": 73,
+          "params": [
+            "{\n  open,\n  onOpenChange,\n  projectName,\n  onContinue,\n  onCancel,\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ProjectAlreadyExistsDialog",
+          "line": 22,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ProjectAlreadyExistsDialog",
+          "callee": "useRef",
+          "lineNumber": 29
+        },
+        {
+          "caller": "ProjectAlreadyExistsDialog",
+          "callee": "onCancel",
+          "lineNumber": 36
+        },
+        {
+          "caller": "ProjectAlreadyExistsDialog",
+          "callee": "onOpenChange",
+          "lineNumber": 39
+        },
+        {
+          "caller": "ProjectAlreadyExistsDialog",
+          "callee": "event.preventDefault",
+          "lineNumber": 46
+        },
+        {
+          "caller": "ProjectAlreadyExistsDialog",
+          "callee": "cancelButtonRef.current?.focus",
+          "lineNumber": 47
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/ProjectInitializationWizard.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 129,
+      "nonEmptyLines": 117,
+      "functions": [
+        {
+          "name": "ProjectInitializationWizard",
+          "startLine": 16,
+          "endLine": 129,
+          "params": [
+            "{ open, onClose, onComplete }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ProjectInitializationWizard",
+          "line": 16,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "React.useState",
+          "lineNumber": 17
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "React.useState",
+          "lineNumber": 18
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "React.useState",
+          "lineNumber": 19
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "React.useState",
+          "lineNumber": 20
+        },
+        {
+          "caller": "handleQuickSetup",
+          "callee": "alert",
+          "lineNumber": 24
+        },
+        {
+          "caller": "handleQuickSetup",
+          "callee": "projectInitializationService.quickSetup",
+          "lineNumber": 28
+        },
+        {
+          "caller": "handleQuickSetup",
+          "callee": "onComplete",
+          "lineNumber": 29
+        },
+        {
+          "caller": "handleQuickSetup",
+          "callee": "onClose",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "setProjectName",
+          "lineNumber": 57
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "setLocation",
+          "lineNumber": 67
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "setEstimator",
+          "lineNumber": 77
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "projectTypeOptions.map",
+          "lineNumber": 87
+        },
+        {
+          "caller": "ProjectInitializationWizard",
+          "callee": "setProjectType",
+          "lineNumber": 95
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/StorageSettings/ChangeLocationDialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 173,
+      "nonEmptyLines": 155,
+      "functions": [
+        {
+          "name": "ChangeLocationDialog",
+          "startLine": 18,
+          "endLine": 173,
+          "params": [
+            "{ open, onOpenChange, currentPath }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ChangeLocationDialog",
+          "line": 18,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "useStorageRoot",
+          "lineNumber": 19
+        },
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "useState",
+          "lineNumber": 20
+        },
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "useState",
+          "lineNumber": 21
+        },
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "useState",
+          "lineNumber": 22
+        },
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "isTauri",
+          "lineNumber": 23
+        },
+        {
+          "caller": "handleSelectFolder",
+          "callee": "import",
+          "lineNumber": 31
+        },
+        {
+          "caller": "handleSelectFolder",
+          "callee": "openDialog",
+          "lineNumber": 32
+        },
+        {
+          "caller": "handleSelectFolder",
+          "callee": "setNewPath",
+          "lineNumber": 39
+        },
+        {
+          "caller": "handleSelectFolder",
+          "callee": "setError",
+          "lineNumber": 40
+        },
+        {
+          "caller": "handleSelectFolder",
+          "callee": "console.error",
+          "lineNumber": 43
+        },
+        {
+          "caller": "handleSelectFolder",
+          "callee": "setError",
+          "lineNumber": 44
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "newPath.trim",
+          "lineNumber": 49
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "setError",
+          "lineNumber": 52
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "onOpenChange",
+          "lineNumber": 57
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "setIsChanging",
+          "lineNumber": 61
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "setError",
+          "lineNumber": 62
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "relocate",
+          "lineNumber": 65
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "onOpenChange",
+          "lineNumber": 66
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "setNewPath",
+          "lineNumber": 67
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "console.error",
+          "lineNumber": 69
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "setError",
+          "lineNumber": 70
+        },
+        {
+          "caller": "handleConfirm",
+          "callee": "setIsChanging",
+          "lineNumber": 72
+        },
+        {
+          "caller": "handleCancel",
+          "callee": "setNewPath",
+          "lineNumber": 77
+        },
+        {
+          "caller": "handleCancel",
+          "callee": "setError",
+          "lineNumber": 78
+        },
+        {
+          "caller": "handleCancel",
+          "callee": "onOpenChange",
+          "lineNumber": 79
+        },
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "setNewPath",
+          "lineNumber": 130
+        },
+        {
+          "caller": "ChangeLocationDialog",
+          "callee": "newPath.trim",
+          "lineNumber": 165
+        }
+      ],
+      "metrics": {
+        "importCount": 6,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/UnsavedChangesDialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 88,
+      "nonEmptyLines": 82,
+      "functions": [
+        {
+          "name": "UnsavedChangesDialog",
+          "startLine": 23,
+          "endLine": 87,
+          "params": [
+            "{\n    open,\n    onOpenChange,\n    onSaveAndLeave,\n    onLeaveWithoutSaving,\n    onCancel,\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "UnsavedChangesDialog",
+          "line": 23,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "UnsavedChangesDialog",
+          "callee": "useRef",
+          "lineNumber": 30
+        },
+        {
+          "caller": "UnsavedChangesDialog",
+          "callee": "onCancel",
+          "lineNumber": 37
+        },
+        {
+          "caller": "UnsavedChangesDialog",
+          "callee": "onOpenChange",
+          "lineNumber": 40
+        },
+        {
+          "caller": "UnsavedChangesDialog",
+          "callee": "event.preventDefault",
+          "lineNumber": 47
+        },
+        {
+          "caller": "UnsavedChangesDialog",
+          "callee": "cancelButtonRef.current?.focus",
+          "lineNumber": 48
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/dialogs/VersionWarningDialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 81,
+      "nonEmptyLines": 76,
+      "functions": [
+        {
+          "name": "VersionWarningDialog",
+          "startLine": 24,
+          "endLine": 81,
+          "params": [
+            "{\n    projectVersion,\n    appVersion,\n    onContinue,\n    onCancel\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "VersionWarningDialog",
+          "line": 24,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "VersionWarningDialog",
+          "callee": "useRef",
+          "lineNumber": 30
+        },
+        {
+          "caller": "VersionWarningDialog",
+          "callee": "onCancel",
+          "lineNumber": 37
+        },
+        {
+          "caller": "VersionWarningDialog",
+          "callee": "event.preventDefault",
+          "lineNumber": 45
+        },
+        {
+          "caller": "VersionWarningDialog",
+          "callee": "cancelButtonRef.current?.focus",
+          "lineNumber": 46
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/error/ErrorPage.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 65,
+      "nonEmptyLines": 56,
+      "functions": [
+        {
+          "name": "ErrorPage",
+          "startLine": 14,
+          "endLine": 64,
+          "params": [
+            "{\n    title = 'Page Not Found',\n    message = 'The project you are looking for could not be found.',\n    showSearchButton = true,\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ErrorPage",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ErrorPage",
+          "callee": "useRouter",
+          "lineNumber": 19
+        },
+        {
+          "caller": "ErrorPage",
+          "callee": "router.push",
+          "lineNumber": 41
+        },
+        {
+          "caller": "ErrorPage",
+          "callee": "router.push",
+          "lineNumber": 52
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/layout/AppShell.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 31,
+      "nonEmptyLines": 27,
+      "functions": [
+        {
+          "name": "AppShell",
+          "startLine": 13,
+          "endLine": 31,
+          "params": [
+            "{ \n    children, \n    projectName,\n    showBreadcrumb = true,\n    rightActions\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "AppShell",
+          "line": 13,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/layout/FileMenu.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 753,
+      "nonEmptyLines": 665,
+      "functions": [
+        {
+          "name": "FileMenu",
+          "startLine": 36,
+          "endLine": 753,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "FileMenu",
+          "line": 36,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "FileMenu",
+          "callee": "useRouter",
+          "lineNumber": 37
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "usePathname",
+          "lineNumber": 38
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 39
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 40
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 41
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 42
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 43
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 44
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 45
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 46
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 47
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 48
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 49
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useState",
+          "lineNumber": 50
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useRef",
+          "lineNumber": 51
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useAppStateStore",
+          "lineNumber": 53
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useIsDirty",
+          "lineNumber": 54
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCurrentProjectId",
+          "lineNumber": 55
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectActions",
+          "lineNumber": 56
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "pathname.startsWith",
+          "lineNumber": 57
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "Boolean",
+          "lineNumber": 58
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "pathname.startsWith",
+          "lineNumber": 58
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useToast",
+          "lineNumber": 61
+        },
+        {
+          "caller": "loadProjectDataForMigration",
+          "callee": "snapshotFromStores",
+          "lineNumber": 65
+        },
+        {
+          "caller": "loadProjectDataForMigration",
+          "callee": "localStorage.getItem",
+          "lineNumber": 68
+        },
+        {
+          "caller": "loadProjectDataForMigration",
+          "callee": "console.warn",
+          "lineNumber": 70
+        },
+        {
+          "caller": "loadProjectDataForMigration",
+          "callee": "loadProjectFromStorage",
+          "lineNumber": 75
+        },
+        {
+          "caller": "loadProjectDataForMigration",
+          "callee": "console.error",
+          "lineNumber": 78
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useEffect",
+          "lineNumber": 84
+        },
+        {
+          "caller": "handleClickOutside",
+          "callee": "menuRef.current.contains",
+          "lineNumber": 86
+        },
+        {
+          "caller": "handleClickOutside",
+          "callee": "setIsOpen",
+          "lineNumber": 87
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "document.addEventListener",
+          "lineNumber": 92
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "document.removeEventListener",
+          "lineNumber": 96
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 100
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.dispatchEvent",
+          "lineNumber": 104
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 107
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "requestCanvasSave",
+          "lineNumber": 108
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.setTimeout",
+          "lineNumber": 113
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectStore.getState",
+          "lineNumber": 114
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectStore.getState",
+          "lineNumber": 119
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 122
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 123
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsLoading",
+          "lineNumber": 124
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "TauriFileSystem.openFileDialog",
+          "lineNumber": 128
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "import",
+          "lineNumber": 132
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "loadProject",
+          "lineNumber": 133
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "addToast",
+          "lineNumber": 138
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 145
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.projects.find",
+          "lineNumber": 146
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectId",
+          "lineNumber": 150
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectFilePath",
+          "lineNumber": 151
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectDialogOpen",
+          "lineNumber": 152
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "getProjectRepository",
+          "lineNumber": 156
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "repository.importProject",
+          "lineNumber": 157
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.updateProject",
+          "lineNumber": 163
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.refreshProjects",
+          "lineNumber": 169
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 170
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "openProjectFromPicker",
+          "lineNumber": 174
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "deserializeProjectLenient",
+          "lineNumber": 179
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "createLocalStoragePayloadFromProjectFileWithDefaults",
+          "lineNumber": 185
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "saveProjectToStorage",
+          "lineNumber": 186
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setWebProjectFileHandle",
+          "lineNumber": 191
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 193
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.projects.find",
+          "lineNumber": 194
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "Boolean",
+          "lineNumber": 204
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.updateProject",
+          "lineNumber": 208
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.addProject",
+          "lineNumber": 210
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 213
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsLoading",
+          "lineNumber": 215
+        },
+        {
+          "caller": "proceedAfterSaveOrDiscard",
+          "callee": "router.push",
+          "lineNumber": 221
+        },
+        {
+          "caller": "proceedAfterSaveOrDiscard",
+          "callee": "setDirty",
+          "lineNumber": 226
+        },
+        {
+          "caller": "proceedAfterSaveOrDiscard",
+          "callee": "router.push",
+          "lineNumber": 227
+        },
+        {
+          "caller": "proceedAfterSaveOrDiscard",
+          "callee": "handleOpenFromFileInternal",
+          "lineNumber": 230
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 233
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 234
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "pathname.startsWith",
+          "lineNumber": 235
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 236
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 241
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setUnsavedDialogOpen",
+          "lineNumber": 242
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 246
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useEffect",
+          "lineNumber": 249
+        },
+        {
+          "caller": "handleNavigateEvent",
+          "callee": "handleNavigateDashboard",
+          "lineNumber": 251
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.addEventListener",
+          "lineNumber": 254
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.removeEventListener",
+          "lineNumber": 255
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 258
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 260
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setUnsavedDialogOpen",
+          "lineNumber": 261
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 262
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "handleOpenFromFileInternal",
+          "lineNumber": 267
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "console.error",
+          "lineNumber": 269
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setErrorMessage",
+          "lineNumber": 270
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 278
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 280
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setUnsavedDialogOpen",
+          "lineNumber": 281
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 282
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 285
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 287
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setProjectSetupOpen",
+          "lineNumber": 290
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "crypto.randomUUID",
+          "lineNumber": 294
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "new Date().toISOString",
+          "lineNumber": 295
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "createEmptyProject",
+          "lineNumber": 298
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "getProjectRepository",
+          "lineNumber": 306
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "repository.saveProject",
+          "lineNumber": 307
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 312
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "projectListStore.addProject",
+          "lineNumber": 313
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "projectListStore.refreshProjects",
+          "lineNumber": 324
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "setProject",
+          "lineNumber": 327
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "useSettingsStore.getState().setCalculationSettings",
+          "lineNumber": 338
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "useSettingsStore.getState",
+          "lineNumber": 338
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "setDirty",
+          "lineNumber": 341
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "setProjectSetupOpen",
+          "lineNumber": 342
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "router.push",
+          "lineNumber": 343
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "addToast",
+          "lineNumber": 345
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "console.error",
+          "lineNumber": 351
+        },
+        {
+          "caller": "handleProjectSetupComplete",
+          "callee": "setErrorMessage",
+          "lineNumber": 352
+        },
+        {
+          "caller": "handleMigration",
+          "callee": "setIsOpen",
+          "lineNumber": 357
+        },
+        {
+          "caller": "handleMigration",
+          "callee": "loadProjectDataForMigration",
+          "lineNumber": 362
+        },
+        {
+          "caller": "handleMigration",
+          "callee": "addToast",
+          "lineNumber": 364
+        },
+        {
+          "caller": "handleMigration",
+          "callee": "setMigrationWizardData",
+          "lineNumber": 374
+        },
+        {
+          "caller": "handleMigration",
+          "callee": "setMigrationWizardOpen",
+          "lineNumber": 375
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 378
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 379
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState().projects.find",
+          "lineNumber": 385
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 385
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "TauriFileSystem.saveFileDialog",
+          "lineNumber": 387
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "snapshotFromStores",
+          "lineNumber": 392
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "import",
+          "lineNumber": 397
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "saveProject",
+          "lineNumber": 398
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setErrorMessage",
+          "lineNumber": 400
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState().updateProject",
+          "lineNumber": 404
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 404
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setDirty",
+          "lineNumber": 405
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "snapshotFromStores",
+          "lineNumber": 409
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "saveProjectAsAndRememberHandle",
+          "lineNumber": 414
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "requestCanvasSave",
+          "lineNumber": 415
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useEffect",
+          "lineNumber": 418
+        },
+        {
+          "caller": "isEditableTarget",
+          "callee": "target.tagName.toLowerCase",
+          "lineNumber": 423
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "isEditableTarget",
+          "lineNumber": 428
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "event.key.toLowerCase",
+          "lineNumber": 432
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "event.preventDefault",
+          "lineNumber": 436
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "handleSaveAs",
+          "lineNumber": 437
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "event.key.toLowerCase",
+          "lineNumber": 441
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "event.preventDefault",
+          "lineNumber": 442
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "handleOpenFromFile",
+          "lineNumber": 443
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "event.key.toLowerCase",
+          "lineNumber": 447
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "event.preventDefault",
+          "lineNumber": 448
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "handleNewProject",
+          "lineNumber": 449
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.addEventListener",
+          "lineNumber": 453
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.removeEventListener",
+          "lineNumber": 454
+        },
+        {
+          "caller": "handleExportReport",
+          "callee": "setIsOpen",
+          "lineNumber": 458
+        },
+        {
+          "caller": "handleExportReport",
+          "callee": "setExportDialogOpen",
+          "lineNumber": 459
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useCallback",
+          "lineNumber": 462
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setUnsavedDialogOpen",
+          "lineNumber": 464
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 467
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "requestCanvasSave",
+          "lineNumber": 472
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "proceedAfterSaveOrDiscard",
+          "lineNumber": 473
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 474
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "requestCanvasSaveAndCheckSuccess",
+          "lineNumber": 478
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "window.confirm",
+          "lineNumber": 480
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 482
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "proceedAfterSaveOrDiscard",
+          "lineNumber": 487
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 488
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 498
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "handleNavigateDashboard",
+          "lineNumber": 508
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 518
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 519
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 550
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState().setOpenCalculationSettings",
+          "lineNumber": 552
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState",
+          "lineNumber": 552
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState().setOpenCalculationSettings",
+          "lineNumber": 555
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState",
+          "lineNumber": 555
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 575
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState().setOpenSystemTemplate",
+          "lineNumber": 577
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState",
+          "lineNumber": 577
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState().setOpenSystemTemplate",
+          "lineNumber": 580
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useDialogStore.getState",
+          "lineNumber": 580
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 593
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "requestCanvasSave",
+          "lineNumber": 594
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "handleSaveAs",
+          "lineNumber": 603
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "handleUnsavedSaveAndLeave",
+          "lineNumber": 631
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setUnsavedDialogOpen",
+          "lineNumber": 634
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "proceedAfterSaveOrDiscard",
+          "lineNumber": 636
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 638
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setUnsavedDialogOpen",
+          "lineNumber": 641
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setPendingAction",
+          "lineNumber": 642
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState().projects.find",
+          "lineNumber": 650
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 650
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectDialogOpen",
+          "lineNumber": 656
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectId",
+          "lineNumber": 657
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectFilePath",
+          "lineNumber": 658
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "(async () => {\n                        if (filePath) {\n                            useProjectListStore.getState().updateProject(projectId, {\n                                filePath,\n                                storagePath: filePath,\n                            });\n                        }\n                        await useProjectListStore.getState().syncProject(projectId);\n                        router.push(`/canvas/${projectId}`);\n                    })",
+          "lineNumber": 662
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState().updateProject",
+          "lineNumber": 664
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 664
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState().syncProject",
+          "lineNumber": 669
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 669
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 670
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectDialogOpen",
+          "lineNumber": 674
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectId",
+          "lineNumber": 675
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setExistingProjectFilePath",
+          "lineNumber": 676
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setProjectSetupOpen",
+          "lineNumber": 683
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setMigrationWizardOpen",
+          "lineNumber": 691
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setErrorMessage",
+          "lineNumber": 695
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "createLocalStoragePayloadFromProjectFileWithDefaults",
+          "lineNumber": 699
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "saveProjectToStorage",
+          "lineNumber": 700
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setErrorMessage",
+          "lineNumber": 702
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "hydrateToStores",
+          "lineNumber": 706
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useSettingsStore.getState().setCalculationSettings",
+          "lineNumber": 709
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useSettingsStore.getState",
+          "lineNumber": 709
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectStore.getState().setProject",
+          "lineNumber": 713
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectStore.getState",
+          "lineNumber": 713
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "useProjectListStore.getState",
+          "lineNumber": 723
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "projectListStore.updateProject",
+          "lineNumber": 724
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "new Date().toISOString",
+          "lineNumber": 728
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setMigrationWizardOpen",
+          "lineNumber": 731
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "router.push",
+          "lineNumber": 733
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "addToast",
+          "lineNumber": 736
+        },
+        {
+          "caller": "FileMenu",
+          "callee": "setErrorMessage",
+          "lineNumber": 748
+        }
+      ],
+      "metrics": {
+        "importCount": 22,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/layout/Header.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 156,
+      "nonEmptyLines": 145,
+      "functions": [
+        {
+          "name": "Header",
+          "startLine": 26,
+          "endLine": 156,
+          "params": [
+            "{\n    projectName,\n    showBreadcrumb = true,\n    showMenuBar = true,\n    rightActions\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Header",
+          "line": 26,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Header",
+          "callee": "useRouter",
+          "lineNumber": 32
+        },
+        {
+          "caller": "Header",
+          "callee": "React.useState",
+          "lineNumber": 33
+        },
+        {
+          "caller": "Header",
+          "callee": "React.useState",
+          "lineNumber": 34
+        },
+        {
+          "caller": "Header",
+          "callee": "useEffect",
+          "lineNumber": 37
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 40
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "router.push",
+          "lineNumber": 41
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "e.preventDefault",
+          "lineNumber": 45
+        },
+        {
+          "caller": "handleKeyDown",
+          "callee": "setShortcutsOpen",
+          "lineNumber": 46
+        },
+        {
+          "caller": "Header",
+          "callee": "window.addEventListener",
+          "lineNumber": 51
+        },
+        {
+          "caller": "Header",
+          "callee": "window.removeEventListener",
+          "lineNumber": 52
+        },
+        {
+          "caller": "Header",
+          "callee": "router.push",
+          "lineNumber": 67
+        },
+        {
+          "caller": "Header",
+          "callee": "setShortcutsOpen",
+          "lineNumber": 95
+        },
+        {
+          "caller": "Header",
+          "callee": "window.dispatchEvent",
+          "lineNumber": 108
+        },
+        {
+          "caller": "Header",
+          "callee": "setSettingsOpen",
+          "lineNumber": 135
+        }
+      ],
+      "metrics": {
+        "importCount": 7,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/layout/HelpMenu.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 77,
+      "nonEmptyLines": 66,
+      "functions": [
+        {
+          "name": "HelpMenu",
+          "startLine": 10,
+          "endLine": 77,
+          "params": [
+            "{ onShowShortcuts }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "HelpMenu",
+          "line": 10,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "HelpMenu",
+          "callee": "useState",
+          "lineNumber": 11
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "useRef",
+          "lineNumber": 12
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "useEffect",
+          "lineNumber": 14
+        },
+        {
+          "caller": "handleClickOutside",
+          "callee": "menuRef.current.contains",
+          "lineNumber": 16
+        },
+        {
+          "caller": "handleClickOutside",
+          "callee": "setIsOpen",
+          "lineNumber": 17
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "document.addEventListener",
+          "lineNumber": 22
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "document.removeEventListener",
+          "lineNumber": 24
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 33
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "onShowShortcuts",
+          "lineNumber": 42
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 43
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 53
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 59
+        },
+        {
+          "caller": "HelpMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 68
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/layout/ViewMenu.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 86,
+      "nonEmptyLines": 73,
+      "functions": [
+        {
+          "name": "ViewMenu",
+          "startLine": 12,
+          "endLine": 86,
+          "params": [
+            "{ onResetLayout }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ViewMenu",
+          "line": 12,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ViewMenu",
+          "callee": "useState",
+          "lineNumber": 13
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "useRef",
+          "lineNumber": 14
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "useLayoutStore",
+          "lineNumber": 16
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "useViewportStore",
+          "lineNumber": 17
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "useEffect",
+          "lineNumber": 19
+        },
+        {
+          "caller": "handleClickOutside",
+          "callee": "menuRef.current.contains",
+          "lineNumber": 21
+        },
+        {
+          "caller": "handleClickOutside",
+          "callee": "setIsOpen",
+          "lineNumber": 22
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "document.addEventListener",
+          "lineNumber": 27
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "document.removeEventListener",
+          "lineNumber": 29
+        },
+        {
+          "caller": "handleResetLayout",
+          "callee": "resetLayout",
+          "lineNumber": 33
+        },
+        {
+          "caller": "handleResetLayout",
+          "callee": "onResetLayout",
+          "lineNumber": 34
+        },
+        {
+          "caller": "handleResetLayout",
+          "callee": "setIsOpen",
+          "lineNumber": 35
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 44
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "setZoom",
+          "lineNumber": 52
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 52
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "fitToScreen",
+          "lineNumber": 58
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 58
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "toggleGrid",
+          "lineNumber": 67
+        },
+        {
+          "caller": "ViewMenu",
+          "callee": "setIsOpen",
+          "lineNumber": 67
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/onboarding/ProjectCreationScreen.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 133,
+      "nonEmptyLines": 121,
+      "functions": [
+        {
+          "name": "ProjectCreationScreen",
+          "startLine": 14,
+          "endLine": 133,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ProjectCreationScreen",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "useRouter",
+          "lineNumber": 15
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "useState",
+          "lineNumber": 16
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "useState",
+          "lineNumber": 17
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "useState",
+          "lineNumber": 18
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "router.push",
+          "lineNumber": 24
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "cn",
+          "lineNumber": 43
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "setProjectType",
+          "lineNumber": 47
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "cn",
+          "lineNumber": 61
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "setProjectType",
+          "lineNumber": 65
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "setProjectName",
+          "lineNumber": 87
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "setUnitSystem",
+          "lineNumber": 101
+        },
+        {
+          "caller": "ProjectCreationScreen",
+          "callee": "setUnitSystem",
+          "lineNumber": 111
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/onboarding/SplashScreen.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 49,
+      "nonEmptyLines": 42,
+      "functions": [
+        {
+          "name": "SplashScreen",
+          "startLine": 5,
+          "endLine": 49,
+          "params": [
+            "{ onComplete }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "SplashScreen",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "SplashScreen",
+          "callee": "useState",
+          "lineNumber": 6
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "useState",
+          "lineNumber": 7
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "useEffect",
+          "lineNumber": 9
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "setInterval",
+          "lineNumber": 10
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "setProgress",
+          "lineNumber": 11
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "clearInterval",
+          "lineNumber": 13
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "clearInterval",
+          "lineNumber": 20
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "useEffect",
+          "lineNumber": 23
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "setLoadingText",
+          "lineNumber": 24
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "setLoadingText",
+          "lineNumber": 25
+        },
+        {
+          "caller": "SplashScreen",
+          "callee": "setTimeout",
+          "lineNumber": 27
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/onboarding/TutorialOverlay.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 77,
+      "nonEmptyLines": 68,
+      "functions": [
+        {
+          "name": "TutorialOverlay",
+          "startLine": 9,
+          "endLine": 77,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "TutorialOverlay",
+          "line": 9,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "TutorialOverlay",
+          "callee": "useTutorialStore",
+          "lineNumber": 10
+        },
+        {
+          "caller": "TutorialOverlay",
+          "callee": "useRouter",
+          "lineNumber": 11
+        },
+        {
+          "caller": "handleSkip",
+          "callee": "skipTutorial",
+          "lineNumber": 14
+        },
+        {
+          "caller": "handleSkip",
+          "callee": "router.push",
+          "lineNumber": 15
+        },
+        {
+          "caller": "handleNext",
+          "callee": "skipTutorial",
+          "lineNumber": 20
+        },
+        {
+          "caller": "handleNext",
+          "callee": "router.push",
+          "lineNumber": 21
+        },
+        {
+          "caller": "handleNext",
+          "callee": "nextStep",
+          "lineNumber": 23
+        },
+        {
+          "caller": "TutorialOverlay",
+          "callee": "handleSkip",
+          "lineNumber": 43
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/accordion.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 58,
+      "nonEmptyLines": 50,
+      "exports": [
+        {
+          "name": "Accordion",
+          "line": 58,
+          "isDefault": false
+        },
+        {
+          "name": "AccordionItem",
+          "line": 58,
+          "isDefault": false
+        },
+        {
+          "name": "AccordionTrigger",
+          "line": 58,
+          "isDefault": false
+        },
+        {
+          "name": "AccordionContent",
+          "line": 58,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 4,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/alert.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 59,
+      "nonEmptyLines": 53,
+      "exports": [
+        {
+          "name": "Alert",
+          "line": 59,
+          "isDefault": false
+        },
+        {
+          "name": "AlertTitle",
+          "line": 59,
+          "isDefault": false
+        },
+        {
+          "name": "AlertDescription",
+          "line": 59,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 3,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 36,
+      "nonEmptyLines": 31,
+      "functions": [
+        {
+          "name": "Badge",
+          "startLine": 30,
+          "endLine": 34,
+          "params": [
+            "{ className, variant, ...props }"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Badge",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "badgeVariants",
+          "line": 36,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Badge",
+          "callee": "cn",
+          "lineNumber": 32
+        },
+        {
+          "caller": "Badge",
+          "callee": "badgeVariants",
+          "lineNumber": 32
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 59,
+      "nonEmptyLines": 55,
+      "exports": [
+        {
+          "name": "Button",
+          "line": 59,
+          "isDefault": false
+        },
+        {
+          "name": "buttonVariants",
+          "line": 59,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/card.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 75,
+      "nonEmptyLines": 68,
+      "exports": [
+        {
+          "name": "Card",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "CardHeader",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "CardFooter",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "CardTitle",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "CardDescription",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "CardContent",
+          "line": 75,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 6,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/checkbox.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 30,
+      "nonEmptyLines": 26,
+      "exports": [
+        {
+          "name": "Checkbox",
+          "line": 30,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/data-table.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 169,
+      "nonEmptyLines": 154,
+      "functions": [
+        {
+          "name": "DataTable",
+          "startLine": 39,
+          "endLine": 169,
+          "params": [
+            "{\n  data,\n  columns,\n  sortState,\n  onSortChange,\n  onRowClick,\n  className,\n  headerClassName,\n  rowClassName,\n  keyExtractor,\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "DataTable",
+          "line": 39,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "handleSort",
+          "callee": "onSortChange",
+          "lineNumber": 60
+        },
+        {
+          "caller": "DataTable",
+          "callee": "cn",
+          "lineNumber": 64
+        },
+        {
+          "caller": "DataTable",
+          "callee": "cn",
+          "lineNumber": 66
+        },
+        {
+          "caller": "DataTable",
+          "callee": "columns.map",
+          "lineNumber": 68
+        },
+        {
+          "caller": "DataTable",
+          "callee": "String",
+          "lineNumber": 69
+        },
+        {
+          "caller": "DataTable",
+          "callee": "column.header",
+          "lineNumber": 83
+        },
+        {
+          "caller": "DataTable",
+          "callee": "handleSort",
+          "lineNumber": 83
+        },
+        {
+          "caller": "DataTable",
+          "callee": "handleSort",
+          "lineNumber": 91
+        },
+        {
+          "caller": "DataTable",
+          "callee": "String",
+          "lineNumber": 92
+        },
+        {
+          "caller": "DataTable",
+          "callee": "cn",
+          "lineNumber": 94
+        },
+        {
+          "caller": "DataTable",
+          "callee": "data.map",
+          "lineNumber": 116
+        },
+        {
+          "caller": "DataTable",
+          "callee": "keyExtractor",
+          "lineNumber": 117
+        },
+        {
+          "caller": "DataTable",
+          "callee": "rowClassName",
+          "lineNumber": 119
+        },
+        {
+          "caller": "DataTable",
+          "callee": "cn",
+          "lineNumber": 125
+        },
+        {
+          "caller": "DataTable",
+          "callee": "onRowClick",
+          "lineNumber": 132
+        },
+        {
+          "caller": "DataTable",
+          "callee": "event.preventDefault",
+          "lineNumber": 137
+        },
+        {
+          "caller": "DataTable",
+          "callee": "onRowClick",
+          "lineNumber": 138
+        },
+        {
+          "caller": "DataTable",
+          "callee": "columns.map",
+          "lineNumber": 144
+        },
+        {
+          "caller": "DataTable",
+          "callee": "String",
+          "lineNumber": 146
+        },
+        {
+          "caller": "DataTable",
+          "callee": "column.cell",
+          "lineNumber": 149
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/dialog.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 109,
+      "nonEmptyLines": 100,
+      "functions": [
+        {
+          "name": "DialogHeader",
+          "startLine": 46,
+          "endLine": 57,
+          "params": [
+            "{\n    className,\n    ...props\n}"
+          ]
+        },
+        {
+          "name": "DialogFooter",
+          "startLine": 60,
+          "endLine": 71,
+          "params": [
+            "{\n    className,\n    ...props\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Dialog",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "DialogTrigger",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "DialogContent",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "DialogHeader",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "DialogFooter",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "DialogTitle",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "DialogDescription",
+          "line": 101,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "DialogHeader",
+          "callee": "cn",
+          "lineNumber": 51
+        },
+        {
+          "caller": "DialogFooter",
+          "callee": "cn",
+          "lineNumber": 65
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 7,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/input.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 25,
+      "nonEmptyLines": 21,
+      "exports": [
+        {
+          "name": "Input",
+          "line": 25,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/label.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 26,
+      "nonEmptyLines": 21,
+      "exports": [
+        {
+          "name": "Label",
+          "line": 26,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/progress.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 27,
+      "nonEmptyLines": 24,
+      "exports": [
+        {
+          "name": "Progress",
+          "line": 27,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ui/radio-group.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 44,
+      "nonEmptyLines": 39,
+      "exports": [
+        {
+          "name": "RadioGroup",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "RadioGroupItem",
+          "line": 44,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    }
+  ]
+}

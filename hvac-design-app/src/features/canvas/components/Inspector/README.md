@@ -20,7 +20,7 @@ File: `hvac-design-app/src/features/canvas/components/Inspector/InspectorPanel.t
 Responsibilities:
 
 - Renders the appropriate inspector content based on selection:
-  - No selection: `CanvasPropertiesInspector`
+  - No selection: `InspectorOverviewPanel`
   - Single selection: entity-specific inspector (`RoomInspector`, `DuctInspector`, `EquipmentInspector`, ...)
   - Multi selection: selection count summary
 - Optional docked header controls:
@@ -102,4 +102,10 @@ File: `hvac-design-app/src/features/canvas/utils/validateFloatingPosition.ts`
 - Drag the floating inspector and refresh to confirm persistence.
 - Dock back and ensure the docked inspector works normally.
 - Resize the window to ensure the floating panel stays on-screen.
+
+## Model Health Source
+
+The overview's Model Health section renders check types from `useValidationStore.validationResults`.
+It groups by `violation.type ?? violation.ruleId` and adds `unresolved_catalog` when catalog resolution fails.
+The inspector does not maintain its own fixed rule list; new validator rule types appear automatically when the validation store emits them.
 

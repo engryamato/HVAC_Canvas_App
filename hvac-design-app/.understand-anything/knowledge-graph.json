@@ -1,0 +1,1535 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "SizeWise HVAC Canvas",
+    "description": "A professional HVAC duct sizing and design application built with Next.js and Tauri. Provides an interactive 2D/3D canvas for drawing duct runs, rooms, fittings, and equipment, with real-time engineering calculations (pressure drop, velocity, auto-sizing), BOM generation, and multi-format export.",
+    "languages": [
+      "TypeScript",
+      "TSX"
+    ],
+    "frameworks": [
+      "Next.js",
+      "React",
+      "Tauri",
+      "Zustand",
+      "Konva",
+      "Three.js"
+    ],
+    "analyzedAt": "2026-05-30T23:00:00.000Z",
+    "gitCommitHash": "HEAD"
+  },
+  "nodes": [
+    {
+      "id": "file:app/layout.tsx",
+      "type": "file",
+      "name": "layout.tsx",
+      "filePath": "app/layout.tsx",
+      "summary": "Root Next.js layout. Wraps the entire app with AppShell (menu bar + platform chrome) and global providers. Entry point for all routes.",
+      "tags": [
+        "layout",
+        "entry-point",
+        "next.js"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:app/(main)/canvas/page.tsx",
+      "type": "file",
+      "name": "canvas/page.tsx",
+      "filePath": "app/(main)/canvas/page.tsx",
+      "summary": "Next.js route for the main canvas designer. Renders CanvasPageWrapper which handles project loading state before mounting CanvasPage.",
+      "tags": [
+        "route",
+        "canvas",
+        "page"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:app/dashboard/page.tsx",
+      "type": "file",
+      "name": "dashboard/page.tsx",
+      "filePath": "app/dashboard/page.tsx",
+      "summary": "Next.js route for the project dashboard. Lists recent and all projects, supports create/open/delete/search operations.",
+      "tags": [
+        "route",
+        "dashboard",
+        "page"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/features/canvas/CanvasPage.tsx",
+      "type": "file",
+      "name": "CanvasPage.tsx",
+      "filePath": "src/features/canvas/CanvasPage.tsx",
+      "summary": "Central canvas orchestrator. Composes the full canvas workspace: left/right sidebars, toolbar, inspector, viewport, status bar, and all canvas tools. Owns the primary canvas interaction loop.",
+      "tags": [
+        "canvas",
+        "orchestrator",
+        "feature",
+        "layout"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "type": "file",
+      "name": "CanvasContainer.tsx",
+      "filePath": "src/features/canvas/components/CanvasContainer.tsx",
+      "summary": "Konva Stage wrapper. Manages the 2D rendering surface, handles mouse/touch events, delegates to the active tool, and coordinates entity rendering layers.",
+      "tags": [
+        "canvas",
+        "konva",
+        "rendering",
+        "events"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/CanvasViewportHost.tsx",
+      "type": "file",
+      "name": "CanvasViewportHost.tsx",
+      "filePath": "src/features/canvas/components/CanvasViewportHost.tsx",
+      "summary": "Hosts the canvas viewport, manages viewport transforms (pan/zoom), and bridges between the Konva stage and the viewport Zustand store.",
+      "tags": [
+        "viewport",
+        "canvas",
+        "pan-zoom"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/ThreeViewport.tsx",
+      "type": "file",
+      "name": "ThreeViewport.tsx",
+      "filePath": "src/features/canvas/components/ThreeViewport.tsx",
+      "summary": "Three.js 3D viewport component. Renders the HVAC system in 3D using WebGL. Toggled by the view mode control.",
+      "tags": [
+        "3d",
+        "three.js",
+        "viewport",
+        "canvas"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "type": "file",
+      "name": "InspectorPanel.tsx",
+      "filePath": "src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "summary": "Right-sidebar inspector panel. Shows entity-specific properties (duct, fitting, equipment, room) for the current selection. Routes to the appropriate sub-inspector based on entity type.",
+      "tags": [
+        "inspector",
+        "sidebar",
+        "properties",
+        "selection"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/Inspector/DuctInspector.tsx",
+      "type": "file",
+      "name": "DuctInspector.tsx",
+      "filePath": "src/features/canvas/components/Inspector/DuctInspector.tsx",
+      "summary": "Inspector sub-panel for duct segments. Displays and allows editing of duct dimensions, material, insulation, velocity, and pressure drop.",
+      "tags": [
+        "inspector",
+        "duct",
+        "properties"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "type": "file",
+      "name": "DuctRunInspector.tsx",
+      "filePath": "src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+      "summary": "Inspector for duct run aggregates. Shows totals: static pressure, system CFM, run length, and cost summary for an entire duct run path.",
+      "tags": [
+        "inspector",
+        "duct-run",
+        "calculations"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "type": "file",
+      "name": "EquipmentInspector.tsx",
+      "filePath": "src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "summary": "Inspector for HVAC equipment (RTUs, AHUs, etc). Displays equipment specs, port connections, and flow assignments.",
+      "tags": [
+        "inspector",
+        "equipment",
+        "properties"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/Toolbar.tsx",
+      "type": "file",
+      "name": "Toolbar.tsx",
+      "filePath": "src/features/canvas/components/Toolbar.tsx",
+      "summary": "Left-side drawing toolbar. Contains draw mode buttons: Select, Duct, Room, Equipment, Fitting, Note, Support. Activates the corresponding tool in the canvas store.",
+      "tags": [
+        "toolbar",
+        "tools",
+        "canvas",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/BOMPanel.tsx",
+      "type": "file",
+      "name": "BOMPanel.tsx",
+      "filePath": "src/features/canvas/components/BOMPanel.tsx",
+      "summary": "Bill of Materials panel. Displays a data grid of all duct, fitting, and equipment items with quantities and costs. Synced to canvas selection highlighting.",
+      "tags": [
+        "bom",
+        "cost",
+        "panel",
+        "data-grid"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/CalculationsPanel.tsx",
+      "type": "file",
+      "name": "CalculationsPanel.tsx",
+      "filePath": "src/features/canvas/components/CalculationsPanel.tsx",
+      "summary": "Engineering calculations summary panel. Aggregates system-level metrics: total static pressure, CFM distribution, velocity profiles, and ASHRAE compliance flags.",
+      "tags": [
+        "calculations",
+        "panel",
+        "engineering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/components/Minimap.tsx",
+      "type": "file",
+      "name": "Minimap.tsx",
+      "filePath": "src/features/canvas/components/Minimap.tsx",
+      "summary": "Canvas minimap overlay. Renders a scaled-down view of the full design, shows current viewport position, and supports click-to-navigate.",
+      "tags": [
+        "minimap",
+        "navigation",
+        "canvas"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/tools/DuctTool.ts",
+      "type": "file",
+      "name": "DuctTool.ts",
+      "filePath": "src/features/canvas/tools/DuctTool.ts",
+      "summary": "Interactive duct drawing tool. Handles click-to-start, drag-to-extend duct runs, snapping to grid and existing endpoints, and auto-connection to equipment ports.",
+      "tags": [
+        "tool",
+        "duct",
+        "drawing",
+        "interaction"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/tools/EquipmentTool.ts",
+      "type": "file",
+      "name": "EquipmentTool.ts",
+      "filePath": "src/features/canvas/tools/EquipmentTool.ts",
+      "summary": "Equipment placement tool. Places HVAC equipment (RTUs, AHUs, VAVs) on the canvas with port markers and connects to adjacent duct runs.",
+      "tags": [
+        "tool",
+        "equipment",
+        "placement"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/tools/FittingTool.ts",
+      "type": "file",
+      "name": "FittingTool.ts",
+      "filePath": "src/features/canvas/tools/FittingTool.ts",
+      "summary": "Fitting insertion tool. Places elbows, wyes, reducers, and other duct fittings at junction points. Auto-detects valid insertion locations.",
+      "tags": [
+        "tool",
+        "fitting",
+        "placement"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/tools/SelectTool.ts",
+      "type": "file",
+      "name": "SelectTool.ts",
+      "filePath": "src/features/canvas/tools/SelectTool.ts",
+      "summary": "Selection tool. Handles single-click selection, drag-marquee multi-select, move operations, and entity resize handles.",
+      "tags": [
+        "tool",
+        "selection",
+        "move",
+        "resize"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/tools/RoomTool.ts",
+      "type": "file",
+      "name": "RoomTool.ts",
+      "filePath": "src/features/canvas/tools/RoomTool.ts",
+      "summary": "Room drawing tool. Allows users to draw rectangular room boundaries that anchor duct run endpoints and define CFM demand zones.",
+      "tags": [
+        "tool",
+        "room",
+        "drawing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/renderers/DuctRenderer.ts",
+      "type": "file",
+      "name": "DuctRenderer.ts",
+      "filePath": "src/features/canvas/renderers/DuctRenderer.ts",
+      "summary": "Konva renderer for duct segments. Draws duct outlines, applies visual state styling (selected, hovered, warning, error), and renders size labels inline.",
+      "tags": [
+        "renderer",
+        "duct",
+        "konva",
+        "visual"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/renderers/DuctRunRenderer.ts",
+      "type": "file",
+      "name": "DuctRunRenderer.ts",
+      "filePath": "src/features/canvas/renderers/DuctRunRenderer.ts",
+      "summary": "Konva renderer for complete duct run paths. Renders the full run as a connected series of segments with flow direction arrows and system color coding.",
+      "tags": [
+        "renderer",
+        "duct-run",
+        "konva",
+        "visual"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/renderers/FittingRenderer.ts",
+      "type": "file",
+      "name": "FittingRenderer.ts",
+      "filePath": "src/features/canvas/renderers/FittingRenderer.ts",
+      "summary": "Konva renderer for duct fittings (elbows, wyes, reducers, caps). Uses engineering symbols conforming to SMACNA drawing conventions.",
+      "tags": [
+        "renderer",
+        "fitting",
+        "konva",
+        "smacna",
+        "visual"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/renderers/EquipmentRenderer.ts",
+      "type": "file",
+      "name": "EquipmentRenderer.ts",
+      "filePath": "src/features/canvas/renderers/EquipmentRenderer.ts",
+      "summary": "Konva renderer for HVAC equipment. Draws equipment symbols with port markers, connection indicators, and nameplate overlays.",
+      "tags": [
+        "renderer",
+        "equipment",
+        "konva",
+        "visual"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/store/canvas.store.ts",
+      "type": "file",
+      "name": "canvas.store.ts",
+      "filePath": "src/core/store/canvas.store.ts",
+      "summary": "Primary Zustand store for the canvas. Owns active tool, draw mode, canvas entities (ducts, fittings, rooms, equipment, notes), and inter-entity connection state.",
+      "tags": [
+        "store",
+        "zustand",
+        "canvas",
+        "state",
+        "entities"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/store/entityStore.ts",
+      "type": "file",
+      "name": "entityStore.ts",
+      "filePath": "src/core/store/entityStore.ts",
+      "summary": "Zustand store for the entity registry. Provides normalized CRUD operations for all canvas entity types. The single source of truth for entity data.",
+      "tags": [
+        "store",
+        "zustand",
+        "entities",
+        "crud",
+        "state"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/store/project.store.ts",
+      "type": "file",
+      "name": "project.store.ts",
+      "filePath": "src/core/store/project.store.ts",
+      "summary": "Zustand store for the active project. Holds project metadata, settings, dirty state, and coordinates with persistence layer for save/load.",
+      "tags": [
+        "store",
+        "zustand",
+        "project",
+        "persistence"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/store/validationStore.ts",
+      "type": "file",
+      "name": "validationStore.ts",
+      "filePath": "src/core/store/validationStore.ts",
+      "summary": "Zustand store for validation state. Holds constraint violations, engineering warnings, and ASHRAE compliance flags across all entities.",
+      "tags": [
+        "store",
+        "zustand",
+        "validation",
+        "engineering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/store/viewportStore.ts",
+      "type": "file",
+      "name": "viewportStore.ts",
+      "filePath": "src/features/canvas/store/viewportStore.ts",
+      "summary": "Zustand store for viewport state: pan offset, zoom level, visible bounds. Drives the Konva stage transform and minimap position indicator.",
+      "tags": [
+        "store",
+        "zustand",
+        "viewport",
+        "pan-zoom"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/store/selectionStore.ts",
+      "type": "file",
+      "name": "selectionStore.ts",
+      "filePath": "src/features/canvas/store/selectionStore.ts",
+      "summary": "Zustand store for selection state. Tracks selected entity IDs, multi-select set, and focus entity. Drives inspector panel and BOM highlight.",
+      "tags": [
+        "store",
+        "zustand",
+        "selection",
+        "canvas"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/services/calculations/engineeringCalculator.ts",
+      "type": "file",
+      "name": "engineeringCalculator.ts",
+      "filePath": "src/core/services/calculations/engineeringCalculator.ts",
+      "summary": "Core HVAC engineering calculator. Implements ASHRAE/SMACNA algorithms: duct friction loss (equal friction method), velocity pressure, fitting loss coefficients (C-values), and system static pressure.",
+      "tags": [
+        "calculations",
+        "engineering",
+        "ashrae",
+        "smacna",
+        "pressure-drop",
+        "velocity"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/calculations/PressurePropagationService.ts",
+      "type": "file",
+      "name": "PressurePropagationService.ts",
+      "filePath": "src/core/services/calculations/PressurePropagationService.ts",
+      "summary": "Propagates static pressure through the duct network graph. Traverses from equipment ports outward, accumulating friction and fitting losses per segment.",
+      "tags": [
+        "calculations",
+        "pressure",
+        "graph-traversal",
+        "propagation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/graph/FlowPropagationService.ts",
+      "type": "file",
+      "name": "FlowPropagationService.ts",
+      "filePath": "src/core/services/graph/FlowPropagationService.ts",
+      "summary": "Propagates CFM flow values through the connection graph. Splits flow at branches (wye fittings), sums at merges, and validates balance at equipment ports.",
+      "tags": [
+        "calculations",
+        "flow",
+        "cfm",
+        "graph-traversal",
+        "propagation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/graph/ConnectionGraphBuilder.ts",
+      "type": "file",
+      "name": "ConnectionGraphBuilder.ts",
+      "filePath": "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "summary": "Builds the adjacency graph of duct network connections from entity store state. Nodes are entities; edges are physical connections between duct endpoints.",
+      "tags": [
+        "graph",
+        "connections",
+        "duct-network",
+        "topology"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/graph/TopologyValidationService.ts",
+      "type": "file",
+      "name": "TopologyValidationService.ts",
+      "filePath": "src/core/services/graph/TopologyValidationService.ts",
+      "summary": "Validates duct network topology: detects orphan segments, dead ends, missing equipment connections, and loop configurations that violate design rules.",
+      "tags": [
+        "validation",
+        "topology",
+        "graph",
+        "duct-network"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/automation/autoSizingService.ts",
+      "type": "file",
+      "name": "autoSizingService.ts",
+      "filePath": "src/core/services/automation/autoSizingService.ts",
+      "summary": "Auto-sizing engine. Given a duct run and target CFM, calculates optimal duct dimensions to meet velocity and pressure drop constraints per ASHRAE guidelines.",
+      "tags": [
+        "auto-sizing",
+        "calculations",
+        "ashrae",
+        "automation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/automation/fittingInsertionService.ts",
+      "type": "file",
+      "name": "fittingInsertionService.ts",
+      "filePath": "src/core/services/automation/fittingInsertionService.ts",
+      "summary": "Auto-inserts required fittings at duct junctions. Detects elbow, wye, and reducer requirements from geometry and inserts the appropriate fitting type.",
+      "tags": [
+        "automation",
+        "fittings",
+        "geometry",
+        "auto-fitting"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/bom/bomGenerationService.ts",
+      "type": "file",
+      "name": "bomGenerationService.ts",
+      "filePath": "src/core/services/bom/bomGenerationService.ts",
+      "summary": "Generates the Bill of Materials from entity store. Aggregates duct lengths, fitting counts, equipment items, and insulation. Applies fabrication profile pricing.",
+      "tags": [
+        "bom",
+        "cost",
+        "generation",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/cost/costCalculationService.ts",
+      "type": "file",
+      "name": "costCalculationService.ts",
+      "filePath": "src/core/services/cost/costCalculationService.ts",
+      "summary": "Calculates material and labor costs from BOM items. Applies fabrication profile unit prices, waste factors, and labor rates.",
+      "tags": [
+        "cost",
+        "calculations",
+        "bom",
+        "fabrication"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/persistence/ProjectStateOrchestrator.ts",
+      "type": "file",
+      "name": "ProjectStateOrchestrator.ts",
+      "filePath": "src/core/persistence/ProjectStateOrchestrator.ts",
+      "summary": "Orchestrates project save/load lifecycle. Coordinates between entity store, project store, and storage adapter. Handles dirty state, auto-save scheduling, and conflict resolution.",
+      "tags": [
+        "persistence",
+        "orchestrator",
+        "save-load",
+        "state"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/persistence/StorageAdapter.ts",
+      "type": "file",
+      "name": "StorageAdapter.ts",
+      "filePath": "src/core/persistence/StorageAdapter.ts",
+      "summary": "Abstract storage interface. Defines read/write/list/delete operations for project files. Implemented by TauriStorageAdapter (desktop), FileSystemAccessAdapter (web), and WebStorageAdapter (browser fallback).",
+      "tags": [
+        "persistence",
+        "storage",
+        "interface",
+        "adapter"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/persistence/adapters/TauriStorageAdapter.ts",
+      "type": "file",
+      "name": "TauriStorageAdapter.ts",
+      "filePath": "src/core/persistence/adapters/TauriStorageAdapter.ts",
+      "summary": "Tauri-native file system adapter. Uses Tauri's FS API for full filesystem access on desktop (Windows/macOS/Linux). Enables native open/save dialogs.",
+      "tags": [
+        "persistence",
+        "tauri",
+        "filesystem",
+        "desktop"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/persistence/adapters/FileSystemAccessAdapter.ts",
+      "type": "file",
+      "name": "FileSystemAccessAdapter.ts",
+      "filePath": "src/core/persistence/adapters/FileSystemAccessAdapter.ts",
+      "summary": "Web File System Access API adapter. Provides file read/write for modern browsers using the showOpenFilePicker / showSaveFilePicker APIs.",
+      "tags": [
+        "persistence",
+        "web",
+        "filesystem",
+        "browser"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/persistence/migration/MigrationRegistry.ts",
+      "type": "file",
+      "name": "MigrationRegistry.ts",
+      "filePath": "src/core/persistence/migration/MigrationRegistry.ts",
+      "summary": "Registers and runs schema migration scripts for project file format upgrades. Ensures older saved projects are migrated to the current schema on open.",
+      "tags": [
+        "migration",
+        "schema",
+        "persistence",
+        "versioning"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/schema/duct.schema.ts",
+      "type": "file",
+      "name": "duct.schema.ts",
+      "filePath": "src/core/schema/duct.schema.ts",
+      "summary": "Zod schema for duct segment entities. Defines the shape of a duct: start/end points, width, height, shape (rectangular/round), material, insulation, and calculation results.",
+      "tags": [
+        "schema",
+        "duct",
+        "zod",
+        "types"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/schema/duct-run.schema.ts",
+      "type": "file",
+      "name": "duct-run.schema.ts",
+      "filePath": "src/core/schema/duct-run.schema.ts",
+      "summary": "Zod schema for duct run aggregates. Defines a logical duct run: ordered list of duct segments, associated fittings, system service, and aggregate calculation state.",
+      "tags": [
+        "schema",
+        "duct-run",
+        "zod",
+        "types"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/schema/equipment.schema.ts",
+      "type": "file",
+      "name": "equipment.schema.ts",
+      "filePath": "src/core/schema/equipment.schema.ts",
+      "summary": "Zod schema for HVAC equipment entities. Defines equipment type, position, dimensions, port definitions, and capacity specifications.",
+      "tags": [
+        "schema",
+        "equipment",
+        "zod",
+        "types"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/schema/fitting.schema.ts",
+      "type": "file",
+      "name": "fitting.schema.ts",
+      "filePath": "src/core/schema/fitting.schema.ts",
+      "summary": "Zod schema for duct fitting entities. Defines fitting type (elbow, wye, reducer, cap, etc.), geometry, C-value, and connection ports.",
+      "tags": [
+        "schema",
+        "fitting",
+        "zod",
+        "types"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/schema/project-file.schema.ts",
+      "type": "file",
+      "name": "project-file.schema.ts",
+      "filePath": "src/core/schema/project-file.schema.ts",
+      "summary": "Top-level Zod schema for the .sizewise project file format. Envelopes all entity collections, project metadata, settings, and schema version.",
+      "tags": [
+        "schema",
+        "project",
+        "zod",
+        "file-format"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/calculators/ductSizing.ts",
+      "type": "file",
+      "name": "ductSizing.ts",
+      "filePath": "src/features/canvas/calculators/ductSizing.ts",
+      "summary": "Duct sizing calculator. Implements equal friction and velocity methods for determining optimal duct cross-section given CFM and allowable pressure drop per 100 ft.",
+      "tags": [
+        "calculations",
+        "duct-sizing",
+        "equal-friction",
+        "velocity-method"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/calculators/pressureDrop.ts",
+      "type": "file",
+      "name": "pressureDrop.ts",
+      "filePath": "src/features/canvas/calculators/pressureDrop.ts",
+      "summary": "Pressure drop calculator. Computes friction loss per unit length using Darcy-Weisbach with ASHRAE roughness coefficients, and total system pressure from accumulated segment losses.",
+      "tags": [
+        "calculations",
+        "pressure-drop",
+        "darcy-weisbach",
+        "ashrae"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/calculators/ventilation.ts",
+      "type": "file",
+      "name": "ventilation.ts",
+      "filePath": "src/features/canvas/calculators/ventilation.ts",
+      "summary": "Ventilation calculator. Computes room CFM requirements from occupancy or square footage (ASHRAE 62.1), and validates supply vs. return air balance.",
+      "tags": [
+        "calculations",
+        "ventilation",
+        "cfm",
+        "ashrae-62.1"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/dashboard/components/DashboardPage.tsx",
+      "type": "file",
+      "name": "DashboardPage.tsx",
+      "filePath": "src/features/dashboard/components/DashboardPage.tsx",
+      "summary": "Project dashboard main view. Shows recent projects, all projects grid, search/filter controls, and new project creation entry point.",
+      "tags": [
+        "dashboard",
+        "projects",
+        "ui",
+        "feature"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/export/components/ExportDialog.tsx",
+      "type": "file",
+      "name": "ExportDialog.tsx",
+      "filePath": "src/features/export/components/ExportDialog.tsx",
+      "summary": "Export dialog. Offers export to PDF (drawing + calculations), PNG (canvas snapshot), CSV (BOM data), SVG (vector drawing), and Excel (BOM spreadsheet).",
+      "tags": [
+        "export",
+        "dialog",
+        "pdf",
+        "csv",
+        "png",
+        "svg"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/services/export/pdfGenerator.ts",
+      "type": "file",
+      "name": "pdfGenerator.ts",
+      "filePath": "src/core/services/export/pdfGenerator.ts",
+      "summary": "PDF report generator. Produces professional HVAC design reports including title block, drawing snapshot, equipment schedule, duct sizing table, and pressure drop summary.",
+      "tags": [
+        "export",
+        "pdf",
+        "report",
+        "generation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/commands/entityCommands.ts",
+      "type": "file",
+      "name": "entityCommands.ts",
+      "filePath": "src/core/commands/entityCommands.ts",
+      "summary": "Command objects for entity operations. Implements the Command pattern for undo/redo: AddEntity, DeleteEntity, MoveEntity, ResizeEntity, UpdateEntityProperty.",
+      "tags": [
+        "commands",
+        "undo-redo",
+        "entities",
+        "pattern"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/commands/historyStore.ts",
+      "type": "file",
+      "name": "historyStore.ts",
+      "filePath": "src/core/commands/historyStore.ts",
+      "summary": "Zustand store for undo/redo history. Maintains command stack, executes forward/backward traversal, and exposes undo/redo availability flags.",
+      "tags": [
+        "store",
+        "zustand",
+        "undo-redo",
+        "history",
+        "commands"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/hooks/useCalculations.ts",
+      "type": "file",
+      "name": "useCalculations.ts",
+      "filePath": "src/features/canvas/hooks/useCalculations.ts",
+      "summary": "React hook bridging entity store changes to the calculation engine. Subscribes to entity mutations and triggers re-calculation of affected duct runs.",
+      "tags": [
+        "hook",
+        "calculations",
+        "reactive",
+        "bridge"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/hooks/useEntityOperations.ts",
+      "type": "file",
+      "name": "useEntityOperations.ts",
+      "filePath": "src/features/canvas/hooks/useEntityOperations.ts",
+      "summary": "React hook encapsulating entity CRUD operations for use in canvas components. Wraps command dispatch with undo/redo support.",
+      "tags": [
+        "hook",
+        "entities",
+        "crud",
+        "commands"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/hooks/useKeyboardShortcuts.ts",
+      "type": "file",
+      "name": "useKeyboardShortcuts.ts",
+      "filePath": "src/features/canvas/hooks/useKeyboardShortcuts.ts",
+      "summary": "Keyboard shortcut manager hook. Binds global shortcuts: Esc (deselect), Ctrl+Z (undo), Ctrl+Y (redo), Delete (remove), Ctrl+C/V (copy/paste), and tool activations.",
+      "tags": [
+        "hook",
+        "keyboard",
+        "shortcuts",
+        "canvas"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/hooks/useAutoSave.ts",
+      "type": "file",
+      "name": "useAutoSave.ts",
+      "filePath": "src/features/canvas/hooks/useAutoSave.ts",
+      "summary": "Auto-save hook. Debounces entity store changes and triggers ProjectStateOrchestrator save after a configurable idle period.",
+      "tags": [
+        "hook",
+        "auto-save",
+        "persistence",
+        "debounce"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/geometry/ductBounds.ts",
+      "type": "file",
+      "name": "ductBounds.ts",
+      "filePath": "src/core/geometry/ductBounds.ts",
+      "summary": "Duct geometry helpers. Computes bounding boxes, endpoint projections, center points, and perpendicular offsets for rectangular and round duct cross-sections.",
+      "tags": [
+        "geometry",
+        "bounds",
+        "duct",
+        "math"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/features/canvas/services/magneticConnectionService.ts",
+      "type": "file",
+      "name": "magneticConnectionService.ts",
+      "filePath": "src/features/canvas/services/magneticConnectionService.ts",
+      "summary": "Magnetic snapping service. Detects proximity of duct endpoints or equipment ports during drawing and snaps cursor position to valid connection targets.",
+      "tags": [
+        "service",
+        "snapping",
+        "connections",
+        "drawing",
+        "ux"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/core/services/validation/constraintValidator.ts",
+      "type": "file",
+      "name": "constraintValidator.ts",
+      "filePath": "src/core/services/validation/constraintValidator.ts",
+      "summary": "Engineering constraint validator. Checks all entities against ASHRAE velocity limits, pressure drop thresholds, and dimensional minimums. Produces structured violation reports.",
+      "tags": [
+        "validation",
+        "constraints",
+        "engineering",
+        "ashrae"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/features/canvas/tokens/getElementColor.ts",
+      "type": "file",
+      "name": "getElementColor.ts",
+      "filePath": "src/features/canvas/tokens/getElementColor.ts",
+      "summary": "Visual token system for canvas elements. Maps entity state (normal, selected, hovered, error, warning) and system service type to specific fill/stroke colors.",
+      "tags": [
+        "tokens",
+        "visual",
+        "color",
+        "design-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/core/config/featureFlags.ts",
+      "type": "file",
+      "name": "featureFlags.ts",
+      "filePath": "src/core/config/featureFlags.ts",
+      "summary": "Feature flag definitions. Controls progressive feature rollout: 3D view, auto-sizing, BOM costing, cloud backup, and advanced fitting library.",
+      "tags": [
+        "config",
+        "feature-flags",
+        "rollout"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:app/(main)/canvas/page.tsx",
+      "target": "file:src/features/canvas/CanvasPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/features/canvas/components/Toolbar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/features/canvas/components/BOMPanel.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/features/canvas/components/CalculationsPanel.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/features/canvas/components/Minimap.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/CanvasPage.tsx",
+      "target": "file:src/core/store/canvas.store.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/tools/DuctTool.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/tools/SelectTool.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/tools/EquipmentTool.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/tools/FittingTool.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/renderers/DuctRenderer.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/renderers/FittingRenderer.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/renderers/EquipmentRenderer.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/core/store/canvas.store.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/core/store/entityStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/tools/DuctTool.ts",
+      "target": "file:src/features/canvas/services/magneticConnectionService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/tools/DuctTool.ts",
+      "target": "file:src/core/store/entityStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/tools/FittingTool.ts",
+      "target": "file:src/core/services/automation/fittingInsertionService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/renderers/DuctRenderer.ts",
+      "target": "file:src/features/canvas/tokens/getElementColor.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/renderers/DuctRunRenderer.ts",
+      "target": "file:src/features/canvas/renderers/DuctRenderer.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/renderers/DuctRunRenderer.ts",
+      "target": "file:src/features/canvas/tokens/getElementColor.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/store/canvas.store.ts",
+      "target": "file:src/core/store/entityStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/store/canvas.store.ts",
+      "target": "file:src/core/store/validationStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/store/project.store.ts",
+      "target": "file:src/core/persistence/ProjectStateOrchestrator.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/persistence/ProjectStateOrchestrator.ts",
+      "target": "file:src/core/persistence/StorageAdapter.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/persistence/ProjectStateOrchestrator.ts",
+      "target": "file:src/core/persistence/migration/MigrationRegistry.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/persistence/StorageAdapter.ts",
+      "target": "file:src/core/persistence/adapters/TauriStorageAdapter.ts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/persistence/StorageAdapter.ts",
+      "target": "file:src/core/persistence/adapters/FileSystemAccessAdapter.ts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/calculations/PressurePropagationService.ts",
+      "target": "file:src/core/services/calculations/engineeringCalculator.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/calculations/PressurePropagationService.ts",
+      "target": "file:src/core/services/graph/ConnectionGraphBuilder.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/graph/FlowPropagationService.ts",
+      "target": "file:src/core/services/graph/ConnectionGraphBuilder.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/graph/TopologyValidationService.ts",
+      "target": "file:src/core/services/graph/ConnectionGraphBuilder.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/automation/autoSizingService.ts",
+      "target": "file:src/features/canvas/calculators/ductSizing.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/automation/autoSizingService.ts",
+      "target": "file:src/features/canvas/calculators/pressureDrop.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/calculators/pressureDrop.ts",
+      "target": "file:src/core/services/calculations/engineeringCalculator.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/bom/bomGenerationService.ts",
+      "target": "file:src/core/services/cost/costCalculationService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/bom/bomGenerationService.ts",
+      "target": "file:src/core/store/entityStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/BOMPanel.tsx",
+      "target": "file:src/core/services/bom/bomGenerationService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/commands/entityCommands.ts",
+      "target": "file:src/core/store/entityStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/commands/historyStore.ts",
+      "target": "file:src/core/commands/entityCommands.ts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/hooks/useCalculations.ts",
+      "target": "file:src/core/services/calculations/PressurePropagationService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/hooks/useCalculations.ts",
+      "target": "file:src/core/services/graph/FlowPropagationService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/hooks/useEntityOperations.ts",
+      "target": "file:src/core/commands/historyStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/hooks/useAutoSave.ts",
+      "target": "file:src/core/persistence/ProjectStateOrchestrator.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/validation/constraintValidator.ts",
+      "target": "file:src/core/store/validationStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/validation/constraintValidator.ts",
+      "target": "file:src/core/services/calculations/engineeringCalculator.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/export/components/ExportDialog.tsx",
+      "target": "file:src/core/services/export/pdfGenerator.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasViewportHost.tsx",
+      "target": "file:src/features/canvas/store/viewportStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "target": "file:src/features/canvas/components/Inspector/DuctInspector.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "target": "file:src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/Inspector/InspectorPanel.tsx",
+      "target": "file:src/features/canvas/store/selectionStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/features/canvas/components/CanvasContainer.tsx",
+      "target": "file:src/features/canvas/store/selectionStore.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/core/services/graph/FlowPropagationService.ts",
+      "target": "file:src/core/services/graph/TopologyValidationService.ts",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 1
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:ui",
+      "name": "UI",
+      "description": "React components, pages, dialogs, and visual elements. No business logic \u2014 purely presentation and event forwarding.",
+      "nodeIds": [
+        "file:app/layout.tsx",
+        "file:app/(main)/canvas/page.tsx",
+        "file:app/dashboard/page.tsx",
+        "file:src/features/canvas/components/Toolbar.tsx",
+        "file:src/features/canvas/components/Minimap.tsx",
+        "file:src/features/canvas/components/BOMPanel.tsx",
+        "file:src/features/canvas/components/CalculationsPanel.tsx",
+        "file:src/features/canvas/components/Inspector/InspectorPanel.tsx",
+        "file:src/features/canvas/components/Inspector/DuctInspector.tsx",
+        "file:src/features/canvas/components/Inspector/DuctRunInspector.tsx",
+        "file:src/features/canvas/components/Inspector/EquipmentInspector.tsx",
+        "file:src/features/dashboard/components/DashboardPage.tsx",
+        "file:src/features/export/components/ExportDialog.tsx"
+      ]
+    },
+    {
+      "id": "layer:feature",
+      "name": "Feature",
+      "description": "Feature-level orchestrators that compose UI and services into user-facing capabilities: canvas designer, dashboard, export.",
+      "nodeIds": [
+        "file:src/features/canvas/CanvasPage.tsx",
+        "file:src/features/canvas/components/CanvasContainer.tsx",
+        "file:src/features/canvas/components/CanvasViewportHost.tsx",
+        "file:src/features/canvas/components/ThreeViewport.tsx",
+        "file:src/features/canvas/hooks/useCalculations.ts",
+        "file:src/features/canvas/hooks/useEntityOperations.ts",
+        "file:src/features/canvas/hooks/useKeyboardShortcuts.ts",
+        "file:src/features/canvas/hooks/useAutoSave.ts"
+      ]
+    },
+    {
+      "id": "layer:tool",
+      "name": "Tool",
+      "description": "Interactive drawing tools that handle user input events and translate them into entity operations. BaseTool pattern with specialized subclasses.",
+      "nodeIds": [
+        "file:src/features/canvas/tools/DuctTool.ts",
+        "file:src/features/canvas/tools/EquipmentTool.ts",
+        "file:src/features/canvas/tools/FittingTool.ts",
+        "file:src/features/canvas/tools/SelectTool.ts",
+        "file:src/features/canvas/tools/RoomTool.ts"
+      ]
+    },
+    {
+      "id": "layer:renderer",
+      "name": "Renderer",
+      "description": "Konva/Three.js rendering layer. Translates entity state into visual canvas elements. Pure visual \u2014 no business logic or state mutation.",
+      "nodeIds": [
+        "file:src/features/canvas/renderers/DuctRenderer.ts",
+        "file:src/features/canvas/renderers/DuctRunRenderer.ts",
+        "file:src/features/canvas/renderers/FittingRenderer.ts",
+        "file:src/features/canvas/renderers/EquipmentRenderer.ts"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service",
+      "description": "Domain services implementing core business logic: engineering calculations, automation, BOM generation, export, and connection management.",
+      "nodeIds": [
+        "file:src/core/services/calculations/engineeringCalculator.ts",
+        "file:src/core/services/calculations/PressurePropagationService.ts",
+        "file:src/core/services/graph/FlowPropagationService.ts",
+        "file:src/core/services/graph/ConnectionGraphBuilder.ts",
+        "file:src/core/services/graph/TopologyValidationService.ts",
+        "file:src/core/services/automation/autoSizingService.ts",
+        "file:src/core/services/automation/fittingInsertionService.ts",
+        "file:src/core/services/bom/bomGenerationService.ts",
+        "file:src/core/services/cost/costCalculationService.ts",
+        "file:src/core/services/validation/constraintValidator.ts",
+        "file:src/core/services/export/pdfGenerator.ts",
+        "file:src/features/canvas/services/magneticConnectionService.ts",
+        "file:src/features/canvas/calculators/ductSizing.ts",
+        "file:src/features/canvas/calculators/pressureDrop.ts",
+        "file:src/features/canvas/calculators/ventilation.ts"
+      ]
+    },
+    {
+      "id": "layer:store",
+      "name": "Store",
+      "description": "Zustand state stores. The single source of truth for application state. All stores are reactive and drive UI re-renders.",
+      "nodeIds": [
+        "file:src/core/store/canvas.store.ts",
+        "file:src/core/store/entityStore.ts",
+        "file:src/core/store/project.store.ts",
+        "file:src/core/store/validationStore.ts",
+        "file:src/features/canvas/store/viewportStore.ts",
+        "file:src/features/canvas/store/selectionStore.ts",
+        "file:src/core/commands/historyStore.ts"
+      ]
+    },
+    {
+      "id": "layer:persistence",
+      "name": "Persistence",
+      "description": "Storage and serialization layer. Adapters for Tauri native FS, Web File System Access API, and browser storage. Migration system for schema upgrades.",
+      "nodeIds": [
+        "file:src/core/persistence/ProjectStateOrchestrator.ts",
+        "file:src/core/persistence/StorageAdapter.ts",
+        "file:src/core/persistence/adapters/TauriStorageAdapter.ts",
+        "file:src/core/persistence/adapters/FileSystemAccessAdapter.ts",
+        "file:src/core/persistence/migration/MigrationRegistry.ts"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "Data / Schema",
+      "description": "Zod schemas defining entity shapes, project file format, and type contracts. Used for runtime validation on save/load and as TypeScript types.",
+      "nodeIds": [
+        "file:src/core/schema/duct.schema.ts",
+        "file:src/core/schema/duct-run.schema.ts",
+        "file:src/core/schema/equipment.schema.ts",
+        "file:src/core/schema/fitting.schema.ts",
+        "file:src/core/schema/project-file.schema.ts",
+        "file:src/core/commands/entityCommands.ts",
+        "file:src/core/geometry/ductBounds.ts",
+        "file:src/features/canvas/tokens/getElementColor.ts"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "App Entry & Routing",
+      "description": "Start here to understand how the app initializes. layout.tsx is the Next.js root that wraps everything. Two primary routes: /dashboard (project list) and /canvas (designer).",
+      "nodeIds": [
+        "file:app/layout.tsx",
+        "file:app/dashboard/page.tsx",
+        "file:app/(main)/canvas/page.tsx"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "State Management Foundation",
+      "description": "The entire app state flows through Zustand stores. entityStore is the canonical data source for all canvas entities. canvas.store owns the active tool and draw mode. project.store coordinates saves.",
+      "nodeIds": [
+        "file:src/core/store/entityStore.ts",
+        "file:src/core/store/canvas.store.ts",
+        "file:src/core/store/project.store.ts",
+        "file:src/features/canvas/store/selectionStore.ts",
+        "file:src/features/canvas/store/viewportStore.ts"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Canvas Composition",
+      "description": "CanvasPage.tsx is the main orchestrator. It composes the full workspace. CanvasContainer.tsx owns the Konva stage and dispatches to tools and renderers.",
+      "nodeIds": [
+        "file:src/features/canvas/CanvasPage.tsx",
+        "file:src/features/canvas/components/CanvasContainer.tsx",
+        "file:src/features/canvas/components/CanvasViewportHost.tsx"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Drawing Tools",
+      "description": "Each draw mode maps to a Tool class. DuctTool handles the core drawing interaction \u2014 click to start, move to extend, click to place. FittingTool auto-detects valid insertion points.",
+      "nodeIds": [
+        "file:src/features/canvas/tools/DuctTool.ts",
+        "file:src/features/canvas/tools/SelectTool.ts",
+        "file:src/features/canvas/tools/FittingTool.ts",
+        "file:src/features/canvas/tools/EquipmentTool.ts",
+        "file:src/features/canvas/services/magneticConnectionService.ts"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Engineering Calculations",
+      "description": "The calculation pipeline: ConnectionGraphBuilder builds the network, FlowPropagationService distributes CFM, PressurePropagationService computes static pressure using engineeringCalculator's ASHRAE algorithms.",
+      "nodeIds": [
+        "file:src/core/services/graph/ConnectionGraphBuilder.ts",
+        "file:src/core/services/graph/FlowPropagationService.ts",
+        "file:src/core/services/calculations/PressurePropagationService.ts",
+        "file:src/core/services/calculations/engineeringCalculator.ts",
+        "file:src/features/canvas/calculators/ductSizing.ts"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Rendering Pipeline",
+      "description": "Renderers are pure visual translators \u2014 they read from entity state and draw to Konva/Three.js. DuctRunRenderer composes individual DuctRenderers. FittingRenderer uses SMACNA engineering symbols.",
+      "nodeIds": [
+        "file:src/features/canvas/renderers/DuctRunRenderer.ts",
+        "file:src/features/canvas/renderers/DuctRenderer.ts",
+        "file:src/features/canvas/renderers/FittingRenderer.ts",
+        "file:src/features/canvas/renderers/EquipmentRenderer.ts",
+        "file:src/features/canvas/tokens/getElementColor.ts"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "Persistence & Storage",
+      "description": "ProjectStateOrchestrator manages save/load lifecycle. StorageAdapter is the interface with three implementations: Tauri (desktop native), FileSystemAccess (modern browser), WebStorage (fallback). Migration system handles schema upgrades.",
+      "nodeIds": [
+        "file:src/core/persistence/ProjectStateOrchestrator.ts",
+        "file:src/core/persistence/StorageAdapter.ts",
+        "file:src/core/persistence/adapters/TauriStorageAdapter.ts",
+        "file:src/core/persistence/migration/MigrationRegistry.ts"
+      ]
+    }
+  ]
+}

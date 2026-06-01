@@ -15,6 +15,7 @@ export interface PreferencesState {
   snapToGrid: boolean;
   showRulers: boolean;
   showFittingLabels: boolean;
+  showCenterline: boolean;
 }
 
 interface PreferencesActions {
@@ -28,6 +29,7 @@ interface PreferencesActions {
   setSnapToGrid: (enabled: boolean) => void;
   setShowRulers: (enabled: boolean) => void;
   setShowFittingLabels: (enabled: boolean) => void;
+  setShowCenterline: (enabled: boolean) => void;
 }
 
 type PreferencesStore = PreferencesState & PreferencesActions;
@@ -43,6 +45,7 @@ export const PREFERENCES_DEFAULTS: PreferencesState = {
   snapToGrid: true,
   showRulers: false,
   showFittingLabels: false,
+  showCenterline: false,
 };
 
 export const usePreferencesStore = create<PreferencesStore>()(
@@ -59,6 +62,7 @@ export const usePreferencesStore = create<PreferencesStore>()(
       setSnapToGrid: (enabled) => set({ snapToGrid: enabled }),
       setShowRulers: (enabled) => set({ showRulers: enabled }),
       setShowFittingLabels: (enabled) => set({ showFittingLabels: enabled }),
+      setShowCenterline: (enabled) => set({ showCenterline: enabled }),
     }),
     { name: 'sws.preferences' }
   )
@@ -77,4 +81,5 @@ export const usePreferencesActions = () =>
     setSnapToGrid: state.setSnapToGrid,
     setShowRulers: state.setShowRulers,
     setShowFittingLabels: state.setShowFittingLabels,
+    setShowCenterline: state.setShowCenterline,
   }));

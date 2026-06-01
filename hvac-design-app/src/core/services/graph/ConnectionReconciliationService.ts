@@ -1,11 +1,20 @@
 import { feetToPixels } from '@/core/constants/coordinates';
 import type { Duct, DuctRun, Entity, Equipment, Fitting, FittingPort, FittingType } from '@/core/schema';
+import type { ConnectionPort } from '@/core/schema/equipment.schema';
+import { getEquipmentPortWorldPosition } from '@/features/canvas/services/equipmentGeometry';
+import { resolveFittingGeometry, applyDuctEndpointCutback } from '@/features/canvas/services/connectionPoints';
+import type { ResolvedConnectionPoint } from '@/features/canvas/services/connectionPoints';
 
 type DuctLike = Duct | DuctRun;
 type Point = { x: number; y: number };
 type DuctEndpoint = {
   duct: DuctLike;
   end: 'start' | 'end';
+  point: Point;
+};
+type EquipmentPortEndpoint = {
+  equipment: Equipment;
+  port: ConnectionPort;
   point: Point;
 };
 
@@ -27,6 +36,12 @@ export class ConnectionReconciliationService {
     }
     for (const item of equipment) {
       item.props.connectedDuctId = undefined;
+      if (item.props.connectionPorts) {
+        item.props.connectionPorts = item.props.connectionPorts.map((port) => ({
+          ...port,
+          connectedDuctId: undefined,
+        }));
+      }
     }
 
     const endpoints = ducts.flatMap((duct) => getDuctEndpoints(duct));
@@ -45,7 +60,14 @@ function cloneEntities(entities: Record<string, Entity>): Record<string, Entity>
       id,
       {
         ...entity,
-        props: { ...entity.props },
+        props: {
+          ...entity.props,
+          ...(
+            entity.type === 'equipment' && entity.props.connectionPorts
+              ? { connectionPorts: entity.props.connectionPorts.map((port) => ({ ...port })) }
+              : {}
+          ),
+        },
         ...('calculated' in entity ? { calculated: { ...entity.calculated } } : {}),
         ...('warnings' in entity && entity.warnings ? { warnings: { ...entity.warnings } } : {}),
       } as Entity,
@@ -55,6 +77,11 @@ function cloneEntities(entities: Record<string, Entity>): Record<string, Entity>
 
 function reconcileEquipment(equipment: Equipment[], endpoints: DuctEndpoint[]): void {
   for (const item of equipment) {
+    if (item.props.connectionPorts?.length) {
+      reconcileEquipmentPorts(item, endpoints);
+      continue;
+    }
+
     const nearest = findNearestEndpoint({ x: item.transform.x, y: item.transform.y }, endpoints);
     if (!nearest) {
       continue;
@@ -62,6 +89,26 @@ function reconcileEquipment(equipment: Equipment[], endpoints: DuctEndpoint[]): 
 
     item.props.connectedDuctId = nearest.duct.id;
     setDuctConnection(nearest, item.id);
+  }
+}
+
+function reconcileEquipmentPorts(item: Equipment, endpoints: DuctEndpoint[]): void {
+  const usedEndpointKeys = new Set<string>();
+  const ports = getEquipmentPortEndpoints(item);
+
+  for (const portEndpoint of ports) {
+    const nearest = findNearestEndpoint(
+      portEndpoint.point,
+      endpoints.filter((endpoint) => !usedEndpointKeys.has(endpointKey(endpoint)))
+    );
+    if (!nearest) {
+      continue;
+    }
+
+    portEndpoint.port.connectedDuctId = nearest.duct.id;
+    item.props.connectedDuctId ??= nearest.duct.id;
+    setDuctConnection(nearest, item.id);
+    usedEndpointKeys.add(endpointKey(nearest));
   }
 }
 
@@ -87,39 +134,229 @@ function reconcileDuctEndpoints(endpoints: DuctEndpoint[]): void {
 
 function reconcileFittings(fittings: Fitting[], endpoints: DuctEndpoint[]): void {
   for (const fitting of fittings) {
-    const fittingPoint = { x: fitting.transform.x, y: fitting.transform.y };
-    const connected = endpoints
-      .filter((endpoint) => distance(endpoint.point, fittingPoint) <= SNAP_TOLERANCE_PX)
-      .sort((a, b) => {
-        const endSort = endPriority(a.end) - endPriority(b.end);
-        return endSort !== 0 ? endSort : a.duct.id.localeCompare(b.duct.id);
-      });
-
-    if (connected.length === 0) {
+    // PR-2 / PR-7: prefer matching duct endpoints to the fitting's resolved
+    // connection points (the single source of truth for port geometry). This
+    // records an explicit endpoint↔connectionPoint edge instead of treating the
+    // fitting as one origin snap target.
+    if (reconcileFittingByPorts(fitting, endpoints)) {
       continue;
     }
 
-    fitting.props.ports = connected.map((endpoint, index) => {
-      const role = roleForPort(fitting.props.fittingType, endpoint, index);
-      return {
-        id: `${fitting.id}-${endpoint.duct.id}-${endpoint.end}`,
-        role,
-        direction: role === 'inlet' ? 'in' : 'out',
-        connectedDuctRunId: endpoint.duct.id,
-        connectedEnd: endpoint.end,
-      } satisfies FittingPort;
-    });
+    // Legacy fallback: older topology where ducts meet at the fitting origin and
+    // are not yet aligned to resolved ports. Kept so existing models keep
+    // reconciling; new port-aligned connections take the path above.
+    reconcileFittingByOrigin(fitting, endpoints);
+  }
+}
 
-    for (const port of fitting.props.ports) {
-      const duct = connected.find((endpoint) => endpoint.duct.id === port.connectedDuctRunId)?.duct;
-      if (!duct) {
+function reconcileFittingByPorts(fitting: Fitting, endpoints: DuctEndpoint[]): boolean {
+  const ports = resolveFittingGeometry(fitting).connectionPoints;
+  const used = new Set<DuctEndpoint>();
+  const matches: { port: ResolvedConnectionPoint; portIndex: number; endpoint: DuctEndpoint }[] = [];
+
+  ports.forEach((port, portIndex) => {
+    let best: DuctEndpoint | null = null;
+    let bestDistance = Infinity;
+    for (const endpoint of endpoints) {
+      if (used.has(endpoint)) {
         continue;
       }
-      if (port.direction === 'in') {
-        duct.props.connectedTo = fitting.id;
-      } else {
-        duct.props.connectedFrom = fitting.id;
+      const candidate = distance(endpoint.point, port.worldPosition);
+      if (candidate <= SNAP_TOLERANCE_PX && candidate < bestDistance) {
+        best = endpoint;
+        bestDistance = candidate;
       }
+    }
+    if (best) {
+      used.add(best);
+      matches.push({ port, portIndex, endpoint: best });
+    }
+  });
+
+  if (matches.length === 0) {
+    return false;
+  }
+
+  // Duct cutback (PR-8): pin each connected duct endpoint exactly onto its
+  // resolved port opening so the run terminates at the fitting body instead of
+  // running beneath it. Idempotent — endpoints already on the opening are left
+  // untouched. Runs in the committed pipeline, so it covers draw-to-port,
+  // drop-on-duct, and re-trim when a fitting or duct is moved.
+  for (const { port, endpoint } of matches) {
+    const changed = applyDuctEndpointCutback(endpoint.duct, endpoint.end, port.worldPosition);
+    if (changed) {
+      endpoint.point = { x: port.worldPosition.x, y: port.worldPosition.y };
+    }
+  }
+
+  fitting.props.ports = matches.map(({ port, endpoint }) => buildFittingPort(fitting, port.role, endpoint));
+  fitting.props.connectionPoints = matches.map(({ endpoint, portIndex }) => ({
+    ductId: endpoint.duct.id,
+    pointIndex: portIndex,
+  }));
+
+  applyDuctConnections(fitting, fitting.props.ports, matches.map((match) => match.endpoint));
+  return true;
+}
+
+function reconcileFittingByOrigin(fitting: Fitting, endpoints: DuctEndpoint[]): void {
+  const fittingPoint = { x: fitting.transform.x, y: fitting.transform.y };
+  const connected = endpoints
+    .filter((endpoint) => distance(endpoint.point, fittingPoint) <= SNAP_TOLERANCE_PX)
+    .sort((a, b) => {
+      const endSort = endPriority(a.end) - endPriority(b.end);
+      return endSort !== 0 ? endSort : a.duct.id.localeCompare(b.duct.id);
+    });
+
+  if (connected.length === 0) {
+    return;
+  }
+
+  const hasIndexedConnectionPoints = fitting.props.connectionPoints?.some(
+    (point) => typeof point.pointIndex === 'number'
+  );
+  if (!hasIndexedConnectionPoints) {
+    fitting.props.ports = connected.map((endpoint, index) =>
+      buildFittingPort(fitting, roleForPort(fitting.props.fittingType, endpoint, index), endpoint)
+    );
+    applyDuctConnections(fitting, fitting.props.ports, connected);
+    return;
+  }
+
+  const resolvedPorts = resolveFittingGeometry(fitting).connectionPoints;
+  const assignments = assignOriginEndpointsToPorts(fitting, connected, resolvedPorts);
+
+  for (const assignment of assignments) {
+    if (!assignment.port) {
+      continue;
+    }
+
+    const changed = applyDuctEndpointCutback(assignment.endpoint.duct, assignment.endpoint.end, assignment.port.worldPosition);
+    if (changed) {
+      assignment.endpoint.point = { x: assignment.port.worldPosition.x, y: assignment.port.worldPosition.y };
+    }
+  }
+
+  fitting.props.ports = assignments.map((assignment, index) =>
+    buildFittingPort(
+      fitting,
+      assignment.port?.role ?? roleForPort(fitting.props.fittingType, assignment.endpoint, index),
+      assignment.endpoint
+    )
+  );
+  fitting.props.connectionPoints = assignments
+    .filter((assignment): assignment is OriginPortAssignment & { port: ResolvedConnectionPoint; portIndex: number } =>
+      Boolean(assignment.port) && typeof assignment.portIndex === 'number'
+    )
+    .map((assignment) => ({
+      ductId: assignment.endpoint.duct.id,
+      pointIndex: assignment.portIndex,
+    }));
+
+  applyDuctConnections(fitting, fitting.props.ports, assignments.map((assignment) => assignment.endpoint));
+}
+
+type OriginPortAssignment = {
+  endpoint: DuctEndpoint;
+  port?: ResolvedConnectionPoint;
+  portIndex?: number;
+};
+
+function assignOriginEndpointsToPorts(
+  fitting: Fitting,
+  connected: DuctEndpoint[],
+  ports: ResolvedConnectionPoint[]
+): OriginPortAssignment[] {
+  if (ports.length === 0) {
+    return connected.map((endpoint) => ({ endpoint }));
+  }
+
+  const usedPortIndexes = new Set<number>();
+
+  return connected.map((endpoint, index) => {
+    const persistedIndex = fitting.props.connectionPoints?.find((point) => point.ductId === endpoint.duct.id)?.pointIndex;
+    if (
+      typeof persistedIndex === 'number' &&
+      ports[persistedIndex] &&
+      !usedPortIndexes.has(persistedIndex)
+    ) {
+      usedPortIndexes.add(persistedIndex);
+      return { endpoint, port: ports[persistedIndex], portIndex: persistedIndex };
+    }
+
+    const desiredRole = roleForPort(fitting.props.fittingType, endpoint, index);
+    const roleMatchIndex = ports.findIndex(
+      (port, portIndex) =>
+        !usedPortIndexes.has(portIndex) && portMatchesRole(fitting.props.fittingType, port.role, desiredRole)
+    );
+    if (roleMatchIndex >= 0) {
+      usedPortIndexes.add(roleMatchIndex);
+      return { endpoint, port: ports[roleMatchIndex], portIndex: roleMatchIndex };
+    }
+
+    const fallbackIndex = ports.findIndex((_port, portIndex) => !usedPortIndexes.has(portIndex));
+    if (fallbackIndex >= 0) {
+      usedPortIndexes.add(fallbackIndex);
+      return { endpoint, port: ports[fallbackIndex], portIndex: fallbackIndex };
+    }
+
+    return { endpoint };
+  });
+}
+
+function portMatchesRole(fittingType: FittingType, portRole: string, fittingPortRole: FittingPort['role']): boolean {
+  if (portRole === 'inlet') {
+    return fittingPortRole === 'inlet';
+  }
+  if (portRole === 'branch' || portRole === 'branch_out') {
+    return fittingPortRole === 'branch_out';
+  }
+  if (portRole === 'outlet' || portRole === 'straight_out') {
+    return fittingPortRole === (fittingType === 'tee' ? 'straight_out' : 'outlet');
+  }
+  return portRole === fittingPortRole;
+}
+
+function buildFittingPort(fitting: Fitting, role: string, endpoint: DuctEndpoint): FittingPort {
+  const normalized = normalizeFittingPortRole(fitting.props.fittingType, role, endpoint);
+  return {
+    id: `${fitting.id}-${endpoint.duct.id}-${endpoint.end}`,
+    role: normalized,
+    direction: normalized === 'inlet' ? 'in' : 'out',
+    connectedDuctRunId: endpoint.duct.id,
+    connectedEnd: endpoint.end,
+  } satisfies FittingPort;
+}
+
+/** Map a resolved port role ('inlet'|'outlet'|'branch') to a FittingPort role. */
+function normalizeFittingPortRole(
+  fittingType: FittingType,
+  role: string,
+  endpoint: DuctEndpoint
+): FittingPort['role'] {
+  if (role === 'inlet') {
+    return 'inlet';
+  }
+  if (role === 'branch' || role === 'branch_out') {
+    return 'branch_out';
+  }
+  if (role === 'outlet' || role === 'straight_out') {
+    return fittingType === 'tee' ? 'straight_out' : 'outlet';
+  }
+  // Already a FittingPort role (legacy callers pass roleForPort output through).
+  return role as FittingPort['role'];
+}
+
+function applyDuctConnections(fitting: Fitting, ports: FittingPort[], endpoints: DuctEndpoint[]): void {
+  for (const port of ports) {
+    const duct = endpoints.find((endpoint) => endpoint.duct.id === port.connectedDuctRunId)?.duct;
+    if (!duct) {
+      continue;
+    }
+    if (port.direction === 'in') {
+      duct.props.connectedTo = fitting.id;
+    } else {
+      duct.props.connectedFrom = fitting.id;
     }
   }
 }
@@ -150,6 +387,18 @@ function setDuctConnection(endpoint: DuctEndpoint, connectedEntityId: string): v
   } else {
     endpoint.duct.props.connectedTo = connectedEntityId;
   }
+}
+
+function getEquipmentPortEndpoints(equipment: Equipment): EquipmentPortEndpoint[] {
+  return (equipment.props.connectionPorts ?? []).map((port) => ({
+    equipment,
+    port,
+    point: getEquipmentPortWorldPosition(port, equipment),
+  }));
+}
+
+function endpointKey(endpoint: DuctEndpoint): string {
+  return `${endpoint.duct.id}:${endpoint.end}`;
 }
 
 function findNearestEndpoint(point: Point, endpoints: DuctEndpoint[]): DuctEndpoint | null {

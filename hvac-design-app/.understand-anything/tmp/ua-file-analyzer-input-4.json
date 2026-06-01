@@ -1,0 +1,360 @@
+{
+  "projectRoot": "C:/Users/User/Downloads/GitHub/HVAC_Canvas_App/hvac-design-app",
+  "batchFiles": [
+    {
+      "path": "src/components/ui/ValidatedInput.tsx",
+      "language": "typescript",
+      "sizeLines": 124,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/commands/ductRunCommands.ts",
+      "language": "typescript",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/commands/entityCommands.ts",
+      "language": "typescript",
+      "sizeLines": 1054,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/commands/historyStore.ts",
+      "language": "typescript",
+      "sizeLines": 115,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/commands/types.ts",
+      "language": "typescript",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/constants/coordinates.ts",
+      "language": "typescript",
+      "sizeLines": 24,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/geometry/bounds.ts",
+      "language": "typescript",
+      "sizeLines": 173,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/geometry/ductBounds.ts",
+      "language": "typescript",
+      "sizeLines": 86,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/geometry/math.ts",
+      "language": "typescript",
+      "sizeLines": 154,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/schema/equipment.schema.ts",
+      "language": "typescript",
+      "sizeLines": 467,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/schema/index.ts",
+      "language": "typescript",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/automation/fittingInsertionService.ts",
+      "language": "typescript",
+      "sizeLines": 1037,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/calculations/ductVelocityThresholds.ts",
+      "language": "typescript",
+      "sizeLines": 46,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/componentServiceInterop.ts",
+      "language": "typescript",
+      "sizeLines": 207,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/connectionDetection.ts",
+      "language": "typescript",
+      "sizeLines": 249,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/ductConnections.ts",
+      "language": "typescript",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/fittingGeneration.ts",
+      "language": "typescript",
+      "sizeLines": 162,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "language": "typescript",
+      "sizeLines": 402,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/ConnectionReconciliationService.ts",
+      "language": "typescript",
+      "sizeLines": 343,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/FlowPropagationService.ts",
+      "language": "typescript",
+      "sizeLines": 230,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/GraphCache.ts",
+      "language": "typescript",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/TopologyValidationService.ts",
+      "language": "typescript",
+      "sizeLines": 220,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/equipmentClassification.ts",
+      "language": "typescript",
+      "sizeLines": 28,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/equipmentPortFlow.ts",
+      "language": "typescript",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/graph/types.ts",
+      "language": "typescript",
+      "sizeLines": 79,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/services/parametrics/ParametricUpdateService.ts",
+      "language": "typescript",
+      "sizeLines": 162,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/store/ductOverlayStore.ts",
+      "language": "typescript",
+      "sizeLines": 135,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/core/store/entityStore.ts",
+      "language": "typescript",
+      "sizeLines": 332,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/auto-fitting/types.ts",
+      "language": "typescript",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/clipboard/clipboardPayload.ts",
+      "language": "typescript",
+      "sizeLines": 44,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/features/canvas/clipboard/entityClipboard.ts",
+      "language": "typescript",
+      "sizeLines": 315,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/components/ui/ValidatedInput.tsx": [
+      "src/components/ui/ValidatedInput.module.css"
+    ],
+    "src/core/commands/ductRunCommands.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/commands/types.ts",
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/core/commands/entityCommands.ts": [
+      "src/core/commands/historyStore.ts",
+      "src/core/commands/types.ts",
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/automation/fittingInsertionService.ts",
+      "src/core/services/calculations/entityCalculationRuntime.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/services/constraintValidation.ts",
+      "src/core/store/componentLibraryStoreV2.ts",
+      "src/core/store/entityStore.ts",
+      "src/core/store/project.store.ts",
+      "src/core/store/settingsStore.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/entities/ductDefaults.ts",
+      "src/features/canvas/entities/ductRunDefaults.ts",
+      "src/features/canvas/store/selectionStore.ts",
+      "src/features/duct-runs/utils/getActiveSectionLength.ts",
+      "src/features/duct-runs/utils/recomputeDuctRunSegments.ts"
+    ],
+    "src/core/commands/historyStore.ts": [
+      "src/core/commands/types.ts"
+    ],
+    "src/core/commands/types.ts": [],
+    "src/core/constants/coordinates.ts": [],
+    "src/core/geometry/bounds.ts": [
+      "src/core/geometry/math.ts"
+    ],
+    "src/core/geometry/ductBounds.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/geometry/bounds.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/DuctRunGeometryService.ts"
+    ],
+    "src/core/geometry/math.ts": [],
+    "src/core/schema/equipment.schema.ts": [
+      "src/core/schema/base.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/unified-component.schema.ts"
+    ],
+    "src/core/schema/index.ts": [],
+    "src/core/services/automation/fittingInsertionService.ts": [
+      "src/core/schema/duct-run.schema.ts",
+      "src/core/schema/duct.schema.ts",
+      "src/core/schema/fitting.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/ductConnections.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/fittingDefaults.ts"
+    ],
+    "src/core/services/calculations/ductVelocityThresholds.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/componentServiceInterop.ts": [
+      "src/core/schema/service.schema.ts",
+      "src/core/schema/unified-component.schema.ts",
+      "src/core/store/componentLibraryStoreV2.ts"
+    ],
+    "src/core/services/connectionDetection.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/ductConnections.ts",
+      "src/core/store/entityStore.ts"
+    ],
+    "src/core/services/ductConnections.ts": [
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/ductGeometryHelpers.ts"
+    ],
+    "src/core/services/fittingGeneration.ts": [
+      "src/core/commands/entityCommands.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/componentServiceInterop.ts",
+      "src/core/services/connectionDetection.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/entities/fittingDefaults.ts"
+    ],
+    "src/core/services/graph/ConnectionGraphBuilder.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentPortFlow.ts",
+      "src/core/services/graph/GraphCache.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/ConnectionReconciliationService.ts": [
+      "src/core/constants/coordinates.ts",
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/features/canvas/services/connectionPoints/index.ts",
+      "src/features/canvas/services/equipmentGeometry.ts"
+    ],
+    "src/core/services/graph/FlowPropagationService.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentClassification.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/GraphCache.ts": [
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/TopologyValidationService.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentClassification.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/services/graph/equipmentClassification.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts"
+    ],
+    "src/core/services/graph/equipmentPortFlow.ts": [
+      "src/core/schema/equipment.schema.ts",
+      "src/core/schema/index.ts",
+      "src/core/services/graph/equipmentClassification.ts"
+    ],
+    "src/core/services/graph/types.ts": [],
+    "src/core/services/parametrics/ParametricUpdateService.ts": [
+      "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/store/ductOverlayStore.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/ductVelocityThresholds.ts",
+      "src/core/services/graph/types.ts"
+    ],
+    "src/core/store/entityStore.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/calculations/PressurePropagationService.ts",
+      "src/core/services/engineeringCalculations.ts",
+      "src/core/services/graph/ConnectionGraphBuilder.ts",
+      "src/core/services/graph/ConnectionReconciliationService.ts",
+      "src/core/services/graph/FlowPropagationService.ts",
+      "src/core/services/graph/TopologyValidationService.ts",
+      "src/core/services/graph/types.ts",
+      "src/core/store/ductOverlayStore.ts",
+      "src/core/store/validationStore.ts",
+      "src/features/canvas/calculators/pressureDrop.ts"
+    ],
+    "src/features/canvas/auto-fitting/types.ts": [
+      "src/core/schema/index.ts",
+      "src/core/services/connectionDetection.ts"
+    ],
+    "src/features/canvas/clipboard/clipboardPayload.ts": [
+      "src/core/schema/index.ts"
+    ],
+    "src/features/canvas/clipboard/entityClipboard.ts": [
+      "src/core/commands/index.ts",
+      "src/core/geometry/ductBounds.ts",
+      "src/core/schema/index.ts",
+      "src/core/store/entityStore.ts",
+      "src/features/canvas/clipboard/clipboardAdapter.ts",
+      "src/features/canvas/clipboard/clipboardPayload.ts",
+      "src/features/canvas/store/cursorStore.ts",
+      "src/features/canvas/store/selectionStore.ts"
+    ]
+  }
+}

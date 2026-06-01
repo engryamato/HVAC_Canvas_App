@@ -26,7 +26,7 @@ function ductRun(id: string, x: number, lengthFeet = 10, props: Partial<DuctRun[
       installLength: lengthFeet,
       segments: [{ index: 0, startStation: 0, endStation: lengthFeet, length: lengthFeet, isPartial: false }],
       ...props,
-    },
+    } as DuctRun['props'],
     calculated: { area: 144, velocity: 1000, frictionLoss: 0.1 },
   };
 }
@@ -77,6 +77,23 @@ describe('entityStore magnetic calculation pipeline', () => {
       neutral: false,
       color: '#16a34a',
     });
+  });
+
+  it('committed pipeline computes airflow, velocity, and friction for new source-connected duct runs', () => {
+    const source = sourceEquipment('550e8400-e29b-41d4-a716-446655441030', 0);
+    const run = ductRun('550e8400-e29b-41d4-a716-446655441031', 0, 12, {
+      airflow: 0,
+    });
+    run.calculated = { area: 120, velocity: 0, frictionLoss: 0 };
+
+    useEntityStore.getState().addEntities([source, run]);
+
+    const committed = useEntityStore.getState().byId[run.id] as DuctRun;
+    expect(committed.props.airflow).toBe(2000);
+    expect(committed.calculated.velocity).toBeGreaterThan(0);
+    expect(committed.calculated.frictionLoss).toBeGreaterThan(0);
+    expect(committed.calculated.cumulativePressureDrop).toBeGreaterThan(0);
+    expect(committed.calculated.availableStaticPressure).toBeLessThan(2);
   });
 
   it('transient updates do not run reconciliation or calculation until committed', () => {
