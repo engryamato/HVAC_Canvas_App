@@ -61,7 +61,7 @@
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^1.8.0",
     "nanoid": "^5.1.7",
-    "next": "^16.2.3",
+    "next": "^16.2.7",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tailwind-merge": "^3.5.0",
@@ -69,7 +69,7 @@
     "three": "^0.183.2",
     "vibe-kanban-web-companion": "^0.0.5",
     "zod": "4.3.6",
-    "zustand": "5.0.12"
+    "zustand": "5.0.14"
   },
   "devDependencies": {
     "@chromatic-com/playwright": "^0.13.1",
