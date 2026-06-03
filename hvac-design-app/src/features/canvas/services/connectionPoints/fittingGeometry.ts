@@ -93,6 +93,20 @@ export interface FittingDimensions {
   eccentric: boolean;
   /** Alignment for eccentric / rect-to-round transitions. */
   alignment: 'center_line' | 'flat_top' | 'flat_bottom';
+  // WS6e E2 — variant-derived geometry detail (defaults reproduce pre-variant
+  // geometry exactly, so old fittings with `variant === undefined` are unchanged).
+  /** Smooth-radius vs sharp mitered elbow (overrides the elbow `fittingType`). */
+  elbowKind: 'radius' | 'mitered';
+  /** Turning-vane treatment drawn inside the elbow. */
+  vaneType: 'none' | 'single_wall' | 'double_wall';
+  /** Flat wall an eccentric reducer shares (`null` = concentric). */
+  eccentricSide: 'top' | 'bottom' | null;
+  /** Vertical alignment of a rect→round transition's round end. */
+  transitionAlignment: 'centered' | 'top' | 'bottom';
+  /** Transition seam style — `gored` adds gore seams. */
+  transitionStyle: 'straight' | 'gored';
+  /** Which side a 3-port branch leans toward (mirrors the branch in y). */
+  branchSide: 'left' | 'right';
 }
 
 function clampSize(value: number | undefined, fallback: number): number {
@@ -111,9 +125,44 @@ function clampSize(value: number | undefined, fallback: number): number {
  * persisted into `transitionData` at connection time, so this still reflects the
  * real connected sizes without needing the entity map here.
  */
+const RADIUS_RATIO_BY_CLASS: Record<'R1.0' | 'R1.5' | 'R2.0', number> = {
+  'R1.0': 1.0,
+  'R1.5': 1.5,
+  'R2.0': 2.0,
+};
+
+/** Resolve the eccentric reducer's shared flat wall (null = concentric). */
+function resolveEccentricSide(
+  type: FittingType,
+  offset: 'top' | 'bottom' | 'left' | 'right' | undefined
+): 'top' | 'bottom' | null {
+  if (offset) {
+    // The reducer body offsets perpendicular to flow (local y); lateral
+    // left/right offsets are not modeled in E2 and fold onto the bottom wall.
+    return offset === 'top' ? 'top' : 'bottom';
+  }
+  return type === 'reducer_eccentric' ? 'bottom' : null;
+}
+
+/** Map the variant transition alignment (and legacy transitionData) to the vertical axis. */
+function resolveTransitionAlignment(
+  variantAlignment: 'centered' | 'top' | 'bottom' | 'left' | 'right' | undefined,
+  legacy: 'center_line' | 'flat_top' | 'flat_bottom' | undefined
+): 'centered' | 'top' | 'bottom' {
+  if (variantAlignment) {
+    if (variantAlignment === 'top') { return 'top'; }
+    if (variantAlignment === 'bottom') { return 'bottom'; }
+    return 'centered'; // centered / left / right (lateral not modeled in E2)
+  }
+  if (legacy === 'flat_top') { return 'top'; }
+  if (legacy === 'flat_bottom') { return 'bottom'; }
+  return 'centered';
+}
+
 export function resolveFittingDimensions(fitting: Fitting): FittingDimensions {
   const props = fitting.props;
   const transition = props.transitionData;
+  const variant = props.variant;
 
   const inletShape = transition?.fromShape ?? 'round';
   const outletShape = transition?.toShape ?? 'round';
@@ -134,14 +183,21 @@ export function resolveFittingDimensions(fitting: Fitting): FittingDimensions {
   const rectWidth = clampSize(transition?.fromWidth ?? transition?.toWidth, inletSize);
   const rectHeight = clampSize(transition?.fromHeight ?? transition?.toHeight, Math.max(MIN_SIZE, inletSize * 0.7));
 
+  // WS6e E2: variant.radiusClass overrides the raw radiusRatio when present.
+  const radiusFromClass = variant?.radiusClass ? RADIUS_RATIO_BY_CLASS[variant.radiusClass] : undefined;
+  const rawRadiusRatio = radiusFromClass ?? props.radiusRatio;
   const radiusRatio =
-    props.radiusRatio !== undefined && Number.isFinite(props.radiusRatio)
-      ? Math.max(0.5, Math.min(3, props.radiusRatio))
+    rawRadiusRatio !== undefined && Number.isFinite(rawRadiusRatio)
+      ? Math.max(0.5, Math.min(3, rawRadiusRatio))
       : DEFAULT_RADIUS_RATIO;
 
   const neckLength = props.neckLength !== undefined && props.neckLength >= 0 ? props.neckLength : 0;
 
-  const angle = props.angle ?? defaultAngleFor(props.fittingType);
+  // WS6e E2: variant.branchAngleDeg (3-port branch angle) overrides the legacy
+  // props.angle; only branch fittings carry it, so this is safe for elbows.
+  const angle = variant?.branchAngleDeg ?? props.angle ?? defaultAngleFor(props.fittingType);
+
+  const eccentricSide = resolveEccentricSide(props.fittingType, variant?.eccentricOffset);
 
   return {
     inletSize,
@@ -154,8 +210,14 @@ export function resolveFittingDimensions(fitting: Fitting): FittingDimensions {
     radiusRatio,
     neckLength,
     angle,
-    eccentric: props.fittingType === 'reducer_eccentric',
-    alignment: transition?.alignment ?? (props.fittingType === 'reducer_eccentric' ? 'flat_bottom' : 'center_line'),
+    eccentric: eccentricSide !== null,
+    alignment: transition?.alignment ?? (eccentricSide === 'top' ? 'flat_top' : eccentricSide === 'bottom' ? 'flat_bottom' : 'center_line'),
+    elbowKind: variant?.elbowType ?? (props.fittingType === 'elbow_mitered' ? 'mitered' : 'radius'),
+    vaneType: variant?.vaneType ?? 'none',
+    eccentricSide,
+    transitionAlignment: resolveTransitionAlignment(variant?.transitionAlignment, transition?.alignment),
+    transitionStyle: variant?.transitionStyle ?? 'straight',
+    branchSide: variant?.branchSide ?? 'right',
   };
 }
 

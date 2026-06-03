@@ -27,11 +27,12 @@ export function buildTwoPortFittingGeometry(type: FittingType, dims: FittingDime
     case 'end_boot':
       return buildOffset(dims);
     case 'reducer_eccentric':
-      return buildReducer(dims, true);
     case 'reducer':
     case 'reducer_tapered':
     default:
-      return buildReducer(dims, false);
+      // WS6e E2: eccentricity (and which wall) now comes from dims.eccentricSide,
+      // which folds in both the legacy reducer_eccentric type and variant.eccentricOffset.
+      return buildReducer(dims);
   }
 }
 
@@ -43,7 +44,7 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-function buildReducer(dims: FittingDimensions, eccentric: boolean): FittingGeometry {
+function buildReducer(dims: FittingDimensions): FittingGeometry {
   const inH = dims.inletSize;
   const outH = dims.outletSize;
   const len = bodyLength(Math.max(inH, outH));
@@ -54,14 +55,16 @@ function buildReducer(dims: FittingDimensions, eccentric: boolean): FittingGeome
   const xOutNeck = half - neck;
   const xOut = half;
 
-  // Concentric: openings centered on y=0. Eccentric: share a flat bottom wall.
-  const bottomY = inH / 2;
-  const inTop = eccentric ? bottomY - inH : -inH / 2;
-  const inBot = eccentric ? bottomY : inH / 2;
-  const outTop = eccentric ? bottomY - outH : -outH / 2;
-  const outBot = eccentric ? bottomY : outH / 2;
-  const inletCenterY = eccentric ? bottomY - inH / 2 : 0;
-  const outletCenterY = eccentric ? bottomY - outH / 2 : 0;
+  // Concentric: openings centered on y=0. Eccentric: share one flat wall
+  // (bottom or top per dims.eccentricSide); the smaller opening's center is
+  // pulled toward that wall.
+  const side = dims.eccentricSide;
+  const inTop = side === 'bottom' ? inH / 2 - inH : side === 'top' ? -inH / 2 : -inH / 2;
+  const inBot = side === 'bottom' ? inH / 2 : side === 'top' ? -inH / 2 + inH : inH / 2;
+  const outTop = side === 'bottom' ? inH / 2 - outH : side === 'top' ? -inH / 2 : -outH / 2;
+  const outBot = side === 'bottom' ? inH / 2 : side === 'top' ? -inH / 2 + outH : outH / 2;
+  const inletCenterY = (inTop + inBot) / 2;
+  const outletCenterY = (outTop + outBot) / 2;
 
   const outline: Point2D[] = [
     { x: xIn, y: inTop },
@@ -108,6 +111,15 @@ function buildRectToRound(dims: FittingDimensions): FittingGeometry {
   const roundCx = half - roundD / 2;
   const r = roundD / 2;
 
+  // WS6e E2: vertical alignment of the round end. `top`/`bottom` flush the round
+  // wall to the matching rect wall; `centered` keeps it on the axis (default).
+  const roundCy =
+    dims.transitionAlignment === 'top'
+      ? -rectH / 2 + r
+      : dims.transitionAlignment === 'bottom'
+        ? rectH / 2 - r
+        : 0;
+
   const rect: Point2D[] = [
     { x: -half, y: -rectH / 2 },
     { x: rectRight, y: -rectH / 2 },
@@ -117,14 +129,25 @@ function buildRectToRound(dims: FittingDimensions): FittingGeometry {
 
   const body: FittingBodyPart[] = [
     { kind: 'polygon', points: rect, fill: true },
-    { kind: 'circle', center: roundPoint({ x: roundCx, y: 0 }), radius: r, fill: true },
+    { kind: 'circle', center: roundPoint({ x: roundCx, y: roundCy }), radius: r, fill: true },
     // Transition walls (open strokes) from rect corners to the round end.
-    { kind: 'quad', from: roundPoint({ x: rectRight, y: -rectH / 2 }), control: roundPoint({ x: (rectRight + roundCx) / 2, y: -rectH / 2 }), to: roundPoint({ x: roundCx - r * 0.7, y: -r }) },
-    { kind: 'quad', from: roundPoint({ x: rectRight, y: rectH / 2 }), control: roundPoint({ x: (rectRight + roundCx) / 2, y: rectH / 2 }), to: roundPoint({ x: roundCx - r * 0.7, y: r }) },
+    { kind: 'quad', from: roundPoint({ x: rectRight, y: -rectH / 2 }), control: roundPoint({ x: (rectRight + roundCx) / 2, y: -rectH / 2 }), to: roundPoint({ x: roundCx - r * 0.7, y: roundCy - r }) },
+    { kind: 'quad', from: roundPoint({ x: rectRight, y: rectH / 2 }), control: roundPoint({ x: (rectRight + roundCx) / 2, y: rectH / 2 }), to: roundPoint({ x: roundCx - r * 0.7, y: roundCy + r }) },
   ];
 
+  // WS6e E2: gored transition seams — straight gore lines from the rect corners
+  // fanning to the round face. `straight` style leaves the body un-seamed.
+  const accents: FittingSegment[] =
+    dims.transitionStyle === 'gored'
+      ? [
+          { from: roundPoint({ x: rectRight, y: -rectH / 2 }), to: roundPoint({ x: roundCx, y: roundCy - r }) },
+          { from: roundPoint({ x: rectRight, y: 0 }), to: roundPoint({ x: roundCx, y: roundCy }) },
+          { from: roundPoint({ x: rectRight, y: rectH / 2 }), to: roundPoint({ x: roundCx, y: roundCy + r }) },
+        ]
+      : [];
+
   const centerlines: FittingSegment[] = [
-    { from: { x: -half, y: 0 }, to: { x: half, y: 0 } },
+    { from: { x: -half, y: 0 }, to: { x: half, y: roundCy } },
   ].map(roundSegment);
 
   const openings: FittingOpening[] = [
@@ -138,13 +161,13 @@ function buildRectToRound(dims: FittingDimensions): FittingGeometry {
     {
       id: 'OUTLET',
       role: 'outlet',
-      position: roundPoint({ x: half, y: 0 }),
+      position: roundPoint({ x: half, y: roundCy }),
       direction: { x: 1, y: 0 },
       profile: { shape: 'round', diameter: roundD },
     },
   ];
 
-  return { anchor: midpoint(openings), body, centerlines, accents: [], openings, maskBounds: bodyBounds(body) };
+  return { anchor: midpoint(openings), body, centerlines, accents, openings, maskBounds: bodyBounds(body) };
 }
 
 function buildEndCap(dims: FittingDimensions): FittingGeometry {

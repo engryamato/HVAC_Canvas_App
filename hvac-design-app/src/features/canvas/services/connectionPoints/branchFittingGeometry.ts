@@ -19,10 +19,49 @@ import { buildWyeGeometry } from './wyeGeometry';
  * adapts it to the shared contract, so the wye remains the canonical template.
  */
 export function buildBranchFittingGeometry(type: FittingType, dims: FittingDimensions): FittingGeometry {
-  if (type === 'wye') {
-    return adaptWye(dims);
+  const base = type === 'wye' ? adaptWye(dims) : buildTee(dims);
+  // WS6e E2: `variant.branchSide` mirrors the branch across the main run. The
+  // main run is symmetric about y=0, so a full y-mirror flips only the branch.
+  // Default 'right' = the original branch-up geometry.
+  return dims.branchSide === 'left' ? mirrorGeometryY(base) : base;
+}
+
+function mirrorPointY(point: Point2D): Point2D {
+  return roundPoint({ x: point.x, y: -point.y });
+}
+
+function mirrorBodyPartY(part: FittingBodyPart): FittingBodyPart {
+  switch (part.kind) {
+    case 'polygon':
+      return { ...part, points: part.points.map(mirrorPointY) };
+    case 'circle':
+      return { ...part, center: mirrorPointY(part.center) };
+    case 'arcBand':
+      return { ...part, center: mirrorPointY(part.center), startAngle: -part.endAngle, endAngle: -part.startAngle };
+    case 'quad':
+      return { from: mirrorPointY(part.from), control: mirrorPointY(part.control), to: mirrorPointY(part.to), kind: 'quad' };
   }
-  return buildTee(dims);
+}
+
+function mirrorSegmentY(segment: FittingSegment): FittingSegment {
+  return { from: mirrorPointY(segment.from), to: mirrorPointY(segment.to) };
+}
+
+/** Reflect a fitting's local geometry across the main run (y = 0). */
+function mirrorGeometryY(geom: FittingGeometry): FittingGeometry {
+  const body = geom.body.map(mirrorBodyPartY);
+  return {
+    anchor: mirrorPointY(geom.anchor),
+    body,
+    centerlines: geom.centerlines.map(mirrorSegmentY),
+    accents: geom.accents.map(mirrorSegmentY),
+    openings: geom.openings.map((opening) => ({
+      ...opening,
+      position: mirrorPointY(opening.position),
+      direction: { x: opening.direction.x, y: -opening.direction.y },
+    })),
+    maskBounds: bodyBounds(body),
+  };
 }
 
 function adaptWye(dims: FittingDimensions): FittingGeometry {
