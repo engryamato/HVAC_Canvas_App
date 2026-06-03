@@ -3,6 +3,7 @@ export const featureFlagNames = [
   'WS2_INLINE_TOOL_OPTIONS',
   'WS3_CAS',
   'WS5_MANUAL_SIZING_PROVENANCE',
+  'WS7_BOM_PRICING',
 ] as const;
 
 export type FeatureFlag = (typeof featureFlagNames)[number];
@@ -27,6 +28,7 @@ export const featureFlags: FeatureFlags = {
   WS2_INLINE_TOOL_OPTIONS: resolveFlag('WS2_INLINE_TOOL_OPTIONS'),
   WS3_CAS: resolveFlag('WS3_CAS'),
   WS5_MANUAL_SIZING_PROVENANCE: resolveFlag('WS5_MANUAL_SIZING_PROVENANCE'),
+  WS7_BOM_PRICING: resolveFlag('WS7_BOM_PRICING'),
 };
 
 export function isEnabled(flag: FeatureFlag): boolean {

@@ -50,6 +50,8 @@ const baseBomItems: BOMItem[] = [
     groupKey: 'duct-round-12-galv',
     sourceEntityIds: ['duct-1'],
     componentDefinitionId: 'comp-duct-1',
+    // WS7: cost joins strictly by catalogItemId (no name/componentDefinitionId fallback).
+    catalogItemId: 'comp-duct-1',
   },
   {
     id: 'fit-1',
@@ -62,6 +64,7 @@ const baseBomItems: BOMItem[] = [
     groupKey: 'fitting-elbow_90',
     sourceEntityIds: ['fit-1'],
     componentDefinitionId: 'comp-fit-1',
+    catalogItemId: 'comp-fit-1',
   },
 ];
 

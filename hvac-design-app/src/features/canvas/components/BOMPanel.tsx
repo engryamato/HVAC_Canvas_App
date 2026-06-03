@@ -90,21 +90,18 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
     (state) => state.projectDetails?.projectName ?? 'Untitled'
   );
 
-  const costByItemNumber = useMemo<Map<number, ItemCost> | null>(() => {
+  const costByItemId = useMemo<Map<string, ItemCost> | null>(() => {
     if (!costEstimate || costEstimate.items.length === 0) {
       return null;
     }
-    const map = new Map<number, ItemCost>();
+    const map = new Map<string, ItemCost>();
     for (const cost of costEstimate.items) {
-      const num = parseInt(cost.bomItemId.replace('bom-', ''), 10);
-      if (!isNaN(num)) {
-        map.set(num, cost);
-      }
+      map.set(cost.bomItemId, cost);
     }
     return map;
   }, [costEstimate]);
 
-  const hasCostData = costByItemNumber !== null;
+  const hasCostData = costByItemId !== null;
 
   useEffect(() => {
     if (!filterOpen) {
@@ -140,7 +137,12 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
       const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
       const totalCost = hasCostData
         ? items.reduce(
-            (sum, item) => sum + (costByItemNumber?.get(item.itemNumber)?.itemTotal ?? 0),
+            (sum, item) => {
+              const itemCost =
+                costByItemId?.get(item.bomItemId ?? '') ??
+                costByItemId?.get(`bom-${item.itemNumber}`);
+              return sum + (itemCost?.itemTotal ?? 0);
+            },
             0
           )
         : 0;
@@ -154,7 +156,7 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
         primaryUnit: items[0]?.unit ?? '',
       };
     }).filter((g) => g.count > 0);
-  }, [filteredItems, hasCostData, costByItemNumber]);
+  }, [filteredItems, hasCostData, costByItemId]);
 
   const visibleCount = filteredItems.length;
   const allGroupsExpanded = groups.length > 0 && groups.every((g) => expandedGroups[g.category]);
@@ -324,6 +326,9 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
             <span className={styles.budgetValue}>
               {formatCurrency(costEstimate.breakdown.totalCost)}
             </span>
+            {(costEstimate.unpricedCount ?? 0) > 0 && (
+              <span className={styles.unpricedCount}>Unpriced: {costEstimate.unpricedCount}</span>
+            )}
           </div>
         )}
       </header>
@@ -381,7 +386,10 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
                       {group.items.map((item) => {
                         const isHighlighted = item.entityId === activeHighlightedEntityId;
                         const isFirstMatch = isHighlighted && item.itemNumber === firstMatchingItemNumber;
-                        const itemCost = costByItemNumber?.get(item.itemNumber);
+                        const itemCost =
+                          costByItemId?.get(item.bomItemId ?? '') ??
+                          costByItemId?.get(`bom-${item.itemNumber}`);
+                        const isUnpriced = item.unpriced || itemCost?.unpriced;
                         const rowClass = [
                           styles.row,
                           isHighlighted && styles.rowHighlighted,
@@ -415,8 +423,8 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
                             </div>
                             <span className={styles.weight}>&mdash;</span>
                             {priceVisible && (
-                              <span className={styles.price}>
-                                {itemCost ? formatCurrency(itemCost.itemTotal) : '—'}
+                              <span className={[styles.price, isUnpriced && styles.unpricedPrice].filter(Boolean).join(' ')}>
+                                {isUnpriced ? 'Unpriced' : itemCost?.itemTotal !== null && itemCost?.itemTotal !== undefined ? formatCurrency(itemCost.itemTotal) : '—'}
                               </span>
                             )}
                           </div>
@@ -441,6 +449,7 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
           {costEstimate && (
             <span className={styles.footerStrong}>
               {formatCurrency(costEstimate.breakdown.totalCost)}
+              {(costEstimate.unpricedCount ?? 0) > 0 ? ` · Unpriced: ${costEstimate.unpricedCount}` : ''}
             </span>
           )}
         </footer>

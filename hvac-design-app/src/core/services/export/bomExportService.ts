@@ -17,10 +17,11 @@ export interface BOMExportRow {
   unit: string;
   size?: string;
   material?: string;
+  unpriced?: boolean;
   // Pricing fields (optional)
-  materialCost?: number;
-  laborCost?: number;
-  totalCost?: number;
+  materialCost?: number | null;
+  laborCost?: number | null;
+  totalCost?: number | null;
   // Engineering fields (optional)
   velocity?: number;
   pressureDrop?: number;
@@ -69,19 +70,31 @@ export class BOMExportService {
     const rows = estimate.items.map(item => [
       item.bomItemId,
       this.escapeCSV(item.description),
-      item.materialUnitPrice.toFixed(2),
+      item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.materialUnitPrice),
       item.materialQuantity.toFixed(2),
-      item.materialSubtotal.toFixed(2),
-      item.laborHours.toFixed(2),
-      item.laborRate.toFixed(2),
-      item.laborSubtotal.toFixed(2),
-      item.itemTotal.toFixed(2),
+      item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.materialSubtotal),
+      item.unpriced ? 'Unpriced' : this.formatNullableNumber(item.laborHours),
+      item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.laborRate),
+      item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.laborSubtotal),
+      item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.itemTotal),
     ]);
+
+    const qualityRow = [
+      '',
+      'Estimate Quality',
+      `${estimate.unpricedCount ?? 0} unpriced · ${estimate.gaugeSplitLineCount ?? 0} gauge-split lines · ${estimate.inferredSizeCount ?? 0} inferred sizes`,
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ];
 
     // Add summary row
     const summaryRow = [
       '',
-      'TOTAL',
+      'CONFIDENT TOTAL',
       '',
       '',
       estimate.breakdown.materialCost.toFixed(2),
@@ -92,7 +105,12 @@ export class BOMExportService {
     ];
 
     const bom = '\uFEFF';
-    return bom + [headers.join(','), ...rows.map(r => r.join(',')), summaryRow.join(',')].join('\n');
+    return bom + [
+      headers.join(','),
+      ...rows.map(r => r.join(',')),
+      qualityRow.map((field) => this.escapeCSV(field)).join(','),
+      summaryRow.join(','),
+    ].join('\n');
   }
 
   /**
@@ -138,9 +156,9 @@ export class BOMExportService {
 
     if (options.includePricing) {
       row.push(
-        item.materialCost?.toFixed(2) || '',
-        item.laborCost?.toFixed(2) || '',
-        item.totalCost?.toFixed(2) || ''
+        item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.materialCost),
+        item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.laborCost),
+        item.unpriced ? 'Unpriced' : this.formatNullableCurrency(item.totalCost)
       );
     }
 
@@ -162,6 +180,14 @@ export class BOMExportService {
       return `"${field.replace(/"/g, '""')}"`;
     }
     return field;
+  }
+
+  private static formatNullableCurrency(value: number | null | undefined): string {
+    return value === null || value === undefined ? '' : value.toFixed(2);
+  }
+
+  private static formatNullableNumber(value: number | null | undefined): string {
+    return value === null || value === undefined ? '' : value.toFixed(2);
   }
 
   /**

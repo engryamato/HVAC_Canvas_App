@@ -1,4 +1,5 @@
-import { Duct, DuctProps } from '../../schema/duct.schema';
+import { Duct } from '../../schema/duct.schema';
+import { DuctRun } from '../../schema/duct-run.schema';
 import { Fitting, FittingProps } from '../../schema/fitting.schema';
 import { Equipment, EquipmentProps } from '../../schema/equipment.schema';
 import { WasteFactors } from '../../schema/calculation-settings.schema';
@@ -21,6 +22,8 @@ export interface BOMItem {
   // Identification
   catalogItemId?: string;
   componentDefinitionId?: string;
+  unpriced?: boolean;
+  unitCost?: number | null;
   
   // Quantities
   quantity: number;
@@ -31,6 +34,7 @@ export interface BOMItem {
   // Material details
   material?: string;
   size?: string; // e.g., "12 inch" or "14x8"
+  gauge?: number;
   
   // Grouping
   groupKey: string; // For aggregation
@@ -56,6 +60,34 @@ export interface BOMGenerationOptions {
   groupSimilarItems?: boolean;
   includeZeroQuantity?: boolean;
 }
+
+export interface EntityStoreSnapshot {
+  byId: Record<string, unknown>;
+  allIds: string[];
+}
+
+export interface BOMQualitySummary {
+  unpricedCount: number;
+  gaugeSplitLineCount: number;
+  inferredSizeCount: number;
+}
+
+type DuctLike = {
+  id: string;
+  props: {
+    shape?: string;
+    diameter?: number;
+    width?: number;
+    height?: number;
+    length?: number;
+    installLength?: number;
+    material?: string;
+    catalogItemId?: string;
+    gauge?: number;
+    insulated?: boolean;
+    insulationThickness?: number;
+  };
+};
 
 export interface EntitySnapshotSignature {
   structural: string;
@@ -121,7 +153,7 @@ export class BOMGenerationService {
    */
   static generateBOM(
     entities: {
-      ducts: Duct[];
+      ducts: Array<Duct | DuctRun>;
       fittings: Fitting[];
       equipment: Equipment[];
     },
@@ -174,11 +206,70 @@ export class BOMGenerationService {
     return items;
   }
 
+  static generateBOMFromEntityStore(
+    entities: EntityStoreSnapshot,
+    wasteFactors: WasteFactors,
+    options: BOMGenerationOptions = {}
+  ): BOMItem[] {
+    const ducts: Array<Duct | DuctRun> = [];
+    const fittings: Fitting[] = [];
+    const equipment: Equipment[] = [];
+
+    for (const id of entities.allIds) {
+      const entity = entities.byId[id] as { type?: string } | undefined;
+      if (!entity) {
+        continue;
+      }
+
+      if (entity.type === 'duct' || entity.type === 'duct_run') {
+        ducts.push(entity as Duct | DuctRun);
+      } else if (entity.type === 'fitting') {
+        fittings.push(entity as Fitting);
+      } else if (entity.type === 'equipment') {
+        equipment.push(entity as Equipment);
+      }
+    }
+
+    return this.generateBOM({ ducts, fittings, equipment }, wasteFactors, options);
+  }
+
+  static summarizeQuality(items: BOMItem[]): BOMQualitySummary {
+    const unpricedCount = items.filter((item) => item.unpriced).length;
+    const inferredSizeCount = items.filter((item) => item.size === 'Unknown size').length;
+    const gaugeSplitGroups = new Map<string, Set<string>>();
+
+    for (const item of items) {
+      if (item.category !== 'duct') {
+        continue;
+      }
+
+      const baseKey = [
+        item.category,
+        item.size ?? '',
+        item.material ?? '',
+      ].join('-');
+      if (!gaugeSplitGroups.has(baseKey)) {
+        gaugeSplitGroups.set(baseKey, new Set());
+      }
+      gaugeSplitGroups.get(baseKey)!.add(String(item.gauge ?? 'unspecified'));
+    }
+
+    const gaugeSplitLineCount = items.filter((item) => {
+      if (item.category !== 'duct') {
+        return false;
+      }
+      const baseKey = [item.category, item.size ?? '', item.material ?? ''].join('-');
+      return (gaugeSplitGroups.get(baseKey)?.size ?? 0) > 1;
+    }).length;
+
+    return { unpricedCount, gaugeSplitLineCount, inferredSizeCount };
+  }
+
   /**
    * Process duct into BOM items
    */
   private static processDuct(
-    duct: Duct,
+    duct: DuctLike,
     wasteFactors: WasteFactors,
     options: BOMGenerationOptions
   ): BOMItem[] {
@@ -201,7 +292,7 @@ export class BOMGenerationService {
    * Create BOM item for duct
    */
   private static createDuctBOMItem(
-    duct: Duct,
+    duct: DuctLike,
     wasteFactors: WasteFactors,
     options: BOMGenerationOptions
   ): BOMItem {
@@ -210,28 +301,32 @@ export class BOMGenerationService {
       : 0;
 
     // Calculate quantity (linear feet)
-    const quantity = duct.props.length || 0;
+    const quantity = duct.props.length ?? duct.props.installLength ?? 0;
     const quantityWithWaste = quantity * (1 + wasteFactor);
 
     // Generate description
     const size = this.getDuctSizeString(duct.props);
     const material = duct.props.material || 'galvanized';
     const description = `${size} ${material} ${duct.props.shape} duct`;
+    const gauge = duct.props.gauge;
 
     // Group key for aggregation
-    const groupKey = `duct-${duct.props.shape}-${size}-${material}`;
+    const groupKey = `duct-${duct.props.shape}-${size}-${material}-gauge-${gauge ?? 'unspecified'}`;
 
     return {
       id: duct.id,
       category: 'duct',
       description,
       catalogItemId: duct.props.catalogItemId,
+      unpriced: !duct.props.catalogItemId,
+      unitCost: duct.props.catalogItemId ? undefined : null,
       quantity,
       unit: 'LF',
       wasteFactor,
       quantityWithWaste,
       material,
       size,
+      gauge,
       groupKey,
       sourceEntityIds: [duct.id],
     };
@@ -241,14 +336,14 @@ export class BOMGenerationService {
    * Create BOM item for insulation
    */
   private static createInsulationBOMItem(
-    duct: Duct,
+    duct: DuctLike,
     wasteFactors: WasteFactors
   ): BOMItem {
     const wasteFactor = wasteFactors.accessories || wasteFactors.default;
 
     const size = this.getDuctSizeString(duct.props);
     const thickness = duct.props.insulationThickness;
-    const quantity = duct.props.length || 0;
+    const quantity = duct.props.length ?? duct.props.installLength ?? 0;
     const quantityWithWaste = quantity * (1 + wasteFactor);
 
     const description = `${size} duct insulation (${thickness}" thick)`;
@@ -258,6 +353,8 @@ export class BOMGenerationService {
       id: `${duct.id}-insulation`,
       category: 'accessory',
       description,
+      unpriced: true,
+      unitCost: null,
       quantity,
       unit: 'LF',
       wasteFactor,
@@ -291,6 +388,8 @@ export class BOMGenerationService {
       category: 'fitting',
       description,
       catalogItemId: fitting.props.catalogItemId,
+      unpriced: !fitting.props.catalogItemId,
+      unitCost: fitting.props.catalogItemId ? undefined : null,
       quantity,
       unit: 'EA',
       wasteFactor,
@@ -323,6 +422,8 @@ export class BOMGenerationService {
       category: 'equipment',
       description,
       catalogItemId: equipment.props.catalogItemId,
+      unpriced: !equipment.props.catalogItemId,
+      unitCost: equipment.props.catalogItemId ? undefined : null,
       quantity,
       unit: 'EA',
       wasteFactor,
@@ -339,7 +440,8 @@ export class BOMGenerationService {
     const grouped = new Map<string, BOMItem>();
 
     for (const item of items) {
-      const existing = grouped.get(item.groupKey);
+      const groupingIdentity = `${item.groupKey}-catalog-${item.catalogItemId ?? 'unpriced'}`;
+      const existing = grouped.get(groupingIdentity);
 
       if (existing) {
         // Merge quantities
@@ -347,7 +449,7 @@ export class BOMGenerationService {
         existing.quantityWithWaste += item.quantityWithWaste;
         existing.sourceEntityIds.push(...item.sourceEntityIds);
       } else {
-        grouped.set(item.groupKey, { ...item });
+        grouped.set(groupingIdentity, { ...item });
       }
     }
 
@@ -389,10 +491,10 @@ export class BOMGenerationService {
   /**
    * Helper: Get duct size string
    */
-  private static getDuctSizeString(duct: Partial<DuctProps>): string {
-    if (duct.shape === 'round' && duct.diameter) {
+  private static getDuctSizeString(duct: DuctLike['props']): string {
+    if ((duct.shape === 'round' || duct.shape === 'flexible') && duct.diameter) {
       return `${duct.diameter}"`;
-    } else if (duct.shape === 'rectangular' && duct.width && duct.height) {
+    } else if ((duct.shape === 'rectangular' || duct.shape === 'flat_oval') && duct.width && duct.height) {
       return `${duct.width}x${duct.height}`;
     }
     return 'Unknown size';

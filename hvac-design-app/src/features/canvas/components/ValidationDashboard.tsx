@@ -9,11 +9,14 @@ import { buildOverlayStatusMap, type DuctOverlayMode, useDuctOverlayStore } from
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { useSettingsStore } from '@/core/store/settingsStore';
+import { isEnabled } from '@/core/flags/featureFlags';
 import { Button } from '@/components/ui/button';
 import { ResolutionWizard } from './ResolutionWizard';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { ConnectionGraphBuilder } from '@/core/services/graph/ConnectionGraphBuilder';
 import { TopologyValidationService } from '@/core/services/graph/TopologyValidationService';
+import { bomGenerationService } from '@/core/services/bom/bomGenerationService';
 import {
   createEntity,
   deleteEntity,
@@ -40,8 +43,10 @@ export function ValidationDashboard() {
   const setOverlayMode = useDuctOverlayStore((state) => state.setOverlayMode);
   const setOverlayStatusMap = useDuctOverlayStore((state) => state.setOverlayStatusMap);
   const components = useComponentLibraryStoreV2((state) => state.components);
+  const calculationSettings = useSettingsStore((state) => state.calculationSettings);
   const selectSingle = useSelectionStore((state) => state.selectSingle);
   const selectedIds = useSelectionStore((state) => state.selectedIds);
+  const ws7BomPricingEnabled = isEnabled('WS7_BOM_PRICING');
 
   const pushToast = (message: string, type: 'success' | 'error' | 'warning' | 'info') => {
     if (typeof window === 'undefined') {
@@ -144,6 +149,19 @@ export function ValidationDashboard() {
   }, [entities]);
 
   const totalIssues = exportBlockers.length + unresolvedCatalogItems.length + constraintIssues;
+  const estimateQuality = useMemo(() => {
+    if (!ws7BomPricingEnabled || !calculationSettings) {
+      return { unpricedCount: 0, gaugeSplitLineCount: 0, inferredSizeCount: 0 };
+    }
+
+    const bomItems = bomGenerationService.generateBOMFromEntityStore(
+      { byId: entities, allIds: Object.keys(entities) },
+      calculationSettings.wasteFactors,
+      { includeAutoInserted: true, applyWasteFactors: true, groupSimilarItems: true }
+    );
+
+    return bomGenerationService.summarizeQuality(bomItems);
+  }, [calculationSettings, entities, ws7BomPricingEnabled]);
   const selectedEntity = selectedIds.length === 1 ? entities[selectedIds[0] ?? ''] : null;
   const selectedOverrideFitting =
     selectedEntity?.type === 'fitting' && selectedEntity.props.manualOverride ? selectedEntity : null;
@@ -298,6 +316,11 @@ export function ValidationDashboard() {
         <p className="text-xs text-slate-500">
           {exportBlockers.length} export blockers, {unresolvedCatalogItems.length} unresolved items, {constraintIssues} constraint issues
         </p>
+        {ws7BomPricingEnabled ? (
+          <p className="text-xs font-medium text-amber-700" data-testid="estimate-quality-advisory">
+            {estimateQuality.unpricedCount} unpriced · {estimateQuality.gaugeSplitLineCount} gauge-split lines · {estimateQuality.inferredSizeCount} inferred sizes
+          </p>
+        ) : null}
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

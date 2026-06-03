@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { generateBillOfMaterials, type BomItem } from '@/features/export/csv';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
+import { isEnabled } from '@/core/flags/featureFlags';
 import {
   costCalculationService,
   type CostDelta,
@@ -61,10 +62,21 @@ export function useBOM(): GroupedBomItems {
   const previousPricingSignatureRef = useRef<string | null>(null);
   const previousEstimateRef = useRef<ProjectCostEstimate | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ws7BomPricingEnabled = isEnabled('WS7_BOM_PRICING');
 
-  const bomItems = useMemo(() => {
-    return generateBillOfMaterials(entities);
-  }, [entities]);
+  const canonicalBomItems = useMemo(() => {
+    if (!calculationSettings || !ws7BomPricingEnabled) {
+      return [];
+    }
+
+    return bomGenerationService.generateBOMFromEntityStore(
+      entities,
+      calculationSettings.wasteFactors,
+      { includeAutoInserted: true, applyWasteFactors: true, groupSimilarItems: true }
+    );
+  }, [entities, calculationSettings, ws7BomPricingEnabled]);
+
+  const bomItems = useMemo(() => generateBillOfMaterials(entities), [entities]);
 
   const entitySignature = useMemo(
     () => bomGenerationService.createEntitySnapshotSignature(entities),
@@ -97,9 +109,6 @@ export function useBOM(): GroupedBomItems {
     const componentPricing = new Map(
       componentDefinitions.map((component) => [component.id, component.pricing] as const)
     );
-    const componentLookupByName = new Map(
-      componentDefinitions.map((component) => [component.name.toLowerCase(), component.id] as const)
-    );
 
     const mapTypeToCategory = (
       type: string
@@ -117,25 +126,32 @@ export function useBOM(): GroupedBomItems {
       return calculationSettings.wasteFactors.accessories ?? calculationSettings.wasteFactors.default ?? 0.1;
     };
 
-    const costBomItems: CostBOMItem[] = bomItems.map((item) => {
-      const category = mapTypeToCategory(item.type);
-      const wasteFactor = mapCategoryToWasteFactor(category);
-      const componentDefinitionId = componentLookupByName.get(item.name.toLowerCase());
+    const costBomItems: CostBOMItem[] = ws7BomPricingEnabled
+      ? canonicalBomItems
+      : bomItems.map((item) => {
+          const componentLookupByName = new Map(
+            componentDefinitions.map((component) => [component.name.toLowerCase(), component.id] as const)
+          );
+          const category = mapTypeToCategory(item.type);
+          const wasteFactor = mapCategoryToWasteFactor(category);
+          const componentDefinitionId = componentLookupByName.get(item.name.toLowerCase());
 
-      return {
-        id: `bom-${item.itemNumber}`,
-        category,
-        description: item.description,
-        quantity: item.quantity,
-        unit: item.unit.toUpperCase(),
-        wasteFactor,
-        quantityWithWaste: item.quantity * (1 + wasteFactor),
-        size: item.specifications || undefined,
-        groupKey: `${category}-${item.name}-${item.specifications}`,
-        sourceEntityIds: [],
-        componentDefinitionId,
-      };
-    });
+          return {
+            id: `bom-${item.itemNumber}`,
+            category,
+            description: item.description,
+            quantity: item.quantity,
+            unit: item.unit.toUpperCase(),
+            wasteFactor,
+            quantityWithWaste: item.quantity * (1 + wasteFactor),
+            size: item.specifications || undefined,
+            groupKey: `${category}-${item.name}-${item.specifications}`,
+            sourceEntityIds: [],
+            componentDefinitionId,
+            unpriced: !componentDefinitionId,
+            unitCost: componentDefinitionId ? undefined : null,
+          };
+        });
 
     const recalculate = () => {
       if (costBomItems.length === 0) {
@@ -207,11 +223,13 @@ export function useBOM(): GroupedBomItems {
     };
   }, [
     bomItems,
+    canonicalBomItems,
     calculationSettings,
     componentDefinitions,
     entitySignature,
     settingsSignature,
     pricingSignature,
+    ws7BomPricingEnabled,
   ]);
 
   // Group items by type

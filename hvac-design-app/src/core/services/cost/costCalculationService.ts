@@ -4,6 +4,7 @@ import {
   CalculationSettings 
 } from '../../schema/calculation-settings.schema';
 import { PricingData } from '../../schema/component-library.schema';
+import { isEnabled } from '../../flags/featureFlags';
 
 /**
  * Cost Calculation Engine
@@ -31,18 +32,19 @@ export interface ItemCost {
   description: string;
   
   // Material
-  materialUnitPrice: number;
+  materialUnitPrice: number | null;
   materialQuantity: number;
-  materialSubtotal: number;
+  materialSubtotal: number | null;
   
   // Labor
-  laborHoursPerUnit: number;
-  laborRate: number;
-  laborHours: number;
-  laborSubtotal: number;
+  laborHoursPerUnit: number | null;
+  laborRate: number | null;
+  laborHours: number | null;
+  laborSubtotal: number | null;
   
   // Total
-  itemTotal: number;
+  itemTotal: number | null;
+  unpriced: boolean;
 }
 
 export type CostCalculationMethod = 'unit' | 'assembly' | 'parametric';
@@ -64,6 +66,10 @@ export interface ProjectCostEstimate {
   settings: CalculationSettings;
   method: CostCalculationMethod;
   assemblyGroups?: AssemblyGroup[];
+  unpricedCount?: number;
+  gaugeSplitLineCount?: number;
+  inferredSizeCount?: number;
+  confidentSubtotal?: number;
 }
 
 export interface CostDelta {
@@ -145,6 +151,7 @@ export class CostCalculationService {
       generatedAt: new Date(),
       settings,
       method: 'unit',
+      ...this.calculateEstimateQuality(bomItems, items, breakdown),
     };
   }
 
@@ -171,6 +178,7 @@ export class CostCalculationService {
       settings,
       method: 'assembly',
       assemblyGroups,
+      ...this.calculateEstimateQuality(bomItems, items, breakdown),
     };
   }
 
@@ -188,9 +196,9 @@ export class CostCalculationService {
       
       return {
         ...baseCost,
-        materialSubtotal: baseCost.materialSubtotal * parametricMultiplier,
-        laborSubtotal: baseCost.laborSubtotal * parametricMultiplier,
-        itemTotal: baseCost.itemTotal * parametricMultiplier,
+        materialSubtotal: baseCost.materialSubtotal === null ? null : baseCost.materialSubtotal * parametricMultiplier,
+        laborSubtotal: baseCost.laborSubtotal === null ? null : baseCost.laborSubtotal * parametricMultiplier,
+        itemTotal: baseCost.itemTotal === null ? null : baseCost.itemTotal * parametricMultiplier,
       };
     });
 
@@ -202,6 +210,7 @@ export class CostCalculationService {
       generatedAt: new Date(),
       settings,
       method: 'parametric',
+      ...this.calculateEstimateQuality(bomItems, items, breakdown),
     };
   }
 
@@ -233,9 +242,11 @@ export class CostCalculationService {
 
       const group = groups.get(category)!;
       group.itemIds.push(item.id);
-      group.materialCost += cost.materialSubtotal;
-      group.laborCost += cost.laborSubtotal;
-      group.totalCost += cost.itemTotal;
+      if (!cost.unpriced) {
+        group.materialCost += cost.materialSubtotal ?? 0;
+        group.laborCost += cost.laborSubtotal ?? 0;
+        group.totalCost += cost.itemTotal ?? 0;
+      }
     }
 
     return Array.from(groups.values());
@@ -269,6 +280,22 @@ export class CostCalculationService {
     componentPricing: Map<string, PricingData>
   ): ItemCost {
     const pricing = this.getPricingData(bomItem, componentPricing);
+    if (!pricing) {
+      return {
+        bomItemId: bomItem.id,
+        description: bomItem.description,
+        materialUnitPrice: null,
+        materialQuantity: bomItem.quantityWithWaste,
+        materialSubtotal: null,
+        laborHoursPerUnit: null,
+        laborRate: null,
+        laborHours: null,
+        laborSubtotal: null,
+        itemTotal: null,
+        unpriced: true,
+      };
+    }
+
     const mappedPricing = this.mapBomToPricingFields(bomItem, pricing, settings);
     const quantityWithWaste = bomItem.quantity * (1 + mappedPricing.wasteFactor);
 
@@ -297,6 +324,7 @@ export class CostCalculationService {
       laborHours,
       laborSubtotal,
       itemTotal,
+      unpriced: false,
     };
   }
 
@@ -308,8 +336,9 @@ export class CostCalculationService {
     settings: CalculationSettings
   ): CostBreakdown {
     // Sum material and labor
-    const materialCost = items.reduce((sum, item) => sum + item.materialSubtotal, 0);
-    const laborCost = items.reduce((sum, item) => sum + item.laborSubtotal, 0);
+    const pricedItems = items.filter((item) => !item.unpriced);
+    const materialCost = pricedItems.reduce((sum, item) => sum + (item.materialSubtotal ?? 0), 0);
+    const laborCost = pricedItems.reduce((sum, item) => sum + (item.laborSubtotal ?? 0), 0);
     const subtotal = materialCost + laborCost;
 
     // Apply markup
@@ -351,15 +380,13 @@ export class CostCalculationService {
     bomItem: BOMItem,
     componentPricing: Map<string, PricingData>
   ): PricingData | null {
-    // Try to get from component library
-    if (bomItem.componentDefinitionId) {
-      const pricing = componentPricing.get(bomItem.componentDefinitionId);
+    if (bomItem.catalogItemId) {
+      const pricing = componentPricing.get(bomItem.catalogItemId);
       if (pricing) {return pricing;}
     }
 
-    // Try catalog item
-    if (bomItem.catalogItemId) {
-      const pricing = componentPricing.get(bomItem.catalogItemId);
+    if (!isEnabled('WS7_BOM_PRICING') && bomItem.componentDefinitionId) {
+      const pricing = componentPricing.get(bomItem.componentDefinitionId);
       if (pricing) {return pricing;}
     }
 
@@ -382,6 +409,42 @@ export class CostCalculationService {
       laborRate: pricing?.laborRate,
       wasteFactor: pricing?.wasteFactor ?? bomItem.wasteFactor ?? categoryWasteFactor,
       markup: pricing?.markup,
+    };
+  }
+
+  private static calculateEstimateQuality(
+    bomItems: BOMItem[],
+    itemCosts: ItemCost[],
+    breakdown: CostBreakdown
+  ): Pick<ProjectCostEstimate, 'unpricedCount' | 'gaugeSplitLineCount' | 'inferredSizeCount' | 'confidentSubtotal'> {
+    const gaugeGroups = new Map<string, Set<string>>();
+    for (const item of bomItems) {
+      if (item.category !== 'duct') {
+        continue;
+      }
+      const key = [item.category, item.size ?? '', item.material ?? ''].join('-');
+      if (!gaugeGroups.has(key)) {
+        gaugeGroups.set(key, new Set());
+      }
+      gaugeGroups.get(key)!.add(String(item.gauge ?? 'unspecified'));
+    }
+
+    const gaugeSplitLineCount = bomItems.filter((item) => {
+      // Gauge-split is an advisory count of real (priced) gauge-specific lines;
+      // unpriced items are already surfaced via unpricedCount and must not be
+      // double-counted here.
+      if (item.category !== 'duct' || item.unpriced) {
+        return false;
+      }
+      const key = [item.category, item.size ?? '', item.material ?? ''].join('-');
+      return (gaugeGroups.get(key)?.size ?? 0) > 1;
+    }).length;
+
+    return {
+      unpricedCount: itemCosts.filter((item) => item.unpriced).length,
+      gaugeSplitLineCount,
+      inferredSizeCount: bomItems.filter((item) => item.size === 'Unknown size').length,
+      confidentSubtotal: breakdown.subtotal,
     };
   }
 
@@ -509,9 +572,16 @@ export class CostCalculationService {
 
     for (const item of estimate.items) {
       lines.push(`${item.description}`);
-      lines.push(`  Material: $${item.materialSubtotal.toFixed(2)}`);
-      lines.push(`  Labor: ${item.laborHours.toFixed(1)} hrs @ $${item.laborRate.toFixed(2)}/hr = $${item.laborSubtotal.toFixed(2)}`);
-      lines.push(`  Item Total: $${item.itemTotal.toFixed(2)}`);
+      if (item.unpriced) {
+        lines.push('  Material: Unpriced');
+        lines.push('  Labor: Unpriced');
+        lines.push('  Item Total: Unpriced');
+        lines.push('');
+        continue;
+      }
+      lines.push(`  Material: $${(item.materialSubtotal ?? 0).toFixed(2)}`);
+      lines.push(`  Labor: ${(item.laborHours ?? 0).toFixed(1)} hrs @ $${(item.laborRate ?? 0).toFixed(2)}/hr = $${(item.laborSubtotal ?? 0).toFixed(2)}`);
+      lines.push(`  Item Total: $${(item.itemTotal ?? 0).toFixed(2)}`);
       lines.push('');
     }
 

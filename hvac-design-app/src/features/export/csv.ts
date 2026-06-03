@@ -57,6 +57,11 @@ export interface BomItem {
   quantity: number;
   unit: string;
   specifications: string;
+  // WS7 (optional, forward-compat): canonical BOMItem id + unpriced flag the BOM
+  // panel reads to link a row to its cost. Unset in the legacy CSV path; the full
+  // csv.ts → canonical reconcile is deferred (see WS7-followups.md).
+  bomItemId?: string;
+  unpriced?: boolean;
 }
 
 // ---------------------------------------------------------------------------
