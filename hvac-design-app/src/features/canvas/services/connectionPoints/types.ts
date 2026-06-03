@@ -8,11 +8,20 @@ export interface Point2D {
   y: number;
 }
 
+/**
+ * WS6e E1 — the formalized cross-section contract a resolver consumes and
+ * produces for a single port/endpoint: shape + size (diameter / W×H / equivalent
+ * diameter). Geometry resolvers (E2–E5) read this to build variant-aware
+ * geometry; {@link resolveConnectionCompatibility} reads it to enforce §9D via
+ * the WS10 shape-compatibility matrix.
+ */
 export interface ConnectionProfile {
   shape: 'round' | 'rectangular' | 'flat_oval' | 'flexible' | 'unknown';
   diameter?: number;
   width?: number;
   height?: number;
+  /** Equivalent round diameter (in.) — used for round↔non-round size comparison. */
+  equivalentDiameter?: number;
 }
 
 export interface EndpointRef {

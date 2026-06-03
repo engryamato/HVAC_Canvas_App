@@ -5,6 +5,7 @@ export * from './ductEndpointResolver';
 export * from './snapScoring';
 export * from './resolveConnectableGeometry';
 export * from './connectionValidation';
+export * from './connectionCompatibility';
 export * from './wyeGeometry';
 export * from './fittingGeometry';
 export * from './twoPortFittingGeometry';
