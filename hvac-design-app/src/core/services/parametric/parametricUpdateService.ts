@@ -8,6 +8,11 @@ import {
 } from '../calculations/engineeringCalculator';
 import { validateDuctConstraints } from '../validation/constraintValidator';
 import { FittingGenerationService } from '../fittingGeneration';
+import {
+  applyComputedSizing,
+  deriveEquivalentDiameter,
+  isSizingProvenanceEnabled,
+} from '../sizing/sizingProvenance';
 
 /**
  * Parametric Update Service
@@ -116,12 +121,15 @@ export class ParametricUpdateService {
       ...sourceDuct.props,
       ...changedProps,
     };
+    const normalizedProps = isSizingProvenanceEnabled()
+      ? deriveEquivalentDiameter(mergedProps)
+      : mergedProps;
 
     // Step 1: Recalculate engineering data for changed duct
-    const newEngineeringData = this.updateDuctCalculations(mergedProps, limits);
+    const newEngineeringData = this.updateDuctCalculations(normalizedProps, limits);
 
     // Step 2: Validate
-    const validationStatus = this.validateDuct(newEngineeringData, limits, mergedProps.systemType);
+    const validationStatus = this.validateDuct(newEngineeringData, limits, normalizedProps.systemType);
 
     // Track violations
     if (!validationStatus.isValid) {
@@ -143,7 +151,7 @@ export class ParametricUpdateService {
       previous: sourceDuct,
       updates: {
         props: {
-          ...mergedProps,
+          ...normalizedProps,
           engineeringData: newEngineeringData,
           constraintStatus: validationStatus,
         },
@@ -173,7 +181,7 @@ export class ParametricUpdateService {
         f.props.inletDuctId === ductId || f.props.outletDuctId === ductId
     );
 
-    const effectiveDiameter = this.getEffectiveDiameter(mergedProps);
+    const effectiveDiameter = this.getEffectiveDiameter(normalizedProps);
     for (const fitting of connectedFittings) {
       updatedEntities.push(fitting.id);
 
@@ -307,18 +315,29 @@ export class ParametricUpdateService {
 
     // Return updated dimensions
     if (sized.shape === 'round') {
-      return {
-        ...duct,
-        diameter: sized.diameter,
-        autoSized: true,
-      };
+      if (!isSizingProvenanceEnabled()) {
+        return {
+          ...duct,
+          diameter: sized.diameter,
+          autoSized: true,
+        };
+      }
+
+      return applyComputedSizing(duct as DuctProps, { diameter: sized.diameter });
     } else {
-      return {
-        ...duct,
+      if (!isSizingProvenanceEnabled()) {
+        return {
+          ...duct,
+          width: sized.width,
+          height: sized.height,
+          autoSized: true,
+        };
+      }
+
+      return applyComputedSizing(duct as DuctProps, {
         width: sized.width,
         height: sized.height,
-        autoSized: true,
-      };
+      });
     }
   }
 

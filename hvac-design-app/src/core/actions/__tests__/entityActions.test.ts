@@ -10,6 +10,7 @@ import {
   commitEntityProps,
   entityActionRegistry,
   resetFittingToAuto,
+  setSize,
   validateAndGate,
   type EntityActionContext,
 } from '../entityActions';
@@ -197,6 +198,40 @@ describe('entityActions', () => {
       duct,
       { selectionBefore: ['duct-1'], selectionAfter: ['duct-1'] }
     );
+  });
+
+  it('setSize marks provenance and dispatches one batched undoable update', async () => {
+    const duct = createDuct({
+      shape: 'rectangular',
+      width: 12,
+      height: 8,
+      provenance: { width: 'computed', height: 'default' },
+    });
+    useEntityStore.getState().addEntity(duct);
+    vi.mocked(parametricUpdateService.scheduleDuctPropertyChange).mockImplementation(
+      async (_id, changedProps) => ({
+        updatedEntities: [duct.id],
+        violations: [],
+        requiresUserAction: false,
+        entityUpdates: [
+          {
+            id: duct.id,
+            previous: duct,
+            updates: { props: changedProps as Duct['props'], modifiedAt: '2025-01-01T00:00:01.000Z' },
+          },
+        ],
+      })
+    );
+
+    await setSize(duct.id, 'height', 10, createContext(), { debounceMs: 0 });
+
+    expect(parametricUpdateService.scheduleDuctPropertyChange).toHaveBeenCalledTimes(1);
+    const nextProps = vi.mocked(parametricUpdateService.scheduleDuctPropertyChange).mock.calls[0][1];
+    expect(nextProps.provenance?.height).toBe('specified');
+    expect(nextProps.provenance?.width).toBe('computed');
+    expect(nextProps.width).not.toBe(12);
+    expect(updateEntities).toHaveBeenCalledTimes(1);
+    expect(updateEntity).not.toHaveBeenCalled();
   });
 
   it('resetFittingToAuto plans and dispatches the reset update', () => {

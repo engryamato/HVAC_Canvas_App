@@ -6,6 +6,7 @@ import {
   DuctCalculatedSchema,
   DuctEngineeringDataSchema,
   DuctMaterialSchema,
+  DuctSizeProvenanceSchema,
   SystemTypeSchema,
 } from './duct.schema';
 import { MaterialSpecSchema } from './component-library.schema';
@@ -107,6 +108,7 @@ const SharedDuctRunPropsSchema = z.object({
   endEndType: DuctEndTypeSchema.optional(),
   previousRectangularWidth: z.number().min(4).max(96).optional().describe('Last rectangular width before round/flexible conversion'),
   previousRectangularHeight: z.number().min(4).max(96).optional().describe('Last rectangular height before round/flexible conversion'),
+  equivalentDiameter: z.number().min(0).optional().describe('Equivalent round diameter in inches'),
   airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),
   staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
   installLength: z.number().min(0.1).max(1000).describe('Installed run length in feet'),
@@ -123,6 +125,7 @@ const SharedDuctRunPropsSchema = z.object({
   catalogItemId: z.string().optional().describe('Resolved Catalog Item ID'),
   engineeringData: DuctEngineeringDataSchema.optional(),
   constraintStatus: ConstraintStatusSchema.optional(),
+  provenance: DuctSizeProvenanceSchema.optional(),
   autoSized: z.boolean().optional().describe('Indicates if the run was auto-sized'),
 });
 
@@ -256,6 +259,9 @@ export const DEFAULT_ROUND_DUCT_RUN_PROPS: DuctRunProps = {
   engineeringSystem: 'standard_duct',
   shape: 'round',
   diameter: 12,
+  provenance: {
+    diameter: 'computed',
+  },
   material: 'galvanized',
   airflow: 0,
   staticPressure: 0.1,
@@ -277,6 +283,10 @@ export const DEFAULT_RECTANGULAR_DUCT_RUN_PROPS: DuctRunProps = {
   shape: 'rectangular',
   width: 12,
   height: 8,
+  provenance: {
+    width: 'computed',
+    height: 'default',
+  },
   material: 'galvanized',
   airflow: 0,
   staticPressure: 0.1,

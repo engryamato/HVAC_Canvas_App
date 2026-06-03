@@ -62,6 +62,20 @@ export const DuctShapeSchema = z.enum(['round', 'rectangular']);
 
 export type DuctShape = z.infer<typeof DuctShapeSchema>;
 
+export const DuctSizeProvenanceValueSchema = z.enum(['default', 'computed', 'specified']);
+
+export type DuctSizeProvenanceValue = z.infer<typeof DuctSizeProvenanceValueSchema>;
+
+export const DuctSizeProvenanceSchema = z.object({
+  width: DuctSizeProvenanceValueSchema.optional(),
+  height: DuctSizeProvenanceValueSchema.optional(),
+  diameter: DuctSizeProvenanceValueSchema.optional(),
+  equivalentDiameter: DuctSizeProvenanceValueSchema.optional(),
+  gauge: DuctSizeProvenanceValueSchema.optional(),
+});
+
+export type DuctSizeProvenance = z.infer<typeof DuctSizeProvenanceSchema>;
+
 /**
  * Duct properties with conditional validation based on shape
  * - Round ducts require diameter
@@ -91,6 +105,11 @@ const SharedDuctPropsSchema = z
       .max(96)
       .optional()
       .describe('Height in inches (rectangular ducts only)'),
+    equivalentDiameter: z
+      .number()
+      .min(0)
+      .optional()
+      .describe('Equivalent round diameter in inches'),
     previousRectangularWidth: z
       .number()
       .min(4)
@@ -118,6 +137,7 @@ const SharedDuctPropsSchema = z
     insulationThickness: z.number().optional().describe('Insulation thickness in inches'),
     engineeringData: DuctEngineeringDataSchema.optional(),
     constraintStatus: ConstraintStatusSchema.optional(),
+    provenance: DuctSizeProvenanceSchema.optional(),
     autoSized: z.boolean().optional().describe('Indicates if duct was auto-sized'),
   })
   .refine(
@@ -203,6 +223,9 @@ export const DEFAULT_ROUND_DUCT_PROPS = {
   engineeringSystem: 'standard_duct' as const,
   shape: 'round' as const,
   diameter: 12,
+  provenance: {
+    diameter: 'computed',
+  },
   length: 10,
   material: 'galvanized' as const,
   airflow: 0, // Flow is calculated from connected terminals
@@ -215,6 +238,10 @@ export const DEFAULT_RECTANGULAR_DUCT_PROPS = {
   shape: 'rectangular' as const,
   width: 12,
   height: 8,
+  provenance: {
+    width: 'computed',
+    height: 'default',
+  },
   length: 10,
   material: 'galvanized' as const,
   airflow: 0, // Flow is calculated from connected terminals

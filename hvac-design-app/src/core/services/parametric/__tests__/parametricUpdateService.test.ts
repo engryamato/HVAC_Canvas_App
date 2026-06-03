@@ -132,4 +132,31 @@ describe('parametricUpdateService scheduling and cascade', () => {
     expect(result.entityUpdates?.length).toBe(2);
     expect(result.entityUpdates?.some((update) => update.id === 'fit-1')).toBe(true);
   });
+
+  it('auto-size skips dimensions marked specified by provenance', () => {
+    const sized = parametricUpdateService.autoSizeDuctToVelocity(
+      {
+        name: 'Duct',
+        engineeringSystem: 'standard_duct',
+        shape: 'rectangular',
+        width: 12,
+        height: 8,
+        length: 20,
+        material: 'galvanized',
+        airflow: 2200,
+        staticPressure: 0.1,
+        provenance: {
+          width: 'computed',
+          height: 'specified',
+        },
+      },
+      1500,
+      limits
+    );
+
+    expect(sized.height).toBe(8);
+    expect(sized.provenance?.height).toBe('specified');
+    expect(sized.width).not.toBe(12);
+    expect(sized.provenance?.width).toBe('computed');
+  });
 });

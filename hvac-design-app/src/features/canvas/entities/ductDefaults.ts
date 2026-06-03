@@ -71,11 +71,18 @@ export function createDuct(
       ? {
           ...baseProps,
           diameter: overrides?.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter,
+          provenance: {
+            diameter: 'computed' as const,
+          },
         }
       : {
           ...baseProps,
           width: overrides?.width ?? 12,
-          height: overrides?.height ?? 12,
+          height: overrides?.height ?? 8,
+          provenance: {
+            width: 'computed' as const,
+            height: overrides?.height === undefined || overrides.height === 8 ? 'default' as const : 'computed' as const,
+          },
         };
 
   const calculated = calculateDuctValues(shape, props as Duct['props']);

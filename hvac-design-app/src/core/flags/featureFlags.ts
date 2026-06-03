@@ -1,4 +1,8 @@
-export const featureFlagNames = ['WS1_SINGLE_TOOLBAR', 'WS2_INLINE_TOOL_OPTIONS'] as const;
+export const featureFlagNames = [
+  'WS1_SINGLE_TOOLBAR',
+  'WS2_INLINE_TOOL_OPTIONS',
+  'WS5_MANUAL_SIZING_PROVENANCE',
+] as const;
 
 export type FeatureFlag = (typeof featureFlagNames)[number];
 
@@ -20,6 +24,7 @@ function resolveFlag(name: FeatureFlag): boolean {
 export const featureFlags: FeatureFlags = {
   WS1_SINGLE_TOOLBAR: resolveFlag('WS1_SINGLE_TOOLBAR'),
   WS2_INLINE_TOOL_OPTIONS: resolveFlag('WS2_INLINE_TOOL_OPTIONS'),
+  WS5_MANUAL_SIZING_PROVENANCE: resolveFlag('WS5_MANUAL_SIZING_PROVENANCE'),
 };
 
 export function isEnabled(flag: FeatureFlag): boolean {

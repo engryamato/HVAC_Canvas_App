@@ -37,20 +37,25 @@ export interface SizingSuggestion {
 }
 
 type DuctSize = { diameter?: number; width?: number; height?: number };
+
+export const STANDARD_ROUND_SIZES = [
+  4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
+] as const;
+
+export const STANDARD_RECTANGULAR_INCREMENTS = [
+  4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 44, 48,
+] as const;
+
 export class AutoSizingService {
   /**
    * Standard round duct sizes (inches)
    */
-  private static readonly STANDARD_ROUND_SIZES = [
-    4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
-  ];
+  private static readonly STANDARD_ROUND_SIZES = STANDARD_ROUND_SIZES;
 
   /**
    * Standard rectangular duct sizes (inches)
    */
-  private static readonly STANDARD_RECTANGULAR_INCREMENTS = [
-    4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 44, 48,
-  ];
+  private static readonly STANDARD_RECTANGULAR_INCREMENTS = STANDARD_RECTANGULAR_INCREMENTS;
 
   /**
    * Auto-size a duct to meet target velocity

@@ -146,6 +146,36 @@ describe('DuctRunPropsSchema', () => {
     expect(result.previousRectangularHeight).toBe(12);
   });
 
+  it('accepts optional per-field size provenance on duct-run props', () => {
+    const result = DuctRunPropsSchema.parse({
+      ...DEFAULT_RECTANGULAR_DUCT_RUN_PROPS,
+      provenance: {
+        width: 'computed',
+        height: 'default',
+        diameter: 'specified',
+        equivalentDiameter: 'computed',
+        gauge: 'specified',
+      },
+    });
+
+    expect(result.provenance).toMatchObject({
+      width: 'computed',
+      height: 'default',
+      diameter: 'specified',
+      equivalentDiameter: 'computed',
+      gauge: 'specified',
+    });
+  });
+
+  it('keeps provenance optional for legacy duct-run props', () => {
+    const result = DuctRunPropsSchema.parse({
+      ...DEFAULT_ROUND_DUCT_RUN_PROPS,
+      provenance: undefined,
+    });
+
+    expect(result.provenance).toBeUndefined();
+  });
+
   it('should reject round runs without diameter', () => {
     const invalid = { ...DEFAULT_ROUND_DUCT_RUN_PROPS, diameter: undefined };
     expect(() => DuctRunPropsSchema.parse(invalid)).toThrow();

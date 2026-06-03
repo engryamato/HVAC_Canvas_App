@@ -67,11 +67,18 @@ export function createDuctRun(overrides?: CreateDuctRunOverrides): DuctRun {
       ? ({
           ...propsBase,
           diameter: overrides?.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter,
+          provenance: {
+            diameter: 'computed',
+          },
         } as DuctRun['props'])
       : ({
           ...propsBase,
           width: overrides?.width ?? 12,
           height: overrides?.height ?? 8,
+          provenance: {
+            width: 'computed',
+            height: overrides?.height === undefined || overrides.height === 8 ? 'default' : 'computed',
+          },
         } as DuctRun['props']);
 
   props.segments = recomputeDuctRunSegments(

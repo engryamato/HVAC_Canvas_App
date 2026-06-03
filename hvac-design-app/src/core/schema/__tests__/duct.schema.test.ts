@@ -119,6 +119,36 @@ describe('DuctPropsSchema', () => {
     expect(result.previousRectangularWidth).toBe(24);
     expect(result.previousRectangularHeight).toBe(12);
   });
+
+  it('accepts optional per-field size provenance on duct props', () => {
+    const result = DuctPropsSchema.parse({
+      ...DEFAULT_RECTANGULAR_DUCT_PROPS,
+      provenance: {
+        width: 'computed',
+        height: 'default',
+        diameter: 'specified',
+        equivalentDiameter: 'computed',
+        gauge: 'specified',
+      },
+    });
+
+    expect(result.provenance).toMatchObject({
+      width: 'computed',
+      height: 'default',
+      diameter: 'specified',
+      equivalentDiameter: 'computed',
+      gauge: 'specified',
+    });
+  });
+
+  it('keeps provenance optional for legacy duct props', () => {
+    const result = DuctPropsSchema.parse({
+      ...DEFAULT_ROUND_DUCT_PROPS,
+      provenance: undefined,
+    });
+
+    expect(result.provenance).toBeUndefined();
+  });
 });
 
 describe('DuctSchema', () => {

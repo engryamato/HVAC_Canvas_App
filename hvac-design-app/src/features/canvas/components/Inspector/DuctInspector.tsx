@@ -8,7 +8,7 @@ import {
   DEFAULT_ROUND_DUCT_PROPS,
 } from '@/core/schema/duct.schema';
 import { useEntityStore } from '@/core/store/entityStore';
-import { commitDuctProperty, commitEntityProps } from '@/core/actions/entityActions';
+import { commitDuctProperty, commitEntityProps, setSize } from '@/core/actions/entityActions';
 import { AutoSizingControls } from '@/components/canvas/AutoSizingControls';
 import type { SizingSuggestion } from '@/core/services/automation/autoSizingService';
 import { ValidationDisplay } from '@/components/canvas/ValidationDisplay';
@@ -25,6 +25,13 @@ import {
 } from '@/core/services/validation/constraintValidator';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { useBomHighlightStore } from '../../store/bomHighlightStore';
+import {
+  applyComputedSizing,
+  getSizeProvenance,
+  getStandardNominalSizes,
+  isSizingProvenanceEnabled,
+  type SizeField,
+} from '@/core/services/sizing/sizingProvenance';
 
 interface DuctInspectorProps {
   entity: Duct;
@@ -57,6 +64,48 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
         {value}
       </div>
     </div>
+  );
+}
+
+function getProvenanceInputClass(provenance: ReturnType<typeof getSizeProvenance>): string {
+  if (!isSizingProvenanceEnabled()) {
+    return '';
+  }
+
+  if (provenance === 'specified') {
+    return 'font-semibold text-blue-700';
+  }
+
+  return 'text-slate-500';
+}
+
+function SizeNominalPicker({
+  field,
+  onChange,
+  value,
+}: {
+  field: Extract<SizeField, 'width' | 'height' | 'diameter'>;
+  onChange: (value: number) => void;
+  value?: number;
+}) {
+  if (!isSizingProvenanceEnabled()) {
+    return null;
+  }
+
+  return (
+    <select
+      aria-label={`${field} nominal size`}
+      className="mt-1 h-8 w-full rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-500 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+      value={value ? String(value) : ''}
+      onChange={(event) => onChange(Number(event.target.value))}
+    >
+      <option value="">Nominal size</option>
+      {getStandardNominalSizes(field).map((size) => (
+        <option key={size} value={size}>
+          {size}"
+        </option>
+      ))}
+    </select>
   );
 }
 
@@ -288,6 +337,13 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
     [entity.id, entityActionContext]
   );
 
+  const commitSize = useCallback(
+    (field: SizeField, value: string | number) => {
+      void setSize(entity.id, field, value, entityActionContext);
+    },
+    [entity.id, entityActionContext]
+  );
+
   const handleShapeChange = useCallback(
     (shape: 'round' | 'rectangular') => {
       const { byId } = useEntityStore.getState();
@@ -350,12 +406,11 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
       const current = byId[entity.id];
       if (!current || current.type !== 'duct') {return;}
 
-      const newSizeProps = {
+      const newSizeProps = applyComputedSizing(current.props, {
         diameter: option.size.diameter,
         width: option.size.width,
         height: option.size.height,
-        autoSized: true,
-      } as Partial<Duct['props']>;
+      });
       const priorIssueCount = (current.props.constraintStatus?.violations ?? []).filter(
         (violation) => violation.severity === 'error' || violation.severity === 'warning'
       ).length;
@@ -535,15 +590,21 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
 
           {isRound ? (
             <PropertyField label="Diameter (in)" htmlFor="duct-diameter">
-              <ValidatedInput
+            <ValidatedInput
                 id="duct-diameter"
                 type="number"
                 min={4}
                 max={60}
-                step={1}
-                value={entity.props.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter}
+                step={isSizingProvenanceEnabled() ? 0.25 : 1}
+                value={entity.props.diameter ?? ''}
                 error={errors['diameter']}
-                onChange={(val) => commit('diameter', Number(val))}
+                className={getProvenanceInputClass(getSizeProvenance(entity.props, 'diameter'))}
+                onChange={(val) => commitSize('diameter', val)}
+              />
+              <SizeNominalPicker
+                field="diameter"
+                value={entity.props.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter}
+                onChange={(diameter) => commitSize('diameter', diameter)}
               />
             </PropertyField>
           ) : (
@@ -554,10 +615,16 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
                   type="number"
                   min={4}
                   max={96}
-                  step={1}
-                  value={entity.props.width ?? DEFAULT_RECTANGULAR_DUCT_PROPS.width}
+                  step={isSizingProvenanceEnabled() ? 0.25 : 1}
+                  value={entity.props.width ?? ''}
                   error={errors['width']}
-                  onChange={(val) => commit('width', Number(val))}
+                  className={getProvenanceInputClass(getSizeProvenance(entity.props, 'width'))}
+                  onChange={(val) => commitSize('width', val)}
+                />
+                <SizeNominalPicker
+                  field="width"
+                  value={entity.props.width ?? DEFAULT_RECTANGULAR_DUCT_PROPS.width}
+                  onChange={(width) => commitSize('width', width)}
                 />
               </PropertyField>
               <PropertyField label="Height (in)" htmlFor="duct-height">
@@ -566,10 +633,16 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
                   type="number"
                   min={4}
                   max={96}
-                  step={1}
-                  value={entity.props.height ?? DEFAULT_RECTANGULAR_DUCT_PROPS.height}
+                  step={isSizingProvenanceEnabled() ? 0.25 : 1}
+                  value={entity.props.height ?? ''}
                   error={errors['height']}
-                  onChange={(val) => commit('height', Number(val))}
+                  className={getProvenanceInputClass(getSizeProvenance(entity.props, 'height'))}
+                  onChange={(val) => commitSize('height', val)}
+                />
+                <SizeNominalPicker
+                  field="height"
+                  value={entity.props.height ?? DEFAULT_RECTANGULAR_DUCT_PROPS.height}
+                  onChange={(height) => commitSize('height', height)}
                 />
               </PropertyField>
             </>

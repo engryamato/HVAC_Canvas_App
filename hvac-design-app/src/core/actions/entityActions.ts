@@ -4,6 +4,11 @@ import { updateEntities, updateEntity } from '@/core/commands/entityCommands';
 import { useEntityStore } from '@/core/store/entityStore';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
+import {
+  applyUserSizeEdit,
+  isSizingProvenanceEnabled,
+  type SizeField,
+} from '@/core/services/sizing/sizingProvenance';
 
 type EntityCommandOptions = Parameters<typeof updateEntity>[3];
 
@@ -72,6 +77,72 @@ export async function commitDuctProperty(
     ctx.engineeringLimits,
     'input',
     opts.debounceMs ?? 500
+  );
+
+  if (result.entityUpdates && result.entityUpdates.length > 0) {
+    updateEntities(result.entityUpdates);
+    return result;
+  }
+
+  updateEntity(entityId, { props: nextProps, modifiedAt: nextEntity.modifiedAt }, previous);
+  return result;
+}
+
+export async function setSize(
+  entityId: string,
+  field: SizeField,
+  value: number | string | null | undefined,
+  ctx: EntityActionContext,
+  opts: { debounceMs?: number } = {}
+): Promise<Awaited<ReturnType<typeof parametricUpdateService.scheduleDuctPropertyChange>> | null> {
+  const normalizedValue =
+    value === '' || value === null || value === undefined ? undefined : Number(value);
+
+  if (!isSizingProvenanceEnabled()) {
+    return commitDuctProperty(
+      entityId,
+      { [field]: normalizedValue } as Partial<Duct['props']>,
+      ctx,
+      opts
+    );
+  }
+
+  const { byId } = useEntityStore.getState();
+  const current = byId[entityId];
+  if (!current || current.type !== 'duct') {
+    return null;
+  }
+
+  if (normalizedValue !== undefined && !Number.isFinite(normalizedValue)) {
+    return null;
+  }
+
+  const previous = cloneEntity(current);
+  const nextProps = applyUserSizeEdit(
+    current.props,
+    field,
+    normalizedValue,
+    { limits: ctx.engineeringLimits }
+  );
+  const nextEntity: Duct = {
+    ...current,
+    props: nextProps,
+    modifiedAt: new Date().toISOString(),
+  };
+
+  if (!validateAndGate(field, nextEntity, ctx)) {
+    return null;
+  }
+
+  const ducts = Object.values(byId).filter((item): item is Duct => item?.type === 'duct');
+  const fittings = Object.values(byId).filter((item): item is Fitting => item?.type === 'fitting');
+  const result = await parametricUpdateService.scheduleDuctPropertyChange(
+    entityId,
+    nextProps,
+    { ducts, fittings },
+    ctx.engineeringLimits,
+    'input',
+    opts.debounceMs ?? 0
   );
 
   if (result.entityUpdates && result.entityUpdates.length > 0) {
