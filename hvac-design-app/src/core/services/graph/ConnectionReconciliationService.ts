@@ -2,8 +2,9 @@ import { feetToPixels } from '@/core/constants/coordinates';
 import type { Duct, DuctRun, Entity, Equipment, Fitting, FittingPort, FittingType } from '@/core/schema';
 import type { ConnectionPort } from '@/core/schema/equipment.schema';
 import { getEquipmentPortWorldPosition } from '@/features/canvas/services/equipmentGeometry';
-import { resolveFittingGeometry, applyDuctEndpointCutback } from '@/features/canvas/services/connectionPoints';
+import { resolveFittingGeometry, applyDuctEndpointCutback, restoreDuctToDesign } from '@/features/canvas/services/connectionPoints';
 import type { ResolvedConnectionPoint } from '@/features/canvas/services/connectionPoints';
+import { isEnabled } from '@/core/flags/featureFlags';
 
 type DuctLike = Duct | DuctRun;
 type Point = { x: number; y: number };
@@ -50,8 +51,65 @@ export class ConnectionReconciliationService {
     reconcileDuctEndpoints(endpoints);
     reconcileFittings(fittings, endpoints);
 
+    // WS6d: make fitting *detach* symmetric. A duct that was cut to a fitting
+    // (rendered ≠ authored design centerline) but ended this pass with NO
+    // connection — its fitting/equipment was removed — re-extends to its design
+    // centerline instead of staying cut. Targeted at orphaned ducts only, so
+    // split/merged/chained runs (which keep connectedFrom/To) are untouched.
+    // No-op for plain ducts (no stored design centerline) and for ducts already
+    // at their design centerline.
+    if (isEnabled('WS6D_DESIGN_GEOMETRY')) {
+      const connectedDuctIds = collectConnectedDuctIds(ducts, fittings, equipment);
+      for (const duct of ducts) {
+        if (!connectedDuctIds.has(duct.id)) {
+          restoreDuctToDesign(duct);
+        }
+      }
+    }
+
     return next;
   }
+}
+
+/** Duct IDs that ended the reconcile pass connected to another duct, a fitting, or equipment. */
+function collectConnectedDuctIds(
+  ducts: DuctLike[],
+  fittings: Fitting[],
+  equipment: Equipment[]
+): Set<string> {
+  const connected = new Set<string>();
+
+  for (const duct of ducts) {
+    if (duct.props.connectedFrom) {
+      connected.add(duct.props.connectedFrom);
+      connected.add(duct.id);
+    }
+    if (duct.props.connectedTo) {
+      connected.add(duct.props.connectedTo);
+      connected.add(duct.id);
+    }
+  }
+
+  for (const fitting of fittings) {
+    for (const point of fitting.props.connectionPoints ?? []) {
+      if (point.ductId) {
+        connected.add(point.ductId);
+      }
+    }
+  }
+
+  for (const item of equipment) {
+    if (item.props.connectedDuctId) {
+      connected.add(item.props.connectedDuctId);
+    }
+    for (const port of item.props.connectionPorts ?? []) {
+      if (port.connectedDuctId) {
+        connected.add(port.connectedDuctId);
+      }
+    }
+  }
+
+  return connected;
 }
 
 function cloneEntities(entities: Record<string, Entity>): Record<string, Entity> {
