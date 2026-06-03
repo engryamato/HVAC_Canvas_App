@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
+import { isEnabled } from '@/core/flags/featureFlags';
 import type {
   ActivityItem,
   DuctSystem,
@@ -540,6 +541,8 @@ function ActivitySection({
   onUndo: () => void;
   onRedo: () => void;
 }) {
+  const singleToolbarEnabled = isEnabled('WS1_SINGLE_TOOLBAR');
+
   return (
     <div className="space-y-2">
       {items.length === 0 ? (
@@ -570,31 +573,33 @@ function ActivitySection({
         </div>
       ) : null}
 
-      <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
-        <button
-          type="button"
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
-          aria-label="Undo last action"
-          aria-disabled={!canUndo}
-          disabled={!canUndo}
-          onClick={onUndo}
-        >
-          <RotateCcw size={11} aria-hidden="true" />
-          Undo
-        </button>
-        <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
-        <button
-          type="button"
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
-          aria-label="Redo last undone action"
-          aria-disabled={!canRedo}
-          disabled={!canRedo}
-          onClick={onRedo}
-        >
-          <RedoIcon size={11} />
-          Redo
-        </button>
-      </div>
+      {!singleToolbarEnabled ? (
+        <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
+          <button
+            type="button"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+            aria-label="Undo last action"
+            aria-disabled={!canUndo}
+            disabled={!canUndo}
+            onClick={onUndo}
+          >
+            <RotateCcw size={11} aria-hidden="true" />
+            Undo
+          </button>
+          <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
+          <button
+            type="button"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+            aria-label="Redo last undone action"
+            aria-disabled={!canRedo}
+            disabled={!canRedo}
+            onClick={onRedo}
+          >
+            <RedoIcon size={11} />
+            Redo
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

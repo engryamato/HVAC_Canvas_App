@@ -42,7 +42,9 @@ describe('Canvas LeftSidebar Tabs', () => {
 
     expect(screen.getByTestId('tab-catalog')).toHaveTextContent('Library');
     expect(screen.getByTestId('tab-manage')).toHaveTextContent('Manage');
-    expect(screen.getByTestId('toolbar')).toBeDefined();
+    // WS1: the sidebar no longer hosts a duplicate tool row; the single toolbar
+    // lives in TopToolBar. The sidebar keeps only its tabs + panels.
+    expect(screen.queryByTestId('toolbar')).toBeNull();
     expect(screen.getAllByTestId('catalog-panel').length).toBeGreaterThan(0);
   });
 

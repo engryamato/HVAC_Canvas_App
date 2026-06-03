@@ -17,3 +17,6 @@ export * from './persistence';
 
 // Geometry exports
 export * from './geometry';
+
+// Feature flag exports
+export * from './flags';

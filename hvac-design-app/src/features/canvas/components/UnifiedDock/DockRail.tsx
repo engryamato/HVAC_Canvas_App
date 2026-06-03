@@ -6,6 +6,7 @@ import {
   Undo2,
   Redo2
 } from 'lucide-react';
+import { isEnabled } from '@/core/flags/featureFlags';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
@@ -19,6 +20,7 @@ export function DockRail({ className = '' }: DockRailProps) {
   const toggleDockPanel = useLayoutStore((state) => state.toggleDockPanel);
 
   const { undo, redo, canUndo, canRedo } = useHistoryStore();
+  const singleToolbarEnabled = isEnabled('WS1_SINGLE_TOOLBAR');
 
   useKeyboardShortcuts({});
 
@@ -56,25 +58,26 @@ export function DockRail({ className = '' }: DockRailProps) {
 
       <div className="flex-1" />
 
-       {/* History Controls */}
-      <div className="flex flex-col gap-2 w-full px-2 pb-4">
-        <button
-          onClick={undo}
-          disabled={!canUndo}
-          title="Undo (Ctrl+Z)"
-          className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-        >
-          <Undo2 size={20} />
-        </button>
-        <button
-          onClick={redo}
-          disabled={!canRedo}
-          title="Redo (Ctrl+Y)"
-          className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-        >
-          <Redo2 size={20} />
-        </button>
-      </div>
+      {!singleToolbarEnabled ? (
+        <div className="flex flex-col gap-2 w-full px-2 pb-4">
+          <button
+            onClick={undo}
+            disabled={!canUndo}
+            title="Undo (Ctrl+Z)"
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+          >
+            <Undo2 size={20} />
+          </button>
+          <button
+            onClick={redo}
+            disabled={!canRedo}
+            title="Redo (Ctrl+Y)"
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+          >
+            <Redo2 size={20} />
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

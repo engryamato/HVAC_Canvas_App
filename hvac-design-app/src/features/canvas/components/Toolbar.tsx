@@ -6,6 +6,7 @@ import {
   useToolActions,
   type CanvasTool,
 } from '@/core/store/canvas.store';
+import { isEnabled } from '@/core/flags/featureFlags';
 import { useCanUndo, useCanRedo } from '@/core/commands/historyStore';
 import { undo, redo } from '@/core/commands/entityCommands';
 import { useCursorStore } from '@/features/canvas/store/cursorStore';
@@ -400,6 +401,7 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
   const isVertical = orientation === 'vertical';
   const setCursorMode = useCursorStore((state) => state.setCursorMode);
   const ductToolbarMetadata = getPlacementToolbarMetadata(activeSpecialtyToolId);
+  const singleToolbarEnabled = isEnabled('WS1_SINGLE_TOOLBAR');
 
   // Handle keyboard shortcuts
   React.useEffect(() => {
@@ -489,6 +491,10 @@ export function ToolButtons({ className = '', orientation = 'vertical' }: ToolBu
 
     setTool(tool);
   };
+
+  if (singleToolbarEnabled) {
+    return null;
+  }
 
   return (
     <div

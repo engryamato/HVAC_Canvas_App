@@ -16,6 +16,20 @@ vi.mock('next/link', () => ({
   ),
 }));
 
+// The standalone <Toolbar/> wrapper is a test-only host for the legacy
+// ToolButtons surface. WS1 moves tools + undo/redo to TopToolBar and gates the
+// legacy surface behind WS1_SINGLE_TOOLBAR; with the flag ON, ToolButtons renders
+// null. These tests cover the FLAG-OFF rollback path, so we force the flags off.
+// The shipped (flag-on) canonical surface is covered by TopToolBar.test.tsx.
+vi.mock('@/core/flags/featureFlags', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/core/flags/featureFlags')>();
+  return {
+    ...actual,
+    isEnabled: () => false,
+    featureFlags: { WS1_SINGLE_TOOLBAR: false, WS2_INLINE_TOOL_OPTIONS: false },
+  };
+});
+
 const createMockRoom = (id: string, name: string): Room => ({
   id,
   type: 'room',

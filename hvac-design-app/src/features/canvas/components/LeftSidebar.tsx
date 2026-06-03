@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { isEnabled } from '@/core/flags/featureFlags';
 import { useStatusMessage } from '@/core/store/canvas.store';
 import { useCursorStore } from '@/features/canvas/store/cursorStore';
 import { useLayoutStore } from '@/stores/useLayoutStore';
@@ -155,7 +156,7 @@ export function LeftSidebar({
 
       {!leftSidebarCollapsed && (
         <div className="border-b border-slate-200 bg-white px-3 py-2">
-          <ToolButtons orientation="horizontal" className="w-full" />
+          {!isEnabled('WS1_SINGLE_TOOLBAR') ? <ToolButtons orientation="horizontal" className="w-full" /> : null}
           <div className="mt-2 rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-600">
             <span className="font-medium">{statusMessage}</span>
             <span className="ml-2 text-slate-500">Cursor: {cursorMode}</span>

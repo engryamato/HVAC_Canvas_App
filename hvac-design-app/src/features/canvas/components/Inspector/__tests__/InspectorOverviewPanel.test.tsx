@@ -246,9 +246,10 @@ describe('InspectorOverviewPanel', () => {
     expect(props.onSelectElementType).toHaveBeenCalledWith('Ducts');
 
     openSection('Recent Activity');
-    fireEvent.click(screen.getByRole('button', { name: /^undo last action$/i }));
-    expect(props.onUndo).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('button', { name: /^redo last undone action$/i }).hasAttribute('disabled')).toBe(true);
+    // WS1: undo/redo are canonical on TopToolBar + keyboard only; the inspector
+    // no longer hosts duplicate undo/redo buttons.
+    expect(screen.queryByRole('button', { name: /^undo last action$/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^redo last undone action$/i })).toBeNull();
   });
 
   it('opens Model Health when clicking the amber health banner', () => {

@@ -6,6 +6,7 @@ import { useViewportStore } from '../store/viewportStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useDuctOverlayStore } from '@/core/store/ductOverlayStore';
+import { isEnabled } from '@/core/flags/featureFlags';
 import { useSelectionStore } from '../store/selectionStore';
 import {
   useDuctDrawSettings,
@@ -78,6 +79,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   const animationFrameRef = useRef<number>();
   const [ductSizePromptOpen, setDuctSizePromptOpen] = useState(false);
   const [equipmentPlacementDialogOpen, setEquipmentPlacementDialogOpen] = useState(false);
+  const inlineToolOptionsEnabled = isEnabled('WS2_INLINE_TOOL_OPTIONS');
   const [overlayTooltip, setOverlayTooltip] = useState<{
     ductRunId: string;
     screenX: number;
@@ -133,15 +135,15 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
     if (prevTool !== currentTool) {
       tools[prevTool].onDeactivate();
       tools[currentTool].onActivate();
-      if (currentTool === 'duct') {
+      if (!inlineToolOptionsEnabled && currentTool === 'duct') {
         setDuctSizePromptOpen(true);
       }
-      if (currentTool === 'equipment') {
+      if (!inlineToolOptionsEnabled && currentTool === 'equipment') {
         setEquipmentPlacementDialogOpen(true);
       }
       prevToolRef.current = currentTool;
     }
-  }, [currentTool, tools]);
+  }, [currentTool, inlineToolOptionsEnabled, tools]);
 
   // Get active tool
   const activeTool = tools[currentTool];
@@ -607,27 +609,31 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
 
   return (
     <div ref={containerRef} data-testid="canvas-area" className={`relative w-full h-full overflow-hidden ${className || ''}`}>
-      <EquipmentPlacementDialog
-        open={equipmentPlacementDialogOpen && currentTool === 'equipment'}
-        onConfirm={() => setEquipmentPlacementDialogOpen(false)}
-        onCancel={() => {
-          setEquipmentPlacementDialogOpen(false);
-          setTool('select');
-        }}
-      />
-      <DuctSizePromptDialog
-        open={ductSizePromptOpen && currentTool === 'duct'}
-        toolShape={toolShape}
-        currentSettings={ductDrawSettings}
-        onConfirm={(settings: Partial<DuctDrawSettings>) => {
-          setDuctDrawSettings(settings);
-          setDuctSizePromptOpen(false);
-        }}
-        onCancel={() => {
-          setDuctSizePromptOpen(false);
-          setTool('select');
-        }}
-      />
+      {!inlineToolOptionsEnabled ? (
+        <>
+          <EquipmentPlacementDialog
+            open={equipmentPlacementDialogOpen && currentTool === 'equipment'}
+            onConfirm={() => setEquipmentPlacementDialogOpen(false)}
+            onCancel={() => {
+              setEquipmentPlacementDialogOpen(false);
+              setTool('select');
+            }}
+          />
+          <DuctSizePromptDialog
+            open={ductSizePromptOpen && currentTool === 'duct'}
+            toolShape={toolShape}
+            currentSettings={ductDrawSettings}
+            onConfirm={(settings: Partial<DuctDrawSettings>) => {
+              setDuctDrawSettings(settings);
+              setDuctSizePromptOpen(false);
+            }}
+            onCancel={() => {
+              setDuctSizePromptOpen(false);
+              setTool('select');
+            }}
+          />
+        </>
+      ) : null}
       {showRulers && (
         <RulersOverlay
           containerRef={containerRef}

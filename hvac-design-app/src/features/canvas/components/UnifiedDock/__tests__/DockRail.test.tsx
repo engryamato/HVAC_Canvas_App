@@ -42,58 +42,18 @@ describe('DockRail', () => {
   });
 
   describe('Undo/Redo Integration', () => {
-    it('should render undo and redo buttons', () => {
-      render(<DockRail />);
-      expect(screen.getByTitle(/Undo/i)).toBeDefined();
-      expect(screen.getByTitle(/Redo/i)).toBeDefined();
-    });
-
-    it('should disable undo/redo when no history', () => {
+    // WS1: undo/redo are canonical on TopToolBar + keyboard only. DockRail keeps
+    // its panel toggles and no longer renders a duplicate undo/redo surface.
+    it('does not render undo/redo buttons (canonical on TopToolBar)', () => {
       (useHistoryStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         undo: vi.fn(),
         redo: vi.fn(),
-        canUndo: false,
-        canRedo: false,
-      });
-      render(<DockRail />);
-      const undoButton = screen.getByTitle(/Undo/i);
-      const redoButton = screen.getByTitle(/Redo/i);
-      
-      expect(undoButton).toBeDisabled();
-      expect(redoButton).toBeDisabled();
-    });
-
-    it('should enable undo button when history available', () => {
-      (useHistoryStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-        undo: vi.fn(),
-        redo: vi.fn(),
-        canUndo: true,
-        canRedo: false,
-      });
-      render(<DockRail />);
-      expect(screen.getByTitle(/Undo/i)).not.toBeDisabled();
-    });
-
-    it('should call undo/redo functions', () => {
-      const undoMock = vi.fn();
-      const redoMock = vi.fn();
-      
-      (useHistoryStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-        undo: undoMock,
-        redo: redoMock,
         canUndo: true,
         canRedo: true,
       });
-
       render(<DockRail />);
-      
-      const undoButton = screen.getByTitle(/Undo/i);
-      fireEvent.click(undoButton);
-      expect(undoMock).toHaveBeenCalled();
-
-      const redoButton = screen.getByTitle(/Redo/i);
-      fireEvent.click(redoButton);
-      expect(redoMock).toHaveBeenCalled();
+      expect(screen.queryByTitle(/Undo/i)).toBeNull();
+      expect(screen.queryByTitle(/Redo/i)).toBeNull();
     });
   });
 
