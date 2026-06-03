@@ -1,7 +1,7 @@
 import { ArrowLeftToLine, ArrowRightToLine, ArrowRightLeft, Layers, Minus, Plus, Ruler } from 'lucide-react';
 import { useMemo } from 'react';
 import type { DuctEndType, DuctRun, DuctSegment, DuctRunShape, InsulationType } from '@/core/schema';
-import { updateEntity as updateEntityCommand } from '@/core/commands/entityCommands';
+import { commitEntityProps } from '@/core/actions/entityActions';
 import { useSelectionStore } from '../../store/selectionStore';
 import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
 import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
@@ -303,10 +303,7 @@ export function DuctRunInspector({ entity }: DuctRunInspectorProps) {
 
   const updateRun = (nextProps: DuctRun['props']) => {
     const previous = structuredClone(entity);
-    updateEntityCommand(entity.id, {
-      props: nextProps,
-      modifiedAt: new Date().toISOString(),
-    }, previous);
+    commitEntityProps<DuctRun>(entity.id, nextProps, previous);
   };
 
   const updateRunProps = (updates: Partial<DuctRun['props']>) => {

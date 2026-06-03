@@ -2,17 +2,16 @@ import { useCallback, useMemo, useState } from 'react';
 import PropertyField from './PropertyField';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
 import { useFieldValidation } from '../../hooks/useFieldValidation';
-import type { Duct, Fitting } from '@/core/schema';
+import type { Duct } from '@/core/schema';
 import {
   DEFAULT_RECTANGULAR_DUCT_PROPS,
   DEFAULT_ROUND_DUCT_PROPS,
 } from '@/core/schema/duct.schema';
 import { useEntityStore } from '@/core/store/entityStore';
-import { updateEntity as updateEntityCommand, updateEntities as updateEntitiesCommand } from '@/core/commands/entityCommands';
+import { commitDuctProperty, commitEntityProps } from '@/core/actions/entityActions';
 import { AutoSizingControls } from '@/components/canvas/AutoSizingControls';
 import type { SizingSuggestion } from '@/core/services/automation/autoSizingService';
 import { ValidationDisplay } from '@/components/canvas/ValidationDisplay';
-import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { useDialogStore } from '@/core/store/dialogStore';
@@ -177,6 +176,13 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
   const { errors, validateField } = useFieldValidation(entity);
   const calculationSettings = useSettingsStore((state) => state.calculationSettings);
   const engineeringLimits = calculationSettings.engineeringLimits;
+  const entityActionContext = useMemo(
+    () => ({
+      engineeringLimits,
+      validateField: (field: string, draft: Duct) => validateField(field, draft),
+    }),
+    [engineeringLimits, validateField]
+  );
   const components = useComponentLibraryStoreV2((state) => state.components);
   const [suggestionFeedback, setSuggestionFeedback] = useState<{
     state: 'cleared' | 'mitigated' | 'unchanged';
@@ -277,47 +283,9 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
 
   const commit = useCallback(
     <K extends keyof Duct['props']>(field: K, value: Duct['props'][K]) => {
-      const { byId } = useEntityStore.getState();
-      const current = byId[entity.id];
-      if (!current || current.type !== 'duct') {
-        return;
-      }
-
-      const previous = JSON.parse(JSON.stringify(current)) as Duct;
-      const nextProps = { ...current.props, [field]: value };
-      const nextEntity: Duct = {
-        ...current,
-        props: nextProps,
-        modifiedAt: new Date().toISOString(),
-      };
-
-      const isValid = validateField(field as string, nextEntity);
-      if (!isValid) {
-        return;
-      }
-
-      const ducts = Object.values(byId).filter((item): item is Duct => item?.type === 'duct');
-      const fittings = Object.values(byId).filter((item): item is Fitting => item?.type === 'fitting');
-
-      void parametricUpdateService
-        .scheduleDuctPropertyChange(
-          entity.id,
-          { [field]: value } as Partial<Duct['props']>,
-          { ducts, fittings },
-          engineeringLimits,
-          'input',
-          500
-        )
-        .then((result) => {
-          if (result.entityUpdates && result.entityUpdates.length > 0) {
-            updateEntitiesCommand(result.entityUpdates);
-            return;
-          }
-
-          updateEntityCommand(entity.id, { props: nextProps, modifiedAt: nextEntity.modifiedAt }, previous);
-        });
+      void commitDuctProperty(entity.id, { [field]: value } as Partial<Duct['props']>, entityActionContext);
     },
-    [engineeringLimits, entity.id, validateField]
+    [entity.id, entityActionContext]
   );
 
   const handleShapeChange = useCallback(
@@ -371,7 +339,7 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
         return;
       }
 
-      updateEntityCommand(entity.id, { props: nextProps, modifiedAt: nextEntity.modifiedAt }, previous);
+      commitEntityProps<Duct>(entity.id, nextProps, previous);
     },
     [entity.id, validateField]
   );
@@ -382,46 +350,30 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
       const current = byId[entity.id];
       if (!current || current.type !== 'duct') {return;}
 
-      const previous = JSON.parse(JSON.stringify(current)) as Duct;
       const newSizeProps = {
         diameter: option.size.diameter,
         width: option.size.width,
         height: option.size.height,
         autoSized: true,
       } as Partial<Duct['props']>;
-      const nextProps = { ...current.props, ...newSizeProps } as Duct['props'];
-      const modifiedAt = new Date().toISOString();
       const priorIssueCount = (current.props.constraintStatus?.violations ?? []).filter(
         (violation) => violation.severity === 'error' || violation.severity === 'warning'
       ).length;
-      const ducts = Object.values(byId).filter((item): item is Duct => item?.type === 'duct');
-      const fittings = Object.values(byId).filter((item): item is Fitting => item?.type === 'fitting');
 
-      void parametricUpdateService
-        .scheduleDuctPropertyChange(
-          entity.id,
-          newSizeProps,
-          { ducts, fittings },
-          engineeringLimits,
-          'input',
-          0
-        )
+      void commitDuctProperty(entity.id, newSizeProps, entityActionContext, { debounceMs: 0 })
         .then((result) => {
-          const updatedPrimary = result.entityUpdates?.find((update) => update.id === entity.id);
-
-          if (result.entityUpdates && result.entityUpdates.length > 0) {
-            updateEntitiesCommand(result.entityUpdates);
-          } else {
-            updateEntityCommand(entity.id, { props: nextProps, modifiedAt }, previous);
+          if (!result) {
+            return;
           }
 
+          const updatedPrimary = result.entityUpdates?.find((update) => update.id === entity.id);
           const nextConstraintStatus = (updatedPrimary?.updates as Partial<Duct> | undefined)?.props
             ?.constraintStatus ?? current.props.constraintStatus;
 
           applySuggestionFeedback(priorIssueCount, nextConstraintStatus);
         });
     },
-    [applySuggestionFeedback, engineeringLimits, entity.id]
+    [applySuggestionFeedback, entity.id, entityActionContext]
   );
 
   const handleFixSuggestion = useCallback(
@@ -432,52 +384,30 @@ export function DuctInspector({ entity, onHighlightInBOM }: DuctInspectorProps) 
         return;
       }
 
-      const previous = JSON.parse(JSON.stringify(current)) as Duct;
-      const nextProps = { ...current.props, [fix.property]: fix.value } as Duct['props'];
-      const nextEntity: Duct = {
-        ...current,
-        props: nextProps,
-        modifiedAt: new Date().toISOString(),
-      };
-
       const field = fix.property as keyof Duct['props'];
-      const isValid = validateField(String(field), nextEntity);
-      if (!isValid) {
-        return;
-      }
-
       const priorIssueCount = (current.props.constraintStatus?.violations ?? []).filter(
         (violation) => violation.severity === 'error' || violation.severity === 'warning'
       ).length;
 
-      const ducts = Object.values(byId).filter((item): item is Duct => item?.type === 'duct');
-      const fittings = Object.values(byId).filter((item): item is Fitting => item?.type === 'fitting');
-
-      void parametricUpdateService
-        .scheduleDuctPropertyChange(
-          entity.id,
-          { [field]: fix.value } as Partial<Duct['props']>,
-          { ducts, fittings },
-          engineeringLimits,
-          'input',
-          0
-        )
+      void commitDuctProperty(
+        entity.id,
+        { [field]: fix.value } as Partial<Duct['props']>,
+        entityActionContext,
+        { debounceMs: 0 }
+      )
         .then((result) => {
-          const updatedPrimary = result.entityUpdates?.find((update) => update.id === entity.id);
-
-          if (result.entityUpdates && result.entityUpdates.length > 0) {
-            updateEntitiesCommand(result.entityUpdates);
-          } else {
-            updateEntityCommand(entity.id, { props: nextProps, modifiedAt: nextEntity.modifiedAt }, previous);
+          if (!result) {
+            return;
           }
 
+          const updatedPrimary = result.entityUpdates?.find((update) => update.id === entity.id);
           const nextConstraintStatus = (updatedPrimary?.updates as Partial<Duct> | undefined)?.props
             ?.constraintStatus ?? current.props.constraintStatus;
 
           applySuggestionFeedback(priorIssueCount, nextConstraintStatus);
         });
     },
-    [applySuggestionFeedback, engineeringLimits, entity.id, validateField]
+    [applySuggestionFeedback, entity.id, entityActionContext]
   );
 
   // ---- Derived display values ---------------------------------------------

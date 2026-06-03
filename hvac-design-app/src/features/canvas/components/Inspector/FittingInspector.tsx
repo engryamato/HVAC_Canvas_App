@@ -4,10 +4,9 @@ import PropertyField from './PropertyField';
 import { ValidatedInput } from '@/components/ui/ValidatedInput';
 import { Button } from '@/components/ui/button';
 import type { Fitting } from '@/core/schema';
-import { updateEntity as updateEntityCommand } from '@/core/commands/entityCommands';
+import { commitEntityProps, resetFittingToAuto } from '@/core/actions/entityActions';
 import { useEntityStore } from '@/core/store/entityStore';
 import { FITTING_TYPE_LABELS } from '../../entities/fittingDefaults';
-import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 
 interface FittingInspectorProps {
   entity: Fitting;
@@ -65,14 +64,15 @@ export function FittingInspector({ entity }: FittingInspectorProps) {
       const previous = JSON.parse(JSON.stringify(current)) as Fitting;
       const shouldLock = Boolean(current.props.autoInserted);
 
-      updateEntityCommand(entity.id, {
-        props: {
+      commitEntityProps<Fitting>(
+        entity.id,
+        {
           ...current.props,
           [field]: value,
           manualOverride: shouldLock ? true : current.props.manualOverride,
         },
-        modifiedAt: new Date().toISOString(),
-      }, previous);
+        previous
+      );
     },
     [entity.id]
   );
@@ -90,24 +90,7 @@ export function FittingInspector({ entity }: FittingInspectorProps) {
   );
 
   const handleResetToAuto = useCallback(() => {
-    const reset = fittingInsertionService.planManualOverrideReset(entity.id);
-    if (!reset) {
-      return;
-    }
-
-    updateEntityCommand(
-      reset.next.id,
-      {
-        props: reset.next.props,
-        transform: reset.next.transform,
-        modifiedAt: reset.next.modifiedAt,
-      },
-      reset.previous,
-      {
-        selectionBefore: [entity.id],
-        selectionAfter: [entity.id],
-      }
-    );
+    resetFittingToAuto(entity.id);
   }, [entity.id]);
 
   const connectedDuctCount = new Set([

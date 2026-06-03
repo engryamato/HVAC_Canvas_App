@@ -5,7 +5,7 @@ import { useFieldValidation } from '../../hooks/useFieldValidation';
 import type { Equipment } from '@/core/schema';
 import { EQUIPMENT_TYPE_DEFAULTS, EQUIPMENT_TYPE_LABELS } from '../../entities/equipmentDefaults';
 import { useEntityStore } from '@/core/store/entityStore';
-import { updateEntity as updateEntityCommand } from '@/core/commands/entityCommands';
+import { commitEntityProps } from '@/core/actions/entityActions';
 import { InspectorAccordion } from './InspectorAccordion';
 
 interface EquipmentInspectorProps {
@@ -36,11 +36,7 @@ export function EquipmentInspector({ entity }: EquipmentInspectorProps) {
         return;
       }
 
-      updateEntityCommand(
-        entity.id,
-        { props: nextProps, modifiedAt: nextEntity.modifiedAt },
-        previous
-      );
+      commitEntityProps<Equipment>(entity.id, nextProps, previous);
     },
     [entity.id, validateField]
   );
@@ -77,11 +73,7 @@ export function EquipmentInspector({ entity }: EquipmentInspectorProps) {
         return;
       }
 
-      updateEntityCommand(
-        entity.id,
-        { props: nextProps, modifiedAt: nextEntity.modifiedAt },
-        previous
-      );
+      commitEntityProps<Equipment>(entity.id, nextProps, previous);
     },
     [entity.id, validateField]
   );
@@ -224,4 +216,3 @@ export function EquipmentInspector({ entity }: EquipmentInspectorProps) {
 }
 
 export default EquipmentInspector;
-
