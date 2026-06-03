@@ -1,14 +1,20 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { createElement, useEffect, useCallback } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 import { redo, undo, deleteEntities } from '@/core/commands';
 import { useSelectionStore } from '../store/selectionStore';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useToolStore } from '@/core/store/canvas.store';
+import { isEnabled as isFeatureEnabled } from '@/core/flags/featureFlags';
 import { useLayoutStore } from '@/stores/useLayoutStore';
 import type { Entity } from '@/core/schema';
 import { ZOOM_TO_SELECTION_PADDING } from '@/core/constants/viewport';
 import { getEquipmentPlanBounds } from '../services/equipmentGeometry';
+import { useCasStore } from '../store/casStore';
+import { CASLayer } from '../components/CAS/CASLayer';
+import { getEntityBounds } from '../components/CAS/actionRegistry';
 import {
   copySelectionToClipboard,
   cutSelectionToClipboard,
@@ -41,6 +47,10 @@ const TOOL_SHORTCUTS: Record<string, ToolType> = {
   f: 'fitting',
   n: 'note',
 };
+
+let casLayerRoot: Root | null = null;
+let casLayerHost: HTMLElement | null = null;
+let casLayerRefs = 0;
 
 function getEntityDimensions(entity: Entity): { width: number; height: number } {
   switch (entity.type) {
@@ -88,6 +98,12 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
 
       const ctrlOrMeta = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
+
+      if (event.shiftKey && event.key === 'F10') {
+        event.preventDefault();
+        window.dispatchEvent(new CustomEvent('sws:axial-menu-requested'));
+        return;
+      }
 
       // Clipboard shortcuts (canvas entities)
       if (ctrlOrMeta && key === 'c' && !event.shiftKey) {
@@ -314,9 +330,37 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
 
         // Escape: clear selection
         if (event.key === 'Escape') {
+          const casState = useCasStore.getState();
+          if (casState.open) {
+            event.preventDefault();
+            casState.closeCas();
+            options.onEscape?.();
+            return;
+          }
+
           clearSelection();
           options.onEscape?.();
           return;
+        }
+
+        if (event.key === 'Enter' && isFeatureEnabled('WS3_CAS')) {
+          const selection = useSelectionStore.getState().selectedIds;
+          const currentTool = useToolStore.getState().currentTool;
+          if (currentTool === 'select' && selection.length === 1) {
+            const entity = useEntityStore.getState().byId[selection[0]];
+            if (entity) {
+              const viewport = useViewportStore.getState();
+              const bounds = getEntityBounds(entity);
+              event.preventDefault();
+              useCasStore.getState().openCas(entity.id, {
+                x: bounds.x * viewport.zoom + viewport.panX,
+                y: bounds.y * viewport.zoom + viewport.panY,
+                width: bounds.width * viewport.zoom,
+                height: bounds.height * viewport.zoom,
+              });
+              return;
+            }
+          }
         }
 
         // Grid toggle: G
@@ -365,4 +409,37 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
   }, [handleKeydown, isEnabled]);
+
+  useEffect(() => {
+    if (!isEnabled || !isFeatureEnabled('WS3_CAS') || typeof document === 'undefined') {
+      return;
+    }
+
+    const canvasArea = document.querySelector<HTMLElement>('[data-testid="canvas-area"]');
+    if (!canvasArea) {
+      return;
+    }
+
+    casLayerRefs += 1;
+
+    if (!casLayerHost) {
+      casLayerHost = document.createElement('div');
+      casLayerHost.setAttribute('data-cas-layer-root', 'true');
+      casLayerHost.className = 'pointer-events-none absolute inset-0 z-20';
+      canvasArea.appendChild(casLayerHost);
+      casLayerRoot = createRoot(casLayerHost);
+      casLayerRoot.render(createElement('div', { className: 'pointer-events-auto' }, createElement(CASLayer)));
+    }
+
+    return () => {
+      casLayerRefs -= 1;
+      if (casLayerRefs <= 0) {
+        casLayerRoot?.unmount();
+        casLayerRoot = null;
+        casLayerHost?.remove();
+        casLayerHost = null;
+        casLayerRefs = 0;
+      }
+    };
+  }, [isEnabled]);
 }

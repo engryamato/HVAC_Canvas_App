@@ -1,6 +1,7 @@
 export const featureFlagNames = [
   'WS1_SINGLE_TOOLBAR',
   'WS2_INLINE_TOOL_OPTIONS',
+  'WS3_CAS',
   'WS5_MANUAL_SIZING_PROVENANCE',
 ] as const;
 
@@ -24,6 +25,7 @@ function resolveFlag(name: FeatureFlag): boolean {
 export const featureFlags: FeatureFlags = {
   WS1_SINGLE_TOOLBAR: resolveFlag('WS1_SINGLE_TOOLBAR'),
   WS2_INLINE_TOOL_OPTIONS: resolveFlag('WS2_INLINE_TOOL_OPTIONS'),
+  WS3_CAS: resolveFlag('WS3_CAS'),
   WS5_MANUAL_SIZING_PROVENANCE: resolveFlag('WS5_MANUAL_SIZING_PROVENANCE'),
 };
 
