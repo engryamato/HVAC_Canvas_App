@@ -25,6 +25,7 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
       pressureUnits: 'in. w.g.',
       temperatureUnits: 'deg F',
       safetyFactors: 'Default (SMACNA Baseline)',
+      projectMode: 'design',
       autoCalculate: true,
     },
     health: [
@@ -67,7 +68,7 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
     canUndo: true,
     canRedo: false,
     actionStatus: null,
-    onToggleAutoCalculate: vi.fn(),
+    onSetProjectMode: vi.fn(),
     onEditEngineeringSettings: vi.fn(),
     onLocateHealthIssue: vi.fn(),
     onSelectAllInvalid: vi.fn(),
@@ -228,8 +229,8 @@ describe('InspectorOverviewPanel', () => {
     render(<InspectorOverviewPanel {...props} />);
 
     openSection('Engineering');
-    fireEvent.click(screen.getByRole('button', { name: /auto calculate/i }));
-    expect(props.onToggleAutoCalculate).toHaveBeenCalledWith(false);
+    fireEvent.click(screen.getByRole('button', { name: /project mode/i }));
+    expect(props.onSetProjectMode).toHaveBeenCalledWith('estimation');
     fireEvent.click(screen.getByRole('button', { name: /edit engineering settings/i }));
     expect(props.onEditEngineeringSettings).toHaveBeenCalledTimes(1);
 
@@ -295,19 +296,19 @@ describe('InspectorOverviewPanel', () => {
     expect(screen.getByRole('button', { name: /elements/i }).textContent).toContain('4 objects');
   });
 
-  it('reflects auto calculate updates from external state', () => {
+  it('reflects project mode updates from external state', () => {
     const { rerender } = render(<InspectorOverviewPanel {...createProps()} />);
 
-    expect(screen.getByRole('button', { name: /engineering/i }).textContent).toContain('Auto Calc ON');
+    expect(screen.getByRole('button', { name: /engineering/i }).textContent).toContain('Design Mode');
 
     rerender(
       <InspectorOverviewPanel
         {...createProps({
-          engineering: { ...createProps().engineering, autoCalculate: false },
+          engineering: { ...createProps().engineering, projectMode: 'estimation', autoCalculate: false },
         })}
       />
     );
 
-    expect(screen.getByRole('button', { name: /engineering/i }).textContent).toContain('Auto Calc OFF');
+    expect(screen.getByRole('button', { name: /engineering/i }).textContent).toContain('Estimation Mode');
   });
 });

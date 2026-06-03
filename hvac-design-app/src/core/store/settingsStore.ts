@@ -7,7 +7,7 @@ import { ConstraintValidationService } from '@/core/services/constraintValidatio
 import { adaptComponentToService } from '@/core/services/componentServiceInterop';
 import type { Duct } from '@/core/schema';
 import type { ValidationSeverity } from '../schema/duct.schema';
-import { 
+import {
   CalculationSettings,
   CalculationTemplate,
   LaborRates,
@@ -15,6 +15,11 @@ import {
   WasteFactors,
   EngineeringLimits
 } from '../schema/calculation-settings.schema';
+import {
+  DEFAULT_PROJECT_MODE,
+  registerProjectModeProvider,
+  type ProjectMode,
+} from '@/core/projectMode/projectMode';
 
 const cloneValue = <T,>(value: T): T => {
   return structuredClone(value);
@@ -255,6 +260,7 @@ const defaultCalculationSettings: CalculationSettings = {
   },
   templateVersion: '1.0.0',
   lockedDefaults: false,
+  projectMode: DEFAULT_PROJECT_MODE,
 };
 
 interface SettingsState {
@@ -273,6 +279,7 @@ interface SettingsState {
     updateWasteFactors: (waste: Partial<WasteFactors>) => void;
     updateEngineeringLimits: (limits: Partial<EngineeringLimits>) => void;
     updateProjectInfo: (info: { projectName?: string; location?: string; estimator?: string }) => void;
+    updateProjectMode: (mode: ProjectMode) => void;
     updateTemplateMetadata: (metadata: {
       templateVersion?: string;
       lockedDefaults?: boolean;
@@ -323,6 +330,11 @@ export const useSettingsStore = create<SettingsState>()(
               if (info.projectName !== undefined) {state.calculationSettings.projectName = info.projectName;}
               if (info.location !== undefined) {state.calculationSettings.location = info.location;}
               if (info.estimator !== undefined) {state.calculationSettings.estimator = info.estimator;}
+              state.calculationSettings.lastModified = new Date();
+            }),
+
+            updateProjectMode: (mode) => set((state) => {
+              state.calculationSettings.projectMode = mode;
               state.calculationSettings.lastModified = new Date();
             }),
 
@@ -408,6 +420,12 @@ export const useSettingsStore = create<SettingsState>()(
               if (state.templates.length === 0) {
                 state.templates = defaultTemplates;
               }
+
+              // Greenfield: pre-WS8 persisted projects have no projectMode.
+              // Backfill the default so the field is present after reload.
+              if (!state.calculationSettings.projectMode) {
+                state.calculationSettings.projectMode = DEFAULT_PROJECT_MODE;
+              }
             },
         }
     )
@@ -420,3 +438,10 @@ useSettingsStore.subscribe((state, previousState) => {
 
   recalculateConstraintStatuses(state.calculationSettings);
 });
+
+// WS8: expose the live project mode to the entity/sizing layer without that
+// layer importing this store (which would re-create the entityStore ⇄
+// settingsStore ESM cycle). See projectMode.ts.
+registerProjectModeProvider(
+  () => useSettingsStore.getState().calculationSettings.projectMode ?? DEFAULT_PROJECT_MODE
+);

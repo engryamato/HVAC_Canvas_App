@@ -7,6 +7,8 @@ import { redo, undo, useCanRedo, useCanUndo, useHistoryStore } from '@/core/comm
 import type { ReversibleCommand } from '@/core/commands';
 import type { Entity } from '@/core/schema';
 import { useCalculationSettingsStore } from '@/core/store/calculationSettingsStore';
+import { isEnabled } from '@/core/flags/featureFlags';
+import { DEFAULT_PROJECT_MODE, type ProjectMode } from '@/core/projectMode/projectMode';
 import { useDialogStore } from '@/core/store/dialogStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectStore } from '@/core/store/project.store';
@@ -445,6 +447,7 @@ function buildEngineering(
   settings: CalculationSettingsWithAuto | null,
   unitSystem: 'imperial' | 'metric'
 ): EngineeringSettings {
+  const projectMode = resolveProjectMode(settings);
   return {
     designStandard: 'SMACNA HVAC Duct Construction Standards',
     shortStandard: 'SMACNA',
@@ -452,8 +455,20 @@ function buildEngineering(
     pressureUnits: unitSystem === 'metric' ? 'Pa' : 'in. w.g.',
     temperatureUnits: unitSystem === 'metric' ? 'deg C' : 'deg F',
     safetyFactors: settings?.templateId ? `Template ${settings.templateId}` : 'Default (SMACNA Baseline)',
-    autoCalculate: settings?.autoCalculate ?? true,
+    projectMode,
+    // Derived alias of the mode; feeds the Systems calc status (Design →
+    // balanced, Estimation → manual/not-calculated).
+    autoCalculate: projectMode === 'design',
   };
+}
+
+function resolveProjectMode(settings: CalculationSettingsWithAuto | null): ProjectMode {
+  if (isEnabled('WS8_PROJECT_MODE')) {
+    return settings?.projectMode ?? DEFAULT_PROJECT_MODE;
+  }
+  // WS8 off: preserve pre-WS8 behavior by mapping the legacy autoCalculate flag
+  // (defaulted on → balanced) onto an equivalent mode.
+  return (settings?.autoCalculate ?? true) ? 'design' : 'estimation';
 }
 
 export function useInspectorOverviewData(): InspectorPanelProps {
@@ -530,11 +545,11 @@ export function useInspectorOverviewData(): InspectorPanelProps {
     [applyInspectorSelection, entities]
   );
 
-  const onToggleAutoCalculate = useCallback(
-    (nextValue: boolean) => {
-      updateCalculationSettings({ ...(calculationSettings ?? {}), autoCalculate: nextValue } as never);
+  const onSetProjectMode = useCallback(
+    (mode: ProjectMode) => {
+      updateCalculationSettings({ projectMode: mode });
     },
-    [calculationSettings, updateCalculationSettings]
+    [updateCalculationSettings]
   );
 
   const onAutoFixGeometry = useCallback(() => {
@@ -571,7 +586,7 @@ export function useInspectorOverviewData(): InspectorPanelProps {
     canRedo,
     actionStatus,
     sectionStates,
-    onToggleAutoCalculate,
+    onSetProjectMode,
     onEditEngineeringSettings: () => setOpenCalculationSettings(true),
     onLocateHealthIssue: (issueId) => applyInspectorSelection(locateByIssue.get(issueId) ?? []),
     onSelectAllInvalid: () => applyInspectorSelection(invalidIds),

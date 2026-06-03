@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PROJECT_MODES } from '@/core/projectMode/projectMode';
 
 /**
  * Labor rates with regional adjustments
@@ -128,6 +129,10 @@ export const CalculationSettingsSchema = z.object({
   projectName: z.string().optional(),
   location: z.string().optional(),
   estimator: z.string().optional(),
+
+  // WS8 — persisted Estimation/Design project mode. Greenfield/optional: old
+  // projects load without it and default to `estimation` at the read boundary.
+  projectMode: z.enum(PROJECT_MODES).optional(),
   
   // Template reference (if created from template)
   templateId: z.string().optional(),

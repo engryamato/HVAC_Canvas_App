@@ -104,7 +104,9 @@ describe('BOMPanel', () => {
     expect(header?.textContent).not.toContain('Price');
   });
 
-  it('shows Price only after the optional Price toggle is enabled', () => {
+  // WS8: Estimation is the default project mode, so cost columns are visible by
+  // default when cost data exists. The Price toggle then collapses them.
+  it('shows Price by default in estimation mode and the toggle collapses it', () => {
     vi.mocked(useBOM).mockReturnValue(makeBomReturn([
       makeItem({ quantity: 4, description: '90\u00b0 Elbow', type: 'Fitting' }),
     ], {
@@ -116,11 +118,11 @@ describe('BOMPanel', () => {
 
     const { container } = render(<BOMPanel />);
 
-    expect(container.querySelector('[data-showprice="false"]')?.textContent).not.toContain('Price');
+    expect(container.querySelector('[data-showprice="true"]')?.textContent).toContain('Price');
 
     fireEvent.click(screen.getByRole('button', { name: /price/i }));
 
-    expect(container.querySelector('[data-showprice="true"]')?.textContent).toContain('Price');
+    expect(container.querySelector('[data-showprice="false"]')?.textContent).not.toContain('Price');
   });
 
   it('renders grouped BOM descriptions with quantity, unit, and placeholder weight', () => {

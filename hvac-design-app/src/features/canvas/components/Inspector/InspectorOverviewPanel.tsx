@@ -295,11 +295,11 @@ function ProjectSection({ data }: { data: InspectorPanelProps['project'] }) {
 
 function EngineeringSection({
   data,
-  onToggleAutoCalculate,
+  onSetProjectMode,
   onEditEngineeringSettings,
 }: {
   data: InspectorPanelProps['engineering'];
-  onToggleAutoCalculate: (nextValue: boolean) => void;
+  onSetProjectMode: InspectorPanelProps['onSetProjectMode'];
   onEditEngineeringSettings: () => void;
 }) {
   const showCenterline = usePreferencesStore((state) => state.showCenterline);
@@ -317,20 +317,20 @@ function EngineeringSection({
         <Row label="Safety Factors" value={data.safetyFactors} />
 
         <div className="flex items-center justify-between px-0.5 py-1.5 text-sm">
-          <span className="text-slate-500">Auto Calculate</span>
+          <span className="text-slate-500">Project Mode</span>
           <button
             type="button"
-            aria-label="Auto Calculate"
-            aria-pressed={data.autoCalculate}
-            onClick={() => onToggleAutoCalculate(!data.autoCalculate)}
+            aria-label="Project Mode"
+            aria-pressed={data.projectMode === 'design'}
+            onClick={() => onSetProjectMode(data.projectMode === 'design' ? 'estimation' : 'design')}
             className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors ${
-              data.autoCalculate
+              data.projectMode === 'design'
                 ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                : 'bg-sky-100 text-sky-700 hover:bg-sky-200'
             }`}
           >
-            {data.autoCalculate ? <ToggleRight size={13} aria-hidden /> : <ToggleLeft size={13} aria-hidden />}
-            {data.autoCalculate ? 'ON' : 'OFF'}
+            {data.projectMode === 'design' ? <ToggleRight size={13} aria-hidden /> : <ToggleLeft size={13} aria-hidden />}
+            {data.projectMode === 'design' ? 'Design' : 'Estimation'}
           </button>
         </div>
 
@@ -636,7 +636,7 @@ function getSectionSummary(
         ? props.project.name
         : `${props.project.name} - ${props.project.number}`;
     case 'engineering':
-      return `${props.engineering.shortStandard} - Auto Calc ${props.engineering.autoCalculate ? 'ON' : 'OFF'}`;
+      return `${props.engineering.shortStandard} - ${props.engineering.projectMode === 'design' ? 'Design' : 'Estimation'} Mode`;
     case 'health':
       return issueCount > 0 ? `${issueCount} issue${issueCount !== 1 ? 's' : ''} detected` : 'All checks passed';
     case 'systems':
@@ -721,11 +721,15 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           summary={getSectionSummary('engineering', props, issueCount, totalLength, totalAirflow, props.unitSystem)}
           disabled={props.sectionStates?.engineering?.loading}
           badge={
-            !props.engineering.autoCalculate ? (
-              <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700">
-                Manual
+            props.engineering.projectMode === 'estimation' ? (
+              <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-sky-700">
+                Estimation
               </span>
-            ) : null
+            ) : (
+              <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-emerald-700">
+                Design
+              </span>
+            )
           }
           isOpen={isOpen('engineering')}
           onToggle={() => toggle('engineering')}
@@ -733,7 +737,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
           <SectionBodyState state={props.sectionStates?.engineering}>
             <EngineeringSection
               data={props.engineering}
-              onToggleAutoCalculate={props.onToggleAutoCalculate}
+              onSetProjectMode={props.onSetProjectMode}
               onEditEngineeringSettings={props.onEditEngineeringSettings}
             />
           </SectionBodyState>

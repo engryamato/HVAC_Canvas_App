@@ -1,3 +1,5 @@
+import type { ProjectMode } from '@/core/projectMode/projectMode';
+
 export type HealthStatus = 'ok' | 'error' | 'warning';
 export type DuctSystemStatus = 'balanced' | 'unbalanced' | 'not_calculated';
 export type ActivityAction = 'Added' | 'Moved' | 'Deleted' | 'Modified' | string;
@@ -33,6 +35,9 @@ export interface EngineeringSettings {
   pressureUnits: string;
   temperatureUnits: string;
   safetyFactors: string;
+  /** WS8 persisted project mode. Drives the Inspector mode switch + badge. */
+  projectMode: ProjectMode;
+  /** Derived alias of `projectMode === 'design'`; feeds the Systems calc status. */
   autoCalculate: boolean;
 }
 
@@ -93,7 +98,7 @@ export interface InspectorPanelProps {
   canRedo: boolean;
   actionStatus?: string | null;
   sectionStates?: Partial<Record<'project' | 'engineering' | 'health' | 'systems' | 'elements' | 'activity', InspectorSectionState>>;
-  onToggleAutoCalculate: (nextValue: boolean) => void;
+  onSetProjectMode: (mode: ProjectMode) => void;
   onEditEngineeringSettings: () => void;
   onLocateHealthIssue: (issueId: string) => InspectorFocusResult;
   onSelectAllInvalid: () => InspectorFocusResult;

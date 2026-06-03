@@ -19,6 +19,7 @@ import { useShallow } from 'zustand/react/shallow';
 import styles from './BOMPanel.module.css';
 import { useBomHighlightStore } from '../store/bomHighlightStore';
 import type { ItemCost } from '@/core/services/cost/costCalculationService';
+import { areCostColumnsDefaultVisible } from '@/core/projectMode/projectMode';
 
 type CategoryKey = 'Duct' | 'Fitting' | 'Equipment' | 'Accessory';
 type CategoryFilter = 'all' | CategoryKey;
@@ -77,7 +78,9 @@ export function BOMPanel({ highlightedEntityId = null }: BOMPanelProps) {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [expandedGroups, setExpandedGroups] = useState<Record<CategoryKey, boolean>>(ALL_EXPANDED);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [showPrice, setShowPrice] = useState(false);
+  // WS8: cost columns are visible by default in Estimation mode, collapsed in
+  // Design (and pre-WS8). The user can still toggle freely afterwards.
+  const [showPrice, setShowPrice] = useState(() => areCostColumnsDefaultVisible());
 
   const firstMatchingRowRef = useRef<HTMLDivElement | null>(null);
   const filterRef = useRef<HTMLDivElement | null>(null);

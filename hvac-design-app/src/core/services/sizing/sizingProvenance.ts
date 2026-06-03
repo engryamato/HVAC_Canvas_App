@@ -2,6 +2,7 @@ import type { EngineeringLimits } from '@/core/schema/calculation-settings.schem
 import type { DuctProps, DuctSizeProvenance, DuctSizeProvenanceValue } from '@/core/schema/duct.schema';
 import type { DuctRunProps } from '@/core/schema/duct-run.schema';
 import { isEnabled } from '@/core/flags/featureFlags';
+import { getInitialSizePostureSource } from '@/core/projectMode/projectMode';
 import { engineeringCalculator } from '@/core/services/calculations/engineeringCalculator';
 import {
   STANDARD_RECTANGULAR_INCREMENTS,
@@ -47,10 +48,14 @@ export function withDefaultSizeProvenance<TProps extends SizableDuctProps>(props
     ...props.provenance,
   };
 
+  // WS8: Estimation mode starts the primary dimension manual-first ('default');
+  // Design (and WS8-off) keep the legacy 'computed' start.
+  const postureSource = getInitialSizePostureSource();
+
   if (props.shape === 'round' || props.shape === 'flexible') {
-    provenance.diameter ??= 'computed';
+    provenance.diameter ??= postureSource;
   } else {
-    provenance.width ??= 'computed';
+    provenance.width ??= postureSource;
     provenance.height ??= props.height === 8 ? 'default' : 'computed';
   }
 

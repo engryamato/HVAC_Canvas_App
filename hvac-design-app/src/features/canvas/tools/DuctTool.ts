@@ -17,6 +17,7 @@ import { adaptComponentToService, getServiceColor } from '@/core/services/compon
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useToolStore } from '@/core/store/canvas.store';
+import { isAutoFittingDefaultEnabled } from '@/core/projectMode/projectMode';
 import { createDuctRun } from '../entities/ductRunDefaults';
 import { useViewportStore } from '../store/viewportStore';
 import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
@@ -90,8 +91,15 @@ export class DuctTool extends BaseTool {
   }
 
   static isAutoFittingEnabled(): boolean {
+    // Explicit programmatic override wins (e.g. tests, the toolbar action).
     if (this.autoFittingEnabledOverride !== null) {
       return this.autoFittingEnabledOverride;
+    }
+    // WS8: the project mode sets the default (Design → on, Estimation → off).
+    // Returns null when the WS8 flag is off → fall through to the legacy env.
+    const modeDefault = isAutoFittingDefaultEnabled();
+    if (modeDefault !== null) {
+      return modeDefault;
     }
     return process.env.NEXT_PUBLIC_ENABLE_AUTO_FITTING === 'true';
   }

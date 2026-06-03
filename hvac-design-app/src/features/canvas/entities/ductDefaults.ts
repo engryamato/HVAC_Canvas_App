@@ -1,5 +1,6 @@
 import type { Duct } from '@/core/schema';
 import { DEFAULT_ROUND_DUCT_PROPS } from '@/core/schema/duct.schema';
+import { getInitialSizePostureSource } from '@/core/projectMode/projectMode';
 import {
   calculateDuctArea,
   calculateVelocity,
@@ -53,6 +54,12 @@ export function createDuct(
 
   const shape = overrides?.shape ?? DEFAULT_ROUND_DUCT_PROPS.shape;
 
+  // WS8: in Estimation mode the primary dimension starts manual-first
+  // ('default', awaiting user entry); Design keeps the legacy 'computed' start.
+  // Only the provenance label changes — 'default'/'computed' are both freely
+  // recomputed by the sizing engine (only 'specified' is protected).
+  const postureSource = getInitialSizePostureSource();
+
   // Build props based on shape
   const baseProps = {
     name: overrides?.name ?? `${shape === 'round' ? 'Round' : 'Rectangular'} Duct ${ductNumber}`,
@@ -72,7 +79,7 @@ export function createDuct(
           ...baseProps,
           diameter: overrides?.diameter ?? DEFAULT_ROUND_DUCT_PROPS.diameter,
           provenance: {
-            diameter: 'computed' as const,
+            diameter: overrides?.diameter === undefined ? postureSource : 'computed' as const,
           },
         }
       : {
@@ -80,7 +87,7 @@ export function createDuct(
           width: overrides?.width ?? 12,
           height: overrides?.height ?? 8,
           provenance: {
-            width: 'computed' as const,
+            width: overrides?.width === undefined ? postureSource : 'computed' as const,
             height: overrides?.height === undefined || overrides.height === 8 ? 'default' as const : 'computed' as const,
           },
         };
