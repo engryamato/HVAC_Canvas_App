@@ -96,6 +96,13 @@ export const FITTING_CONNECTION_OFFSETS: Record<FittingType, ConnectionPointDef[
     { role: 'inlet', localX: -42, localY: 0 },
     { role: 'outlet', localX: 20, localY: 0 },
   ],
+  // WS10: a takeoff is topologically a body tap (through-flow + branch). These
+  // offsets mirror the tee as a safe placeholder; real takeoff geometry is WS6.
+  takeoff: [
+    { role: 'inlet', localX: -32, localY: 0 },
+    { role: 'outlet', localX: 52, localY: 0 },
+    { role: 'branch', localX: 10, localY: -32 },
+  ],
 };
 
 /**

@@ -19,7 +19,10 @@ function fitting(type: FittingType): Fitting {
   };
 }
 
-const EXPECTED_PORTS: Record<FittingType, number> = {
+// WS10 adds the `takeoff` fitting type but its geometry is deferred to WS6, so
+// it is intentionally omitted here (Partial) and excluded from the port-count
+// assertions below until the resolver lands.
+const EXPECTED_PORTS: Partial<Record<FittingType, number>> = {
   elbow_90: 2,
   elbow_45: 2,
   elbow_mitered: 2,
@@ -38,7 +41,7 @@ const ALL_TYPES = Object.keys(EXPECTED_PORTS) as FittingType[];
 describe('buildFittingGeometry', () => {
   it.each(ALL_TYPES)('produces the expected stable port count for %s', (type) => {
     const geometry = buildFittingGeometry(fitting(type));
-    expect(geometry.openings).toHaveLength(EXPECTED_PORTS[type]);
+    expect(geometry.openings).toHaveLength(EXPECTED_PORTS[type] as number);
   });
 
   it.each(ALL_TYPES)('emits unit facing directions and non-empty body for %s', (type) => {

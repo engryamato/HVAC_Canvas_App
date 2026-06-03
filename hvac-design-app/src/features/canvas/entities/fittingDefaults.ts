@@ -102,6 +102,7 @@ export const FITTING_TYPE_LABELS: Record<FittingType, string> = {
   wye: 'Wye',
   elbow_mitered: 'Mitered Elbow',
   end_boot: 'End Boot',
+  takeoff: 'Takeoff',
 };
 
 export default createFitting;
