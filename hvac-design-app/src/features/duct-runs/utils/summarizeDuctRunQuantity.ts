@@ -47,9 +47,6 @@ export interface DuctRunQuantitySummary {
 
 const FAMILY_LABELS: Record<DuctRunFamily, string> = {
   standard_duct: 'Standard Duct',
-  grease_duct: 'Grease Duct',
-  boiler_flue: 'Boiler Flue',
-  generator_exhaust: 'Generator Exhaust',
 };
 
 const SHAPE_LABELS: Record<DuctRunShape, string> = {

@@ -46,12 +46,6 @@ export function createFitting(
     connectionPoints: Array<{ ductId: string; pointIndex?: number }>;
     transitionData: FittingProps['transitionData'];
     engineeringSystem: FittingProps['engineeringSystem'];
-    backpressureLimit: number;
-    thermalExpansionJointRequired: boolean;
-    weldedAccessRequired: boolean;
-    greaseRated: boolean;
-    wallType: 'single' | 'double';
-    condensateDrainRequired: boolean;
   }>
 ): Fitting {
   const fittingNumber = getNextFittingNumber();
@@ -72,18 +66,6 @@ export function createFitting(
     manualOverride: overrides?.manualOverride ?? typeDefaults.manualOverride ?? false,
     connectionPoints: overrides?.connectionPoints,
     transitionData: overrides?.transitionData,
-    ...(overrides?.backpressureLimit !== undefined ? { backpressureLimit: overrides.backpressureLimit } : {}),
-    ...(overrides?.thermalExpansionJointRequired !== undefined
-      ? { thermalExpansionJointRequired: overrides.thermalExpansionJointRequired }
-      : {}),
-    ...(overrides?.weldedAccessRequired !== undefined
-      ? { weldedAccessRequired: overrides.weldedAccessRequired }
-      : {}),
-    ...(overrides?.greaseRated !== undefined ? { greaseRated: overrides.greaseRated } : {}),
-    ...(overrides?.wallType ? { wallType: overrides.wallType } : {}),
-    ...(overrides?.condensateDrainRequired !== undefined
-      ? { condensateDrainRequired: overrides.condensateDrainRequired }
-      : {}),
   };
 
   return {

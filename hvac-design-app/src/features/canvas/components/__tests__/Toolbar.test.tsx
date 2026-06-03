@@ -338,21 +338,21 @@ describe('Toolbar - Undo/Redo Integration', () => {
       act(() => {
         useToolStore.setState({
           currentTool: 'duct',
-          activeSpecialtyToolId: 'single_wall_pipe',
+          activeSpecialtyToolId: 'custom_tool',
         });
       });
 
       render(<Toolbar />);
 
-      const specialtyButton = screen.getByLabelText(/single wall pipe/i);
+      const specialtyButton = screen.getByLabelText(/^duct$/i);
       expect(specialtyButton).toBeDefined();
-      expect(screen.getByTitle(/single wall pipe/i)).toBeDefined();
+      expect(screen.getByTitle(/duct/i)).toBeDefined();
 
       fireEvent.click(specialtyButton);
 
       expect(useToolStore.getState().currentTool).toBe('duct');
-      expect(useToolStore.getState().activeSpecialtyToolId).toBe('single_wall_pipe');
-      expect(screen.getByTestId('toolbar-icon-duct')).toHaveAttribute('data-icon-key', 'duct_boiler_flue');
+      expect(useToolStore.getState().activeSpecialtyToolId).toBe('custom_tool');
+      expect(screen.getByTestId('toolbar-icon-duct')).toHaveAttribute('data-icon-key', 'duct_rectangular');
     });
 
     it('should render the fitting button with the HVAC fitting glyph', () => {

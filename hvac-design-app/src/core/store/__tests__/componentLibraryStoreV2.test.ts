@@ -195,25 +195,6 @@ describe('componentLibraryStoreV2', () => {
       complianceRefs: [],
       calculationCapabilities: ['sizing'],
     });
-    store.addSystemProfile({
-      id: 'boiler-flue',
-      name: 'Boiler & Water Heater Flue',
-      engineeringSystem: 'boiler_flue',
-      defaultSystemType: 'exhaust',
-      color: '#ea580c',
-      source: 'baseline',
-      supportedArchetypes: {
-        duct: ['single_wall_pipe'],
-        fitting: ['boot_tee'],
-        equipment: ['draft_inducer'],
-        accessory: ['condensate_trap'],
-      },
-      fittingRules: [],
-      dimensionalConstraints: {},
-      complianceRefs: [],
-      calculationCapabilities: ['sizing', 'compliance'],
-    });
-
     store.addEntry(
       createCatalogEntry({
         id: 'standard-duct',
@@ -222,17 +203,6 @@ describe('componentLibraryStoreV2', () => {
         engineeringSystem: 'standard_duct',
         source: 'system',
         systemType: 'supply',
-      })
-    );
-    store.addEntry(
-      createCatalogEntry({
-        id: 'single-wall-pipe',
-        name: 'Single Wall Pipe',
-        componentClass: 'duct',
-        engineeringSystem: 'boiler_flue',
-        source: 'system',
-        systemType: 'exhaust',
-        specialtyToolId: 'single_wall_pipe',
       })
     );
 
@@ -245,17 +215,6 @@ describe('componentLibraryStoreV2', () => {
       engineeringSystem: 'standard_duct',
       systemType: 'supply',
       defaultSystemType: 'supply',
-    });
-
-    store.selectEntry('single-wall-pipe');
-    expect(store.getAvailableArchetypes()).toEqual(['single_wall_pipe']);
-    expect(store.getActivationIntent()).toMatchObject({
-      entryId: 'single-wall-pipe',
-      componentClass: 'duct',
-      specialtyToolId: 'single-wall-pipe',
-      engineeringSystem: 'boiler_flue',
-      systemType: 'exhaust',
-      defaultSystemType: 'exhaust',
     });
   });
 

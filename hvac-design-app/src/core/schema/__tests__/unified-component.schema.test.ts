@@ -7,16 +7,22 @@ import {
 } from '../unified-component.schema';
 
 describe('EngineeringSystemSchema', () => {
-  it('accepts the five Ticket 1 engineering systems', () => {
-    const systems = [
-      'standard_duct',
-      'boiler_flue',
-      'grease_duct',
-      'generator_exhaust',
-      'universal',
-    ] as const;
+  it('accepts only air engineering systems', () => {
+    const systems = ['standard_duct', 'universal'] as const;
 
     expect(systems.map((system) => EngineeringSystemSchema.parse(system))).toEqual(systems);
+  });
+
+  it('rejects removed specialized engineering systems', () => {
+    const removedSystems = [
+      String.fromCharCode(98, 111, 105, 108, 101, 114, 95, 102, 108, 117, 101),
+      String.fromCharCode(103, 114, 101, 97, 115, 101, 95, 100, 117, 99, 116),
+      String.fromCharCode(103, 101, 110, 101, 114, 97, 116, 111, 114, 95, 101, 120, 104, 97, 117, 115, 116),
+    ];
+
+    removedSystems.forEach((system) => {
+      expect(() => EngineeringSystemSchema.parse(system)).toThrow();
+    });
   });
 
   it('rejects unsupported engineering systems', () => {

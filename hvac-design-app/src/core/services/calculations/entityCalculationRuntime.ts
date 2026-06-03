@@ -46,9 +46,6 @@ export interface EquipmentCalculationRuntime {
 function resolveEngineeringSystem(engineeringSystem: unknown): EngineeringSystem | undefined {
   if (
     engineeringSystem === 'standard_duct' ||
-    engineeringSystem === 'boiler_flue' ||
-    engineeringSystem === 'grease_duct' ||
-    engineeringSystem === 'generator_exhaust' ||
     engineeringSystem === 'universal'
   ) {
     return engineeringSystem;
@@ -160,15 +157,6 @@ function buildFittingContextDuct(
     props: {
       ...baseDuct.props,
       engineeringSystem: fitting.props.engineeringSystem,
-      ...('backpressureLimit' in fitting.props && typeof fitting.props.backpressureLimit === 'number'
-        ? { backpressureLimit: fitting.props.backpressureLimit }
-        : {}),
-      ...('wallType' in fitting.props && fitting.props.wallType
-        ? { wallType: fitting.props.wallType }
-        : {}),
-      ...('greaseRated' in fitting.props && fitting.props.greaseRated
-        ? { fireRating: 'grease-rated' }
-        : {}),
     } as Duct['props'],
   };
 }
@@ -197,9 +185,6 @@ function buildSyntheticEquipmentDuct(equipment: Equipment): Duct {
       material: 'galvanized',
       airflow: toEquipmentAirflow(equipment),
       staticPressure: equipment.props.staticPressure,
-      ...('backpressureLimit' in equipment.props && typeof equipment.props.backpressureLimit === 'number'
-        ? { backpressureLimit: equipment.props.backpressureLimit }
-        : {}),
     } as Duct['props'],
     calculated: {
       area: 0,
@@ -226,9 +211,6 @@ function buildEquipmentContextDuct(
         engineeringSystem: equipment.props.engineeringSystem as Duct['props']['engineeringSystem'],
         airflow: toEquipmentAirflow(equipment),
         staticPressure: equipment.props.staticPressure,
-        ...('backpressureLimit' in equipment.props && typeof equipment.props.backpressureLimit === 'number'
-          ? { backpressureLimit: equipment.props.backpressureLimit }
-          : {}),
       } as Duct['props'],
     };
   }

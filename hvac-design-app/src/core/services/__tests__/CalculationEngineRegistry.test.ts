@@ -49,29 +49,12 @@ describe('CalculationEngineRegistry', () => {
     expect(metadata.engine?.engineeringSystem).toBe('standard_duct');
     expect(metadata.capabilities).toEqual(['sizing', 'pressure_drop']);
     expect(metadata.label).toBe('Standard Duct');
-    expect(CalculationEngineRegistry.has('boiler_flue')).toBe(true);
-    expect(CalculationEngineRegistry.has('grease_duct')).toBe(true);
-    expect(CalculationEngineRegistry.has('generator_exhaust')).toBe(true);
+    expect(CalculationEngineRegistry.has('standard_duct')).toBe(true);
     expect(CalculationEngineRegistry.has('universal')).toBe(true);
-    expect(systems).toEqual([
-      'standard_duct',
-      'boiler_flue',
-      'grease_duct',
-      'generator_exhaust',
-      'universal',
-    ]);
+    expect(systems).toEqual(['standard_duct', 'universal']);
   });
 
-  it('describes specialty systems with explicit metadata', () => {
-    const metadata = CalculationEngineRegistry.describe('boiler_flue');
-
-    expect(metadata.supported).toBe(true);
-    expect(metadata.engine?.engineeringSystem).toBe('boiler_flue');
-    expect(metadata.capabilities).toEqual(['sizing', 'compliance']);
-    expect(metadata.label).toBe('Boiler & Water Heater Flue');
-  });
-
-  it('describes T10 universal components with load and compliance support', () => {
+  it('describes universal components with load and compliance support', () => {
     const metadata = CalculationEngineRegistry.describe('universal');
 
     expect(metadata.supported).toBe(true);
@@ -81,7 +64,7 @@ describe('CalculationEngineRegistry', () => {
   });
 
   it('gracefully warns only for unknown engineering systems', () => {
-    const duct = createTestDuct('generator_exhaust');
+    const duct = createTestDuct('standard_duct');
     const result = calculateDuct(duct);
 
     expect(result.engine.supported).toBe(true);

@@ -55,8 +55,6 @@ function seedStore() {
   store.reset();
   store.addCategory({ id: 'air_distribution', name: 'Air Distribution', parentId: null, subcategories: [] });
   store.addCategory({ id: 'standard_ductwork', name: 'Standard Ductwork', parentId: 'air_distribution', subcategories: [] });
-  store.addCategory({ id: 'specialty_exhaust', name: 'Specialty Exhaust', parentId: null, subcategories: [] });
-  store.addCategory({ id: 'boiler_flue', name: 'Boiler & Water Heater Flue', parentId: 'specialty_exhaust', subcategories: [] });
   store.addCategory({ id: 'universal_components', name: 'Universal Components', parentId: null, subcategories: [] });
   store.addCategory({ id: 'hangers_supports', name: 'Hangers, Supports & Seismic', parentId: 'universal_components', subcategories: [] });
 
@@ -90,25 +88,6 @@ function seedStore() {
       fitting: [],
       equipment: ['auto_hanger_spacing'],
       accessory: ['hanger', 'support', 'seismic'],
-    },
-    fittingRules: [],
-    dimensionalConstraints: {},
-    complianceRefs: [],
-    calculationCapabilities: [],
-  });
-
-  store.addSystemProfile({
-    id: 'boiler-flue',
-    name: 'Boiler & Water Heater Flue',
-    engineeringSystem: 'boiler_flue',
-    defaultSystemType: 'exhaust',
-    color: '#ea580c',
-    source: 'baseline',
-    supportedArchetypes: {
-      duct: ['single_wall_pipe'],
-      fitting: ['boot_tee'],
-      equipment: ['draft_inducer'],
-      accessory: ['condensate_trap'],
     },
     fittingRules: [],
     dimensionalConstraints: {},
@@ -164,10 +143,10 @@ describe('ManagePanel', () => {
         name: 'Rectangular Duct',
         componentClass: 'duct',
         category: 'duct',
-        categoryId: 'boiler_flue',
+        categoryId: 'standard_duct',
         typeId: 'straight',
         type: 'straight',
-        engineeringSystem: 'boiler_flue',
+        engineeringSystem: 'standard_duct',
         source: 'system',
         systemType: 'exhaust',
       })
@@ -312,9 +291,9 @@ describe('ManagePanel', () => {
     fireEvent.change(componentClassSelect, { target: { value: 'fitting' } });
     expect(archetypeSelect).toHaveValue('elbow');
 
-    fireEvent.change(engineeringSystemSelect, { target: { value: 'boiler_flue' } });
+    fireEvent.change(engineeringSystemSelect, { target: { value: 'standard_duct' } });
     await waitFor(() => {
-      expect((dialog.querySelectorAll('select')[3] as HTMLSelectElement | undefined)).toHaveValue('boot_tee');
+      expect((dialog.querySelectorAll('select')[3] as HTMLSelectElement | undefined)).toHaveValue('elbow');
     });
   });
 });

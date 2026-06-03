@@ -86,10 +86,7 @@ describe('catalogIcons', () => {
     ).toBe('accessory_grd');
   });
 
-  it('keeps specialty duct toolbar mapping intact', () => {
-    expect(resolveToolbarIconKey('duct', 'boiler_flue')).toBe('duct_boiler_flue');
-    expect(resolveToolbarIconKey('duct', 'grease_duct')).toBe('duct_grease');
-    expect(resolveToolbarIconKey('duct', 'generator_exhaust')).toBe('duct_generator');
+  it('keeps air duct toolbar mapping intact', () => {
     expect(resolveToolbarIconKey('duct', 'duct')).toBe('duct_rectangular');
     expect(resolveToolbarIconKey('fitting')).toBe('fitting_elbow');
   });

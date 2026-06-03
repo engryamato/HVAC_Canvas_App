@@ -225,35 +225,7 @@ export class FittingTool extends BaseTool {
       serviceId: activeService?.id ?? activeComponent.id,
       catalogItemId: activeComponent.id,
       inletDuctId,
-      engineeringSystem: (
-        ['standard_duct', 'boiler_flue', 'grease_duct', 'generator_exhaust'] as const
-      ).find((s) => s === activeComponent.engineeringSystem) ?? 'standard_duct',
-      ...(activeComponent.engineeringSystem === 'generator_exhaust'
-        ? {
-            backpressureLimit:
-              typeof activeComponent.customFields?.backpressureLimit === 'number'
-                ? activeComponent.customFields.backpressureLimit
-                : undefined,
-            thermalExpansionJointRequired:
-              activeComponent.typeId === 'gasket_hardware',
-          }
-        : {}),
-      ...(activeComponent.engineeringSystem === 'grease_duct'
-        ? {
-            weldedAccessRequired:
-              activeComponent.typeId === 'mitered_elbow' ||
-              activeComponent.typeId === 'tee',
-            greaseRated: true,
-          }
-        : {}),
-      ...(activeComponent.engineeringSystem === 'boiler_flue'
-        ? {
-            wallType:
-              activeComponent.typeId === 'double_wall_pipe' ? 'double' : 'single',
-            condensateDrainRequired:
-              activeComponent.typeId === 'condensate_drain',
-          }
-        : {}),
+      engineeringSystem: 'standard_duct',
     });
 
     createEntity(fitting);

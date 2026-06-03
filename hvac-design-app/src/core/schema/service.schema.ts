@@ -86,7 +86,7 @@ export const ServiceSchema = z.object({
 
   // Industrial Constraints (optional)
   industrialConstraints: z.object({
-    industrialType: z.enum(['kitchen_exhaust', 'generator_exhaust', 'commercial_supply', 'fume_hood']),
+    industrialType: z.enum(['commercial_supply', 'fume_hood']),
     forbiddenFittings: z.array(FittingTypeSchema),
     requiredMaterial: IndustrialMaterialSchema,
     minTransitionSlopeInchesPerFoot: z.number(),

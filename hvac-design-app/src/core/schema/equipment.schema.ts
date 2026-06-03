@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { BaseEntitySchema, ServiceIdSchema } from './base.schema';
 import { ConstraintStatusSchema } from './duct.schema';
-import { EngineeringSystemSchema } from './unified-component.schema';
 
 /**
  * Equipment types for HVAC components
@@ -145,24 +144,6 @@ export const StandardEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
   engineeringSystem: z.literal('standard_duct'),
 });
 
-export const BoilerFlueEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
-  engineeringSystem: z.literal('boiler_flue'),
-  draftType: z.enum(['natural', 'forced']).optional(),
-  btuInput: z.number().min(0).optional(),
-});
-
-export const GreaseDuctEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
-  engineeringSystem: z.literal('grease_duct'),
-  greaseExtractionStage: z.enum(['single', 'multi']).optional(),
-  fireSuppressionReady: z.boolean().optional(),
-});
-
-export const GeneratorExhaustEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
-  engineeringSystem: z.literal('generator_exhaust'),
-  engineModel: z.string().max(100).optional(),
-  backpressureLimit: z.number().min(0).optional(),
-});
-
 export const UniversalEquipmentPropsSchema = SharedEquipmentPropsSchema.extend({
   engineeringSystem: z.literal('universal'),
   spacingRule: z.string().optional(),
@@ -181,20 +162,11 @@ export const EquipmentPropsSchema = z.preprocess(
 
     const candidate = value as Record<string, unknown>;
     return {
-      engineeringSystem:
-        EngineeringSystemSchema.safeParse(candidate.engineeringSystem).success
-          ? candidate.engineeringSystem
-          : 'standard_duct',
+      engineeringSystem: candidate.engineeringSystem ?? 'standard_duct',
       ...candidate,
     };
   },
-  z.union([
-    StandardEquipmentPropsSchema,
-    BoilerFlueEquipmentPropsSchema,
-    GreaseDuctEquipmentPropsSchema,
-    GeneratorExhaustEquipmentPropsSchema,
-    UniversalEquipmentPropsSchema,
-  ])
+  z.union([StandardEquipmentPropsSchema, UniversalEquipmentPropsSchema])
 );
 
 export type EquipmentProps = z.infer<typeof EquipmentPropsSchema>;

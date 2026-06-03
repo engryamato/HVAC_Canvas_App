@@ -79,7 +79,7 @@ describe('equipment geometry and duct connection profiles', () => {
       staticPressure: 0.1,
     }) as DuctRun;
     const flatOvalRun = createDuctRun({
-      engineeringSystem: 'generator_exhaust',
+      engineeringSystem: 'standard_duct',
       systemType: 'exhaust',
       shape: 'flat_oval',
       width: 30,
@@ -116,7 +116,7 @@ describe('equipment geometry and duct connection profiles', () => {
         width: 30,
         height: 12,
         airflow: 700,
-        engineeringSystem: 'generator_exhaust',
+        engineeringSystem: 'standard_duct',
         systemType: 'exhaust',
       },
     });

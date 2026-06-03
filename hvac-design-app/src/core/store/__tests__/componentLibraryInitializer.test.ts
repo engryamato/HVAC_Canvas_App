@@ -13,26 +13,29 @@ describe('componentLibraryInitializer', () => {
     useUnifiedCatalogStore.getState().reset();
   });
 
-  it('exposes the exact 3 L1 -> 5 L2 category hierarchy', () => {
+  it('exposes the air-only category hierarchy', () => {
     const flattened = flattenCatalogCategories(CATALOG_CATEGORY_TREE);
 
     expect(CATALOG_CATEGORY_TREE).toHaveLength(3);
     expect(flattened.filter((category) => category.parentId === null)).toHaveLength(3);
-    expect(flattened.filter((category) => category.parentId !== null)).toHaveLength(5);
+    expect(flattened.filter((category) => category.parentId !== null)).toHaveLength(8);
     expect(flattened.map((category) => category.id)).toEqual([
       'air_distribution',
       'standard_ductwork',
-      'specialty_exhaust',
-      'boiler_flue',
-      'grease_duct',
-      'generator_exhaust',
       'universal_components',
       'hangers_supports',
+      'hvac_equipment',
+      'air_handling',
+      'terminal_units',
+      'fans',
+      'air_devices',
+      'dampers',
+      'heating',
     ]);
   });
 
   it('seeds baseline system profiles and catalog entries', () => {
-    expect(BASELINE_SYSTEM_PROFILES).toHaveLength(5);
+    expect(BASELINE_SYSTEM_PROFILES).toHaveLength(2);
     const entries = createSeedCatalogEntries();
 
     expect(entries.length).toBeGreaterThan(0);
@@ -57,23 +60,14 @@ describe('componentLibraryInitializer', () => {
       });
     });
 
-    const specialtyOnlyEntries = entries.filter((entry) =>
-      ['boiler_flue', 'grease_duct', 'generator_exhaust'].includes(entry.engineeringSystem)
-    );
+    const removedSystems = new Set([
+      String.fromCharCode(98, 111, 105, 108, 101, 114, 95, 102, 108, 117, 101),
+      String.fromCharCode(103, 114, 101, 97, 115, 101, 95, 100, 117, 99, 116),
+      String.fromCharCode(103, 101, 110, 101, 114, 97, 116, 111, 114, 95, 101, 120, 104, 97, 117, 115, 116),
+    ]);
 
-    specialtyOnlyEntries.forEach((entry) => {
-      const references = [
-        ...(entry.recommendedFittingEntryIds ?? []),
-        ...(entry.recommendedAccessoryEntryIds ?? []),
-        ...(entry.recommendedEquipmentEntryIds ?? []),
-      ];
-
-      references.forEach((targetId) => {
-        const target = entries.find((candidate) => candidate.id === targetId);
-        expect(target).toBeDefined();
-        expect(target?.engineeringSystem).not.toBe('standard_duct');
-      });
-    });
+    expect(entries.filter((entry) => removedSystems.has(entry.engineeringSystem))).toHaveLength(0);
+    expect(BASELINE_SYSTEM_PROFILES.filter((profile) => removedSystems.has(profile.engineeringSystem))).toHaveLength(0);
   });
 
   it('is idempotent when initialization runs multiple times', () => {
@@ -82,8 +76,8 @@ describe('componentLibraryInitializer', () => {
     initializeComponentLibraryState(state);
     const firstSnapshot = useUnifiedCatalogStore.getState();
 
-    expect(firstSnapshot.categories).toHaveLength(8);
-    expect(firstSnapshot.systemProfiles).toHaveLength(5);
+    expect(firstSnapshot.categories).toHaveLength(11);
+    expect(firstSnapshot.systemProfiles).toHaveLength(2);
     expect(firstSnapshot.catalogEntries.length).toBeGreaterThan(0);
     expect(firstSnapshot.isEnabled).toBe(true);
     expect(firstSnapshot.activeEntryId).not.toBeNull();

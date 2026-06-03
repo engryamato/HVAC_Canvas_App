@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, CookingPot, Flame, Gauge } from 'lucide-react';
+import { Box } from 'lucide-react';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useValidationSummary } from '@/core/store/validationStore';
 import { useUnifiedCatalogStore } from '@/core/store/componentLibraryStoreV2';
@@ -20,12 +20,6 @@ const TONE_STYLES: Record<NonNullable<PlacementBannerInfo['tone']>, { text: stri
 
 function getBannerIcon(iconKey: PlacementToolbarIconKey) {
   switch (iconKey) {
-    case 'boiler_flue':
-      return Flame;
-    case 'grease_duct':
-      return CookingPot;
-    case 'generator_exhaust':
-      return Gauge;
     case 'duct':
     default:
       return Box;

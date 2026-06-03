@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  BoilerFlueEquipmentPropsSchema,
   EquipmentSchema,
   EquipmentPropsSchema,
   StandardEquipmentPropsSchema,
@@ -50,6 +49,20 @@ describe('EquipmentPropsSchema', () => {
     const result = EquipmentPropsSchema.parse(props);
     expect(result).toBeTruthy();
     expect(result.engineeringSystem).toBe('standard_duct');
+  });
+
+  it('rejects removed specialized equipment prop shapes', () => {
+    const removedSystem = String.fromCharCode(
+      103, 101, 110, 101, 114, 97, 116, 111, 114, 95, 101, 120, 104, 97, 117, 115, 116
+    );
+
+    expect(() =>
+      EquipmentPropsSchema.parse({
+        ...createDefaultEquipmentProps('fan'),
+        engineeringSystem: removedSystem,
+        backpressureLimit: 2,
+      })
+    ).toThrow();
   });
 
   it('should reject empty name', () => {
@@ -123,16 +136,10 @@ describe('EquipmentPropsSchema', () => {
   });
 
   it('uses engineeringSystem as the level-2 discriminator', () => {
-    const result = BoilerFlueEquipmentPropsSchema.parse({
-      ...createDefaultEquipmentProps('fan'),
-      engineeringSystem: 'boiler_flue',
-    });
-
-    expect(result.engineeringSystem).toBe('boiler_flue');
     expect(() =>
       StandardEquipmentPropsSchema.parse({
         ...createDefaultEquipmentProps('fan'),
-        engineeringSystem: 'generator_exhaust',
+        engineeringSystem: 'universal',
       })
     ).toThrow();
   });

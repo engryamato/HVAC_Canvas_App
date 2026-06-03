@@ -136,31 +136,6 @@ export const StandardDuctPropsSchema = SharedDuctPropsSchema.safeExtend({
   engineeringSystem: z.literal('standard_duct'),
 });
 
-export const BoilerFluePropsSchema = SharedDuctPropsSchema.safeExtend({
-  engineeringSystem: z.literal('boiler_flue'),
-  wallType: z.enum(['single', 'double']).optional(),
-  condensateSlope: z.number().optional(),
-  btuRating: z.number().optional(),
-  flueGasDewpoint: z.number().optional(),
-  venting: z.enum(['natural', 'forced']).optional(),
-});
-
-export const GreaseDuctPropsSchema = SharedDuctPropsSchema.safeExtend({
-  engineeringSystem: z.literal('grease_duct'),
-  constructionType: z.string().optional(),
-  fireRating: z.string().optional(),
-  liquidTight: z.boolean().optional(),
-  weldSpec: z.string().optional(),
-});
-
-export const GeneratorExhaustPropsSchema = SharedDuctPropsSchema.safeExtend({
-  engineeringSystem: z.literal('generator_exhaust'),
-  connectionType: z.enum(['flanged', 'slip_fit']).optional(),
-  backpressureLimit: z.number().optional(),
-  exhaustTempF: z.number().optional(),
-  engineModel: z.string().optional(),
-});
-
 export const DuctPropsSchema = z.preprocess(
   (value) => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -169,19 +144,11 @@ export const DuctPropsSchema = z.preprocess(
 
     const candidate = value as Record<string, unknown>;
     return {
-      engineeringSystem:
-        EngineeringSystemSchema.safeParse(candidate.engineeringSystem).success
-          ? candidate.engineeringSystem
-          : 'standard_duct',
+      engineeringSystem: candidate.engineeringSystem ?? 'standard_duct',
       ...candidate,
     };
   },
-  z.discriminatedUnion('engineeringSystem', [
-    StandardDuctPropsSchema,
-    BoilerFluePropsSchema,
-    GreaseDuctPropsSchema,
-    GeneratorExhaustPropsSchema,
-  ])
+  StandardDuctPropsSchema
 );
 
 export type DuctProps = z.infer<typeof DuctPropsSchema>;

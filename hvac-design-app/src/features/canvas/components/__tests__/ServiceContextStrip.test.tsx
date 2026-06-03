@@ -23,17 +23,17 @@ function seedStore() {
   store.reset();
 
   store.addSystemProfile({
-    id: 'boiler-flue',
-    name: 'Boiler & Water Heater Flue',
-    engineeringSystem: 'boiler_flue',
-    defaultSystemType: 'exhaust',
-    color: '#ea580c',
+    id: 'standard-duct',
+    name: 'Standard Ductwork',
+    engineeringSystem: 'standard_duct',
+    defaultSystemType: 'supply',
+    color: '#2563eb',
     source: 'baseline',
     supportedArchetypes: {
-      duct: ['single_wall_pipe'],
-      fitting: ['boot_tee'],
-      equipment: ['draft_inducer'],
-      accessory: ['condensate_trap'],
+      duct: ['straight'],
+      fitting: ['elbow'],
+      equipment: ['terminal_box'],
+      accessory: ['damper'],
     },
     fittingRules: [],
     dimensionalConstraints: {},
@@ -42,22 +42,21 @@ function seedStore() {
   });
 
   store.addEntry({
-    id: 'single-wall-pipe',
-    name: 'Single Wall Pipe',
+    id: 'round-duct',
+    name: 'Round Duct',
     componentClass: 'duct',
     category: 'duct',
-    categoryId: 'boiler_flue',
-    typeId: 'single_wall_pipe',
-    type: 'single_wall_pipe',
-    engineeringSystem: 'boiler_flue',
+    categoryId: 'standard_ductwork',
+    typeId: 'straight',
+    type: 'straight',
+    engineeringSystem: 'standard_duct',
     placeable: true,
     source: 'system',
-    specialtyToolId: 'single_wall_pipe',
     recommendedFittingEntryIds: [],
     recommendedAccessoryEntryIds: [],
     recommendedEquipmentEntryIds: [],
     connectionNotes: [],
-    systemType: 'exhaust',
+    systemType: 'supply',
     engineeringProperties: {
       frictionFactor: 0.01,
       maxVelocity: 1800,
@@ -75,8 +74,8 @@ function seedStore() {
     updatedAt: new Date(),
   });
 
-  store.selectEntry('single-wall-pipe');
-  store.setSystemType('exhaust');
+  store.selectEntry('round-duct');
+  store.setSystemType('supply');
 }
 
 describe('ServiceContextStrip', () => {
@@ -84,29 +83,23 @@ describe('ServiceContextStrip', () => {
     seedStore();
     useToolStore.setState({
       currentTool: 'duct',
-      activeSpecialtyToolId: 'single_wall_pipe',
+      activeSpecialtyToolId: null,
     });
   });
 
-  it('renders specialty context banner from the active specialty tool', async () => {
+  it('does not render a specialty banner in air-only mode', () => {
     render(<ServiceContextStrip />);
 
-    const banner = await screen.findByTestId('specialty-context-banner');
-    expect(banner).toBeDefined();
-    expect(screen.getByText('Specialty Context')).toBeDefined();
-    expect(screen.getByTestId('specialty-context-banner-title')).toHaveTextContent('Boiler & Water Heater Flue');
-    expect(screen.getByTestId('specialty-context-banner-description')).toHaveTextContent('Single Wall Pipe');
-    expect(screen.getByText('Esc exits specialty mode')).toBeDefined();
-    expect(screen.getByTestId('specialty-context-banner-icon')).toHaveStyle({ color: '#ea580c' });
+    expect(screen.queryByTestId('specialty-context-banner')).toBeNull();
   });
 
   it('keeps the active entry and service override row visible', () => {
     render(<ServiceContextStrip />);
 
     expect(screen.getByText('Active:')).toBeDefined();
-    expect(screen.getByTestId('active-entry-name')).toHaveTextContent('Single Wall Pipe');
-    expect(screen.getByTestId('active-entry-system')).toHaveTextContent('boiler flue');
-    expect(screen.getByDisplayValue('Exhaust')).toBeDefined();
+    expect(screen.getByTestId('active-entry-name')).toHaveTextContent('Round Duct');
+    expect(screen.getByTestId('active-entry-system')).toHaveTextContent('standard duct');
+    expect(screen.getByDisplayValue('Supply')).toBeDefined();
     expect(screen.getByText('Validated')).toBeDefined();
   });
 });

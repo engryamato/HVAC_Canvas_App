@@ -108,7 +108,7 @@ export interface EquipmentPlacementDraft {
   width: number;
   depth: number;
   height: number;
-  engineeringSystem: 'standard_duct' | 'boiler_flue' | 'grease_duct' | 'generator_exhaust' | 'universal';
+  engineeringSystem: 'standard_duct' | 'universal';
 }
 
 /**

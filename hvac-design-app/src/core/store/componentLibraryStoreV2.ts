@@ -145,9 +145,6 @@ const defaultState: StoreShape = {
 
 const CATEGORY_ID_BY_ENGINEERING_SYSTEM: Record<EngineeringSystem, string> = {
   standard_duct: 'standard_ductwork',
-  boiler_flue: 'boiler_flue',
-  grease_duct: 'grease_duct',
-  generator_exhaust: 'generator_exhaust',
   universal: 'hangers_supports',
 };
 
@@ -159,11 +156,7 @@ const FALLBACK_TYPE_ID_BY_COMPONENT_CLASS: Record<ComponentClass, string> = {
 };
 
 function getDefaultSystemType(engineeringSystem: unknown): SystemType {
-  return engineeringSystem === 'boiler_flue' ||
-    engineeringSystem === 'grease_duct' ||
-    engineeringSystem === 'generator_exhaust'
-    ? 'exhaust'
-    : 'supply';
+  return engineeringSystem === 'standard_duct' || engineeringSystem === 'universal' ? 'supply' : 'supply';
 }
 
 function inferComponentClass(input: Record<string, unknown>): ComponentClass {
@@ -183,20 +176,9 @@ function inferComponentClass(input: Record<string, unknown>): ComponentClass {
 function inferEngineeringSystem(input: Record<string, unknown>): EngineeringSystem {
   if (
     input.engineeringSystem === 'standard_duct' ||
-    input.engineeringSystem === 'boiler_flue' ||
-    input.engineeringSystem === 'grease_duct' ||
-    input.engineeringSystem === 'generator_exhaust' ||
     input.engineeringSystem === 'universal'
   ) {
     return input.engineeringSystem;
-  }
-
-  if (
-    input.categoryId === 'boiler_flue' ||
-    input.categoryId === 'grease_duct' ||
-    input.categoryId === 'generator_exhaust'
-  ) {
-    return input.categoryId;
   }
 
   if (
@@ -314,11 +296,7 @@ function resolveSpecialtyToolId(entry: CatalogEntry): string | null {
 }
 
 function shouldAutoApplySystemType(entry: CatalogEntry): boolean {
-  return (
-    entry.engineeringSystem === 'boiler_flue' ||
-    entry.engineeringSystem === 'grease_duct' ||
-    entry.engineeringSystem === 'generator_exhaust'
-  );
+  return false;
 }
 
 export function dedupeEntries(entries: CatalogEntry[]): CatalogEntry[] {

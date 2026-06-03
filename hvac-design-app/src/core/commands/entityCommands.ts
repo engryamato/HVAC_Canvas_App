@@ -381,20 +381,6 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
       severity: 'warning',
     }));
 
-    if (
-      fitting.props.engineeringSystem === 'generator_exhaust' &&
-      typeof fitting.props.backpressureLimit === 'number' &&
-      runtime.calculated.pressureLoss > fitting.props.backpressureLimit
-    ) {
-      violations.push({
-        ruleId: 'backpressure-limit',
-        type: 'backpressure-limit',
-        message: `Calculated fitting pressure loss ${runtime.calculated.pressureLoss.toFixed(2)} exceeds limit ${fitting.props.backpressureLimit.toFixed(2)}.`,
-        suggestedFix: 'Reduce run resistance or select a higher-rated exhaust fitting.',
-        severity: 'warning',
-      });
-    }
-
     return violations;
   }
 
@@ -433,21 +419,6 @@ function buildRuntimeViolations(entity: Entity): ConstraintViolation[] {
         type: 'support-spacing-guidance',
         message: `Computed support spacing is ${runtime.spacing.toFixed(1)} ft for the connected run.`,
         suggestedFix: `Verify the configured spacing rule "${equipment.props.spacingRule}" matches this run.`,
-        severity: 'warning',
-      });
-    }
-
-    if (
-      equipment.props.engineeringSystem === 'generator_exhaust' &&
-      typeof equipment.props.backpressureLimit === 'number' &&
-      typeof runtime.engineeringData.pressureDrop === 'number' &&
-      runtime.engineeringData.pressureDrop > equipment.props.backpressureLimit
-    ) {
-      violations.push({
-        ruleId: 'backpressure-limit',
-        type: 'backpressure-limit',
-        message: `Calculated connected-run backpressure ${runtime.engineeringData.pressureDrop.toFixed(2)} exceeds limit ${equipment.props.backpressureLimit.toFixed(2)}.`,
-        suggestedFix: 'Reduce run resistance or select a higher-rated exhaust component.',
         severity: 'warning',
       });
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode, SVGProps } from 'react';
-import { Cog, Flame, Gauge, CookingPot, Wrench } from 'lucide-react';
+import { Cog, Wrench } from 'lucide-react';
 import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 import type { CanvasTool } from '@/core/store/canvas.store';
 import type { PlacementToolbarIconKey } from '@/features/canvas/tools/placementStrategies';
@@ -12,31 +12,16 @@ export type CatalogIconKey =
   | 'duct_round'
   | 'duct_flat_oval'
   | 'duct_flexible'
-  | 'duct_boiler_flue'
-  | 'duct_boiler_single_wall'
-  | 'duct_boiler_double_wall'
-  | 'duct_boiler_flexible_liner'
-  | 'duct_grease'
-  | 'duct_grease_round'
-  | 'duct_grease_rectangular'
-  | 'duct_grease_zero_clearance'
-  | 'duct_generator'
-  | 'duct_generator_flanged'
-  | 'duct_generator_slip_fit'
   | 'fitting'
   | 'fitting_elbow'
   | 'fitting_elbow_radius'
   | 'fitting_elbow_90'
   | 'fitting_elbow_45'
-  | 'fitting_elbow_grease'
   | 'fitting_elbow_long_radius'
   | 'fitting_mitered_elbow'
   | 'fitting_elbow_mitered'
-  | 'fitting_elbow_grease_mitered'
   | 'fitting_tee'
   | 'fitting_tee_cross'
-  | 'fitting_tee_grease'
-  | 'fitting_boot_tee'
   | 'fitting_wye'
   | 'fitting_wye_lateral'
   | 'fitting_wye_engine'
@@ -44,11 +29,9 @@ export type CatalogIconKey =
   | 'fitting_reducer_concentric'
   | 'fitting_reducer_eccentric'
   | 'fitting_reducer_increaser'
-  | 'fitting_reducer_grease'
   | 'fitting_reducer_expander'
   | 'fitting_transition'
   | 'fitting_transition_square_to_round'
-  | 'fitting_transition_grease'
   | 'fitting_end_cap'
   | 'fitting_takeoff'
   | 'fitting_takeoff_spin_in'
@@ -61,7 +44,6 @@ export type CatalogIconKey =
   | 'equipment_fan_coil'
   | 'equipment_exhaust_fan'
   | 'equipment_ahu'
-  | 'equipment_draft_inducer'
   | 'equipment_draft_control'
   | 'equipment_appliance_adapter'
   | 'equipment_hood_connection'
@@ -83,14 +65,12 @@ export type CatalogIconKey =
   | 'accessory_access_door'
   | 'accessory_flexible_connector'
   | 'accessory_grd'
-  | 'accessory_condensate_trap'
   | 'accessory_wall_thimble'
   | 'accessory_roof_flashing'
   | 'accessory_support_bracket'
   | 'accessory_rain_cap'
   | 'accessory_screened_termination'
   | 'accessory_suppression_coupling'
-  | 'accessory_grease_reservoir'
   | 'accessory_roof_curb'
   | 'accessory_penetration_wrap'
   | 'accessory_vented_thimble'
@@ -167,36 +147,6 @@ function FlexibleDuctIcon(props: IconProps) {
   );
 }
 
-function BoilerFlueDuctIcon(props: IconProps) {
-  return (
-    <BaseSvg {...props}>
-      <path d="M4 16c3-6 7-9 16-9" />
-      <path d="M7 18h10" />
-      <path d="M16 6l4 1-1 4" />
-    </BaseSvg>
-  );
-}
-
-function GreaseDuctIcon(props: IconProps) {
-  return (
-    <BaseSvg {...props}>
-      <rect x="4" y="8" width="16" height="8" rx="2" />
-      <path d="M8 8V6" />
-      <path d="M16 8V6" />
-      <path d="M12 18c1.5 0 2.5-1 2.5-2.5S13 12 12 10c-1 2-2.5 3.5-2.5 5.5S10.5 18 12 18Z" />
-    </BaseSvg>
-  );
-}
-
-function GeneratorDuctIcon(props: IconProps) {
-  return (
-    <BaseSvg {...props}>
-      <circle cx="11" cy="12" r="6" />
-      <path d="M17 8l3-2v12l-3-2" />
-      <path d="M9 9l3 3-3 3" />
-    </BaseSvg>
-  );
-}
 
 function ElbowFittingIcon(props: IconProps) {
   return (
@@ -242,17 +192,6 @@ function Elbow45FittingIcon(props: IconProps) {
   );
 }
 
-function GreaseElbowFittingIcon(props: IconProps) {
-  return (
-    <BaseSvg {...props}>
-      <path d="M4 3v9c0 4.4 3.6 8 8 8h9" />
-      <path d="M7 6v6c0 2.8 2.2 5 5 5h6" />
-      <path d="M10 9v3c0 1.1.9 2 2 2h3" />
-      <path d="M4 20h4" />
-      <path d="M18 16v4" />
-    </BaseSvg>
-  );
-}
 
 function LongRadiusElbowFittingIcon(props: IconProps) {
   return (
@@ -276,17 +215,6 @@ function MiteredElbowFittingIcon(props: IconProps) {
   );
 }
 
-function GreaseMiteredElbowFittingIcon(props: IconProps) {
-  return (
-    <BaseSvg {...props}>
-      <path d="M4 3v7l9 9h8" />
-      <path d="M7 6v4l7 7h4" />
-      <path d="M10 9v1l5 5h1" />
-      <path d="M4 20h4" />
-      <path d="M18 16v4" />
-    </BaseSvg>
-  );
-}
 
 function TeeFittingIcon(props: IconProps) {
   return (
@@ -907,14 +835,6 @@ const DUCT_ICON_BY_KEY: Record<string, CatalogIconKey> = {
   rectangular: 'duct_rectangular',
   straight: 'duct_rectangular',
   round: 'duct_round',
-  single_wall_pipe: 'duct_boiler_flue',
-  double_wall_pipe: 'duct_boiler_flue',
-  flexible_liner: 'duct_boiler_flue',
-  factory_built_round: 'duct_grease',
-  welded_rectangular: 'duct_grease',
-  zero_clearance: 'duct_grease',
-  flanged_exhaust_pipe: 'duct_generator',
-  slip_fit_exhaust_pipe: 'duct_generator',
   flat_oval: 'duct_flat_oval',
   flexible: 'duct_flexible',
 };
@@ -925,14 +845,12 @@ const FITTING_ICON_BY_KEY: Record<string, CatalogIconKey> = {
   elbow_45: 'fitting_elbow',
   radius: 'fitting_elbow',
   standard_elbow: 'fitting_elbow',
-  grease_elbow: 'fitting_elbow',
   long_radius_elbow: 'fitting_elbow',
   mitered: 'fitting_mitered_elbow',
   mitered_elbow: 'fitting_mitered_elbow',
   tee: 'fitting_tee',
   cross: 'fitting_tee',
   tee_cross: 'fitting_tee',
-  boot_tee: 'fitting_tee',
   wye: 'fitting_wye',
   wye_lateral: 'fitting_wye',
   lateral: 'fitting_wye',
@@ -955,31 +873,16 @@ const ALL_ICON_KEYS = new Set<CatalogIconKey>([
   'duct_round',
   'duct_flat_oval',
   'duct_flexible',
-  'duct_boiler_flue',
-  'duct_boiler_single_wall',
-  'duct_boiler_double_wall',
-  'duct_boiler_flexible_liner',
-  'duct_grease',
-  'duct_grease_round',
-  'duct_grease_rectangular',
-  'duct_grease_zero_clearance',
-  'duct_generator',
-  'duct_generator_flanged',
-  'duct_generator_slip_fit',
   'fitting',
   'fitting_elbow',
   'fitting_elbow_radius',
   'fitting_elbow_90',
   'fitting_elbow_45',
-  'fitting_elbow_grease',
   'fitting_elbow_long_radius',
   'fitting_mitered_elbow',
   'fitting_elbow_mitered',
-  'fitting_elbow_grease_mitered',
   'fitting_tee',
   'fitting_tee_cross',
-  'fitting_tee_grease',
-  'fitting_boot_tee',
   'fitting_wye',
   'fitting_wye_lateral',
   'fitting_wye_engine',
@@ -987,11 +890,9 @@ const ALL_ICON_KEYS = new Set<CatalogIconKey>([
   'fitting_reducer_concentric',
   'fitting_reducer_eccentric',
   'fitting_reducer_increaser',
-  'fitting_reducer_grease',
   'fitting_reducer_expander',
   'fitting_transition',
   'fitting_transition_square_to_round',
-  'fitting_transition_grease',
   'fitting_end_cap',
   'fitting_takeoff',
   'fitting_takeoff_spin_in',
@@ -1004,7 +905,6 @@ const ALL_ICON_KEYS = new Set<CatalogIconKey>([
   'equipment_fan_coil',
   'equipment_exhaust_fan',
   'equipment_ahu',
-  'equipment_draft_inducer',
   'equipment_draft_control',
   'equipment_appliance_adapter',
   'equipment_hood_connection',
@@ -1026,14 +926,12 @@ const ALL_ICON_KEYS = new Set<CatalogIconKey>([
   'accessory_access_door',
   'accessory_flexible_connector',
   'accessory_grd',
-  'accessory_condensate_trap',
   'accessory_wall_thimble',
   'accessory_roof_flashing',
   'accessory_support_bracket',
   'accessory_rain_cap',
   'accessory_screened_termination',
   'accessory_suppression_coupling',
-  'accessory_grease_reservoir',
   'accessory_roof_curb',
   'accessory_penetration_wrap',
   'accessory_vented_thimble',
@@ -1104,12 +1002,6 @@ export function resolveToolbarIconKey(
 ): CatalogIconKey | null {
   if (tool === 'duct') {
     switch (placementIconKey) {
-      case 'boiler_flue':
-        return 'duct_boiler_flue';
-      case 'grease_duct':
-        return 'duct_grease';
-      case 'generator_exhaust':
-        return 'duct_generator';
       case 'duct':
       default:
         return 'duct_rectangular';
@@ -1138,20 +1030,6 @@ function renderSvgIcon(iconKey: CatalogIconKey, props: IconProps) {
       return <FlatOvalDuctIcon {...props} />;
     case 'duct_flexible':
       return <FlexibleDuctIcon {...props} />;
-    case 'duct_boiler_flue':
-    case 'duct_boiler_single_wall':
-    case 'duct_boiler_double_wall':
-    case 'duct_boiler_flexible_liner':
-      return <BoilerFlueDuctIcon {...props} />;
-    case 'duct_grease':
-    case 'duct_grease_round':
-    case 'duct_grease_rectangular':
-    case 'duct_grease_zero_clearance':
-      return <GreaseDuctIcon {...props} />;
-    case 'duct_generator':
-    case 'duct_generator_flanged':
-    case 'duct_generator_slip_fit':
-      return <GeneratorDuctIcon {...props} />;
     case 'fitting':
     case 'fitting_elbow':
       return <ElbowFittingIcon {...props} />;
@@ -1161,24 +1039,17 @@ function renderSvgIcon(iconKey: CatalogIconKey, props: IconProps) {
       return <Elbow90FittingIcon {...props} />;
     case 'fitting_elbow_45':
       return <Elbow45FittingIcon {...props} />;
-    case 'fitting_elbow_grease':
-      return <GreaseElbowFittingIcon {...props} />;
     case 'fitting_elbow_long_radius':
       return <LongRadiusElbowFittingIcon {...props} />;
     case 'fitting_mitered_elbow':
       return <MiteredElbowFittingIcon {...props} />;
     case 'fitting_elbow_mitered':
       return <MiteredElbowFittingIcon {...props} />;
-    case 'fitting_elbow_grease_mitered':
-      return <GreaseMiteredElbowFittingIcon {...props} />;
     case 'fitting_tee':
       return <TeeFittingIcon {...props} />;
     case 'fitting_tee_cross':
       return <TeeVariantIcon {...props} variant="cross" />;
-    case 'fitting_tee_grease':
       return <TeeVariantIcon {...props} variant="drop" />;
-    case 'fitting_boot_tee':
-      return <TeeVariantIcon {...props} variant="boot" />;
     case 'fitting_wye':
       return <WyeFittingIcon {...props} />;
     case 'fitting_wye_lateral':
@@ -1193,7 +1064,6 @@ function renderSvgIcon(iconKey: CatalogIconKey, props: IconProps) {
       return <ReducerVariantIcon {...props} variant="eccentric" />;
     case 'fitting_reducer_increaser':
       return <ReducerVariantIcon {...props} variant="increaser" />;
-    case 'fitting_reducer_grease':
       return <ReducerVariantIcon {...props} variant="drop" />;
     case 'fitting_reducer_expander':
       return <ReducerVariantIcon {...props} variant="expander" />;
@@ -1201,7 +1071,6 @@ function renderSvgIcon(iconKey: CatalogIconKey, props: IconProps) {
       return <TransitionFittingIcon {...props} />;
     case 'fitting_transition_square_to_round':
       return <TransitionVariantIcon {...props} variant="square" />;
-    case 'fitting_transition_grease':
       return <TransitionVariantIcon {...props} variant="drop" />;
     case 'fitting_end_cap':
       return <EndCapFittingIcon {...props} />;
@@ -1223,8 +1092,6 @@ function renderSvgIcon(iconKey: CatalogIconKey, props: IconProps) {
       return <AhuVariantIcon {...props} variant="coil" />;
     case 'equipment_exhaust_fan':
       return <FanEquipmentIcon {...props} />;
-    case 'equipment_draft_inducer':
-      return <FanVariantIcon {...props} variant="control" />;
     case 'equipment_upblast_fan':
       return <FanVariantIcon {...props} variant="upblast" />;
     case 'equipment_utility_set_fan':
@@ -1291,10 +1158,6 @@ function renderSvgIcon(iconKey: CatalogIconKey, props: IconProps) {
       return <BellowsVariantIcon {...props} variant="bell" />;
     case 'accessory_grd':
       return <GrdAccessoryIcon {...props} />;
-    case 'accessory_condensate_trap':
-      return <CondensateVariantIcon {...props} variant="trap" />;
-    case 'accessory_grease_reservoir':
-      return <CondensateVariantIcon {...props} variant="reservoir" />;
     case 'accessory_suppression_coupling':
       return <SupportVariantIcon {...props} variant="coupling" />;
     case 'accessory_wall_thimble':
@@ -1354,11 +1217,7 @@ export function HvacCatalogIcon({
     ? Cog
     : iconKey === 'accessory'
       ? Wrench
-      : iconKey.startsWith('duct_boiler')
-        ? Flame
-        : iconKey.startsWith('duct_grease')
-          ? CookingPot
-          : Gauge;
+      : Wrench;
 
   return (
     <LucideIcon

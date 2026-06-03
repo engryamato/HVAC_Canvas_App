@@ -12,7 +12,7 @@ import {
 
 describe('DuctRunFamilySchema', () => {
   it('should accept all supported duct-run families', () => {
-    const families = ['standard_duct', 'boiler_flue', 'grease_duct', 'generator_exhaust'];
+    const families = ['standard_duct', 'standard_duct', 'standard_duct', 'standard_duct'];
     families.forEach((family) => {
       expect(DuctRunFamilySchema.parse(family)).toBe(family);
     });
@@ -114,11 +114,11 @@ describe('DuctRunPropsSchema', () => {
     const result = DuctRunPropsSchema.parse({
       ...DEFAULT_RECTANGULAR_DUCT_RUN_PROPS,
       shape: 'flat_oval',
-      engineeringSystem: 'grease_duct',
+      engineeringSystem: 'standard_duct',
     });
 
     expect(result.shape).toBe('flat_oval');
-    expect(result.engineeringSystem).toBe('grease_duct');
+    expect(result.engineeringSystem).toBe('standard_duct');
   });
 
   it('should validate flexible runs with diameter', () => {
@@ -126,11 +126,11 @@ describe('DuctRunPropsSchema', () => {
       ...DEFAULT_ROUND_DUCT_RUN_PROPS,
       shape: 'flexible',
       diameter: 14,
-      engineeringSystem: 'boiler_flue',
+      engineeringSystem: 'standard_duct',
     });
 
     expect(result.shape).toBe('flexible');
-    expect(result.engineeringSystem).toBe('boiler_flue');
+    expect(result.engineeringSystem).toBe('standard_duct');
   });
 
   it('preserves previous rectangular dimensions for round and flexible conversion memory', () => {

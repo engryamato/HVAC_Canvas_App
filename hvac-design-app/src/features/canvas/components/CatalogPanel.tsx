@@ -54,14 +54,6 @@ function getCategoryColor(id: string): string {
   if (id === 'air_distribution' || id === 'standard_ductwork') {
     return '#2563eb';
   }
-  if (
-    id === 'specialty_exhaust' ||
-    id === 'boiler_flue' ||
-    id === 'grease_duct' ||
-    id === 'generator_exhaust'
-  ) {
-    return '#ea580c';
-  }
   if (id === 'universal_components' || id === 'hangers_supports') {
     return '#64748b';
   }

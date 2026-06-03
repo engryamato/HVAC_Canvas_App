@@ -15,12 +15,7 @@ const SEGMENT_TOLERANCE_FEET = 0.001;
 export const DuctRunShapeSchema = z.enum(['rectangular', 'round', 'flat_oval', 'flexible']);
 export type DuctRunShape = z.infer<typeof DuctRunShapeSchema>;
 
-export const DuctRunFamilySchema = z.enum([
-  'standard_duct',
-  'boiler_flue',
-  'grease_duct',
-  'generator_exhaust',
-]);
+export const DuctRunFamilySchema = z.enum(['standard_duct']);
 export type DuctRunFamily = z.infer<typeof DuctRunFamilySchema>;
 
 export const InsulationTypeSchema = z.enum([
@@ -190,9 +185,7 @@ export const DuctRunPropsSchema = z
 
     return {
       ...candidate,
-      engineeringSystem: DuctRunFamilySchema.safeParse(candidate.engineeringSystem).success
-        ? candidate.engineeringSystem
-        : 'standard_duct',
+      engineeringSystem: candidate.engineeringSystem ?? 'standard_duct',
       designStartPoint: candidate.designStartPoint ?? candidate.startPoint,
       designEndPoint: candidate.designEndPoint ?? candidate.endPoint,
       designLength: candidate.designLength ?? candidate.installLength,

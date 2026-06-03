@@ -133,7 +133,7 @@ export function ServiceEditor({ open, onClose, serviceId }: ServiceEditorProps) 
       typeId: 'service_duct',
       type: 'service_duct',
       subtype: primaryShape,
-      engineeringSystem: formData.systemType === 'exhaust' ? 'generator_exhaust' : 'standard_duct',
+      engineeringSystem: 'standard_duct',
       placeable: true,
       source: 'custom',
       recommendedFittingEntryIds: [],

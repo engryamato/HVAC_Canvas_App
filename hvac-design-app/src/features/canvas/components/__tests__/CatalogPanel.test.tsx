@@ -58,8 +58,6 @@ function seedStore() {
 
   store.addCategory({ id: 'air_distribution', name: 'Air Distribution', parentId: null, subcategories: [] });
   store.addCategory({ id: 'standard_ductwork', name: 'Standard Ductwork', parentId: 'air_distribution', subcategories: [] });
-  store.addCategory({ id: 'specialty_exhaust', name: 'Specialty Exhaust', parentId: null, subcategories: [] });
-  store.addCategory({ id: 'boiler_flue', name: 'Boiler & Water Heater Flue', parentId: 'specialty_exhaust', subcategories: [] });
   store.addCategory({ id: 'universal_components', name: 'Universal Components', parentId: null, subcategories: [] });
   store.addCategory({ id: 'hangers_supports', name: 'Hangers, Supports & Seismic', parentId: 'universal_components', subcategories: [] });
 
@@ -75,25 +73,6 @@ function seedStore() {
       fitting: ['elbow'],
       equipment: ['terminal_box'],
       accessory: ['damper'],
-    },
-    fittingRules: [],
-    dimensionalConstraints: {},
-    complianceRefs: [],
-    calculationCapabilities: [],
-  });
-
-  store.addSystemProfile({
-    id: 'boiler-flue',
-    name: 'Boiler & Water Heater Flue',
-    engineeringSystem: 'boiler_flue',
-    defaultSystemType: 'exhaust',
-    color: '#ea580c',
-    source: 'baseline',
-    supportedArchetypes: {
-      duct: ['single_wall_pipe'],
-      fitting: ['boot_tee'],
-      equipment: ['draft_inducer'],
-      accessory: ['condensate_trap'],
     },
     fittingRules: [],
     dimensionalConstraints: {},
@@ -119,23 +98,6 @@ function seedStore() {
       recommendedAccessoryEntryIds: ['custom-hanger'],
       recommendedEquipmentEntryIds: ['terminal-box'],
       connectionNotes: ['Round branch with elbow and terminal accessories.'],
-    })
-  );
-
-  store.addEntry(
-    createEntry({
-      id: 'single-wall-pipe',
-      name: 'Single Wall Pipe',
-      componentClass: 'duct',
-      category: 'duct',
-      categoryId: 'boiler_flue',
-      typeId: 'single_wall_pipe',
-      type: 'single_wall_pipe',
-      engineeringSystem: 'boiler_flue',
-      source: 'system',
-      keySpec: '1/4 in per ft slope',
-      description: 'Boiler flue duct',
-      iconKey: 'duct_boiler_single_wall',
     })
   );
 
@@ -223,13 +185,6 @@ describe('CatalogPanel', () => {
     fireEvent.click(screen.getByTestId('catalog-root-air_distribution'));
     expect(screen.queryByTestId('catalog-category-standard_ductwork')).toBeNull();
 
-    fireEvent.change(screen.getByRole('textbox', { name: 'Search' }), { target: { value: 'Single Wall Pipe' } });
-
-    expect(screen.queryByTestId('catalog-root-air_distribution')).toBeNull();
-    expect(screen.getByTestId('catalog-root-specialty_exhaust')).toBeDefined();
-    expect(screen.getByTestId('catalog-category-boiler_flue')).toBeDefined();
-    expect(screen.queryByTestId('catalog-category-standard_ductwork')).toBeNull();
-
     fireEvent.change(screen.getByRole('textbox', { name: 'Search' }), { target: { value: 'supports' } });
 
     expect(screen.queryByTestId('catalog-root-air_distribution')).toBeNull();
@@ -258,7 +213,6 @@ describe('CatalogPanel', () => {
     render(<CatalogPanel />);
 
     expect(screen.getByTestId('catalog-row-icon-round-duct')).toHaveAttribute('data-icon-key', 'duct_round');
-    expect(screen.getByTestId('catalog-row-icon-single-wall-pipe')).toHaveAttribute('data-icon-key', 'duct_boiler_single_wall');
     expect(screen.getByTestId('catalog-row-icon-radius-elbow')).toHaveAttribute('data-icon-key', 'fitting_elbow_radius');
   });
 
@@ -330,7 +284,7 @@ describe('CatalogPanel', () => {
     render(<CatalogPanel />);
 
     const firstRow = screen.getByTestId('catalog-row-trigger-round-duct');
-    const secondRow = screen.getByTestId('catalog-row-trigger-single-wall-pipe');
+    const secondRow = screen.getByTestId('catalog-row-trigger-radius-elbow');
 
     firstRow.focus();
     expect(firstRow).toHaveFocus();

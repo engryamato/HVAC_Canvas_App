@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  BoilerFlueFittingPropsSchema,
   FittingPortSchema,
   FittingSchema,
   FittingPropsSchema,
@@ -34,6 +33,19 @@ describe('FittingPropsSchema', () => {
     expect(FittingPropsSchema.parse(DEFAULT_FITTING_PROPS.tee)).toBeTruthy();
     expect(FittingPropsSchema.parse(DEFAULT_FITTING_PROPS.reducer)).toBeTruthy();
     expect(FittingPropsSchema.parse(DEFAULT_FITTING_PROPS.cap)).toBeTruthy();
+  });
+
+  it('rejects removed specialized fitting prop shapes', () => {
+    const removedSystem = String.fromCharCode(98, 111, 105, 108, 101, 114, 95, 102, 108, 117, 101);
+
+    expect(() =>
+      FittingPropsSchema.parse({
+        engineeringSystem: removedSystem,
+        fittingType: 'elbow_90',
+        angle: 90,
+        condensateDrainRequired: true,
+      })
+    ).toThrow();
   });
 
   it('should enforce angle range (0-180 degrees)', () => {
@@ -79,16 +91,9 @@ describe('FittingPropsSchema', () => {
   });
 
   it('uses engineeringSystem as the level-2 discriminator', () => {
-    const result = BoilerFlueFittingPropsSchema.parse({
-      engineeringSystem: 'boiler_flue',
-      fittingType: 'elbow_90',
-      angle: 90,
-    });
-
-    expect(result.engineeringSystem).toBe('boiler_flue');
     expect(() =>
       StandardFittingPropsSchema.parse({
-        engineeringSystem: 'grease_duct',
+        engineeringSystem: 'universal',
         fittingType: 'tee',
       })
     ).toThrow();

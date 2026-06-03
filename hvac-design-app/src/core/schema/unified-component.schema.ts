@@ -12,13 +12,7 @@ const CoercedDateSchema = z.coerce.date();
 export const ComponentClassSchema = z.enum(['duct', 'fitting', 'equipment', 'accessory']);
 export type ComponentClass = z.infer<typeof ComponentClassSchema>;
 
-export const EngineeringSystemSchema = z.enum([
-  'standard_duct',
-  'boiler_flue',
-  'grease_duct',
-  'generator_exhaust',
-  'universal',
-]);
+export const EngineeringSystemSchema = z.enum(['standard_duct', 'universal']);
 export type EngineeringSystem = z.infer<typeof EngineeringSystemSchema>;
 
 export const CatalogSourceSchema = z.enum(['system', 'custom']);

@@ -42,7 +42,7 @@ describe('fabricationProfileStore', () => {
 
     const persisted = JSON.parse(localStorage.getItem(FABRICATION_PROFILE_STORAGE_KEY) ?? '{}');
     expect(persisted.state.committed.profiles.round_rigid.defaultSectionLength).toBe(8);
-    expect(store.getSectionLength('grease_duct', 'round')).toBe(8);
+    expect(store.getSectionLength('standard_duct', 'round')).toBe(8);
 
     useFabricationProfileStore.getState().resetProfiles();
 

@@ -19,7 +19,7 @@ const createTestDuct = (overrides: Partial<Duct['props']> & Record<string, unkno
   modifiedAt: '2026-01-01T00:00:00.000Z',
   props: {
     name: 'Test Duct',
-    engineeringSystem: 'boiler_flue',
+    engineeringSystem: 'standard_duct',
     shape: 'round',
     diameter: 12,
     length: 10,
@@ -57,24 +57,24 @@ describe('useCalculations helpers', () => {
   beforeEach(() => {
     useUnifiedCatalogStore.getState().reset();
     useUnifiedCatalogStore.getState().addSystemProfile({
-      id: 'boiler-flue',
-      name: 'Boiler & Water Heater Flue',
-      engineeringSystem: 'boiler_flue',
-      defaultSystemType: 'exhaust',
-      color: '#ea580c',
+      id: 'standard-duct',
+      name: 'Standard Ductwork',
+      engineeringSystem: 'standard_duct',
+      defaultSystemType: 'supply',
+      color: '#2563eb',
       source: 'baseline',
       supportedArchetypes: {
-        duct: ['single_wall_pipe'],
-        fitting: ['boot_tee'],
-        equipment: ['draft_inducer'],
-        accessory: ['condensate_trap'],
+        duct: ['straight'],
+        fitting: ['elbow'],
+        equipment: ['terminal_box'],
+        accessory: ['damper'],
       },
       fittingRules: [],
       dimensionalConstraints: {
-        minimumSlopePerFoot: 0.5,
+        maximumAspectRatio: 4,
       },
       complianceRefs: [],
-      calculationCapabilities: ['sizing', 'compliance'],
+      calculationCapabilities: ['sizing'],
     });
   });
 
@@ -137,7 +137,7 @@ describe('useCalculations helpers', () => {
   });
 
   it('builds warnings for unsupported systems only when required', () => {
-    const engine = calculateDuct(createTestDuct({ engineeringSystem: 'generator_exhaust' })).engine;
+    const engine = calculateDuct(createTestDuct({ engineeringSystem: 'standard_duct' })).engine;
 
     expect(engine.supported).toBe(true);
     expect(buildEngineDispatchWarning(engine)).toBeUndefined();
@@ -157,24 +157,7 @@ describe('useCalculations helpers', () => {
     });
   });
 
-  it('surfaces boiler flue compliance warnings and universal load/compliance support', () => {
-    const boilerFlue = calculateDuct(
-      createTestDuct({
-        engineeringSystem: 'boiler_flue',
-        condensateSlope: 0.25,
-        venting: 'natural',
-        wallType: 'single',
-      })
-    );
-
-    expect(boilerFlue.engine.capabilities).toEqual(['sizing', 'compliance']);
-    expect(boilerFlue.complianceWarnings).toContain(
-      'Condensate slope 0.25 in/ft is below the required 0.50 in/ft.'
-    );
-    expect(boilerFlue.complianceWarnings).toContain(
-      'Verify single-wall natural vent runs remain within listed connector limitations.'
-    );
-
+  it('surfaces universal load/compliance support', () => {
     const universal = calculateDuct(
       createTestDuct({
         engineeringSystem: 'universal' as never,

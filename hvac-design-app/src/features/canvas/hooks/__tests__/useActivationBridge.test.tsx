@@ -31,25 +31,6 @@ function seedBridgeStore() {
     complianceRefs: [],
     calculationCapabilities: ['sizing'],
   });
-  store.addSystemProfile({
-    id: 'boiler-flue',
-    name: 'Boiler & Water Heater Flue',
-    engineeringSystem: 'boiler_flue',
-    defaultSystemType: 'exhaust',
-    color: '#ea580c',
-    source: 'baseline',
-    supportedArchetypes: {
-      duct: ['single_wall_pipe'],
-      fitting: ['boot_tee'],
-      equipment: ['draft_inducer'],
-      accessory: ['condensate_trap'],
-    },
-    fittingRules: [],
-    dimensionalConstraints: {},
-    complianceRefs: [],
-    calculationCapabilities: ['sizing', 'compliance'],
-  });
-
   store.addEntry({
     id: 'round-duct',
     name: 'Round Duct',
@@ -84,23 +65,22 @@ function seedBridgeStore() {
   });
 
   store.addEntry({
-    id: 'single-wall-pipe',
-    name: 'Single Wall Pipe',
+    id: 'standard-elbow',
+    name: 'Standard Elbow',
     componentClass: 'fitting',
     category: 'fitting',
-    categoryId: 'boiler_flue',
+    categoryId: 'standard_ductwork',
     typeId: 'elbow',
     type: 'elbow',
     subtype: 'radius',
-    engineeringSystem: 'boiler_flue',
+    engineeringSystem: 'standard_duct',
     placeable: true,
     source: 'system',
-    specialtyToolId: 'single_wall_pipe',
     recommendedFittingEntryIds: [],
     recommendedAccessoryEntryIds: [],
     recommendedEquipmentEntryIds: [],
     connectionNotes: [],
-    systemType: 'exhaust',
+    systemType: 'supply',
     engineeringProperties: {
       frictionFactor: 0.01,
       maxVelocity: 2000,
@@ -119,22 +99,21 @@ function seedBridgeStore() {
   });
 
   store.addEntry({
-    id: 'draft-inducer',
-    name: 'Draft Inducer',
+    id: 'terminal-box',
+    name: 'Terminal Box',
     componentClass: 'equipment',
     category: 'equipment',
-    categoryId: 'boiler_flue',
-    typeId: 'draft_inducer',
-    type: 'draft_inducer',
-    engineeringSystem: 'boiler_flue',
+    categoryId: 'standard_ductwork',
+    typeId: 'terminal_box',
+    type: 'terminal_box',
+    engineeringSystem: 'standard_duct',
     placeable: true,
     source: 'system',
-    specialtyToolId: 'draft_inducer',
     recommendedFittingEntryIds: [],
     recommendedAccessoryEntryIds: [],
     recommendedEquipmentEntryIds: [],
     connectionNotes: [],
-    systemType: 'exhaust',
+    systemType: 'supply',
     engineeringProperties: {
       frictionFactor: 0.01,
       maxVelocity: 2000,
@@ -234,7 +213,7 @@ describe('useActivationBridge', () => {
     render(<ActivationBridgeProbe />);
 
     await act(async () => {
-      useUnifiedCatalogStore.getState().selectEntry('single-wall-pipe');
+      useUnifiedCatalogStore.getState().selectEntry('standard-elbow');
     });
 
     await waitFor(() => {
@@ -257,13 +236,13 @@ describe('useActivationBridge', () => {
     render(<ActivationBridgeProbe />);
 
     await act(async () => {
-      useUnifiedCatalogStore.getState().selectEntry('draft-inducer');
+      useUnifiedCatalogStore.getState().selectEntry('terminal-box');
     });
 
     await waitFor(() => {
       expect(useToolStore.getState().currentTool).toBe('equipment');
       expect(useToolStore.getState().activeSpecialtyToolId).toBeNull();
-      expect(useToolStore.getState().selectedEquipmentType).toBe('fan');
+      expect(useToolStore.getState().selectedEquipmentType).toBe('damper');
     });
   });
 

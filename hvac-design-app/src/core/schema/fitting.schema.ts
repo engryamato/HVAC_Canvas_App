@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { BaseEntitySchema, ServiceIdSchema } from './base.schema';
 import { ConstraintStatusSchema } from './duct.schema';
-import { EngineeringSystemSchema } from './unified-component.schema';
 
 /**
  * Fitting types for duct connections
@@ -106,24 +105,6 @@ export const StandardFittingPropsSchema = SharedFittingPropsSchema.extend({
   engineeringSystem: z.literal('standard_duct'),
 });
 
-export const BoilerFlueFittingPropsSchema = SharedFittingPropsSchema.extend({
-  engineeringSystem: z.literal('boiler_flue'),
-  wallType: z.enum(['single', 'double']).optional(),
-  condensateDrainRequired: z.boolean().optional(),
-});
-
-export const GreaseDuctFittingPropsSchema = SharedFittingPropsSchema.extend({
-  engineeringSystem: z.literal('grease_duct'),
-  weldedAccessRequired: z.boolean().optional(),
-  greaseRated: z.boolean().optional(),
-});
-
-export const GeneratorExhaustFittingPropsSchema = SharedFittingPropsSchema.extend({
-  engineeringSystem: z.literal('generator_exhaust'),
-  backpressureLimit: z.number().min(0).optional(),
-  thermalExpansionJointRequired: z.boolean().optional(),
-});
-
 /**
  * Fitting properties
  * Added name field for consistency with other entity types
@@ -136,19 +117,11 @@ export const FittingPropsSchema = z.preprocess(
 
     const candidate = value as Record<string, unknown>;
     return {
-      engineeringSystem:
-        EngineeringSystemSchema.safeParse(candidate.engineeringSystem).success
-          ? candidate.engineeringSystem
-          : 'standard_duct',
+      engineeringSystem: candidate.engineeringSystem ?? 'standard_duct',
       ...candidate,
     };
   },
-  z.union([
-    StandardFittingPropsSchema,
-    BoilerFlueFittingPropsSchema,
-    GreaseDuctFittingPropsSchema,
-    GeneratorExhaustFittingPropsSchema,
-  ])
+  StandardFittingPropsSchema
 );
 
 export type FittingProps = z.infer<typeof FittingPropsSchema>;

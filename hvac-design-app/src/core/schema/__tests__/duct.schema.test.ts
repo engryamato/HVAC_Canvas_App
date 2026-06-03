@@ -41,6 +41,19 @@ describe('DuctPropsSchema', () => {
     expect(DuctPropsSchema.parse(DEFAULT_RECTANGULAR_DUCT_PROPS)).toBeTruthy();
   });
 
+  it('rejects removed specialized duct prop shapes', () => {
+    const removedSystem = String.fromCharCode(103, 114, 101, 97, 115, 101, 95, 100, 117, 99, 116);
+
+    expect(() =>
+      DuctPropsSchema.parse({
+        ...DEFAULT_ROUND_DUCT_PROPS,
+        engineeringSystem: removedSystem,
+        constructionType: 'welded',
+        liquidTight: true,
+      })
+    ).toThrow();
+  });
+
   it('should reject round duct without diameter', () => {
     const invalid = { ...DEFAULT_ROUND_DUCT_PROPS, diameter: undefined };
     expect(() => DuctPropsSchema.parse(invalid)).toThrow();

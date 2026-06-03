@@ -37,7 +37,7 @@ describe('summarizeDuctRunQuantity', () => {
   it('reports explicit partial pieces in segment order', () => {
     const summary = summarizeDuctRunQuantity({
       shape: 'round',
-      engineeringSystem: 'grease_duct',
+      engineeringSystem: 'standard_duct',
       diameter: 18,
       segments: [
         { index: 0, length: 5, isPartial: false, startStation: 0, endStation: 5 },
@@ -48,8 +48,8 @@ describe('summarizeDuctRunQuantity', () => {
     });
 
     expect(summary).toMatchObject({
-      family: 'grease_duct',
-      familyLabel: 'Grease Duct',
+      family: 'standard_duct',
+      familyLabel: 'Standard Duct',
       shape: 'round',
       shapeLabel: 'Round',
       sizeKey: 'round:18',
@@ -66,7 +66,7 @@ describe('summarizeDuctRunQuantity', () => {
   it('falls back to the only segment length when the run is entirely partial', () => {
     const summary = summarizeDuctRunQuantity({
       shape: 'flexible',
-      engineeringSystem: 'generator_exhaust',
+      engineeringSystem: 'standard_duct',
       diameter: 8,
       segments: [{ index: 0, length: 3.25, isPartial: true, startStation: 0, endStation: 3.25 }],
     });
@@ -82,7 +82,7 @@ describe('summarizeDuctRunQuantity', () => {
     expect(() =>
       summarizeDuctRunQuantity({
         shape: 'rectangular',
-        engineeringSystem: 'boiler_flue',
+        engineeringSystem: 'standard_duct',
         width: 20,
         height: 20,
         segments: [],

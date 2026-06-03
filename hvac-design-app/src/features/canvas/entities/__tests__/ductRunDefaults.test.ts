@@ -7,12 +7,12 @@ describe('canvas ductRunDefaults', () => {
       shape: 'flat_oval',
       width: 30,
       height: 12,
-      engineeringSystem: 'generator_exhaust',
+      engineeringSystem: 'standard_duct',
       systemType: 'exhaust',
     });
 
     expect(run.props).toMatchObject({
-      engineeringSystem: 'generator_exhaust',
+      engineeringSystem: 'standard_duct',
       systemType: 'exhaust',
     });
   });

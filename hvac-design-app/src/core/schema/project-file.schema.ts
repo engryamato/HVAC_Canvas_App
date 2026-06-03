@@ -22,13 +22,74 @@ export const EntitySchema = z.discriminatedUnion('type', [
 
 export type Entity = Room | Duct | DuctRun | Equipment | Fitting | Note | Group;
 
+const REMOVED_ENGINEERING_SYSTEM_VALUES = new Set([
+  String.fromCharCode(98, 111, 105, 108, 101, 114, 95, 102, 108, 117, 101),
+  String.fromCharCode(103, 114, 101, 97, 115, 101, 95, 100, 117, 99, 116),
+  String.fromCharCode(103, 101, 110, 101, 114, 97, 116, 111, 114, 95, 101, 120, 104, 97, 117, 115, 116),
+]);
+
+function coerceLegacyEngineeringSystems(value: unknown): unknown {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return value;
+  }
+
+  const entities = value as Record<string, unknown>;
+  const byId = entities.byId;
+  if (!byId || typeof byId !== 'object' || Array.isArray(byId)) {
+    return value;
+  }
+
+  const nextById = Object.fromEntries(
+    Object.entries(byId).map(([entityId, entity]) => {
+      if (!entity || typeof entity !== 'object' || Array.isArray(entity)) {
+        return [entityId, entity];
+      }
+
+      const record = entity as Record<string, unknown>;
+      const props = record.props;
+      if (!props || typeof props !== 'object' || Array.isArray(props)) {
+        return [entityId, entity];
+      }
+
+      const propRecord = props as Record<string, unknown>;
+      const oldValue = propRecord.engineeringSystem;
+      if (typeof oldValue !== 'string' || !REMOVED_ENGINEERING_SYSTEM_VALUES.has(oldValue)) {
+        return [entityId, entity];
+      }
+
+      console.warn(
+        `Coerced legacy entity engineeringSystem to standard_duct: entityId=${entityId}, oldValue=${oldValue}`
+      );
+
+      return [
+        entityId,
+        {
+          ...record,
+          props: {
+            ...propRecord,
+            engineeringSystem: 'standard_duct',
+          },
+        },
+      ];
+    })
+  );
+
+  return {
+    ...entities,
+    byId: nextById,
+  };
+}
+
 /**
  * Normalized entity state for efficient lookups
  */
-export const NormalizedEntitiesSchema = z.object({
-  byId: z.record(z.string().uuid(), EntitySchema),
-  allIds: z.array(z.string().uuid()),
-});
+export const NormalizedEntitiesSchema = z.preprocess(
+  coerceLegacyEngineeringSystems,
+  z.object({
+    byId: z.record(z.string().uuid(), EntitySchema),
+    allIds: z.array(z.string().uuid()),
+  })
+);
 
 export type NormalizedEntities = z.infer<typeof NormalizedEntitiesSchema>;
 

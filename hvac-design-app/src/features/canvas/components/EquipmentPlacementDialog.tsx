@@ -421,9 +421,6 @@ export function EquipmentPlacementDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="standard_duct">Standard Duct</SelectItem>
-                  <SelectItem value="boiler_flue">Boiler Flue</SelectItem>
-                  <SelectItem value="grease_duct">Grease Duct</SelectItem>
-                  <SelectItem value="generator_exhaust">Generator Exhaust</SelectItem>
                   <SelectItem value="universal">Universal</SelectItem>
                 </SelectContent>
               </Select>

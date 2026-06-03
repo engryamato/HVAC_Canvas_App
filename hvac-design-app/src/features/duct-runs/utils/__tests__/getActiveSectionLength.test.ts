@@ -27,7 +27,7 @@ describe('getActiveSectionLength', () => {
     expect(
       getActiveSectionLength({
         props: {
-          engineeringSystem: 'boiler_flue',
+          engineeringSystem: 'standard_duct',
           shape: 'flat_oval',
         },
       } as never)

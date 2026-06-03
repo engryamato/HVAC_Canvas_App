@@ -188,12 +188,6 @@ export function createEquipment(
     connectionPorts: ConnectionPort[];
     loadRating: number;
     spacingRule: string;
-    backpressureLimit: number;
-    engineModel: string;
-    draftType: 'natural' | 'forced';
-    btuInput: number;
-    greaseExtractionStage: 'single' | 'multi';
-    fireSuppressionReady: boolean;
   }>
 ): Equipment {
   const equipmentNumber = getNextEquipmentNumber(equipmentType);
@@ -238,14 +232,6 @@ export function createEquipment(
       ...(connectionPorts?.length ? { connectionPorts } : {}),
       ...(overrides?.loadRating !== undefined ? { loadRating: overrides.loadRating } : {}),
       ...(overrides?.spacingRule ? { spacingRule: overrides.spacingRule } : {}),
-      ...(overrides?.backpressureLimit !== undefined ? { backpressureLimit: overrides.backpressureLimit } : {}),
-      ...(overrides?.engineModel ? { engineModel: overrides.engineModel } : {}),
-      ...(overrides?.draftType ? { draftType: overrides.draftType } : {}),
-      ...(overrides?.btuInput !== undefined ? { btuInput: overrides.btuInput } : {}),
-      ...(overrides?.greaseExtractionStage ? { greaseExtractionStage: overrides.greaseExtractionStage } : {}),
-      ...(overrides?.fireSuppressionReady !== undefined
-        ? { fireSuppressionReady: overrides.fireSuppressionReady }
-        : {}),
     },
   };
 }
