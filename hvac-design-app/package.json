@@ -18,6 +18,7 @@
     "tauri:build": "NODE_ENV=production node scripts/validate-env.js && tauri build",
     "validate-env": "node scripts/validate-env.js",
     "test": "vitest run",
+    "test:pending": "vitest run --config vitest.pending.config.ts",
     "test:watch": "vitest",
     "test:ci": "vitest run --reporter=verbose --reporter=json --outputFile=test-results.json",
     "test:ui": "vitest --ui",

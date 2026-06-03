@@ -9,7 +9,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts', 'vitest-canvas-mock'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules/', 'e2e/', 'src-tauri/'],
+    exclude: ['node_modules/', 'e2e/', 'src-tauri/', '**/*.pending.test.ts'],
     deps: {
       // Inline Tauri modules so mocks work with dynamic imports
       inline: [/@tauri-apps/],
