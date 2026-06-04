@@ -33,7 +33,7 @@ import type { GaugeWeightRecord } from './gaugeWeightTable';
  * is the next step.
  */
 
-export type DerivableGauge = GaugeWeightRecord['gauge']; // 26 | 24 | 22 | 20 | 18
+export type DerivableGauge = GaugeWeightRecord['gauge']; // 26 | 24 | 22 | 20 | 18 | 16
 
 interface GaugeBreak {
   /** Inclusive upper bound on the largest cross-section dimension, inches. */

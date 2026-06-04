@@ -69,6 +69,32 @@ describe('WS6b/WS6a — deriveDuctConstruction (flag on)', () => {
     const result = deriveDuctConstruction(duct({ shape: 'rectangular', width: 24, height: 12, length: 40 }));
     expect(result!.surfaceAreaSquareFeet).toBeCloseTo(2 * (2 + 1) * 40, 9);
   });
+
+  it('uses installLength for duct_run props (not just legacy length)', () => {
+    const viaLength = deriveDuctConstruction(duct({ shape: 'round', diameter: 12, length: 10 }));
+    const viaInstall = deriveDuctConstruction(
+      duct({ shape: 'round', diameter: 12, installLength: 10 } as Partial<DuctProps>)
+    );
+    expect(viaInstall!.surfaceAreaSquareFeet).toBeCloseTo(viaLength!.surfaceAreaSquareFeet, 9);
+    expect(viaInstall!.surfaceAreaSquareFeet).toBeCloseTo(Math.PI * 1 * 10, 9);
+  });
+
+  it('normalizes flat-oval major/minor regardless of width vs height order', () => {
+    const wide = deriveDuctConstruction(duct({ shape: 'flat_oval', width: 24, height: 12, length: 10 } as unknown as Partial<DuctProps>));
+    const tall = deriveDuctConstruction(duct({ shape: 'flat_oval', width: 12, height: 24, length: 10 } as unknown as Partial<DuctProps>));
+    const expected = (Math.PI * 1 + 2 * (2 - 1)) * 10; // major=2ft, minor=1ft
+    expect(wide!.surfaceAreaSquareFeet).toBeCloseTo(expected, 9);
+    expect(tall!.surfaceAreaSquareFeet).toBeCloseTo(expected, 9);
+  });
+
+  it('preserves a gauge that has no provenance record (imported/migrated data)', () => {
+    const result = deriveDuctConstruction(
+      duct({ shape: 'round', diameter: 12, length: 10, gauge: 30 } as Partial<DuctProps>)
+    );
+    expect(result!.gauge).toBe(30); // not recomputed
+    expect(result!.gaugeProvenance).toBeUndefined();
+    expect(result!.weightPounds).toBeUndefined(); // 30 is off-table → "—"
+  });
 });
 
 describe('WS6b/WS6a — deriveDuctConstruction (flag off)', () => {

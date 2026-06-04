@@ -45,7 +45,9 @@ function isTableGauge(gauge: number | undefined): gauge is GaugeWeightRecord['ga
 }
 
 function ductSurfaceArea(props: Partial<DuctProps>, shape: DuctRunShape): number {
-  const lengthFeet = props.length ?? 0;
+  // Legacy Duct carries `length`; DuctRun carries `installLength` — accept both.
+  const lengthFeet =
+    props.length ?? (props as { installLength?: number }).installLength ?? 0;
   const toFeet = (inches: number | undefined): number => (inches ?? 0) / 12;
 
   switch (shape) {
@@ -56,13 +58,18 @@ function ductSurfaceArea(props: Partial<DuctProps>, shape: DuctRunShape): number
         heightFeet: toFeet(props.height),
         lengthFeet,
       });
-    case 'flat_oval':
+    case 'flat_oval': {
+      // Major/minor are the larger/smaller cross-section dimension — do not
+      // assume width >= height (a rotated oval may carry width < height).
+      const major = Math.max(props.width ?? 0, props.height ?? 0);
+      const minor = Math.min(props.width ?? 0, props.height ?? 0);
       return EngineeringCalculator.calculateSurfaceArea({
         shape: 'flat_oval',
-        majorFeet: toFeet(props.width),
-        minorFeet: toFeet(props.height),
+        majorFeet: major / 12,
+        minorFeet: minor / 12,
         lengthFeet,
       });
+    }
     case 'flexible':
       return EngineeringCalculator.calculateSurfaceArea({
         shape: 'flexible',
@@ -91,7 +98,13 @@ export function deriveDuctConstruction(
   const effectivePressure = resolveEffectivePressureClass(props.pressureClass, defaults.defaultPressureClass);
 
   // Gauge — WS5 guarded. resolveComputedGauge returns null when `specified`.
-  const computed = resolveComputedGauge(props as Partial<SizableDuctProps>, shape, effectivePressure);
+  // Also preserve a gauge that exists WITHOUT a provenance record (imported /
+  // migrated / pre-WS5 data): treat it as user intent, never silently recompute.
+  const gaugePresentButUnprovenanced =
+    props.gauge !== undefined && props.provenance?.gauge === undefined;
+  const computed = gaugePresentButUnprovenanced
+    ? null
+    : resolveComputedGauge(props as Partial<SizableDuctProps>, shape, effectivePressure);
   const gauge = computed ? computed.gauge : props.gauge;
   const gaugeProvenance = computed ? ('computed' as const) : undefined;
 
