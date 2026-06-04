@@ -17,14 +17,21 @@ import type { GaugeWeightRecord } from './gaugeWeightTable';
  * pressure class — heavier (lower-number) gauge for larger ducts and higher
  * pressure. This module is the single derivation point feeding WS6a/WS7.
  *
- * ⚠️ PROVISIONAL TABLE — pending D11 gauge-SELECTION ratification.
- * `GAUGE_SELECTION_SCHEDULE` below reproduces a standard SMACNA rectangular
- * gauge schedule, but the exact breakpoints are the user's engineering-truth
- * call (the companion weight table in `gaugeWeightTable.ts` was D11-ratified by
- * the user on 2026-06-03; this selection schedule still needs the same sign-off).
- * It is therefore NOT yet auto-wired into the live cost/BOM path — derivation is
- * exposed as a pure function for WS6a/WS7 to consume once ratified. Ratifying =
- * editing the constants here; the mechanism and provenance handling are final.
+ * RATIFIED 2026-06-04 (user) per SMACNA source for the RECTANGULAR schedule:
+ * pressure classes group into 0.5/1/2" (low) and 4/6/10" (high) tiers, with 3"
+ * (medium) taking the high tier conservatively (its rectangular gauge is not
+ * separately tabulated in the source). Companion weight table ratified 2026-06-03
+ * (+16 ga added 2026-06-04). Seal class is derived from pressure per SMACNA
+ * (>=4"→A, 3"→B, <=2"→C) via {@link deriveSealClass}.
+ *
+ * ⚠️ ROUND/flat-oval: the source tabulates round gauge only for medium pressure;
+ * a complete cross-pressure round schedule is still pending. Round therefore
+ * still resolves through the (heavier, conservative) rectangular schedule — see
+ * {@link deriveGauge}. This OVERSTATES round weight/cost slightly until the round
+ * table is ratified; it never under-builds.
+ *
+ * Still exposed as a pure function for WS6a/WS7; live auto-wiring into cost/BOM
+ * is the next step.
  */
 
 export type DerivableGauge = GaugeWeightRecord['gauge']; // 26 | 24 | 22 | 20 | 18
@@ -36,61 +43,37 @@ interface GaugeBreak {
 }
 
 /**
- * Largest-dimension → gauge breakpoints per pressure class. Within a class the
- * gauge gets heavier as the duct grows; across classes it gets heavier as the
- * pressure rises (both columns are monotonic — asserted in the unit tests).
- * `Infinity` is the catch-all heaviest band.
+ * Largest-dimension → gauge breakpoints per pressure class (SMACNA rectangular,
+ * ratified 2026-06-04). Two tiers per the source: low (0.5/1/2") share one
+ * schedule; high (4/6/10") share a heavier one; medium (3") takes the high tier
+ * (its rectangular gauge is not separately tabulated). Within a class the gauge
+ * gets heavier as the duct grows; across classes it gets heavier as pressure
+ * rises (both monotonic — asserted in the unit tests). `Infinity` = heaviest band.
  */
+const LOW_PRESSURE_RECT: GaugeBreak[] = [
+  { maxDimensionIn: 12, gauge: 26 },
+  { maxDimensionIn: 30, gauge: 24 },
+  { maxDimensionIn: 54, gauge: 22 },
+  { maxDimensionIn: 84, gauge: 20 },
+  { maxDimensionIn: Infinity, gauge: 18 },
+];
+
+const HIGH_PRESSURE_RECT: GaugeBreak[] = [
+  { maxDimensionIn: 12, gauge: 24 },
+  { maxDimensionIn: 30, gauge: 22 },
+  { maxDimensionIn: 42, gauge: 20 },
+  { maxDimensionIn: 84, gauge: 18 },
+  { maxDimensionIn: Infinity, gauge: 16 },
+];
+
 const GAUGE_SELECTION_SCHEDULE: Record<PressureClass, GaugeBreak[]> = {
-  '0.5': [
-    { maxDimensionIn: 12, gauge: 26 },
-    { maxDimensionIn: 30, gauge: 26 },
-    { maxDimensionIn: 54, gauge: 24 },
-    { maxDimensionIn: 84, gauge: 22 },
-    { maxDimensionIn: Infinity, gauge: 20 },
-  ],
-  '1': [
-    { maxDimensionIn: 12, gauge: 26 },
-    { maxDimensionIn: 30, gauge: 24 },
-    { maxDimensionIn: 54, gauge: 22 },
-    { maxDimensionIn: 84, gauge: 22 },
-    { maxDimensionIn: Infinity, gauge: 20 },
-  ],
-  '2': [
-    { maxDimensionIn: 12, gauge: 26 },
-    { maxDimensionIn: 30, gauge: 24 },
-    { maxDimensionIn: 54, gauge: 22 },
-    { maxDimensionIn: 84, gauge: 20 },
-    { maxDimensionIn: Infinity, gauge: 18 },
-  ],
-  '3': [
-    { maxDimensionIn: 12, gauge: 24 },
-    { maxDimensionIn: 30, gauge: 22 },
-    { maxDimensionIn: 54, gauge: 20 },
-    { maxDimensionIn: 84, gauge: 18 },
-    { maxDimensionIn: Infinity, gauge: 18 },
-  ],
-  '4': [
-    { maxDimensionIn: 12, gauge: 24 },
-    { maxDimensionIn: 30, gauge: 22 },
-    { maxDimensionIn: 54, gauge: 20 },
-    { maxDimensionIn: 84, gauge: 18 },
-    { maxDimensionIn: Infinity, gauge: 18 },
-  ],
-  '6': [
-    { maxDimensionIn: 12, gauge: 22 },
-    { maxDimensionIn: 30, gauge: 20 },
-    { maxDimensionIn: 54, gauge: 18 },
-    { maxDimensionIn: 84, gauge: 18 },
-    { maxDimensionIn: Infinity, gauge: 18 },
-  ],
-  '10': [
-    { maxDimensionIn: 12, gauge: 20 },
-    { maxDimensionIn: 30, gauge: 18 },
-    { maxDimensionIn: 54, gauge: 18 },
-    { maxDimensionIn: 84, gauge: 18 },
-    { maxDimensionIn: Infinity, gauge: 18 },
-  ],
+  '0.5': LOW_PRESSURE_RECT,
+  '1': LOW_PRESSURE_RECT,
+  '2': LOW_PRESSURE_RECT,
+  '3': HIGH_PRESSURE_RECT,
+  '4': HIGH_PRESSURE_RECT,
+  '6': HIGH_PRESSURE_RECT,
+  '10': HIGH_PRESSURE_RECT,
 };
 
 /**
@@ -131,6 +114,25 @@ export function resolveEffectiveSealClass(
   projectDefault: SealClass | undefined
 ): SealClass {
   return runValue ?? projectDefault ?? DEFAULT_SEAL_CLASS;
+}
+
+/**
+ * SMACNA-derived seal class from pressure class (source-ratified 2026-06-04):
+ * `>=4"` → A (all joints/seams/penetrations), `3"` → B (transverse + seams),
+ * `<=2"` → C (transverse joints). SMACNA leaves `<2"` technically unsealed, but
+ * we floor at C (the lightest sealed class) so every run carries a valid class.
+ *
+ * NOTE: this supersedes the blanket `DEFAULT_SEAL_CLASS='A'` posture — see the
+ * open decision in the WS6b memory before wiring it as the live default.
+ */
+export function deriveSealClass(pressureClass: PressureClass): SealClass {
+  if (pressureClass === '4' || pressureClass === '6' || pressureClass === '10') {
+    return 'A';
+  }
+  if (pressureClass === '3') {
+    return 'B';
+  }
+  return 'C';
 }
 
 /** Largest cross-section dimension (inches) for a duct of the given props. */

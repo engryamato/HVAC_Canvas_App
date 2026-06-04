@@ -8,6 +8,7 @@ import {
 import { GAUGE_WEIGHT_TABLE } from '../gaugeWeightTable';
 import {
   deriveGauge,
+  deriveSealClass,
   largestDimensionOf,
   resolveComputedGauge,
   resolveEffectivePressureClass,
@@ -24,9 +25,24 @@ describe('WS6b — deriveGauge (SMACNA selection schedule)', () => {
     expect(deriveGauge(10, 'rectangular', '2')).toBe(26);
   });
 
-  it('uses the heaviest gauge for a large high-pressure duct', () => {
-    expect(deriveGauge(200, 'rectangular', '10')).toBe(18);
+  it('uses 16 ga for a large high-pressure duct and 18 ga for large low-pressure', () => {
+    expect(deriveGauge(200, 'rectangular', '10')).toBe(16);
+    expect(deriveGauge(200, 'rectangular', '4')).toBe(16);
     expect(deriveGauge(200, 'rectangular', '2')).toBe(18);
+  });
+
+  it('shares one schedule across the low-pressure tier (0.5/1/2)', () => {
+    for (const dim of [10, 24, 40, 70, 120]) {
+      expect(deriveGauge(dim, 'rectangular', '0.5')).toBe(deriveGauge(dim, 'rectangular', '2'));
+      expect(deriveGauge(dim, 'rectangular', '1')).toBe(deriveGauge(dim, 'rectangular', '2'));
+    }
+  });
+
+  it('shares one schedule across the high-pressure tier (3/4/6/10)', () => {
+    for (const dim of [10, 24, 40, 70, 120]) {
+      expect(deriveGauge(dim, 'rectangular', '3')).toBe(deriveGauge(dim, 'rectangular', '10'));
+      expect(deriveGauge(dim, 'rectangular', '6')).toBe(deriveGauge(dim, 'rectangular', '10'));
+    }
   });
 
   it('only ever returns a gauge present in the ratified weight table', () => {
@@ -79,6 +95,27 @@ describe('WS6b — effective class resolution (project default + per-run overrid
   it('lets the per-run value win over the project default', () => {
     expect(resolveEffectivePressureClass('6', '4')).toBe('6');
     expect(resolveEffectiveSealClass('B', 'C')).toBe('B');
+  });
+});
+
+describe('WS6b — deriveSealClass (SMACNA pressure → seal chain)', () => {
+  it('maps pressure class to the SMACNA seal class', () => {
+    expect(deriveSealClass('0.5')).toBe('C');
+    expect(deriveSealClass('1')).toBe('C');
+    expect(deriveSealClass('2')).toBe('C');
+    expect(deriveSealClass('3')).toBe('B');
+    expect(deriveSealClass('4')).toBe('A');
+    expect(deriveSealClass('6')).toBe('A');
+    expect(deriveSealClass('10')).toBe('A');
+  });
+
+  it('gets stricter (C→B→A) as pressure rises', () => {
+    const order = { C: 0, B: 1, A: 2 };
+    const classes = ['0.5', '1', '2', '3', '4', '6', '10'] as const;
+    const seals = classes.map((pc) => order[deriveSealClass(pc)]);
+    for (let i = 1; i < seals.length; i += 1) {
+      expect(seals[i]!).toBeGreaterThanOrEqual(seals[i - 1]!);
+    }
   });
 });
 
