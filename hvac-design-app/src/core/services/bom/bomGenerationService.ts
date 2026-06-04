@@ -35,6 +35,8 @@ export interface BOMItem {
   material?: string;
   size?: string; // e.g., "12 inch" or "14x8"
   gauge?: number;
+  surfaceAreaSquareFeet?: number;
+  weightPounds?: number;
   
   // Grouping
   groupKey: string; // For aggregation
@@ -86,6 +88,10 @@ type DuctLike = {
     gauge?: number;
     insulated?: boolean;
     insulationThickness?: number;
+  };
+  calculated?: {
+    surfaceArea?: number;
+    weight?: number;
   };
 };
 
@@ -327,6 +333,8 @@ export class BOMGenerationService {
       material,
       size,
       gauge,
+      surfaceAreaSquareFeet: duct.calculated?.surfaceArea,
+      weightPounds: duct.calculated?.weight,
       groupKey,
       sourceEntityIds: [duct.id],
     };
@@ -447,6 +455,13 @@ export class BOMGenerationService {
         // Merge quantities
         existing.quantity += item.quantity;
         existing.quantityWithWaste += item.quantityWithWaste;
+        if (item.surfaceAreaSquareFeet !== undefined || existing.surfaceAreaSquareFeet !== undefined) {
+          existing.surfaceAreaSquareFeet =
+            (existing.surfaceAreaSquareFeet ?? 0) + (item.surfaceAreaSquareFeet ?? 0);
+        }
+        if (item.weightPounds !== undefined || existing.weightPounds !== undefined) {
+          existing.weightPounds = (existing.weightPounds ?? 0) + (item.weightPounds ?? 0);
+        }
         existing.sourceEntityIds.push(...item.sourceEntityIds);
       } else {
         grouped.set(groupingIdentity, { ...item });
