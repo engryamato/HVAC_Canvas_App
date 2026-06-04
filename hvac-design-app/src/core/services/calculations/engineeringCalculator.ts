@@ -1,5 +1,16 @@
 import { EngineeringLimits } from '../../schema/calculation-settings.schema';
 import { DuctEngineeringData } from '../../schema/duct.schema';
+import { getGaugeWeight, type GaugeWeightRecord } from './gaugeWeightTable';
+
+/** WS6a-A1: flexible duct corrugation/stretch factor on the round area. */
+export const FLEX_CORRUGATION_FACTOR = 1.05;
+
+/** WS6a-A1 surface-area inputs (all lengths in FEET; one variant per shape). */
+export type SurfaceAreaInput =
+  | { shape: 'rectangular'; widthFeet: number; heightFeet: number; lengthFeet: number }
+  | { shape: 'round'; diameterFeet: number; lengthFeet: number }
+  | { shape: 'flexible'; diameterFeet: number; lengthFeet: number }
+  | { shape: 'flat_oval'; majorFeet: number; minorFeet: number; lengthFeet: number };
 
 /**
  * Engineering Calculations Service
@@ -274,6 +285,34 @@ export class EngineeringCalculator {
     }
 
     return totalDuctLoss + totalFittingLoss;
+  }
+
+  /**
+   * WS6a-A1 — duct lateral surface area (ft^2) from shape + dimensions in feet.
+   * rect 2(W+H)L; round/flex piDL (flex x1.05); flat-oval uses the oval
+   * perimeter [pi*a + 2(A-a)]L (a = minor/width, A = major), NOT a rectangle.
+   */
+  static calculateSurfaceArea(input: SurfaceAreaInput): number {
+    switch (input.shape) {
+      case 'rectangular':
+        return 2 * (input.widthFeet + input.heightFeet) * input.lengthFeet;
+      case 'round':
+        return Math.PI * input.diameterFeet * input.lengthFeet;
+      case 'flexible':
+        return Math.PI * input.diameterFeet * input.lengthFeet * FLEX_CORRUGATION_FACTOR;
+      case 'flat_oval':
+        return (Math.PI * input.minorFeet + 2 * (input.majorFeet - input.minorFeet)) * input.lengthFeet;
+    }
+  }
+
+  /**
+   * WS6a-A3 — fabricated duct weight (lb) = surface area (ft^2) x the ratified
+   * SMACNA gauge unit weight (D11) including the 15% seam allowance. Gauge comes
+   * from WS6b. When the gauge is unresolved the CALLER must show "—" (never 0);
+   * this pure calculator requires a ratified gauge.
+   */
+  static calculateDuctWeight(input: { areaSquareFeet: number; gauge: GaugeWeightRecord['gauge'] }): number {
+    return input.areaSquareFeet * getGaugeWeight(input.gauge).fabricatedLbPerSquareFoot;
   }
 }
 
