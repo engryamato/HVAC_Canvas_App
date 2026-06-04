@@ -9,6 +9,7 @@ export * from './connectionCompatibility';
 export * from './wyeGeometry';
 export * from './fittingGeometry';
 export * from './twoPortFittingGeometry';
+export * from './transitionGeometry';
 export * from './elbowGeometry';
 export * from './branchFittingGeometry';
 export * from './ductCutbackService';
