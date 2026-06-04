@@ -6,7 +6,6 @@ import {
   type SealClass,
 } from '@/core/schema/duct.schema';
 import type { SizableDuctProps } from '@/core/services/sizing/sizingProvenance';
-import { getSizeProvenance } from '@/core/services/sizing/sizingProvenance';
 import type { GaugeWeightRecord } from './gaugeWeightTable';
 
 /**
@@ -216,7 +215,9 @@ export function resolveComputedGauge(
   shape: DuctRunShape,
   effectivePressureClass: PressureClass
 ): ResolvedGauge | null {
-  if (getSizeProvenance(props, 'gauge') === 'specified') {
+  // Inline of the WS5 provenance check (provenance.gauge defaults to 'computed')
+  // — kept dependency-free so the calculation layer stays store-cycle-safe.
+  if (props.provenance?.gauge === 'specified') {
     return null;
   }
   const dimension = largestDimensionOf(props);

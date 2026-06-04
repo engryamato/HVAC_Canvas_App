@@ -182,8 +182,12 @@ describe('entityActions', () => {
     expect(id).toBe(duct.id);
     expect(updates).toMatchObject({ props: { ...duct.props, airflow: 1400 } });
     expect(typeof updates.modifiedAt).toBe('string');
-    expect(previous).toEqual(duct);
-    expect(previous).not.toBe(duct);
+    // The committed pipeline derives construction (gauge/surfaceArea/weight) when
+    // the duct is added, so `previous` snapshots the derived stored entity — it
+    // must deep-equal current state but be a distinct clone (not the same ref).
+    const stored = useEntityStore.getState().byId[duct.id];
+    expect(previous).toEqual(stored);
+    expect(previous).not.toBe(stored);
   });
 
   it('commitEntityProps wraps direct updateEntity dispatch', () => {

@@ -7,7 +7,6 @@ import {
   DuctSizingParams 
 } from '../calculations/engineeringCalculator';
 import { validateDuctConstraints } from '../validation/constraintValidator';
-import { deriveDuctConstruction } from '../calculations/ductConstructionService';
 import { FittingGenerationService } from '../fittingGeneration';
 import {
   applyComputedSizing,
@@ -148,38 +147,19 @@ export class ParametricUpdateService {
 
     const timestamp = new Date().toISOString();
 
-    // WS6b/WS6a: derive gauge / seal class / surface area / weight from the
-    // updated size + pressure class (gated; null when off). WS5 provenance is
-    // respected — a user-specified gauge is preserved.
-    const construction = deriveDuctConstruction(normalizedProps);
-    const constructedProps: DuctProps = construction
-      ? {
-          ...normalizedProps,
-          ...(construction.gauge !== undefined ? { gauge: construction.gauge } : {}),
-          sealClass: construction.sealClass,
-          ...(construction.gaugeProvenance
-            ? { provenance: { ...normalizedProps.provenance, gauge: construction.gaugeProvenance } }
-            : {}),
-        }
-      : normalizedProps;
-    const constructedCalculated = construction
-      ? {
-          ...sourceDuct.calculated,
-          surfaceArea: construction.surfaceAreaSquareFeet,
-          weight: construction.weightPounds,
-        }
-      : undefined;
-
+    // Note: gauge / seal class / surface area / weight derivation (WS6a/WS6b) is
+    // centralized in the committed pipeline (entityStore.runCommittedPipeline),
+    // which covers both Duct and DuctRun — see deriveDuctConstruction. This path
+    // only updates engineering data + validation; the pipeline runs right after.
     const primaryDuctUpdate: { id: string; updates: Partial<Entity>; previous: Entity } = {
       id: sourceDuct.id,
       previous: sourceDuct,
       updates: {
         props: {
-          ...constructedProps,
+          ...normalizedProps,
           engineeringData: newEngineeringData,
           constraintStatus: validationStatus,
         },
-        ...(constructedCalculated ? { calculated: constructedCalculated } : {}),
         modifiedAt: timestamp,
       },
     };

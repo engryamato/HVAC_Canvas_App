@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type { Duct, DuctRun, Entity, EntityType } from '@/core/schema';
+import type { DuctProps } from '@/core/schema/duct.schema';
+import { deriveDuctConstruction } from '@/core/services/calculations/ductConstructionService';
 import { ConnectionGraphBuilder } from '@/core/services/graph/ConnectionGraphBuilder';
 import { ConnectionReconciliationService } from '@/core/services/graph/ConnectionReconciliationService';
 import { FlowPropagationService } from '@/core/services/graph/FlowPropagationService';
@@ -118,6 +120,37 @@ const runCommittedPipeline = (state: EntityState) => {
         ...entity.calculated,
         cumulativePressureDrop: undefined,
         availableStaticPressure: undefined,
+      } as typeof entity.calculated;
+    }
+
+    // WS6a/WS6b (H1b): derive construction — gauge, seal class, surface area,
+    // weight — for every duct AND duct_run in the committed recompute. Gated by
+    // WS6_CONSTRUCTION_DERIVATION (deriveDuctConstruction returns null when off).
+    // WS5 provenance is respected (a specified gauge is preserved); weight is
+    // left undefined ("—") when the gauge is unresolved — never 0.
+    for (const id of state.allIds) {
+      const entity = state.byId[id];
+      if (!entity || (entity.type !== 'duct' && entity.type !== 'duct_run')) {
+        continue;
+      }
+      const construction = deriveDuctConstruction(entity.props as Partial<DuctProps>);
+      if (!construction) {
+        continue;
+      }
+      if (construction.gauge !== undefined) {
+        entity.props.gauge = construction.gauge;
+      }
+      if (construction.gaugeProvenance) {
+        entity.props.provenance = {
+          ...entity.props.provenance,
+          gauge: construction.gaugeProvenance,
+        };
+      }
+      entity.props.sealClass = construction.sealClass;
+      entity.calculated = {
+        ...entity.calculated,
+        surfaceArea: construction.surfaceAreaSquareFeet,
+        weight: construction.weightPounds,
       } as typeof entity.calculated;
     }
 
