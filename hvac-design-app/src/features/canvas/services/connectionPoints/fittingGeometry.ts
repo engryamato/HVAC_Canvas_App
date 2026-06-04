@@ -1,9 +1,11 @@
 import type { Fitting } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
+import { isEnabled } from '@/core/flags/featureFlags';
 import type { ConnectionProfile, Point2D } from './types';
 import { buildTwoPortFittingGeometry } from './twoPortFittingGeometry';
 import { buildElbowGeometry } from './elbowGeometry';
 import { buildBranchFittingGeometry } from './branchFittingGeometry';
+import { buildTakeoffGeometry } from './takeoffGeometry';
 
 /**
  * Shared parametric fitting geometry (PR-8).
@@ -107,6 +109,14 @@ export interface FittingDimensions {
   transitionStyle: 'straight' | 'gored';
   /** Which side a 3-port branch leans toward (mirrors the branch in y). */
   branchSide: 'left' | 'right';
+  // WS6e E4 — body-junction takeoff detail (defaults reproduce a plain straight
+  // perpendicular tap; only the `takeoff` type reads these).
+  /** Takeoff class drawn at a duct-body junction. */
+  takeoffType: 'straight_tap' | 'conical_tap' | 'bellmouth' | 'spin_in' | 'saddle';
+  /** Takeoff branch entry angle from the trunk run, degrees (90 = perpendicular). */
+  entryAngle: number;
+  /** Whether a balancing-damper blade is drawn in the takeoff branch. */
+  hasDamper: boolean;
 }
 
 function clampSize(value: number | undefined, fallback: number): number {
@@ -218,6 +228,12 @@ export function resolveFittingDimensions(fitting: Fitting): FittingDimensions {
     transitionAlignment: resolveTransitionAlignment(variant?.transitionAlignment, transition?.alignment),
     transitionStyle: variant?.transitionStyle ?? 'straight',
     branchSide: variant?.branchSide ?? 'right',
+    takeoffType: variant?.takeoffType ?? 'straight_tap',
+    entryAngle:
+      variant?.entryAngleDeg !== undefined && Number.isFinite(variant.entryAngleDeg)
+        ? variant.entryAngleDeg
+        : 90,
+    hasDamper: variant?.hasDamper ?? false,
   };
 }
 
@@ -251,6 +267,12 @@ export function buildFittingGeometry(fitting: Fitting): FittingGeometry {
     case 'tee':
     case 'wye':
       return buildBranchFittingGeometry(type, dims);
+    case 'takeoff':
+      // WS6e E4: body-junction takeoff geometry. Behind WS6D_DESIGN_GEOMETRY so
+      // a flag-off build keeps the legacy reducer-shaped fallthrough.
+      return isEnabled('WS6D_DESIGN_GEOMETRY')
+        ? buildTakeoffGeometry(dims)
+        : buildTwoPortFittingGeometry(type, dims);
     default:
       return buildTwoPortFittingGeometry(type, dims);
   }
