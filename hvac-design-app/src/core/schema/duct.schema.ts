@@ -71,7 +71,8 @@ export type DuctShape = z.infer<typeof DuctShapeSchema>;
 export const PressureClassSchema = z.enum(['0.5', '1', '2', '3', '4', '6', '10']);
 export type PressureClass = z.infer<typeof PressureClassSchema>;
 
-export const SealClassSchema = z.enum(['A', 'B', 'C']);
+// SMACNA seal classes plus `unsealed` (< 2" w.g., non-VAV). A is the strictest.
+export const SealClassSchema = z.enum(['unsealed', 'A', 'B', 'C']);
 export type SealClass = z.infer<typeof SealClassSchema>;
 
 export const DEFAULT_PRESSURE_CLASS: PressureClass = '2';

@@ -73,9 +73,38 @@ describe('WS6b — deriveGauge (SMACNA selection schedule)', () => {
     expect(deriveGauge(40, 'rectangular')).toBe(deriveGauge(40, 'rectangular', DEFAULT_PRESSURE_CLASS));
   });
 
-  it('treats round/flexible by their largest dimension (never lighter than rectangular)', () => {
-    const round: DerivableGauge = deriveGauge(60, 'round', '2');
-    expect(round).toBe(deriveGauge(60, 'rectangular', '2'));
+  it('uses the SMACNA round spiral schedule for round/flexible', () => {
+    // Small round = lightest; round is lighter than rectangular where they diverge.
+    expect(deriveGauge(8, 'round', '2')).toBe(26);
+    const round20: DerivableGauge = deriveGauge(20, 'round', '2');
+    const rect20: DerivableGauge = deriveGauge(20, 'rectangular', '2');
+    expect(round20).toBeGreaterThan(rect20); // 26 (round) lighter than 24 (rect)
+  });
+
+  it('treats flexible identically to round', () => {
+    for (const dim of [10, 24, 40, 70]) {
+      for (const pc of ALL_CLASSES) {
+        expect(deriveGauge(dim, 'flexible', pc)).toBe(deriveGauge(dim, 'round', pc));
+      }
+    }
+  });
+
+  it('keeps flat-oval on the (conservative) rectangular schedule', () => {
+    for (const dim of [10, 40, 90]) {
+      expect(deriveGauge(dim, 'flat_oval', '2')).toBe(deriveGauge(dim, 'rectangular', '2'));
+    }
+  });
+
+  it('keeps the round schedule monotonic in size and pressure', () => {
+    const dims = [8, 20, 33, 40, 55, 80];
+    const within = dims.map((d) => deriveGauge(d, 'round', '2'));
+    for (let i = 1; i < within.length; i += 1) {
+      expect(within[i]!).toBeLessThanOrEqual(within[i - 1]!);
+    }
+    const across = ALL_CLASSES.map((pc) => deriveGauge(20, 'round', pc));
+    for (let i = 1; i < across.length; i += 1) {
+      expect(across[i]!).toBeLessThanOrEqual(across[i - 1]!);
+    }
   });
 });
 
@@ -99,9 +128,9 @@ describe('WS6b — effective class resolution (project default + per-run overrid
 });
 
 describe('WS6b — deriveSealClass (SMACNA pressure → seal chain)', () => {
-  it('maps pressure class to the SMACNA seal class', () => {
-    expect(deriveSealClass('0.5')).toBe('C');
-    expect(deriveSealClass('1')).toBe('C');
+  it('maps pressure class to the SMACNA seal class (unsealed < 2")', () => {
+    expect(deriveSealClass('0.5')).toBe('unsealed');
+    expect(deriveSealClass('1')).toBe('unsealed');
     expect(deriveSealClass('2')).toBe('C');
     expect(deriveSealClass('3')).toBe('B');
     expect(deriveSealClass('4')).toBe('A');
@@ -109,8 +138,8 @@ describe('WS6b — deriveSealClass (SMACNA pressure → seal chain)', () => {
     expect(deriveSealClass('10')).toBe('A');
   });
 
-  it('gets stricter (C→B→A) as pressure rises', () => {
-    const order = { C: 0, B: 1, A: 2 };
+  it('gets stricter (unsealed→C→B→A) as pressure rises', () => {
+    const order = { unsealed: 0, C: 1, B: 2, A: 3 };
     const classes = ['0.5', '1', '2', '3', '4', '6', '10'] as const;
     const seals = classes.map((pc) => order[deriveSealClass(pc)]);
     for (let i = 1; i < seals.length; i += 1) {

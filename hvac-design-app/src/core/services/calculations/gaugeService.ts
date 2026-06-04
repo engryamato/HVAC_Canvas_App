@@ -24,11 +24,10 @@ import type { GaugeWeightRecord } from './gaugeWeightTable';
  * (+16 ga added 2026-06-04). Seal class is derived from pressure per SMACNA
  * (>=4"→A, 3"→B, <=2"→C) via {@link deriveSealClass}.
  *
- * ⚠️ ROUND/flat-oval: the source tabulates round gauge only for medium pressure;
- * a complete cross-pressure round schedule is still pending. Round therefore
- * still resolves through the (heavier, conservative) rectangular schedule — see
- * {@link deriveGauge}. This OVERSTATES round weight/cost slightly until the round
- * table is ratified; it never under-builds.
+ * ROUND: ratified 2026-06-04 (user, SMACNA positive-pressure SPIRAL schedule —
+ * the common, lighter round construction; longitudinal-seam/fitting gauges are
+ * heavier and handled with WS6a fitting weight). Round/flexible use the round
+ * schedule; flat-oval keeps the (conservative) rectangular schedule.
  *
  * Still exposed as a pure function for WS6a/WS7; live auto-wiring into cost/BOM
  * is the next step.
@@ -77,17 +76,67 @@ const GAUGE_SELECTION_SCHEDULE: Record<PressureClass, GaugeBreak[]> = {
 };
 
 /**
- * Derive the SMACNA gauge for a duct's largest cross-section dimension (inches)
- * and pressure class. `shape` is accepted for future per-shape schedules; round
- * and flat-oval currently share the rectangular schedule keyed on their largest
- * dimension (diameter / major axis), which is conservative (never lighter).
+ * SMACNA round duct (positive-pressure, spiral lockseam), ratified 2026-06-04.
+ * Sampled by the source at 2"/4"/10" w.g.; mapped low (0.5/1/2)→2", medium
+ * (3/4)→4", high (6/10)→10". Breakpoints (inclusive diameter, inches) collapse
+ * the source's per-diameter rows. `Infinity` extends the largest sourced band
+ * (>84") to the heaviest gauge conservatively.
+ */
+const ROUND_LOW: GaugeBreak[] = [
+  { maxDimensionIn: 22, gauge: 26 },
+  { maxDimensionIn: 30, gauge: 24 },
+  { maxDimensionIn: 36, gauge: 22 },
+  { maxDimensionIn: 60, gauge: 20 },
+  { maxDimensionIn: 84, gauge: 18 },
+  { maxDimensionIn: Infinity, gauge: 16 },
+];
+
+const ROUND_MED: GaugeBreak[] = [
+  { maxDimensionIn: 18, gauge: 26 },
+  { maxDimensionIn: 26, gauge: 24 },
+  { maxDimensionIn: 36, gauge: 22 },
+  { maxDimensionIn: 50, gauge: 20 },
+  { maxDimensionIn: 84, gauge: 18 },
+  { maxDimensionIn: Infinity, gauge: 16 },
+];
+
+const ROUND_HIGH: GaugeBreak[] = [
+  { maxDimensionIn: 14, gauge: 26 },
+  { maxDimensionIn: 26, gauge: 24 },
+  { maxDimensionIn: 36, gauge: 22 },
+  { maxDimensionIn: 50, gauge: 20 },
+  { maxDimensionIn: 84, gauge: 18 },
+  { maxDimensionIn: Infinity, gauge: 16 },
+];
+
+const ROUND_SELECTION_SCHEDULE: Record<PressureClass, GaugeBreak[]> = {
+  '0.5': ROUND_LOW,
+  '1': ROUND_LOW,
+  '2': ROUND_LOW,
+  '3': ROUND_MED,
+  '4': ROUND_MED,
+  '6': ROUND_HIGH,
+  '10': ROUND_HIGH,
+};
+
+/** Round and flexible duct use the round schedule; flat-oval keeps rectangular. */
+function isRoundLike(shape: DuctRunShape): boolean {
+  return shape === 'round' || shape === 'flexible';
+}
+
+/**
+ * Derive the SMACNA gauge for a duct's largest cross-section dimension (inches),
+ * shape, and pressure class. Round/flexible use the (lighter) round spiral
+ * schedule; rectangular and flat-oval use the rectangular schedule.
  */
 export function deriveGauge(
   largestDimensionInches: number,
-  _shape: DuctRunShape,
+  shape: DuctRunShape,
   pressureClass: PressureClass = DEFAULT_PRESSURE_CLASS
 ): DerivableGauge {
-  const schedule = GAUGE_SELECTION_SCHEDULE[pressureClass];
+  const schedule = isRoundLike(shape)
+    ? ROUND_SELECTION_SCHEDULE[pressureClass]
+    : GAUGE_SELECTION_SCHEDULE[pressureClass];
   const dimension = Number.isFinite(largestDimensionInches) && largestDimensionInches > 0
     ? largestDimensionInches
     : 0;
@@ -119,11 +168,13 @@ export function resolveEffectiveSealClass(
 /**
  * SMACNA-derived seal class from pressure class (source-ratified 2026-06-04):
  * `>=4"` → A (all joints/seams/penetrations), `3"` → B (transverse + seams),
- * `<=2"` → C (transverse joints). SMACNA leaves `<2"` technically unsealed, but
- * we floor at C (the lightest sealed class) so every run carries a valid class.
+ * `2"` → C (transverse joints), `<2"` → `unsealed` (non-VAV). This is the
+ * ratified default logic; a project/run may still manually override to a
+ * stricter blanket class (e.g. owner-mandated Seal A) — that override wins via
+ * the stored `sealClass` and `resolveEffectiveSealClass`.
  *
- * NOTE: this supersedes the blanket `DEFAULT_SEAL_CLASS='A'` posture — see the
- * open decision in the WS6b memory before wiring it as the live default.
+ * NOTE: supersedes the blanket `DEFAULT_SEAL_CLASS='A'` posture as the *derived*
+ * default; the live-default switch lands with WS6a/WS7 wiring.
  */
 export function deriveSealClass(pressureClass: PressureClass): SealClass {
   if (pressureClass === '4' || pressureClass === '6' || pressureClass === '10') {
@@ -132,7 +183,10 @@ export function deriveSealClass(pressureClass: PressureClass): SealClass {
   if (pressureClass === '3') {
     return 'B';
   }
-  return 'C';
+  if (pressureClass === '2') {
+    return 'C';
+  }
+  return 'unsealed';
 }
 
 /** Largest cross-section dimension (inches) for a duct of the given props. */
