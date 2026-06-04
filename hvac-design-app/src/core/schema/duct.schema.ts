@@ -62,6 +62,21 @@ export const DuctShapeSchema = z.enum(['round', 'rectangular']);
 
 export type DuctShape = z.infer<typeof DuctShapeSchema>;
 
+/**
+ * WS6b — SMACNA construction pressure class (in. w.g.) and seal class.
+ * Optional on ducts/runs; a project-level default applies when unset
+ * (`defaultPressureClass` = '2', `defaultSealClass` = 'A'). Greenfield: old
+ * ducts have no value and inherit the project default at read time.
+ */
+export const PressureClassSchema = z.enum(['0.5', '1', '2', '3', '4', '6', '10']);
+export type PressureClass = z.infer<typeof PressureClassSchema>;
+
+export const SealClassSchema = z.enum(['A', 'B', 'C']);
+export type SealClass = z.infer<typeof SealClassSchema>;
+
+export const DEFAULT_PRESSURE_CLASS: PressureClass = '2';
+export const DEFAULT_SEAL_CLASS: SealClass = 'A';
+
 export const DuctSizeProvenanceValueSchema = z.enum(['default', 'computed', 'specified']);
 
 export type DuctSizeProvenanceValue = z.infer<typeof DuctSizeProvenanceValueSchema>;
@@ -133,6 +148,8 @@ const SharedDuctPropsSchema = z
     systemType: SystemTypeSchema.optional(),
     materialSpec: MaterialSpecSchema.optional(),
     gauge: z.number().optional().describe('Metal gauge thickness'),
+    pressureClass: PressureClassSchema.optional().describe('SMACNA construction pressure class (in. w.g.); inherits project default when unset'),
+    sealClass: SealClassSchema.optional().describe('SMACNA seal class A/B/C; inherits project default when unset'),
     insulated: z.boolean().optional(),
     insulationThickness: z.number().optional().describe('Insulation thickness in inches'),
     engineeringData: DuctEngineeringDataSchema.optional(),

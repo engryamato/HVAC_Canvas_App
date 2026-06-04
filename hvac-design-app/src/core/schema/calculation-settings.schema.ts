@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PROJECT_MODES } from '@/core/projectMode/projectMode';
+import { PressureClassSchema, SealClassSchema } from './duct.schema';
 
 /**
  * Labor rates with regional adjustments
@@ -133,6 +134,12 @@ export const CalculationSettingsSchema = z.object({
   // WS8 — persisted Estimation/Design project mode. Greenfield/optional: old
   // projects load without it and default to `estimation` at the read boundary.
   projectMode: z.enum(PROJECT_MODES).optional(),
+
+  // WS6b — project default SMACNA pressure/seal class. A run inherits these
+  // unless it carries its own pressureClass/sealClass. Optional/greenfield:
+  // old projects fall back to '2'/'A' at the read boundary (gaugeService).
+  defaultPressureClass: PressureClassSchema.optional().describe('Project default SMACNA pressure class (in. w.g.); default 2'),
+  defaultSealClass: SealClassSchema.optional().describe('Project default SMACNA seal class; default A'),
   
   // Template reference (if created from template)
   templateId: z.string().optional(),

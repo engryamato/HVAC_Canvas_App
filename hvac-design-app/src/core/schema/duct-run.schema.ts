@@ -7,6 +7,8 @@ import {
   DuctEngineeringDataSchema,
   DuctMaterialSchema,
   DuctSizeProvenanceSchema,
+  PressureClassSchema,
+  SealClassSchema,
   SystemTypeSchema,
 } from './duct.schema';
 import { MaterialSpecSchema } from './component-library.schema';
@@ -102,6 +104,8 @@ const SharedDuctRunPropsSchema = z.object({
   material: DuctMaterialSchema,
   materialSpec: MaterialSpecSchema.optional(),
   gauge: z.number().optional().describe('Metal gauge thickness'),
+  pressureClass: PressureClassSchema.optional().describe('SMACNA construction pressure class (in. w.g.); inherits project default when unset'),
+  sealClass: SealClassSchema.optional().describe('SMACNA seal class A/B/C; inherits project default when unset'),
   insulationType: InsulationTypeSchema.optional(),
   insulationThickness: z.number().min(0.5).max(6).optional().describe('Insulation thickness in inches'),
   startEndType: DuctEndTypeSchema.optional(),
