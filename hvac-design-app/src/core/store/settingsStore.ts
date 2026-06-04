@@ -20,6 +20,7 @@ import {
   registerProjectModeProvider,
   type ProjectMode,
 } from '@/core/projectMode/projectMode';
+import { registerDuctConstructionProvider } from '@/core/services/calculations/ductConstructionProvider';
 
 const cloneValue = <T,>(value: T): T => {
   return structuredClone(value);
@@ -445,3 +446,13 @@ useSettingsStore.subscribe((state, previousState) => {
 registerProjectModeProvider(
   () => useSettingsStore.getState().calculationSettings.projectMode ?? DEFAULT_PROJECT_MODE
 );
+
+// WS6b/WS6a: same cycle-safe pattern — expose the project's construction
+// defaults (pressure/seal class) to the gauge/weight derivation.
+registerDuctConstructionProvider(() => {
+  const settings = useSettingsStore.getState().calculationSettings;
+  return {
+    defaultPressureClass: settings.defaultPressureClass,
+    defaultSealClass: settings.defaultSealClass,
+  };
+});

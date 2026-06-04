@@ -7,6 +7,7 @@ import {
   DuctSizingParams 
 } from '../calculations/engineeringCalculator';
 import { validateDuctConstraints } from '../validation/constraintValidator';
+import { deriveDuctConstruction } from '../calculations/ductConstructionService';
 import { FittingGenerationService } from '../fittingGeneration';
 import {
   applyComputedSizing,
@@ -146,15 +147,39 @@ export class ParametricUpdateService {
     updatedEntities.push(ductId);
 
     const timestamp = new Date().toISOString();
+
+    // WS6b/WS6a: derive gauge / seal class / surface area / weight from the
+    // updated size + pressure class (gated; null when off). WS5 provenance is
+    // respected — a user-specified gauge is preserved.
+    const construction = deriveDuctConstruction(normalizedProps);
+    const constructedProps: DuctProps = construction
+      ? {
+          ...normalizedProps,
+          ...(construction.gauge !== undefined ? { gauge: construction.gauge } : {}),
+          sealClass: construction.sealClass,
+          ...(construction.gaugeProvenance
+            ? { provenance: { ...normalizedProps.provenance, gauge: construction.gaugeProvenance } }
+            : {}),
+        }
+      : normalizedProps;
+    const constructedCalculated = construction
+      ? {
+          ...sourceDuct.calculated,
+          surfaceArea: construction.surfaceAreaSquareFeet,
+          weight: construction.weightPounds,
+        }
+      : undefined;
+
     const primaryDuctUpdate: { id: string; updates: Partial<Entity>; previous: Entity } = {
       id: sourceDuct.id,
       previous: sourceDuct,
       updates: {
         props: {
-          ...normalizedProps,
+          ...constructedProps,
           engineeringData: newEngineeringData,
           constraintStatus: validationStatus,
         },
+        ...(constructedCalculated ? { calculated: constructedCalculated } : {}),
         modifiedAt: timestamp,
       },
     };

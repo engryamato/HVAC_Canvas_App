@@ -208,6 +208,16 @@ export const DuctCalculatedSchema = z.object({
     .nonnegative()
     .optional()
     .describe('Remaining source static pressure at this duct in in.w.g.'),
+  surfaceArea: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('WS6a lateral surface area in sq ft (computed, read-only)'),
+  weight: z
+    .number()
+    .nonnegative()
+    .optional()
+    .describe('WS6a fabricated weight in lb (computed; omitted/"—" when gauge unresolved)'),
 });
 
 export type DuctCalculated = z.infer<typeof DuctCalculatedSchema>;
