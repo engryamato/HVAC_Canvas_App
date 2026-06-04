@@ -11,6 +11,7 @@ export * from './fittingGeometry';
 export * from './twoPortFittingGeometry';
 export * from './transitionGeometry';
 export * from './takeoffGeometry';
+export * from './bootGeometry';
 export * from './elbowGeometry';
 export * from './branchFittingGeometry';
 export * from './ductCutbackService';
