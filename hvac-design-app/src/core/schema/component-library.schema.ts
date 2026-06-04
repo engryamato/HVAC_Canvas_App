@@ -44,6 +44,10 @@ export const PricingDataSchema = z.object({
   laborRate: z.number().min(0).optional(), // $/hour (can override project rate)
   wasteFactor: z.number().min(0).max(1), // 0.0 to 1.0 (10% waste = 0.10)
   markup: z.number().min(0).optional(), // Markup percentage override
+  // WS7 weight pricing: $/lb for sheet-metal duct material. When present (and a
+  // computed weight exists) duct material is priced by weight; overrides the
+  // project-level per-material rate. Optional/greenfield.
+  materialCostPerPound: z.number().min(0).optional(),
   notes: z.string().optional(),
 });
 

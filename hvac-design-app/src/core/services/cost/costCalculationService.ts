@@ -280,6 +280,41 @@ export class CostCalculationService {
     componentPricing: Map<string, PricingData>
   ): ItemCost {
     const pricing = this.getPricingData(bomItem, componentPricing);
+
+    // WS7 weight pricing (opt-in / additive): price duct MATERIAL by weight x $/lb
+    // when a rate (catalog materialCostPerPound → project per-material rate) AND a
+    // computed weight both exist. Wins over LF/catalog material pricing when the
+    // rate is present; only ever activates with a real rate, so it never yields a
+    // silent $0. Labor stays on the existing per-LF basis.
+    if (isEnabled('WS7_WEIGHT_PRICING') && bomItem.category === 'duct' && (bomItem.weightPounds ?? 0) > 0) {
+      const perPound = this.resolvePerPoundRate(bomItem, pricing, settings);
+      if (perPound !== undefined) {
+        const mapped = this.mapBomToPricingFields(bomItem, pricing, settings);
+        const weightWithWaste = (bomItem.weightPounds as number) * (1 + mapped.wasteFactor);
+        const materialSubtotal = perPound * weightWithWaste;
+
+        const laborQuantityWithWaste = bomItem.quantity * (1 + mapped.wasteFactor);
+        const laborHoursPerUnit = mapped.laborUnits;
+        const laborRate = mapped.laborRate ?? this.getLaborRate(bomItem.category, settings.laborRates);
+        const laborHours = laborHoursPerUnit * laborQuantityWithWaste;
+        const laborSubtotal = laborHours * laborRate;
+
+        return {
+          bomItemId: bomItem.id,
+          description: bomItem.description,
+          materialUnitPrice: perPound,
+          materialQuantity: weightWithWaste,
+          materialSubtotal,
+          laborHoursPerUnit,
+          laborRate,
+          laborHours,
+          laborSubtotal,
+          itemTotal: materialSubtotal + laborSubtotal,
+          unpriced: false,
+        };
+      }
+    }
+
     if (!pricing) {
       return {
         bomItemId: bomItem.id,
@@ -410,6 +445,26 @@ export class CostCalculationService {
       wasteFactor: pricing?.wasteFactor ?? bomItem.wasteFactor ?? categoryWasteFactor,
       markup: pricing?.markup,
     };
+  }
+
+  /**
+   * WS7 weight-pricing rate ($/lb): catalog `materialCostPerPound` overrides the
+   * project per-material rate (`settings.materialCostPerPound[material]`).
+   * Returns undefined when neither is set — weight pricing then does not apply.
+   */
+  private static resolvePerPoundRate(
+    bomItem: BOMItem,
+    pricing: PricingData | null,
+    settings: CalculationSettings
+  ): number | undefined {
+    if (pricing?.materialCostPerPound !== undefined) {
+      return pricing.materialCostPerPound;
+    }
+    const material = bomItem.material;
+    if (material && settings.materialCostPerPound) {
+      return settings.materialCostPerPound[material];
+    }
+    return undefined;
   }
 
   private static calculateEstimateQuality(

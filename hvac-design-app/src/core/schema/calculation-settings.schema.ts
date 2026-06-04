@@ -140,6 +140,12 @@ export const CalculationSettingsSchema = z.object({
   // old projects fall back to '2'/'A' at the read boundary (gaugeService).
   defaultPressureClass: PressureClassSchema.optional().describe('Project default SMACNA pressure class (in. w.g.); default 2'),
   defaultSealClass: SealClassSchema.optional().describe('Project default SMACNA seal class; default A'),
+
+  // WS7 weight pricing — project-level sheet-metal $/lb by duct material
+  // (galvanized/stainless/…). Catalog PricingData.materialCostPerPound overrides
+  // this per item. Optional: absent → weight pricing simply does not apply.
+  materialCostPerPound: z.record(z.string(), z.number().min(0)).optional()
+    .describe('Project sheet-metal $/lb by material type (WS7 weight pricing)'),
   
   // Template reference (if created from template)
   templateId: z.string().optional(),
