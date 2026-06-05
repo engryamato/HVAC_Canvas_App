@@ -188,6 +188,32 @@ describe('FittingTool', () => {
       expect(entity.type).toBe('fitting');
       if (entity.type === 'fitting') {
         expect(entity.props.fittingType).toBe('tee');
+        expect(entity.props.catalogItemId).toBe('fitting-tee');
+      }
+    });
+
+    it('should create fitting from selected fitting type without active catalog entry', () => {
+      useComponentLibraryStoreV2.getState().selectEntry(null);
+      useToolStore.setState({ selectedFittingType: 'tee' });
+
+      const mouseEvent = createMockToolEvent({
+        x: 100,
+        y: 100,
+        screenX: 100,
+        screenY: 100,
+      });
+
+      tool.onMouseMove(mouseEvent);
+      tool.onMouseDown(mouseEvent);
+
+      const entities = useEntityStore.getState().allIds;
+      expect(entities.length).toBe(1);
+
+      const entity = useEntityStore.getState().byId[entities[0]!]!;
+      expect(entity.type).toBe('fitting');
+      if (entity.type === 'fitting') {
+        expect(entity.props.fittingType).toBe('tee');
+        expect(entity.props.catalogItemId).toBeUndefined();
       }
     });
   });

@@ -6,6 +6,7 @@ import {
 } from './BaseTool';
 import { createFitting, FITTING_TYPE_LABELS } from '../entities/fittingDefaults';
 import { createEntity, validateAndRecord } from '@/core/commands/entityCommands';
+import { useToolStore } from '@/core/store/canvas.store';
 import { useViewportStore } from '../store/viewportStore';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
@@ -20,6 +21,7 @@ import { computeFittingOriginForAnchorSnap } from '../services/fittingConnection
 import { resolveLocalFittingPorts } from '../services/connectionPoints';
 import type { Fitting } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
+import type { UnifiedComponentDefinition } from '@/core/schema/unified-component.schema';
 
 const GHOST_DURATION_MS = 280;
 const ROTATION_STEP_DEG = 45;
@@ -43,6 +45,18 @@ interface FittingToolState {
   manualRotationOffset: number;
   cancelGhost: CancelGhost | null;
 }
+
+type EffectiveFittingType =
+  | {
+      useCatalog: true;
+      activeComponent: UnifiedComponentDefinition;
+      fittingType: FittingType;
+    }
+  | {
+      useCatalog: false;
+      activeComponent: UnifiedComponentDefinition | undefined;
+      fittingType: FittingType;
+    };
 
 /**
  * FittingTool - places fittings on the canvas with:
@@ -119,10 +133,9 @@ export class FittingTool extends BaseTool {
 
     if (this.state.mode !== 'placing' || !this.state.currentPoint) return;
 
-    const activeComponent = this.getActiveComponent();
-    if (!activeComponent || activeComponent.category !== 'fitting') return;
+    const { fittingType } = this.resolveEffectiveFittingType();
+    if (!fittingType) return;
 
-    const fittingType = resolveFittingType(activeComponent);
     const origin = this.state.snappedFittingOrigin ?? this.state.currentPoint;
     const rotation = this.state.rotation;
 
@@ -202,31 +215,38 @@ export class FittingTool extends BaseTool {
   }
 
   private placeFitting(): void {
-    const activeComponent = this.getActiveComponent();
-    if (!activeComponent || activeComponent.category !== 'fitting') {
-      console.warn('[FittingTool] No active fitting component selected');
+    const { activeComponent, fittingType, useCatalog } =
+      this.resolveEffectiveFittingType();
+    if (!fittingType) {
+      console.warn('[FittingTool] No fitting type selected');
       return;
     }
 
     const origin = this.state.snappedFittingOrigin ?? this.state.currentPoint;
     if (!origin) return;
 
-    const type = resolveFittingType(activeComponent);
-    const activeService = adaptComponentToService(activeComponent);
     const snap = this.state.snapTarget;
 
     const inletDuctId =
       snap?.snapType === 'duct_endpoint' && snap.ductId ? snap.ductId : undefined;
 
-    const fitting = createFitting(type, {
-      x: origin.x,
-      y: origin.y,
-      rotation: this.state.rotation,
-      serviceId: activeService?.id ?? activeComponent.id,
-      catalogItemId: activeComponent.id,
-      inletDuctId,
-      engineeringSystem: 'standard_duct',
-    });
+    const fitting = useCatalog
+      ? createFitting(fittingType, {
+          x: origin.x,
+          y: origin.y,
+          rotation: this.state.rotation,
+          serviceId: adaptComponentToService(activeComponent)?.id ?? activeComponent.id,
+          catalogItemId: activeComponent.id,
+          inletDuctId,
+          engineeringSystem: 'standard_duct',
+        })
+      : createFitting(fittingType, {
+          x: origin.x,
+          y: origin.y,
+          rotation: this.state.rotation,
+          inletDuctId,
+          engineeringSystem: 'standard_duct',
+        });
 
     createEntity(fitting);
     validateAndRecord(fitting.id);
@@ -249,9 +269,20 @@ export class FittingTool extends BaseTool {
     this.state.cancelGhost = ghost;
   }
 
-  private getActiveFittingType(): FittingType | null {
-    const c = this.getActiveComponent();
-    return c?.category === 'fitting' ? resolveFittingType(c) : null;
+  private resolveEffectiveFittingType(): EffectiveFittingType {
+    const activeComponent = this.getActiveComponent();
+    const useCatalog = activeComponent?.category === 'fitting';
+    const fittingType = useCatalog
+      ? resolveFittingType(activeComponent)
+      : useToolStore.getState().selectedFittingType;
+
+    return useCatalog
+      ? { activeComponent, fittingType, useCatalog }
+      : { activeComponent, fittingType, useCatalog };
+  }
+
+  private getActiveFittingType(): FittingType {
+    return this.resolveEffectiveFittingType().fittingType;
   }
 
   private getOrBuildPreviewFitting(fittingType: FittingType): Fitting {
