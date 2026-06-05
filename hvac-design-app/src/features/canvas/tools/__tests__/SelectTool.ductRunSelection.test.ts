@@ -1,6 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Equipment } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
+import { FittingGenerationService } from '@/core/services/fittingGeneration';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { useEntityStore } from '@/core/store/entityStore';
 import { createDuctRun, resetDuctRunCounter } from '../../entities/ductRunDefaults';
 import { createFitting, resetFittingCounter } from '../../entities/fittingDefaults';
@@ -13,6 +15,7 @@ import { SelectTool } from '../SelectTool';
 
 describe('SelectTool duct_run segment selection', () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     useEntityStore.getState().clearAllEntities();
     useSelectionStore.getState().clearSelection();
     useSelectionStore.getState().setHovered(null);
@@ -117,6 +120,15 @@ describe('SelectTool duct_run segment selection', () => {
     const endFitting = seedFittingAt('middle-end-fitting', 220, 100, [middle.id, right.id]);
 
     return { left, middle, right, startFitting, endFitting };
+  }
+
+  function seedThreeDuctBranchNetwork() {
+    const left = seedRunBetween('branch-left-run', { x: 0, y: 100 }, { x: 100, y: 100 });
+    const middle = seedRunBetween('branch-middle-run', { x: 100, y: 100 }, { x: 220, y: 100 });
+    const branch = seedRunBetween('branch-vertical-run', { x: 100, y: 100 }, { x: 100, y: 220 });
+    const tee = seedFittingAt('branch-tee', 100, 100, [left.id, middle.id, branch.id], 'tee');
+
+    return { left, middle, branch, tee };
   }
 
   it('selects the run and hit section on first click', () => {
@@ -408,6 +420,45 @@ describe('SelectTool duct_run segment selection', () => {
     expect(
       getAngleDegrees(stretched.props.designStartPoint!, stretched.props.designEndPoint!)
     ).toBeCloseTo(45, 6);
+  });
+
+  it('rebuilds auto-fittings through the topology-aware path after dragging a branch duct', () => {
+    DuctTool.setAutoFittingEnabled(true);
+    const buildReRunPlanSpy = vi
+      .spyOn(fittingInsertionService, 'buildReRunPlan')
+      .mockReturnValue({ changes: [], preservedManualOverrideCount: 0 });
+    const resolveReRunPlanSpy = vi
+      .spyOn(fittingInsertionService, 'resolveReRunPlan')
+      .mockReturnValue({
+        insertedOrUpdatedCount: 0,
+        insertedCount: 0,
+        updatedCount: 0,
+        removedCount: 0,
+        manualOverridesPreserved: 0,
+        skippedChangedCount: 0,
+        operations: [],
+      });
+    const legacyAutoGenerateSpy = vi
+      .spyOn(FittingGenerationService, 'autoGenerateFittings')
+      .mockReturnValue([]);
+    const { middle } = seedThreeDuctBranchNetwork();
+    const tool = new SelectTool();
+    useSelectionStore.getState().select(middle.id);
+
+    tool.onMouseDown({ x: 160, y: 100, button: 0 });
+    tool.onMouseMove({ x: 166, y: 100, button: 0 });
+    tool.onMouseMove({ x: 172, y: 100, button: 0 });
+    tool.onMouseUp({ x: 172, y: 100, button: 0 });
+
+    expect(buildReRunPlanSpy).toHaveBeenCalledTimes(1);
+    expect(resolveReRunPlanSpy).toHaveBeenCalledTimes(1);
+    expect(resolveReRunPlanSpy).toHaveBeenCalledWith(
+      { changes: [], preservedManualOverrideCount: 0 },
+      expect.objectContaining({
+        [middle.id]: expect.objectContaining({ type: 'duct_run' }),
+      })
+    );
+    expect(legacyAutoGenerateSpy).not.toHaveBeenCalled();
   });
 
   it('starts endpoint detachment in one drag when the pointer begins on a tee fitting', () => {

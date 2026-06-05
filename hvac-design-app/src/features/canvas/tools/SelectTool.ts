@@ -30,7 +30,6 @@ import {
   MagneticConnectionService,
   type MagneticSnapResult,
 } from '../services/magneticConnectionService';
-import { FittingGenerationService } from '@/core/services/fittingGeneration';
 import {
   getWorldConnectionPoints,
   type WorldConnectionPoint,
@@ -241,11 +240,12 @@ export class SelectTool extends BaseTool {
       this.alignDraggedFittingToMagneticSnap();
       this.alignDraggedEquipmentToMagneticSnap();
       this.commitMovedEntities();
+      this.rerunAutoFittings();
     }
 
     if (this.state.mode === 'stretching') {
       this.commitMovedEntities();
-      this.rerunAutoFittingsAfterStretch();
+      this.rerunAutoFittings();
     }
 
     if (this.state.mode === 'marquee' && this.state.startPoint && this.state.currentPoint) {
@@ -704,17 +704,10 @@ export class SelectTool extends BaseTool {
         selectionBefore: this.state.initialSelection,
         selectionAfter,
       });
-
-      if (current.type === 'duct_run' && this.state.mode === 'dragging') {
-        this.removeFittingsConnectedToDuct(id);
-        if (DuctTool.isAutoFittingEnabled()) {
-          FittingGenerationService.autoGenerateFittings(id);
-        }
-      }
     });
   }
 
-  private rerunAutoFittingsAfterStretch(): void {
+  private rerunAutoFittings(): void {
     if (!DuctTool.isAutoFittingEnabled()) {
       return;
     }
