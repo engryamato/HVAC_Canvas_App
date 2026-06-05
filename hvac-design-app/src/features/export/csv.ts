@@ -1,6 +1,7 @@
 import type { BOMLineItem } from './bom';
-import { generateBOM } from './bom';
 import type { ProjectFile } from '@/core/schema';
+import type { WasteFactors } from '@/core/schema/calculation-settings.schema';
+import { BOMGenerationService, DEFAULT_BOM_WASTE_FACTORS } from '@/core/services/bom/bomGenerationService';
 import { downloadFile } from './download';
 
 interface ExportCsvOptions {
@@ -479,19 +480,16 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
   }));
 }
 
-export function downloadBomCsv(entities: EntitiesLike, projectName: string): void {
-  const entityList = entities.allIds
-    .map((id) => entities.byId[id])
-    .filter((e): e is Record<string, unknown> => e !== undefined)
-    .map((e) => ({
-      type: String(e.type ?? ''),
-      size: e.size as string | undefined,
-      material: e.material as string | undefined,
-      description: e.description as string | undefined,
-    }));
-
-  const bom = generateBOM(entityList);
-  const csv = exportBOMtoCSV(bom);
+export function downloadBomCsv(
+  entities: EntitiesLike,
+  projectName: string,
+  wasteFactors: WasteFactors = DEFAULT_BOM_WASTE_FACTORS,
+): void {
+  const items = BOMGenerationService.generateBOMFromEntityStore(
+    { byId: entities.byId, allIds: entities.allIds } as unknown as Parameters<typeof BOMGenerationService.generateBOMFromEntityStore>[0],
+    wasteFactors,
+  );
+  const csv = BOMGenerationService.exportToCSV(items);
   downloadFileLocal(csv, `${projectName}-bom.csv`, 'text/csv;charset=utf-8');
 }
 

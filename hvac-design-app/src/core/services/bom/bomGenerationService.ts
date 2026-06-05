@@ -4,6 +4,14 @@ import { Fitting, FittingProps } from '../../schema/fitting.schema';
 import { Equipment, EquipmentProps } from '../../schema/equipment.schema';
 import { WasteFactors } from '../../schema/calculation-settings.schema';
 
+export const DEFAULT_BOM_WASTE_FACTORS: WasteFactors = {
+  default: 0.1,
+  ducts: 0.1,
+  fittings: 0.05,
+  equipment: 0.02,
+  accessories: 0.08,
+};
+
 /**
  * Bill of Materials (BOM) Generation Service
  * 
@@ -548,6 +556,9 @@ export class BOMGenerationService {
       'Unit',
       'Waste %',
       'Qty w/ Waste',
+      'Gauge',
+      'Weight (lb)',
+      'Surface Area (sq ft)',
     ];
 
     const rows = items.map(item => [
@@ -559,10 +570,19 @@ export class BOMGenerationService {
       item.unit,
       (item.wasteFactor * 100).toFixed(1) + '%',
       item.quantityWithWaste.toFixed(2),
+      item.gauge !== undefined ? String(item.gauge) : '',
+      item.weightPounds !== undefined ? item.weightPounds.toFixed(2) : '',
+      item.surfaceAreaSquareFeet !== undefined ? item.surfaceAreaSquareFeet.toFixed(2) : '',
     ]);
 
     const csvRows = [headers, ...rows];
-    return csvRows.map(row => row.join(',')).join('\n');
+    // Escape cells containing commas/quotes/newlines (RFC 4180) so descriptions
+    // or materials with commas don't corrupt the CSV.
+    const escapeCell = (value: string): string =>
+      /[",\n\r]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+    const body = csvRows.map(row => row.map(escapeCell).join(',')).join('\n');
+    // Prepend UTF-8 BOM for Excel compatibility (parity with legacy exportBOMtoCSV).
+    return String.fromCharCode(0xFEFF) + body;
   }
 }
 

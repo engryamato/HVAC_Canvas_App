@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import styles from './ExportMenu.module.css';
-import { exportProjectJSON, exportBOMtoCSV, generateBOM } from './';
+import { exportProjectJSON } from './';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useProjectDetails } from '@/core/store/project.store';
+import { useSettingsStore } from '@/core/store/settingsStore';
+import { BOMGenerationService, DEFAULT_BOM_WASTE_FACTORS } from '@/core/services/bom/bomGenerationService';
 import { downloadFile } from './download';
 import type { PdfPageSize } from './pdf';
 import { ExportDialog, ExportDialogOptions } from './ExportDialog';
@@ -37,6 +39,8 @@ export function ExportMenu() {
   const entitiesById = useEntityStore((state) => state.byId);
   const entityIds = useEntityStore((state) => state.allIds);
   const projectDetails = useProjectDetails();
+  const wasteFactors =
+    useSettingsStore((state) => state.calculationSettings?.wasteFactors) ?? DEFAULT_BOM_WASTE_FACTORS;
   const [pdfPageSize, setPdfPageSize] = useState<PdfPageSize>('letter');
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -52,12 +56,11 @@ export function ExportMenu() {
   };
 
   const handleExportCsv = () => {
-    const bom = generateBOM(
-      entityIds
-        .map((id) => entitiesById[id])
-        .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined)
+    const items = BOMGenerationService.generateBOMFromEntityStore(
+      { byId: entitiesById, allIds: entityIds } as unknown as Parameters<typeof BOMGenerationService.generateBOMFromEntityStore>[0],
+      wasteFactors,
     );
-    const csv = exportBOMtoCSV(bom);
+    const csv = BOMGenerationService.exportToCSV(items);
     downloadFile(
       csv,
       `${sanitizeFileName(projectDetails?.projectName ?? 'project')}-bom.csv`,
@@ -118,12 +121,11 @@ export function ExportMenu() {
           try {
             const project = buildExportProjectSnapshot();
             if (options.format === 'csv' && project) {
-              const bom = generateBOM(
-                entityIds
-                  .map((id) => entitiesById[id])
-                  .filter((e): e is NonNullable<typeof e> => e !== undefined)
+              const items = BOMGenerationService.generateBOMFromEntityStore(
+                { byId: entitiesById, allIds: entityIds } as unknown as Parameters<typeof BOMGenerationService.generateBOMFromEntityStore>[0],
+                wasteFactors,
               );
-              const csv = exportBOMtoCSV(bom);
+              const csv = BOMGenerationService.exportToCSV(items);
               downloadFile(
                 csv,
                 `${sanitizeFileName(projectDetails?.projectName ?? 'project')}-bom.csv`,
