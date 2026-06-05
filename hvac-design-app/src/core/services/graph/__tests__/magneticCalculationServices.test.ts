@@ -598,6 +598,30 @@ describe('ConnectionGraphBuilder persisted metadata', () => {
       target: run.id,
     });
   });
+
+  it('collapses contradictory reciprocal duct metadata into a single physical edge', () => {
+    // A and B each name the other as their downstream (`connectedTo`), producing directional
+    // edges A->B and B->A for one physical link. The canonical pair key must keep only one,
+    // otherwise TopologyValidationService reads the reversed pair as a false 2-cycle.
+    const runA = ductRun('550e8400-e29b-41d4-a716-446655440120', 0, 0, 10, {
+      connectedTo: '550e8400-e29b-41d4-a716-446655440121',
+    });
+    const runB = ductRun('550e8400-e29b-41d4-a716-446655440121', 120, 0, 10, {
+      connectedTo: '550e8400-e29b-41d4-a716-446655440120',
+    });
+    const entities = { [runA.id]: runA, [runB.id]: runB };
+
+    const graph = ConnectionGraphBuilder.buildFromPersistedMetadata(entities);
+    const pairEdges = Array.from(graph.edges.values()).filter(
+      (edge) =>
+        (edge.source === runA.id && edge.target === runB.id) ||
+        (edge.source === runB.id && edge.target === runA.id)
+    );
+
+    expect(pairEdges).toHaveLength(1);
+    const [result] = TopologyValidationService.validate(graph, entities);
+    expect(result.reason).not.toBe('CYCLE_DETECTED');
+  });
 });
 
 describe('TopologyValidationService', () => {

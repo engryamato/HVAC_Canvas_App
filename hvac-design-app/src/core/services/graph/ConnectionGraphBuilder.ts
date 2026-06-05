@@ -5,6 +5,14 @@ import { isEquipmentEntityOutletPort } from './equipmentPortFlow';
 
 export class ConnectionGraphBuilder {
   private graph: ConnectionGraph;
+  /**
+   * Tracks the canonical (direction-insensitive) key for every edge already added so a
+   * single physical link can never be recorded twice. Without this, contradictory
+   * `connectedFrom`/`connectedTo` metadata (A→B on one entity, B→A on the other) yields two
+   * directional edges for one connection, which `TopologyValidationService` then reads as a
+   * false 2-cycle / inflated incoming-edge count.
+   */
+  private edgePairKeys = new Set<string>();
 
   constructor() {
     this.graph = {
@@ -24,6 +32,12 @@ export class ConnectionGraphBuilder {
     if (this.graph.edges.has(edge.id)) {
       return;
     }
+
+    const pairKey = edgePairKey(edge);
+    if (this.edgePairKeys.has(pairKey)) {
+      return;
+    }
+    this.edgePairKeys.add(pairKey);
 
     this.graph.edges.set(edge.id, edge);
     
@@ -301,6 +315,20 @@ function isEquipmentPortConnection(
 
 function physicalConnectionKey(firstEntityId: string, secondEntityId: string): string {
   return [firstEntityId, secondEntityId].sort().join('<->');
+}
+
+/**
+ * Canonical dedup key for an edge. For the default directional id (`${source}->${target}`)
+ * we collapse A→B and B→A to a single physical link via the sorted node-pair key. Edges that
+ * carry a custom id — equipment ports inject `:${portId}`, the legacy `fromEntities` builder
+ * uses a `-` separator — keep their own id as the key so genuinely distinct parallel
+ * connections (e.g. two equipment ports landing on the same duct) are preserved.
+ */
+function edgePairKey(edge: GraphEdge): string {
+  if (edge.id !== `${edge.source}->${edge.target}`) {
+    return edge.id;
+  }
+  return physicalConnectionKey(edge.source, edge.target);
 }
 
 function toGraphNodeType(type: string): GraphNode['type'] {
