@@ -53,7 +53,12 @@ export function buildBootGeometry(dims: FittingDimensions): FittingGeometry {
   const half = len / 2;
   const xIn = -half;
   const xFace = half;
-  const inHalf = inH / 2;
+  // Body inlet-edge half-height: a rectangular inlet flares from its actual
+  // rectHeight. The primary inletSize equals the rect *width* (resolveFittingDimensions
+  // falls back fromWidth → inletSize), so using it here would draw the inlet face
+  // square. A round inlet keeps its diameter, which also feeds the round footprint.
+  const inletFaceH = roundInlet ? inH : dims.rectHeight;
+  const inHalf = inletFaceH / 2;
   const faceHalf = faceH / 2;
 
   // Trapezoid flaring from the duct profile (left) to the register face (right).

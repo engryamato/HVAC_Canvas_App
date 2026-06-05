@@ -58,6 +58,19 @@ describe('WS6e E5 — terminal boot / register collar geometry', () => {
     expect(large.height).toBeGreaterThan(small.height);
   });
 
+  it('draws the rectangular inlet body edge from rectHeight, not the inlet width', () => {
+    // fromWidth 20 / fromHeight 10: inletSize resolves to the width (20), so the
+    // body inlet edge must come from rectHeight (10) → half-height 5, not 10.
+    const g = geom({ transitionData: { fromShape: 'rectangular', fromWidth: 20, fromHeight: 10 } });
+    const polygon = g.body.find((p) => p.kind === 'polygon');
+    if (!polygon || polygon.kind !== 'polygon') throw new Error('expected a polygon body part');
+    const minX = Math.min(...polygon.points.map((p) => p.x));
+    const inletEdgeHalfHeight = Math.max(
+      ...polygon.points.filter((p) => p.x === minX).map((p) => Math.abs(p.y))
+    );
+    expect(inletEdgeHalfHeight).toBeCloseTo(5, 6);
+  });
+
   it('adds a round footprint for a round duct inlet but not for a rectangular one', () => {
     const round = geom({ transitionData: { fromShape: 'round', fromDiameter: 12 } });
     const rect = geom({ transitionData: { fromShape: 'rectangular', fromWidth: 12, fromHeight: 8 } });
