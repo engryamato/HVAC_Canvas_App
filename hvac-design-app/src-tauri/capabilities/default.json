@@ -7,6 +7,8 @@
     "core:default",
     "dialog:default",
     "fs:default",
+    "fs:scope-document-recursive",
+    "fs:scope-appdata-recursive",
     "clipboard-manager:default"
   ]
 }
