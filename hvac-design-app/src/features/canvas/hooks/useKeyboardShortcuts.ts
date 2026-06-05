@@ -14,6 +14,7 @@ import { ZOOM_TO_SELECTION_PADDING } from '@/core/constants/viewport';
 import { getEquipmentPlanBounds } from '../services/equipmentGeometry';
 import { useCasStore } from '../store/casStore';
 import { CASLayer } from '../components/CAS/CASLayer';
+import { AxialLayer } from '../components/AxialMenu/AxialLayer';
 import { getEntityBounds } from '../components/CAS/actionRegistry';
 import {
   copySelectionToClipboard,
@@ -411,7 +412,9 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
   }, [handleKeydown, isEnabled]);
 
   useEffect(() => {
-    if (!isEnabled || !isFeatureEnabled('WS3_CAS') || typeof document === 'undefined') {
+    const shouldMountCas = isFeatureEnabled('WS3_CAS');
+    const shouldMountAxial = isFeatureEnabled('WS6_CONSTRUCTION_DERIVATION');
+    if (!isEnabled || (!shouldMountCas && !shouldMountAxial) || typeof document === 'undefined') {
       return;
     }
 
@@ -428,17 +431,25 @@ export function useKeyboardShortcuts(options: ShortcutOptions = {}) {
       casLayerHost.className = 'pointer-events-none absolute inset-0 z-20';
       canvasArea.appendChild(casLayerHost);
       casLayerRoot = createRoot(casLayerHost);
-      casLayerRoot.render(createElement('div', { className: 'pointer-events-auto' }, createElement(CASLayer)));
+      casLayerRoot.render(createElement('div', { className: 'pointer-events-auto' }, createElement(CASLayer), createElement(AxialLayer)));
     }
 
     return () => {
       casLayerRefs -= 1;
       if (casLayerRefs <= 0) {
-        casLayerRoot?.unmount();
+        // Defer unmount to a microtask: unmounting a React root synchronously
+        // during another component's render/cleanup throws "Attempted to
+        // synchronously unmount a root while React was already rendering".
+        // Detach the refs now so a remount in the same tick builds a fresh root.
+        const rootToUnmount = casLayerRoot;
+        const hostToRemove = casLayerHost;
         casLayerRoot = null;
-        casLayerHost?.remove();
         casLayerHost = null;
         casLayerRefs = 0;
+        queueMicrotask(() => {
+          rootToUnmount?.unmount();
+          hostToRemove?.remove();
+        });
       }
     };
   }, [isEnabled]);

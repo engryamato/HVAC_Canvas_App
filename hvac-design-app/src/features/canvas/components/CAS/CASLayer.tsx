@@ -6,7 +6,7 @@ import { isEnabled } from '@/core/flags/featureFlags';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../../store/selectionStore';
-import { useViewportStore } from '../../store/viewportStore';
+import { usePanAndZoom } from '../../store/viewportStore';
 import { useCasStore } from '../../store/casStore';
 import { CASContainer } from './CASContainer';
 import { CASHandle } from './CASHandle';
@@ -30,22 +30,28 @@ export function CASLayer() {
   const selectedIds = useSelectionStore((state) => state.selectedIds);
   const selectedSegments = useSelectionStore((state) => state.selectedSegments);
   const entitiesById = useEntityStore((state) => state.byId);
-  const viewport = useViewportStore((state) => ({ panX: state.panX, panY: state.panY, zoom: state.zoom }));
-  const cas = useCasStore();
+  // Stable selectors (shallow / primitive) — an inline `(s) => ({...})` selector
+  // returns a new object every render and drives React's "getSnapshot should be
+  // cached" infinite update loop. usePanAndZoom is shallow-compared.
+  const viewport = usePanAndZoom();
+  const casOpen = useCasStore((state) => state.open);
+  const casAnchorEntityId = useCasStore((state) => state.anchorEntityId);
+  const casAnchorRect = useCasStore((state) => state.anchorRect);
+  const closeCas = useCasStore((state) => state.closeCas);
 
   React.useEffect(() => {
     if (!enabled || currentTool !== 'select' || selectedIds.length === 0) {
-      cas.closeCas();
+      closeCas();
     }
-  }, [cas, currentTool, enabled, selectedIds.length]);
+  }, [closeCas, currentTool, enabled, selectedIds.length]);
 
   if (!enabled || currentTool !== 'select' || selectedIds.length === 0) {
     return null;
   }
 
   if (selectedIds.length > 1) {
-    return cas.open ? (
-      <CASContainer selectionMode="multi" selectionCount={selectedIds.length} anchorRect={cas.anchorRect} />
+    return casOpen ? (
+      <CASContainer selectionMode="multi" selectionCount={selectedIds.length} anchorRect={casAnchorRect} />
     ) : null;
   }
 
@@ -61,11 +67,11 @@ export function CASLayer() {
   return (
     <>
       <CASHandle entity={snapshot} anchorRect={anchorRect} />
-      {cas.open && cas.anchorEntityId === entity.id ? (
+      {casOpen && casAnchorEntityId === entity.id ? (
         <CASContainer
           entity={snapshot}
           selectionMode={selectedSegment ? 'segment' : 'single'}
-          anchorRect={cas.anchorRect ?? anchorRect}
+          anchorRect={casAnchorRect ?? anchorRect}
         />
       ) : null}
     </>

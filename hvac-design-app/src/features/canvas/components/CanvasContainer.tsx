@@ -534,6 +534,40 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
   }, [onMouseLeave, clearLastCanvasPoint]);
 
   /**
+   * Right-click on a fitting opens the WS4 axial menu (behind the WS6 flag).
+   * Uses SelectTool's centered 48x48 fitting bounds so right-click targets the
+   * same fitting a left-click would select. On a non-fitting / empty space we
+   * still suppress the native context menu but open nothing.
+   */
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      e.preventDefault();
+      if (!isEnabled('WS6_CONSTRUCTION_DERIVATION')) {
+        return;
+      }
+      const { x, y } = screenToCanvas(e.clientX, e.clientY);
+      const fitting = [...entities]
+        .filter((entity): entity is Fitting => entity.type === 'fitting')
+        .sort((a, b) => b.zIndex - a.zIndex)
+        .find((f) => {
+          const fx = f.transform.x;
+          const fy = f.transform.y;
+          return x >= fx - 24 && x <= fx + 24 && y >= fy - 24 && y <= fy + 24;
+        });
+      if (!fitting) {
+        return;
+      }
+      useSelectionStore.getState().select(fitting.id);
+      window.dispatchEvent(
+        new CustomEvent('sws:axial-menu-requested', {
+          detail: { entityId: fitting.id, x: e.clientX, y: e.clientY },
+        })
+      );
+    },
+    [entities, screenToCanvas]
+  );
+
+  /**
    * Handle keyboard events - delegate to active tool
    */
   useEffect(() => {
@@ -660,6 +694,7 @@ export function CanvasContainer({ className, onMouseMove, onMouseLeave }: Canvas
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
+        onContextMenu={handleContextMenu}
       />
     </div>
   );

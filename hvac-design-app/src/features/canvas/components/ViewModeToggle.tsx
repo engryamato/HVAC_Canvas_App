@@ -6,7 +6,6 @@ import { useActiveViewMode, useViewModeStore, type CanvasViewMode } from '../sto
 
 const viewModes: Array<{ id: CanvasViewMode; label: string; icon: typeof DraftingCompass; shortcut: string }> = [
   { id: 'plan', label: 'Plan View', icon: DraftingCompass, shortcut: 'Shift+2' },
-  // 3D View suspended — { id: '3d', label: '3D View', icon: Box, shortcut: 'Shift+3' },
 ];
 
 export function ViewModeToggle(): React.ReactElement {
@@ -22,8 +21,6 @@ export function ViewModeToggle(): React.ReactElement {
       if (event.key === '@' || event.key === '2') {
         setViewMode('plan');
       }
-
-      // Shift+3 shortcut for 3D view is suspended
     };
 
     window.addEventListener('keydown', handleKeyDown);
