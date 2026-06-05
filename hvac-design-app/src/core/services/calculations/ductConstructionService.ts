@@ -109,7 +109,7 @@ export function deriveDuctConstruction(
   const gaugeProvenance = computed ? ('computed' as const) : undefined;
 
   // Seal class — manual override → explicit project default → SMACNA derivation.
-  const sealClass = props.sealClass ?? defaults.defaultSealClass ?? deriveSealClass(effectivePressure);
+  const sealClass = props.sealClass ?? defaults.defaultSealClass ?? deriveSealClass(effectivePressure, { isVAV: props.isVAV });
 
   const surfaceAreaSquareFeet = ductSurfaceArea(props, shape);
   const weightPounds = isTableGauge(gauge)

@@ -146,6 +146,14 @@ describe('WS6b — deriveSealClass (SMACNA pressure → seal chain)', () => {
       expect(seals[i]!).toBeGreaterThanOrEqual(seals[i - 1]!);
     }
   });
+
+  it('applies the SMACNA VAV exception only below 2"', () => {
+    expect(deriveSealClass('0.5', { isVAV: true })).toBe('C');
+    expect(deriveSealClass('1', { isVAV: true })).toBe('C');
+    expect(deriveSealClass('0.5')).toBe('unsealed');
+    expect(deriveSealClass('2', { isVAV: true })).toBe('C');
+    expect(deriveSealClass('4', { isVAV: true })).toBe('A');
+  });
 });
 
 describe('WS6b — largestDimensionOf', () => {

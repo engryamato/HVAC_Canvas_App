@@ -167,7 +167,8 @@ export function resolveEffectiveSealClass(
 /**
  * SMACNA-derived seal class from pressure class (source-ratified 2026-06-04):
  * `>=4"` → A (all joints/seams/penetrations), `3"` → B (transverse + seams),
- * `2"` → C (transverse joints), `<2"` → `unsealed` (non-VAV). This is the
+ * `2"` → C (transverse joints), `<2"` → `unsealed`, EXCEPT VAV (≥0.5"
+ * upstream of terminal boxes) → C. This is the
  * ratified default logic; a project/run may still manually override to a
  * stricter blanket class (e.g. owner-mandated Seal A) — that override wins via
  * the stored `sealClass` and `resolveEffectiveSealClass`.
@@ -175,7 +176,7 @@ export function resolveEffectiveSealClass(
  * NOTE: supersedes the blanket `DEFAULT_SEAL_CLASS='A'` posture as the *derived*
  * default; the live-default switch lands with WS6a/WS7 wiring.
  */
-export function deriveSealClass(pressureClass: PressureClass): SealClass {
+export function deriveSealClass(pressureClass: PressureClass, opts?: { isVAV?: boolean }): SealClass {
   if (pressureClass === '4' || pressureClass === '6' || pressureClass === '10') {
     return 'A';
   }
@@ -185,7 +186,7 @@ export function deriveSealClass(pressureClass: PressureClass): SealClass {
   if (pressureClass === '2') {
     return 'C';
   }
-  return 'unsealed';
+  return opts?.isVAV ? 'C' : 'unsealed';
 }
 
 /** Largest cross-section dimension (inches) for a duct of the given props. */

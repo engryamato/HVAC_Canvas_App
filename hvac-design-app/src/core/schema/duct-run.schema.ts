@@ -106,6 +106,7 @@ const SharedDuctRunPropsSchema = z.object({
   gauge: z.number().optional().describe('Metal gauge thickness'),
   pressureClass: PressureClassSchema.optional().describe('SMACNA construction pressure class (in. w.g.); inherits project default when unset'),
   sealClass: SealClassSchema.optional().describe('SMACNA seal class A/B/C; inherits project default when unset'),
+  isVAV: z.boolean().optional().describe('VAV system upstream of terminal boxes (SMACNA: <2" w.g. then requires Seal C, not unsealed)'),
   insulationType: InsulationTypeSchema.optional(),
   insulationThickness: z.number().min(0.5).max(6).optional().describe('Insulation thickness in inches'),
   startEndType: DuctEndTypeSchema.optional(),

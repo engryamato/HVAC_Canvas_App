@@ -54,6 +54,20 @@ describe('WS6b/WS6a — deriveDuctConstruction (flag on)', () => {
     ).toBe('A');
   });
 
+  it('derives Seal C for VAV ducts below 2" pressure class', () => {
+    const result = deriveDuctConstruction(
+      duct({ shape: 'round', diameter: 12, length: 10, pressureClass: '1', isVAV: true } as Partial<DuctProps>)
+    );
+    expect(result!.sealClass).toBe('C');
+  });
+
+  it('keeps non-VAV ducts below 2" pressure class unsealed by default', () => {
+    const result = deriveDuctConstruction(
+      duct({ shape: 'round', diameter: 12, length: 10, pressureClass: '1' })
+    );
+    expect(result!.sealClass).toBe('unsealed');
+  });
+
   it('lets an explicit project default seal class win over derivation', () => {
     registerDuctConstructionProvider(() => ({ defaultSealClass: 'B' }));
     expect(deriveDuctConstruction(duct({ shape: 'round', diameter: 12, length: 10, pressureClass: '2' }))!.sealClass).toBe('B');
