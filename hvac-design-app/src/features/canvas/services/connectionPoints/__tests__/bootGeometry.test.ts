@@ -26,6 +26,24 @@ describe('WS6e E5 — terminal boot / register collar geometry', () => {
     expect(opening(g, 'OUTLET').profile.shape).toBe('rectangular');
   });
 
+  it('keeps a round inlet profile for round duct inlets', () => {
+    expect(opening(geom({ transitionData: { fromShape: 'round', fromDiameter: 12 } }), 'INLET').profile.shape).toBe(
+      'round'
+    );
+  });
+
+  it('uses rectangular inlet dimensions from transition data', () => {
+    const profile = opening(
+      geom({ transitionData: { fromShape: 'rectangular', fromWidth: 20, fromHeight: 10 } }),
+      'INLET'
+    ).profile;
+
+    expect(profile.shape).toBe('rectangular');
+    if (profile.shape !== 'rectangular') throw new Error('expected rectangular inlet profile');
+    expect(profile.width).toBe(20);
+    expect(profile.height).toBe(10);
+  });
+
   it('flares the register face larger than the duct', () => {
     const g = geom({ transitionData: { fromShape: 'round', fromDiameter: 12 } });
     const outlet = opening(g, 'OUTLET').profile;

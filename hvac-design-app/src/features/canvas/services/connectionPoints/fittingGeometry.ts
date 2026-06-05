@@ -80,6 +80,8 @@ export interface FittingDimensions {
   outletSize: number;
   /** Branch size for 3-port fittings (inches). */
   branchSize: number;
+  branchWidth: number;
+  branchHeight: number;
   inletShape: 'round' | 'rectangular';
   outletShape: 'round' | 'rectangular';
   /** Rect width/height for rect-to-round and rectangular ends. */
@@ -213,6 +215,8 @@ export function resolveFittingDimensions(fitting: Fitting): FittingDimensions {
     inletSize,
     outletSize,
     branchSize,
+    branchWidth: clampSize(transition?.toWidth, branchSize),
+    branchHeight: clampSize(transition?.toHeight, branchSize),
     inletShape,
     outletShape,
     rectWidth,

@@ -87,7 +87,10 @@ export function buildBootGeometry(dims: FittingDimensions): FittingGeometry {
       role: 'inlet',
       position: roundPoint({ x: xIn, y: 0 }),
       direction: { x: -1, y: 0 },
-      profile: roundProfile(dims.inletShape, inH),
+      profile:
+        dims.inletShape === 'rectangular'
+          ? { shape: 'rectangular', width: dims.rectWidth, height: dims.rectHeight }
+          : roundProfile('round', inH),
     },
     {
       id: 'OUTLET',

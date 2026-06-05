@@ -149,7 +149,10 @@ export function buildTakeoffGeometry(dims: FittingDimensions): FittingGeometry {
       role: 'branch',
       position: roundPoint(tip),
       direction: normalize(d),
-      profile: roundProfile(dims.outletShape, branchH),
+      profile:
+        dims.outletShape === 'rectangular'
+          ? { shape: 'rectangular', width: dims.branchWidth, height: dims.branchHeight }
+          : roundProfile('round', branchH),
     },
   ];
 

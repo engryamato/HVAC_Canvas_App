@@ -46,6 +46,29 @@ describe('WS6e E4 — takeoff branch geometry', () => {
     expect(g.anchor).toEqual({ x: 0, y: 0 });
   });
 
+  it('keeps the default branch opening profile round', () => {
+    expect(branch(geom({})).profile.shape).toBe('round');
+  });
+
+  it('uses rectangular branch dimensions from transition data', () => {
+    const profile = branch(
+      geom({
+        transitionData: {
+          fromShape: 'round',
+          toShape: 'rectangular',
+          toWidth: 14,
+          toHeight: 8,
+          toDiameter: undefined,
+        },
+      })
+    ).profile;
+
+    expect(profile.shape).toBe('rectangular');
+    if (profile.shape !== 'rectangular') throw new Error('expected rectangular branch profile');
+    expect(profile.width).toBe(14);
+    expect(profile.height).toBe(8);
+  });
+
   it('rises perpendicular at 90° and leans toward the outlet below it', () => {
     const perpendicular = branch(geom({ variant: { entryAngleDeg: 90 } }));
     const angled = branch(geom({ variant: { entryAngleDeg: 45 } }));
