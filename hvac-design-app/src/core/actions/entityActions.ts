@@ -3,7 +3,10 @@ import type { EngineeringLimits } from '@/core/schema/calculation-settings.schem
 import { updateEntities, updateEntity } from '@/core/commands/entityCommands';
 import { useEntityStore } from '@/core/store/entityStore';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
-import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
+import {
+  parametricUpdateService,
+  type ParametricUpdateResult,
+} from '@/core/services/parametric/parametricUpdateService';
 import {
   applyUserSizeEdit,
   isSizingProvenanceEnabled,
@@ -37,6 +40,39 @@ function cloneEntity<T extends Entity>(entity: T): T {
 
 function getChangedField(changedProps: Partial<Duct['props']>): string | null {
   return Object.keys(changedProps)[0] ?? null;
+}
+
+/**
+ * Apply a debounced parametric result behind a stale-guard. `baseline` is the
+ * entity reference captured BEFORE the (possibly long-debounced) schedule call.
+ * entityStore updates entities immutably (entityStore.ts:259-268), so if the
+ * live reference is no longer === baseline (or is gone), the duct was
+ * moved/edited/deleted by a newer action during the debounce window: the result
+ * is built from a stale snapshot and is dropped to avoid clobbering that newer
+ * state. A `superseded` result (a newer same-duct edit coalesced this one) is
+ * dropped for the same reason — the newer edit owns the write.
+ */
+function applyGuardedParametricResult(
+  entityId: string,
+  baseline: Entity,
+  result: ParametricUpdateResult,
+  fallback: { nextProps: Duct['props']; modifiedAt: string; previous: Entity }
+): void {
+  if (result.superseded) {
+    return;
+  }
+  if (useEntityStore.getState().byId[entityId] !== baseline) {
+    return;
+  }
+  if (result.entityUpdates && result.entityUpdates.length > 0) {
+    updateEntities(result.entityUpdates);
+    return;
+  }
+  updateEntity(
+    entityId,
+    { props: fallback.nextProps, modifiedAt: fallback.modifiedAt },
+    fallback.previous
+  );
 }
 
 export function validateAndGate(field: string, draft: Entity, ctx: EntityActionContext): boolean {
@@ -79,12 +115,11 @@ export async function commitDuctProperty(
     opts.debounceMs ?? 500
   );
 
-  if (result.entityUpdates && result.entityUpdates.length > 0) {
-    updateEntities(result.entityUpdates);
-    return result;
-  }
-
-  updateEntity(entityId, { props: nextProps, modifiedAt: nextEntity.modifiedAt }, previous);
+  applyGuardedParametricResult(entityId, current, result, {
+    nextProps,
+    modifiedAt: nextEntity.modifiedAt,
+    previous,
+  });
   return result;
 }
 
@@ -145,12 +180,11 @@ export async function setSize(
     opts.debounceMs ?? 0
   );
 
-  if (result.entityUpdates && result.entityUpdates.length > 0) {
-    updateEntities(result.entityUpdates);
-    return result;
-  }
-
-  updateEntity(entityId, { props: nextProps, modifiedAt: nextEntity.modifiedAt }, previous);
+  applyGuardedParametricResult(entityId, current, result, {
+    nextProps,
+    modifiedAt: nextEntity.modifiedAt,
+    previous,
+  });
   return result;
 }
 

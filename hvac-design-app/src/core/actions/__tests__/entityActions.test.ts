@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Duct, Entity, Fitting } from '@/core/schema';
 import type { EngineeringLimits } from '@/core/schema/calculation-settings.schema';
 import { useEntityStore } from '@/core/store/entityStore';
-import { parametricUpdateService } from '@/core/services/parametric/parametricUpdateService';
+import {
+  parametricUpdateService,
+  type ParametricUpdateResult,
+} from '@/core/services/parametric/parametricUpdateService';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { updateEntities, updateEntity } from '@/core/commands/entityCommands';
 import {
@@ -188,6 +191,59 @@ describe('entityActions', () => {
     const stored = useEntityStore.getState().byId[duct.id];
     expect(previous).toEqual(stored);
     expect(previous).not.toBe(stored);
+  });
+
+  it('drops a debounced result when the duct is mutated externally during the wait (stale-guard)', async () => {
+    const duct = createDuct({ airflow: 1000 });
+    useEntityStore.getState().addEntity(duct);
+
+    // Hold the schedule promise open so we can interleave an external mutation.
+    let resolveSchedule!: (result: ParametricUpdateResult) => void;
+    vi.mocked(parametricUpdateService.scheduleDuctPropertyChange).mockReturnValue(
+      new Promise<ParametricUpdateResult>((resolve) => {
+        resolveSchedule = resolve;
+      })
+    );
+
+    const pending = commitDuctProperty(duct.id, { airflow: 1400 }, createContext(), {
+      debounceMs: 0,
+    });
+
+    // A concurrent external change (e.g. a drag-move) replaces the entity
+    // reference while the debounced computation is still in flight.
+    useEntityStore.getState().updateEntityTransient(duct.id, {
+      transform: { x: 99, y: 0, elevation: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    });
+
+    resolveSchedule({
+      updatedEntities: [duct.id],
+      violations: [],
+      requiresUserAction: false,
+      entityUpdates: [],
+    });
+    await pending;
+
+    // The stale snapshot result must NOT clobber the newer (moved) state.
+    expect(updateEntity).not.toHaveBeenCalled();
+    expect(updateEntities).not.toHaveBeenCalled();
+  });
+
+  it('does not write a superseded debounced result', async () => {
+    const duct = createDuct({ airflow: 1000 });
+    useEntityStore.getState().addEntity(duct);
+    vi.mocked(parametricUpdateService.scheduleDuctPropertyChange).mockResolvedValue({
+      updatedEntities: [],
+      violations: [],
+      requiresUserAction: false,
+      entityUpdates: [],
+      superseded: true,
+    });
+
+    await commitDuctProperty(duct.id, { airflow: 1400 }, createContext(), { debounceMs: 0 });
+
+    // A newer same-duct edit coalesced this one; the newer edit owns the write.
+    expect(updateEntity).not.toHaveBeenCalled();
+    expect(updateEntities).not.toHaveBeenCalled();
   });
 
   it('commitEntityProps wraps direct updateEntity dispatch', () => {

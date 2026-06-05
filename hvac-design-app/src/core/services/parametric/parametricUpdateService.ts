@@ -33,6 +33,10 @@ export interface ParametricUpdateResult {
   requiresUserAction: boolean;
   entityUpdates?: Array<{ id: string; updates: Partial<Entity>; previous: Entity }>;
   engineeringData?: DuctEngineeringData;
+  // True when this promise resolved because a newer same-duct change superseded
+  // (or cancelled) it before its debounce fired. The caller must NOT apply a
+  // fallback write for a superseded result — the newer change owns the entity.
+  superseded?: boolean;
 }
 
 export type ParametricUpdateMode = 'input' | 'drag';
@@ -244,6 +248,7 @@ export class ParametricUpdateService {
         violations: [],
         requiresUserAction: false,
         entityUpdates: [],
+        superseded: true,
       });
       this.pendingDuctUpdates.delete(ductId);
     }
@@ -295,6 +300,7 @@ export class ParametricUpdateService {
       violations: [],
       requiresUserAction: false,
       entityUpdates: [],
+      superseded: true,
     });
   }
 
