@@ -128,6 +128,28 @@ describe('AxialLayer variant writes', () => {
     );
   });
 
+  it('resets to the root menu when re-requested for a different fitting while open', async () => {
+    const elbow = fitting('fit-elbow-reopen', 'elbow_90');
+    const cap = fitting('fit-cap-reopen', 'cap');
+    setEntities([elbow, cap]);
+    render(<AxialLayer />);
+
+    // Open on the elbow and drill into the Radius submenu (stack depth 2).
+    window.dispatchEvent(
+      new CustomEvent('sws:axial-menu-requested', { detail: { entityId: elbow.id, x: 10, y: 10 } })
+    );
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Radius' }));
+    await screen.findByRole('menuitem', { name: 'R1.5' });
+
+    // Re-request for the cap while the menu is still open: it must remount at the
+    // cap's root, not keep the elbow's drilled-in radius submenu.
+    window.dispatchEvent(
+      new CustomEvent('sws:axial-menu-requested', { detail: { entityId: cap.id, x: 10, y: 10 } })
+    );
+    await screen.findByRole('menuitem', { name: 'Screen' });
+    expect(screen.queryByRole('menuitem', { name: 'R1.5' })).toBeNull();
+  });
+
   it('writes a cap variant key', async () => {
     const entity = fitting('fit-cap', 'cap');
 
