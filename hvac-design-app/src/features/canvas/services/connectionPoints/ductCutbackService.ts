@@ -99,16 +99,11 @@ export function getDuctCenterline(duct: DuctLikeEntity): {
 } {
   ensureDuctDesignCenterline(duct);
 
-  if (duct.type === 'duct_run') {
-    return {
-      start: { ...duct.props.designStartPoint! },
-      end: { ...duct.props.designEndPoint! },
-      length: duct.props.designLength ?? duct.props.installLength,
-    };
-  }
-
-  const endpoints = getDuctEndpoints(duct);
-  return { ...endpoints, length: duct.props.length };
+  return {
+    start: { ...duct.props.designStartPoint! },
+    end: { ...duct.props.designEndPoint! },
+    length: duct.props.designLength ?? authoredFallbackLength(duct),
+  };
 }
 
 /** Resolve a duct/run's start and end world points. */
@@ -125,11 +120,18 @@ export function getDuctEndpoints(duct: DuctLikeEntity): { start: Point2D; end: P
   return { start, end: projectEnd(start, duct.transform.rotation ?? 0, duct.props.length) };
 }
 
-function ensureDuctDesignCenterline(duct: DuctLikeEntity): void {
-  if (duct.type !== 'duct_run') {
-    return;
-  }
+/** Authored length to fall back on when no `designLength` is stored, per entity kind. */
+function authoredFallbackLength(duct: DuctLikeEntity): number {
+  return duct.type === 'duct_run' ? duct.props.installLength : duct.props.length;
+}
 
+/**
+ * Capture the authored centerline the first time a duct/run is touched, before any cutback
+ * has moved its endpoints. Applies to plain `duct`s too (their design fields persist via the
+ * schema) so a fitting detach can restore them — without this, a plain duct's "design" was
+ * read back from its already-cut geometry and the cutback became permanent.
+ */
+function ensureDuctDesignCenterline(duct: DuctLikeEntity): void {
   if (
     duct.props.designStartPoint &&
     duct.props.designEndPoint &&
@@ -141,7 +143,7 @@ function ensureDuctDesignCenterline(duct: DuctLikeEntity): void {
   const endpoints = getDuctEndpoints(duct);
   duct.props.designStartPoint ??= { ...endpoints.start };
   duct.props.designEndPoint ??= { ...endpoints.end };
-  duct.props.designLength ??= duct.props.installLength;
+  duct.props.designLength ??= authoredFallbackLength(duct);
 }
 
 function applyDuctAppliedCenterline(

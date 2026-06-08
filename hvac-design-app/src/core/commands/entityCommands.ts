@@ -157,6 +157,12 @@ function cloneDuctWithNewGeometry(
     connectedFrom: overrides.connectedFrom,
     connectedTo: overrides.connectedTo,
   };
+  // The clone gets new geometry, so it must not inherit the source's authored centerline —
+  // let it re-capture its own design fields lazily on first cutback (mirrors the duct_run
+  // clone, which resets designStartPoint/designEndPoint/designLength to the split geometry).
+  delete duct.props.designStartPoint;
+  delete duct.props.designEndPoint;
+  delete duct.props.designLength;
   duct.transform = {
     ...source.transform,
     x: overrides.x,

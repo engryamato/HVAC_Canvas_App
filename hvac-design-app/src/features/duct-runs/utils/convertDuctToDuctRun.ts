@@ -30,8 +30,15 @@ export function convertDuctToDuctRun(
     },
     endPoint: computeEndPoint(duct),
   };
-  const designStartPoint = { ...baseProps.startPoint };
-  const designEndPoint = { ...baseProps.endPoint };
+  // Honor an authored centerline already captured on the plain duct so a cut duct converted
+  // to a run keeps its uncut design — otherwise the cutback geometry would be baked in as design.
+  const designStartPoint = duct.props.designStartPoint
+    ? { ...duct.props.designStartPoint }
+    : { ...baseProps.startPoint };
+  const designEndPoint = duct.props.designEndPoint
+    ? { ...duct.props.designEndPoint }
+    : { ...baseProps.endPoint };
+  const designLength = duct.props.designLength ?? baseProps.installLength;
 
   const sectionLength =
     options.sectionLength ??
@@ -58,7 +65,7 @@ export function convertDuctToDuctRun(
       ...propsWithoutLegacyLength,
       designStartPoint,
       designEndPoint,
-      designLength: baseProps.installLength,
+      designLength,
       segments,
     },
   } as DuctRun;

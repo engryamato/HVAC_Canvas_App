@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { DuctRun } from '@/core/schema';
+import type { Duct, DuctRun } from '@/core/schema';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
 import {
   applyDuctEndpointCutback,
@@ -44,6 +44,36 @@ function run(start: { x: number; y: number }, end: { x: number; y: number }): Du
     },
     calculated: { area: 113, velocity: 0, frictionLoss: 0 },
   } as DuctRun;
+}
+
+function plainDuct(start: { x: number; y: number }, end: { x: number; y: number }): Duct {
+  const length = pixelsToFeet(Math.hypot(end.x - start.x, end.y - start.y));
+  return {
+    id: '550e8400-e29b-41d4-a716-446655440200',
+    type: 'duct',
+    transform: {
+      x: start.x,
+      y: start.y,
+      elevation: 0,
+      rotation: (Math.atan2(end.y - start.y, end.x - start.x) * 180) / Math.PI,
+      scaleX: 1,
+      scaleY: 1,
+    },
+    zIndex: 5,
+    createdAt: now,
+    modifiedAt: now,
+    props: {
+      name: 'Duct',
+      engineeringSystem: 'standard_duct',
+      shape: 'round',
+      diameter: 12,
+      length,
+      material: 'galvanized',
+      airflow: 0,
+      staticPressure: 0.1,
+    },
+    calculated: { area: 113, velocity: 0, frictionLoss: 0 },
+  } as Duct;
 }
 
 describe('applyDuctEndpointCutback', () => {
@@ -122,5 +152,26 @@ describe('applyDuctEndpointCutback', () => {
     expect(getDuctEndpoints(duct)).toEqual({ start: { x: 10, y: 20 }, end: { x: 70, y: 20 } });
     // installLength projection sanity (feet → px round-trips).
     expect(feetToPixels(pixelsToFeet(60))).toBeCloseTo(60, 6);
+  });
+
+  it('captures and restores a plain duct centerline so its cutback is not permanent', () => {
+    const duct = plainDuct({ x: 100, y: 100 }, { x: 220, y: 100 }); // 120px = 10ft
+
+    applyDuctEndpointCutback(duct, 'end', { x: 200, y: 100 });
+    // The body shortened to the opening...
+    expect(duct.props.length).toBeCloseTo(pixelsToFeet(100), 6);
+    expect(getDuctEndpoints(duct).end).toEqual({ x: 200, y: 100 });
+    // ...but the authored centerline was captured before the cut.
+    expect(getDuctCenterline(duct)).toEqual({
+      start: { x: 100, y: 100 },
+      end: { x: 220, y: 100 },
+      length: pixelsToFeet(120),
+    });
+
+    const restored = restoreDuctToDesign(duct);
+    expect(restored).toBe(true);
+    expect(duct.transform.x).toBe(100);
+    expect(duct.props.length).toBeCloseTo(pixelsToFeet(120), 6);
+    expect(getDuctEndpoints(duct).end).toEqual({ x: 220, y: 100 });
   });
 });

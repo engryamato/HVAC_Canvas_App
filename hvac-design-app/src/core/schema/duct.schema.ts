@@ -139,6 +139,20 @@ const SharedDuctPropsSchema = z
       .optional()
       .describe('Last rectangular height before round conversion'),
     length: z.number().min(0.1).max(1000).describe('Length in feet'),
+    designStartPoint: z
+      .object({ x: z.number(), y: z.number() })
+      .optional()
+      .describe('Authored, uncut centerline start point (world px); restores after fitting detach'),
+    designEndPoint: z
+      .object({ x: z.number(), y: z.number() })
+      .optional()
+      .describe('Authored, uncut centerline end point (world px); restores after fitting detach'),
+    designLength: z
+      .number()
+      .min(0.1)
+      .max(1000)
+      .optional()
+      .describe('Authored, uncut length in feet'),
     material: DuctMaterialSchema,
     airflow: z.number().min(0).max(100000).describe('Airflow in CFM'),
     staticPressure: z.number().min(0).max(20).describe('Static pressure in in.w.g.'),
