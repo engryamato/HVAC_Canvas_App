@@ -13,6 +13,7 @@ import { useSelectionStore } from '../store/selectionStore';
 import { usePreferencesStore } from '@/core/store/preferencesStore';
 import type { LocalStoragePayload } from '../hooks/useAutoSave';
 import { hydrateToStores } from '@/core/persistence/ProjectStateOrchestrator';
+import { createEquipment } from '../entities/equipmentDefaults';
 
 describe('CanvasPageWrapper hydration — web/localStorage path', () => {
     beforeEach(() => {
@@ -64,9 +65,14 @@ describe('CanvasPageWrapper hydration — web/localStorage path', () => {
     });
 
     it('hydrates selection state', () => {
+        // Selection only restores ids that survive entity hydration (see the
+        // hydratedEntityIds filter in ProjectStateOrchestrator), so the selected
+        // entity must actually exist in the payload.
+        const equipment = createEquipment('air_handler');
         hydrateToStores({
             project: {
                 settings: { activeViewMode: '3d', unitSystem: 'imperial', gridSize: 12, gridVisible: true },
+                entities: { byId: { [equipment.id]: equipment }, allIds: [equipment.id] },
                 threeDViewState: {
                     cameraTarget: { x: 0, y: 0, z: 0 },
                     cameraPosition: { x: 560, y: 320, z: 560 },
@@ -79,8 +85,8 @@ describe('CanvasPageWrapper hydration — web/localStorage path', () => {
                     showPlanOverlay: false,
                 },
             } as any,
-            selection: { selectedIds: ['entity-1'], hoveredId: null },
+            selection: { selectedIds: [equipment.id], hoveredId: null },
         } as Partial<LocalStoragePayload> as LocalStoragePayload);
-        expect(useSelectionStore.getState().selectedIds).toEqual(['entity-1']);
+        expect(useSelectionStore.getState().selectedIds).toEqual([equipment.id]);
     });
 });
