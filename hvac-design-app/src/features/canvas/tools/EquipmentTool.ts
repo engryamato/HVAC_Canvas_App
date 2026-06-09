@@ -10,9 +10,13 @@ import { createEntity, validateAndRecord } from '@/core/commands/entityCommands'
 import { useViewportStore } from '../store/viewportStore';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityStore } from '@/core/store/entityStore';
+import { useSettingsStore } from '@/core/store/settingsStore';
 import { MagneticConnectionService, type EquipmentPortSnapResult } from '../services/magneticConnectionService';
+import { applyEquipmentCapacitySizing } from '@/core/services/sizing/sizingProvenance';
+import { commitEntityProps } from '@/core/actions/entityActions';
 import type { Equipment } from '@/core/schema';
 import type { EquipmentType } from '@/core/schema/equipment.schema';
+import type { DuctRun } from '@/core/schema/duct-run.schema';
 
 interface EquipmentToolState {
   currentPoint: { x: number; y: number } | null;
@@ -223,6 +227,9 @@ export class EquipmentTool extends BaseTool {
     createEntity(equipment);
     validateAndRecord(equipment.id);
 
+    // Apply equipment-driven sizing to all connected ducts (WS5-FU-001)
+    this.applyEquipmentSizingToConnectedDucts(equipment);
+
     // Auto-increment the name for the next placement (AHU-1 → AHU-2)
     const nextName = draft.name.replace(/(\d+)$/, (_, n) => String(Number(n) + 1));
     storeState.setEquipmentPlacementDraft({ name: nextName });
@@ -231,6 +238,47 @@ export class EquipmentTool extends BaseTool {
     storeState.setStatusMessage(
       `Placed ${draft.name}  ·  Click to place  ·  [E] Edit specs  ·  [Esc] Cancel`
     );
+  }
+
+  private applyEquipmentSizingToConnectedDucts(equipment: Equipment): void {
+    const entityStore = useEntityStore.getState();
+    const settingsStore = useSettingsStore.getState();
+
+    // Collect unique connected duct IDs from all equipment ports
+    const connectedDuctIds = new Set<string>();
+    for (const port of equipment.props.connectionPorts ?? []) {
+      if (port.connectedDuctId) {
+        connectedDuctIds.add(port.connectedDuctId);
+      }
+    }
+
+    if (connectedDuctIds.size === 0) {
+      return;
+    }
+
+    const engineeringLimits = settingsStore.calculationSettings.engineeringLimits;
+
+    for (const ductId of connectedDuctIds) {
+      const entity = entityStore.byId[ductId];
+      if (!entity || entity.type !== 'duct_run') {
+        continue;
+      }
+      const duct = entity as DuctRun;
+
+      // Use the duct's assigned airflow, falling back to equipment capacity.
+      // props.airflow defaults to 0, so use || (not ??) to fall through to capacity.
+      const airflow = duct.props.airflow || equipment.props.capacity;
+      if (airflow <= 0) {
+        continue;
+      }
+
+      const sizedProps = applyEquipmentCapacitySizing(duct.props, airflow, engineeringLimits);
+
+      // Only commit if sizing actually changed something
+      if (sizedProps !== duct.props) {
+        commitEntityProps(ductId, sizedProps, duct);
+      }
+    }
   }
 }
 

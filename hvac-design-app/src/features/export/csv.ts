@@ -4,6 +4,8 @@ import type { WasteFactors } from '@/core/schema/calculation-settings.schema';
 import { BOMGenerationService, DEFAULT_BOM_WASTE_FACTORS } from '@/core/services/bom/bomGenerationService';
 import { downloadFile } from './download';
 
+// Legacy helpers here are intentionally limited to CSV encoding/formatting.
+// Full BOM generation now lives in bomGenerationService (WS7-FU-001 reconciliation).
 interface ExportCsvOptions {
   separator?: string;
   includeHeader?: boolean;

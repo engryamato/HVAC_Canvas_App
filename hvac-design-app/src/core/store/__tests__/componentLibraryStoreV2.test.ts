@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  UNIFIED_CATALOG_STORE_VERSION,
   migrateLegacyState,
   normalizeCategories,
   useComponentLibraryStoreV2,
@@ -218,6 +219,25 @@ describe('componentLibraryStoreV2', () => {
     });
   });
 
+  it('does not throw when a stale active entry has an invalid engineering system', () => {
+    const malformedEntry = {
+      ...createCatalogEntry({
+        id: 'stale-entry',
+        name: 'Stale Entry',
+        componentClass: 'duct',
+      }),
+      engineeringSystem: 'Supply',
+    } as unknown as CatalogEntry;
+
+    useComponentLibraryStoreV2.setState({
+      catalogEntries: [malformedEntry],
+      activeEntryId: 'stale-entry',
+    });
+
+    expect(() => useComponentLibraryStoreV2.getState().getActivationIntent()).not.toThrow();
+    expect(useComponentLibraryStoreV2.getState().getActivationIntent()).toBeNull();
+  });
+
   it('supports cloneEntry and customizeEntry canonical flows', () => {
     const store = useComponentLibraryStoreV2.getState();
     store.addEntry(createCatalogEntry({ id: 'base-entry', name: 'Base Entry', source: 'system' }));
@@ -280,6 +300,37 @@ describe('componentLibraryStoreV2 migration helpers', () => {
       source: 'custom',
     });
     expect(migrated.activeEntryId).toBe('legacy-1');
+  });
+
+  it('normalizes stale catalog entries with invalid engineering systems during migration', () => {
+    const migrated = migrateLegacyState({
+      catalogEntries: [
+        {
+          id: 'stale-catalog-entry',
+          name: 'Stale Catalog Entry',
+          componentClass: 'duct',
+          categoryId: 'standard_ductwork',
+          typeId: 'round',
+          engineeringSystem: 'Supply',
+          pricing: { materialCost: 0, laborUnits: 0, wasteFactor: 0 },
+          engineeringProperties: { frictionFactor: 0.02, maxVelocity: 2500 },
+          materials: [],
+          isCustom: true,
+        },
+      ],
+      activeEntryId: 'stale-catalog-entry',
+    });
+
+    expect(migrated.catalogEntries).toHaveLength(1);
+    expect(migrated.catalogEntries[0]).toMatchObject({
+      id: 'stale-catalog-entry',
+      engineeringSystem: 'standard_duct',
+    });
+    expect(migrated.activeEntryId).toBe('stale-catalog-entry');
+  });
+
+  it('bumps the persisted catalog store version so stale localStorage is re-migrated', () => {
+    expect(UNIFIED_CATALOG_STORE_VERSION).toBe(5);
   });
 
   it('normalizes nested categories and removes duplicates by id', () => {

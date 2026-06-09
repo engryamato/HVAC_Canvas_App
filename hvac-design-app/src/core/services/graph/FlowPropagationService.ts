@@ -77,11 +77,16 @@ export class FlowPropagationService {
       // Add leaves (degree 1) and flow sources to initial queue
       // IMPORTANT: Do not treat Ducts as leaves to initiate propagation. 
       // Ducts are passive carriers and should only process when pushed by terminals or fittings.
+      // IMPORTANT: Do not treat source equipment (AHU) with zero accumulated flow as a leaf.
+      // Source equipment without demand should not seed trunk flow; terminal demand
+      // should peel from diffusers upstream through the tee to the trunk.
       const isFlowSource = flowNode.accumulatedFlow > 0;
       const isLeafNonDuct =
         flowNode.unprocessedConnections <= 1 && flowNode.type !== 'duct' && flowNode.type !== 'duct_run';
+      const isZeroFlowSourceEquipment =
+        flowNode.type === 'equipment' && flowNode.accumulatedFlow <= 0;
 
-      if (isFlowSource || isLeafNonDuct) {
+      if ((isFlowSource || isLeafNonDuct) && !isZeroFlowSourceEquipment) {
         queue.push(nodeId);
       }
     }

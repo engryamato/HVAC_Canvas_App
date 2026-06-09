@@ -124,9 +124,9 @@ describe('WS9 golden flow and pressure propagation', () => {
   // BUG WS9-AF-002 (docs/ductwork-program/WS9-engine-divergences.md): a rooted
   // source (AHU) is degree-1, so FlowPropagationService queues it as a leaf and
   // finalizes the trunk duct at 0 CFM before downstream demand peels up through
-  // the tee. The trunk should carry the sum of branch demand (500). Un-skip when
-  // the leaf-peeling order is fixed so sources never seed trunk flow.
-  it.skip('accumulates summed branch demand on the trunk upstream of the tee', () => {
+  // the tee. The trunk should carry the sum of branch demand (500). Fixed by
+  // excluding zero-flow source equipment from initial queue seeding.
+  it('accumulates summed branch demand on the trunk upstream of the tee', () => {
     const { entities, tree } = smallTree();
 
     const flows = FlowPropagationService.calculateFlows(tree, entities);

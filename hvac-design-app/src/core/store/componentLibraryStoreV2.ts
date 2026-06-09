@@ -21,7 +21,7 @@ import {
 import type { SystemType } from '../schema/duct.schema';
 
 export const UNIFIED_CATALOG_STORAGE_KEY = 'sws.unifiedCatalog.v1';
-export const UNIFIED_CATALOG_STORE_VERSION = 4;
+export const UNIFIED_CATALOG_STORE_VERSION = 5;
 
 export interface ImportPreview {
   format: 'csv' | 'json';
@@ -688,7 +688,7 @@ export const useUnifiedCatalogStore = create<UnifiedCatalogState>()(
           return null;
         }
 
-        return ActivationIntentSchema.parse({
+        const parsedIntent = ActivationIntentSchema.safeParse({
           entryId: entry.id,
           componentClass: entry.componentClass,
           specialtyToolId: resolveSpecialtyToolId(entry),
@@ -696,6 +696,8 @@ export const useUnifiedCatalogStore = create<UnifiedCatalogState>()(
           systemType: get().activeSystemType,
           defaultSystemType: resolveDefaultSystemType(entry, profile),
         });
+
+        return parsedIntent.success ? parsedIntent.data : null;
       },
 
       addComponent: (component) => get().addEntry(component),

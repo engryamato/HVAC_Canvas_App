@@ -39,7 +39,7 @@ export interface ConnectionPoint {
 }
 
 export interface JunctionAnalysis {
-  type: 'elbow' | 'tee' | 'wye' | 'cross' | 'transition' | 'cap';
+  type: 'elbow' | 'tee' | 'wye' | 'cross' | 'transition' | 'cap' | 'tap';
   location?: Point;
   ducts?: string[];
   angle?: number;
@@ -93,6 +93,11 @@ export interface AutoFittingReRunResult {
 const CONNECTION_TOLERANCE = 12;
 const STRAIGHT_ANGLE_TOLERANCE = 15;
 const WYE_BRANCH_ANGLE_THRESHOLD = 60;
+// WS6c Part 1 — tee/wye hysteresis deadband. Commit wye below 55°, tee above
+// 65°, and keep the prior classification between 55–65° to stop flip-flop while
+// dragging a branch through the boundary. Tunable.
+const WYE_TEE_DEADBAND_LOW = 55;
+const WYE_TEE_DEADBAND_HIGH = 65;
 const ANGLE_EPSILON = 0.000001;
 const COORDINATE_PRECISION = 3;
 
@@ -138,7 +143,10 @@ export class FittingInsertionService {
     };
   }
 
-  static analyzeMultiDuctJunction(connections: ConnectionPoint[]): JunctionAnalysis {
+  static analyzeMultiDuctJunction(
+    connections: ConnectionPoint[],
+    previousType?: 'tee' | 'wye'
+  ): JunctionAnalysis {
     const sortedConnections = [...connections].sort((a, b) => a.ductId.localeCompare(b.ductId));
 
     if (connections.length === 2) {
@@ -165,7 +173,17 @@ export class FittingInsertionService {
     }
 
     if (connections.length === 3) {
-      const branch = this.classifyThreeWayJunction(sortedConnections);
+      // Check for body tap: two collinear connections with opposite endPoints
+      // (suggesting same continuous duct) + a perpendicular branch
+      const bodyTap = this.classifyBodyTap(sortedConnections);
+      if (bodyTap) {
+        return {
+          type: 'tap',
+          angle: bodyTap.branchAngle,
+          branches: sortedConnections,
+        };
+      }
+      const branch = this.classifyThreeWayJunction(sortedConnections, previousType);
       return {
         type: branch.type,
         angle: branch.branchAngle,
@@ -212,6 +230,10 @@ export class FittingInsertionService {
 
       case 'wye':
         fittingType = 'wye';
+        break;
+
+      case 'tap':
+        fittingType = 'takeoff';
         break;
 
       case 'transition':
@@ -771,7 +793,10 @@ export class FittingInsertionService {
    * return the branch angle (degrees, measured against the main run) so the
    * fitting geometry can be generated to follow the detected angle.
    */
-  private static classifyThreeWayJunction(connections: ConnectionPoint[]): { type: 'tee' | 'wye'; branchAngle: number } {
+  private static classifyThreeWayJunction(
+    connections: ConnectionPoint[],
+    previousType?: 'tee' | 'wye'
+  ): { type: 'tee' | 'wye'; branchAngle: number } {
     const main = this.findMainRunPair(connections);
     if (!main) {
       return { type: 'tee', branchAngle: 90 };
@@ -788,8 +813,135 @@ export class FittingInsertionService {
     );
     // Fold to the acute branch angle off the main run (0–90).
     const branchAngle = rawBranchAngle > 90 ? 180 - rawBranchAngle : rawBranchAngle;
-    const type = branchAngle <= WYE_BRANCH_ANGLE_THRESHOLD + ANGLE_EPSILON ? 'wye' : 'tee';
+    const type = this.classifyTeeWyeWithHysteresis(branchAngle, previousType);
     return { type, branchAngle };
+  }
+
+  /**
+   * WS6c Part 1 — sticky tee/wye classification. Commits to wye below the low
+   * deadband edge and tee above the high edge; inside the 55–65° deadband it
+   * keeps the prior classification (if any) so a branch dragged through the
+   * boundary does not flip-flop. With no prior classification it falls back to
+   * the ratified single cutoff (wye ≤ 60°, tee > 60°).
+   */
+  private static classifyTeeWyeWithHysteresis(
+    branchAngle: number,
+    previousType?: 'tee' | 'wye'
+  ): 'tee' | 'wye' {
+    if (branchAngle < WYE_TEE_DEADBAND_LOW - ANGLE_EPSILON) {
+      return 'wye';
+    }
+    if (branchAngle > WYE_TEE_DEADBAND_HIGH + ANGLE_EPSILON) {
+      return 'tee';
+    }
+    if (previousType) {
+      return previousType;
+    }
+    return branchAngle <= WYE_BRANCH_ANGLE_THRESHOLD + ANGLE_EPSILON ? 'wye' : 'tee';
+  }
+
+  /**
+   * Find the tee/wye classification of an existing auto-inserted fitting that
+   * already sits at this junction (matched by its inlet+outlet ducts), so the
+   * hysteresis deadband can stay sticky across drag re-evaluations.
+   */
+  private static findPriorTeeWyeType(
+    ductIds: string[],
+    entitiesById: Record<string, Entity>
+  ): 'tee' | 'wye' | undefined {
+    const ductSet = new Set(ductIds);
+    for (const entity of Object.values(entitiesById)) {
+      if (entity.type !== 'fitting') {
+        continue;
+      }
+      const fittingType = entity.props.fittingType;
+      if (fittingType !== 'tee' && fittingType !== 'wye') {
+        continue;
+      }
+      const { inletDuctId, outletDuctId } = entity.props;
+      if (inletDuctId && outletDuctId && ductSet.has(inletDuctId) && ductSet.has(outletDuctId)) {
+        return fittingType;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Detect a body takeoff (tap) junction: a branch connecting perpendicularly
+   * to the body of a continuous trunk duct. The trunk appears as two connections
+   * with opposite endPoints (one 'start', one 'end') at collinear angles (~0 or ~180),
+   * and the branch is perpendicular (~90 deg) AND connects at a position along the
+   * trunk body (not at the trunk endpoints).
+   */
+  private static classifyBodyTap(connections: ConnectionPoint[]): { branchAngle: number } | null {
+    // Find the two most collinear connections (potential main run)
+    const main = this.findMainRunPair(connections);
+    if (!main) {
+      return null;
+    }
+
+    const branch = connections.find((c) => c !== main.first && c !== main.second);
+    if (!branch) {
+      return null;
+    }
+
+    // Check if main run connections have opposite endPoints (one 'start', one 'end')
+    // suggesting they are the same continuous duct
+    const firstEndPoint = main.first.endPoint;
+    const secondEndPoint = main.second.endPoint;
+    const hasOppositeEndPoints = (firstEndPoint === 'start' && secondEndPoint === 'end') ||
+                                  (firstEndPoint === 'end' && secondEndPoint === 'start');
+
+    if (!hasOppositeEndPoints) {
+      return null;
+    }
+
+    // Check if branch is perpendicular to main run (~90 degrees)
+    const rawBranchAngle = Math.min(
+      this.calculateAngleDifference(branch.angle, main.first.angle),
+      this.calculateAngleDifference(branch.angle, main.second.angle)
+    );
+    const branchAngle = rawBranchAngle > 90 ? 180 - rawBranchAngle : rawBranchAngle;
+
+    // Body tap: branch angle close to 90 degrees (perpendicular)
+    const PERPENDICULAR_TOLERANCE = 20;
+    if (Math.abs(branchAngle - 90) > PERPENDICULAR_TOLERANCE) {
+      return null;
+    }
+
+    // Additional check: branch position should be on the trunk body, not at the junction.
+    // For a body tap, the trunk endpoints are at different positions (trunk has length),
+    // and the branch connects somewhere between them.
+    // For a tee, all three connections are at the same junction point.
+    const trunkStart = main.first.point;
+    const trunkEnd = main.second.point;
+    const branchPos = branch.point;
+
+    // Check if trunk has meaningful length (endpoints at different positions)
+    const trunkLength = Math.hypot(trunkEnd.x - trunkStart.x, trunkEnd.y - trunkStart.y);
+    if (trunkLength < 1) {
+      return null; // Trunk endpoints coincide - not a body tap
+    }
+
+    // Check if branch position is between trunk endpoints (on the body)
+    // Project branch position onto trunk line and check if it's between endpoints
+    const trunkDx = trunkEnd.x - trunkStart.x;
+    const trunkDy = trunkEnd.y - trunkStart.y;
+    const branchDx = branchPos.x - trunkStart.x;
+    const branchDy = branchPos.y - trunkStart.y;
+
+    // Dot product to find projection parameter t
+    const trunkLenSq = trunkDx * trunkDx + trunkDy * trunkDy;
+    const t = (branchDx * trunkDx + branchDy * trunkDy) / trunkLenSq;
+
+    // t should be between 0 and 1 (on the trunk segment), and not at the endpoints
+    // (t=0 is trunk start, t=1 is trunk end - those are junction points for tees)
+    const ENDPOINT_TOLERANCE = 0.1;
+    if (t > ENDPOINT_TOLERANCE && t < 1 - ENDPOINT_TOLERANCE) {
+      return { branchAngle };
+    }
+
+    return null;
   }
 
   private static findMainRunPair(connections: ConnectionPoint[]): { first: ConnectionPoint; second: ConnectionPoint } | null {
@@ -833,7 +985,11 @@ export class FittingInsertionService {
       }
 
       const branchPoints = [endpoint, ...nearby].sort((a, b) => a.ductId.localeCompare(b.ductId));
-      const analysis = this.analyzeMultiDuctJunction(branchPoints);
+      const previousTeeWyeType = this.findPriorTeeWyeType(
+        branchPoints.map((point) => point.ductId),
+        entitiesById
+      );
+      const analysis = this.analyzeMultiDuctJunction(branchPoints, previousTeeWyeType);
       const ductIds = branchPoints.map((point) => point.ductId).sort();
 
       if (analysis.type === 'cap' || analysis.type === 'cross') {

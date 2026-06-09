@@ -20,13 +20,17 @@ splits + previously-$0 items becoming Unpriced.
 
 ## WS7-FU-002 — Wire the canvas BOM panel rows to canonical cost identity
 
-**Status:** partial.
+**Status:** implemented (display join); legacy CSV path unchanged.
 
-`BOMPanel` reads optional `bomItemId`/`unpriced` (added to the legacy
-`csv.ts` `BomItem` as forward-compat fields, unset in the legacy path) and falls
-back to an `itemNumber`-based cost key. Once FU-001 lands and the panel consumes
-the canonical `BOMItem[]` directly, the row→`ItemCost` link should key on the
-canonical `bomItemId` instead of the fallback.
+`useBOM` now stamps each legacy display row with its canonical `bomItemId` when
+`WS7_BOM_PRICING` is on: it builds an `entityId → BOMItem.id` map from the
+canonical items' `sourceEntityIds` and fills the forward-compat `bomItemId`
+field on the rows it returns (additive — no displayed value or CSV output
+changes). With the flag on, the canonical cost items are keyed by `BOMItem.id`
+(`ItemCost.bomItemId = bomItem.id`), so `BOMPanel`'s `costByItemId.get(item.bomItemId)`
+join now resolves on the canonical identity. With the flag off, rows keep the
+`bom-${itemNumber}` fallback. Full consumption of the canonical `BOMItem[]` as
+the panel's row source (instead of the legacy rows) still waits on FU-001.
 
 ## Shipped and green (service layer + flag)
 

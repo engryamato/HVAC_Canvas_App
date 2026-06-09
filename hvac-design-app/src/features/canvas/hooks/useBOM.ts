@@ -37,6 +37,35 @@ export interface GroupedBomItems {
 }
 
 /**
+ * WS7-FU-002 — stamp each legacy display row with its canonical BOMItem id,
+ * matched via the canonical items' `sourceEntityIds`. Additive: it only fills
+ * the forward-compat `bomItemId` field and never changes a displayed value or
+ * the legacy CSV output. With the canonical cost items keyed by `BOMItem.id`
+ * (`ItemCost.bomItemId = bomItem.id`), this lets the BOM panel resolve a row's
+ * cost on the canonical identity instead of the `bom-${itemNumber}` fallback.
+ */
+export function stampCanonicalBomItemIds(
+  rows: BomItem[],
+  canonicalItems: CostBOMItem[]
+): BomItem[] {
+  if (canonicalItems.length === 0) {
+    return rows;
+  }
+  const entityToBomItemId = new Map<string, string>();
+  for (const canonical of canonicalItems) {
+    for (const entityId of canonical.sourceEntityIds) {
+      if (!entityToBomItemId.has(entityId)) {
+        entityToBomItemId.set(entityId, canonical.id);
+      }
+    }
+  }
+  return rows.map((item) => {
+    const bomItemId = item.entityId ? entityToBomItemId.get(item.entityId) : undefined;
+    return bomItemId ? { ...item, bomItemId } : item;
+  });
+}
+
+/**
  * Hook to get Bill of Materials from current entities
  *
  * Automatically updates when entities change.
@@ -232,30 +261,41 @@ export function useBOM(): GroupedBomItems {
     ws7BomPricingEnabled,
   ]);
 
+  // WS7-FU-002: when canonical pricing is on, stamp each legacy display row with
+  // its canonical BOMItem id so the BOM panel's cost join keys on the canonical
+  // identity (bomItemId) instead of the itemNumber fallback.
+  const displayItems = useMemo(
+    () =>
+      ws7BomPricingEnabled
+        ? stampCanonicalBomItemIds(bomItems, canonicalBomItems)
+        : bomItems,
+    [bomItems, canonicalBomItems, ws7BomPricingEnabled]
+  );
+
   // Group items by type
   const grouped = useMemo(() => {
-    const ducts = bomItems.filter((item) => item.type === 'Duct');
-    const equipment = bomItems.filter((item) => item.type === 'Equipment');
-    const fittings = bomItems.filter((item) => item.type === 'Fitting');
-    const accessories = bomItems.filter(
+    const ducts = displayItems.filter((item) => item.type === 'Duct');
+    const equipment = displayItems.filter((item) => item.type === 'Equipment');
+    const fittings = displayItems.filter((item) => item.type === 'Fitting');
+    const accessories = displayItems.filter(
       (item) => item.type !== 'Duct' && item.type !== 'Equipment' && item.type !== 'Fitting'
     );
 
     return {
-      all: bomItems,
+      all: displayItems,
       ducts,
       equipment,
       fittings,
       accessories,
       totals: {
-        totalItems: bomItems.length,
-        totalQuantity: bomItems.reduce((sum, item) => sum + item.quantity, 0),
+        totalItems: displayItems.length,
+        totalQuantity: displayItems.reduce((sum, item) => sum + item.quantity, 0),
       },
       costEstimate,
       costDelta,
       lastUpdated,
     };
-  }, [bomItems, costEstimate, costDelta, lastUpdated]);
+  }, [displayItems, costEstimate, costDelta, lastUpdated]);
 
   return grouped;
 }

@@ -17,7 +17,7 @@ The detailed spec (Parts 0–6 + addenda). Source of truth for behavior; the dec
 - **[Workstream Decomposition](Workstream_Decomposition.md)** — the live program source: 11 workstreams, 4 milestones, all locked decisions (D1–D11), per-WS scope/deps/success/open-items.
 
 ## 3. Tickets
-Implementation-ready specs. Status: ✓ = specced; ◐ = skeleton (partly gated).
+Implementation-ready specs. Status: ✓ = specced **and implemented** (in branch history); ◐ = partial (a sub-part explicitly deferred — see the ticket / follow-up notes).
 
 ### M1 — Foundation
 | Ticket | What |
@@ -50,10 +50,10 @@ Implementation-ready specs. Status: ✓ = specced; ◐ = skeleton (partly gated)
 | [WS4](tickets/WS4-axial-menu.md) ✓ | Axial menu (co-ships WS6e) |
 | [WS6b](tickets/WS6b-pressure-seal-gauge.md) ✓ | Pressure/seal class + gauge auto-derivation |
 | [WS6a](tickets/WS6a-surface-area-weight.md) ✓ | Surface area + weight calculators |
-| [WS6c](tickets/WS6c-engine-correctness.md) ◐ | Engine correctness — hysteresis (decided) + divergence backlog (post-WS9 run) |
+| [WS6c](tickets/WS6c-engine-correctness.md) ✓ | Engine correctness — tee/wye hysteresis deadband (implemented) + WS9 divergence backlog resolved (AF-001 body-takeoff → tap, AF-002 trunk-flow seeding) |
 
 ## 4. Build Order
-- **[BUILD_ORDER.md](BUILD_ORDER.md)** — the sequence to implement in, with gates (parity / D11 / flags), the critical path, and the first-PR recommendation (**WS6f**).
+- **[BUILD_ORDER.md](BUILD_ORDER.md)** — the sequence the program was built in, with gates (parity / D11 / flags), the critical path, and the first-PR recommendation (**WS6f**). All workstreams WS0–WS10 (incl. WS6a–WS6f) have landed in branch history; the only deferred items are tracked in the follow-up notes below.
 
 ---
 
@@ -61,7 +61,7 @@ Implementation-ready specs. Status: ✓ = specced; ◐ = skeleton (partly gated)
 - **Statement tags:** `[Verified]` (code-backed), `[Decision]` (settled), `[Proposal]` (to implement), `[Open]` (needs a decision).
 - **Gates:** `pnpm parity:check` (WS6f/WS6d/WS6e); **D11** gauge-table ratification (WS9/WS6a/WS6b, once); per-WS feature flags.
 - **Greenfield (D5):** new schema fields apply to new projects; old projects default on load (no migration).
-- **No code yet** — every workstream is specced; build starts from BUILD_ORDER.
+- **Implementation state** — every workstream (WS0–WS10, WS6a–WS6f) is specced **and implemented** in this branch's history. Remaining gaps are explicitly deferred and tracked in [WS7-followups.md](WS7-followups.md) (WS7-FU-001 full CSV reconcile) and the WS6e post-WS4 detection tail; see [WS9-engine-divergences.md](WS9-engine-divergences.md) for the resolved engine divergences.
 
 ## Related memory (cross-session)
 `v1-air-ductwork-only-scope` · `program-decomposition-decisions` · `manual-duct-size-required` · `cost-estimation-gaps` · `interaction-architecture-plan` · `toolbar-tool-option-panels` · `duct-cutback-restore-asymmetry` · `core-flows-refactor-parity-gate`.

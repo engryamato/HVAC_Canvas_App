@@ -1,7 +1,7 @@
 # TICKET WS6c — Engine-correctness fixes (SKELETON — backlog gated on WS9 run)
 
 **Epic:** WS6 · **Milestone:** M4 · **Priority:** P1 · **Effort:** decided part ~4–6h; backlog TBD after WS9
-**Type:** Engine fixes · **Status:** Skeleton — decided part ready; divergence backlog **populated post-WS9-run** · **Code changes:** none until all docs done
+**Type:** Engine fixes · **Status:** Implemented — Part 1 tee/wye hysteresis deadband landed (`classifyThreeWayJunction` + `classifyTeeWyeWithHysteresis`, drag-sticky via `findPriorTeeWyeType`); Part 2 backlog resolved by WS9 (AF-001 body-takeoff → `tap`, AF-002 trunk-flow seeding — both green in golden tests)
 
 ## What's required to fully spec WS6c
 
@@ -51,8 +51,8 @@ Part 1 is a small constant/logic change behind the WS6 flag. Backlog children ro
 
 ## Open items
 
-- **[gated]** Part 2 backlog — populate from WS9's run. This is the one ticket intentionally left partial.
-- **[at-ticket]** hysteresis constant values (55/65) — confirmed; tune if field cases differ.
+- **[resolved]** Part 2 backlog — WS9's run surfaced two Bucket-A divergences (AF-001 body-takeoff misclassified as tee; AF-002 rooted source finalizing trunk flow at zero). Both are fixed and locked by golden regression tests (`fittingInsertionService.golden.test.ts`, `propagation.golden.test.ts`). No further speculative divergences were confirmed wrong. See [WS9-engine-divergences.md](../WS9-engine-divergences.md).
+- **[done]** hysteresis constant values (55/65) — implemented as `WYE_TEE_DEADBAND_LOW`/`WYE_TEE_DEADBAND_HIGH`; tune if field cases differ.
 
 ## Out of scope
 
