@@ -42,10 +42,10 @@ typecheck-*.count.txt
 .sisyphus/
 
 # Root planning drafts (canonical copies live under docs/)
-PLAN-*.md
-PRD-*.md
-PRD_*.md
-RESTORATION_SUMMARY.md
+/PLAN-*.md
+/PRD-*.md
+/PRD_*.md
+/RESTORATION_SUMMARY.md
 
 # Local UX reference and QA captures
 SizeWise UI/

@@ -162,6 +162,7 @@ export function TopToolBar({ className = '' }: TopToolBarProps) {
             onClick={() => handleToolSelect(tool.id)}
             title={'tooltip' in tool && typeof tool.tooltip === 'string' ? `${tool.label} - ${tool.tooltip}` : tool.label}
             aria-label={tool.label}
+            aria-pressed={currentTool === tool.id}
             data-testid={`tool-${tool.id}`}
             className={`
               h-9 rounded-md flex items-center justify-center gap-1.5 px-2 transition-all duration-200
