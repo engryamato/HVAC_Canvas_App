@@ -29,18 +29,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint --quiet
-
-      - name: Build app
-        run: pnpm build
+      - name: Verify app
+        run: pnpm verify:all
         env:
           NODE_ENV: production
           NEXT_PUBLIC_DEBUG_MODE: false
-
-      - name: Run stable targeted tests
-        run: >
-          pnpm exec vitest run
-          src/core/services/__tests__/connectionDetection.test.ts
-          src/features/canvas/clipboard/__tests__/entityClipboard.test.ts
-          src/features/canvas/__tests__/CanvasPageWrapper.hydration.web.test.ts

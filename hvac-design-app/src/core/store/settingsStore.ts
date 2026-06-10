@@ -17,6 +17,7 @@ import {
 } from '../schema/calculation-settings.schema';
 import {
   DEFAULT_PROJECT_MODE,
+  registerAutoFittingProvider,
   registerProjectModeProvider,
   type ProjectMode,
 } from '@/core/projectMode/projectMode';
@@ -262,6 +263,7 @@ const defaultCalculationSettings: CalculationSettings = {
   templateVersion: '1.0.0',
   lockedDefaults: false,
   projectMode: DEFAULT_PROJECT_MODE,
+  autoFittingEnabled: true,
 };
 
 interface SettingsState {
@@ -281,6 +283,7 @@ interface SettingsState {
     updateEngineeringLimits: (limits: Partial<EngineeringLimits>) => void;
     updateProjectInfo: (info: { projectName?: string; location?: string; estimator?: string }) => void;
     updateProjectMode: (mode: ProjectMode) => void;
+    updateAutoFittingEnabled: (enabled: boolean) => void;
     updateTemplateMetadata: (metadata: {
       templateVersion?: string;
       lockedDefaults?: boolean;
@@ -336,6 +339,11 @@ export const useSettingsStore = create<SettingsState>()(
 
             updateProjectMode: (mode) => set((state) => {
               state.calculationSettings.projectMode = mode;
+              state.calculationSettings.lastModified = new Date();
+            }),
+
+            updateAutoFittingEnabled: (enabled) => set((state) => {
+              state.calculationSettings.autoFittingEnabled = enabled;
               state.calculationSettings.lastModified = new Date();
             }),
 
@@ -427,6 +435,10 @@ export const useSettingsStore = create<SettingsState>()(
               if (!state.calculationSettings.projectMode) {
                 state.calculationSettings.projectMode = DEFAULT_PROJECT_MODE;
               }
+
+              if (state.calculationSettings.autoFittingEnabled === undefined) {
+                state.calculationSettings.autoFittingEnabled = true;
+              }
             },
         }
     )
@@ -445,6 +457,10 @@ useSettingsStore.subscribe((state, previousState) => {
 // settingsStore ESM cycle). See projectMode.ts.
 registerProjectModeProvider(
   () => useSettingsStore.getState().calculationSettings.projectMode ?? DEFAULT_PROJECT_MODE
+);
+
+registerAutoFittingProvider(
+  () => useSettingsStore.getState().calculationSettings.autoFittingEnabled
 );
 
 // WS6b/WS6a: same cycle-safe pattern — expose the project's construction

@@ -166,7 +166,14 @@ describe('ProjectFileSchema', () => {
       },
     };
 
-    expect(ProjectFileSchema.parse(projectWithDuctRun)).toEqual(projectWithDuctRun);
+    const parsed = ProjectFileSchema.parse(projectWithDuctRun);
+    expect(parsed).toMatchObject(projectWithDuctRun);
+    expect(parsed.entities.byId[ductRunId]?.props).toMatchObject({
+      designLength: 10,
+      startEndType: 'flange',
+      endEndType: 'flange',
+      insulationThickness: 1,
+    });
   });
 });
 

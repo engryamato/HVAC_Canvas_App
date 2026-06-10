@@ -7,7 +7,7 @@ import {
 import { createEntity, createEntities, splitDuctRunAtPoint } from '@/core/commands/entityCommands';
 import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { feetToPixels, pixelsToFeet } from '@/core/constants/coordinates';
-import type { Duct, DuctEndType, DuctRun, Entity, Equipment, InsulationType } from '@/core/schema';
+import type { Duct, DuctEndType, DuctRun, Entity, Equipment, Fitting, InsulationType } from '@/core/schema';
 import {
   DuctMaterialSchema as DuctEntityMaterialSchema,
   DuctShapeSchema as LegacyDuctShapeSchema,
@@ -17,11 +17,13 @@ import { adaptComponentToService, getServiceColor } from '@/core/services/compon
 import { useComponentLibraryStoreV2 } from '@/core/store/componentLibraryStoreV2';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useToolStore } from '@/core/store/canvas.store';
-import { isAutoFittingDefaultEnabled } from '@/core/projectMode/projectMode';
+import { isAutoFittingProjectSettingEnabled } from '@/core/projectMode/projectMode';
 import { createDuctRun } from '../entities/ductRunDefaults';
 import { useViewportStore } from '../store/viewportStore';
+import type { FittingPreview } from '../auto-fitting/types';
 import { getActiveSectionLength } from '@/features/duct-runs/utils/getActiveSectionLength';
 import { recomputeDuctRunSegments } from '@/features/duct-runs/utils/recomputeDuctRunSegments';
+import { renderFitting } from '../renderers/FittingRenderer';
 import {
   resolvePlacementStrategy,
   type PlacementContext,
@@ -90,18 +92,16 @@ export class DuctTool extends BaseTool {
     this.autoFittingEnabledOverride = enabled;
   }
 
+  static clearAutoFittingEnabledOverride(): void {
+    this.autoFittingEnabledOverride = null;
+  }
+
   static isAutoFittingEnabled(): boolean {
-    // Explicit programmatic override wins (e.g. tests, the toolbar action).
+    // Explicit session override wins (e.g. tests and tooling).
     if (this.autoFittingEnabledOverride !== null) {
       return this.autoFittingEnabledOverride;
     }
-    // WS8: the project mode sets the default (Design → on, Estimation → off).
-    // Returns null when the WS8 flag is off → fall through to the legacy env.
-    const modeDefault = isAutoFittingDefaultEnabled();
-    if (modeDefault !== null) {
-      return modeDefault;
-    }
-    return process.env.NEXT_PUBLIC_ENABLE_AUTO_FITTING === 'true';
+    return isAutoFittingProjectSettingEnabled();
   }
 
   getCursor(): string {
@@ -308,6 +308,7 @@ export class DuctTool extends BaseTool {
       (startPoint.y + currentPoint.y) / 2 - 8 / zoom
     );
     ctx.restore();
+    this.renderAutoFittingPreview(context, startPoint, currentPoint, isValid);
     this.renderCancelGhost(context);
   }
 
@@ -492,6 +493,125 @@ export class DuctTool extends BaseTool {
         }
       }
     }
+  }
+
+  private renderAutoFittingPreview(
+    { ctx, zoom }: ToolRenderContext,
+    startPoint: { x: number; y: number },
+    endPoint: { x: number; y: number },
+    isValid: boolean
+  ): void {
+    if (!isValid || !DuctTool.isAutoFittingEnabled()) {
+      return;
+    }
+
+    const previewRun = this.createPreviewDuctRun(startPoint, endPoint);
+    const entities = { ...useEntityStore.getState().byId, [previewRun.id]: previewRun };
+    const plan = fittingInsertionService.planAutoInsertForDuct(previewRun.id, entities);
+    if (plan.insertions.length === 0) {
+      return;
+    }
+
+    const preview = this.createFittingPreview(plan.insertions);
+    const ghostColor = preview.ghostColor === 'green' ? '#047857' : '#B91C1C';
+    const first = plan.insertions[0]!;
+    for (const fitting of plan.insertions) {
+      ctx.save();
+      ctx.translate(fitting.transform.x, fitting.transform.y);
+      ctx.rotate((fitting.transform.rotation * Math.PI) / 180);
+      ctx.globalAlpha = preview.isValid ? 0.45 : 0.35;
+      renderFitting(fitting, {
+        ctx,
+        zoom,
+        isSelected: false,
+        isHovered: false,
+        entitiesById: entities,
+        showFittingLabels: false,
+        backgroundColor: 'rgba(0,0,0,0)',
+      });
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.font = `${11 / zoom}px sans-serif`;
+    ctx.fillStyle = ghostColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(preview.tooltipText, first.transform.x, first.transform.y - 20 / zoom);
+    ctx.restore();
+  }
+
+  private createFittingPreview(fittings: Fitting[]): FittingPreview {
+    const labels = fittings.map((fitting) => this.formatFittingType(fitting.props.fittingType));
+
+    return {
+      fittings: fittings.map((fitting, sequenceIndex) => ({
+        fittingType: fitting.props.fittingType,
+        sequenceIndex,
+      })),
+      isValid: true,
+      tooltipText: `Auto-fitting: ${labels.join(' + ')}`,
+      ghostColor: 'green',
+    };
+  }
+
+  private createPreviewDuctRun(
+    start: { x: number; y: number },
+    end: { x: number; y: number }
+  ): DuctRun {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const installLength = pixelsToFeet(Math.hypot(dx, dy));
+    const rawRotation = Math.atan2(dy, dx) * (180 / Math.PI);
+    const rotation = ((rawRotation % 360) + 360) % 360;
+    const activeComponent = this.getActiveComponent();
+    const activeService = activeComponent ? adaptComponentToService(activeComponent) : null;
+    const ductDrawSettings = useToolStore.getState().ductDrawSettings;
+    const requestedShape =
+      ductDrawSettings.shape ??
+      activeComponent?.subtype ??
+      activeService?.dimensionalConstraints.allowedShapes[0] ??
+      'rectangular';
+    const shape = this.normalizeRunShape(requestedShape);
+
+    const run = createDuctRun({
+      name: 'Auto-Fitting Preview Duct',
+      x: start.x,
+      y: start.y,
+      installLength,
+      serviceId: activeService?.id ?? activeComponent?.id,
+      catalogItemId: activeComponent?.id,
+      engineeringSystem:
+        activeComponent?.engineeringSystem === 'universal'
+          ? 'standard_duct'
+          : (activeComponent?.engineeringSystem ?? 'standard_duct'),
+      specialtyToolId: useToolStore.getState().activeSpecialtyToolId ?? undefined,
+      shape,
+      material: this.resolveMaterial(shape, activeService?.material),
+    });
+
+    run.id = '__auto-fitting-preview-duct__';
+    run.transform.rotation = rotation;
+    run.props.startPoint = { ...start };
+    run.props.endPoint = { ...end };
+    run.props.designStartPoint = { ...start };
+    run.props.designEndPoint = { ...end };
+    run.props.designLength = installLength;
+
+    if (shape === 'round' || shape === 'flexible') {
+      run.props.diameter = ductDrawSettings.diameter ?? activeComponent?.defaultDimensions?.diameter ?? 12;
+    }
+
+    if (shape === 'rectangular' || shape === 'flat_oval') {
+      run.props.width = ductDrawSettings.width ?? activeComponent?.defaultDimensions?.width ?? 12;
+      run.props.height = ductDrawSettings.height ?? activeComponent?.defaultDimensions?.height ?? 8;
+    }
+
+    return run;
+  }
+
+  private formatFittingType(type: Fitting['props']['fittingType']): string {
+    return String(type).replace(/_/g, ' ');
   }
 
   private getActiveComponent(): UnifiedComponentDefinition | null {

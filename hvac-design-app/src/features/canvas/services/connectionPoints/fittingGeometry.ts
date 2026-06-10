@@ -1,6 +1,5 @@
 import type { Fitting } from '@/core/schema';
 import type { FittingType } from '@/core/schema/fitting.schema';
-import { isEnabled } from '@/core/flags/featureFlags';
 import type { ConnectionProfile, Point2D } from './types';
 import { buildTwoPortFittingGeometry } from './twoPortFittingGeometry';
 import { buildElbowGeometry } from './elbowGeometry';
@@ -272,11 +271,7 @@ export function buildFittingGeometry(fitting: Fitting): FittingGeometry {
     case 'wye':
       return buildBranchFittingGeometry(type, dims);
     case 'takeoff':
-      // WS6e E4: body-junction takeoff geometry. Behind WS6D_DESIGN_GEOMETRY so
-      // a flag-off build keeps the legacy reducer-shaped fallthrough.
-      return isEnabled('WS6D_DESIGN_GEOMETRY')
-        ? buildTakeoffGeometry(dims)
-        : buildTwoPortFittingGeometry(type, dims);
+      return buildTakeoffGeometry(dims);
     default:
       return buildTwoPortFittingGeometry(type, dims);
   }

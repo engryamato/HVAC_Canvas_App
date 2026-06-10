@@ -111,7 +111,7 @@ function getPortPosition(port, box) {
 function getArrowDirection(port) {
   const edge = EDGE_VECTOR[port.edge];
   const flow = PORT_FLOW[port.role];
-  if (flow === "in") return { x: -edge.x, y: -edge.y };
+  if (flow === "in") {return { x: -edge.x, y: -edge.y };}
   return edge;
 }
 

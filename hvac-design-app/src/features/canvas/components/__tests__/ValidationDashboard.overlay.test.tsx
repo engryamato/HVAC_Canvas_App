@@ -60,6 +60,33 @@ describe('ValidationDashboard duct color overlay', () => {
     );
     window.removeEventListener('sws:toast', toast);
   });
+
+  it('lets a conflict reviewer apply the auto-fitting recommendation for one override', () => {
+    const existing = duct('existing', 100, 100, 0);
+    const next = duct('new', 220, 100, 90);
+    const lockedConflict = fitting('fit-locked-conflict', 'existing', 'new', 'reducer');
+    useEntityStore.setState({
+      byId: {
+        [existing.id]: existing,
+        [next.id]: next,
+        [lockedConflict.id]: lockedConflict,
+      },
+      allIds: [existing.id, next.id, lockedConflict.id],
+    });
+
+    render(<ValidationDashboard />);
+
+    expect(screen.getByText('Manual Override Conflicts')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: /use auto/i }));
+
+    const updated = useEntityStore.getState().byId[lockedConflict.id];
+    expect(updated?.type).toBe('fitting');
+    if (updated?.type !== 'fitting') {
+      throw new Error('Expected fitting');
+    }
+    expect(updated.props.manualOverride).toBe(false);
+    expect(updated.props.fittingType).not.toBe('reducer');
+  });
 });
 
 function duct(id: string, x: number, y: number, rotation: number): Duct {

@@ -1,10 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createEntity } from '@/core/commands/entityCommands';
 import { useToolStore } from '@/core/store/canvas.store';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useSelectionStore } from '../../store/selectionStore';
 import { createEquipment } from '../../entities/equipmentDefaults';
 import { createDuctRun } from '../../entities/ductRunDefaults';
+import { createFitting } from '../../entities/fittingDefaults';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { getAngleDegrees } from '../angleConstraint';
 import { DuctTool } from '../DuctTool';
 import { SelectTool } from '../SelectTool';
@@ -34,6 +36,7 @@ function pointAt(
 
 describe('DuctTool duct_run hydration', () => {
   beforeEach(() => {
+    DuctTool.setAutoFittingEnabled(false);
     useEntityStore.getState().clearAllEntities();
     useSelectionStore.getState().clearSelection();
     useToolStore.getState().setDuctDrawSettings({
@@ -46,6 +49,11 @@ describe('DuctTool duct_run hydration', () => {
       startEndType: 'flange',
       endEndType: 'flange',
     });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    DuctTool.clearAutoFittingEnabledOverride();
   });
 
   it('creates duct_run entities for new draws', () => {
@@ -359,6 +367,51 @@ describe('DuctTool duct_run hydration', () => {
 
     expect(ctx.arc).not.toHaveBeenCalledWith(100, 100, 8, 0, Math.PI * 2);
     expect(ctx.strokeRect).toHaveBeenCalledWith(88, 96, 24, 8);
+  });
+
+  it('renders an auto-fitting ghost preview while drawing toward a planned junction', () => {
+    DuctTool.setAutoFittingEnabled(true);
+    const previewFitting = createFitting('elbow_90', { x: 240, y: 120 });
+    previewFitting.props.autoInserted = true;
+    vi.spyOn(fittingInsertionService, 'planAutoInsertForDuct').mockReturnValue({
+      insertions: [previewFitting],
+      orphanFittingIds: [],
+    });
+
+    const tool = new DuctTool();
+    tool.onActivate();
+    tool.onMouseDown({ x: 120, y: 120, button: 0 });
+    tool.onMouseMove({ x: 240, y: 120 });
+
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      closePath: vi.fn(),
+      arc: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillText: vi.fn(),
+      setLineDash: vi.fn(),
+      translate: vi.fn(),
+      rotate: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      quadraticCurveTo: vi.fn(),
+      globalAlpha: 1,
+      strokeStyle: '',
+      fillStyle: '',
+      lineWidth: 0,
+      lineCap: '',
+      lineJoin: '',
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+    } as unknown as CanvasRenderingContext2D;
+
+    tool.render({ ctx, zoom: 1, panX: 0, panY: 0 });
+
+    expect(ctx.fillText).toHaveBeenCalledWith('Auto-fitting: elbow 90', 240, 100);
   });
 
   it('allows segment hit selection once the run is selected', () => {

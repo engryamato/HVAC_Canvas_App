@@ -57,11 +57,11 @@ export class EquipmentTool extends BaseTool {
   }
 
   onMouseDown(event: ToolMouseEvent): void {
-    if (event.button !== 0) return;
+    if (event.button !== 0) {return;}
 
     // Don't place if the placement dialog is open
     const { equipmentPlacementDialogOpen } = useToolStore.getState();
-    if (equipmentPlacementDialogOpen) return;
+    if (equipmentPlacementDialogOpen) {return;}
 
     const placement = this.resolvePlacementPoint(event.x, event.y);
     this.createEquipmentEntity(placement.point.x, placement.point.y, placement.snap);
@@ -92,7 +92,7 @@ export class EquipmentTool extends BaseTool {
     const { equipmentPlacementDialogOpen, equipmentPlacementDraft } = useToolStore.getState();
 
     // Don't render preview while dialog is open
-    if (equipmentPlacementDialogOpen || !this.state.currentPoint) return;
+    if (equipmentPlacementDialogOpen || !this.state.currentPoint) {return;}
 
     const { ctx, zoom } = context;
     const currentPoint = this.state.currentPoint;
@@ -141,7 +141,7 @@ export class EquipmentTool extends BaseTool {
 
   private snapToGrid(x: number, y: number): { x: number; y: number } {
     const { snapToGrid, gridSize } = useViewportStore.getState();
-    if (!snapToGrid) return { x, y };
+    if (!snapToGrid) {return { x, y };}
     return {
       x: Math.round(x / gridSize) * gridSize,
       y: Math.round(y / gridSize) * gridSize,

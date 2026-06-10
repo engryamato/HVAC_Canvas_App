@@ -22,6 +22,9 @@
 
 **Statement tags used throughout:** `[Decision]` settled · `[Proposal]` to implement · `[Open]` needs a decision (resolve at the noted time, not silently).
 
+| D12 | **Auto-fitting defaults on in every project mode; users can override per project** | Supersedes the WS8 Estimation-off auto-fitting default. `projectMode` still drives WS5 sizing posture and WS7 cost-column defaults; auto-fitting is a persisted `autoFittingEnabled` project setting with legacy projects defaulting to `true`. |
+| D13 | **Auto-fitting wrap-up ratified** | D-AF-1: auto-fitting is default-on and user-overridable. D-AF-2: topology strategy refactor is deferred to v1.1; the tested monolithic service remains canonical. D-AF-3: cutback/restore geometry is correctness behavior and stays unconditional. |
+
 ## Milestone map
 
 | Milestone | Workstreams | Gate to exit |
@@ -105,8 +108,8 @@
 - **Open:** none blocking. Pipeline = full reconcile; pricing = strict id-only (no name fallback). `catalogItemId` verified populated by the tools + carried by `bomGenerationService`; manually-drawn items w/o it → Unpriced. Risk: more Unpriced lines surface (intended truth; pre-export gate mitigates).
 
 ### WS8 — Persisted Estimation/Design project mode  *(M3; ticket: `tickets/WS8-project-mode.md`)*
-- **Objective:** a real, persisted mode (NOT the inert `autoCalculate`) that sets defaults. **New project = Estimation default; full scope** (posture + cost columns + auto-fitting flag).
-- **Scope (in):** `projectMode` enum on settings (greenfield, default `estimation`); drives WS5 posture, WS7 cost columns, WS6 auto-fitting flag; replace inert `autoCalculate`. **(out):** the underlying behaviors (owned by WS5/WS6/WS7).
+- **Objective:** a real, persisted mode (NOT the inert `autoCalculate`) that sets defaults. **New project = Estimation default; scope** (posture + cost columns). **D12 supersedes the earlier auto-fitting-off-in-Estimation default.**
+- **Scope (in):** `projectMode` enum on settings (greenfield, default `estimation`); drives WS5 posture and WS7 cost columns; replace inert `autoCalculate`. **(out):** auto-fitting enablement is now `autoFittingEnabled` per D12; the underlying behaviors are owned by WS5/WS6/WS7.
 - **Deps:** WS5 (provenance), WS7 (cost columns).
 - **Deliverables:** persisted mode field; default-wiring; mode badge.
 - **Success:** mode persists across reload; switching flips the documented defaults.

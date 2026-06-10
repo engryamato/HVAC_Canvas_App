@@ -4,10 +4,11 @@ import { ConnectionGraphBuilder } from '../ConnectionGraphBuilder';
 import { TopologyValidationService } from '../TopologyValidationService';
 import { useEntityStore } from '@/core/store/entityStore';
 import { useHistoryStore } from '@/core/commands/historyStore';
+import { deleteEntity } from '@/core/commands/entityCommands';
 import { useToolStore } from '@/core/store/canvas.store';
 import { DuctTool } from '@/features/canvas/tools/DuctTool';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
-import { getDuctCenterline } from '@/features/canvas/services/connectionPoints';
+import { getDuctCenterline, resolveFittingGeometry } from '@/features/canvas/services/connectionPoints';
 import { resetDuctRunCounter } from '@/features/canvas/entities/ductRunDefaults';
 import { resetFittingCounter } from '@/features/canvas/entities/fittingDefaults';
 
@@ -143,9 +144,17 @@ describe('2D auto-fitting lifecycle integration', () => {
     drawRun({ x: 220, y: 100 }, { x: 280, y: 203.923 });
 
     expect(autoFittings().length).toBeGreaterThanOrEqual(1);
+    const autoFitting = autoFittings()[0]!;
 
     const stored = storedRun(inlet.id);
     const design = getDuctCenterline(stored);
+    const portAtCutback = resolveFittingGeometry(autoFitting).connectionPoints
+      .map((point) => point.worldPosition)
+      .find(
+        (point) =>
+          Math.abs(point.x - (stored.props.endPoint?.x ?? Number.NaN)) < 0.001 &&
+          Math.abs(point.y - (stored.props.endPoint?.y ?? Number.NaN)) < 0.001
+      );
 
     // The design centerline remains the authored line, untouched by the cutback...
     expect(design.start).toEqual({ x: 100, y: 100 });
@@ -156,5 +165,12 @@ describe('2D auto-fitting lifecycle integration', () => {
     // ...while the rendered geometry was actually cut back from the design end,
     // so the restore-to-design path has something to restore.
     expect(stored.props.endPoint).not.toEqual(design.end);
+    expect(portAtCutback).toEqual(stored.props.endPoint);
+
+    deleteEntity(autoFitting.id);
+
+    const restored = storedRun(inlet.id);
+    expect(restored.props.endPoint).toEqual({ x: 220, y: 100 });
+    expect(restored.props.installLength).toBeCloseTo(10, 6);
   });
 });

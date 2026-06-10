@@ -39,7 +39,7 @@ describe('WS6e E5 — terminal boot / register collar geometry', () => {
     ).profile;
 
     expect(profile.shape).toBe('rectangular');
-    if (profile.shape !== 'rectangular') throw new Error('expected rectangular inlet profile');
+    if (profile.shape !== 'rectangular') {throw new Error('expected rectangular inlet profile');}
     expect(profile.width).toBe(20);
     expect(profile.height).toBe(10);
   });
@@ -47,14 +47,14 @@ describe('WS6e E5 — terminal boot / register collar geometry', () => {
   it('flares the register face larger than the duct', () => {
     const g = geom({ transitionData: { fromShape: 'round', fromDiameter: 12 } });
     const outlet = opening(g, 'OUTLET').profile;
-    if (outlet.shape !== 'rectangular') throw new Error('expected rectangular register face');
+    if (outlet.shape !== 'rectangular') {throw new Error('expected rectangular register face');}
     expect(outlet.height).toBeGreaterThan(12);
   });
 
   it('scales the register face with the duct size', () => {
     const small = opening(geom({ transitionData: { fromShape: 'round', fromDiameter: 8 } }), 'OUTLET').profile;
     const large = opening(geom({ transitionData: { fromShape: 'round', fromDiameter: 20 } }), 'OUTLET').profile;
-    if (small.shape !== 'rectangular' || large.shape !== 'rectangular') throw new Error('expected rectangular faces');
+    if (small.shape !== 'rectangular' || large.shape !== 'rectangular') {throw new Error('expected rectangular faces');}
     expect(large.height).toBeGreaterThan(small.height);
   });
 
@@ -63,7 +63,7 @@ describe('WS6e E5 — terminal boot / register collar geometry', () => {
     // body inlet edge must come from rectHeight (10) → half-height 5, not 10.
     const g = geom({ transitionData: { fromShape: 'rectangular', fromWidth: 20, fromHeight: 10 } });
     const polygon = g.body.find((p) => p.kind === 'polygon');
-    if (!polygon || polygon.kind !== 'polygon') throw new Error('expected a polygon body part');
+    if (!polygon || polygon.kind !== 'polygon') {throw new Error('expected a polygon body part');}
     const minX = Math.min(...polygon.points.map((p) => p.x));
     const inletEdgeHalfHeight = Math.max(
       ...polygon.points.filter((p) => p.x === minX).map((p) => Math.abs(p.y))

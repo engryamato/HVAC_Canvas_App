@@ -102,7 +102,7 @@ function SizeNominalPicker({
       <option value="">Nominal size</option>
       {getStandardNominalSizes(field).map((size) => (
         <option key={size} value={size}>
-          {size}"
+          {size}&quot;
         </option>
       ))}
     </select>

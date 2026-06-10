@@ -32,7 +32,7 @@ Author a golden test suite (vitest) with documented expected values + a standard
 | Sizing | 1000 CFM @ 1500 FPM target, round | nearest standard Ø from `STANDARD_ROUND_SIZES` | std-size rounding | A |
 | Pressure drop | known duct/material | in.w.g./100ft (Darcy-Weisbach) | ASHRAE | A |
 | Elbow insert | 2 ducts at >15° turn | elbow inserted | tolerance rule | A |
-| Tee vs wye | branch 30° / 90° off main | wye / tee | §28 convention | A (near-60° boundary → `.todo`, hysteresis is WS6) |
+| Tee vs wye | branch 30° / 90° off main + near-60° deadband | wye / tee; sticky 55-65° hysteresis | §28 convention | A (near-60° boundary covered by WS6c golden tests) |
 | Reducer | size change along run | reducer inserted | profile change | A |
 | Transition | round→rect | transition inserted | shape change | A |
 | Body takeoff | branch off duct body | tap/takeoff class (NOT tee) | SMACNA | A → likely `.skip`+bug (engine returns tee today) |
@@ -84,7 +84,7 @@ Additive tests + fixtures. Revert = delete the suites. **No feature flag** (test
 - **[merge gate, D11]** user ratifies the gauge↔pressure-class↔weight table before merge.
 - **[Open — your override]** Bucket B as non-blocking `pending` (proposed) vs hard-blocking red.
 - **[at-ticket]** the exact `pending`-suite tagging mechanism (vitest `projects`/`test.skipIf` + CI filter vs `*.pending.test.ts` glob exclusion).
-- **[at-ticket]** near-60° tee/wye boundary cases: assert as `.todo` pending WS6 hysteresis (don't lock a value that WS6 will change).
+- **[done]** near-60° tee/wye boundary cases: WS6c golden tests assert sticky 55-65° hysteresis plus the no-prior 60° fallback.
 
 ## Out of scope
 

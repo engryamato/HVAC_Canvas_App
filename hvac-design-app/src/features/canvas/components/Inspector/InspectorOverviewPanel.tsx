@@ -296,10 +296,12 @@ function ProjectSection({ data }: { data: InspectorPanelProps['project'] }) {
 function EngineeringSection({
   data,
   onSetProjectMode,
+  onSetAutoFittingEnabled,
   onEditEngineeringSettings,
 }: {
   data: InspectorPanelProps['engineering'];
   onSetProjectMode: InspectorPanelProps['onSetProjectMode'];
+  onSetAutoFittingEnabled: InspectorPanelProps['onSetAutoFittingEnabled'];
   onEditEngineeringSettings: () => void;
 }) {
   const showCenterline = usePreferencesStore((state) => state.showCenterline);
@@ -331,6 +333,24 @@ function EngineeringSection({
           >
             {data.projectMode === 'design' ? <ToggleRight size={13} aria-hidden /> : <ToggleLeft size={13} aria-hidden />}
             {data.projectMode === 'design' ? 'Design' : 'Estimation'}
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between px-0.5 py-1.5 text-sm">
+          <span className="text-slate-500">Auto-Fitting</span>
+          <button
+            type="button"
+            aria-label="Auto-Fitting"
+            aria-pressed={data.autoFittingEnabled}
+            onClick={() => onSetAutoFittingEnabled(!data.autoFittingEnabled)}
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition-colors ${
+              data.autoFittingEnabled
+                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+            }`}
+          >
+            {data.autoFittingEnabled ? <ToggleRight size={13} aria-hidden /> : <ToggleLeft size={13} aria-hidden />}
+            {data.autoFittingEnabled ? 'ON' : 'OFF'}
           </button>
         </div>
 
@@ -738,6 +758,7 @@ export function InspectorOverviewPanel(props: InspectorPanelProps) {
             <EngineeringSection
               data={props.engineering}
               onSetProjectMode={props.onSetProjectMode}
+              onSetAutoFittingEnabled={props.onSetAutoFittingEnabled}
               onEditEngineeringSettings={props.onEditEngineeringSettings}
             />
           </SectionBodyState>

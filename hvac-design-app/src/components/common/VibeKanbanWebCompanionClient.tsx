@@ -1,18 +1,20 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { isDevelopment } from '@/utils/platform'
+const isDevelopmentBuild = process.env.NODE_ENV === 'development'
 
-const VibeKanbanWebCompanion = dynamic(
-  () =>
-    import('vibe-kanban-web-companion').then(
-      (module) => module.VibeKanbanWebCompanion
-    ),
-  { ssr: false }
-)
+const VibeKanbanWebCompanion = isDevelopmentBuild
+  ? dynamic(
+      () =>
+        import('vibe-kanban-web-companion').then(
+          (module) => module.VibeKanbanWebCompanion
+        ),
+      { ssr: false }
+    )
+  : () => null
 
 export const VibeKanbanWebCompanionClient = () => {
-  if (!isDevelopment) {
+  if (!isDevelopmentBuild) {
     return null
   }
 

@@ -1,5 +1,3 @@
-import { isEnabled } from '@/core/flags/featureFlags';
-
 /**
  * WS8 — Persisted Estimation/Design project mode.
  *
@@ -29,6 +27,7 @@ export function isProjectMode(value: unknown): value is ProjectMode {
  * the settings store so this module never statically imports the store.
  */
 let projectModeProvider: (() => ProjectMode) | null = null;
+let autoFittingProvider: (() => boolean | undefined) | null = null;
 
 export function registerProjectModeProvider(provider: () => ProjectMode): void {
   projectModeProvider = provider;
@@ -37,6 +36,15 @@ export function registerProjectModeProvider(provider: () => ProjectMode): void {
 /** Test/teardown helper — clears the registered provider. */
 export function resetProjectModeProvider(): void {
   projectModeProvider = null;
+}
+
+export function registerAutoFittingProvider(provider: () => boolean | undefined): void {
+  autoFittingProvider = provider;
+}
+
+/** Test/teardown helper - clears the registered auto-fitting provider. */
+export function resetAutoFittingProvider(): void {
+  autoFittingProvider = null;
 }
 
 /**
@@ -55,9 +63,6 @@ export function getProjectMode(): ProjectMode {
  * always returns `computed` to preserve pre-WS8 behavior exactly.
  */
 export function getInitialSizePostureSource(): 'default' | 'computed' {
-  if (!isEnabled('WS8_PROJECT_MODE')) {
-    return 'computed';
-  }
   return getProjectMode() === 'estimation' ? 'default' : 'computed';
 }
 
@@ -67,19 +72,21 @@ export function getInitialSizePostureSource(): 'default' | 'computed' {
  * preserve the legacy default-hidden behavior.
  */
 export function areCostColumnsDefaultVisible(): boolean {
-  if (!isEnabled('WS8_PROJECT_MODE')) {
-    return false;
-  }
   return getProjectMode() === 'estimation';
 }
 
 /**
- * WS6 auto-fitting default: Design → on; Estimation → off. Returns `null` when
- * the WS8 flag is off, meaning "no opinion — defer to the legacy env/override".
+ * WS6 auto-fitting default: always on by default. Project mode no longer drives
+ * this behavior; users can override it per project.
  */
-export function isAutoFittingDefaultEnabled(): boolean | null {
-  if (!isEnabled('WS8_PROJECT_MODE')) {
-    return null;
-  }
-  return getProjectMode() === 'design';
+export function isAutoFittingDefaultEnabled(): boolean {
+  return true;
+}
+
+/**
+ * Persisted project auto-fitting setting. Greenfield and legacy projects default
+ * to enabled when the field is absent.
+ */
+export function isAutoFittingProjectSettingEnabled(): boolean {
+  return autoFittingProvider?.() ?? isAutoFittingDefaultEnabled();
 }

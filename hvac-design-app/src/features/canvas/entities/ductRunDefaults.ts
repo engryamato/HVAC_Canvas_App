@@ -43,7 +43,7 @@ export function createDuctRun(overrides?: CreateDuctRunOverrides): DuctRun {
   const now = new Date().toISOString();
   const shape = overrides?.shape ?? 'round';
   const installLength = overrides?.installLength ?? 10;
-  const runNumber = getNextDuctRunNumber();
+  const runNumber = overrides?.name ? null : getNextDuctRunNumber();
 
   const propsBase = {
     name:

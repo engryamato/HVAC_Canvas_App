@@ -114,7 +114,7 @@ function getPortPosition(port, box) {
 function getArrowDirection(port) {
   const edge = EDGE_VECTOR[port.edge];
   const flow = PORT_FLOW[port.role];
-  if (flow === "in") return { x: -edge.x, y: -edge.y };
+  if (flow === "in") {return { x: -edge.x, y: -edge.y };}
   return edge;
 }
 
@@ -762,7 +762,7 @@ function ImplementationRule() {
         </p>
         <p>
           When a duct connects to a port, the port marker shape and the curb opening width
-          adapt to match the duct's cross-section (round → circle, rectangular → rect).
+          adapt to match the duct&apos;s cross-section (round → circle, rectangular → rect).
         </p>
       </div>
     </div>

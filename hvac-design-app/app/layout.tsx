@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { DeviceWarning } from '@components/common/DeviceWarning'
-import { VibeKanbanWebCompanionClient } from '@components/common/VibeKanbanWebCompanionClient'
 import { ToastHost } from '@components/ui/ToastHost'
 import { ToastProvider } from '@/components/ui/ToastContext'
 
@@ -20,7 +19,6 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <ToastProvider>
           <DeviceWarning />
-          <VibeKanbanWebCompanionClient />
           <ToastHost />
           {children}
         </ToastProvider>

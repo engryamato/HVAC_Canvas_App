@@ -4,7 +4,6 @@ import type { ConnectionPort } from '@/core/schema/equipment.schema';
 import { getEquipmentPortWorldPosition } from '@/features/canvas/services/equipmentGeometry';
 import { resolveFittingGeometry, applyDuctEndpointCutback, restoreDuctToDesign } from '@/features/canvas/services/connectionPoints';
 import type { ResolvedConnectionPoint } from '@/features/canvas/services/connectionPoints';
-import { isEnabled } from '@/core/flags/featureFlags';
 
 type DuctLike = Duct | DuctRun;
 type Point = { x: number; y: number };
@@ -58,12 +57,10 @@ export class ConnectionReconciliationService {
     // split/merged/chained runs (which keep connectedFrom/To) are untouched.
     // No-op for plain ducts (no stored design centerline) and for ducts already
     // at their design centerline.
-    if (isEnabled('WS6D_DESIGN_GEOMETRY')) {
-      const connectedDuctIds = collectConnectedDuctIds(ducts, fittings, equipment);
-      for (const duct of ducts) {
-        if (!connectedDuctIds.has(duct.id)) {
-          restoreDuctToDesign(duct);
-        }
+    const connectedDuctIds = collectConnectedDuctIds(ducts, fittings, equipment);
+    for (const duct of ducts) {
+      if (!connectedDuctIds.has(duct.id)) {
+        restoreDuctToDesign(duct);
       }
     }
 

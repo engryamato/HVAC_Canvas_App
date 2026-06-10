@@ -91,13 +91,13 @@ export function EquipmentPlacementDialog({
   const filteredEntries = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return catalogEntries.filter((e) => {
-      if (e.componentClass !== 'equipment') return false;
+      if (e.componentClass !== 'equipment') {return false;}
       // Category filter
-      if (selectedCategory !== 'all' && e.categoryId !== selectedCategory) return false;
+      if (selectedCategory !== 'all' && e.categoryId !== selectedCategory) {return false;}
       // Search filter
       if (q) {
         const hay = [e.name, e.typeId, ...(e.tags ?? [])].join(' ').toLowerCase();
-        if (!hay.includes(q)) return false;
+        if (!hay.includes(q)) {return false;}
       }
       return true;
     });
@@ -106,7 +106,7 @@ export function EquipmentPlacementDialog({
   // ── Search debounce ──────────────────────────────────────────────────────
   const handleSearchChange = useCallback((value: string) => {
     setSearchQuery(value);
-    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    if (searchTimerRef.current) {clearTimeout(searchTimerRef.current);}
     searchTimerRef.current = setTimeout(() => {
       // Debounced — state already set above; no extra action needed
     }, 150);
@@ -120,7 +120,7 @@ export function EquipmentPlacementDialog({
         return;
       }
       const entry = catalogEntries.find((e) => e.id === entryId);
-      if (entry) applyEquipmentCatalogEntry(entry);
+      if (entry) {applyEquipmentCatalogEntry(entry);}
     },
     [catalogEntries, applyEquipmentCatalogEntry, setEquipmentPlacementDraft]
   );
@@ -149,7 +149,7 @@ export function EquipmentPlacementDialog({
   // ── CFM unit conversion ──────────────────────────────────────────────────
   const handleCapacityUnitChange = useCallback(
     (unit: 'CFM' | 'm3/h') => {
-      if (unit === draft.capacityUnit) return;
+      if (unit === draft.capacityUnit) {return;}
       const converted =
         unit === 'm3/h'
           ? Math.round(draft.capacity * 1.699)

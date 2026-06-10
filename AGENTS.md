@@ -15,6 +15,13 @@
 - All `@tauri-apps/*` calls must have an `isTauri()` guard so the web build still works.
 - Run `pnpm parity:check` before every commit. It must exit 0.
 
+## 📁 HERMES SHARED MEMORY
+
+- **Shared Hermes project memory**: `.agent/shared-memory.md`
+- **File index**: `.agent/file-index.md`
+- When repo context is missing, read `.agent/shared-memory.md` first.
+- Do not edit `.agent/shared-memory.md` unless explicitly required by the task.
+
 ## OVERVIEW
 SizeWise HVAC Canvas monorepo with a Next.js (App Router) frontend and Tauri desktop backend.
 Use this root map to orient; directory-level AGENTS files cover specifics.

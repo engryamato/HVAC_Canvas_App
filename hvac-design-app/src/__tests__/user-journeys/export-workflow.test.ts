@@ -348,12 +348,12 @@ describe('Export Workflow User Journey', () => {
 
       const [ductItem] = ductItems;
       expect(ductItem).toBeDefined();
-      expect(ductItem!.description).toBe('Round Duct 12" × 10\'');
-      expect(ductItem!.quantity).toBe(3);
-      expect(ductItem!.unit).toBe('EA');
+      expect(ductItem!.description).toContain('12"x10\' Round Duct Flange Ends');
+      expect(ductItem!.quantity).toBe(30);
+      expect(ductItem!.unit).toBe('LF');
     });
 
-    it('should separate ducts by public size and length description', () => {
+    it('should group same-size ducts by canonical material and size even when lengths differ', () => {
       createEntity(createMockDuct('duct-1', 'Galv Duct', 'galvanized', 12, 10));
       createEntity(createMockDuct('duct-2', 'Long Duct', 'galvanized', 12, 15));
 
@@ -361,7 +361,8 @@ describe('Export Workflow User Journey', () => {
       const bom = generateBOM(entities);
 
       const ductItems = bom.filter((item) => item.type === 'Duct');
-      expect(ductItems).toHaveLength(2);
+      expect(ductItems).toHaveLength(1);
+      expect(ductItems[0]?.quantity).toBe(25);
     });
 
     it('should count fittings by type', () => {
@@ -411,9 +412,10 @@ describe('Export Workflow User Journey', () => {
       expect(item.itemNumber).toBeDefined();
       expect(item.type).toBe('Duct');
       expect(item.description).toBeDefined();
-      expect(item.quantity).toBe(1);
-      expect(item.unit).toBe('EA');
-      expect(item.specifications).toBe('12"');
+      expect(item.quantity).toBe(25);
+      expect(item.unit).toBe('LF');
+      expect(item.specifications).toContain('12"');
+      expect(item.specifications).toContain('26ga');
       expect(item.entityId).toBe('duct-1');
     });
 
@@ -429,7 +431,7 @@ describe('Export Workflow User Journey', () => {
       const equipItem = bom.find((item) => item.type === 'Equipment');
       const fitItem = bom.find((item) => item.type === 'Fitting');
 
-      expect(ductItem?.unit).toBe('EA');
+      expect(ductItem?.unit).toBe('LF');
       expect(equipItem?.unit).toBe('EA');
       expect(fitItem?.unit).toBe('EA');
     });
@@ -477,7 +479,7 @@ describe('Export Workflow User Journey', () => {
       const bom = generateBOM(entities);
       const csv = convertBOMToCSV(bom);
 
-      expect(csv).toContain('"1","Round Duct 12"');
+      expect(csv).toContain('Round Duct Flange Ends","LF"');
     });
 
     it('should include all BOM items in CSV', () => {
@@ -518,10 +520,11 @@ describe('Export Workflow User Journey', () => {
 
       // Check aggregation
       const ductItems = bom.filter((item) => item.type === 'Duct');
-      expect(ductItems.length).toBe(3);
+      expect(ductItems.length).toBe(2);
 
       const duct12 = ductItems.filter((item) => item.specifications.includes('12"'));
-      expect(duct12).toHaveLength(2);
+      expect(duct12).toHaveLength(1);
+      expect(duct12[0]?.quantity).toBe(40);
 
       const equipmentItems = bom.filter((item) => item.type === 'Equipment');
       expect(equipmentItems.length).toBe(2);

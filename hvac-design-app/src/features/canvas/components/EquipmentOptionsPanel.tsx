@@ -60,9 +60,9 @@ export function EquipmentOptionsPanel() {
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return catalogEntries.filter((entry) => {
-      if (entry.componentClass !== 'equipment') return false;
-      if (selectedCategory !== 'all' && entry.categoryId !== selectedCategory) return false;
-      if (!query) return true;
+      if (entry.componentClass !== 'equipment') {return false;}
+      if (selectedCategory !== 'all' && entry.categoryId !== selectedCategory) {return false;}
+      if (!query) {return true;}
       return [entry.name, entry.typeId, ...(entry.tags ?? [])].join(' ').toLowerCase().includes(query);
     });
   }, [catalogEntries, searchQuery, selectedCategory]);
@@ -112,7 +112,7 @@ export function EquipmentOptionsPanel() {
 
   const handleCapacityUnitChange = useCallback(
     (unit: 'CFM' | 'm3/h') => {
-      if (unit === draft.capacityUnit) return;
+      if (unit === draft.capacityUnit) {return;}
       patch({
         capacityUnit: unit,
         capacity: unit === 'm3/h' ? Math.round(draft.capacity * 1.699) : Math.round(draft.capacity / 1.699),

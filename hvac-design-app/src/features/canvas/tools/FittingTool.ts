@@ -96,7 +96,7 @@ export class FittingTool extends BaseTool {
   }
 
   onMouseDown(event: ToolMouseEvent): void {
-    if (event.button !== 0) return;
+    if (event.button !== 0) {return;}
     this.placeFitting();
   }
 
@@ -131,10 +131,10 @@ export class FittingTool extends BaseTool {
   render(context: ToolRenderContext): void {
     this.renderCancelGhost(context);
 
-    if (this.state.mode !== 'placing' || !this.state.currentPoint) return;
+    if (this.state.mode !== 'placing' || !this.state.currentPoint) {return;}
 
     const { fittingType } = this.resolveEffectiveFittingType();
-    if (!fittingType) return;
+    if (!fittingType) {return;}
 
     const origin = this.state.snappedFittingOrigin ?? this.state.currentPoint;
     const rotation = this.state.rotation;
@@ -182,7 +182,7 @@ export class FittingTool extends BaseTool {
 
   private updateSnapAndRotation(mouseX: number, mouseY: number): void {
     const fittingType = this.getActiveFittingType();
-    if (!fittingType) return;
+    if (!fittingType) {return;}
 
     const { byId } = useEntityStore.getState();
     const raw = MagneticConnectionService.resolveSnapTarget(mouseX, mouseY, byId);
@@ -223,7 +223,7 @@ export class FittingTool extends BaseTool {
     }
 
     const origin = this.state.snappedFittingOrigin ?? this.state.currentPoint;
-    if (!origin) return;
+    if (!origin) {return;}
 
     const snap = this.state.snapTarget;
 
@@ -296,7 +296,7 @@ export class FittingTool extends BaseTool {
 
   private snapToGrid(x: number, y: number): { x: number; y: number } {
     const { snapToGrid, gridSize } = useViewportStore.getState();
-    if (!snapToGrid) return { x, y };
+    if (!snapToGrid) {return { x, y };}
     return {
       x: Math.round(x / gridSize) * gridSize,
       y: Math.round(y / gridSize) * gridSize,
@@ -311,7 +311,7 @@ export class FittingTool extends BaseTool {
       0,
       Math.min(1, 1 - snap.distance / MagneticConnectionService.SNAP_TOLERANCE)
     );
-    if (opacity <= 0) return;
+    if (opacity <= 0) {return;}
 
     const baseR = SNAP_RING_RADIUS / zoom;
     const pulseR = baseR + (4 / zoom) * opacity;
@@ -351,7 +351,7 @@ export class FittingTool extends BaseTool {
     // Use the SAME resolved local ports the renderer/snapping use, so the
     // preview dots sit exactly on the drawn openings (no stale offset table).
     const defs = resolveLocalFittingPorts(previewFitting);
-    if (!defs.length) return;
+    if (!defs.length) {return;}
 
     const rad = (rotationDeg * Math.PI) / 180;
     const cos = Math.cos(rad);
@@ -404,7 +404,7 @@ export class FittingTool extends BaseTool {
   /** Fade-out ghost after Escape - cubic ease-out. */
   private renderCancelGhost(context: ToolRenderContext): void {
     const ghost = this.state.cancelGhost;
-    if (!ghost) return;
+    if (!ghost) {return;}
 
     const elapsed = performance.now() - ghost.startTime;
     if (elapsed >= GHOST_DURATION_MS) {

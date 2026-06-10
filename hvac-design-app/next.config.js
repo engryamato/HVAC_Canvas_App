@@ -18,10 +18,6 @@ const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
   poweredByHeader: false,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-
   // Handle Tauri-specific modules that aren't available in web builds
   webpack: (config, { isServer }) => {
     // Externalize Tauri modules that may not exist in web context

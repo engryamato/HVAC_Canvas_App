@@ -7,7 +7,6 @@ import { redo, undo, useCanRedo, useCanUndo, useHistoryStore } from '@/core/comm
 import type { ReversibleCommand } from '@/core/commands';
 import type { Entity } from '@/core/schema';
 import { useCalculationSettingsStore } from '@/core/store/calculationSettingsStore';
-import { isEnabled } from '@/core/flags/featureFlags';
 import { DEFAULT_PROJECT_MODE, type ProjectMode } from '@/core/projectMode/projectMode';
 import { useDialogStore } from '@/core/store/dialogStore';
 import { useEntityStore } from '@/core/store/entityStore';
@@ -456,6 +455,7 @@ function buildEngineering(
     temperatureUnits: unitSystem === 'metric' ? 'deg C' : 'deg F',
     safetyFactors: settings?.templateId ? `Template ${settings.templateId}` : 'Default (SMACNA Baseline)',
     projectMode,
+    autoFittingEnabled: settings?.autoFittingEnabled ?? true,
     // Derived alias of the mode; feeds the Systems calc status (Design →
     // balanced, Estimation → manual/not-calculated).
     autoCalculate: projectMode === 'design',
@@ -463,12 +463,7 @@ function buildEngineering(
 }
 
 function resolveProjectMode(settings: CalculationSettingsWithAuto | null): ProjectMode {
-  if (isEnabled('WS8_PROJECT_MODE')) {
-    return settings?.projectMode ?? DEFAULT_PROJECT_MODE;
-  }
-  // WS8 off: preserve pre-WS8 behavior by mapping the legacy autoCalculate flag
-  // (defaulted on → balanced) onto an equivalent mode.
-  return (settings?.autoCalculate ?? true) ? 'design' : 'estimation';
+  return settings?.projectMode ?? DEFAULT_PROJECT_MODE;
 }
 
 export function useInspectorOverviewData(): InspectorPanelProps {
@@ -552,6 +547,13 @@ export function useInspectorOverviewData(): InspectorPanelProps {
     [updateCalculationSettings]
   );
 
+  const onSetAutoFittingEnabled = useCallback(
+    (enabled: boolean) => {
+      updateCalculationSettings({ autoFittingEnabled: enabled });
+    },
+    [updateCalculationSettings]
+  );
+
   const onAutoFixGeometry = useCallback(() => {
     commitNetwork();
     const repairPlan = buildGeometryRepairPlan(useValidationStore.getState().validationResults);
@@ -587,6 +589,7 @@ export function useInspectorOverviewData(): InspectorPanelProps {
     actionStatus,
     sectionStates,
     onSetProjectMode,
+    onSetAutoFittingEnabled,
     onEditEngineeringSettings: () => setOpenCalculationSettings(true),
     onLocateHealthIssue: (issueId) => applyInspectorSelection(locateByIssue.get(issueId) ?? []),
     onSelectAllInvalid: () => applyInspectorSelection(invalidIds),

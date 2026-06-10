@@ -31,6 +31,7 @@ const settings: CalculationSettings = {
     },
     standardConditions: { temperature: 70, pressure: 29.92, altitude: 0 },
   },
+  autoFittingEnabled: true,
 };
 
 function bomItem(overrides: Partial<BOMItem>): BOMItem {
