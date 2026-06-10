@@ -42,10 +42,10 @@ typecheck-*.count.txt
 .sisyphus/
 
 # Root planning drafts (canonical copies live under docs/)
-PLAN-*.md
-PRD-*.md
-PRD_*.md
-RESTORATION_SUMMARY.md
+/PLAN-*.md
+/PRD-*.md
+/PRD_*.md
+/RESTORATION_SUMMARY.md
 
 # Local UX reference and QA captures
 SizeWise UI/
@@ -58,6 +58,22 @@ sizaa*.png
 
 # Vitest run output dumps (not config)
 hvac-design-app/vitest-*.json
+
+# Local editor/package artifacts
+*.vsix
+
+# Scratch one-off scripts and captures
+analyze_gap.py
+check_img.py
+color_probe.py
+convert_svg.py
+crop_img.py
+final_crop.py
+find_split.py
+fix_crop*.py
+precise_crop.py
+ruler.py
+ruler_debug.png
 
 # Superpowers visual companion artifacts
 .superpowers/

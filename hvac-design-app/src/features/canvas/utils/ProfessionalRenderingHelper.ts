@@ -36,7 +36,7 @@ export type DuctEndType = 'flange' | 'raw' | 'crimped' | 'coupled';
  * ```
  */
 export class ProfessionalRenderingHelper {
-  private static readonly PATTERN_CACHE_LIMIT = 30;
+  private static readonly PATTERN_CACHE_LIMIT = 20;
 
   private static patternCache: Map<string, CanvasPattern> = new Map();
   private static patternKeys: string[] = []; // For LRU tracking

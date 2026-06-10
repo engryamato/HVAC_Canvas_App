@@ -135,6 +135,10 @@ export const CalculationSettingsSchema = z.object({
   // projects load without it and default to `estimation` at the read boundary.
   projectMode: z.enum(PROJECT_MODES).optional(),
 
+  // D-AF-1 — persisted per-project auto-fitting preference. Greenfield and old
+  // projects default to enabled.
+  autoFittingEnabled: z.boolean().default(true),
+
   // WS6b — project default SMACNA pressure/seal class. A run inherits these
   // unless it carries its own pressureClass/sealClass. Optional/greenfield:
   // old projects fall back to '2'/'A' at the read boundary (gaugeService).

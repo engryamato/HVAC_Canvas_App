@@ -47,7 +47,7 @@ function reducer(): Fitting {
 
 function outletWorld(fitting: Fitting): { x: number; y: number } {
   const outlet = resolveFittingGeometry(fitting).connectionPoints.find((p) => p.role === 'outlet');
-  if (!outlet) throw new Error('reducer has no outlet port');
+  if (!outlet) {throw new Error('reducer has no outlet port');}
   return { x: outlet.worldPosition.x, y: outlet.worldPosition.y };
 }
 

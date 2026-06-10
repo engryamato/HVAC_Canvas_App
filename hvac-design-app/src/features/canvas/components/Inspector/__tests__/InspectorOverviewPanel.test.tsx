@@ -27,6 +27,7 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
       safetyFactors: 'Default (SMACNA Baseline)',
       projectMode: 'design',
       autoCalculate: true,
+      autoFittingEnabled: true,
     },
     health: [
       { id: 'unconnected', status: 'error', label: 'Unconnected Sections', count: 5 },
@@ -69,6 +70,7 @@ function createProps(overrides: Partial<InspectorPanelProps> = {}): InspectorPan
     canRedo: false,
     actionStatus: null,
     onSetProjectMode: vi.fn(),
+    onSetAutoFittingEnabled: vi.fn(),
     onEditEngineeringSettings: vi.fn(),
     onLocateHealthIssue: vi.fn(),
     onSelectAllInvalid: vi.fn(),
@@ -231,6 +233,8 @@ describe('InspectorOverviewPanel', () => {
     openSection('Engineering');
     fireEvent.click(screen.getByRole('button', { name: /project mode/i }));
     expect(props.onSetProjectMode).toHaveBeenCalledWith('estimation');
+    fireEvent.click(screen.getByRole('button', { name: /auto-fitting/i }));
+    expect(props.onSetAutoFittingEnabled).toHaveBeenCalledWith(false);
     fireEvent.click(screen.getByRole('button', { name: /edit engineering settings/i }));
     expect(props.onEditEngineeringSettings).toHaveBeenCalledTimes(1);
 

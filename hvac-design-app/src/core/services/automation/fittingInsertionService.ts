@@ -772,16 +772,7 @@ export class FittingInsertionService {
   }
 
   private static calculateFittingTurnAngle(a: ConnectionPoint, b: ConnectionPoint): number {
-    const inlet = a.endPoint === 'end' ? a : b.endPoint === 'end' ? b : a;
-    const outlet = inlet === a ? b : a;
-    const inletOutward = this.outwardDirectionForEndpoint(inlet);
-    const inletIntoFitting = { x: -inletOutward.x, y: -inletOutward.y };
-    const outletOutward = this.outwardDirectionForEndpoint(outlet);
-
-    return this.calculateAngleDifference(
-      vectorAngle(inletIntoFitting),
-      vectorAngle(outletOutward)
-    );
+    return this.calculateAngleBetweenConnectionPoints(a, b);
   }
 
   private static calculateAngleDifference(a: number, b: number): number {

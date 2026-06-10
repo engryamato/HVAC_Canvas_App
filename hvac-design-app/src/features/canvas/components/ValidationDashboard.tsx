@@ -13,7 +13,10 @@ import { useSettingsStore } from '@/core/store/settingsStore';
 import { isEnabled } from '@/core/flags/featureFlags';
 import { Button } from '@/components/ui/button';
 import { ResolutionWizard } from './ResolutionWizard';
-import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
+import {
+  fittingInsertionService,
+  type PlannedAutoFittingChange,
+} from '@/core/services/automation/fittingInsertionService';
 import { ConnectionGraphBuilder } from '@/core/services/graph/ConnectionGraphBuilder';
 import { TopologyValidationService } from '@/core/services/graph/TopologyValidationService';
 import { bomGenerationService } from '@/core/services/bom/bomGenerationService';
@@ -35,6 +38,7 @@ export function ValidationDashboard() {
   type ManualOverrideResetPlan = NonNullable<ReturnType<typeof fittingInsertionService.planManualOverrideReset>>;
   const [resolveEntityId, setResolveEntityId] = useState<string | null>(null);
   const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
+  const [keptConflictKeys, setKeptConflictKeys] = useState<Set<string>>(new Set());
   const validationResults = useValidationStore((state) => state.validationResults);
   const exportBlockers = useValidationStore((state) => state.exportBlockers);
   const unresolvedCatalogItems = useValidationStore((state) => state.unresolvedCatalogItems);
@@ -180,6 +184,17 @@ export function ValidationDashboard() {
     const conflictCount = autoFittingPlan.changes.filter((change) => Boolean(change.conflictReason)).length;
     return { insertCount, updateCount, removeCount, conflictCount };
   }, [autoFittingPlan]);
+  const autoFittingConflictChanges = useMemo(
+    () =>
+      autoFittingPlan.changes.filter(
+        (change) =>
+          Boolean(change.conflictReason) &&
+          Boolean(change.existingFittingId) &&
+          Boolean(change.desiredFitting) &&
+          !keptConflictKeys.has(change.key)
+      ),
+    [autoFittingPlan, keptConflictKeys]
+  );
 
   const handleEntityClick = (entityId: string) => {
     selectSingle(entityId);
@@ -190,7 +205,24 @@ export function ValidationDashboard() {
     const plan = autoFittingPlan;
     const result = fittingInsertionService.resolveReRunPlan(plan, entities);
 
-    for (const operation of result.operations) {
+    applyAutoFittingOperations(result.operations, selection);
+
+    const conflictConversions = plan.changes.filter((change) => Boolean(change.conflictReason)).length;
+    const conflictMessage =
+      conflictConversions > 0
+        ? `, ${conflictConversions} conflict${conflictConversions === 1 ? '' : 's'} converted`
+        : '';
+    pushToast(
+      `${result.insertedOrUpdatedCount} fittings inserted/updated, ${result.manualOverridesPreserved} manual overrides preserved${conflictMessage}`,
+      'success'
+    );
+  };
+
+  const applyAutoFittingOperations = (
+    operations: ReturnType<typeof fittingInsertionService.resolveReRunPlan>['operations'],
+    selection: string[]
+  ) => {
+    for (const operation of operations) {
       if (operation.action === 'insert') {
         createEntity(operation.next, {
           selectionBefore: selection,
@@ -221,16 +253,28 @@ export function ValidationDashboard() {
         }
       );
     }
+  };
 
-    const conflictConversions = plan.changes.filter((change) => Boolean(change.conflictReason)).length;
-    const conflictMessage =
-      conflictConversions > 0
-        ? `, ${conflictConversions} conflict${conflictConversions === 1 ? '' : 's'} converted`
-        : '';
-    pushToast(
-      `${result.insertedOrUpdatedCount} fittings inserted/updated, ${result.manualOverridesPreserved} manual overrides preserved${conflictMessage}`,
-      'success'
+  const handleKeepConflict = (change: PlannedAutoFittingChange) => {
+    setKeptConflictKeys((current) => {
+      const next = new Set(current);
+      next.add(change.key);
+      return next;
+    });
+    if (change.existingFittingId) {
+      selectSingle(change.existingFittingId);
+    }
+    pushToast('Manual override preserved', 'info');
+  };
+
+  const handleUseAutoForConflict = (change: PlannedAutoFittingChange) => {
+    const selection = [...selectedIds];
+    const result = fittingInsertionService.resolveReRunPlan(
+      { changes: [change], preservedManualOverrideCount: 0 },
+      entities
     );
+    applyAutoFittingOperations(result.operations, selection);
+    pushToast('Auto-fitting recommendation applied', 'success');
   };
 
   const handleOverlayModeChange = (mode: DuctOverlayMode) => {
@@ -389,6 +433,40 @@ export function ValidationDashboard() {
           <p className="text-xs text-slate-500">
             {manualOverrideCount} locked override{manualOverrideCount === 1 ? '' : 's'} currently preserved from auto-fitting.
           </p>
+          {autoFittingConflictChanges.length > 0 ? (
+            <div className="space-y-2 rounded border border-amber-200 bg-amber-50 p-2" data-testid="autofitting-conflict-list">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+                Manual Override Conflicts
+              </div>
+              {autoFittingConflictChanges.map((change) => (
+                <div key={`${change.key}-${change.existingFittingId}`} className="space-y-2 rounded bg-white p-2">
+                  <div className="text-xs text-slate-600">
+                    {change.existingFittingId ?? 'Manual fitting'} conflicts with auto{' '}
+                    {change.desiredFitting ? formatFittingType(change.desiredFitting.props.fittingType) : 'fitting'}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() => handleKeepConflict(change)}
+                    >
+                      Keep Mine
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() => handleUseAutoForConflict(change)}
+                    >
+                      Use Auto
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {Object.keys(issuesByService).length === 0 ? (
@@ -468,4 +546,8 @@ export function ValidationDashboard() {
       </Dialog>
     </div>
   );
+}
+
+function formatFittingType(type: string): string {
+  return type.replace(/_/g, ' ');
 }

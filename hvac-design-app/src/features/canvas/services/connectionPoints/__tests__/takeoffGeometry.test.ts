@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Fitting } from '@/core/schema';
 import type { FittingProps, FittingType } from '@/core/schema/fitting.schema';
 import { resolveFittingDimensions, type FittingBodyPart } from '../fittingGeometry';
@@ -64,7 +64,7 @@ describe('WS6e E4 — takeoff branch geometry', () => {
     ).profile;
 
     expect(profile.shape).toBe('rectangular');
-    if (profile.shape !== 'rectangular') throw new Error('expected rectangular branch profile');
+    if (profile.shape !== 'rectangular') {throw new Error('expected rectangular branch profile');}
     expect(profile.width).toBe(14);
     expect(profile.height).toBe(8);
   });
@@ -84,7 +84,7 @@ describe('WS6e E4 — per-class takeoff geometry', () => {
     const conical = geom({ variant: { takeoffType: 'conical_tap' } });
     const baseWidth = (g: ReturnType<typeof geom>) => {
       const poly = g.body[0];
-      if (poly.kind !== 'polygon') throw new Error('expected stub polygon');
+      if (poly.kind !== 'polygon') {throw new Error('expected stub polygon');}
       // base edge is the last->first vertex span across p (here the trunk x-axis).
       return Math.abs(poly.points[3]!.x - poly.points[0]!.x);
     };
@@ -123,32 +123,3 @@ describe('WS6e E4 — damper blade', () => {
   });
 });
 
-describe('WS6e E4 — flag gating', () => {
-  afterEach(() => {
-    vi.resetModules();
-    vi.doUnmock('@/core/flags/featureFlags');
-  });
-
-  it('falls back to the legacy reducer-shaped geometry (INLET/OUTLET) when the flag is off', async () => {
-    vi.resetModules();
-    vi.doMock('@/core/flags/featureFlags', () => ({
-      isEnabled: (flag: string) => flag !== 'WS6D_DESIGN_GEOMETRY',
-    }));
-    const { buildFittingGeometry } = await import('../fittingGeometry');
-    const g = buildFittingGeometry(
-      fitting({ fittingType: 'takeoff', transitionData: { fromShape: 'round', toDiameter: 8 } })
-    );
-    const ids = g.openings.map((o) => o.id).sort();
-    expect(ids).toEqual(['INLET', 'OUTLET']);
-  });
-
-  it('produces the BRANCH-only takeoff geometry when the flag is on', async () => {
-    vi.resetModules();
-    vi.doMock('@/core/flags/featureFlags', () => ({
-      isEnabled: () => true,
-    }));
-    const { buildFittingGeometry } = await import('../fittingGeometry');
-    const g = buildFittingGeometry(fitting({ fittingType: 'takeoff' }));
-    expect(g.openings.map((o) => o.id)).toEqual(['BRANCH']);
-  });
-});

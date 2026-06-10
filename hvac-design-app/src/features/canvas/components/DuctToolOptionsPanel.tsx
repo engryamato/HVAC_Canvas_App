@@ -207,7 +207,7 @@ function NominalSizeSelect({
       <SelectContent>
         {getStandardNominalSizes(field).map((size) => (
           <SelectItem key={size} value={String(size)}>
-            {size}"
+            {size}&quot;
           </SelectItem>
         ))}
       </SelectContent>

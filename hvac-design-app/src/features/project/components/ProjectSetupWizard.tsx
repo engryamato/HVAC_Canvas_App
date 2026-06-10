@@ -101,6 +101,7 @@ export function ProjectSetupWizard({ isOpen, onClose, onComplete }: ProjectSetup
       projectName,
       location,
       estimator,
+      autoFittingEnabled: true,
       templateId: selectedTemplateId,
       lastModified: new Date(),
     };

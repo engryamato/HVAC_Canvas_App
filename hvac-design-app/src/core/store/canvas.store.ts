@@ -496,7 +496,7 @@ export const useToolStore = create<ToolStore>()(
     applyEquipmentCatalogEntry: (entry) =>
       set((state) => {
         const typeId = entry.typeId as EquipmentType | undefined;
-        if (!typeId) return;
+        if (!typeId) {return;}
         const defaults = DEFAULT_EQUIPMENT_PROPS[typeId] ?? DEFAULT_EQUIPMENT_PROPS['air_handler'];
         const abbrev = EQUIPMENT_TYPE_ABBREV[typeId] ?? 'EQ';
         const category = EQUIPMENT_TYPE_CATEGORY[typeId] ?? 'air_handling';

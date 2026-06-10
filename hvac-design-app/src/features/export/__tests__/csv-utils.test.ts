@@ -57,9 +57,49 @@ describe('csv helpers', () => {
     expect(items[0]).toMatchObject({
       type: 'Duct',
       description: '12"x8"x5\' Rectangular Duct Flange Ends',
-      quantity: 2,
-      unit: 'EA',
+      quantity: 10,
+      unit: 'LF',
+      specifications: '12"x8"',
+      unpriced: true,
     });
+  });
+
+  it('uses canonical BOM identity for gauge splits and unpriced rows', () => {
+    const items = generateBillOfMaterials({
+      byId: {
+        'duct-1': {
+          id: 'duct-1',
+          type: 'duct_run',
+          props: {
+            shape: 'rectangular',
+            width: 12,
+            height: 8,
+            installLength: 5,
+            material: 'galvanized',
+            gauge: 26,
+            catalogItemId: 'cat-duct-26',
+          },
+        },
+        'duct-2': {
+          id: 'duct-2',
+          type: 'duct_run',
+          props: {
+            shape: 'rectangular',
+            width: 12,
+            height: 8,
+            installLength: 5,
+            material: 'galvanized',
+            gauge: 24,
+          },
+        },
+      },
+      allIds: ['duct-1', 'duct-2'],
+    });
+
+    expect(items).toHaveLength(2);
+    expect(items.map((item) => item.specifications)).toEqual(['12"x8" 26ga', '12"x8" 24ga']);
+    expect(items.map((item) => item.quantity)).toEqual([5, 5]);
+    expect(items.map((item) => item.unpriced)).toEqual([false, true]);
   });
 
   it('formats flat oval duct segment descriptions with mixed ends and wrapper insulation', () => {
@@ -127,13 +167,13 @@ describe('csv helpers', () => {
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({
       type: 'Duct',
-      description: '12"x8"x5\' Rectangular Duct Raw Ends',
-      quantity: 4,
-      unit: 'EA',
+      description: '12"x8"x20\' Rectangular Duct Raw Ends',
+      quantity: 20,
+      unit: 'LF',
     });
   });
 
-  it('does not display positive partial duct segments as zero length', () => {
+  it('uses canonical linear footage for positive partial duct segments', () => {
     const items = generateBillOfMaterials({
       byId: {
         'duct-1': {
@@ -155,10 +195,9 @@ describe('csv helpers', () => {
       allIds: ['duct-1'],
     });
 
-    expect(items.map((item) => item.description)).toEqual([
-      '⌀13"x5\' Round Duct Flange by Coupled End',
-      '⌀13"x1\' Round Duct Flange by Coupled End',
-    ]);
+    expect(items).toHaveLength(1);
+    expect(items[0]?.quantity).toBe(5.4);
+    expect(items[0]?.unit).toBe('LF');
   });
 
   it('formats round duct segment descriptions with diameter, length, and liner insulation', () => {

@@ -39,6 +39,8 @@ export interface EngineeringSettings {
   projectMode: ProjectMode;
   /** Derived alias of `projectMode === 'design'`; feeds the Systems calc status. */
   autoCalculate: boolean;
+  /** Persisted per-project auto-fitting preference. */
+  autoFittingEnabled: boolean;
 }
 
 export interface HealthItem {
@@ -99,6 +101,7 @@ export interface InspectorPanelProps {
   actionStatus?: string | null;
   sectionStates?: Partial<Record<'project' | 'engineering' | 'health' | 'systems' | 'elements' | 'activity', InspectorSectionState>>;
   onSetProjectMode: (mode: ProjectMode) => void;
+  onSetAutoFittingEnabled: (enabled: boolean) => void;
   onEditEngineeringSettings: () => void;
   onLocateHealthIssue: (issueId: string) => InspectorFocusResult;
   onSelectAllInvalid: () => InspectorFocusResult;

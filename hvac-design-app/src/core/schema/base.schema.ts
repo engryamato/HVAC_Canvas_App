@@ -5,7 +5,7 @@ import { z } from 'zod';
  * to the canonical [0, 360) range.
  */
 function normalizeRotation(v: unknown): unknown {
-  if (typeof v !== 'number') return v;
+  if (typeof v !== 'number') {return v;}
   return ((v % 360) + 360) % 360;
 }
 

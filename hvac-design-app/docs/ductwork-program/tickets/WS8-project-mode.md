@@ -10,13 +10,13 @@ The app serves two personas (estimator/takeoff vs designer). A persisted project
 ## Decisions (locked)
 
 - **New-project default = Estimation** (matches the takeoff emphasis; designers switch later).
-- **Scope = full:** mode drives the WS5 size posture, WS7 cost-column visibility, and an auto-fitting-default flag WS6 reads. WS8 owns the mode + the flags; the behaviors live in WS5/WS6/WS7.
+- **Scope = posture + cost columns:** mode drives the WS5 size posture and WS7 cost-column visibility. **D12 supersedes the original auto-fitting-default flag:** auto-fitting now defaults on in every mode and is user-overridable per project through `autoFittingEnabled`.
 
 ## Current state (verified)
 
 - `autoCalculate` inert (`useInspectorOverviewData.ts:533`, `as never`); not on `CalculationSettingsSchema`; not persisted; gates an Inspector label only.
 - `NewProjectDialog` exists (project creation).
-- WS5 provenance engine; WS7 cost columns; WS6 auto-fitting fires only on explicit button today (so "Estimation = auto-fitting off" is already the de-facto state).
+- WS5 provenance engine; WS7 cost columns; WS6 auto-fitting now defaults on through the persisted `autoFittingEnabled` project setting per D12.
 
 ## Proposed change
 
@@ -26,13 +26,14 @@ The app serves two personas (estimator/takeoff vs designer). A persisted project
    - **Size posture (WS5):** `estimation` → initial provenance leans manual (fields await user entry per WS5's default-state rule); `design` → more `computed`.
    - **Cost columns (WS7):** visible in `estimation`; collapsible in `design`.
    - **Auto-fitting default flag:** `design` → on; `estimation` → off (WS6 reads this flag; matches current de-facto off).
+   - **D12 supersession:** auto-fitting is no longer mode-driven. It defaults on in all modes and persists as `autoFittingEnabled`.
 4. **Remove the inert `autoCalculate`** path (or alias it to `projectMode` for back-compat of the label).
 
 ## Acceptance criteria
 
 1. `projectMode` exists on the settings schema, persists across reload; old projects default to `estimation`.
 2. New projects start in `estimation`; the mode switch changes + persists it.
-3. Mode flips the documented defaults: WS5 posture, WS7 cost-column visibility, the WS6 auto-fitting flag.
+3. Mode flips the documented defaults: WS5 posture and WS7 cost-column visibility. Auto-fitting remains on unless the project-level `autoFittingEnabled` preference is turned off.
 4. The inert `autoCalculate` no longer drives anything (removed or aliased); no `as never` cast remains.
 5. `pnpm typecheck` clean.
 
@@ -42,7 +43,7 @@ The app serves two personas (estimator/takeoff vs designer). A persisted project
 |---|---|---|
 | Unit | `projectMode` persists; old project defaults to estimation | +2 |
 | Unit | new project = estimation; switch persists | +1 |
-| Unit | mode flips WS5 posture flag / WS7 cost-column flag / WS6 auto-fitting flag | +3 |
+| Unit | mode flips WS5 posture flag / WS7 cost-column flag while auto-fitting remains mode-independent | +3 |
 | Unit | `autoCalculate` removed/aliased; no `as never` | +1 |
 
 ## Rollback
@@ -56,11 +57,12 @@ Behind a WS8 flag. Additive schema field; greenfield. Revert = drop the field + 
 | `src/core/schema/calculation-settings.schema.ts` (or project settings) | add `projectMode` |
 | `src/features/.../useInspectorOverviewData.ts:533` | replace inert `autoCalculate` with real `projectMode` |
 | `src/features/dashboard/components/NewProjectDialog.tsx` | default new project to `estimation` |
-| WS5 (posture), WS7 (cost columns), WS6 (auto-fitting flag) | read `projectMode` |
+| WS5 (posture), WS7 (cost columns) | read `projectMode` |
+| WS6 (auto-fitting) | read `autoFittingEnabled` |
 
 ## Dependencies & blocks
 
-- **Depends on:** WS5 (posture flag consumer), WS7 (cost columns). WS6 reads the auto-fitting flag.
+- **Depends on:** WS5 (posture flag consumer), WS7 (cost columns). WS6 reads `autoFittingEnabled`.
 - **Blocks:** nothing.
 
 ## Open items

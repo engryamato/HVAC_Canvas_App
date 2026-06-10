@@ -1,22 +1,18 @@
 # WS7 Follow-ups
 
 WS7 shipped its **safe, high-value core** (strict id-only pricing, Unpriced-not-$0,
-gauge as a cost/grouping dimension, advisory pre-export counts) behind flag
-`WS7_BOM_PRICING`. The most invasive piece — reconciling the **live CSV output**
-to the canonical pipeline — was deferred after verification found it changed
-live money-output fidelity and broke existing contract tests.
+gauge as a cost/grouping dimension, advisory pre-export counts). The invasive
+CSV reconcile follow-up is now implemented with golden coverage.
 
 ## WS7-FU-001 — Reconcile csv.ts generateBillOfMaterials to the canonical pipeline
 
-**Status:** deferred.
+**Status:** implemented.
 
-`src/features/export/csv.ts` `generateBillOfMaterials` remains the LEGACY
-generator (kept intact; `csv-utils.test.ts` green). The ticket's goal #1 (reduce
-it to a pure formatter over the canonical `BOMItem[]`) was reverted because the
-first pass changed duct descriptions and dropped `Accessory` rows in the CSV
-path — a live-output fidelity regression on an estimating tool. Reconcile later
-with golden snapshots so the ONLY intended output change is gauge-driven line
-splits + previously-$0 items becoming Unpriced.
+`src/features/export/csv.ts` `generateBillOfMaterials` is now an adapter over
+canonical `bomGenerationService` `BOMItem[]`. The adapter preserves the existing
+display-description formatter and accessory fallback while canonical BOM owns
+line identity, LF quantities, gauge-driven line splits, and Unpriced state.
+`csv-utils.test.ts` snapshots the accepted output deltas.
 
 ## WS7-FU-002 — Wire the canvas BOM panel rows to canonical cost identity
 

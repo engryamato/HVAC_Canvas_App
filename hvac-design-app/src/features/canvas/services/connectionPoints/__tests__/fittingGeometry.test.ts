@@ -101,6 +101,14 @@ function angleBetween(a: { x: number; y: number }, b: { x: number; y: number }):
   return (Math.acos(Math.max(-1, Math.min(1, dot))) * 180) / Math.PI;
 }
 
+function elbowTurnAngle(openings: ReturnType<typeof buildFittingGeometry>['openings']): number {
+  const inletFlowIntoFitting = {
+    x: -openings[0].direction.x,
+    y: -openings[0].direction.y,
+  };
+  return angleBetween(inletFlowIntoFitting, openings[1].direction);
+}
+
 describe('fitting geometry follows the detected angle', () => {
   it('wye branch opening leans at the detected branch angle (default 45 unchanged)', () => {
     const def = buildFittingGeometry(fitting('wye')).openings.find((o) => o.role === 'branch')!;
@@ -120,12 +128,12 @@ describe('fitting geometry follows the detected angle', () => {
 
   it('elbow arc spans the detected turn angle (90 / 45 presets unchanged)', () => {
     const ports90 = buildFittingGeometry(fitting('elbow_90')).openings;
-    expect(angleBetween(ports90[0].direction, ports90[1].direction)).toBeCloseTo(90, 1);
+    expect(elbowTurnAngle(ports90)).toBeCloseTo(90, 1);
 
     const ports45 = buildFittingGeometry(fitting('elbow_45')).openings;
-    expect(angleBetween(ports45[0].direction, ports45[1].direction)).toBeCloseTo(45, 1);
+    expect(elbowTurnAngle(ports45)).toBeCloseTo(45, 1);
 
     const ports60 = buildFittingGeometry(withAngle('elbow_90', 60)).openings;
-    expect(angleBetween(ports60[0].direction, ports60[1].direction)).toBeCloseTo(60, 1);
+    expect(elbowTurnAngle(ports60)).toBeCloseTo(60, 1);
   });
 });

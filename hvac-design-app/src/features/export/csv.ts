@@ -1,7 +1,11 @@
 import type { BOMLineItem } from './bom';
 import type { ProjectFile } from '@/core/schema';
 import type { WasteFactors } from '@/core/schema/calculation-settings.schema';
-import { BOMGenerationService, DEFAULT_BOM_WASTE_FACTORS } from '@/core/services/bom/bomGenerationService';
+import {
+  BOMGenerationService,
+  DEFAULT_BOM_WASTE_FACTORS,
+  type BOMItem as CanonicalBOMItem,
+} from '@/core/services/bom/bomGenerationService';
 import { downloadFile } from './download';
 
 // Legacy helpers here are intentionally limited to CSV encoding/formatting.
@@ -346,9 +350,6 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
   const entityList = entities.allIds
     .map((id) => entities.byId[id])
     .filter((e): e is Record<string, unknown> => e !== undefined);
-
-  // Build quick duct lookups used to derive fitting descriptions.
-  // Used to derive fitting shapes from connected duct runs.
   const ductMetadataByEntityId = new Map<string, DuctBomMetadata>();
   entityList.forEach((entity) => {
     const t = String(entity.type ?? '');
@@ -361,125 +362,120 @@ export function generateBillOfMaterials(entities: EntitiesLike): BomItem[] {
     }
   });
 
-  // --- Build raw (ungrouped) line items ---
-  type RawItem = Omit<BomItem, 'itemNumber'>;
-  const rawItems: RawItem[] = [];
+  const canonicalItems = BOMGenerationService.generateBOMFromEntityStore(
+    { byId: entities.byId, allIds: entities.allIds },
+    DEFAULT_BOM_WASTE_FACTORS,
+    { includeAutoInserted: true, applyWasteFactors: false, groupSimilarItems: true }
+  );
 
-  entityList.forEach((entity) => {
-    const entityType = String(entity.type ?? 'unknown');
-    const props = (entity.props ?? {}) as Record<string, unknown>;
-    const entityId = String(entity.id ?? '');
+  const rows: Omit<BomItem, 'itemNumber'>[] = canonicalItems.map((item) => {
+    const sourceEntityId = item.sourceEntityIds[0];
+    const sourceEntity = sourceEntityId
+      ? (entities.byId[sourceEntityId] as { type?: string; props?: Record<string, unknown> } | undefined)
+      : undefined;
+    let description = item.description;
+    let baseSpecifications = item.size ?? '';
 
-    switch (entityType) {
-      case 'duct_run':
-      case 'duct': {
-        const sizeStr = formatDuctSize(props);
-        const segments = Array.isArray(props.segments) ? props.segments : [];
-        const segmentSources = segments.length > 0 ? segments : [null];
-        for (const segment of segmentSources) {
-          const segmentProps = segment && typeof segment === 'object' && !Array.isArray(segment)
-            ? { ...props, ...(segment as Record<string, unknown>) }
-            : props;
-          const description = formatDuctDescription(segmentProps);
-          rawItems.push({
-            entityId,
-            name: description,
-            type: 'Duct',
-            description,
-            quantity: 1,
-            unit: 'EA',
-            specifications: sizeStr,
-          });
-        }
-        break;
-      }
-      case 'fitting': {
-        // Derive metadata from transitionData, connectionPoints, or inletDuctId.
-        const transitionData = props.transitionData as Record<string, unknown> | undefined;
-        let ductMetadata: DuctBomMetadata | undefined;
-        if (!transitionData?.fromShape) {
-          const connectionPoints = props.connectionPoints as Array<{ ductId: string }> | undefined;
-          if (connectionPoints && connectionPoints.length > 0) {
-            ductMetadata = ductMetadataByEntityId.get(connectionPoints[0].ductId);
-          }
-          if (!ductMetadata && props.inletDuctId) {
-            ductMetadata = ductMetadataByEntityId.get(String(props.inletDuctId));
-          }
-          if (!ductMetadata && props.outletDuctId) {
-            ductMetadata = ductMetadataByEntityId.get(String(props.outletDuctId));
-          }
-        } else {
-          ductMetadata = getDuctBomMetadata({
-            shape: transitionData.fromShape,
-            diameter: transitionData.fromDiameter,
-            width: transitionData.fromWidth,
-            height: transitionData.fromHeight,
-          });
-        }
-
-        const { description, specifications } = formatFittingBomDescription(props, ductMetadata);
-        rawItems.push({
-          entityId,
-          name: description,
-          type: 'Fitting',
-          description,
-          quantity: 1,
-          unit: 'EA',
-          specifications,
-        });
-        break;
-      }
-      case 'equipment': {
-        const description = formatEquipmentDescription(props);
-        rawItems.push({
-          entityId,
-          name: description,
-          type: 'Equipment',
-          description,
-          quantity: 1,
-          unit: 'EA',
-          specifications: String(props.equipmentType ?? ''),
-        });
-        break;
-      }
-      // Skip non-BOM entity types
-      case 'room':
-      case 'note':
-      case 'group':
-        break;
-      default: {
-        const description = String(props.name ?? entityType);
-        rawItems.push({
-          entityId,
-          name: description,
-          type: 'Accessory',
-          description,
-          quantity: 1,
-          unit: 'EA',
-          specifications: '',
-        });
-      }
+    if ((sourceEntity?.type === 'duct' || sourceEntity?.type === 'duct_run') && sourceEntity.props) {
+      description = formatDuctDescription(sourceEntity.props);
+      baseSpecifications = formatDuctSize(sourceEntity.props) || baseSpecifications;
     }
+
+    if (sourceEntity?.type === 'fitting' && sourceEntity.props) {
+      const ductMetadata = resolveFittingDuctMetadata(sourceEntity.props, ductMetadataByEntityId);
+      const formatted = formatFittingBomDescription(sourceEntity.props, ductMetadata);
+      description = formatted.description;
+      baseSpecifications = formatted.specifications || baseSpecifications;
+    }
+
+    const specifications = [baseSpecifications, item.gauge !== undefined ? `${item.gauge}ga` : '']
+      .filter(Boolean)
+      .join(' ');
+
+    return {
+      entityId: sourceEntityId,
+      name: description,
+      type: formatCanonicalCategory(item.category),
+      description,
+      quantity: item.quantity,
+      unit: item.unit,
+      specifications,
+      bomItemId: item.id,
+      unpriced: item.unpriced,
+    };
   });
 
-  // --- Group identical items (same type + description) ---
-  const grouped = new Map<string, RawItem>();
-  for (const item of rawItems) {
-    const key = `${item.type}::${item.description}`;
-    const existing = grouped.get(key);
-    if (existing) {
-      existing.quantity += 1;
-      // Keep the first entityId for canvas highlight sync
-    } else {
-      grouped.set(key, { ...item });
+  for (const id of entities.allIds) {
+    const entity = entities.byId[id] as { type?: string; props?: Record<string, unknown> } | undefined;
+    if (!entity || isCanonicalBomEntityType(entity.type) || isNonBomEntityType(entity.type)) {
+      continue;
     }
+
+    const description = String(entity.props?.name ?? entity.type ?? 'Accessory');
+    rows.push({
+      entityId: id,
+      name: description,
+      type: 'Accessory',
+      description,
+      quantity: 1,
+      unit: 'EA',
+      specifications: '',
+      unpriced: true,
+    });
   }
 
-  // --- Assign sequential item numbers ---
-  return Array.from(grouped.values()).map((item, index) => ({
+  return rows.map((item, index) => ({
     ...item,
     itemNumber: index + 1,
   }));
+}
+
+function resolveFittingDuctMetadata(
+  props: Record<string, unknown>,
+  ductMetadataByEntityId: Map<string, DuctBomMetadata>
+): DuctBomMetadata | undefined {
+  const transitionData = props.transitionData as Record<string, unknown> | undefined;
+  if (transitionData?.fromShape) {
+    return getDuctBomMetadata({
+      shape: transitionData.fromShape,
+      diameter: transitionData.fromDiameter,
+      width: transitionData.fromWidth,
+      height: transitionData.fromHeight,
+    });
+  }
+
+  const connectionPoints = props.connectionPoints as Array<{ ductId: string }> | undefined;
+  if (connectionPoints && connectionPoints.length > 0) {
+    return ductMetadataByEntityId.get(connectionPoints[0].ductId);
+  }
+  if (props.inletDuctId) {
+    return ductMetadataByEntityId.get(String(props.inletDuctId));
+  }
+  if (props.outletDuctId) {
+    return ductMetadataByEntityId.get(String(props.outletDuctId));
+  }
+  return undefined;
+}
+
+function formatCanonicalCategory(category: CanonicalBOMItem['category']): BomItem['type'] {
+  switch (category) {
+    case 'duct':
+      return 'Duct';
+    case 'fitting':
+      return 'Fitting';
+    case 'equipment':
+      return 'Equipment';
+    default:
+      return 'Accessory';
+  }
+}
+
+function isCanonicalBomEntityType(type: string | undefined): boolean {
+  return type === 'duct' || type === 'duct_run' || type === 'fitting' || type === 'equipment';
+}
+
+function isNonBomEntityType(type: string | undefined): boolean {
+  return type === 'room' || type === 'note' || type === 'group';
 }
 
 export function downloadBomCsv(

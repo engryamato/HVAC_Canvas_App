@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { DuctRun, Entity } from '@/core/schema';
 import { pixelsToFeet } from '@/core/constants/coordinates';
 import { ConnectionReconciliationService } from '../ConnectionReconciliationService';
@@ -42,10 +42,6 @@ function cutRun(): DuctRun {
 }
 
 describe('ConnectionReconciliationService — WS6d detach restores design geometry', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('re-extends a previously-cut duct to its design centerline when no fitting connects it', () => {
     const duct = cutRun();
     const result = ConnectionReconciliationService.reconcile({ [duct.id]: duct }) as Record<string, Entity>;
@@ -56,19 +52,4 @@ describe('ConnectionReconciliationService — WS6d detach restores design geomet
     expect(reconciled.props.installLength).toBeCloseTo(pixelsToFeet(120), 6);
   });
 
-  it('leaves the cut geometry untouched when WS6D_DESIGN_GEOMETRY is off (legacy)', async () => {
-    vi.resetModules();
-    vi.doMock('@/core/flags/featureFlags', () => ({
-      isEnabled: (flag: string) => flag !== 'WS6D_DESIGN_GEOMETRY',
-    }));
-    const { ConnectionReconciliationService: Service } = await import('../ConnectionReconciliationService');
-
-    const duct = cutRun();
-    const result = Service.reconcile({ [duct.id]: duct }) as Record<string, Entity>;
-    const reconciled = result[duct.id] as DuctRun;
-
-    // Legacy: the detached duct stays cut (the asymmetry bug, preserved behind the flag).
-    expect(reconciled.props.endPoint).toEqual({ x: 200, y: 100 });
-    expect(reconciled.props.installLength).toBeCloseTo(pixelsToFeet(100), 6);
-  });
 });

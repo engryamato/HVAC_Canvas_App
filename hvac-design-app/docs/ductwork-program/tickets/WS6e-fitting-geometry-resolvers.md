@@ -1,7 +1,7 @@
 # TICKET WS6e — Fitting geometry resolvers + WS10 geometry half + §9D pipeline
 
 **Epic:** WS6 · **Milestone:** M4 · **Priority:** P0 (co-ships WS4; unblocks WS6a-A2) · **Effort:** ~30–45h — **the largest ticket; build in the E1–E6 order**
-**Type:** Geometry engine (extend existing resolvers) · **Status:** Ready · **Code changes:** none until all docs done
+**Type:** Geometry engine (extend existing resolvers) · **Status:** Implemented · **Code changes:** resolver/test suite landed
 **Gate:** `pnpm parity:check` (`[[core-flows-refactor-parity-gate]]`); air-only (`[[v1-air-ductwork-only-scope]]`).
 
 ## Context
@@ -66,7 +66,7 @@ Single command: `variant` change → resolve geometry + ports (E1–E5) → upda
 
 ## Rollback
 
-Behind the WS6 flag (co-shipped with WS4). Large; revert restores the pre-variant resolvers. Greenfield. Build + verify per-phase (E1→E6) so a partial revert is possible.
+Shipped default-on; the WS6d design-geometry flag branch has been retired. Revert restores the previous resolver behavior from git history. Build + verify per-phase (E1→E6) so a partial revert is possible.
 
 ## Files reference
 

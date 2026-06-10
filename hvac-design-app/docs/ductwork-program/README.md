@@ -61,7 +61,7 @@ Implementation-ready specs. Status: ✓ = specced **and implemented** (in branch
 - **Statement tags:** `[Verified]` (code-backed), `[Decision]` (settled), `[Proposal]` (to implement), `[Open]` (needs a decision).
 - **Gates:** `pnpm parity:check` (WS6f/WS6d/WS6e); **D11** gauge-table ratification (WS9/WS6a/WS6b, once); per-WS feature flags.
 - **Greenfield (D5):** new schema fields apply to new projects; old projects default on load (no migration).
-- **Implementation state** — every workstream (WS0–WS10, WS6a–WS6f) is specced **and implemented** in this branch's history. Remaining gaps are explicitly deferred and tracked in [WS7-followups.md](WS7-followups.md) (WS7-FU-001 full CSV reconcile) and the WS6e post-WS4 detection tail; see [WS9-engine-divergences.md](WS9-engine-divergences.md) for the resolved engine divergences.
+- **Implementation state** — every workstream (WS0–WS10, WS6a–WS6f) is specced **and implemented** in this branch's history. Auto-fitting is default-on with a persisted project toggle, WS7-FU-001 is reconciled through the canonical BOM adapter, and the WS9 divergence/todo set is resolved; see [WS7-followups.md](WS7-followups.md) and [WS9-engine-divergences.md](WS9-engine-divergences.md).
 
 ## Related memory (cross-session)
 `v1-air-ductwork-only-scope` · `program-decomposition-decisions` · `manual-duct-size-required` · `cost-estimation-gaps` · `interaction-architecture-plan` · `toolbar-tool-option-panels` · `duct-cutback-restore-asymmetry` · `core-flows-refactor-parity-gate`.

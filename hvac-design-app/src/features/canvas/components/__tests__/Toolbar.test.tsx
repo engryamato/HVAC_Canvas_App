@@ -375,13 +375,14 @@ describe('Toolbar - Undo/Redo Integration', () => {
       expect(screen.getByTestId('toolbar-icon-fitting')).toHaveAttribute('data-icon-key', 'fitting_elbow');
     });
 
-    it('should show equipment selector when equipment tool active', () => {
+    it('should activate equipment tool without rendering the retired equipment selector', () => {
       render(<Toolbar />);
 
       const equipmentButton = screen.getByLabelText(/equipment/i);
       fireEvent.click(equipmentButton);
 
-      expect(screen.getByText(/equipment type/i)).toBeDefined();
+      expect(useToolStore.getState().currentTool).toBe('equipment');
+      expect(screen.queryByText(/equipment type/i)).toBeNull();
     });
 
     it('should show fitting selector when fitting tool active', () => {

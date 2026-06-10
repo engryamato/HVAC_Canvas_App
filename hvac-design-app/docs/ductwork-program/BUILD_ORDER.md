@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-03 · No code yet; this is the implementation sequence once build starts.
 
-Ordered by dependency + leverage. Each wave can overlap internally; later waves assume earlier ones merged. **Gates:** `parity` = `pnpm parity:check`; `D11` = ratify the SMACNA gauge↔pressure-class↔weight table (once, shared); `flag` = per-workstream feature flag.
+Ordered by dependency + leverage. Each wave can overlap internally; later waves assume earlier ones merged. **Gates:** `parity` = `pnpm parity:check`; `D11` = ratify the SMACNA gauge↔pressure-class↔weight table (once, shared); historical `flag` gates are now default-on, with shipped WS8 and WS6d branches retired.
 
 ## Wave 0 — Scope + foundation (start here)
 

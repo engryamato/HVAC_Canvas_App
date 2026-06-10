@@ -135,6 +135,7 @@ export class ProjectInitializationService {
       projectName: projectInfo.name,
       location: projectInfo.location,
       estimator: projectInfo.estimator,
+      autoFittingEnabled: true,
       templateId: template.id,
       lastModified: new Date(),
     };
@@ -192,6 +193,7 @@ export class ProjectInitializationService {
       projectName: projectInfo.name,
       location: projectInfo.location,
       estimator: projectInfo.estimator,
+      autoFittingEnabled: true,
       lastModified: new Date(),
     };
   }

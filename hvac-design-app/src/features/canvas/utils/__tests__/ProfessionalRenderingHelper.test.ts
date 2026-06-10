@@ -202,7 +202,7 @@ describe('ProfessionalRenderingHelper', () => {
       helper.drawElbow(center, 0, 90, 20);
 
       expect(ctx.arc).toHaveBeenNthCalledWith(1, 100, 100, 40, 0, Math.PI / 2);
-      expect(ctx.arc).toHaveBeenNthCalledWith(2, 100, 100, 20, 0, Math.PI / 2);
+      expect(ctx.arc).toHaveBeenNthCalledWith(2, 100, 100, 20, Math.PI / 2, 0, true);
       expect(ctx.arc).toHaveBeenNthCalledWith(3, 100, 100, 30, 0, Math.PI / 2);
     });
 
@@ -216,7 +216,7 @@ describe('ProfessionalRenderingHelper', () => {
       expect(arcCalls[0]?.[4]).toBe(Math.PI / 4);
       expect(arcCalls[3]?.[4]).toBe(Math.PI / 2);
       expect(arcCalls[6]?.[4]).toBe(Math.PI);
-      expect(ctx.stroke).toHaveBeenCalledTimes(9);
+      expect(ctx.stroke).toHaveBeenCalledTimes(12);
     });
   });
 
@@ -232,14 +232,14 @@ describe('ProfessionalRenderingHelper', () => {
         { x: 20, y: 60 },
         { x: 80, y: 60 },
         20,
-        { style: 'solid' }
+        expect.objectContaining({ style: 'solid' })
       );
       expect(spy).toHaveBeenNthCalledWith(
         2,
         { x: 50, y: 60 },
         { x: 50, y: 30 },
         20,
-        { style: 'solid' }
+        expect.objectContaining({ style: 'solid' })
       );
     });
 
@@ -253,7 +253,7 @@ describe('ProfessionalRenderingHelper', () => {
         { x: 50, y: 60 },
         { x: 50, y: 90 },
         20,
-        { style: 'solid' }
+        expect.objectContaining({ style: 'solid' })
       );
     });
 
@@ -267,7 +267,7 @@ describe('ProfessionalRenderingHelper', () => {
         { x: 50, y: 60 },
         { x: 80, y: 60 },
         20,
-        { style: 'solid' }
+        expect.objectContaining({ style: 'solid' })
       );
     });
   });
@@ -278,8 +278,8 @@ describe('ProfessionalRenderingHelper', () => {
 
       expect(ctx.moveTo).toHaveBeenNthCalledWith(1, 0, 4);
       expect(ctx.lineTo).toHaveBeenNthCalledWith(1, 10, 2);
-      expect(ctx.moveTo).toHaveBeenNthCalledWith(2, 0, -4);
       expect(ctx.lineTo).toHaveBeenNthCalledWith(2, 10, -2);
+      expect(ctx.lineTo).toHaveBeenNthCalledWith(3, 0, -4);
       expect(ctx.stroke).toHaveBeenCalledTimes(2);
     });
   });

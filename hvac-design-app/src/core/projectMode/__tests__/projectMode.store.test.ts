@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useSettingsStore } from '@/core/store/settingsStore';
 import {
   areCostColumnsDefaultVisible,
+  isAutoFittingProjectSettingEnabled,
   getInitialSizePostureSource,
   getProjectMode,
 } from '../projectMode';
@@ -37,6 +38,24 @@ describe('projectMode ⇄ settings store (WS8)', () => {
     expect(areCostColumnsDefaultVisible()).toBe(false);
   });
 
+  it('new projects default auto-fitting on independent of mode', () => {
+    expect(useSettingsStore.getState().calculationSettings.autoFittingEnabled).toBe(true);
+    expect(isAutoFittingProjectSettingEnabled()).toBe(true);
+
+    useSettingsStore.getState().updateProjectMode('design');
+    expect(isAutoFittingProjectSettingEnabled()).toBe(true);
+
+    useSettingsStore.getState().updateProjectMode('estimation');
+    expect(isAutoFittingProjectSettingEnabled()).toBe(true);
+  });
+
+  it('persists a project-level auto-fitting override', () => {
+    useSettingsStore.getState().updateAutoFittingEnabled(false);
+
+    expect(useSettingsStore.getState().calculationSettings.autoFittingEnabled).toBe(false);
+    expect(isAutoFittingProjectSettingEnabled()).toBe(false);
+  });
+
   it('a settings object without projectMode reads as estimation (greenfield)', () => {
     const settings = useSettingsStore.getState().calculationSettings;
     // Simulate a pre-WS8 persisted project: strip the field.
@@ -44,5 +63,13 @@ describe('projectMode ⇄ settings store (WS8)', () => {
     useSettingsStore.getState().setCalculationSettings(legacy as typeof settings);
 
     expect(getProjectMode()).toBe('estimation');
+  });
+
+  it('a legacy settings object without autoFittingEnabled reads as enabled', () => {
+    const settings = useSettingsStore.getState().calculationSettings;
+    const { autoFittingEnabled: _omit, ...legacy } = settings;
+    useSettingsStore.getState().setCalculationSettings(legacy as typeof settings);
+
+    expect(isAutoFittingProjectSettingEnabled()).toBe(true);
   });
 });

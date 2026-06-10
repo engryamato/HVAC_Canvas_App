@@ -78,8 +78,9 @@ function buildSmoothElbow(dims: FittingDimensions, turnDeg: number): FittingGeom
   const turn = turnDeg * DEG;
   const tangent = radius * Math.tan(turn / 2);
   const inletCenter = roundPoint({ x: -tangent, y: 0 });
-  const outletDir = normalize({ x: Math.cos(turn), y: Math.sin(turn) });
-  const outletCenter = roundPoint({ x: tangent * outletDir.x, y: tangent * outletDir.y });
+  const outletAxis = normalize({ x: Math.cos(turn), y: Math.sin(turn) });
+  const outletDir = outletAxis;
+  const outletCenter = roundPoint({ x: tangent * outletAxis.x, y: tangent * outletAxis.y });
   const inletDir = { x: -1, y: 0 };
   const arcCenter = roundPoint({ x: -tangent, y: radius });
   const startAngle = Math.atan2(inletCenter.y - arcCenter.y, inletCenter.x - arcCenter.x);

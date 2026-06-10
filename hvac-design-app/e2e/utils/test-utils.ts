@@ -68,14 +68,14 @@ export async function openCanvas(page: Page, projectName: string = 'E2E Test Pro
     await page.getByTestId('create-button').click();
     
     // Verify redirection to canvas
-    await expect(page).toHaveURL(/\/canvas\//, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/canvas(?:\/|\?)/, { timeout: 15000 });
   } else {
     // Open first existing project
     // Note: In a real "clean slate" test env, we might want to always create new,
     // but for local dev/faster tests, reusing is fine if state is reset.
     // For specific tests, generating a unique project name helps.
     await projectCards.first().click();
-    await expect(page).toHaveURL(/\/canvas\//, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/canvas(?:\/|\?)/, { timeout: 15000 });
   }
 }
 

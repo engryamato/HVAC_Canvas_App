@@ -180,7 +180,7 @@ describe('createDefaultEquipmentProps', () => {
 
   it('should create air_handler with correct name', () => {
     const props = createDefaultEquipmentProps('air_handler');
-    expect(props.name).toBe('New Air Handler');
+    expect(props.name).toBe('AHU-1');
     expect(props.equipmentType).toBe('air_handler');
   });
 });

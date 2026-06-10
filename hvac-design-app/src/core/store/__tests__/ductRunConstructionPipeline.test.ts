@@ -39,6 +39,7 @@ const settings = (perPound?: Record<string, number>): CalculationSettings => ({
     frictionFactors: { galvanized: 0.0005, stainless: 0.00015, flexible: 0.003, fiberglass: 0.0003 },
     standardConditions: { temperature: 70, pressure: 29.92, altitude: 0 },
   },
+  autoFittingEnabled: true,
   ...(perPound ? { materialCostPerPound: perPound } : {}),
 });
 
