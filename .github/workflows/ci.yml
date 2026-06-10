@@ -32,5 +32,11 @@ jobs:
       - name: Verify app
         run: pnpm verify:all
         env:
+          NODE_ENV: test
+          NEXT_PUBLIC_DEBUG_MODE: false
+
+      - name: Production build
+        run: pnpm build
+        env:
           NODE_ENV: production
           NEXT_PUBLIC_DEBUG_MODE: false
