@@ -235,7 +235,9 @@ export function resolveFittingDimensions(fitting: Fitting): FittingDimensions {
     entryAngle:
       variant?.entryAngleDeg !== undefined && Number.isFinite(variant.entryAngleDeg)
         ? variant.entryAngleDeg
-        : 90,
+        : props.fittingType === 'takeoff' && props.angle !== undefined && Number.isFinite(props.angle)
+          ? props.angle
+          : 90,
     hasDamper: variant?.hasDamper ?? false,
   };
 }
@@ -348,5 +350,6 @@ export function bodyBounds(parts: FittingBodyPart[]): { x: number; y: number; wi
       points.push(part.from, part.control, part.to);
     }
   }
+
   return boundsOf(points);
 }

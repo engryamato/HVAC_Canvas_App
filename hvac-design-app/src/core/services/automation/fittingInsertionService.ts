@@ -798,13 +798,19 @@ export class FittingInsertionService {
       return { type: 'tee', branchAngle: 90 };
     }
 
-    const rawBranchAngle = Math.min(
-      this.calculateAngleDifference(branch.angle, main.first.angle),
-      this.calculateAngleDifference(branch.angle, main.second.angle)
+    // Measure the full branch angle (0–180) against the OUTLET's outward
+    // direction so the fore/aft lean survives: <90° leans toward the outlet,
+    // >90° leans back toward the inlet (reversed branch). The local fitting
+    // geometry uses the same convention, so the drawn branch follows the duct.
+    const inletIsFirst = main.first.endPoint === 'end' || main.second.endPoint !== 'end';
+    const outlet = inletIsFirst ? main.second : main.first;
+    const branchAngle = this.calculateAngleDifference(
+      this.outwardAngleForEndpoint(branch),
+      this.outwardAngleForEndpoint(outlet)
     );
-    // Fold to the acute branch angle off the main run (0–90).
-    const branchAngle = rawBranchAngle > 90 ? 180 - rawBranchAngle : rawBranchAngle;
-    const type = this.classifyTeeWyeWithHysteresis(branchAngle, previousType);
+    // Classification (tee vs wye) still keys off the acute fold.
+    const acuteBranchAngle = branchAngle > 90 ? 180 - branchAngle : branchAngle;
+    const type = this.classifyTeeWyeWithHysteresis(acuteBranchAngle, previousType);
     return { type, branchAngle };
   }
 
@@ -887,16 +893,19 @@ export class FittingInsertionService {
       return null;
     }
 
-    // Check if branch is perpendicular to main run (~90 degrees)
-    const rawBranchAngle = Math.min(
-      this.calculateAngleDifference(branch.angle, main.first.angle),
-      this.calculateAngleDifference(branch.angle, main.second.angle)
+    // Full branch angle (0–180) against the downstream trunk direction, so a
+    // back-leaning tap keeps its lean. Tap detection still keys off the acute fold.
+    const inletIsFirst = main.first.endPoint === 'end' || main.second.endPoint !== 'end';
+    const outlet = inletIsFirst ? main.second : main.first;
+    const branchAngle = this.calculateAngleDifference(
+      this.outwardAngleForEndpoint(branch),
+      this.outwardAngleForEndpoint(outlet)
     );
-    const branchAngle = rawBranchAngle > 90 ? 180 - rawBranchAngle : rawBranchAngle;
+    const acuteBranchAngle = branchAngle > 90 ? 180 - branchAngle : branchAngle;
 
     // Body tap: branch angle close to 90 degrees (perpendicular)
     const PERPENDICULAR_TOLERANCE = 20;
-    if (Math.abs(branchAngle - 90) > PERPENDICULAR_TOLERANCE) {
+    if (Math.abs(acuteBranchAngle - 90) > PERPENDICULAR_TOLERANCE) {
       return null;
     }
 
@@ -1220,6 +1229,11 @@ export class FittingInsertionService {
       const predicted = rotateVector(port.facingDirection, rotation, scaleY);
       return score + dot(predicted, this.outwardDirectionForEndpoint(assignment.branch));
     }, 0);
+  }
+
+  /** Outward direction angle (degrees) at a connection endpoint. */
+  private static outwardAngleForEndpoint(connection: ConnectionPoint): number {
+    return connection.endPoint === 'start' ? connection.angle : connection.angle + 180;
   }
 
   private static outwardDirectionForEndpoint(connection: ConnectionPoint): Point {

@@ -25,6 +25,8 @@ export {
   createEntity,
   createEntities,
   updateEntity,
+  updateEntities,
+  applyEntityChanges,
   deleteEntity,
   deleteEntities,
   moveEntities,

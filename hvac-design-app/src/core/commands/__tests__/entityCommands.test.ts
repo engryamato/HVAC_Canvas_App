@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createEntity, updateEntity, updateEntities, deleteEntity, undo, redo, splitDuctRunAtPoint } from '../entityCommands';
+import {
+  applyEntityChanges,
+  createEntity,
+  updateEntity,
+  updateEntities,
+  deleteEntity,
+  undo,
+  redo,
+  splitDuctRunAtPoint,
+} from '../entityCommands';
 import { useEntityStore, selectEntity, selectEntityCount } from '@/core/store/entityStore';
 import { useHistoryStore } from '../historyStore';
 import { useSelectionStore } from '@/features/canvas/store/selectionStore';
@@ -170,6 +179,78 @@ describe('Entity Commands', () => {
       const revertedFitting = selectEntity(fitting.id) as Fitting;
       expect(revertedDuct.props.diameter).toBe(12);
       expect(revertedFitting.calculated.equivalentLength).toBe(30);
+    });
+  });
+
+  describe('applyEntityChanges', () => {
+    it('applies mixed create, update, and delete operations as one undoable command', () => {
+      const existingRoom = createMockRoom('room-existing', 'Existing');
+      const removedRoom = createMockRoom('room-remove', 'Remove Me');
+      const createdRoom = createMockRoom('room-created', 'Created');
+      const updatedRoom = createMockRoom('room-existing', 'Updated');
+
+      createEntity(existingRoom);
+      createEntity(removedRoom);
+      useHistoryStore.getState().clear();
+
+      applyEntityChanges(
+        {
+          createEntities: [createdRoom],
+          updateEntities: [{ previous: existingRoom, next: updatedRoom }],
+          deleteEntities: [removedRoom],
+        },
+        { selectionAfter: [createdRoom.id, updatedRoom.id] }
+      );
+
+      expect(useHistoryStore.getState().past).toHaveLength(1);
+      expect((selectEntity(existingRoom.id) as Room).props.name).toBe('Updated');
+      expect(selectEntity(createdRoom.id)).toEqual(createdRoom);
+      expect(selectEntity(removedRoom.id)).toBeUndefined();
+      expect(useSelectionStore.getState().selectedIds).toEqual([createdRoom.id, updatedRoom.id]);
+      expect(useEntityStore.getState().allIds).toEqual([existingRoom.id, createdRoom.id]);
+
+      undo();
+      expect(selectEntity(createdRoom.id)).toBeUndefined();
+      expect((selectEntity(existingRoom.id) as Room).props.name).toBe('Existing');
+      expect(selectEntity(removedRoom.id)).toEqual(removedRoom);
+      expect(useEntityStore.getState().allIds).toEqual([existingRoom.id, removedRoom.id]);
+
+      redo();
+      expect((selectEntity(existingRoom.id) as Room).props.name).toBe('Updated');
+      expect(selectEntity(createdRoom.id)).toEqual(createdRoom);
+      expect(selectEntity(removedRoom.id)).toBeUndefined();
+      expect(useEntityStore.getState().allIds).toEqual([existingRoom.id, createdRoom.id]);
+    });
+
+    it('preserves Date values inside entity snapshots across undo and redo', () => {
+      const lastValidated = new Date('2026-01-01T00:00:00.000Z');
+      const previousDuct: Duct = {
+        ...createDuct({ name: 'Previous Duct' }),
+        id: 'duct-date-snapshot',
+      };
+      const nextDuct: Duct = {
+        ...previousDuct,
+        props: {
+          ...previousDuct.props,
+          airflow: 750,
+          constraintStatus: {
+            isValid: false,
+            violations: [{ type: 'geometry', severity: 'warning', message: 'Check geometry' }],
+            lastValidated,
+          },
+        },
+      };
+
+      createEntity(previousDuct);
+      useHistoryStore.getState().clear();
+
+      applyEntityChanges({ updateEntities: [{ previous: previousDuct, next: nextDuct }] });
+
+      expect(((selectEntity(previousDuct.id) as Duct).props.constraintStatus?.lastValidated)).toBeInstanceOf(Date);
+      undo();
+      redo();
+      expect(((selectEntity(previousDuct.id) as Duct).props.constraintStatus?.lastValidated)).toBeInstanceOf(Date);
+      expect(((selectEntity(previousDuct.id) as Duct).props.constraintStatus?.lastValidated)).toEqual(lastValidated);
     });
   });
 

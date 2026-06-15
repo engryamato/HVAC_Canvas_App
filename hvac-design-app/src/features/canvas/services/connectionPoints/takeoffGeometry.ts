@@ -38,8 +38,10 @@ import {
  */
 
 const DEFAULT_ENTRY_ANGLE = 90;
+// Full fore/aft range: <90° leans toward the +x outlet side, >90° leans back
+// toward the inlet side (reversed tap). The vector math is valid across it.
 const MIN_ENTRY_ANGLE = 30;
-const MAX_ENTRY_ANGLE = 90;
+const MAX_ENTRY_ANGLE = 150;
 
 const MAIN_AXIS: Point2D = { x: 1, y: 0 };
 

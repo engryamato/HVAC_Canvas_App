@@ -73,8 +73,8 @@ function createWye(): Fitting {
   };
 }
 
-describe('renderFitting body geometry (PR-8: real fill, no fake mask)', () => {
-  it('fills and strokes the parametric body instead of a background overlap rectangle', () => {
+describe('renderFitting SMACNA body rendering', () => {
+  it('fills the body with opaque white sheet metal and strokes the walls', () => {
     const ctx = createCtx();
     const context: RenderContext = {
       ctx,
@@ -86,18 +86,33 @@ describe('renderFitting body geometry (PR-8: real fill, no fake mask)', () => {
 
     renderFitting(createFitting(), context);
 
-    // The fitting now masks underlying ducts with its real (white) filled body,
+    // The fitting masks underlying ducts with its real opaque white body,
     // not a faked background-colored rectangle.
-    expect((ctx as any).fillStyleAssignments).toContain('rgba(255, 255, 255, 0.92)');
+    expect((ctx as any).fillStyleAssignments).toContain('#FFFFFF');
     expect((ctx as any).fillStyleAssignments).not.toContain('#f8fafc');
     expect(ctx.fillRect).not.toHaveBeenCalled();
     expect(ctx.fill).toHaveBeenCalled();
     expect(ctx.stroke).toHaveBeenCalled();
   });
+
+  it('strokes the union pass before filling so one merged outline survives', () => {
+    const ctx = createCtx();
+    const order: string[] = [];
+    (ctx.stroke as ReturnType<typeof vi.fn>).mockImplementation(() => order.push('stroke'));
+    (ctx.fill as ReturnType<typeof vi.fn>).mockImplementation(() => order.push('fill'));
+    const context: RenderContext = { ctx, zoom: 1, isSelected: false, isHovered: false, backgroundColor: '#fff' };
+
+    renderFitting(createWye(), context);
+
+    // First operation must be a body stroke (double-width pass), and at least
+    // one fill must come after it (covering interior strokes).
+    expect(order[0]).toBe('stroke');
+    expect(order.indexOf('fill')).toBeGreaterThan(0);
+  });
 });
 
-describe('renderFitting magnetic port decorations', () => {
-  it('draws magnetic markers and labels at every resolved wye port', () => {
+describe('renderFitting connection-point markers', () => {
+  it('draws a compact ring + core marker at every resolved wye port, with no debug text', () => {
     const ctx = createCtx();
     const labels: string[] = [];
     (ctx.fillText as ReturnType<typeof vi.fn>).mockImplementation((text: string) => {
@@ -107,10 +122,11 @@ describe('renderFitting magnetic port decorations', () => {
 
     renderFitting(createWye(), context);
 
-    // Three ports × (end-line + three marker circles) → markers present.
-    expect(labels).toEqual(expect.arrayContaining(['INLET', 'OUTLET', 'BRANCH']));
-    // 3 ports × 3 concentric circles = 9 marker arcs (end lines use moveTo/lineTo).
-    expect((ctx.arc as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThanOrEqual(9);
+    // Port ids are no longer painted on the canvas (labels were debug noise).
+    expect(labels).toEqual([]);
+    // 3 ports × 2 concentric circles (ring + core) = at least 6 marker arcs.
+    expect((ctx.arc as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThanOrEqual(6);
+    // CAD dashed centerlines are still drawn.
     expect(ctx.setLineDash).toHaveBeenCalled();
   });
 });

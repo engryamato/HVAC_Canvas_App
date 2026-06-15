@@ -48,6 +48,20 @@ interface EntityReplacementPayload {
   selection?: string[];
 }
 
+interface EntityChangeBatch {
+  createEntities?: Entity[];
+  updateEntities?: Array<{ previous: Entity; next: Entity }>;
+  deleteEntities?: Entity[];
+}
+
+interface EntityChangePayload {
+  createEntities: Entity[];
+  updateEntities: Array<{ id: string; updates: Partial<Entity> }>;
+  deleteEntityIds: string[];
+  entityOrder?: string[];
+  selection?: string[];
+}
+
 interface SplitDuctRunOptions extends CommandOptions {
   selectionAfter?: string[];
 }
@@ -75,6 +89,23 @@ function applySelection(selection?: string[]): void {
     return;
   }
   useSelectionStore.getState().selectMultiple([...selection]);
+}
+
+function cloneEntity<T extends Entity>(entity: T): T {
+  return structuredClone(entity);
+}
+
+function restoreEntityOrder(entityOrder?: string[]): void {
+  if (!entityOrder) {
+    return;
+  }
+
+  useEntityStore.setState((state) => {
+    const orderedExistingIds = entityOrder.filter((id) => state.byId[id]);
+    const orderedSet = new Set(orderedExistingIds);
+    const remainingIds = state.allIds.filter((id) => state.byId[id] && !orderedSet.has(id));
+    state.allIds = [...orderedExistingIds, ...remainingIds];
+  });
 }
 
 function executeAndRecord(command: ReversibleCommand): void {
@@ -748,6 +779,60 @@ export function updateEntities(
 }
 
 /**
+ * Apply mixed creates, updates, and deletes as a single undoable history entry.
+ * This is used by higher-level reconciliation flows where several entity-level
+ * operations together represent one user action.
+ */
+export function applyEntityChanges(changes: EntityChangeBatch, options?: CommandOptions): void {
+  const createEntities = changes.createEntities ?? [];
+  const updateEntityPairs = changes.updateEntities ?? [];
+  const deleteEntities = changes.deleteEntities ?? [];
+
+  if (createEntities.length === 0 && updateEntityPairs.length === 0 && deleteEntities.length === 0) {
+    return;
+  }
+
+  const selection = captureSelection(options);
+  const entityOrderBefore = [...useEntityStore.getState().allIds];
+  const deletedIds = new Set(deleteEntities.map((entity) => entity.id));
+  const entityOrderAfterBase = entityOrderBefore.filter((id) => !deletedIds.has(id));
+  const entityOrderAfterSet = new Set(entityOrderAfterBase);
+  const entityOrderAfter = [
+    ...entityOrderAfterBase,
+    ...createEntities.map((entity) => entity.id).filter((id) => !entityOrderAfterSet.has(id)),
+  ];
+
+  const command: ReversibleCommand = {
+    id: generateCommandId(),
+    type: CommandType.APPLY_ENTITY_CHANGES,
+    payload: {
+      createEntities: createEntities.map(cloneEntity),
+      updateEntities: updateEntityPairs.map((item) => ({ id: item.next.id, updates: cloneEntity(item.next) })),
+      deleteEntityIds: deleteEntities.map((entity) => entity.id),
+      entityOrder: entityOrderAfter,
+      selection: selection.after,
+    } satisfies EntityChangePayload,
+    timestamp: Date.now(),
+    inverse: {
+      id: generateCommandId(),
+      type: CommandType.APPLY_ENTITY_CHANGES,
+      payload: {
+        createEntities: deleteEntities.map(cloneEntity),
+        updateEntities: updateEntityPairs.map((item) => ({ id: item.previous.id, updates: cloneEntity(item.previous) })),
+        deleteEntityIds: createEntities.map((entity) => entity.id),
+        entityOrder: entityOrderBefore,
+        selection: selection.before,
+      } satisfies EntityChangePayload,
+      timestamp: Date.now(),
+    },
+    selectionBefore: selection.before,
+    selectionAfter: selection.after,
+  };
+
+  executeAndRecord(command);
+}
+
+/**
  * Delete an entity from the canvas
  * Stores the entity for undo support
  * Can be called with either entity ID (string) or Entity object
@@ -980,6 +1065,30 @@ function executeCommand(command: Command): void {
       const { entityIds, selection } = command.payload as { entityIds: string[]; selection?: string[] };
       entityStore.removeEntities(entityIds);
       entityIds.forEach((id) => useValidationStore.getState().clearValidation(id));
+      applySelection(selection);
+      break;
+    }
+
+    case CommandType.APPLY_ENTITY_CHANGES: {
+      const { createEntities, updateEntities, deleteEntityIds, entityOrder, selection } =
+        command.payload as EntityChangePayload;
+
+      if (deleteEntityIds.length > 0) {
+        entityStore.removeEntities(deleteEntityIds);
+        deleteEntityIds.forEach((id) => useValidationStore.getState().clearValidation(id));
+      }
+
+      if (createEntities.length > 0) {
+        entityStore.addEntities(createEntities);
+        createEntities.forEach((entity) => syncEntityValidation(entity));
+      }
+
+      updateEntities.forEach(({ id, updates }) => {
+        entityStore.updateEntity(id, updates);
+        syncEntityValidationById(id);
+      });
+
+      restoreEntityOrder(entityOrder);
       applySelection(selection);
       break;
     }

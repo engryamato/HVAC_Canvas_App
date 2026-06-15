@@ -3,9 +3,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { redo, undo, useCanRedo, useCanUndo, useHistoryStore } from '@/core/commands';
+import { applyEntityChanges, redo, undo, useCanRedo, useCanUndo, useHistoryStore } from '@/core/commands';
 import type { ReversibleCommand } from '@/core/commands';
 import type { Entity } from '@/core/schema';
+import { fittingInsertionService } from '@/core/services/automation/fittingInsertionService';
 import { useCalculationSettingsStore } from '@/core/store/calculationSettingsStore';
 import { DEFAULT_PROJECT_MODE, type ProjectMode } from '@/core/projectMode/projectMode';
 import { useDialogStore } from '@/core/store/dialogStore';
@@ -356,6 +357,9 @@ function commandTypeLabel(command: Pick<ReversibleCommand, 'type' | 'payload'>):
   const payload = command.payload as {
     entity?: EntityLike;
     entities?: EntityLike[];
+    createEntities?: EntityLike[];
+    updateEntities?: unknown[];
+    deleteEntityIds?: string[];
     updates?: { type?: string };
     transforms?: unknown[];
   };
@@ -369,6 +373,9 @@ function commandTypeLabel(command: Pick<ReversibleCommand, 'type' | 'payload'>):
   if (payload.transforms?.length) {
     return 'Entity';
   }
+  if (payload.createEntities || payload.updateEntities || payload.deleteEntityIds) {
+    return 'Entity Changes';
+  }
   return titleize(command.type.replace(/_ENTITY|_ENTITIES/g, ''));
 }
 
@@ -376,6 +383,9 @@ function commandTarget(command: Pick<ReversibleCommand, 'type' | 'payload'>): st
   const payload = command.payload as {
     entity?: EntityLike;
     entities?: EntityLike[];
+    createEntities?: EntityLike[];
+    updateEntities?: unknown[];
+    deleteEntityIds?: string[];
     id?: string;
     ids?: string[];
     transforms?: unknown[];
@@ -389,6 +399,13 @@ function commandTarget(command: Pick<ReversibleCommand, 'type' | 'payload'>): st
   }
   if (payload.transforms?.length) {
     return `${payload.transforms.length} item${payload.transforms.length === 1 ? '' : 's'}`;
+  }
+  if (payload.createEntities || payload.updateEntities || payload.deleteEntityIds) {
+    const changeCount =
+      (payload.createEntities?.length ?? 0) +
+      (payload.updateEntities?.length ?? 0) +
+      (payload.deleteEntityIds?.length ?? 0);
+    return `${changeCount} change${changeCount === 1 ? '' : 's'}`;
   }
   if (payload.ids?.length) {
     return `${payload.ids.length} items`;
@@ -555,12 +572,82 @@ export function useInspectorOverviewData(): InspectorPanelProps {
   );
 
   const onAutoFixGeometry = useCallback(() => {
+    const storeEntities = useEntityStore.getState().byId as Record<string, Entity>;
+    const autoFittingPlan = fittingInsertionService.buildReRunPlan(storeEntities);
+    const autoFittingResult = fittingInsertionService.resolveReRunPlan(autoFittingPlan, storeEntities);
+
+    const createEntities: Entity[] = [];
+    const updateEntities: Array<{ previous: Entity; next: Entity }> = [];
+    const deleteEntities: Entity[] = [];
+
+    for (const operation of autoFittingResult.operations) {
+      if (operation.action === 'insert') {
+        createEntities.push(operation.next);
+        continue;
+      }
+
+      if (operation.action === 'remove') {
+        deleteEntities.push(operation.previous);
+        continue;
+      }
+
+      updateEntities.push({ previous: operation.previous, next: operation.next });
+    }
+
+    const remainingChangedEntityIds = [
+      ...createEntities.map((entity) => entity.id),
+      ...updateEntities.map((item) => item.next.id),
+    ];
+    const changedEntityIds = [
+      ...remainingChangedEntityIds,
+      ...deleteEntities.map((entity) => entity.id),
+    ];
+
+    if (changedEntityIds.length > 0) {
+      const deletedIds = new Set(deleteEntities.map((entity) => entity.id));
+      const selectionAfter = remainingChangedEntityIds.length > 0
+        ? remainingChangedEntityIds
+        : useSelectionStore.getState().selectedIds.filter((id) => !deletedIds.has(id));
+
+      applyEntityChanges(
+        { createEntities, updateEntities, deleteEntities },
+        { selectionAfter }
+      );
+    }
+
     commitNetwork();
     const repairPlan = buildGeometryRepairPlan(useValidationStore.getState().validationResults);
-    if (repairPlan.changedEntityIds.length > 0) {
+    const unresolvedCount = repairPlan.changedEntityIds.length;
+    if (unresolvedCount > 0) {
       selectMultiple(repairPlan.changedEntityIds);
+      if (changedEntityIds.length > 0) {
+        useHistoryStore.setState((state) => {
+          const latestCommand = state.past[state.past.length - 1];
+          if (latestCommand?.type !== 'APPLY_ENTITY_CHANGES') {
+            return;
+          }
+          latestCommand.selectionAfter = repairPlan.changedEntityIds;
+        });
+      }
     }
-    setActionStatus(repairPlan.message);
+
+    const summary = [
+      `${autoFittingResult.insertedCount} inserted`,
+      `${autoFittingResult.updatedCount} updated`,
+      `${autoFittingResult.removedCount} removed`,
+    ].join(', ');
+    const skippedSummary = autoFittingResult.skippedChangedCount > 0
+      ? ` ${autoFittingResult.skippedChangedCount} auto-fitting change${autoFittingResult.skippedChangedCount === 1 ? '' : 's'} skipped.`
+      : '';
+    const unresolvedSummary = unresolvedCount > 0
+      ? ` ${unresolvedCount} geometry issue${unresolvedCount === 1 ? '' : 's'} still need attention.`
+      : '';
+
+    setActionStatus(
+      changedEntityIds.length > 0
+        ? `Auto-fixed geometry: ${summary}. ${autoFittingResult.manualOverridesPreserved} manual override${autoFittingResult.manualOverridesPreserved === 1 ? '' : 's'} preserved.${skippedSummary}${unresolvedSummary}`
+        : repairPlan.message
+    );
   }, [commitNetwork, selectMultiple]);
 
   const sectionStates = useMemo(

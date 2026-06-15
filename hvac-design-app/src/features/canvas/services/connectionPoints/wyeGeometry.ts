@@ -44,8 +44,10 @@ export interface WyeGeometry {
 
 const BRANCH_TAPER_ANGLE = (13 * Math.PI) / 180;
 const DEFAULT_WYE_BRANCH_ANGLE = 45;
+// Full fore/aft range: <90° leans toward the outlet, >90° leans back toward the
+// inlet (reversed branch). The parametric cone math is valid across the range.
 const MIN_WYE_BRANCH_ANGLE = 15;
-const MAX_WYE_BRANCH_ANGLE = 75;
+const MAX_WYE_BRANCH_ANGLE = 165;
 
 /**
  * @param branchAngleDeg Angle of the branch relative to the main run (degrees),
@@ -76,14 +78,37 @@ export function buildWyeGeometry(
   const topWallY = -Dc / 2;
   const xJw = 1.25 * Dc;
   const Lb = 1.95 * Db;
-  const Jw: Point2D = { x: xJw, y: topWallY };
-  const Tc: Point2D = { x: Jw.x + Lb * d.x, y: Jw.y + Lb * d.y };
-  const Tb1: Point2D = { x: Tc.x + (Db / 2) * p.x, y: Tc.y + (Db / 2) * p.y };
-  const Tb2: Point2D = { x: Tc.x - (Db / 2) * p.x, y: Tc.y - (Db / 2) * p.y };
+  let Jw: Point2D = { x: xJw, y: topWallY };
+  let Tc: Point2D = { x: Jw.x + Lb * d.x, y: Jw.y + Lb * d.y };
+  let Tb1: Point2D = { x: Tc.x + (Db / 2) * p.x, y: Tc.y + (Db / 2) * p.y };
+  let Tb2: Point2D = { x: Tc.x - (Db / 2) * p.x, y: Tc.y - (Db / 2) * p.y };
   const Lap = Db / 2 / Math.tan(BRANCH_TAPER_ANGLE);
-  const A: Point2D = { x: Tc.x + Lap * d.x, y: Tc.y + Lap * d.y };
-  const W1 = intersectAtY(A, Tb1, topWallY);
-  const W2 = intersectAtY(A, Tb2, topWallY);
+  let A: Point2D = { x: Tc.x + Lap * d.x, y: Tc.y + Lap * d.y };
+  let W1 = intersectAtY(A, Tb1, topWallY);
+  let W2 = intersectAtY(A, Tb2, topWallY);
+
+  // Keep the cone root seated on the common-section wall. A back-leaning
+  // (reversed, >90°) branch can push the wall intersections past the inlet
+  // face; shift the whole branch along +x so the root stays on the body.
+  const rootMinX = Math.min(W1.x, W2.x);
+  const rootMaxX = Math.max(W1.x, W2.x);
+  const margin = 0.15 * Dc;
+  let shiftX = 0;
+  if (rootMinX < margin) {
+    shiftX = margin - rootMinX;
+  } else if (rootMaxX > xR0 - margin) {
+    shiftX = Math.max(margin - rootMinX, xR0 - margin - rootMaxX);
+  }
+  if (shiftX !== 0) {
+    const sx = (point: Point2D): Point2D => ({ x: point.x + shiftX, y: point.y });
+    Jw = sx(Jw);
+    Tc = sx(Tc);
+    Tb1 = sx(Tb1);
+    Tb2 = sx(Tb2);
+    A = sx(A);
+    W1 = sx(W1);
+    W2 = sx(W2);
+  }
 
   // Center the main run horizontally; keep the main axis on y = 0.
   const cx = xEnd / 2;

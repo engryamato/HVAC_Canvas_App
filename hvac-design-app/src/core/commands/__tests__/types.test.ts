@@ -14,6 +14,7 @@ describe('CommandType', () => {
   it('should have all batch command types', () => {
     expect(CommandType.CREATE_ENTITIES).toBe('CREATE_ENTITIES');
     expect(CommandType.DELETE_ENTITIES).toBe('DELETE_ENTITIES');
+    expect(CommandType.APPLY_ENTITY_CHANGES).toBe('APPLY_ENTITY_CHANGES');
   });
 
   it('should have all group command types', () => {

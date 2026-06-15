@@ -1,3 +1,5 @@
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { ProjectCostEstimate } from '../cost/costCalculationService';
 import { BOMExportRow } from './bomExportService';
 
@@ -12,34 +14,57 @@ export interface PDFExportOptions {
   pageSize: 'letter' | 'a4';
 }
 
+const PAGE_MARGIN = 14;
+const BRAND_COLOR: [number, number, number] = [37, 99, 235];
+const TABLE_HEAD_COLOR: [number, number, number] = [243, 244, 246];
+const TABLE_TEXT_COLOR: [number, number, number] = [17, 24, 39];
+
 /**
  * PDF Generator Service
- * 
- * Generates professional PDF reports for project documentation
+ *
+ * Generates professional PDF reports for project documentation.
  */
 export class PDFGenerator {
   /**
-   * Generate a complete project report as PDF
-   * Note: This is a placeholder implementation. In production, use a library like jsPDF or Puppeteer.
+   * Generate a complete project report as PDF.
    */
   static generateProjectReport(
     options: PDFExportOptions,
-    bomRows?: BOMExportRow[],
+    bomRows: BOMExportRow[] = [],
     costEstimate?: ProjectCostEstimate
   ): Uint8Array {
-    // Placeholder: Return empty PDF bytes
-    // In production, this would use jsPDF or similar library
-    const placeholder = new Uint8Array([0x25, 0x50, 0x44, 0x46]); // %PDF header
-    
-    console.log('Generating PDF report:', {
-      project: options.projectName,
-      includeBOM: options.includeBOM,
-      includePricing: options.includePricing,
-      bomItemCount: bomRows?.length,
-      totalCost: costEstimate?.breakdown.totalCost,
+    const doc = new jsPDF({
+      unit: 'mm',
+      format: options.pageSize,
+      compress: false,
     });
-    
-    return placeholder;
+
+    const generatedAt = new Date();
+    let y = PAGE_MARGIN;
+
+    y = this.addTitlePage(doc, options, generatedAt, bomRows, costEstimate, y);
+
+    if (options.includeBOM) {
+      y = this.ensureSpace(doc, y, 48);
+      y = this.addBOMSection(doc, bomRows, options, y);
+    }
+
+    if (options.includePricing && costEstimate) {
+      y = this.ensureSpace(doc, y, 62);
+      y = this.addCostSection(doc, costEstimate, y);
+    }
+
+    if (options.includeCanvasSnapshot) {
+      y = this.ensureSpace(doc, y, 24);
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9);
+      doc.setTextColor(107, 114, 128);
+      doc.text('Canvas snapshot export is deferred to a future report format.', PAGE_MARGIN, y);
+    }
+
+    this.addFooters(doc);
+
+    return new Uint8Array(doc.output('arraybuffer'));
   }
 
   /**
@@ -50,9 +75,12 @@ export class PDFGenerator {
     bomRows?: BOMExportRow[],
     costEstimate?: ProjectCostEstimate
   ): string {
-    const title = `${options.projectName} - Project Report`;
+    const title = this.escapeHTML(`${options.projectName} - Project Report`);
     const date = new Date().toLocaleDateString();
-    
+    const projectName = this.escapeHTML(options.projectName);
+    const projectNumber = this.escapeHTML(options.projectNumber || 'N/A');
+    const clientName = this.escapeHTML(options.clientName || 'N/A');
+
     let html = `
 <!DOCTYPE html>
 <html>
@@ -72,10 +100,10 @@ export class PDFGenerator {
   </style>
 </head>
 <body>
-  <h1>${options.projectName}</h1>
+  <h1>${projectName}</h1>
   <div class="summary">
-    <p><strong>Project Number:</strong> ${options.projectNumber || 'N/A'}</p>
-    <p><strong>Client:</strong> ${options.clientName || 'N/A'}</p>
+    <p><strong>Project Number:</strong> ${projectNumber}</p>
+    <p><strong>Client:</strong> ${clientName}</p>
     <p><strong>Date:</strong> ${date}</p>
     <p><strong>Page Size:</strong> ${options.pageSize.toUpperCase()}</p>
   </div>
@@ -85,7 +113,7 @@ export class PDFGenerator {
       html += this.generateBOMSection(bomRows, options.includePricing);
     }
 
-    if (costEstimate) {
+    if (options.includePricing && costEstimate) {
       html += this.generateCostSection(costEstimate);
     }
 
@@ -97,6 +125,220 @@ export class PDFGenerator {
 </html>`;
 
     return html;
+  }
+
+  private static addTitlePage(
+    doc: jsPDF,
+    options: PDFExportOptions,
+    generatedAt: Date,
+    bomRows: BOMExportRow[],
+    costEstimate: ProjectCostEstimate | undefined,
+    y: number
+  ): number {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(...BRAND_COLOR);
+    doc.text('SizeWise HVAC Canvas', PAGE_MARGIN, y);
+
+    y += 11;
+    doc.setFontSize(16);
+    doc.setTextColor(...TABLE_TEXT_COLOR);
+    doc.text(`${options.projectName} - Project Report`, PAGE_MARGIN, y);
+
+    y += 10;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Generated: ${generatedAt.toLocaleString()}`, PAGE_MARGIN, y);
+    y += 6;
+    doc.text(`Project Number: ${options.projectNumber || 'N/A'}`, PAGE_MARGIN, y);
+    y += 6;
+    doc.text(`Client: ${options.clientName || 'N/A'}`, PAGE_MARGIN, y);
+    y += 10;
+
+    const summaryRows = [
+      ['BOM Rows', String(bomRows.length)],
+      ['Pricing Included', options.includePricing ? 'Yes' : 'No'],
+      ['Engineering Notes Included', options.includeEngineeringNotes ? 'Yes' : 'No'],
+      ['Page Size', options.pageSize.toUpperCase()],
+    ];
+
+    if (options.includePricing && costEstimate) {
+      summaryRows.push(['Confident Total', this.formatCurrency(costEstimate.confidentSubtotal ?? costEstimate.breakdown.totalCost)]);
+      summaryRows.push(['Unpriced Items', String(costEstimate.unpricedCount ?? 0)]);
+    }
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Project Summary', 'Value']],
+      body: summaryRows,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { fillColor: BRAND_COLOR, textColor: [255, 255, 255] },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 60 } },
+    });
+
+    return this.afterTableY(doc, y) + 10;
+  }
+
+  private static addBOMSection(
+    doc: jsPDF,
+    rows: BOMExportRow[],
+    options: PDFExportOptions,
+    y: number
+  ): number {
+    this.addSectionHeading(doc, 'Bill of Materials', y);
+    y += 6;
+
+    if (rows.length === 0) {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9);
+      doc.setTextColor(107, 114, 128);
+      doc.text('No bill of materials rows are available for this project.', PAGE_MARGIN, y);
+      return y + 8;
+    }
+
+    const head = ['ID', 'Category', 'Description', 'Qty', 'Unit', 'Size', 'Material'];
+    if (options.includePricing) {
+      head.push('Material Cost', 'Labor Cost', 'Total Cost');
+    }
+    if (options.includeEngineeringNotes) {
+      head.push('Velocity (FPM)', 'Pressure Drop (in.w.g./100ft)');
+    }
+
+    const body = rows.map((row) => {
+      const cells = [
+        row.id,
+        row.subcategory ? `${row.category} / ${row.subcategory}` : row.category,
+        row.description,
+        this.formatNumber(row.quantity),
+        row.unit,
+        row.size ?? '',
+        row.material ?? '',
+      ];
+
+      if (options.includePricing) {
+        cells.push(
+          row.unpriced ? 'Unpriced' : this.formatNullableCurrency(row.materialCost),
+          row.unpriced ? 'Unpriced' : this.formatNullableCurrency(row.laborCost),
+          row.unpriced ? 'Unpriced' : this.formatNullableCurrency(row.totalCost)
+        );
+      }
+
+      if (options.includeEngineeringNotes) {
+        cells.push(row.velocity?.toFixed(0) ?? '', row.pressureDrop?.toFixed(4) ?? '');
+      }
+
+      return cells;
+    });
+
+    autoTable(doc, {
+      startY: y,
+      head: [head],
+      body,
+      theme: 'grid',
+      styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak' },
+      headStyles: { fillColor: TABLE_HEAD_COLOR, textColor: TABLE_TEXT_COLOR },
+      columnStyles: {
+        0: { cellWidth: 18 },
+        1: { cellWidth: 24 },
+        2: { cellWidth: 42 },
+      },
+    });
+
+    return this.afterTableY(doc, y) + 10;
+  }
+
+  private static addCostSection(doc: jsPDF, estimate: ProjectCostEstimate, y: number): number {
+    this.addSectionHeading(doc, 'Cost Summary', y);
+    y += 6;
+
+    const body = [
+      ['Material Cost', this.formatCurrency(estimate.breakdown.materialCost)],
+      ['Labor Cost', this.formatCurrency(estimate.breakdown.laborCost)],
+      ['Subtotal', this.formatCurrency(estimate.breakdown.subtotal)],
+      ['Markup', this.formatCurrency(estimate.breakdown.markup)],
+      ['Overhead', this.formatCurrency(estimate.breakdown.overhead)],
+      ['Tax', this.formatCurrency(estimate.breakdown.tax)],
+      ['Total Cost', this.formatCurrency(estimate.breakdown.totalCost)],
+      ['Confident Subtotal', this.formatCurrency(estimate.confidentSubtotal ?? estimate.breakdown.totalCost)],
+      [
+        'Estimate Quality',
+        `${estimate.unpricedCount ?? 0} unpriced · ${estimate.gaugeSplitLineCount ?? 0} gauge-split lines · ${estimate.inferredSizeCount ?? 0} inferred sizes`,
+      ],
+    ];
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Cost Component', 'Amount / Status']],
+      body,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { fillColor: BRAND_COLOR, textColor: [255, 255, 255] },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.row.index === 6) {
+          data.cell.styles.fontStyle = 'bold';
+        }
+      },
+    });
+
+    return this.afterTableY(doc, y) + 10;
+  }
+
+  private static addSectionHeading(doc: jsPDF, heading: string, y: number): void {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...TABLE_TEXT_COLOR);
+    doc.text(heading, PAGE_MARGIN, y);
+  }
+
+  private static addFooters(doc: jsPDF): void {
+    const pageCount = doc.getNumberOfPages();
+    for (let page = 1; page <= pageCount; page += 1) {
+      doc.setPage(page);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(107, 114, 128);
+      doc.text('SizeWise HVAC Canvas', PAGE_MARGIN, pageHeight - 8);
+      doc.text(`Page ${page} of ${pageCount}`, pageWidth - PAGE_MARGIN, pageHeight - 8, { align: 'right' });
+    }
+  }
+
+  private static ensureSpace(doc: jsPDF, y: number, neededHeight: number): number {
+    const pageHeight = doc.internal.pageSize.getHeight();
+    if (y + neededHeight <= pageHeight - PAGE_MARGIN) {
+      return y;
+    }
+    doc.addPage();
+    return PAGE_MARGIN;
+  }
+
+  private static afterTableY(doc: jsPDF, fallback: number): number {
+    const lastTable = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable;
+    return lastTable?.finalY ?? fallback;
+  }
+
+  private static formatCurrency(value: number): string {
+    return `$${value.toFixed(2)}`;
+  }
+
+  private static formatNullableCurrency(value: number | null | undefined): string {
+    return value === null || value === undefined ? '' : this.formatCurrency(value);
+  }
+
+  private static formatNumber(value: number): string {
+    return Number.isInteger(value) ? String(value) : value.toFixed(2);
+  }
+
+  private static escapeHTML(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   private static generateBOMSection(rows: BOMExportRow[], includePricing: boolean): string {
@@ -118,12 +360,12 @@ export class PDFGenerator {
 
     for (const row of rows) {
       html += `      <tr>
-        <td>${row.category}</td>
-        <td>${row.description}</td>
+        <td>${this.escapeHTML(row.category)}</td>
+        <td>${this.escapeHTML(row.description)}</td>
         <td>${row.quantity}</td>
-        <td>${row.unit}</td>
-        <td>${row.size || '-'}</td>
-        ${includePricing ? `<td>$${row.materialCost?.toFixed(2) || '0.00'}</td><td>$${row.totalCost?.toFixed(2) || '0.00'}</td>` : ''}
+        <td>${this.escapeHTML(row.unit)}</td>
+        <td>${this.escapeHTML(row.size || '-')}</td>
+        ${includePricing ? `<td>${row.unpriced ? 'Unpriced' : `$${row.materialCost?.toFixed(2) || '0.00'}`}</td><td>${row.unpriced ? 'Unpriced' : `$${row.totalCost?.toFixed(2) || '0.00'}`}</td>` : ''}
       </tr>
 `;
     }
@@ -137,7 +379,7 @@ export class PDFGenerator {
 
   private static generateCostSection(estimate: ProjectCostEstimate): string {
     const b = estimate.breakdown;
-    
+
     return `
   <h2>Cost Summary</h2>
   <div class="summary">

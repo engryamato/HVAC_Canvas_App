@@ -95,8 +95,10 @@ function bodyLength(primary: number): number {
 }
 
 const DEFAULT_TEE_BRANCH_ANGLE = 90;
-const MIN_TEE_BRANCH_ANGLE = 45;
-const MAX_TEE_BRANCH_ANGLE = 90;
+// Full fore/aft range: <90 leans toward the outlet, >90 leans back toward the
+// inlet (reversed branch). The vector math below is valid across the range.
+const MIN_TEE_BRANCH_ANGLE = 30;
+const MAX_TEE_BRANCH_ANGLE = 150;
 
 function buildTee(dims: FittingDimensions): FittingGeometry {
   const mainH = dims.inletSize;
@@ -105,8 +107,9 @@ function buildTee(dims: FittingDimensions): FittingGeometry {
   const bx = 0; // branch root centered on the main run
   const branchLen = mainH / 2 + bodyLength(branchH) * 0.45;
 
-  // Branch leans toward the outlet by `theta` from the main run. 90° = the
-  // classic perpendicular tee, which reproduces the original geometry exactly.
+  // Branch angle is measured from the outlet (+x) direction: 90° = the classic
+  // perpendicular tee, <90° leans toward the outlet, >90° leans back toward the
+  // inlet (reversed branch).
   const theta =
     (Math.min(MAX_TEE_BRANCH_ANGLE, Math.max(MIN_TEE_BRANCH_ANGLE, dims.angle || DEFAULT_TEE_BRANCH_ANGLE)) *
       Math.PI) /

@@ -143,6 +143,30 @@ describe('inspector overview data helpers', () => {
     expect(activity[0].target).not.toContain('06d8ae67');
   });
 
+  it('summarizes mixed entity change commands in recent activity', () => {
+    const activity = buildActivityItems(
+      [
+        {
+          id: '1',
+          type: 'APPLY_ENTITY_CHANGES',
+          payload: {
+            createEntities: [{ id: 'created', type: 'fitting' }],
+            updateEntities: [{ id: 'updated', updates: { id: 'updated', type: 'fitting' } }],
+            deleteEntityIds: ['removed'],
+          },
+          timestamp: 1000,
+        },
+      ] as never,
+      new Date(3000)
+    );
+
+    expect(activity[0]).toMatchObject({
+      action: 'Modified',
+      type: 'Entity Changes',
+      target: '3 changes',
+    });
+  });
+
   it('builds focus metadata for inspector selections', () => {
     expect(buildInspectorFocusRequest(['a', 'a', 'b'])).toEqual({
       ids: ['a', 'b'],
